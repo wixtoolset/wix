@@ -13,20 +13,25 @@
 #include <msi.h>
 #include <wininet.h>
 #include <CommCtrl.h>
+#include <intsafe.h>
 #include <strsafe.h>
 
 #include <dutil.h>
 #include <apputil.h>
+#include <buffutil.h>
 #include <pathutil.h>
 #include <locutil.h>
 #include <memutil.h>
 #include <dictutil.h>
+#include <fileutil.h>
+#include <pipeutil.h>
+#include <regutil.h>
 #include <strutil.h>
 #include <thmutil.h>
 #include <xmlutil.h>
 
-#include <BootstrapperEngine.h>
-#include <BootstrapperApplication.h>
+#include <baenginetypes.h>
+#include <batypes.h>
 
 #include "IBootstrapperEngine.h"
 #include "IBootstrapperApplication.h"
@@ -39,3 +44,6 @@
 #include "balcondition.h"
 #include "balinfo.h"
 #include "balretry.h"
+
+#include "BalBaseBAFunctionsProc.h"
+#include "msg.h"

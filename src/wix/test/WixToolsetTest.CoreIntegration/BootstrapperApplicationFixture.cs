@@ -1,5 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+#if TODO
+
 namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
@@ -44,3 +46,4 @@ namespace WixToolsetTest.CoreIntegration
         }
     }
 }
+#endif

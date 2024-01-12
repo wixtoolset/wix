@@ -2,10 +2,16 @@
 
 namespace WixToolset.Core
 {
+    using System;
     using WixToolset.Data;
 
     internal static class CompilerErrors
     {
+        public static Message AlreadyDefinedBootstrapperApplicationSource(SourceLineNumber sourceLineNumbers, SourceLineNumber originalSourceLineNumbers, string originalElementName)
+        {
+            return Message(sourceLineNumbers, Ids.AlreadyDefinedBootstrapperApplicationSource, "More than one BootstrapperApplication source file was specified. Only one is allowed. Another BootstrapperApplication source file was defined via the {0} element at {1}.", originalElementName, originalSourceLineNumbers.ToString());
+        }
+
         public static Message IllegalCharactersInProvider(SourceLineNumber sourceLineNumbers, string attributeName, char illegalChar, string illegalChars)
         {
             return Message(sourceLineNumbers, Ids.IllegalCharactersInProvider, "The provider key authored into the {0} attribute contains an illegal character, '{1}'. Please author the provider key without any of the following characters: {2}", attributeName, illegalChar, illegalChars);
@@ -44,6 +50,7 @@ namespace WixToolset.Core
             IllegalName = 6601,
             ExampleRegid = 6602,
             IllegalBundleVariableName = 6603,
+            AlreadyDefinedBootstrapperApplicationSource = 6604,
         } // 5400-5499 and 6600-6699 were the ranges for Dependency and Tag which are now in Core between CompilerWarnings and CompilerErrors.
     }
 }

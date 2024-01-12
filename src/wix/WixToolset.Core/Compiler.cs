@@ -117,8 +117,10 @@ namespace WixToolset.Core
                 var bundleValidator = this.Context.ServiceProvider.GetService<IBundleValidator>();
                 var parseHelper = this.Context.ServiceProvider.GetService<IParseHelper>();
 
-                this.Core = new CompilerCore(target, this.Messaging, bundleValidator, parseHelper, extensionsByNamespace);
-                this.Core.ShowPedanticMessages = this.ShowPedanticMessages;
+                this.Core = new CompilerCore(target, this.Messaging, bundleValidator, parseHelper, extensionsByNamespace)
+                {
+                    ShowPedanticMessages = this.ShowPedanticMessages
+                };
                 this.componentIdPlaceholders = new Dictionary<string, string>();
 
                 // parse the document
@@ -2114,7 +2116,7 @@ namespace WixToolset.Core
             Identifier id = null;
             string componentIdPlaceholder = null;
             var keyFound = false;
-            string keyPath = null;
+            Identifier keyPath = null;
 
             var keyPathType = ComponentKeyPathType.Directory;
             var location = ComponentLocation.LocalOnly;
@@ -2293,7 +2295,7 @@ namespace WixToolset.Core
             foreach (var child in node.Elements())
             {
                 var keyPathSet = YesNoType.NotSet;
-                string keyPossible = null;
+                Identifier keyPossible = null;
                 ComponentKeyPathType? keyBit = null;
 
                 if (CompilerCore.WixNamespace == child.Name.Namespace)
@@ -2432,7 +2434,7 @@ namespace WixToolset.Core
 
                                 case PossibleKeyPathType.Directory:
                                     keyBit = ComponentKeyPathType.Directory;
-                                    keyPossible = String.Empty;
+                                    keyPossible = null;
                                     break;
 
                                 case PossibleKeyPathType.OdbcDataSource:
@@ -2468,7 +2470,7 @@ namespace WixToolset.Core
                 // the KeyPath of the component, set it now.  Alternatively, if a possible
                 // KeyPath has been found and no KeyPath has been previously set, use this
                 // value as the default KeyPath of the component
-                if (!String.IsNullOrEmpty(keyPossible) && (YesNoType.Yes == keyPathSet || (YesNoType.NotSet == keyPathSet && String.IsNullOrEmpty(keyPath) && !keyFound)))
+                if (keyPossible != null && (YesNoType.Yes == keyPathSet || (YesNoType.NotSet == keyPathSet && keyPath == null && !keyFound)))
                 {
                     keyFound = YesNoType.Yes == keyPathSet;
                     keyPath = keyPossible;
@@ -2506,11 +2508,11 @@ namespace WixToolset.Core
             // generatable guid must be met.
             if (componentIdPlaceholder == id.Id)
             {
-                if (allowImplicitIds || keyFound && !String.IsNullOrEmpty(keyPath))
+                if (allowImplicitIds || keyFound && keyPath != null)
                 {
-                    this.componentIdPlaceholders.Add(componentIdPlaceholder, keyPath);
+                    this.componentIdPlaceholders.Add(componentIdPlaceholder, keyPath.Id);
 
-                    id = new Identifier(AccessModifier.Section, keyPath);
+                    id = keyPath;
                 }
                 else
                 {
@@ -2527,7 +2529,7 @@ namespace WixToolset.Core
                     DirectoryRef = directoryId,
                     Location = location,
                     Condition = condition,
-                    KeyPath = keyPath,
+                    KeyPath = keyPath?.Id,
                     KeyPathType = keyPathType,
                     DisableRegistryReflection = disableRegistryReflection,
                     NeverOverwrite = neverOverwrite,
@@ -3861,7 +3863,7 @@ namespace WixToolset.Core
             }
             else // add the appropriate part of this directory element to the file source.
             {
-                string append = String.IsNullOrEmpty(sourceName) ? name : sourceName;
+                var append = String.IsNullOrEmpty(sourceName) ? name : sourceName;
 
                 if (!String.IsNullOrEmpty(append))
                 {
@@ -5082,7 +5084,7 @@ namespace WixToolset.Core
         /// <param name="fileSymbol">Outgoing file symbol containing parsed attributes.</param>
         /// <param name="assemblySymbol">Outgoing assembly symbol containing parsed attributes.</param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        private YesNoType ParseFileElementAttributes(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out string possibleKeyPath, string componentGuid, bool isNakedFile, out FileSymbol fileSymbol, out AssemblySymbol assemblySymbol)
+        private YesNoType ParseFileElementAttributes(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out Identifier possibleKeyPath, string componentGuid, bool isNakedFile, out FileSymbol fileSymbol, out AssemblySymbol assemblySymbol)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
@@ -5468,7 +5470,7 @@ namespace WixToolset.Core
             possibleKeyPath = null;
             if (null == companionFile)
             {
-                possibleKeyPath = id.Id;
+                possibleKeyPath = id;
             }
 
             return keyPath;
@@ -5573,7 +5575,7 @@ namespace WixToolset.Core
         /// <param name="win64Component">true if the component is 64-bit.</param>
         /// <param name="componentGuid">Component GUID (including `*`).</param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        private YesNoType ParseFileElement(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out string possibleKeyPath, bool win64Component, string componentGuid)
+        private YesNoType ParseFileElement(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out Identifier possibleKeyPath, bool win64Component, string componentGuid)
         {
             var keyPath = this.ParseFileElementAttributes(node, componentId, directoryId, diskId, sourcePath, out possibleKeyPath, componentGuid, isNakedFile: false, out var fileSymbol, out var assemblySymbol);
 

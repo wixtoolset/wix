@@ -719,7 +719,7 @@ static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
     result = BUNDLE_QUERY_CALLBACK_RESULT_CANCEL;
 
     // Pass to BA.
-    hr = UserExperienceOnDetectRelatedBundlePackage(pContext->pUserExperience, pPackage->sczId, pBundle->wzBundleId, relationType, fPerMachine, pVersion);
+    hr = BACallbackOnDetectRelatedBundlePackage(pContext->pUserExperience, pPackage->sczId, pBundle->wzBundleId, relationType, fPerMachine, pVersion);
     ExitOnRootFailure(hr, "BA aborted detect related BUNDLE package.");
 
     result = BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE;

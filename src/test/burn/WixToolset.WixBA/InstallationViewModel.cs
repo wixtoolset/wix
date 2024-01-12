@@ -97,7 +97,6 @@ namespace WixToolset.WixBA
             WixBA.Model.Bootstrapper.ExecutePackageComplete += this.ExecutePackageComplete;
             WixBA.Model.Bootstrapper.Error += this.ExecuteError;
             WixBA.Model.Bootstrapper.ApplyComplete += this.ApplyComplete;
-            WixBA.Model.Bootstrapper.SetUpdateComplete += this.SetUpdateComplete;
         }
 
         void RootPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -430,15 +429,7 @@ namespace WixToolset.WixBA
 
             if (!WixBA.Model.BAManifest.Bundle.Packages.ContainsKey(e.ProductCode))
             {
-                WixBA.Model.BAManifest.Bundle.AddRelatedBundleAsPackage(e);
-            }
-        }
-
-        private void SetUpdateComplete(object sender, SetUpdateCompleteEventArgs e)
-        {
-            if (!String.IsNullOrEmpty(e.NewPackageId) && !WixBA.Model.BAManifest.Bundle.Packages.ContainsKey(e.NewPackageId))
-            {
-                WixBA.Model.BAManifest.Bundle.AddUpdateBundleAsPackage(e);
+                WixBA.Model.BAManifest.Bundle.AddRelatedBundleAsPackage(e.ProductCode, e.RelationType, e.PerMachine, e.Version);
             }
         }
 

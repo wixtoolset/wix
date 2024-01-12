@@ -253,9 +253,9 @@ namespace WixToolset.Mba.Core
         }
 
         /// <inheritdoc/>
-        public void SetUpdate(string localSource, string downloadSource, long size, UpdateHashType hashType, string hash)
+        public void SetUpdate(string localSource, string downloadSource, long size, UpdateHashType hashType, string hash, string updatePackageId)
         {
-            this.engine.SetUpdate(localSource, downloadSource, size, hashType, hash);
+            this.engine.SetUpdate(localSource, downloadSource, size, hashType, hash, updatePackageId);
         }
 
         /// <inheritdoc/>

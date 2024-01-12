@@ -48,19 +48,14 @@ namespace WixToolset.Bal
             return Message(sourceLineNumbers, Ids.MissingDNCBAFactoryAssembly, "When using DotNetCoreBootstrapperApplicationHost, the Payload element for the BA's entry point DLL must have bal:BAFactoryAssembly=\"yes\".");
         }
 
-        public static Message MissingDNCPrereq(SourceLineNumber sourceLineNumbers)
+        public static Message MissingPrereq(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.MissingDNCPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the DotNetCoreBootstrapperApplicationHost with SelfContainedDeployment set to \"no\".");
+            return Message(sourceLineNumbers, Ids.MissingPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the bal:WixPrerequisiteBootstrapperApplication.");
         }
 
         public static Message MissingIUIPrimaryPackage(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.MissingIUIPrimaryPackage, "When using WixInternalUIBootstrapperApplication, there must be one package with bal:PrimaryPackageType=\"default\".");
-        }
-
-        public static Message MissingMBAPrereq(SourceLineNumber sourceLineNumbers)
-        {
-            return Message(sourceLineNumbers, Ids.MissingMBAPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.");
         }
 
         public static Message MultipleBAFunctions(SourceLineNumber sourceLineNumbers)
@@ -106,11 +101,10 @@ namespace WixToolset.Bal
         public enum Ids
         {
             AttributeRequiresPrereqPackage = 6801,
-            MissingMBAPrereq = 6802,
+            MissingPrereq = 6802,
             MultiplePrereqLicenses = 6803,
             MultipleBAFunctions = 6804,
             BAFunctionsPayloadRequiredInUXContainer = 6805,
-            MissingDNCPrereq = 6806,
             MissingIUIPrimaryPackage = 6808,
             MultiplePrimaryPackageType = 6809,
             MultiplePrimaryPackageType2 = 6810,

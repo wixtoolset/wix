@@ -1,8 +1,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Bundle Name="DiversePayloadsBundle" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}">
-        <BootstrapperApplication>
-            <BootstrapperApplicationDll SourceFile="fakeba.dll" />
-        </BootstrapperApplication>
+        <BootstrapperApplication SourceFile="fakeba.dll" />
+
         <Chain>
             <PackageGroupRef Id="ExternalContainerPackages" />
             <ExePackage SourceFile="signed_bundle_engine.exe" DetectCondition="none" Permanent="yes" />

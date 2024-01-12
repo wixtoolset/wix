@@ -37,15 +37,18 @@ namespace WixToolset.Mba.Core
         /// <summary>
         /// Adds a related bundle as a package.
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="productCode"></param>
+        /// <param name="relationType"></param>
+        /// <param name="perMachine"></param>
+        /// <param name="version"></param>
         /// <returns>The created <see cref="IPackageInfo"/>.</returns>
-        IPackageInfo AddRelatedBundleAsPackage(DetectRelatedBundleEventArgs e);
+        IPackageInfo AddRelatedBundleAsPackage(string productCode, RelationType relationType, bool perMachine, string version);
 
         /// <summary>
         /// Adds an update bundle as a package.
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="packageId">Package id added as update bundle.</param>
         /// <returns>The created <see cref="IPackageInfo"/>.</returns>
-        IPackageInfo AddUpdateBundleAsPackage(SetUpdateCompleteEventArgs e);
+        IPackageInfo AddUpdateBundleAsPackage(string packageId);
     }
 }

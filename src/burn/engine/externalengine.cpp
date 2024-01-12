@@ -14,8 +14,8 @@ static HRESULT ProcessUnknownEmbeddedMessages(
     __out DWORD* pdwResult
     );
 static HRESULT EnqueueAction(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
-    __inout BOOTSTRAPPER_ENGINE_ACTION** ppAction
+    __in BAENGINE_CONTEXT* pEngineContext,
+    __inout BAENGINE_ACTION** ppAction
     );
 
 // function definitions
@@ -227,7 +227,7 @@ HRESULT ExternalEngineSendEmbeddedError(
     *pnResult = static_cast<int>(dwResult);
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -262,7 +262,7 @@ HRESULT ExternalEngineSendEmbeddedProgress(
     *pnResult = static_cast<int>(dwResult);
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -273,25 +273,25 @@ HRESULT ExternalEngineSetUpdate(
     __in_z_opt LPCWSTR wzDownloadSource,
     __in const DWORD64 qwSize,
     __in const BOOTSTRAPPER_UPDATE_HASH_TYPE hashType,
-    __in_opt LPCWSTR wzHash
+    __in_opt LPCWSTR wzHash,
+    __in_z_opt LPCWSTR wzUpdatePackageId
     )
 {
     HRESULT hr = S_OK;
     BOOL fLeaveCriticalSection = FALSE;
-    LPWSTR sczFilePath = NULL;
+    LPWSTR sczFileRelativePath = NULL;
     LPWSTR sczCommandline = NULL;
-    LPWSTR sczPreviousId = NULL;
-    LPCWSTR wzNewId = NULL;
     UUID guid = { };
-    WCHAR wzGuid[39];
+    WCHAR wzCacheId[39];
     RPC_STATUS rs = RPC_S_OK;
     BOOL fRemove = (!wzLocalSource || !*wzLocalSource) && (!wzDownloadSource || !*wzDownloadSource);
 
-    UserExperienceOnSetUpdateBegin(&pEngineState->userExperience);
+    // Consider allowing the BA to pass this name in, like the UpdatePackageId can be passed in.
+    LPCWSTR wzFileName = NULL;
 
     ::EnterCriticalSection(&pEngineState->userExperience.csEngineActive);
     fLeaveCriticalSection = TRUE;
-    hr = UserExperienceEnsureEngineInactive(&pEngineState->userExperience);
+    hr = BootstrapperApplicationEnsureEngineInactive(&pEngineState->userExperience);
     ExitOnFailure(hr, "Engine is active, cannot change engine state.");
 
     if (!fRemove)
@@ -306,8 +306,6 @@ HRESULT ExternalEngineSetUpdate(
         }
     }
 
-    sczPreviousId = pEngineState->update.package.sczId;
-    pEngineState->update.package.sczId = NULL;
     UpdateUninitialize(&pEngineState->update);
 
     if (fRemove)
@@ -318,31 +316,46 @@ HRESULT ExternalEngineSetUpdate(
     hr = CoreCreateUpdateBundleCommandLine(&sczCommandline, &pEngineState->internalCommand, &pEngineState->command);
     ExitOnFailure(hr, "Failed to create command-line for update bundle.");
 
-    // Bundles would fail to use the downloaded update bundle, as the running bundle would be one of the search paths.
-    // Here I am generating a random guid, but in the future it would be nice if the feed would provide the ID of the update.
+    // Always generate a new CacheId for a location to where we can download then cache the update bundle. This running
+    // bundle will clean that cached location when it is done while the update bundle caches itself in its official cache
+    // location during its execution.
     rs = ::UuidCreate(&guid);
     hr = HRESULT_FROM_RPC(rs);
     ExitOnFailure(hr, "Failed to create bundle update guid.");
 
-    if (!::StringFromGUID2(guid, wzGuid, countof(wzGuid)))
+    if (!::StringFromGUID2(guid, wzCacheId, countof(wzCacheId)))
     {
-        hr = E_OUTOFMEMORY;
+        hr = E_INSUFFICIENT_BUFFER;
         ExitOnRootFailure(hr, "Failed to convert bundle update guid into string.");
     }
 
-    hr = StrAllocFormatted(&sczFilePath, L"%ls\\%ls", wzGuid, pEngineState->registration.sczExecutableName);
+    // If the update package id is not provided, use the cache id.
+    if (!wzUpdatePackageId || !*wzUpdatePackageId)
+    {
+        wzUpdatePackageId = wzCacheId;
+    }
+
+    // If the file name is not provided, use the current bundle's name. Not a great option but it is the best we have.
+    if (!wzFileName || !*wzFileName)
+    {
+        wzFileName = pEngineState->registration.sczExecutableName;
+    }
+
+    // Download the update bundle into a relative folder using the update package id. Ths is important because this running bundle is
+    // in the root of one of search paths used in source resolution. Thus, if when wzFileName is the same as the running bundle, the
+    // running bundle will be found first and the updated bundle will not actually be downloaded.
+    hr = StrAllocFormatted(&sczFileRelativePath, L"%ls\\%ls", wzUpdatePackageId, wzFileName);
     ExitOnFailure(hr, "Failed to build bundle update file path.");
 
     if (!wzLocalSource || !*wzLocalSource)
     {
-        wzLocalSource = sczFilePath;
+        wzLocalSource = sczFileRelativePath;
     }
 
-    hr = PseudoBundleInitializeUpdateBundle(&pEngineState->update.package, wzGuid, pEngineState->registration.sczId, sczFilePath, wzLocalSource, wzDownloadSource, qwSize, sczCommandline, wzHash);
+    hr = PseudoBundleInitializeUpdateBundle(&pEngineState->update.package, wzUpdatePackageId, wzCacheId, sczFileRelativePath, wzLocalSource, wzDownloadSource, qwSize, sczCommandline, wzHash);
     ExitOnFailure(hr, "Failed to set update bundle.");
 
     pEngineState->update.fUpdateAvailable = TRUE;
-    wzNewId = wzGuid;
 
 LExit:
     if (fLeaveCriticalSection)
@@ -350,11 +363,8 @@ LExit:
         ::LeaveCriticalSection(&pEngineState->userExperience.csEngineActive);
     }
 
-    UserExperienceOnSetUpdateComplete(&pEngineState->userExperience, hr, sczPreviousId, wzNewId);
-
-    ReleaseStr(sczPreviousId);
     ReleaseStr(sczCommandline);
-    ReleaseStr(sczFilePath);
+    ReleaseStr(sczFileRelativePath);
 
     return hr;
 }
@@ -371,7 +381,7 @@ HRESULT ExternalEngineSetLocalSource(
     BURN_PAYLOAD* pPayload = NULL;
 
     ::EnterCriticalSection(&pEngineState->userExperience.csEngineActive);
-    hr = UserExperienceEnsureEngineInactive(&pEngineState->userExperience);
+    hr = BootstrapperApplicationEnsureEngineInactive(&pEngineState->userExperience);
     ExitOnFailure(hr, "Engine is active, cannot change engine state.");
 
     if (!wzPath || !*wzPath)
@@ -411,7 +421,8 @@ HRESULT ExternalEngineSetDownloadSource(
     __in_z_opt LPCWSTR wzPayloadId,
     __in_z_opt LPCWSTR wzUrl,
     __in_z_opt LPCWSTR wzUser,
-    __in_z_opt LPCWSTR wzPassword
+    __in_z_opt LPCWSTR wzPassword,
+    __in_z_opt LPCWSTR wzAuthorizationHeader
     )
 {
     HRESULT hr = S_OK;
@@ -420,7 +431,7 @@ HRESULT ExternalEngineSetDownloadSource(
     DOWNLOAD_SOURCE* pDownloadSource = NULL;
 
     ::EnterCriticalSection(&pEngineState->userExperience.csEngineActive);
-    hr = UserExperienceEnsureEngineInactive(&pEngineState->userExperience);
+    hr = BootstrapperApplicationEnsureEngineInactive(&pEngineState->userExperience);
     ExitOnFailure(hr, "Engine is active, cannot change engine state.");
 
     if (wzPayloadId && *wzPayloadId)
@@ -443,7 +454,16 @@ HRESULT ExternalEngineSetDownloadSource(
         ExitOnFailure(hr, "BA did not provide container or payload id.");
     }
 
-    if (wzUrl && *wzUrl)
+    if (wzAuthorizationHeader && *wzAuthorizationHeader)
+    {
+        hr = StrAllocString(&pDownloadSource->sczAuthorizationHeader, wzAuthorizationHeader, 0);
+        ExitOnFailure(hr, "Failed to set download authorization header.");
+
+        // Authorization header means no user.
+        ReleaseNullStr(pDownloadSource->sczUser);
+        ReleaseNullStr(pDownloadSource->sczPassword);
+    }
+    else if (wzUrl && *wzUrl)
     {
         hr = StrAllocString(&pDownloadSource->sczUrl, wzUrl, 0);
         ExitOnFailure(hr, "Failed to set download URL.");
@@ -462,6 +482,9 @@ HRESULT ExternalEngineSetDownloadSource(
             {
                 ReleaseNullStr(pDownloadSource->sczPassword);
             }
+
+            // User means no authorization header.
+            ReleaseNullStr(pDownloadSource->sczAuthorizationHeader);
         }
         else // no user means no password either.
         {
@@ -586,15 +609,15 @@ HRESULT ExternalEngineCompareVersions(
 }
 
 HRESULT ExternalEngineDetect(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     )
 {
     HRESULT hr = S_OK;
-    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
+    BAENGINE_ACTION* pAction = NULL;
 
-    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
-    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+    pAction = (BAENGINE_ACTION*)MemAlloc(sizeof(BAENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BAENGINE_ACTION");
 
     pAction->dwMessage = WM_BURN_DETECT;
     pAction->detect.hwndParent = hwndParent;
@@ -609,20 +632,20 @@ LExit:
 }
 
 HRESULT ExternalEnginePlan(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in const BOOTSTRAPPER_ACTION action
     )
 {
     HRESULT hr = S_OK;
-    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
+    BAENGINE_ACTION* pAction = NULL;
 
     if (BOOTSTRAPPER_ACTION_LAYOUT > action || BOOTSTRAPPER_ACTION_UPDATE_REPLACE_EMBEDDED < action)
     {
         ExitOnRootFailure(hr = E_INVALIDARG, "BA passed invalid action to Plan: %u.", action);
     }
 
-    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
-    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+    pAction = (BAENGINE_ACTION*)MemAlloc(sizeof(BAENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BAENGINE_ACTION");
 
     pAction->dwMessage = WM_BURN_PLAN;
     pAction->plan.action = action;
@@ -637,20 +660,20 @@ LExit:
 }
 
 HRESULT ExternalEngineElevate(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     )
 {
     HRESULT hr = S_OK;
-    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
+    BAENGINE_ACTION* pAction = NULL;
 
     if (INVALID_HANDLE_VALUE != pEngineContext->pEngineState->companionConnection.hPipe)
     {
         ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_ALREADY_INITIALIZED));
     }
 
-    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
-    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+    pAction = (BAENGINE_ACTION*)MemAlloc(sizeof(BAENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BAENGINE_ACTION");
 
     pAction->dwMessage = WM_BURN_ELEVATE;
     pAction->elevate.hwndParent = hwndParent;
@@ -665,12 +688,12 @@ LExit:
 }
 
 HRESULT ExternalEngineApply(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     )
 {
     HRESULT hr = S_OK;
-    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
+    BAENGINE_ACTION* pAction = NULL;
 
     ExitOnNull(hwndParent, hr, E_INVALIDARG, "BA passed NULL hwndParent to Apply.");
     if (!::IsWindow(hwndParent))
@@ -678,8 +701,8 @@ HRESULT ExternalEngineApply(
         ExitOnRootFailure(hr = E_INVALIDARG, "BA passed invalid hwndParent to Apply.");
     }
 
-    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
-    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+    pAction = (BAENGINE_ACTION*)MemAlloc(sizeof(BAENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BAENGINE_ACTION");
 
     pAction->dwMessage = WM_BURN_APPLY;
     pAction->apply.hwndParent = hwndParent;
@@ -694,15 +717,15 @@ LExit:
 }
 
 HRESULT ExternalEngineQuit(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in const DWORD dwExitCode
     )
 {
     HRESULT hr = S_OK;
-    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
+    BAENGINE_ACTION* pAction = NULL;
 
-    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
-    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+    pAction = (BAENGINE_ACTION*)MemAlloc(sizeof(BAENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BAENGINE_ACTION");
 
     pAction->dwMessage = WM_BURN_QUIT;
     pAction->quit.dwExitCode = dwExitCode;
@@ -717,7 +740,7 @@ LExit:
 }
 
 HRESULT ExternalEngineLaunchApprovedExe(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent,
     __in_z LPCWSTR wzApprovedExeForElevationId,
     __in_z_opt LPCWSTR wzArguments,
@@ -727,7 +750,7 @@ HRESULT ExternalEngineLaunchApprovedExe(
     HRESULT hr = S_OK;
     BURN_APPROVED_EXE* pApprovedExe = NULL;
     BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe = NULL;
-    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
+    BAENGINE_ACTION* pAction = NULL;
 
     if (!wzApprovedExeForElevationId || !*wzApprovedExeForElevationId)
     {
@@ -737,8 +760,8 @@ HRESULT ExternalEngineLaunchApprovedExe(
     hr = ApprovedExesFindById(&pEngineContext->pEngineState->approvedExes, wzApprovedExeForElevationId, &pApprovedExe);
     ExitOnFailure(hr, "BA requested unknown approved exe with id: %ls", wzApprovedExeForElevationId);
 
-    pAction = (BOOTSTRAPPER_ENGINE_ACTION*)MemAlloc(sizeof(BOOTSTRAPPER_ENGINE_ACTION), TRUE);
-    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BOOTSTRAPPER_ENGINE_ACTION");
+    pAction = (BAENGINE_ACTION*)MemAlloc(sizeof(BAENGINE_ACTION), TRUE);
+    ExitOnNull(pAction, hr, E_OUTOFMEMORY, "Failed to alloc BAENGINE_ACTION");
 
     pAction->dwMessage = WM_BURN_LAUNCH_APPROVED_EXE;
     pLaunchApprovedExe = &pAction->launchApprovedExe;
@@ -762,8 +785,7 @@ HRESULT ExternalEngineLaunchApprovedExe(
 LExit:
     if (pAction)
     {
-        CoreBootstrapperEngineActionUninitialize(pAction);
-        MemFree(pAction);
+        BAEngineFreeAction(pAction);
     }
 
     return hr;
@@ -771,7 +793,8 @@ LExit:
 
 HRESULT ExternalEngineSetUpdateSource(
     __in BURN_ENGINE_STATE* pEngineState,
-    __in_z LPCWSTR wzUrl
+    __in_z LPCWSTR wzUrl,
+    __in_z_opt LPCWSTR wzAuthorizationHeader
     )
 {
     HRESULT hr = S_OK;
@@ -779,16 +802,27 @@ HRESULT ExternalEngineSetUpdateSource(
 
     ::EnterCriticalSection(&pEngineState->userExperience.csEngineActive);
     fLeaveCriticalSection = TRUE;
-    hr = UserExperienceEnsureEngineInactive(&pEngineState->userExperience);
+    hr = BootstrapperApplicationEnsureEngineInactive(&pEngineState->userExperience);
     ExitOnFailure(hr, "Engine is active, cannot change engine state.");
 
     if (wzUrl && *wzUrl)
     {
         hr = StrAllocString(&pEngineState->update.sczUpdateSource, wzUrl, 0);
         ExitOnFailure(hr, "Failed to set feed download URL.");
+
+        if (wzAuthorizationHeader && *wzAuthorizationHeader)
+        {
+            hr = StrAllocString(&pEngineState->update.sczAuthorizationHeader, wzAuthorizationHeader, 0);
+            ExitOnFailure(hr, "Failed to set feed authorization header.");
+        }
+        else
+        {
+            ReleaseNullStr(pEngineState->update.sczAuthorizationHeader);
+        }
     }
     else // no URL provided means clear out the whole download source.
     {
+        ReleaseNullStr(pEngineState->update.sczAuthorizationHeader);
         ReleaseNullStr(pEngineState->update.sczUpdateSource);
     }
 
@@ -810,14 +844,23 @@ HRESULT ExternalEngineGetRelatedBundleVariable(
     )
 {
     HRESULT hr = S_OK;
+    LPWSTR sczValue = NULL;
+
     if (wzVariable && *wzVariable && pcchValue)
     {
-        hr = BundleGetBundleVariableFixed(wzBundleId, wzVariable, wzValue, pcchValue);
+        hr = BundleGetBundleVariable(wzBundleId, wzVariable, &sczValue);
+        if (SUCCEEDED(hr))
+        {
+            hr = CopyStringToExternal(sczValue, wzValue, pcchValue);
+        }
     }
     else
     {
         hr = E_INVALIDARG;
     }
+
+    StrSecureZeroFreeString(sczValue);
+
     return hr;
 }
 
@@ -888,8 +931,8 @@ static HRESULT ProcessUnknownEmbeddedMessages(
 }
 
 static HRESULT EnqueueAction(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
-    __inout BOOTSTRAPPER_ENGINE_ACTION** ppAction
+    __in BAENGINE_CONTEXT* pEngineContext,
+    __inout BAENGINE_ACTION** ppAction
     )
 {
     HRESULT hr = S_OK;

@@ -40,7 +40,7 @@
       <PackageGroupRef Id="$(var.NetFx472WebId)" />
     </PackageGroup>
 
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx472WebId)" LicenseUrl="$(var.NetFx472EulaLink)" />
+    <bal:BootstrapperApplicationPrerequisiteInformation PackageId="$(var.NetFx472WebId)" LicenseUrl="$(var.NetFx472EulaLink)" />
   </Fragment>
 
   <Fragment>
@@ -62,6 +62,6 @@
       <PackageGroupRef Id="$(var.NetFx472RedistId)" />
     </PackageGroup>
 
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx472RedistId)" LicenseUrl="$(var.NetFx472EulaLink)" />
+    <bal:BootstrapperApplicationPrerequisiteInformation PackageId="$(var.NetFx472RedistId)" LicenseUrl="$(var.NetFx472EulaLink)" />
   </Fragment>
 </Wix>

@@ -51,10 +51,8 @@ public:
     // Constructor - initialize member variables.
     //
     CWixSampleBAFunctions(
-        __in HMODULE hModule,
-        __in IBootstrapperEngine* pEngine,
-        __in const BA_FUNCTIONS_CREATE_ARGS* pArgs
-        ) : CBalBaseBAFunctions(hModule, pEngine, pArgs)
+        __in HMODULE hModule
+        ) : CBalBaseBAFunctions(hModule)
     {
     }
 
@@ -75,14 +73,15 @@ HRESULT WINAPI CreateBAFunctions(
 {
     HRESULT hr = S_OK;
     CWixSampleBAFunctions* pBAFunctions = NULL;
-    IBootstrapperEngine* pEngine = NULL;
 
     // This is required to enable logging functions.
-    hr = BalInitializeFromCreateArgs(pArgs->pBootstrapperCreateArgs, &pEngine);
-    ExitOnFailure(hr, "Failed to initialize Bal.");
+    BalInitialize(pArgs->pEngine);
 
-    pBAFunctions = new CWixSampleBAFunctions(hModule, pEngine, pArgs);
+    pBAFunctions = new CWixSampleBAFunctions(hModule);
     ExitOnNull(pBAFunctions, hr, E_OUTOFMEMORY, "Failed to create new CWixSampleBAFunctions object.");
+
+    hr = pBAFunctions->OnCreate(pArgs->pEngine, pArgs->pCommand);
+    ExitOnFailure(hr, "Failed to call OnCreate CPrereqBaf.");
 
     pResults->pfnBAFunctionsProc = BalBaseBAFunctionsProc;
     pResults->pvBAFunctionsProcContext = pBAFunctions;
@@ -90,7 +89,6 @@ HRESULT WINAPI CreateBAFunctions(
 
 LExit:
     ReleaseObject(pBAFunctions);
-    ReleaseObject(pEngine);
 
     return hr;
 }

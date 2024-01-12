@@ -90,8 +90,7 @@ HRESULT CacheInitialize(
 HRESULT CacheInitializeSources(
     __in BURN_CACHE* pCache,
     __in BURN_REGISTRATION* pRegistration,
-    __in BURN_VARIABLES* pVariables,
-    __in BURN_ENGINE_COMMAND* pInternalCommand
+    __in BURN_VARIABLES* pVariables
     );
 HRESULT CacheEnsureAcquisitionFolder(
     __in BURN_CACHE* pCache
@@ -170,11 +169,6 @@ BOOL CacheBundleRunningFromCache(
 HRESULT CachePreparePackage(
     __in BURN_CACHE* pCache,
     __in BURN_PACKAGE* pPackage
-    );
-HRESULT CacheBundleToCleanRoom(
-    __in BURN_CACHE* pCache,
-    __in BURN_SECTION* pSection,
-    __deref_out_z_opt LPWSTR* psczCleanRoomBundlePath
     );
 HRESULT CacheBundleToWorkingDirectory(
     __in BURN_CACHE* pCache,

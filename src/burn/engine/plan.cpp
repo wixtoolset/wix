@@ -441,15 +441,11 @@ extern "C" HRESULT PlanLayoutBundle(
     hr = VariableGetString(pVariables, BURN_BUNDLE_LAYOUT_DIRECTORY, &sczLayoutDirectory);
     if (E_NOTFOUND == hr) // if not set, use the current directory as the layout directory.
     {
-        hr = VariableGetString(pVariables, BURN_BUNDLE_SOURCE_PROCESS_FOLDER, &sczLayoutDirectory);
-        if (E_NOTFOUND == hr) // if not set, use the current directory as the layout directory.
-        {
-            hr = PathForCurrentProcess(&sczExecutablePath, NULL);
-            ExitOnFailure(hr, "Failed to get path for current executing process as layout directory.");
+        hr = PathForCurrentProcess(&sczExecutablePath, NULL);
+        ExitOnFailure(hr, "Failed to get path for current executing process as layout directory.");
 
-            hr = PathGetDirectory(sczExecutablePath, &sczLayoutDirectory);
-            ExitOnFailure(hr, "Failed to get executing process as layout directory.");
-        }
+        hr = PathGetDirectory(sczExecutablePath, &sczLayoutDirectory);
+        ExitOnFailure(hr, "Failed to get executing process as layout directory.");
     }
     ExitOnFailure(hr, "Failed to get bundle layout directory property.");
 
@@ -538,7 +534,7 @@ extern "C" HRESULT PlanForwardCompatibleBundles(
 
         fIgnoreBundle = fRecommendIgnore;
 
-        hr = UserExperienceOnPlanForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->detectRelationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, &fIgnoreBundle);
+        hr = BACallbackOnPlanForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->detectRelationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, &fIgnoreBundle);
         ExitOnRootFailure(hr, "BA aborted plan forward compatible bundle.");
 
         if (!fIgnoreBundle)
@@ -564,7 +560,7 @@ extern "C" HRESULT PlanPackages(
     )
 {
     HRESULT hr = S_OK;
-    
+
     hr = PlanPackagesHelper(pPackages->rgPackages, pPackages->cPackages, pUX, pPlan, pLog, pVariables);
 
     return hr;
@@ -896,11 +892,11 @@ static HRESULT PlanPackagesHelper(
         DWORD iPackage = fReverseOrder ? cPackages - 1 - i : i;
         BURN_PACKAGE* pPackage = rgPackages + iPackage;
 
-        UserExperienceOnPlannedPackage(pUX, pPackage->sczId, pPackage->execute, pPackage->rollback, NULL != pPackage->hCacheEvent, pPackage->fPlannedUncache);
+        BACallbackOnPlannedPackage(pUX, pPackage->sczId, pPackage->execute, pPackage->rollback, NULL != pPackage->hCacheEvent, pPackage->fPlannedUncache);
 
         if (pPackage->compatiblePackage.fPlannable)
         {
-            UserExperienceOnPlannedCompatiblePackage(pUX, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, pPackage->compatiblePackage.fRemove);
+            BACallbackOnPlannedCompatiblePackage(pUX, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, pPackage->compatiblePackage.fRemove);
         }
     }
 
@@ -961,7 +957,7 @@ static HRESULT InitializePackage(
     pPackage->requested = pPackage->defaultRequested;
     fBeginCalled = TRUE;
 
-    hr = UserExperienceOnPlanPackageBegin(pUX, pPackage->sczId, pPackage->currentState, pPackage->fCached, installCondition, repairCondition, &pPackage->requested, &pPackage->cacheType);
+    hr = BACallbackOnPlanPackageBegin(pUX, pPackage->sczId, pPackage->currentState, pPackage->fCached, installCondition, repairCondition, &pPackage->requested, &pPackage->cacheType);
     ExitOnRootFailure(hr, "BA aborted plan package begin.");
 
     if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
@@ -973,7 +969,7 @@ static HRESULT InitializePackage(
 LExit:
     if (fBeginCalled)
     {
-        UserExperienceOnPlanPackageComplete(pUX, pPackage->sczId, hr, pPackage->requested);
+        BACallbackOnPlanPackageComplete(pUX, pPackage->sczId, hr, pPackage->requested);
     }
 
     return hr;
@@ -1375,7 +1371,7 @@ extern "C" HRESULT PlanRelatedBundlesInitialize(
 
         pRelatedBundle->planRelationType = pRelatedBundle->defaultPlanRelationType;
 
-        hr = UserExperienceOnPlanRelatedBundleType(pUserExperience, pRelatedBundle->package.sczId, &pRelatedBundle->planRelationType);
+        hr = BACallbackOnPlanRelatedBundleType(pUserExperience, pRelatedBundle->package.sczId, &pRelatedBundle->planRelationType);
         ExitOnRootFailure(hr, "BA aborted plan related bundle type.");
 
         if (BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DOWNGRADE == pRelatedBundle->planRelationType &&
@@ -1462,7 +1458,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
 
         pRelatedBundle->package.defaultRequested = pRelatedBundle->package.requested;
 
-        hr = UserExperienceOnPlanRelatedBundle(pUserExperience, pRelatedBundle->package.sczId, &pRelatedBundle->package.requested);
+        hr = BACallbackOnPlanRelatedBundle(pUserExperience, pRelatedBundle->package.sczId, &pRelatedBundle->package.requested);
         ExitOnRootFailure(hr, "BA aborted plan related bundle.");
 
         // If uninstalling and the dependent related bundle may be executed, ignore its provider key to allow for downgrades with ref-counting.
@@ -1662,7 +1658,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
 
             pRelatedBundle->defaultRequestedRestore = pRelatedBundle->requestedRestore = BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT;
 
-            hr = UserExperienceOnPlanRestoreRelatedBundle(pUserExperience, pRelatedBundle->package.sczId, &pRelatedBundle->requestedRestore);
+            hr = BACallbackOnPlanRestoreRelatedBundle(pUserExperience, pRelatedBundle->package.sczId, &pRelatedBundle->requestedRestore);
             ExitOnRootFailure(hr, "BA aborted plan restore related bundle.");
 
             switch (pRelatedBundle->requestedRestore)
@@ -1966,7 +1962,7 @@ extern "C" HRESULT PlanRollbackBoundaryBegin(
     pExecuteAction->type = BURN_EXECUTE_ACTION_TYPE_ROLLBACK_BOUNDARY_START;
     pExecuteAction->rollbackBoundary.pRollbackBoundary = pRollbackBoundary;
 
-    hr = UserExperienceOnPlanRollbackBoundary(pUX, pRollbackBoundary->sczId, &pRollbackBoundary->fTransaction);
+    hr = BACallbackOnPlanRollbackBoundary(pUX, pRollbackBoundary->sczId, &pRollbackBoundary->fTransaction);
     ExitOnRootFailure(hr, "BA aborted plan rollback boundary.");
 
     // Only use MSI transaction if authored and the BA requested it.

@@ -512,7 +512,7 @@ namespace Bootstrapper
             }
             finally
             {
-                ReleaseBuffer(pbBuffer);
+                ReleaseMem(pbBuffer);
                 VariablesUninitialize(&variables1);
                 VariablesUninitialize(&variables2);
             }

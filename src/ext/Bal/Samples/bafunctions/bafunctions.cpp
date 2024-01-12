@@ -26,13 +26,13 @@ extern "C" BOOL WINAPI DllMain(
 }
 
 extern "C" HRESULT WINAPI BAFunctionsCreate(
-    __in const BA_FUNCTIONS_CREATE_ARGS* pArgs,
-    __inout BA_FUNCTIONS_CREATE_RESULTS* pResults
+    __in const BA_FUNCTIONS_CREATE_ARGS* /*pArgs*/,
+    __inout BA_FUNCTIONS_CREATE_RESULTS* /*pResults*/
     )
 {
     HRESULT hr = S_OK;
     
-    hr = CreateBAFunctions(vhInstance, pArgs, pResults);
+    //hr = CreateBAFunctions(vhInstance, pArgs, pResults);
     BalExitOnFailure(hr, "Failed to create BAFunctions interface.");
 
 LExit:

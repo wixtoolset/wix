@@ -21,8 +21,7 @@ namespace WixToolset.Mba.Core
         int BAProc(
             int message,
             IntPtr pvArgs,
-            IntPtr pvResults,
-            IntPtr pvContext
+            IntPtr pvResults
             );
 
         /// <summary>
@@ -32,9 +31,22 @@ namespace WixToolset.Mba.Core
             int message,
             IntPtr pvArgs,
             IntPtr pvResults,
-            ref int phr,
-            IntPtr pvContext
+            ref int phr
             );
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.Create"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnCreate(IBootstrapperEngine engine, ref Command command);
+
+        /// <summary>
+        /// See <see cref="IDefaultBootstrapperApplication.Destroy"/>.
+        /// </summary>
+        [PreserveSig]
+        [return: MarshalAs(UnmanagedType.I4)]
+        int OnDestroy(bool reload);
 
         /// <summary>
         /// See <see cref="IDefaultBootstrapperApplication.Startup"/>.
@@ -937,24 +949,6 @@ namespace WixToolset.Mba.Core
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
             int hrStatus
-            );
-
-        /// <summary>
-        /// See <see cref="IDefaultBootstrapperApplication.SetUpdateBegin"/>.
-        /// </summary>
-        [PreserveSig]
-        [return: MarshalAs(UnmanagedType.I4)]
-        int OnSetUpdateBegin();
-
-        /// <summary>
-        /// See <see cref="IDefaultBootstrapperApplication.SetUpdateComplete"/>.
-        /// </summary>
-        [PreserveSig]
-        [return: MarshalAs(UnmanagedType.I4)]
-        int OnSetUpdateComplete(
-            int hrStatus,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzPreviousPackageId,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzNewPackageId
             );
 
         /// <summary>

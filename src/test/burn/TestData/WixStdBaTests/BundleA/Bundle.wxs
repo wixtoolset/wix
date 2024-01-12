@@ -9,7 +9,7 @@
     <?endif?>
 
     <Update Location='$(UpdateFeed)' />
-    
+
     <Variable Name="TestGroupName" Value="$(var.TestGroupName)" />
 
     <BootstrapperApplication>

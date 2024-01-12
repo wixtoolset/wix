@@ -43,11 +43,6 @@ static HRESULT EscapeAndAppendArgumentToCommandLineFormattedArgs(
     __in __format_string LPCWSTR wzFormat,
     __in va_list args
     );
-static HRESULT AppendLayoutToCommandLine(
-    __in BOOTSTRAPPER_ACTION action,
-    __in_z LPCWSTR wzLayoutDirectory,
-    __deref_inout_z LPWSTR* psczCommandLine
-    );
 static HRESULT GetSanitizedCommandLine(
     __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in BOOTSTRAPPER_COMMAND* pCommand,
@@ -151,18 +146,6 @@ extern "C" HRESULT CoreInitialize(
         ExitOnFailure(hr, "Failed to overwrite the bundle active parent built-in variable.");
     }
 
-    if (pEngineState->internalCommand.sczSourceProcessPath)
-    {
-        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_PATH, pEngineState->internalCommand.sczSourceProcessPath, TRUE, FALSE);
-        ExitOnFailure(hr, "Failed to set source process path variable.");
-
-        hr = PathGetDirectory(pEngineState->internalCommand.sczSourceProcessPath, &sczSourceProcessFolder);
-        ExitOnFailure(hr, "Failed to get source process folder from path.");
-
-        hr = VariableSetString(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_FOLDER, sczSourceProcessFolder, TRUE, FALSE);
-        ExitOnFailure(hr, "Failed to set source process folder variable.");
-    }
-
     // Set BURN_BUNDLE_ORIGINAL_SOURCE, if it was passed in on the command line.
     // Needs to be done after ManifestLoadXmlFromBuffer.
     if (pEngineState->internalCommand.sczOriginalSource)
@@ -171,9 +154,9 @@ extern "C" HRESULT CoreInitialize(
         ExitOnFailure(hr, "Failed to set original source variable.");
     }
 
-    if (BURN_MODE_UNTRUSTED == pEngineState->internalCommand.mode || BURN_MODE_NORMAL == pEngineState->internalCommand.mode || BURN_MODE_EMBEDDED == pEngineState->internalCommand.mode)
+    if (BURN_MODE_NORMAL == pEngineState->internalCommand.mode || BURN_MODE_EMBEDDED == pEngineState->internalCommand.mode)
     {
-        hr = CacheInitializeSources(&pEngineState->cache, &pEngineState->registration, &pEngineState->variables, &pEngineState->internalCommand);
+        hr = CacheInitializeSources(&pEngineState->cache, &pEngineState->registration, &pEngineState->variables);
         ExitOnFailure(hr, "Failed to initialize internal cache source functionality.");
     }
 
@@ -182,7 +165,7 @@ extern "C" HRESULT CoreInitialize(
     if (BURN_MODE_NORMAL == pEngineState->internalCommand.mode || BURN_MODE_EMBEDDED == pEngineState->internalCommand.mode)
     {
         // Extract all UX payloads to working folder.
-        hr = UserExperienceEnsureWorkingFolder(&pEngineState->cache, &pEngineState->userExperience.sczTempDirectory);
+        hr = BootstrapperApplicationEnsureWorkingFolder(&pEngineState->cache, &pEngineState->userExperience.sczTempDirectory);
         ExitOnFailure(hr, "Failed to get unique temporary folder for bootstrapper application.");
 
         hr = PayloadExtractUXContainer(&pEngineState->userExperience.payloads, &containerContext, pEngineState->userExperience.sczTempDirectory);
@@ -297,7 +280,7 @@ extern "C" HRESULT CoreQueryRegistration(
     }
 
 LExit:
-    ReleaseBuffer(pbBuffer);
+    ReleaseMem(pbBuffer);
 
     return hr;
 }
@@ -324,7 +307,7 @@ extern "C" HRESULT CoreDetect(
     ExitOnFailure(hr, "Failed to reset the dynamic registration variables during detect.");
 
     fDetectBegan = TRUE;
-    hr = UserExperienceOnDetectBegin(&pEngineState->userExperience, pEngineState->registration.fCached, pEngineState->registration.detectedRegistrationType, pEngineState->packages.cPackages);
+    hr = BACallbackOnDetectBegin(&pEngineState->userExperience, pEngineState->registration.fCached, pEngineState->registration.detectedRegistrationType, pEngineState->packages.cPackages);
     ExitOnRootFailure(hr, "UX aborted detect begin.");
 
     pEngineState->userExperience.hwndDetect = hwndParent;
@@ -429,7 +412,7 @@ LExit:
 
     if (fDetectBegan)
     {
-        UserExperienceOnDetectComplete(&pEngineState->userExperience, hr, pEngineState->registration.fEligibleForCleanup);
+        BACallbackOnDetectComplete(&pEngineState->userExperience, hr, pEngineState->registration.fEligibleForCleanup);
     }
 
     pEngineState->userExperience.hwndDetect = NULL;
@@ -453,7 +436,7 @@ extern "C" HRESULT CorePlan(
     LogId(REPORT_STANDARD, MSG_PLAN_BEGIN, pEngineState->packages.cPackages, LoggingBurnActionToString(action));
 
     fPlanBegan = TRUE;
-    hr = UserExperienceOnPlanBegin(&pEngineState->userExperience, pEngineState->packages.cPackages);
+    hr = BACallbackOnPlanBegin(&pEngineState->userExperience, pEngineState->packages.cPackages);
     ExitOnRootFailure(hr, "BA aborted plan begin.");
 
     if (!pEngineState->fDetected)
@@ -583,7 +566,7 @@ LExit:
 
     if (fPlanBegan)
     {
-        UserExperienceOnPlanComplete(&pEngineState->userExperience, hr);
+        BACallbackOnPlanComplete(&pEngineState->userExperience, hr);
     }
 
     LogId(REPORT_STANDARD, MSG_PLAN_COMPLETE, hr);
@@ -674,13 +657,13 @@ extern "C" HRESULT CoreApply(
         ++dwPhaseCount;
     }
 
-    hr = UserExperienceOnApplyBegin(&pEngineState->userExperience, dwPhaseCount);
+    hr = BACallbackOnApplyBegin(&pEngineState->userExperience, dwPhaseCount);
     ExitOnRootFailure(hr, "BA aborted apply begin.");
 
     if (pEngineState->plan.fDowngrade)
     {
         hr = HRESULT_FROM_WIN32(ERROR_PRODUCT_VERSION);
-        UserExperienceOnApplyDowngrade(&pEngineState->userExperience, &hr);
+        BACallbackOnApplyDowngrade(&pEngineState->userExperience, &hr);
 
         ExitFunction();
     }
@@ -767,7 +750,7 @@ extern "C" HRESULT CoreApply(
     if (pEngineState->plan.cExecuteActions)
     {
         hr = ApplyExecute(pEngineState, &applyContext, &fSuspend, &restart);
-        UserExperienceExecutePhaseComplete(&pEngineState->userExperience, hr); // signal that execute completed.
+        BootstrapperApplicationExecutePhaseComplete(&pEngineState->userExperience, hr); // signal that execute completed.
     }
 
     // Wait for cache thread to terminate, this should return immediately unless we're waiting for layout to complete.
@@ -847,7 +830,7 @@ LExit:
 
     if (fApplyBegan)
     {
-        UserExperienceOnApplyComplete(&pEngineState->userExperience, hr, restart, &applyCompleteAction);
+        BACallbackOnApplyComplete(&pEngineState->userExperience, hr, restart, &applyCompleteAction);
         if (BOOTSTRAPPER_APPLYCOMPLETE_ACTION_RESTART == applyCompleteAction)
         {
             pEngineState->fRestart = TRUE;
@@ -869,7 +852,7 @@ extern "C" HRESULT CoreLaunchApprovedExe(
 
     LogId(REPORT_STANDARD, MSG_LAUNCH_APPROVED_EXE_BEGIN, pLaunchApprovedExe->sczId);
 
-    hr = UserExperienceOnLaunchApprovedExeBegin(&pEngineState->userExperience);
+    hr = BACallbackOnLaunchApprovedExeBegin(&pEngineState->userExperience);
     ExitOnRootFailure(hr, "BA aborted LaunchApprovedExe begin.");
 
     // Elevate.
@@ -880,7 +863,7 @@ extern "C" HRESULT CoreLaunchApprovedExe(
     hr = ElevationLaunchApprovedExe(pEngineState->companionConnection.hPipe, pLaunchApprovedExe, &dwProcessId);
 
 LExit:
-    UserExperienceOnLaunchApprovedExeComplete(&pEngineState->userExperience, hr, dwProcessId);
+    BACallbackOnLaunchApprovedExeComplete(&pEngineState->userExperience, hr, dwProcessId);
 
     LogId(REPORT_STANDARD, MSG_LAUNCH_APPROVED_EXE_COMPLETE, hr, dwProcessId);
 
@@ -888,7 +871,7 @@ LExit:
 }
 
 extern "C" void CoreQuit(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in DWORD dwExitCode
     )
 {
@@ -942,7 +925,7 @@ extern "C" HRESULT CoreSaveEngineState(
     }
 
 LExit:
-    ReleaseBuffer(pbBuffer);
+    ReleaseMem(pbBuffer);
 
     return hr;
 }
@@ -1087,95 +1070,6 @@ LExit:
     return hr;
 }
 
-extern "C" HRESULT CoreCreateCleanRoomCommandLine(
-    __deref_inout_z LPWSTR* psczCommandLine,
-    __in BURN_ENGINE_STATE* pEngineState,
-    __in_z LPCWSTR wzCleanRoomBundlePath,
-    __in_z LPCWSTR wzCurrentProcessPath,
-    __inout HANDLE* phFileAttached,
-    __inout HANDLE* phFileSelf
-    )
-{
-    HRESULT hr = S_OK;
-    BOOTSTRAPPER_COMMAND* pCommand = &pEngineState->command;
-    BURN_ENGINE_COMMAND* pInternalCommand = &pEngineState->internalCommand;
-
-    // The clean room switch must always be at the front of the command line so
-    // the EngineInCleanRoom function will operate correctly.
-    hr = StrAllocFormatted(psczCommandLine, L"-%ls=\"%ls\"", BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, wzCurrentProcessPath);
-    ExitOnFailure(hr, "Failed to allocate parameters for unelevated process.");
-
-    // Send a file handle for the child Burn process to access the attached container.
-    hr = CoreAppendFileHandleAttachedToCommandLine(pEngineState->section.hEngineFile, phFileAttached, psczCommandLine);
-    ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED);
-
-    // Grab a file handle for the child Burn process.
-    hr = CoreAppendFileHandleSelfToCommandLine(wzCleanRoomBundlePath, phFileSelf, psczCommandLine, NULL);
-    ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
-
-    hr = CoreAppendSplashScreenWindowToCommandLine(pCommand->hwndSplashScreen, psczCommandLine);
-    ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN);
-
-    if (pInternalCommand->sczLogFile)
-    {
-        LPCWSTR wzLogParameter = (BURN_LOGGING_ATTRIBUTE_EXTRADEBUG & pInternalCommand->dwLoggingAttributes) ? L"xlog" : L"log";
-        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls", wzLogParameter);
-        ExitOnFailure(hr, "Failed to append logging switch.");
-
-        hr = AppAppendCommandLineArgument(psczCommandLine, pInternalCommand->sczLogFile);
-        ExitOnFailure(hr, "Failed to append custom log path.");
-    }
-
-    hr = AppendLayoutToCommandLine(pCommand->action, pCommand->wzLayoutDirectory, psczCommandLine);
-    ExitOnFailure(hr, "Failed to append layout.");
-
-    switch (pInternalCommand->automaticUpdates)
-    {
-    case BURN_AU_PAUSE_ACTION_NONE:
-        hr = StrAllocConcat(psczCommandLine, L" /noaupause", 0);
-        ExitOnFailure(hr, "Failed to append /noaupause.");
-        break;
-    case BURN_AU_PAUSE_ACTION_IFELEVATED_NORESUME:
-        hr = StrAllocConcat(psczCommandLine, L" /keepaupaused", 0);
-        ExitOnFailure(hr, "Failed to append /keepaupaused.");
-        break;
-    }
-
-    // TODO: This should only be added if it was enabled from the command line.
-    if (pInternalCommand->fDisableSystemRestore)
-    {
-        hr = StrAllocConcat(psczCommandLine, L" /disablesystemrestore", 0);
-        ExitOnFailure(hr, "Failed to append /disablesystemrestore.");
-    }
-
-    if (pInternalCommand->sczOriginalSource)
-    {
-        hr = StrAllocConcat(psczCommandLine, L" /originalsource", 0);
-        ExitOnFailure(hr, "Failed to append /originalsource.");
-
-        hr = AppAppendCommandLineArgument(psczCommandLine, pInternalCommand->sczOriginalSource);
-        ExitOnFailure(hr, "Failed to append original source.");
-    }
-
-    if (pEngineState->embeddedConnection.sczName)
-    {
-        hr = StrAllocConcatFormatted(psczCommandLine, L" -%ls %ls %ls %u", BURN_COMMANDLINE_SWITCH_EMBEDDED, pEngineState->embeddedConnection.sczName, pEngineState->embeddedConnection.sczSecret, pEngineState->embeddedConnection.dwProcessId);
-        ExitOnFailure(hr, "Failed to allocate embedded command.");
-    }
-
-    if (pInternalCommand->sczIgnoreDependencies)
-    {
-        hr = StrAllocConcatFormatted(psczCommandLine, L" /%ls=%ls", BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, pInternalCommand->sczIgnoreDependencies);
-        ExitOnFailure(hr, "Failed to append ignored dependencies to command-line.");
-    }
-
-    hr = CoreRecreateCommandLine(psczCommandLine, pCommand->action, pInternalCommand, pCommand, pCommand->relationType, pCommand->fPassthrough);
-    ExitOnFailure(hr, "Failed to recreate clean room command-line.");
-
-LExit:
-    return hr;
-}
-
 extern "C" HRESULT CoreCreatePassthroughBundleCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
     __in BURN_ENGINE_COMMAND* pInternalCommand,
@@ -1200,9 +1094,6 @@ extern "C" HRESULT CoreCreateResumeCommandLine(
     )
 {
     HRESULT hr = S_OK;
-
-    hr = StrAllocFormatted(psczCommandLine, L"/%ls", BURN_COMMANDLINE_SWITCH_CLEAN_ROOM);
-    ExitOnFailure(hr, "Failed to alloc resume command-line.");
 
     if (BURN_LOGGING_ATTRIBUTE_EXTRADEBUG & pPlan->pInternalCommand->dwLoggingAttributes)
     {
@@ -1694,40 +1585,6 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 i += 2;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM), BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM)))
-            {
-                if (0 != i)
-                {
-                    fInvalidCommandLine = TRUE;
-                    TraceLog(E_INVALIDARG, "Clean room command-line switch must be first argument on command-line.");
-                }
-
-                if (BURN_MODE_UNKNOWN == pInternalCommand->mode)
-                {
-                    pInternalCommand->mode = BURN_MODE_NORMAL;
-                }
-                else
-                {
-                    fInvalidCommandLine = TRUE;
-                    TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
-                }
-
-                // Get a pointer to the next character after the switch.
-                LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM)];
-                if (L'\0' != wzParam[0])
-                {
-                    if (L'=' != wzParam[0])
-                    {
-                        fInvalidCommandLine = TRUE;
-                        TraceLog(E_INVALIDARG, "Invalid switch: %ls", argv[i]);
-                    }
-                    else if (L'\0' != wzParam[1])
-                    {
-                        hr = PathExpand(&pInternalCommand->sczSourceProcessPath, wzParam + 1, PATH_EXPAND_FULLPATH);
-                        ExitOnFailure(hr, "Failed to copy source process path.");
-                    }
-                }
-            }
             else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT), BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT, lstrlenW(BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT)))
             {
                 // Get a pointer to the next character after the switch.
@@ -1762,13 +1619,7 @@ extern "C" HRESULT CoreParseCommandLine(
                 switch (pInternalCommand->mode)
                 {
                 case BURN_MODE_UNKNOWN:
-                    // Set mode to UNTRUSTED to ensure multiple modes weren't specified.
-                    pInternalCommand->mode = BURN_MODE_UNTRUSTED;
-                    break;
                 case BURN_MODE_NORMAL:
-                    // The initialization code already assumes that the
-                    // clean room switch is at the beginning of the command line,
-                    // so it's safe to assume that the mode is NORMAL in the clean room.
                     pInternalCommand->mode = BURN_MODE_EMBEDDED;
                     break;
                 default:
@@ -2012,7 +1863,7 @@ extern "C" HRESULT CoreParseCommandLine(
 
     if (BURN_MODE_UNKNOWN == pInternalCommand->mode)
     {
-        pInternalCommand->mode = BURN_MODE_UNTRUSTED;
+        pInternalCommand->mode = BURN_MODE_NORMAL;
     }
 
 LExit:
@@ -2132,18 +1983,6 @@ LExit:
     return hr;
 }
 
-extern "C" void DAPI CoreBootstrapperEngineActionUninitialize(
-    __in BOOTSTRAPPER_ENGINE_ACTION* pAction
-    )
-{
-    switch (pAction->dwMessage)
-    {
-    case WM_BURN_LAUNCH_APPROVED_EXE:
-        ApprovedExesUninitializeLaunch(&pAction->launchApprovedExe);
-        break;
-    }
-}
-
 // internal helper functions
 
 static HRESULT AppendEscapedArgumentToCommandLine(
@@ -2216,30 +2055,6 @@ static HRESULT EscapeAndAppendArgumentToCommandLineFormattedArgs(
 LExit:
     ReleaseStr(sczArgument);
 
-    return hr;
-}
-
-static HRESULT AppendLayoutToCommandLine(
-    __in BOOTSTRAPPER_ACTION action,
-    __in_z LPCWSTR wzLayoutDirectory,
-    __deref_inout_z LPWSTR* psczCommandLine
-    )
-{
-    HRESULT hr = S_OK;
-
-    if (BOOTSTRAPPER_ACTION_LAYOUT == action || wzLayoutDirectory)
-    {
-        hr = StrAllocConcat(psczCommandLine, L" /layout", 0);
-        ExitOnFailure(hr, "Failed to append layout switch.");
-
-        if (wzLayoutDirectory)
-        {
-            hr = AppAppendCommandLineArgument(psczCommandLine, wzLayoutDirectory);
-            ExitOnFailure(hr, "Failed to append layout directory.");
-        }
-    }
-
-LExit:
     return hr;
 }
 
@@ -2347,7 +2162,7 @@ static HRESULT DetectPackage(
     BOOL fBegan = FALSE;
 
     fBegan = TRUE;
-    hr = UserExperienceOnDetectPackageBegin(&pEngineState->userExperience, pPackage->sczId);
+    hr = BACallbackOnDetectPackageBegin(&pEngineState->userExperience, pPackage->sczId);
     ExitOnRootFailure(hr, "BA aborted detect package begin.");
 
     // Detect the cache state of the package.
@@ -2389,7 +2204,7 @@ LExit:
 
     if (fBegan)
     {
-        UserExperienceOnDetectPackageComplete(&pEngineState->userExperience, pPackage->sczId, hr, pPackage->currentState, pPackage->fCached);
+        BACallbackOnDetectPackageComplete(&pEngineState->userExperience, pPackage->sczId, hr, pPackage->currentState, pPackage->fCached);
     }
 
     return hr;
@@ -2465,7 +2280,7 @@ static DWORD WINAPI CacheThreadProc(
     hr = ApplyCache(pEngineState->section.hSourceEngineFile, &pEngineState->userExperience, &pEngineState->variables, &pEngineState->plan, pEngineState->companionConnection.hCachePipe, pContext->pApplyContext);
 
 LExit:
-    UserExperienceExecutePhaseComplete(&pEngineState->userExperience, hr); // signal that cache completed.
+    BootstrapperApplicationExecutePhaseComplete(&pEngineState->userExperience, hr); // signal that cache completed.
 
     if (fComInitialized)
     {

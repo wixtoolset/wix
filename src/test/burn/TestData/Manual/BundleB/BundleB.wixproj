@@ -6,6 +6,7 @@
     <UpgradeCode>{5DE2F206-3C37-4265-81F7-095284E16B08}</UpgradeCode>
     <HarvestDirectoryAdditionalOptions>-generate payloadgroup</HarvestDirectoryAdditionalOptions>
   </PropertyGroup>
+
   <ItemGroup>
     <HarvestDirectory Include="BAPayloads">
       <ComponentGroupName>BAPayloads</ComponentGroupName>
@@ -18,18 +19,22 @@
       <Transforms>package.xslt</Transforms>
     </HarvestDirectory>
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\PackageA\PackageA.wixproj" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="WixToolset.Heat" />
     <PackageReference Include="WixToolset.Bal.wixext" />
   </ItemGroup>
+
   <!-- We do this dynamically to avoid committing so many files to source control. -->
   <Target Name="CreateThousandsOfFiles" AfterTargets="BeforeBuild">
     <Exec Command='"$(BaseOutputPath)$(Configuration)\net6.0\win-x86\testexe.exe" /gf "BAPayloads|10000' WorkingDirectory="$(MSBuildProjectDirectory)" />
     <Exec Command='"$(BaseOutputPath)$(Configuration)\net6.0\win-x86\testexe.exe" /gf "PackagePayloads|10000' WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
+
   <Target Name="DeleteThousandsOfFiles" AfterTargets="AfterBuild">
     <RemoveDir Directories="$(MSBuildProjectDirectory)\BAPayloads" />
     <RemoveDir Directories="$(MSBuildProjectDirectory)\PackagePayloads" />

@@ -10,6 +10,8 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixBootstrapperApplication,
             new IntermediateFieldDefinition[]
             {
+                new IntermediateFieldDefinition(nameof(WixBootstrapperApplicationSymbolFields.ExePayloadRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBootstrapperApplicationSymbolFields.Secondary), IntermediateFieldType.Number),
             },
             typeof(WixBootstrapperApplicationSymbol));
     }
@@ -19,6 +21,8 @@ namespace WixToolset.Data.Symbols
 {
     public enum WixBootstrapperApplicationSymbolFields
     {
+        ExePayloadRef,
+        Secondary
     }
 
     public class WixBootstrapperApplicationSymbol : IntermediateSymbol
@@ -32,5 +36,17 @@ namespace WixToolset.Data.Symbols
         }
 
         public IntermediateField this[WixBootstrapperApplicationSymbolFields index] => this.Fields[(int)index];
+
+        public string ExePayloadRef
+        {
+            get => (string)this.Fields[(int)WixBootstrapperApplicationSymbolFields.ExePayloadRef];
+            set => this.Set((int)WixBootstrapperApplicationSymbolFields.ExePayloadRef, value);
+        }
+
+        public bool? Secondary
+        {
+            get => (bool?)this.Fields[(int)WixBootstrapperApplicationSymbolFields.Secondary];
+            set => this.Set((int)WixBootstrapperApplicationSymbolFields.Secondary, value);
+        }
     }
 }

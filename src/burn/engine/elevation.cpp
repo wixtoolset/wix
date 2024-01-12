@@ -420,7 +420,7 @@ extern "C" HRESULT ElevationElevate(
     HRESULT hr = S_OK;
     int nResult = IDOK;
 
-    hr = UserExperienceOnElevateBegin(&pEngineState->userExperience);
+    hr = BACallbackOnElevateBegin(&pEngineState->userExperience);
     ExitOnRootFailure(hr, "BA aborted elevation requirement.");
 
     hr = BurnPipeCreateNameAndSecret(&pEngineState->companionConnection.sczName, &pEngineState->companionConnection.sczSecret);
@@ -458,7 +458,7 @@ extern "C" HRESULT ElevationElevate(
                 hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
             }
 
-            nResult = UserExperienceSendError(&pEngineState->userExperience, BOOTSTRAPPER_ERROR_TYPE_ELEVATE, NULL, hr, NULL, MB_ICONERROR | MB_RETRYCANCEL, IDNOACTION);
+            nResult = BootstrapperApplicationSendError(&pEngineState->userExperience, BOOTSTRAPPER_ERROR_TYPE_ELEVATE, NULL, hr, NULL, MB_ICONERROR | MB_RETRYCANCEL, IDNOACTION);
         }
     } while (IDRETRY == nResult);
     ExitOnFailure(hr, "Failed to elevate.");
@@ -469,7 +469,7 @@ LExit:
         BurnPipeConnectionUninitialize(&pEngineState->companionConnection);
     }
 
-    UserExperienceOnElevateComplete(&pEngineState->userExperience, hr);
+    BACallbackOnElevateComplete(&pEngineState->userExperience, hr);
 
     return hr;
 }
@@ -511,15 +511,15 @@ extern "C" HRESULT ElevationApplyInitialize(
     // Best effort to keep the sequence of BA events sane.
     if (context.fPauseCompleteNeeded)
     {
-        UserExperienceOnPauseAUComplete(pBA, hr);
+        BACallbackOnPauseAUComplete(pBA, hr);
     }
     if (context.fSrpCompleteNeeded)
     {
-        UserExperienceOnSystemRestorePointComplete(pBA, hr);
+        BACallbackOnSystemRestorePointComplete(pBA, hr);
     }
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -540,7 +540,7 @@ extern "C" HRESULT ElevationApplyUninitialize(
     hr = (HRESULT)dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -598,7 +598,7 @@ extern "C" HRESULT ElevationSessionBegin(
     hr = (HRESULT)dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -644,7 +644,7 @@ extern "C" HRESULT ElevationSessionEnd(
     hr = (HRESULT)dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -693,7 +693,7 @@ extern "C" HRESULT ElevationCachePreparePackage(
     hr = (HRESULT)dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -743,7 +743,7 @@ extern "C" HRESULT ElevationCacheCompletePayload(
     hr = (HRESULT)dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -781,7 +781,7 @@ extern "C" HRESULT ElevationCacheVerifyPayload(
     hr = (HRESULT)dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -834,7 +834,7 @@ extern "C" HRESULT ElevationProcessDependentRegistration(
     hr = (HRESULT)dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -895,7 +895,7 @@ extern "C" HRESULT ElevationExecuteRelatedBundle(
     *pRestart = context.restart;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -959,7 +959,7 @@ extern "C" HRESULT ElevationExecuteBundlePackage(
     *pRestart = context.restart;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1014,7 +1014,7 @@ extern "C" HRESULT ElevationExecuteExePackage(
     *pRestart = context.restart;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1042,7 +1042,7 @@ extern "C" HRESULT ElevationMsiBeginTransaction(
     hr = static_cast<HRESULT>(dwResult);
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1079,7 +1079,7 @@ extern "C" HRESULT ElevationMsiCommitTransaction(
     *pRestart = context.restart;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1116,7 +1116,7 @@ extern "C" HRESULT ElevationMsiRollbackTransaction(
     *pRestart = context.restart;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1203,7 +1203,7 @@ extern "C" HRESULT ElevationExecuteMsiPackage(
     *pRestart = context.restart;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1283,7 +1283,7 @@ extern "C" HRESULT ElevationExecuteMspPackage(
     *pRestart = context.restart;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1335,7 +1335,7 @@ extern "C" HRESULT ElevationExecuteMsuPackage(
     *pRestart = context.restart;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1388,7 +1388,7 @@ extern "C" HRESULT ElevationUninstallMsiCompatiblePackage(
     *pRestart = context.restart;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1425,7 +1425,7 @@ extern "C" HRESULT ElevationExecutePackageProviderAction(
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_PROVIDER message to per-machine process.");
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1465,7 +1465,7 @@ extern "C" HRESULT ElevationExecutePackageDependencyAction(
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_PACKAGE_DEPENDENCY message to per-machine process.");
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1494,7 +1494,7 @@ extern "C" HRESULT ElevationCleanCompatiblePackage(
     hr = (HRESULT)dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1524,7 +1524,7 @@ extern "C" HRESULT ElevationCleanPackage(
     hr = (HRESULT)dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1559,7 +1559,7 @@ extern "C" HRESULT ElevationLaunchApprovedExe(
     *pdwProcessId = context.dwProcessId;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -1756,7 +1756,7 @@ static HRESULT ProcessApplyInitializeMessages(
     {
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_BEGIN:
         pContext->fPauseCompleteNeeded = TRUE;
-        hrBA = UserExperienceOnPauseAUBegin(pContext->pBA);
+        hrBA = BACallbackOnPauseAUBegin(pContext->pBA);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE:
@@ -1765,18 +1765,18 @@ static HRESULT ProcessApplyInitializeMessages(
         ExitOnFailure(hr, "Failed to read pause AU hrStatus.");
 
         pContext->fPauseCompleteNeeded = FALSE;
-        hrBA = UserExperienceOnPauseAUComplete(pContext->pBA, hrStatus);
+        hrBA = BACallbackOnPauseAUComplete(pContext->pBA, hrStatus);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_BEGIN:
         if (pContext->fPauseCompleteNeeded)
         {
             pContext->fPauseCompleteNeeded = FALSE;
-            hrBA = UserExperienceOnPauseAUComplete(pContext->pBA, E_INVALIDSTATE);
+            hrBA = BACallbackOnPauseAUComplete(pContext->pBA, E_INVALIDSTATE);
         }
 
         pContext->fSrpCompleteNeeded = TRUE;
-        hrBA = UserExperienceOnSystemRestorePointBegin(pContext->pBA);
+        hrBA = BACallbackOnSystemRestorePointBegin(pContext->pBA);
         break;
 
     case BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE:
@@ -1785,7 +1785,7 @@ static HRESULT ProcessApplyInitializeMessages(
         ExitOnFailure(hr, "Failed to read system restore point hrStatus.");
 
         pContext->fSrpCompleteNeeded = FALSE;
-        hrBA = UserExperienceOnSystemRestorePointComplete(pContext->pBA, hrStatus);
+        hrBA = BACallbackOnSystemRestorePointComplete(pContext->pBA, hrStatus);
         break;
 
     default:
@@ -1930,7 +1930,7 @@ static HRESULT ProcessGenericExecuteMessages(
         ExitOnFailure(hr, "Failed to read error code.");
 
         hr = BuffReadString((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &sczMessage);
-        ExitOnFailure(hr, "Failed to read message.");
+        ExitOnFailure(hr, "Failed to read error message.");
 
         message.error.wzMessage = sczMessage;
         break;
@@ -2042,7 +2042,7 @@ static HRESULT ProcessMsiPackageMessages(
         ExitOnFailure(hr, "Failed to read error code.");
 
         hr = BuffReadString((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &sczMessage);
-        ExitOnFailure(hr, "Failed to read message.");
+        ExitOnFailure(hr, "Failed to read MSI execute error message.");
         message.error.wzMessage = sczMessage;
         break;
 
@@ -2051,10 +2051,10 @@ static HRESULT ProcessMsiPackageMessages(
         message.type = WIU_MSI_EXECUTE_MESSAGE_MSI_MESSAGE;
 
         hr = BuffReadNumber((BYTE*)pMsg->pvData, pMsg->cbData, &iData, (DWORD*)&message.msiMessage.mt);
-        ExitOnFailure(hr, "Failed to read message type.");
+        ExitOnFailure(hr, "Failed to read MSI execute message type.");
 
         hr = BuffReadString((BYTE*)pMsg->pvData, pMsg->cbData, &iData, &sczMessage);
-        ExitOnFailure(hr, "Failed to read message.");
+        ExitOnFailure(hr, "Failed to read MSI execute message.");
         message.msiMessage.wzMessage = sczMessage;
         break;
 
@@ -3558,7 +3558,7 @@ static HRESULT CALLBACK BurnCacheMessageHandler(
     hr = dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -3593,7 +3593,7 @@ static DWORD CALLBACK ElevatedProgressRoutine(
     ExitOnFailure(hr, "Failed to send progress routine message to per-user process.");
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return dwResult;
 }
@@ -3668,7 +3668,7 @@ static int GenericExecuteMessageHandler(
     ExitOnFailure(hr, "Failed to send message to per-user process.");
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return nResult;
 }
@@ -3747,7 +3747,7 @@ static int MsiExecuteMessageHandler(
 
     default:
         hr = E_UNEXPECTED;
-        ExitOnFailure(hr, "Invalid message type: %d", pMessage->type);
+        ExitOnFailure(hr, "Invalid MSI execute message type: %d", pMessage->type);
     }
 
     // send message
@@ -3755,7 +3755,7 @@ static int MsiExecuteMessageHandler(
     ExitOnFailure(hr, "Failed to send msi message to per-user process.");
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return nResult;
 }
@@ -3895,7 +3895,7 @@ static HRESULT OnLaunchApprovedExe(
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_LAUNCH_APPROVED_EXE_PROCESSID message to per-user process.");
 
 LExit:
-    ReleaseBuffer(pbSendData);
+    ReleaseMem(pbSendData);
     ApprovedExesUninitializeLaunch(pLaunchApprovedExe);
     return hr;
 }
@@ -4056,7 +4056,7 @@ static HRESULT ElevatedOnPauseAUComplete(
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_PAUSE_AU_COMPLETE message to per-user process.");
 
 LExit:
-    ReleaseBuffer(pbSendData);
+    ReleaseMem(pbSendData);
 
     return hr;
 }
@@ -4092,7 +4092,7 @@ static HRESULT ElevatedOnSystemRestorePointComplete(
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_APPLY_INITIALIZE_SYSTEM_RESTORE_POINT_COMPLETE message to per-user process.");
 
 LExit:
-    ReleaseBuffer(pbSendData);
+    ReleaseMem(pbSendData);
 
     return hr;
 }
@@ -4114,7 +4114,7 @@ static HRESULT ElevatedOnExecuteActionComplete(
     ExitOnFailure(hr, "Failed to send BURN_ELEVATION_MESSAGE_TYPE_EXECUTE_ACTION_COMPLETE message to per-user process.");
 
 LExit:
-    ReleaseBuffer(pbSendData);
+    ReleaseMem(pbSendData);
 
     return hr;
 }

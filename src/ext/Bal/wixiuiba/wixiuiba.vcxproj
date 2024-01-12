@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-<Project DefaultTargets="Build" Toolsxmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
       <Configuration>Debug</Configuration>
@@ -31,39 +31,58 @@
 
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0F73E566-925C-448D-99CB-3A7F5DF399C8}</ProjectGuid>
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <Keyword>Win32Proj</Keyword>
+    <ConfigurationType>Application</ConfigurationType>
+    <ProjectSubSystem>Windows</ProjectSubSystem>
     <CharacterSet>Unicode</CharacterSet>
-    <TargetName>wixiuiba</TargetName>
-    <ProjectModuleDefinitionFile>wixiuiba.def</ProjectModuleDefinitionFile>
+    <Description>WiX Internal UI Bootstrapper Application</Description>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>..\wixstdba\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>shlwapi.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalIncludeDirectories>$(ProjectDir)..\stdbas\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalLinkLibraries>stdbas.res</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
+  <ItemDefinitionGroup>
+    <Link>
+      <DelayLoadDLLs>version.dll</DelayLoadDLLs>
+      <AdditionalOptions>/DEPENDENTLOADFLAG:0x800 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <ClInclude Include="precomp.h" />
+    <ClInclude Include="wixiuiba.h" />
+  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="WixInternalUIBootstrapperApplication.cpp" />
     <ClCompile Include="wixiuiba.cpp" />
   </ItemGroup>
+
   <ItemGroup>
-    <ClInclude Include="precomp.h" />
-    <ClInclude Include="WixInternalUIBootstrapperApplication.h" />
-    <ClInclude Include="wixiuiba.h" />
+    <Manifest Include="..\stdbas\stdbas.manifest" />
+    <ResourceCompile Include="wixiuiba.rc" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="wixiuiba.def" />
+    <ProjectReference Include="..\stdbas\stdbas.vcxproj">
+      <Project>{DBBF5F32-BAEA-46A8-99A0-17277A906456}</Project>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.BalUtil" />
-
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
 

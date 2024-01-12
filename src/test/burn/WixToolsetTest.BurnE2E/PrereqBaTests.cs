@@ -21,7 +21,7 @@ namespace WixToolsetTest.BurnE2E
         ///   The preqba doesn't infinitely try to install prereqs.
         ///   The engine automatically uninstalls the bundle since only permanent packages were installed.
         /// </summary>
-        [RuntimeFact]
+        [RuntimeFact(Skip = ".NET displays a message box when runtime is not present on the machine which hangs on CI systems. Skip this test until we can get a different behavior from .NET")]
         public void DncAlwaysPreqBaDetectsInfiniteLoop()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -54,7 +54,7 @@ namespace WixToolsetTest.BurnE2E
         ///   The preqba doesn't infinitely reload itself after failing to load the managed BA.
         ///   The engine automatically uninstalls the bundle since only permanent packages were installed.
         /// </summary>
-        [RuntimeFact]
+        [RuntimeFact(Skip = ".NET displays a message box when runtime is not present on the machine which hangs on CI systems. Skip this test until we can get a different behavior from .NET")]
         public void DncPreqBaDetectsInfiniteLoop()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
@@ -165,7 +165,7 @@ namespace WixToolsetTest.BurnE2E
         ///   The preqba doesn't infinitely try to install prereqs.
         ///   The engine automatically uninstalls the bundle since only permanent packages were installed.
         /// </summary>
-        [RuntimeFact]
+        [RuntimeFact(Skip = ".NET displays a message box when runtime is not present on the machine which hangs on CI systems. Skip this test until we can get a different behavior from .NET")]
         public void MbaAlwaysPreqBaDetectsInfiniteLoop()
         {
             var packageB = this.CreatePackageInstaller("PackageB");
@@ -198,7 +198,7 @@ namespace WixToolsetTest.BurnE2E
         ///   The preqba doesn't infinitely reload itself after failing to load the managed BA.
         ///   The engine automatically uninstalls the bundle since only permanent packages were installed.
         /// </summary>
-        [RuntimeFact]
+        [RuntimeFact(Skip = ".NET displays a message box when runtime is not present on the machine which hangs on CI systems. Skip this test until we can get a different behavior from .NET")]
         public void MbaPreqBaDetectsInfiniteLoop()
         {
             var packageB = this.CreatePackageInstaller("PackageB");

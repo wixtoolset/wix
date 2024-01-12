@@ -6,7 +6,9 @@
 extern "C" {
 #endif
 
-#define ReleasePipeHandle(h) if (h != INVALID_HANDLE_VALUE) { ::CloseHandle(h); }
+// macro definitions
+
+#define ReleasePipeHandle(h) if (h != INVALID_HANDLE_VALUE) { ::CloseHandle(h); h = INVALID_HANDLE_VALUE; }
 #define ReleasePipeMessage(pMsg) if (pMsg) { PipeFreeMessage(pMsg); }
 
 
@@ -26,6 +28,23 @@ typedef struct _PIPE_MESSAGE
     BOOL fAllocatedData;
     LPVOID pvData;
 } PIPE_MESSAGE;
+
+typedef struct _PIPE_RPC_HANDLE
+{
+    HANDLE hPipe;
+    CRITICAL_SECTION cs;
+
+    BOOL fInitialized;
+    BOOL fOwnHandle;
+} PIPE_RPC_HANDLE;
+
+typedef struct _PIPE_RPC_RESULT
+{
+    HRESULT hr;
+
+    DWORD cbData;
+    LPBYTE pbData;
+} PIPE_RPC_RESULT;
 
 
 // functions
@@ -72,15 +91,85 @@ DAPI_(HRESULT) PipeReadMessage(
 );
 
 /*******************************************************************
- PipeWriteMessage - writes a message to the pipe.
+ PipeRpcInitiailize - initializes a RPC pipe handle from a pipe handle.
 
 *******************************************************************/
-DAPI_(HRESULT) PipeWriteMessage(
+DAPI_(void) PipeRpcInitialize(
+    __in PIPE_RPC_HANDLE* phRpcPipe,
     __in HANDLE hPipe,
+    __in BOOL fTakeHandleOwnership
+);
+
+/*******************************************************************
+ PipeRpcInitialized - checks if a RPC pipe handle is initialized.
+
+*******************************************************************/
+DAPI_(BOOL) PipeRpcInitialized(
+    __in PIPE_RPC_HANDLE* phRpcPipe
+);
+
+/*******************************************************************
+ PipeRpcUninitiailize - uninitializes a RPC pipe handle.
+
+*******************************************************************/
+DAPI_(void) PipeRpcUninitiailize(
+    __in PIPE_RPC_HANDLE* phRpcPipe
+);
+
+/*******************************************************************
+ PipeRpcReadMessage - reads a message from the pipe. Free with
+    PipeFreeMessage().
+
+*******************************************************************/
+DAPI_(HRESULT) PipeRpcReadMessage(
+    __in PIPE_RPC_HANDLE* phRpcPipe,
+    __in PIPE_MESSAGE* pMsg
+);
+
+/*******************************************************************
+ PipeRpcRequest - sends message and reads a response over the pipe.
+    Free with PipeFreeRpcResult().
+
+*******************************************************************/
+DAPI_(HRESULT) PipeRpcRequest(
+    __in PIPE_RPC_HANDLE* phRpcPipe,
+    __in DWORD dwMessageType,
+    __in_bcount(cbArgs) LPVOID pbArgs,
+    __in SIZE_T cbArgs,
+    __in PIPE_RPC_RESULT* pResult
+);
+
+/*******************************************************************
+ PipeRpcResponse - sends response over the pipe.
+
+*******************************************************************/
+DAPI_(HRESULT) PipeRpcResponse(
+    __in PIPE_RPC_HANDLE* phPipe,
+    __in DWORD dwMessageType,
+    __in HRESULT hrResult,
+    __in_bcount(cbResult) LPVOID pvResult,
+    __in SIZE_T cbResult
+    );
+
+/*******************************************************************
+ PipeRpcWriteMessage - writes a message to the pipe.
+
+*******************************************************************/
+DAPI_(HRESULT) PipeRpcWriteMessage(
+    __in PIPE_RPC_HANDLE* phPipe,
     __in DWORD dwMessageType,
     __in_bcount_opt(cbData) LPVOID pvData,
     __in SIZE_T cbData
 );
+
+/*******************************************************************
+ PipeWriteDisconnect - writes a message to the pipe indicating the
+    client should disconnect.
+
+*******************************************************************/
+DAPI_(HRESULT) PipeWriteDisconnect(
+    __in HANDLE hPipe
+    );
 
 /*******************************************************************
  PipeFreeMessage - frees any memory allocated in PipeReadMessage.
@@ -91,12 +180,32 @@ DAPI_(void) PipeFreeMessage(
 );
 
 /*******************************************************************
+ PipeFreeRpcResult - frees any memory allocated in PipeRpcRequest.
+
+*******************************************************************/
+DAPI_(void) PipeFreeRpcResult(
+    __in PIPE_RPC_RESULT* pResult
+);
+
+/*******************************************************************
  PipeServerWaitForClientConnect - Called from the server process to
     wait for a client to connect back to the provided pipe.
 
 *******************************************************************/
 DAPI_(HRESULT) PipeServerWaitForClientConnect(
+    __in HANDLE hClientProcess,
     __in HANDLE hPipe
+);
+
+/*******************************************************************
+ PipeWriteMessage - writes a message to the pipe.
+
+*******************************************************************/
+DAPI_(HRESULT) PipeWriteMessage(
+    __in HANDLE hPipe,
+    __in DWORD dwMessageType,
+    __in_bcount_opt(cbData) LPVOID pvData,
+    __in SIZE_T cbData
 );
 
 #ifdef __cplusplus

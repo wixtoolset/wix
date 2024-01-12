@@ -19,15 +19,19 @@ namespace WixToolset.Bal
 
 namespace WixToolset.Bal.Symbols
 {
+    using System;
     using WixToolset.Data;
 
     public enum WixBalBootstrapperApplicationType
     {
         Unknown,
         Standard,
+        [Obsolete]
         ManagedHost,
+        [Obsolete]
         DotNetCoreHost,
         InternalUi,
+        Prerequisite,
     }
 
     public enum WixBalBootstrapperApplicationSymbolFields

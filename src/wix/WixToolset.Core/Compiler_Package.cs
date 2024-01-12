@@ -710,7 +710,7 @@ namespace WixToolset.Core
         /// <param name="driverName">Default name of driver.</param>
         /// <param name="possibleKeyPath">Identifier of this element in case it is a keypath.</param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        private YesNoType ParseODBCDataSource(XElement node, string componentId, string driverName, out string possibleKeyPath)
+        private YesNoType ParseODBCDataSource(XElement node, string componentId, string driverName, out Identifier possibleKeyPath)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
@@ -806,7 +806,7 @@ namespace WixToolset.Core
                 });
             }
 
-            possibleKeyPath = id.Id;
+            possibleKeyPath = id;
             return keyPath;
         }
 
@@ -1580,7 +1580,7 @@ namespace WixToolset.Core
         /// <param name="win64Component">true if the component is 64-bit.</param>
         /// <param name="possibleKeyPath">Identifier of this registry key since it could be the component's keypath.</param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        private YesNoType ParseRegistryKeyElement(XElement node, string componentId, RegistryRootType? root, string parentKey, bool win64Component, out string possibleKeyPath)
+        private YesNoType ParseRegistryKeyElement(XElement node, string componentId, RegistryRootType? root, string parentKey, bool win64Component, out Identifier possibleKeyPath)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
@@ -1666,7 +1666,7 @@ namespace WixToolset.Core
             {
                 if (CompilerCore.WixNamespace == child.Name.Namespace)
                 {
-                    string possibleChildKeyPath = null;
+                    Identifier possibleChildKeyPath = null;
 
                     switch (child.Name.LocalName)
                     {
@@ -1752,7 +1752,7 @@ namespace WixToolset.Core
         /// <param name="win64Component">true if the component is 64-bit.</param>
         /// <param name="possibleKeyPath">Identifier of this registry key since it could be the component's keypath.</param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        private YesNoType ParseRegistryValueElement(XElement node, string componentId, RegistryRootType? root, string parentKey, bool win64Component, out string possibleKeyPath)
+        private YesNoType ParseRegistryValueElement(XElement node, string componentId, RegistryRootType? root, string parentKey, bool win64Component, out Identifier possibleKeyPath)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             Identifier id = null;
@@ -1986,7 +1986,7 @@ namespace WixToolset.Core
             // Registry/@Id a possible key path.
             if (null == possibleKeyPath)
             {
-                possibleKeyPath = id.Id;
+                possibleKeyPath = id;
             }
 
             return keyPath;

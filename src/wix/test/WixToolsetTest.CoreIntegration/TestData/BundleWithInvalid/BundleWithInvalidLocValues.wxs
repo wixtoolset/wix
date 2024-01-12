@@ -1,9 +1,8 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Bundle Name="BundleWithInvalidUpgradeCode" Condition="!(loc.NonsenseGlobalCondition)"
             Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="{F2A56B65-2105-44C8-A532-A93A8C169D07}">
-        <BootstrapperApplication>
-            <BootstrapperApplicationDll SourceFile="fakeba.dll" />
-        </BootstrapperApplication>
+        <BootstrapperApplication SourceFile="fakeba.dll" />
+
         <Chain>
             <MsiPackage SourceFile="example.msi" InstallCondition="!(loc.NonsensePlanCondition)">
                 <MsiProperty Condition="!(loc.NonsenseExecuteCondition)" Name="!(loc.BuiltinMsiPropertyName)" Value="1" />

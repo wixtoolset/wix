@@ -23,6 +23,7 @@ namespace DutilTests
             HRESULT hr = S_OK;
             HANDLE hServerPipe = INVALID_HANDLE_VALUE;
             HANDLE hClientThread = NULL;
+            PIPE_RPC_HANDLE hRpc = { INVALID_HANDLE_VALUE };
             PIPE_MESSAGE msg = { };
             DWORD dwThread = 42;
             DWORD dwTestMessageId = 987654;
@@ -32,6 +33,12 @@ namespace DutilTests
                 hr = PipeCreate(L"DutilTest", NULL, &hServerPipe);
                 NativeAssert::Succeeded(hr, "Failed to create server pipe.");
 
+                PipeRpcInitialize(&hRpc, hServerPipe, FALSE);
+                NativeAssert::Equal((DWORD_PTR)hServerPipe, (DWORD_PTR)hRpc.hPipe);
+
+                BOOL fInitialized = PipeRpcInitialized(&hRpc);
+                NativeAssert::True(fInitialized);
+
                 hClientThread = ::CreateThread(NULL, 0, _TestPipeClientThreadProc, &dwTestMessageId, 0, NULL);
                 if (hClientThread == 0)
                 {
@@ -39,10 +46,10 @@ namespace DutilTests
                     return;
                 }
 
-                hr = PipeServerWaitForClientConnect(hServerPipe);
+                hr = PipeServerWaitForClientConnect(hClientThread, hServerPipe);
                 NativeAssert::Succeeded(hr, "Failed to wait for client to connect to pipe.");
 
-                hr = PipeReadMessage(hServerPipe, &msg);
+                hr = PipeRpcReadMessage(&hRpc, &msg);
                 NativeAssert::Succeeded(hr, "Failed to read message from client.");
 
                 NativeAssert::Equal(dwTestMessageId, msg.dwMessageType);
@@ -57,6 +64,8 @@ namespace DutilTests
                 ReleasePipeMessage(&msg);
                 ReleaseHandle(hClientThread);
                 ReleasePipeHandle(hServerPipe);
+
+                PipeRpcUninitiailize(&hRpc);
             }
         }
     };
@@ -69,6 +78,7 @@ static DWORD STDAPICALLTYPE _TestPipeClientThreadProc(
 {
     HRESULT hr = S_OK;
     HANDLE hClientPipe = INVALID_HANDLE_VALUE;
+    PIPE_RPC_HANDLE hRpc = { INVALID_HANDLE_VALUE };
 
     hr = PipeClientConnect(L"DutilTest", &hClientPipe);
     if (FAILED(hr))
@@ -76,14 +86,17 @@ static DWORD STDAPICALLTYPE _TestPipeClientThreadProc(
         return hr;
     }
 
+    PipeRpcInitialize(&hRpc, hClientPipe, TRUE);
+
     ::Sleep(200);
 
-    hr = PipeWriteMessage(hClientPipe, *(LPDWORD)lpThreadParameter, NULL, 0);
+    hr = PipeRpcWriteMessage(&hRpc, *(LPDWORD)lpThreadParameter, NULL, 0);
     if (FAILED(hr))
     {
         return hr;
     }
 
-    ReleasePipeHandle(hClientPipe);
+    PipeRpcUninitiailize(&hRpc);
+
     return 12;
 }

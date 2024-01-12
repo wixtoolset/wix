@@ -6,58 +6,48 @@ namespace WixToolset.Mba.Core
     using System.Runtime.InteropServices;
 
     /// <summary>
-    /// Default implementation of <see cref="IBootstrapperApplicationFactory"/>.
+    /// This is no longer used.
     /// </summary>
+    [Obsolete("Bootstrapper applications now run out of proc and do not use a BootstrapperApplicationFactory. Remove your BootstrapperApplicationFactory class. See https://wixtoolset.org/docs/fiveforfour/ for more details.")]
     public abstract class BaseBootstrapperApplicationFactory : IBootstrapperApplicationFactory
     {
         /// <summary>
-        /// Default implementation of <see cref="IBootstrapperApplicationFactory.Create(IntPtr, IntPtr)"/>
+        /// This is no longer used.
         /// </summary>
-        /// <param name="pArgs">The args struct given by the engine when initially creating the BA.</param>
-        /// <param name="pResults">The results struct given by the engine when initially creating the BA</param>
+        /// <param name="pArgs">This is no longer used.</param>
+        /// <param name="pResults">This is no longer used.</param>
         public void Create(IntPtr pArgs, IntPtr pResults)
         {
-            InitializeFromCreateArgs(pArgs, out var engine, out var bootstrapperCommand);
-
-            var ba = this.Create(engine, bootstrapperCommand);
-            StoreBAInCreateResults(pResults, ba);
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Called by <see cref="BaseBootstrapperApplicationFactory.Create(IntPtr, IntPtr)"/> to get the <see cref="IBootstrapperApplication"/>.
+        /// This is no longer used.
         /// </summary>
-        /// <param name="engine">The bundle engine.</param>
-        /// <param name="bootstrapperCommand">Command information passed from the engine for the BA to perform.</param>
-        /// <returns>The <see cref="IBootstrapperApplication"/> for the bundle.</returns>
+        /// <param name="engine">This is no longer used.</param>
+        /// <param name="bootstrapperCommand">This is no longer used.</param>
+        /// <returns>This is no longer used.</returns>
         protected abstract IBootstrapperApplication Create(IEngine engine, IBootstrapperCommand bootstrapperCommand);
 
         /// <summary>
-        /// Initializes the native part of <see cref="WixToolset.Mba.Core"/>.
-        /// Most users should inherit from <see cref="BaseBootstrapperApplicationFactory"/> instead of calling this method.
+        /// This is no longer used.
         /// </summary>
-        /// <param name="pArgs">The args struct given by the engine when initially creating the BA.</param>
-        /// <param name="engine">The bundle engine interface.</param>
-        /// <param name="bootstrapperCommand">The context of the current run of the bundle.</param>
+        /// <param name="pArgs">This is no longer used.</param>
+        /// <param name="engine">This is no longer used.</param>
+        /// <param name="bootstrapperCommand">This is no longer used.</param>
         public static void InitializeFromCreateArgs(IntPtr pArgs, out IEngine engine, out IBootstrapperCommand bootstrapperCommand)
         {
-            Command pCommand = new Command
-            {
-                cbSize = Marshal.SizeOf(typeof(Command))
-            };
-            var pEngine = MbaNative.InitializeFromCreateArgs(pArgs, ref pCommand);
-            engine = new Engine(pEngine);
-            bootstrapperCommand = pCommand.GetBootstrapperCommand();
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Registers the BA with the engine using the default mapping between the message based interface and the COM interface.
-        /// Most users should inherit from <see cref="BaseBootstrapperApplicationFactory"/> instead of calling this method.
+        /// This is no longer used.
         /// </summary>
-        /// <param name="pResults">The results struct given by the engine when initially creating the BA</param>
-        /// <param name="ba">The <see cref="IBootstrapperApplication"/>.</param>
+        /// <param name="pResults">This is no longer used.</param>
+        /// <param name="ba">This is no longer used.</param>
         public static void StoreBAInCreateResults(IntPtr pResults, IBootstrapperApplication ba)
         {
-            MbaNative.StoreBAInCreateResults(pResults, ba);
+            throw new NotImplementedException();
         }
     }
 }

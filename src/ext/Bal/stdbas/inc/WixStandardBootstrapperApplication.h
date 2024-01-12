@@ -1,0 +1,12 @@
+#pragma once
+// Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+
+EXTERN_C HRESULT CreateWixPrerequisiteBootstrapperApplication(
+    __in HINSTANCE hInstance,
+    __out IBootstrapperApplication** ppApplication
+    );
+
+EXTERN_C HRESULT CreateWixStandardBootstrapperApplication(
+    __in HINSTANCE hInstance,
+    __out IBootstrapperApplication** ppApplication
+    );

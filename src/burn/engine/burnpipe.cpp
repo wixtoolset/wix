@@ -305,7 +305,7 @@ extern "C" HRESULT BurnPipeWaitForChildConnect(
     {
         HANDLE hPipe = hPipes[i];
 
-        hr = PipeServerWaitForClientConnect(hPipe);
+        hr = PipeServerWaitForClientConnect(pConnection->hProcess, hPipe);
         ExitOnRootFailure(hr, "Failed to wait for child to connect to pipe.");
 
         // Prove we are the one that created the elevated process by passing the secret.
@@ -355,7 +355,7 @@ extern "C" HRESULT BurnPipeTerminateLoggingPipe(
     ExitOnFailure(hr, "Failed to post complete message to logging pipe.");
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }
@@ -419,7 +419,7 @@ extern "C" HRESULT BurnPipeTerminateChildProcess(
 #endif
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }

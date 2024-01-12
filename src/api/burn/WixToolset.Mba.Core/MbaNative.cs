@@ -8,14 +8,10 @@ namespace WixToolset.Mba.Core
     internal static class MbaNative
     {
         [DllImport("mbanative.dll", ExactSpelling = true, PreserveSig = false)]
-        internal static extern IBootstrapperEngine InitializeFromCreateArgs(
-            IntPtr pArgs,
-            ref Command pCommand
-            );
+        internal static extern void BootstrapperApplicationDebuggerCheck();
 
-        [DllImport("mbanative.dll", ExactSpelling = true)]
-        internal static extern void StoreBAInCreateResults(
-            IntPtr pResults,
+        [DllImport("mbanative.dll", ExactSpelling = true, PreserveSig = false)]
+        internal static extern void BootstrapperApplicationRun(
             [MarshalAs(UnmanagedType.Interface)] IBootstrapperApplication pBA
             );
     }

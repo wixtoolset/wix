@@ -126,7 +126,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var bundlePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var bundlePath = Path.Combine(baseFolder, @"bin", "test.exe");
 
                 var result = WixRunner.Execute(new[]
                 {
@@ -139,7 +139,11 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", bundlePath,
                 });
 
-                Assert.Equal(7002, result.ExitCode);
+                var messages = result.Messages.Select(WixMessageFormatter.FormatMessage).OrderBy(m => m).ToArray();
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "Error 7002: The Payload 'paybrzYNo9tnpTN4NnUuXkoauGUDe8' is shared with the BootstrapperApplication. This is not currently supported.",
+                }, messages);
             }
         }
 

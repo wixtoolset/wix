@@ -6,11 +6,13 @@
                 <PayloadGroupRef Id="Shared" />
             </ExePackage>
         </PackageGroup>
-        <BootstrapperApplication>
+
+        <PayloadGroup Id="override ExtraBoostrapperApplicationPayloads">
             <PayloadGroupRef Id="Shared" />
-        </BootstrapperApplication>
+        </PayloadGroup>
+
         <PayloadGroup Id="Shared">
-            <Payload SourceFile="$(sys.SOURCEFILEPATH)" />
+            <Payload SourceFile="test.txt" />
         </PayloadGroup>
     </Fragment>
 </Wix>

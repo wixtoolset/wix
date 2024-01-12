@@ -7,14 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <BindPath Include="..\wixstdba\Resources\" />
+    <BindPath Include="..\stdbas\Resources\" />
     <BindPath Include="$(OutputPath)net462" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\dnchost\dnchost.vcxproj" Platforms="arm64,x86,x64" />
-    <ProjectReference Include="..\mbahost\mbahost.vcxproj" Platforms="arm64,x86,x64" />
     <ProjectReference Include="..\wixiuiba\wixiuiba.vcxproj" Platforms="arm64,x86,x64" />
+    <ProjectReference Include="..\wixprqba\wixprqba.vcxproj" Platforms="arm64,x86,x64" />
     <ProjectReference Include="..\wixstdba\wixstdba.vcxproj" Platforms="arm64,x86,x64" />
   </ItemGroup>
 

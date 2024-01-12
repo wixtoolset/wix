@@ -324,7 +324,7 @@ extern "C" HRESULT MspEngineDetectPackage(
                 }
             }
 
-            hr = UserExperienceOnDetectPatchTarget(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, pTargetProduct->patchPackageState);
+            hr = BACallbackOnDetectPatchTarget(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, pTargetProduct->patchPackageState);
             ExitOnRootFailure(hr, "BA aborted detect patch target.");
         }
     }
@@ -358,7 +358,7 @@ extern "C" HRESULT MspEnginePlanInitializePackage(
 
         pTargetProduct->defaultRequested = pTargetProduct->requested = pPackage->requested;
 
-        hr = UserExperienceOnPlanPatchTarget(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, &pTargetProduct->requested);
+        hr = BACallbackOnPlanPatchTarget(pUserExperience, pPackage->sczId, pTargetProduct->wzTargetProductCode, &pTargetProduct->requested);
         ExitOnRootFailure(hr, "BA aborted plan patch target.");
     }
 

@@ -5,31 +5,27 @@ namespace WixToolset.Mba.Core
     using System;
 
     /// <summary>
-    /// Identifies the bootstrapper application factory class.
+    /// This is no longer used.
     /// </summary>
-    /// <remarks>
-    /// This required assembly attribute identifies the bootstrapper application factory class.
-    /// </remarks>
+    [Obsolete("Bootstrapper applications now run out of proc and do not use a BootstrapperApplicationFactory. Remove your BootstrapperApplicationFactory class. See https://wixtoolset.org/docs/fiveforfour/ for more details.")]
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
     public sealed class BootstrapperApplicationFactoryAttribute : Attribute
     {
-        private Type bootstrapperApplicationFactoryType;
-
         /// <summary>
-        /// Creates a new instance of the <see cref="BootstrapperApplicationFactoryAttribute"/> class.
+        /// This is no longer used.
         /// </summary>
-        /// <param name="bootstrapperApplicationFactoryType">The <see cref="Type"/> of the BA factory.</param>
+        /// <param name="bootstrapperApplicationFactoryType">This is no longer used</param>
         public BootstrapperApplicationFactoryAttribute(Type bootstrapperApplicationFactoryType)
         {
-            this.bootstrapperApplicationFactoryType = bootstrapperApplicationFactoryType;
+            throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Gets the type of the bootstrapper application factory class to create.
+        /// This is no longer used.
         /// </summary>
         public Type BootstrapperApplicationFactoryType
         {
-            get { return this.bootstrapperApplicationFactoryType; }
+            get { throw new NotImplementedException(); }
         }
     }
 }

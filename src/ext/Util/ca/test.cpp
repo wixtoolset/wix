@@ -216,7 +216,7 @@ static DWORD WINAPI ThreadProc(
 
     // Create the window to handle reboots without activating it.
     hWnd = ::CreateWindowExW(WS_EX_TOOLWINDOW, wc.lpszClassName, NULL, WS_POPUP | WS_VISIBLE, CW_USEDEFAULT, SW_SHOWNA, 0, 0, HWND_DESKTOP, NULL, pContext->hInstance, NULL);
-    ExitOnNullWithLastError(hWnd, hr, "Failed to create window.");
+    ExitOnNullWithLastError(hWnd, hr, "Failed to create test UI thread window.");
 
     // Persist the window handle and let the caller know we've initialized.
     pContext->hWnd = hWnd;

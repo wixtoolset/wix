@@ -3,7 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
-    <IsDncBA>true</IsDncBA>
+    <OutputType>WinExe</OutputType>
+    <DebugType>embedded</DebugType>
     <Description>Latest .NET Core MBA</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Mba.Core" />
+  </ItemGroup>
 </Project>

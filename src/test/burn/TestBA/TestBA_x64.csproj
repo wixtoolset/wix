@@ -4,25 +4,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net462;net6.0-windows</TargetFrameworks>
+    <OutputType>WinExe</OutputType>
     <AssemblyName>TestBA</AssemblyName>
     <RootNamespace>WixToolset.Test.BA</RootNamespace>
     <DebugType>embedded</DebugType>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <UseWindowsForms>true</UseWindowsForms>
+    <SelfContained>false</SelfContained>
     <RollForward>Major</RollForward>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)'=='net462' ">
-    <Content Include="TestBA.BootstrapperCore.config" CopyToOutputDirectory="PreserveNewest" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Mba.Core" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)'!='.NETFramework' ">
-    <PackageReference Include="WixToolset.Dnc.HostGenerator" />
   </ItemGroup>
 </Project>

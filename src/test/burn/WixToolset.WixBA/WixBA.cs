@@ -18,17 +18,9 @@ namespace WixToolset.WixBA
     /// </summary>
     public class WixBA : BootstrapperApplication
     {
-        public WixBA(IEngine engine, IBootstrapperCommand command)
-            : base(engine)
-        {
-            this.Command = command;
+        internal IBootstrapperApplicationData BAManifest { get; private set; }
 
-            this.BAManifest = new BootstrapperApplicationData();
-        }
-
-        internal IBootstrapperApplicationData BAManifest { get; }
-
-        internal IBootstrapperCommand Command { get; }
+        internal IBootstrapperCommand Command { get; private set; }
 
         internal IEngine Engine => this.engine;
 
@@ -187,6 +179,13 @@ namespace WixToolset.WixBA
             }
 
             this.Engine.Quit(exitCode);
+        }
+
+        protected override void OnCreate(CreateEventArgs args)
+        {
+            base.OnCreate(args);
+            this.Command = args.Command;
+            this.BAManifest = new BootstrapperApplicationData();
         }
 
         private void PostTelemetry()

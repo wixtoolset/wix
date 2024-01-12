@@ -143,7 +143,7 @@ extern "C" HRESULT DetectForwardCompatibleBundles(
                         pRegistration->fForwardCompatibleBundleExists = TRUE;
                     }
 
-                    hr = UserExperienceOnDetectForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->detectRelationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, !pRelatedBundle->package.fCached);
+                    hr = BACallbackOnDetectForwardCompatibleBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->detectRelationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, !pRelatedBundle->package.fCached);
                     ExitOnRootFailure(hr, "BA aborted detect forward compatible bundle.");
 
                     LogId(REPORT_STANDARD, MSG_DETECTED_FORWARD_COMPATIBLE_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->detectRelationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingBoolToString(pRelatedBundle->package.fCached));
@@ -174,7 +174,7 @@ extern "C" HRESULT DetectReportRelatedBundles(
 
         LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_BUNDLE, pRelatedBundle->package.sczId, LoggingRelationTypeToString(pRelatedBundle->detectRelationType), LoggingPerMachineToString(pRelatedBundle->package.fPerMachine), pRelatedBundle->pVersion->sczVersion, LoggingBoolToString(pRelatedBundle->package.fCached));
 
-        hr = UserExperienceOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->detectRelationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, !pRelatedBundle->package.fCached);
+        hr = BACallbackOnDetectRelatedBundle(pUX, pRelatedBundle->package.sczId, pRelatedBundle->detectRelationType, pRelatedBundle->sczTag, pRelatedBundle->package.fPerMachine, pRelatedBundle->pVersion, !pRelatedBundle->package.fCached);
         ExitOnRootFailure(hr, "BA aborted detect related bundle.");
 
         // For now, if any related bundles will be executed during uninstall by default then never automatically clean up the bundle.
@@ -223,7 +223,7 @@ extern "C" HRESULT DetectUpdate(
     hr = StrAllocString(&sczOriginalSource, pUpdate->sczUpdateSource, 0);
     ExitOnFailure(hr, "Failed to duplicate update feed source.");
 
-    hr = UserExperienceOnDetectUpdateBegin(pUX, sczOriginalSource, &fSkip);
+    hr = BACallbackOnDetectUpdateBegin(pUX, sczOriginalSource, &fSkip);
     ExitOnRootFailure(hr, "BA aborted detect update begin.");
 
     if (!fSkip)
@@ -237,7 +237,7 @@ LExit:
 
     if (fBeginCalled)
     {
-        UserExperienceOnDetectUpdateComplete(pUX, hr, &fIgnoreError);
+        BACallbackOnDetectUpdateComplete(pUX, hr, &fIgnoreError);
         if (fIgnoreError)
         {
             hr = S_OK;
@@ -270,8 +270,8 @@ static HRESULT WINAPI AuthenticationRequired(
     hr = StrAllocFromError(&sczError, HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED), NULL);
     ExitOnFailure(hr, "Failed to allocation error string.");
 
-    UserExperienceOnError(pAuthenticationData->pUX, errorType, pAuthenticationData->wzPackageOrContainerId, ERROR_ACCESS_DENIED, sczError, MB_RETRYCANCEL, 0, NULL, &nResult); // ignore return value.
-    nResult = UserExperienceCheckExecuteResult(pAuthenticationData->pUX, FALSE, BURN_MB_RETRYTRYAGAIN, nResult);
+    BACallbackOnError(pAuthenticationData->pUX, errorType, pAuthenticationData->wzPackageOrContainerId, ERROR_ACCESS_DENIED, sczError, MB_RETRYCANCEL, 0, NULL, &nResult); // ignore return value.
+    nResult = BootstrapperApplicationCheckExecuteResult(pAuthenticationData->pUX, FALSE, BURN_MB_RETRYTRYAGAIN, nResult);
     if (IDTRYAGAIN == nResult && pAuthenticationData->pUX->hwndDetect)
     {
         er = ::InternetErrorDlg(pAuthenticationData->pUX->hwndDetect, hUrl, ERROR_INTERNET_INCORRECT_PASSWORD, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA, NULL);
@@ -356,6 +356,7 @@ LExit:
     ReleaseStr(downloadSource.sczUrl);
     ReleaseStr(downloadSource.sczUser);
     ReleaseStr(downloadSource.sczPassword);
+    ReleaseStr(downloadSource.sczAuthorizationHeader);
     ReleaseStr(sczUpdateId);
     ReleaseStr(sczError);
     return hr;
@@ -411,7 +412,7 @@ static HRESULT DetectAtomFeedUpdate(
                 hashType = BOOTSTRAPPER_UPDATE_HASH_TYPE_SHA512;
             }
 
-            hr = UserExperienceOnDetectUpdate(pUX,
+            hr = BACallbackOnDetectUpdate(pUX,
                 pEnclosure ? pEnclosure->wzUrl : NULL,
                 pEnclosure ? pEnclosure->dw64Size : 0,
                 wzHash,

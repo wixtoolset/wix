@@ -27,6 +27,7 @@ typedef struct _DOWNLOAD_SOURCE
     LPWSTR sczUrl;
     LPWSTR sczUser;
     LPWSTR sczPassword;
+    LPWSTR sczAuthorizationHeader;
 } DOWNLOAD_SOURCE;
 
 typedef struct _DOWNLOAD_CACHE_CALLBACK

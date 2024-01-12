@@ -80,7 +80,7 @@ extern "C" HRESULT DAPI StrAllocSecure(
 
 /********************************************************************
 AllocHelper - allocates or reuses dynamic string memory
-If fZeroOnRealloc is true and the memory needs to reallocated, 
+If fZeroOnRealloc is true and the memory needs to reallocated,
 calls SecureZeroMemory on original block of memory after it is moved.
 
 NOTE: caller is responsible for freeing ppwz even if function fails
@@ -350,8 +350,8 @@ extern "C" HRESULT DAPI StrAllocString(
 }
 
 /********************************************************************
-StrAllocStringSecure - allocates or reuses dynamic string memory and 
-copies in an existing string. If the memory needs to reallocated, 
+StrAllocStringSecure - allocates or reuses dynamic string memory and
+copies in an existing string. If the memory needs to reallocated,
 calls SecureZeroMemory on original block of memory after it is moved.
 
 NOTE: caller is responsible for freeing ppwz even if function fails
@@ -369,7 +369,7 @@ extern "C" HRESULT DAPI StrAllocStringSecure(
 
 /********************************************************************
 AllocStringHelper - allocates or reuses dynamic string memory and copies in an existing string
-If fZeroOnRealloc is true and the memory needs to reallocated, 
+If fZeroOnRealloc is true and the memory needs to reallocated,
 calls SecureZeroMemory on original block of memory after it is moved.
 
 NOTE: caller is responsible for freeing ppwz even if function fails
@@ -623,7 +623,7 @@ LExit:
 
 
 /********************************************************************
-StrAllocPrefix - allocates or reuses dynamic string memory and 
+StrAllocPrefix - allocates or reuses dynamic string memory and
                  prefixes a string
 
 NOTE: caller is responsible for freeing ppwz even if function fails
@@ -703,8 +703,8 @@ extern "C" HRESULT DAPI StrAllocConcat(
 
 
 /********************************************************************
-StrAllocConcatSecure - allocates or reuses dynamic string memory and 
-adds an existing string. If the memory needs to reallocated, calls 
+StrAllocConcatSecure - allocates or reuses dynamic string memory and
+adds an existing string. If the memory needs to reallocated, calls
 SecureZeroMemory on the original block of memory after it is moved.
 
 NOTE: caller is responsible for freeing ppwz even if function fails
@@ -723,7 +723,7 @@ extern "C" HRESULT DAPI StrAllocConcatSecure(
 
 /********************************************************************
 AllocConcatHelper - allocates or reuses dynamic string memory and adds an existing string
-If fZeroOnRealloc is true and the memory needs to reallocated, 
+If fZeroOnRealloc is true and the memory needs to reallocated,
 calls SecureZeroMemory on original block of memory after it is moved.
 
 NOTE: caller is responsible for freeing ppwz even if function fails
@@ -940,7 +940,7 @@ LExit:
 
 
 /********************************************************************
-StrAllocFormattedSecure - allocates or reuses dynamic string memory 
+StrAllocFormattedSecure - allocates or reuses dynamic string memory
 and formats it. If the memory needs to be reallocated,
 calls SecureZeroMemory on original block of memory after it is moved.
 
@@ -990,7 +990,7 @@ extern "C" HRESULT DAPI StrAnsiAllocFormatted(
 
 
 /********************************************************************
-StrAllocFormattedArgs - allocates or reuses dynamic string memory 
+StrAllocFormattedArgs - allocates or reuses dynamic string memory
 and formats it with the passed in args
 
 NOTE: caller is responsible for freeing ppwz even if function fails
@@ -1009,7 +1009,7 @@ extern "C" HRESULT DAPI StrAllocFormattedArgs(
 StrAllocFormattedArgsSecure - allocates or reuses dynamic string memory
 and formats it with the passed in args.
 
-If the memory needs to reallocated, calls SecureZeroMemory on the 
+If the memory needs to reallocated, calls SecureZeroMemory on the
 original block of memory after it is moved.
 
 NOTE: caller is responsible for freeing ppwz even if function fails
@@ -1028,7 +1028,7 @@ extern "C" HRESULT DAPI StrAllocFormattedArgsSecure(
 AllocFormattedArgsHelper - allocates or reuses dynamic string memory
 and formats it with the passed in args.
 
-If fZeroOnRealloc is true and the memory needs to reallocated, 
+If fZeroOnRealloc is true and the memory needs to reallocated,
 calls SecureZeroMemory on original block of memory after it is moved.
 
 NOTE: caller is responsible for freeing ppwz even if function fails
@@ -1108,7 +1108,7 @@ LExit:
 
 
 /********************************************************************
-StrAnsiAllocFormattedArgs - allocates or reuses dynamic ANSI string memory 
+StrAnsiAllocFormattedArgs - allocates or reuses dynamic ANSI string memory
 and formats it with the passed in args
 
 NOTE: caller is responsible for freeing ppsz even if function fails
@@ -1946,7 +1946,7 @@ extern "C" HRESULT DAPI MultiSzPrepend(
     // Allocate the result buffer
     hr = StrAlloc(&pwzResult, cchResult + 1);
     StrExitOnFailure(hr, "failed to allocate result string");
- 
+
     // Prepend
     hr = ::StringCchCopyW(pwzResult, cchResult, pwzInsert);
     StrExitOnRootFailure(hr, "failed to copy prepend string: %ls", pwzInsert);
@@ -2395,7 +2395,7 @@ extern "C" HRESULT DAPI StrStringToUInt16(
     ULONGLONG ull = 0;
 
     hr = StrStringToUInt64(wzIn, cchIn, &ull);
-    StrExitOnFailure(hr, "Failed to parse uint64.");
+    StrExitOnFailure(hr, "Failed to parse uint64 to convert to uint16.");
 
     if (USHORT_MAX < ull)
     {
@@ -2447,7 +2447,7 @@ extern "C" HRESULT DAPI StrStringToUInt32(
     ULONGLONG ull = 0;
 
     hr = StrStringToUInt64(wzIn, cchIn, &ull);
-    StrExitOnFailure(hr, "Failed to parse uint64.");
+    StrExitOnFailure(hr, "Failed to parse uint64 to convert to uint32.");
 
     if (UINT_MAX < ull)
     {

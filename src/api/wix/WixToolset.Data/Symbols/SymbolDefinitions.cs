@@ -550,8 +550,10 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.WixBootstrapperApplication:
                     return SymbolDefinitions.WixBootstrapperApplication;
 
+#pragma warning disable 612
                 case SymbolDefinitionType.WixBootstrapperApplicationDll:
                     return SymbolDefinitions.WixBootstrapperApplicationDll;
+#pragma warning restore 612
 
                 case SymbolDefinitionType.WixBuildInfo:
                     return SymbolDefinitions.WixBuildInfo;

@@ -13,7 +13,6 @@ const LPCWSTR BURN_POLICY_REGISTRY_PATH = L"WiX\\Burn";
 
 const LPCWSTR BURN_COMMANDLINE_SWITCH_PARENT = L"parent";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_PARENT_NONE = L"parent:none";
-const LPCWSTR BURN_COMMANDLINE_SWITCH_CLEAN_ROOM = L"burn.clean.room";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY = L"burn.engine.working.directory";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_ELEVATED = L"burn.elevated";
 const LPCWSTR BURN_COMMANDLINE_SWITCH_EMBEDDED = L"burn.embedded";
@@ -47,8 +46,6 @@ const LPCWSTR BURN_BUNDLE_FORCED_RESTART_PACKAGE = L"WixBundleForcedRestartPacka
 const LPCWSTR BURN_BUNDLE_INSTALLED = L"WixBundleInstalled";
 const LPCWSTR BURN_BUNDLE_ELEVATED = L"WixBundleElevated";
 const LPCWSTR BURN_BUNDLE_PROVIDER_KEY = L"WixBundleProviderKey";
-const LPCWSTR BURN_BUNDLE_SOURCE_PROCESS_PATH = L"WixBundleSourceProcessPath";
-const LPCWSTR BURN_BUNDLE_SOURCE_PROCESS_FOLDER = L"WixBundleSourceProcessFolder";
 const LPCWSTR BURN_BUNDLE_TAG = L"WixBundleTag";
 const LPCWSTR BURN_BUNDLE_UILEVEL = L"WixBundleUILevel";
 const LPCWSTR BURN_BUNDLE_VERSION = L"WixBundleVersion";
@@ -68,7 +65,6 @@ const LPCWSTR BURN_BUNDLE_LAST_USED_SOURCE = L"WixBundleLastUsedSource";
 enum BURN_MODE
 {
     BURN_MODE_UNKNOWN,
-    BURN_MODE_UNTRUSTED,
     BURN_MODE_NORMAL,
     BURN_MODE_ELEVATED,
     BURN_MODE_EMBEDDED,
@@ -115,7 +111,6 @@ typedef struct _BURN_ENGINE_COMMAND
     LPWSTR sczAncestors;
     LPWSTR sczIgnoreDependencies;
 
-    LPWSTR sczSourceProcessPath;
     LPWSTR sczOriginalSource;
     LPWSTR sczEngineWorkingDirectory;
 
@@ -263,7 +258,7 @@ HRESULT CoreLaunchApprovedExe(
     __in BURN_LAUNCH_APPROVED_EXE* pLaunchApprovedExe
     );
 void CoreQuit(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in DWORD dwExitCode
     );
 HRESULT CoreSaveEngineState(
@@ -271,14 +266,6 @@ HRESULT CoreSaveEngineState(
     );
 LPCWSTR CoreRelationTypeToCommandLineString(
     __in BOOTSTRAPPER_RELATION_TYPE relationType
-    );
-HRESULT CoreCreateCleanRoomCommandLine(
-    __deref_inout_z LPWSTR* psczCommandLine,
-    __in BURN_ENGINE_STATE* pEngineState,
-    __in_z LPCWSTR wzCleanRoomBundlePath,
-    __in_z LPCWSTR wzCurrentProcessPath,
-    __inout HANDLE* phFileAttached,
-    __inout HANDLE* phFileSelf
     );
 HRESULT CoreCreatePassthroughBundleCommandLine(
     __deref_inout_z LPWSTR* psczCommandLine,
@@ -360,9 +347,6 @@ HRESULT DAPI CoreCloseElevatedLoggingThread(
     );
 HRESULT DAPI CoreWaitForUnelevatedLoggingThread(
     __in HANDLE hUnelevatedLoggingThread
-    );
-void DAPI CoreBootstrapperEngineActionUninitialize(
-    __in BOOTSTRAPPER_ENGINE_ACTION* pAction
     );
 
 #if defined(__cplusplus)

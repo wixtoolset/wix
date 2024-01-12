@@ -1,6 +1,7 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+#include <baenginetypes.h>
 
 DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-81512C29C2FB")
 {
@@ -65,7 +66,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
         __in_z_opt LPCWSTR wzDownloadSource,
         __in DWORD64 qwSize,
         __in BOOTSTRAPPER_UPDATE_HASH_TYPE hashType,
-        __in_z_opt LPCWSTR wzHash
+        __in_z_opt LPCWSTR wzHash,
+        __in_z_opt LPCWSTR wzUpdatePackageId
         ) = 0;
 
     STDMETHOD(SetLocalSource)(
@@ -79,7 +81,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
         __in_z_opt LPCWSTR wzPayloadId,
         __in_z LPCWSTR wzUrl,
         __in_z_opt LPCWSTR wzUser,
-        __in_z_opt LPCWSTR wzPassword
+        __in_z_opt LPCWSTR wzPassword,
+        __in_z_opt LPCWSTR wzAuthorizationHeader
         ) = 0;
 
     STDMETHOD(SetVariableNumeric)(
@@ -128,7 +131,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
         ) = 0;
 
     STDMETHOD(SetUpdateSource)(
-        __in_z LPCWSTR wzUrl
+        __in_z LPCWSTR wzUrl,
+        __in_z_opt LPCWSTR wzAuthorizationHeader
         ) = 0;
 
     STDMETHOD(CompareVersions)(
@@ -143,5 +147,4 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
         __out_ecount_opt(*pcchValue) LPWSTR wzValue,
         __inout SIZE_T* pcchValue
         ) = 0;
-
 };

@@ -123,8 +123,8 @@ namespace Example.Extension
         private IComponentKeyPath ParseExampleSetKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement element, string componentId)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            string file = null;
-            string reg = null;
+            Identifier file = null;
+            Identifier reg = null;
             var explicitly = false;
 
             foreach (var attrib in element.Attributes())
@@ -134,11 +134,11 @@ namespace Example.Extension
                     switch (attrib.Name.LocalName)
                     {
                         case "File":
-                            file = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            file = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
 
                         case "Registry":
-                            reg = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            reg = this.ParseHelper.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
 
                         case "Explicitly":
@@ -166,7 +166,7 @@ namespace Example.Extension
                 var componentKeyPath = this.CreateComponentKeyPath();
                 componentKeyPath.Id = file ?? reg;
                 componentKeyPath.Explicit = explicitly;
-                componentKeyPath.Type = String.IsNullOrEmpty(file) ? PossibleKeyPathType.Registry : PossibleKeyPathType.File;
+                componentKeyPath.Type = file is null ? PossibleKeyPathType.Registry : PossibleKeyPathType.File;
                 return componentKeyPath;
             }
 

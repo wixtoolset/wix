@@ -104,13 +104,14 @@ namespace WixTestTools
         /// <summary>
         /// Scans a log file for matches to the regex.
         /// </summary>
-        /// <param name="regex">A regular expression</param>
-        /// <returns>The number of matches</returns>
-        public bool EntireFileAtOncestr(string regex)
+        /// <param name="match">A string to find.</param>
+        /// <returns>If the string is found.</returns>
+        public bool EntireFileAtOncestr(string match)
         {
             string logFileText = this.ReadLogFile();
-            return logFileText.Contains(regex);
+            return logFileText.Contains(match);
         }
+
         /// <summary>
         /// Scans a log file for matches to the regex string.
         /// Only the Multiline RegexOption is used and matches are case sensitive.
@@ -143,12 +144,12 @@ namespace WixTestTools
         /// <summary>
         /// Search through the log and Assert.Fail() if a specified string is not found.
         /// </summary>
-        /// <param name="regex">Search expression</param>
+        /// <param name="match">Search expression</param>
         /// <param name="ignoreCase">Perform case insensitive match</param>
-        public void AssertTextInLog(string regex, bool ignoreCase)
+        public void AssertTextInLog(string match, bool ignoreCase)
         {
-            Assert.True(this.EntireFileAtOncestr(regex),
-                String.Format("The log does not contain a match to the regular expression \"{0}\" ", regex));
+            Assert.True(this.EntireFileAtOncestr(match),
+                String.Format("The log does not contain a match for the {1}string \"{0}\" ", match, ignoreCase ? "case insensitive " : ""));
         }
 
         /// <summary>

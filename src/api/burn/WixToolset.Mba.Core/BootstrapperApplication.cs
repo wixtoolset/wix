@@ -13,23 +13,15 @@ namespace WixToolset.Mba.Core
     public abstract class BootstrapperApplication : MarshalByRefObject, IDefaultBootstrapperApplication
     {
         /// <summary>
-        /// Specifies whether this bootstrapper should run asynchronously. The default is true.
-        /// </summary>
-        protected readonly bool asyncExecution;
-
-        /// <summary>
         /// Gets the <see cref="IEngine"/> for interaction with the engine.
         /// </summary>
-        protected readonly IEngine engine;
+        protected IEngine engine;
 
-        /// <summary>
-        /// Creates a new instance of the <see cref="BootstrapperApplication"/> class.
-        /// </summary>
-        protected BootstrapperApplication(IEngine engine)
-        {
-            this.engine = engine;
-            this.asyncExecution = true;
-        }
+        /// <inheritdoc/>
+        public event EventHandler<CreateEventArgs> Create;
+
+        /// <inheritdoc/>
+        public event EventHandler<DestroyEventArgs> Destroy;
 
         /// <inheritdoc/>
         public event EventHandler<StartupEventArgs> Startup;
@@ -266,12 +258,6 @@ namespace WixToolset.Mba.Core
         public event EventHandler<CachePayloadExtractCompleteEventArgs> CachePayloadExtractComplete;
 
         /// <inheritdoc/>
-        public event EventHandler<SetUpdateBeginEventArgs> SetUpdateBegin;
-
-        /// <inheritdoc/>
-        public event EventHandler<SetUpdateCompleteEventArgs> SetUpdateComplete;
-
-        /// <inheritdoc/>
         public event EventHandler<PlanRestoreRelatedBundleEventArgs> PlanRestoreRelatedBundle;
 
         /// <inheritdoc/>
@@ -284,9 +270,56 @@ namespace WixToolset.Mba.Core
         public event EventHandler<CachePackageNonVitalValidationFailureEventArgs> CachePackageNonVitalValidationFailure;
 
         /// <summary>
+        /// The default constructor.
+        /// </summary>
+        /// <remarks>
+        /// The engine object will be valid after handling the OnCreate() event.
+        /// </remarks>
+        protected BootstrapperApplication()
+        {
+        }
+
+        /// <summary>
+        /// This constructor is no longer used.
+        /// </summary>
+        [Obsolete("This constructor is no longer used. Use the default constructor. The engine object will be valid after handling the OnCreate() event.")]
+        protected BootstrapperApplication(IEngine engine)
+        {
+            throw new NotImplementedException("This constructor is no longer used. Use the default constructor. The engine object will be valid after handling the OnCreate() event.");
+        }
+
+        /// <summary>
         /// Entry point that is called when the bootstrapper application is ready to run.
         /// </summary>
         protected abstract void Run();
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="Create"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnCreate(CreateEventArgs args)
+        {
+            this.engine = args.Engine;
+
+            EventHandler<CreateEventArgs> handler = this.Create;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
+
+        /// <summary>
+        /// Called by the engine, raises the <see cref="Destroy"/> event.
+        /// </summary>
+        /// <param name="args">Additional arguments for this event.</param>
+        protected virtual void OnDestroy(DestroyEventArgs args)
+        {
+            EventHandler<DestroyEventArgs> handler = this.Destroy;
+            if (null != handler)
+            {
+                handler(this, args);
+            }
+        }
 
         /// <summary>
         /// Called by the engine, raises the <see cref="Startup"/> event.
@@ -300,19 +333,10 @@ namespace WixToolset.Mba.Core
                 handler(this, args);
             }
 
-            if (this.asyncExecution)
-            {
-                this.engine.Log(LogLevel.Verbose, "Creating BA thread to run asynchronously.");
-                Thread uiThread = new Thread(this.Run);
-                uiThread.Name = "UIThread";
-                uiThread.SetApartmentState(ApartmentState.STA);
-                uiThread.Start();
-            }
-            else
-            {
-                this.engine.Log(LogLevel.Verbose, "Creating BA thread to run synchronously.");
-                this.Run();
-            }
+            Thread uiThread = new Thread(this.Run);
+            uiThread.Name = "UIThread";
+            uiThread.SetApartmentState(ApartmentState.STA);
+            uiThread.Start();
         }
 
         /// <summary>
@@ -1315,31 +1339,6 @@ namespace WixToolset.Mba.Core
             }
         }
 
-        /// <summary>
-        /// Called by the engine, raises the <see cref="SetUpdateBegin"/> event.
-        /// </summary>
-        /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnSetUpdateBegin(SetUpdateBeginEventArgs args)
-        {
-            EventHandler<SetUpdateBeginEventArgs> handler = this.SetUpdateBegin;
-            if (null != handler)
-            {
-                handler(this, args);
-            }
-        }
-
-        /// <summary>
-        /// Called by the engine, raises the <see cref="SetUpdateComplete"/> event.
-        /// </summary>
-        /// <param name="args">Additional arguments for this event.</param>
-        protected virtual void OnSetUpdateComplete(SetUpdateCompleteEventArgs args)
-        {
-            EventHandler<SetUpdateCompleteEventArgs> handler = this.SetUpdateComplete;
-            if (null != handler)
-            {
-                handler(this, args);
-            }
-        }
 
         /// <summary>
         /// Called by the engine, raises the <see cref="PlanRestoreRelatedBundle"/> event.
@@ -1395,7 +1394,7 @@ namespace WixToolset.Mba.Core
 
         #region IBootstrapperApplication Members
 
-        int IBootstrapperApplication.BAProc(int message, IntPtr pvArgs, IntPtr pvResults, IntPtr pvContext)
+        int IBootstrapperApplication.BAProc(int message, IntPtr pvArgs, IntPtr pvResults)
         {
             switch (message)
             {
@@ -1404,8 +1403,24 @@ namespace WixToolset.Mba.Core
             }
         }
 
-        void IBootstrapperApplication.BAProcFallback(int message, IntPtr pvArgs, IntPtr pvResults, ref int phr, IntPtr pvContext)
+        void IBootstrapperApplication.BAProcFallback(int message, IntPtr pvArgs, IntPtr pvResults, ref int phr)
         {
+        }
+
+        int IBootstrapperApplication.OnCreate(IBootstrapperEngine engine, ref Command command)
+        {
+            CreateEventArgs args = new CreateEventArgs(new Engine(engine), command.GetBootstrapperCommand());
+            this.OnCreate(args);
+
+            return args.HResult;
+        }
+
+        int IBootstrapperApplication.OnDestroy(bool reload)
+        {
+            DestroyEventArgs args = new DestroyEventArgs(reload);
+            this.OnDestroy(args);
+
+            return args.HResult;
         }
 
         int IBootstrapperApplication.OnStartup()
@@ -2103,22 +2118,6 @@ namespace WixToolset.Mba.Core
         {
             CachePayloadExtractCompleteEventArgs args = new CachePayloadExtractCompleteEventArgs(wzContainerId, wzPayloadId, hrStatus);
             this.OnCachePayloadExtractComplete(args);
-
-            return args.HResult;
-        }
-
-        int IBootstrapperApplication.OnSetUpdateBegin()
-        {
-            SetUpdateBeginEventArgs args = new SetUpdateBeginEventArgs();
-            this.OnSetUpdateBegin(args);
-
-            return args.HResult;
-        }
-
-        int IBootstrapperApplication.OnSetUpdateComplete(int hrStatus, string wzPreviousPackageId, string wzNewPackageId)
-        {
-            SetUpdateCompleteEventArgs args = new SetUpdateCompleteEventArgs(hrStatus, wzPreviousPackageId, wzNewPackageId);
-            this.OnSetUpdateComplete(args);
 
             return args.HResult;
         }

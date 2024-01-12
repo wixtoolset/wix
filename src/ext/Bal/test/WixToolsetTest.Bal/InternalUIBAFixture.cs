@@ -45,8 +45,8 @@ namespace WixToolsetTest.Bal
                     "<WixBalPackageInfo PackageId='test.msi' PrimaryPackageType='default' />",
                 }, balPackageInfos);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "mbapreq.thm")));
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "mbapreq.wxl")));
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
             }
         }
 
@@ -84,14 +84,14 @@ namespace WixToolsetTest.Bal
                     "<WixBalPackageInfo PackageId='test.msi' PrimaryPackageType='default' />",
                 }, balPackageInfos);
 
-                var mbaPrereqInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixMbaPrereqInformation");
+                var mbaPrereqInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPrereqInformation");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<WixMbaPrereqInformation PackageId='wixnative.exe' LicenseUrl='https://www.mysite.com/prereqterms' />",
+                    "<WixPrereqInformation PackageId='wixnative.exe' LicenseUrl='https://www.mysite.com/prereqterms' />",
                 }, mbaPrereqInfos);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "mbapreq.thm")));
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "mbapreq.wxl")));
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
             }
         }
 
@@ -129,14 +129,14 @@ namespace WixToolsetTest.Bal
                     "<WixBalPackageInfo PackageId='test.msi' PrimaryPackageType='default' />",
                 }, balPackageInfos);
 
-                var mbaPrereqInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixMbaPrereqInformation");
+                var mbaPrereqInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPrereqInformation");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<WixMbaPrereqInformation PackageId='wixnative.exe' />",
+                    "<WixPrereqInformation PackageId='wixnative.exe' />",
                 }, mbaPrereqInfos);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "mbapreq.thm")));
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "mbapreq.wxl")));
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
             }
         }
 
@@ -183,14 +183,14 @@ namespace WixToolsetTest.Bal
                     "<WixBalPackageInfo PackageId='test.msi' DisplayInternalUICondition='DISPLAYTEST' PrimaryPackageType='default' />",
                 }, balPackageInfos);
 
-                var mbaPrereqInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixMbaPrereqInformation");
+                var mbaPrereqInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPrereqInformation");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<WixMbaPrereqInformation PackageId='wixnative.exe' />",
+                    "<WixPrereqInformation PackageId='wixnative.exe' />",
                 }, mbaPrereqInfos);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "mbapreq.thm")));
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "mbapreq.wxl")));
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
             }
         }
 

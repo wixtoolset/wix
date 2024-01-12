@@ -1,17 +1,17 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Fragment>
-    <BootstrapperApplication Id="BrokenDncAlwaysPrereq">
+    <BootstrapperApplication Id="BrokenDncAlwaysPrereq" SourceFile="!(bindpath.dncx86)\TestBA.exe" Secondary="true">
       <Payload SourceFile="!(bindpath.dncx86)\TestBA.deps.json" />
-      <Payload SourceFile="!(bindpath.dncx86)\TestBA.dll" bal:BAFactoryAssembly="yes" />
+      <Payload SourceFile="!(bindpath.dncx86)\TestBA.dll" />
       <Payload Name="good.runtimeconfig.json" SourceFile="!(bindpath.dncx86)\TestBA.runtimeconfig.json" />
       <Payload Name="TestBA.runtimeconfig.json" SourceFile="bad.runtimeconfig.json" />
       <Payload SourceFile="!(bindpath.dncx86)\mbanative.dll" />
       <Payload SourceFile="!(bindpath.dncx86)\WixToolset.Mba.Core.dll" />
       <Payload SourceFile="$(var.PrereqBaf.TargetPath)" bal:BAFunctions="yes" />
-      <bal:WixDotNetCoreBootstrapperApplicationHost AlwaysInstallPrereqs="yes" />
+
+      <bal:WixPrerequisiteBootstrapperApplication />
     </BootstrapperApplication>
   </Fragment>
 

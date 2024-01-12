@@ -109,10 +109,10 @@ int WINAPI wWinMain(
     ExitOnFailure(hr, "Failed to create theme.");
 
     hr = CreateMainWindowClass(hInstance, vpTheme, &atom);
-    ExitOnFailure(hr, "Failed to create main window.");
+    ExitOnFailure(hr, "Failed to create thmviewer main window.");
 
     hr = ThemeCreateParentWindow(vpTheme, 0, reinterpret_cast<LPCWSTR>(atom), vpTheme->sczCaption, vpTheme->dwStyle, CW_USEDEFAULT, CW_USEDEFAULT, HWND_DESKTOP, hInstance, NULL, THEME_WINDOW_INITIAL_POSITION_DEFAULT, &hWnd);
-    ExitOnFailure(hr, "Failed to create window.");
+    ExitOnFailure(hr, "Failed to create thmviewer parent window.");
 
     if (!sczThemeFile)
     {

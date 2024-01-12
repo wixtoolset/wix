@@ -365,19 +365,19 @@ namespace WixToolset.Mba.Core
                 package.DisplayInternalUICondition = BootstrapperApplicationData.GetAttribute(node, "DisplayInternalUICondition");
             }
 
-            nodes = root.Select("/p:BootstrapperApplicationData/p:WixMbaPrereqInformation", namespaceManager);
+            nodes = root.Select("/p:BootstrapperApplicationData/p:WixPrereqInformation", namespaceManager);
 
             foreach (XPathNavigator node in nodes)
             {
                 string id = BootstrapperApplicationData.GetAttribute(node, "PackageId");
                 if (id == null)
                 {
-                    throw new Exception("Failed to get package identifier for WixMbaPrereqInformation.");
+                    throw new Exception("Failed to get package identifier for WixPrereqInformation.");
                 }
 
                 if (!packagesById.TryGetValue(id, out var ipackage))
                 {
-                    throw new Exception(String.Format("Failed to find package specified in WixMbaPrereqInformation: {0}", id));
+                    throw new Exception(String.Format("Failed to find package specified in WixPrereqInformation: {0}", id));
                 }
 
                 var package = (PackageInfo)ipackage;

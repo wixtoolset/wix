@@ -244,6 +244,7 @@ extern "C" void PayloadUninitialize(
         ReleaseStr(pPayload->downloadSource.sczUrl);
         ReleaseStr(pPayload->downloadSource.sczUser);
         ReleaseStr(pPayload->downloadSource.sczPassword);
+        ReleaseStr(pPayload->downloadSource.sczAuthorizationHeader);
         ReleaseStr(pPayload->sczUnverifiedPath);
     }
 }

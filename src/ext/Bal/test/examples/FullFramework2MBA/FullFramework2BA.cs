@@ -6,14 +6,9 @@ namespace Example.FullFramework2MBA
 
     public class FullFramework2BA : BootstrapperApplication
     {
-        public FullFramework2BA(IEngine engine)
-            : base(engine)
-        {
-
-        }
-
         protected override void Run()
         {
+            this.engine.Quit(42);
         }
 
         protected override void OnStartup(StartupEventArgs args)

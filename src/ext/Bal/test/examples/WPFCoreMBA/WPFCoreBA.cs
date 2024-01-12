@@ -7,11 +7,6 @@ namespace Example.WPFCoreMBA
 
     public class WPFCoreBA : BootstrapperApplication
     {
-        public WPFCoreBA(IEngine engine)
-            : base(engine)
-        {
-        }
-        
         public Dispatcher BADispatcher { get; private set; }
 
         protected override void Run()
@@ -21,7 +16,7 @@ namespace Example.WPFCoreMBA
             window.Closed += (s, e) => this.BADispatcher.InvokeShutdown();
             //window.Show();
             //Dispatcher.Run();
-            //this.engine.Quit(0);
+            this.engine.Quit(0);
         }
 
         protected override void OnStartup(StartupEventArgs args)

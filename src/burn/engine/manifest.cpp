@@ -104,7 +104,7 @@ static HRESULT ParseFromXml(
         }
     }
 
-    // parse built-in condition 
+    // parse built-in condition
     hr = ConditionGlobalParseFromXml(&pEngineState->condition, pixeBundle);
     ExitOnFailure(hr, "Failed to parse global condition.");
 
@@ -113,8 +113,8 @@ static HRESULT ParseFromXml(
     ExitOnFailure(hr, "Failed to parse variables.");
 
     // parse user experience
-    hr = UserExperienceParseFromXml(&pEngineState->userExperience, pixeBundle);
-    ExitOnFailure(hr, "Failed to parse user experience.");
+    hr = BootstrapperApplicationParseFromXml(&pEngineState->userExperience, pixeBundle);
+    ExitOnFailure(hr, "Failed to parse bootstrapper application.");
 
     // parse extensions
     hr = BurnExtensionParseFromXml(&pEngineState->extensions, &pEngineState->userExperience.payloads, pixeBundle);

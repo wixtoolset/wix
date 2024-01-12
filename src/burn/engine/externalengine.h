@@ -81,7 +81,8 @@ HRESULT ExternalEngineSetUpdate(
     __in_z_opt LPCWSTR wzDownloadSource,
     __in const DWORD64 qwSize,
     __in const BOOTSTRAPPER_UPDATE_HASH_TYPE hashType,
-    __in_opt LPCWSTR wzHash
+    __in_opt LPCWSTR wzHash,
+    __in_opt LPCWSTR wzUpdatePackageId
 );
 
 HRESULT ExternalEngineSetLocalSource(
@@ -97,7 +98,8 @@ HRESULT ExternalEngineSetDownloadSource(
     __in_z_opt LPCWSTR wzPayloadId,
     __in_z_opt LPCWSTR wzUrl,
     __in_z_opt LPCWSTR wzUser,
-    __in_z_opt LPCWSTR wzPassword
+    __in_z_opt LPCWSTR wzPassword,
+    __in_z_opt LPCWSTR wzAuthorizationHeader
     );
 
 HRESULT ExternalEngineSetVariableNumeric(
@@ -138,32 +140,32 @@ HRESULT ExternalEngineGetRelatedBundleVariable(
 );
 
 HRESULT ExternalEngineDetect(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     );
 
 HRESULT ExternalEnginePlan(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in const BOOTSTRAPPER_ACTION action
     );
 
 HRESULT ExternalEngineElevate(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     );
 
 HRESULT ExternalEngineApply(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent
     );
 
 HRESULT ExternalEngineQuit(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in const DWORD dwExitCode
     );
 
 HRESULT ExternalEngineLaunchApprovedExe(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_CONTEXT* pEngineContext,
     __in_opt const HWND hwndParent,
     __in_z LPCWSTR wzApprovedExeForElevationId,
     __in_z_opt LPCWSTR wzArguments,
@@ -172,7 +174,8 @@ HRESULT ExternalEngineLaunchApprovedExe(
 
 HRESULT ExternalEngineSetUpdateSource(
     __in BURN_ENGINE_STATE* pEngineState,
-    __in_z LPCWSTR wzUrl
+    __in_z LPCWSTR wzUrl,
+    __in_z_opt LPCWSTR wzAuthorizationHeader
     );
 
 HRESULT WINAPI ExternalEngineValidateMessageParameter(

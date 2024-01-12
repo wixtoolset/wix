@@ -80,6 +80,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 if (!burnReader.ExtractUXContainer(baFolderPath, baFolderPath))
                 {
+                    this.Messaging.Write(BurnBackendErrors.BundleMissingBootstrapperApplicationContainer(sourceLineNumbers, sourcePath));
                     return;
                 }
 

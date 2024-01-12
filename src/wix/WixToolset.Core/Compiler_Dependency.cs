@@ -68,7 +68,7 @@ namespace WixToolset.Core
         /// <param name="parentId">The identifier of the parent component or package.</param>
         /// <param name="possibleKeyPath">Possible KeyPath identifier.</param>
         /// <returns>Yes if this is the keypath.</returns>
-        private YesNoType ParseProvidesElement(XElement node, WixBundlePackageType? packageType, string parentId, out string possibleKeyPath)
+        private YesNoType ParseProvidesElement(XElement node, WixBundlePackageType? packageType, string parentId, out Identifier possibleKeyPath)
         {
             possibleKeyPath = null;
 
@@ -211,13 +211,13 @@ namespace WixToolset.Core
                     this.Core.CreateRegistryStringSymbol(sourceLineNumbers, root, keyProvides, null, value, parentId);
 
                     value = !String.IsNullOrEmpty(version) ? version : "[ProductVersion]";
-                    var versionRegistrySymbol = this.Core.CreateRegistryStringSymbol(sourceLineNumbers, root, keyProvides, "Version", value, parentId);
+                    var versionRegistryId = this.Core.CreateRegistryStringSymbol(sourceLineNumbers, root, keyProvides, "Version", value, parentId);
 
                     value = !String.IsNullOrEmpty(displayName) ? displayName : "[ProductName]";
                     this.Core.CreateRegistryStringSymbol(sourceLineNumbers, root, keyProvides, "DisplayName", value, parentId);
 
                     // Use the Version registry value and use that as a potential key path.
-                    possibleKeyPath = versionRegistrySymbol.Id;
+                    possibleKeyPath = versionRegistryId;
                 }
             }
 

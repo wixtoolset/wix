@@ -3,15 +3,16 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Fragment>
-    <BootstrapperApplication Id="BrokenDnc">
+    <BootstrapperApplication Id="BrokenDnc" SourceFile="!(bindpath.dncx86)\TestBA.exe" Secondary="yes">
       <Payload SourceFile="!(bindpath.dncx86)\TestBA.deps.json" />
-      <Payload SourceFile="!(bindpath.dncx86)\TestBA.dll" bal:BAFactoryAssembly="yes" />
+      <Payload SourceFile="!(bindpath.dncx86)\TestBA.dll" />
       <Payload Name="good.runtimeconfig.json" SourceFile="!(bindpath.dncx86)\TestBA.runtimeconfig.json" />
       <Payload Name="TestBA.runtimeconfig.json" SourceFile="bad.runtimeconfig.json" />
       <Payload SourceFile="!(bindpath.dncx86)\mbanative.dll" />
       <Payload SourceFile="!(bindpath.dncx86)\WixToolset.Mba.Core.dll" />
       <Payload SourceFile="$(var.PrereqBaf.TargetPath)" bal:BAFunctions="yes" />
-      <bal:WixDotNetCoreBootstrapperApplicationHost />
+
+      <bal:WixPrerequisiteBootstrapperApplication />
     </BootstrapperApplication>
   </Fragment>
 

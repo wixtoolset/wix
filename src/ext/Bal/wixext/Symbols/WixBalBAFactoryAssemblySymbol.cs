@@ -2,11 +2,13 @@
 
 namespace WixToolset.Bal
 {
+    using System;
     using WixToolset.Data;
     using WixToolset.Bal.Symbols;
 
     public static partial class BalSymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition WixBalBAFactoryAssembly = new IntermediateSymbolDefinition(
             BalSymbolDefinitionType.WixBalBAFactoryAssembly.ToString(),
             new[]
@@ -20,14 +22,17 @@ namespace WixToolset.Bal
 
 namespace WixToolset.Bal.Symbols
 {
+    using System;
     using WixToolset.Data;
 
+    [Obsolete]
     public enum WixBalBAFactorySymbolFields
     {
         PayloadId,
         FilePath,
     }
 
+    [Obsolete]
     public class WixBalBAFactoryAssemblySymbol : IntermediateSymbol
     {
         public WixBalBAFactoryAssemblySymbol() : base(BalSymbolDefinitions.WixBalBAFactoryAssembly, null, null)

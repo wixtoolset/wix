@@ -253,6 +253,13 @@ Language=English
 Bootstrapper application already requested to quit, ignoring request: '%1!hs!'.
 .
 
+MessageId=59
+Severity=Warning
+SymbolicName=MSG_BA_NO_SECONDARY_BOOSTRAPPER_SO_RELOAD_NOT_SUPPORTED
+Language=English
+Bootstrapper application requested reload but there is no secondary bootstrapper application, ignoring the request to reload.
+.
+
 MessageId=100
 Severity=Success
 SymbolicName=MSG_DETECT_BEGIN
@@ -1076,7 +1083,7 @@ MessageId=381
 Severity=Warning
 SymbolicName=MSG_APPLY_CANCEL_IGNORED_DURING_ROLLBACK
 Language=English
-Ignoring application request to cancel from %1!ls! during rollback. 
+Ignoring application request to cancel from %1!ls! during rollback.
 .
 
 MessageId=382

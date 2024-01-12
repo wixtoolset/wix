@@ -77,6 +77,5 @@ public:
 
 private:
     HMODULE m_hBAModule;
-    BOOTSTRAPPER_CREATE_RESULTS* m_pCreateResults;
     DWORD m_dwThreadId;
 };

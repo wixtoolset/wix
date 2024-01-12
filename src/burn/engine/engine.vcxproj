@@ -47,17 +47,20 @@
 
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
+
   <ImportGroup Label="Shared">
   </ImportGroup>
 
   <ItemGroup>
     <ClCompile Include="apply.cpp" />
     <ClCompile Include="approvedexe.cpp" />
+    <ClCompile Include="bacallback.cpp" />
+    <ClCompile Include="bootstrapperapplication.cpp" />
     <ClCompile Include="bundlepackageengine.cpp" />
     <ClCompile Include="burnextension.cpp" />
     <ClCompile Include="detect.cpp" />
     <ClCompile Include="embedded.cpp" />
-    <ClCompile Include="EngineForApplication.cpp" />
+    <ClCompile Include="baengine.cpp" />
     <ClCompile Include="EngineForExtension.cpp" />
     <ClCompile Include="externalengine.cpp" />
     <ClCompile Include="cabextract.cpp" />
@@ -99,10 +102,12 @@
   <ItemGroup>
     <ClInclude Include="apply.h" />
     <ClInclude Include="approvedexe.h" />
-    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BootstrapperApplication.h" />
-    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BootstrapperEngine.h" />
+    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\batypes.h" />
+    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\baenginetypes.h" />
     <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BundleExtension.h" />
     <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BundleExtensionEngine.h" />
+    <ClInclude Include="bacallback.h" />
+    <ClInclude Include="bootstrapperapplication.h" />
     <ClInclude Include="bundlepackageengine.h" />
     <ClInclude Include="burnextension.h" />
     <ClInclude Include="cabextract.h" />
@@ -114,7 +119,7 @@
     <ClInclude Include="detect.h" />
     <ClInclude Include="elevation.h" />
     <ClInclude Include="embedded.h" />
-    <ClInclude Include="EngineForApplication.h" />
+    <ClInclude Include="baengine.h" />
     <ClInclude Include="EngineForExtension.h" />
     <ClInclude Include="exeengine.h" />
     <ClInclude Include="externalengine.h" />
@@ -164,32 +169,14 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
       <szVerMajorMinorBuild>$(rmj).$(rmm).$(rup).$(rpr)</szVerMajorMinorBuild>
       <szInformationalVersion>$(InformationalVersion)</szInformationalVersion>
     </PropertyGroup>
-
     <ItemGroup>
-      <BurnVersionLines Include="
-// &lt;auto-generated/&gt;
-#ifndef _VERSION_FILE_H_
-#define _VERSION_FILE_H_
-
-#define szVerMajorMinorBuild &quot;$(szVerMajorMinorBuild)&quot;
-#define wzVerMajorMinorBuild L&quot;$(szVerMajorMinorBuild)&quot;
-#define rmj	$(rmj)
-#define rmm	$(rmm)
-#define rup	$(rup)
-#define rpr	$(rpr)
-#define szInformationalVersion &quot;$(szInformationalVersion)&quot;
-#define wzInformationalVersion L&quot;$(szInformationalVersion)&quot;
-
-#endif
-"/>
+      <BurnVersionLines Include="&#xD;&#xA;// &lt;auto-generated/&gt;&#xD;&#xA;#ifndef _VERSION_FILE_H_&#xD;&#xA;#define _VERSION_FILE_H_&#xD;&#xA;&#xD;&#xA;#define szVerMajorMinorBuild &quot;$(szVerMajorMinorBuild)&quot;&#xD;&#xA;#define wzVerMajorMinorBuild L&quot;$(szVerMajorMinorBuild)&quot;&#xD;&#xA;#define rmj	$(rmj)&#xD;&#xA;#define rmm	$(rmm)&#xD;&#xA;#define rup	$(rup)&#xD;&#xA;#define rpr	$(rpr)&#xD;&#xA;#define szInformationalVersion &quot;$(szInformationalVersion)&quot;&#xD;&#xA;#define wzInformationalVersion L&quot;$(szInformationalVersion)&quot;&#xD;&#xA;&#xD;&#xA;#endif&#xD;&#xA;" />
     </ItemGroup>
-
     <WriteLinesToFile Overwrite="true" File="$(BurnGeneratedHeaderDirectory)engine.version.h" Lines="@(BurnVersionLines)" />
   </Target>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.DUtil" />
-
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
 

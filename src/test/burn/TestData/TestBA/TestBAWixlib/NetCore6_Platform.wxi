@@ -35,7 +35,7 @@
       <PackageGroupRef Id="$(var.AspNetCoreRedistId)" />
     </PackageGroup>
 
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.AspNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
+    <bal:BootstrapperApplicationPrerequisiteInformation PackageId="$(var.AspNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
   </Fragment>
 
   <Fragment>
@@ -43,7 +43,7 @@
       <PackageGroupRef Id="$(var.DesktopNetCoreRedistId)" />
     </PackageGroup>
 
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.DesktopNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
+    <bal:BootstrapperApplicationPrerequisiteInformation PackageId="$(var.DesktopNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
   </Fragment>
 
   <Fragment>
@@ -51,7 +51,7 @@
       <PackageGroupRef Id="$(var.DotNetCoreRedistId)" />
     </PackageGroup>
 
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.DotNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
+    <bal:BootstrapperApplicationPrerequisiteInformation PackageId="$(var.DotNetCoreRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
   </Fragment>
 
   <Fragment>
@@ -59,6 +59,6 @@
       <PackageGroupRef Id="$(var.DotNetCoreSdkRedistId)" />
     </PackageGroup>
 
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.DotNetCoreSdkRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
+    <bal:BootstrapperApplicationPrerequisiteInformation PackageId="$(var.DotNetCoreSdkRedistId)" LicenseUrl="$(var.NetCoreEulaLink)" />
   </Fragment>
 </Include>

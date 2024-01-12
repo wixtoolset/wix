@@ -2,10 +2,12 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using WixToolset.Data.Symbols;
 
     public static partial class SymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition WixBootstrapperApplicationDll = new IntermediateSymbolDefinition(
             SymbolDefinitionType.WixBootstrapperApplicationDll,
             new IntermediateFieldDefinition[]
@@ -18,11 +20,14 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
     public enum WixBootstrapperApplicationDllSymbolFields
     {
         DpiAwareness,
     }
 
+    [Obsolete]
     public enum WixBootstrapperApplicationDpiAwarenessType
     {
         Unaware,
@@ -32,6 +37,7 @@ namespace WixToolset.Data.Symbols
         GdiScaled,
     }
 
+    [Obsolete]
     public class WixBootstrapperApplicationDllSymbol : IntermediateSymbol
     {
         public WixBootstrapperApplicationDllSymbol() : base(SymbolDefinitions.WixBootstrapperApplicationDll, null, null)

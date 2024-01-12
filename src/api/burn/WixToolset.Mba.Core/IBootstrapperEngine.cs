@@ -108,14 +108,15 @@ namespace WixToolset.Mba.Core
             );
 
         /// <summary>
-        /// See <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string)"/>.
+        /// See <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string, string)"/>.
         /// </summary>
         void SetUpdate(
             [MarshalAs(UnmanagedType.LPWStr)] string wzLocalSource,
             [MarshalAs(UnmanagedType.LPWStr)] string wzDownloadSource,
             [MarshalAs(UnmanagedType.U8)] long qwValue,
             [MarshalAs(UnmanagedType.U4)] UpdateHashType hashType,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzHash
+            [MarshalAs(UnmanagedType.LPWStr)] string wzHash,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzUpdatePackageId
             );
 
         /// <summary>
@@ -330,12 +331,12 @@ namespace WixToolset.Mba.Core
         Repair,
 
         /// <summary>
-        /// Launch the update registered with <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string)"/> and then exit without waiting for it to complete.
+        /// Launch the update registered with <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string, string)"/> and then exit without waiting for it to complete.
         /// </summary>
         UpdateReplace,
 
         /// <summary>
-        /// Launch the update registered with <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string)"/> as an embedded bundle.
+        /// Launch the update registered with <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string, string)"/> as an embedded bundle.
         /// </summary>
         UpdateReplaceEmbedded,
     }

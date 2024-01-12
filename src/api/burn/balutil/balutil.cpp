@@ -3,7 +3,38 @@
 #include "precomp.h"
 
 const DWORD VARIABLE_GROW_FACTOR = 80;
+static DWORD vdwDebuggerCheck = 0;
 static IBootstrapperEngine* vpEngine = NULL;
+
+static HRESULT ParseCommandLine(
+    __inout_z LPWSTR *psczPipeBaseName,
+    __inout_z LPWSTR *psczPipeSecret,
+    __out DWORD64 *pqwEngineAPIVersion
+    );
+static HRESULT ConnectToEngine(
+    __in_z LPCWSTR wzPipeBaseName,
+    __in_z LPCWSTR wzPipeSecret,
+    __out HANDLE *phBAPipe,
+    __out HANDLE *phEnginePipe
+    );
+static HRESULT ConnectAndVerify(
+    __in_z LPCWSTR wzPipeName,
+    __in_z LPCWSTR wzPipeSecret,
+    __in DWORD cbPipeSecret,
+    __out HANDLE *phPipe
+    );
+static HRESULT PumpMessages(
+    __in HANDLE hPipe,
+    __in IBootstrapperApplication* pApplication,
+    __in IBootstrapperEngine* pEngine
+    );
+static void MsgProc(
+    __in BOOTSTRAPPER_APPLICATION_MESSAGE messageType,
+    __in_bcount(cbData) LPVOID pvData,
+    __in DWORD cbData,
+    __in IBootstrapperApplication* pApplication,
+    __in IBootstrapperEngine* pEngine
+    );
 
 // prototypes
 
@@ -17,37 +48,135 @@ DAPI_(void) BalInitialize(
     vpEngine = pEngine;
 }
 
-DAPI_(HRESULT) BalInitializeFromCreateArgs(
-    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __out_opt IBootstrapperEngine** ppEngine
-    )
-{
-    HRESULT hr = S_OK;
-    IBootstrapperEngine* pEngine = NULL;
-
-    hr = BalBootstrapperEngineCreate(pArgs->pfnBootstrapperEngineProc, pArgs->pvBootstrapperEngineProcContext, &pEngine);
-    ExitOnFailure(hr, "Failed to create BalBootstrapperEngine.");
-
-    BalInitialize(pEngine);
-
-    if (ppEngine)
-    {
-        *ppEngine = pEngine;
-    }
-    pEngine = NULL;
-
-LExit:
-    ReleaseObject(pEngine);
-
-    return hr;
-}
-
-
 DAPI_(void) BalUninitialize()
 {
     ReleaseNullObject(vpEngine);
 }
 
+DAPI_(HRESULT) BootstrapperApplicationRun(
+    __in IBootstrapperApplication* pApplication
+    )
+{
+    HRESULT hr = S_OK;
+    BOOL fComInitialized = FALSE;
+    DWORD64 qwEngineAPIVersion = 0;
+    LPWSTR sczPipeBaseName = NULL;
+    LPWSTR sczPipeSecret = NULL;
+    HANDLE hBAPipe = INVALID_HANDLE_VALUE;
+    HANDLE hEnginePipe = INVALID_HANDLE_VALUE;
+    IBootstrapperEngine* pEngine = NULL;
+    BOOL fInitializedBal = FALSE;
+
+    // initialize COM
+    hr = ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    ExitOnFailure(hr, "Failed to initialize COM.");
+    fComInitialized = TRUE;
+
+    hr = ParseCommandLine(&sczPipeBaseName, &sczPipeSecret, &qwEngineAPIVersion);
+    BalExitOnFailure(hr, "Failed to parse command line.");
+
+    // TODO: Validate the engine API version.
+
+    hr = ConnectToEngine(sczPipeBaseName, sczPipeSecret, &hBAPipe, &hEnginePipe);
+    BalExitOnFailure(hr, "Failed to connect to engine.");
+
+    hr = BalBootstrapperEngineCreate(hEnginePipe, &pEngine);
+    BalExitOnFailure(hr, "Failed to create bootstrapper engine.");
+
+    BalInitialize(pEngine);
+    fInitializedBal = TRUE;
+
+    BootstrapperApplicationDebuggerCheck();
+
+    hr = MsgPump(hBAPipe, pApplication, pEngine);
+    BalExitOnFailure(hr, "Failed while pumping messages.");
+
+LExit:
+    if (fInitializedBal)
+    {
+        BalUninitialize();
+    }
+
+    ReleaseNullObject(pEngine);
+    ReleasePipeHandle(hEnginePipe);
+    ReleasePipeHandle(hBAPipe);
+    ReleaseStr(sczPipeSecret);
+    ReleaseStr(sczPipeBaseName);
+
+    if (fComInitialized)
+    {
+        ::CoUninitialize();
+    }
+
+    return hr;
+}
+
+DAPI_(VOID) BootstrapperApplicationDebuggerCheck()
+{
+    HRESULT hr = S_OK;
+    HKEY hk = NULL;
+    BOOL fDebug = FALSE;
+    LPWSTR sczDebugBootstrapperApplications = NULL;
+    LPWSTR sczDebugBootstrapperApplication = NULL;
+    LPWSTR sczModulePath = NULL;
+    LPCWSTR wzModuleFilename = NULL;
+    WCHAR wzMessage[1024] = { };
+
+    if (0 == vdwDebuggerCheck)
+    {
+        ++vdwDebuggerCheck;
+
+        hr = RegOpen(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Session Manager\\Environment", KEY_QUERY_VALUE, &hk);
+        if (SUCCEEDED(hr))
+        {
+            hr = RegReadString(hk, L"WixDebugBootstrapperApplications", &sczDebugBootstrapperApplications);
+            if (SUCCEEDED(hr) && sczDebugBootstrapperApplications && *sczDebugBootstrapperApplications &&
+                sczDebugBootstrapperApplications[0] != L'0' && !sczDebugBootstrapperApplications[1])
+            {
+                hr = PathForCurrentProcess(&sczModulePath, NULL);
+                if (SUCCEEDED(hr) && sczModulePath && *sczModulePath)
+                {
+                    wzModuleFilename = PathFile(sczModulePath);
+                    if (wzModuleFilename)
+                    {
+                        fDebug = TRUE;
+                    }
+                }
+            }
+            else
+            {
+                hr = RegReadString(hk, L"WixDebugBootstrapperApplication", &sczDebugBootstrapperApplication);
+                if (SUCCEEDED(hr) && sczDebugBootstrapperApplication && *sczDebugBootstrapperApplication)
+                {
+                    hr = PathForCurrentProcess(&sczModulePath, NULL);
+                    if (SUCCEEDED(hr) && sczModulePath && *sczModulePath)
+                    {
+                        wzModuleFilename = PathFile(sczModulePath);
+                        if (wzModuleFilename && CSTR_EQUAL == ::CompareStringOrdinal(sczDebugBootstrapperApplication, -1, wzModuleFilename, -1, TRUE))
+                        {
+                            fDebug = TRUE;
+                        }
+                    }
+                }
+            }
+
+            if (fDebug)
+            {
+                hr = ::StringCchPrintfW(wzMessage, countof(wzMessage), L"To debug the boostrapper application process %ls\n\nSet breakpoints and attach a debugger to process id: %d (0x%x)", wzModuleFilename, ::GetCurrentProcessId(), ::GetCurrentProcessId());
+
+                if (SUCCEEDED(hr))
+                {
+                    ::MessageBoxW(NULL, wzMessage, L"WiX Bootstrapper Application", MB_SERVICE_NOTIFICATION | MB_TOPMOST | MB_ICONQUESTION | MB_OK | MB_SYSTEMMODAL);
+                }
+            }
+        }
+    }
+
+    ReleaseRegKey(hk);
+    ReleaseStr(sczModulePath);
+    ReleaseStr(sczDebugBootstrapperApplication);
+    ReleaseStr(sczDebugBootstrapperApplications);
+}
 
 DAPI_(HRESULT) BalManifestLoad(
     __in HMODULE hBootstrapperApplicationModule,
@@ -668,6 +797,149 @@ LExit:
     {
         ::LocalFree(pwz);
     }
+
+    return hr;
+}
+
+
+static HRESULT ParseCommandLine(
+    __inout_z LPWSTR *psczPipeBaseName,
+    __inout_z LPWSTR *psczPipeSecret,
+    __out DWORD64 *pqwEngineAPIVersion
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR wzCommandLine = ::GetCommandLineW();
+    int argc = 0;
+    LPWSTR* argv = NULL;
+
+    *pqwEngineAPIVersion = 0;
+
+    hr = AppParseCommandLine(wzCommandLine, &argc, &argv);
+    ExitOnFailure(hr, "Failed to parse command line.");
+
+    // Skip the executable full path in argv[0].
+    for (int i = 1; i < argc; ++i)
+    {
+        if (argv[i][0] == L'-')
+        {
+            if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BOOTSTRAPPER_APPLICATION_COMMANDLINE_SWITCH_API_VERSION, -1, TRUE))
+            {
+                if (i + 1 >= argc)
+                {
+                    BalExitOnRootFailure(hr = E_INVALIDARG, "Must specify an api version.");
+                }
+
+                ++i;
+
+                hr = StrStringToUInt64(argv[i], 0, pqwEngineAPIVersion);
+                BalExitOnFailure(hr, "Failed to parse api version: %ls", argv[i]);
+            }
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BOOTSTRAPPER_APPLICATION_COMMANDLINE_SWITCH_PIPE_NAME, -1, TRUE))
+            {
+                if (i + 2 >= argc)
+                {
+                    BalExitOnRootFailure(hr = E_INVALIDARG, "Must specify a pipe name and pipe secret.");
+                }
+
+                ++i;
+
+                hr = StrAllocString(psczPipeBaseName, argv[i], 0);
+                BalExitOnFailure(hr, "Failed to copy pipe name.");
+
+                ++i;
+
+                hr = StrAllocString(psczPipeSecret, argv[i], 0);
+                BalExitOnFailure(hr, "Failed to copy pipe secret.");
+            }
+        }
+        else
+        {
+            BalExitWithRootFailure(hr, E_INVALIDARG, "Invalid argument: %ls", argv[i]);
+        }
+    }
+
+LExit:
+    if (argv)
+    {
+        AppFreeCommandLineArgs(argv);
+    }
+
+    return hr;
+}
+
+static HRESULT ConnectToEngine(
+    __in_z LPCWSTR wzPipeBaseName,
+    __in_z LPCWSTR wzPipeSecret,
+    __out HANDLE *phBAPipe,
+    __out HANDLE *phEnginePipe
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczBAPipeName = NULL;
+    LPWSTR sczEnginePipeName = NULL;
+    HANDLE hBAPipe = INVALID_HANDLE_VALUE;
+    HANDLE hEnginePipe = INVALID_HANDLE_VALUE;
+
+    DWORD cbPipeSecret = lstrlenW(wzPipeSecret) * sizeof(WCHAR);
+
+    hr = StrAllocFormatted(&sczBAPipeName, L"%ls%ls", wzPipeBaseName, L".BA");
+    ExitOnFailure(hr, "Failed to allocate BA pipe name.");
+
+    hr = StrAllocFormatted(&sczEnginePipeName, L"%ls%ls", wzPipeBaseName, L".BAEngine");
+    ExitOnFailure(hr, "Failed to allocate BA engine pipe name.");
+
+    hr = ConnectAndVerify(sczBAPipeName, wzPipeSecret, cbPipeSecret, &hBAPipe);
+    BalExitOnFailure(hr, "Failed to connect to bootstrapper application pipe.");
+
+    hr = ConnectAndVerify(sczEnginePipeName, wzPipeSecret, cbPipeSecret, &hEnginePipe);
+    BalExitOnFailure(hr, "Failed to connect to engine pipe.");
+
+    *phBAPipe = hBAPipe;
+    hBAPipe = INVALID_HANDLE_VALUE;
+
+    *phEnginePipe = hEnginePipe;
+    hEnginePipe = INVALID_HANDLE_VALUE;
+
+LExit:
+    ReleasePipeHandle(hEnginePipe);
+    ReleasePipeHandle(hBAPipe);
+    ReleaseStr(sczEnginePipeName);
+    ReleaseStr(sczBAPipeName);
+
+    return hr;
+}
+
+static HRESULT ConnectAndVerify(
+    __in_z LPCWSTR wzPipeName,
+    __in_z LPCWSTR wzPipeSecret,
+    __in DWORD cbPipeSecret,
+    __out HANDLE *phPipe
+    )
+{
+    HRESULT hr = S_OK;
+    HRESULT hrConnect = S_OK;
+    HANDLE hPipe = INVALID_HANDLE_VALUE;
+
+    hr = PipeClientConnect(wzPipeName, &hPipe);
+    BalExitOnFailure(hr, "Failed to connect to pipe.");
+
+    hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(&cbPipeSecret), sizeof(cbPipeSecret));
+    BalExitOnFailure(hr, "Failed to write secret size to pipe.");
+
+    hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(wzPipeSecret), cbPipeSecret);
+    BalExitOnFailure(hr, "Failed to write secret size to pipe.");
+
+    FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(&hrConnect), sizeof(hrConnect));
+    BalExitOnFailure(hr, "Failed to read connect result from pipe.");
+
+    BalExitOnFailure(hrConnect, "Failed connect result from pipe.");
+
+    *phPipe = hPipe;
+    hPipe = INVALID_HANDLE_VALUE;
+
+LExit:
+    ReleasePipeHandle(hPipe);
 
     return hr;
 }

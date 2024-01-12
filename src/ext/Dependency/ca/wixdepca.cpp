@@ -209,7 +209,7 @@ static HRESULT EnsureRequiredDependencies(
 
         // Send a yes/no message with a warning icon since continuing could be detrimental.
         // This is sent as a USER message to better detect whether a user or dependency-aware bootstrapper is responding
-        // or if Windows Installer or a dependency-unaware boostrapper is returning a typical default response.
+        // or if Windows Installer or a dependency-unaware bootstrapper is returning a typical default response.
         er = WcaProcessMessage(static_cast<INSTALLMESSAGE>(INSTALLMESSAGE_USER | MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2), hDependencyRec);
         switch (er)
         {
@@ -359,7 +359,7 @@ static HRESULT EnsureAbsentDependents(
 
         // Send a yes/no message with a warning icon since continuing could be detrimental.
         // This is sent as a USER message to better detect whether a user or dependency-aware bootstrapper is responding
-        // or if Windows Installer or a dependency-unaware boostrapper is returning a typical default response.
+        // or if Windows Installer or a dependency-unaware bootstrapper is returning a typical default response.
         er = WcaProcessMessage(static_cast<INSTALLMESSAGE>(INSTALLMESSAGE_USER | MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2), hDependencyRec);
         switch (er)
         {

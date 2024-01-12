@@ -8,34 +8,32 @@ class CTestBAFunctions : public CBalBaseBAFunctions
 {
 public:
     CTestBAFunctions(
-        __in HMODULE hModule,
-        __in IBootstrapperEngine* pEngine,
-        __in const BA_FUNCTIONS_CREATE_ARGS* pArgs
-        ) : CBalBaseBAFunctions(hModule, pEngine, pArgs)
+        __in HMODULE hModule
+        ) : CBalBaseBAFunctions(hModule)
     {
     }
 };
 
 HRESULT CreateBAFunctions(
     __in HMODULE hModule,
-    __in IBootstrapperEngine* pEngine,
     __in const BA_FUNCTIONS_CREATE_ARGS* pArgs,
-    __in BA_FUNCTIONS_CREATE_RESULTS* pResults,
-    __out IBAFunctions** ppApplication
+    __inout BA_FUNCTIONS_CREATE_RESULTS* pResults
     )
 {
     HRESULT hr = S_OK;
-    CTestBAFunctions* pApplication = NULL;
+    CTestBAFunctions* pFunction = NULL;
 
-    pApplication = new CTestBAFunctions(hModule, pEngine, pArgs);
-    ExitOnNull(pApplication, hr, E_OUTOFMEMORY, "Failed to create new test bafunctions object.");
+    pFunction = new CTestBAFunctions(hModule);
+    ExitOnNull(pFunction, hr, E_OUTOFMEMORY, "Failed to create new test bafunctions object.");
+
+    hr = pFunction->OnCreate(pArgs->pEngine, pArgs->pCommand);
+    ExitOnFailure(hr, "Failed to initialize new test bafunctions.");
 
     pResults->pfnBAFunctionsProc = BalBaseBAFunctionsProc;
-    pResults->pvBAFunctionsProcContext = pApplication;
-    *ppApplication = pApplication;
-    pApplication = NULL;
+    pResults->pvBAFunctionsProcContext = pFunction;
+    pFunction = NULL;
 
 LExit:
-    ReleaseObject(pApplication);
+    ReleaseObject(pFunction);
     return hr;
 }

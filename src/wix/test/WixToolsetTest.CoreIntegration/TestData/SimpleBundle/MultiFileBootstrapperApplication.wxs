@@ -1,7 +1,5 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
-    <BootstrapperApplication Id="fakeba">
-      <BootstrapperApplicationDll SourceFile="fakeba.dll" />
-    </BootstrapperApplication>
+    <BootstrapperApplication Id="fakeba" SourceFile="fakeba.dll" />
   </Fragment>
 </Wix>

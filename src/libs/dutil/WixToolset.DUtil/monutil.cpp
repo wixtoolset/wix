@@ -1209,7 +1209,7 @@ static DWORD WINAPI WaiterThread(
 
                             ZeroMemory(rgfProcessedIndex, sizeof(rgfProcessedIndex));
                             for (DWORD i = 0; i < pWaiterContext->cRequests; ++i)
-                            { 
+                            {
                                 if (rgfProcessedIndex[i])
                                 {
                                     // if we already processed this item due to UpdateWaitStatus swapping array indices, then skip it
@@ -1244,7 +1244,7 @@ static DWORD WINAPI WaiterThread(
 
                             ZeroMemory(rgfProcessedIndex, sizeof(rgfProcessedIndex));
                             for (DWORD i = 0; i < pWaiterContext->cRequests; ++i)
-                            { 
+                            {
                                 if (rgfProcessedIndex[i])
                                 {
                                     // if we already processed this item due to UpdateWaitStatus swapping array indices, then skip it
@@ -1279,7 +1279,7 @@ static DWORD WINAPI WaiterThread(
 
                             ZeroMemory(rgfProcessedIndex, sizeof(rgfProcessedIndex));
                             for (DWORD i = 0; i < pWaiterContext->cRequests; ++i)
-                            { 
+                            {
                                 if (rgfProcessedIndex[i])
                                 {
                                     // if we already processed this item due to UpdateWaitStatus swapping array indices, then skip it
@@ -1308,7 +1308,7 @@ static DWORD WINAPI WaiterThread(
                         case MON_MESSAGE_DRIVE_STATUS_UPDATE:
                             ZeroMemory(rgfProcessedIndex, sizeof(rgfProcessedIndex));
                             for (DWORD i = 0; i < pWaiterContext->cRequests; ++i)
-                            { 
+                            {
                                 if (rgfProcessedIndex[i])
                                 {
                                     // if we already processed this item due to UpdateWaitStatus swapping array indices, then skip it
@@ -1349,7 +1349,7 @@ static DWORD WINAPI WaiterThread(
                             if (pInternalWait->dwSendIteration == static_cast<DWORD>(msg.lParam))
                             {
                                 for (DWORD i = 0; i < pWaiterContext->cRequests; ++i)
-                                { 
+                                {
                                     if (MON_DIRECTORY == pWaiterContext->rgRequests[i].type && pWaiterContext->rgHandles[i + 1] == reinterpret_cast<HANDLE>(pInternalWait->pvContext))
                                     {
                                         // Release handles ASAP so the remove request will succeed
@@ -1878,7 +1878,7 @@ static HRESULT CreateMonWindow(
     }
 
     *pHwnd = ::CreateWindowExW(0, wc.lpszClassName, L"", 0, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0, HWND_DESKTOP, NULL, wc.hInstance, pm);
-    MonExitOnNullWithLastError(*pHwnd, hr, "Failed to create window.");
+    MonExitOnNullWithLastError(*pHwnd, hr, "Failed to create monitor window.");
 
     // Rumor has it that drive arrival / removal events can be lost in the rare event that some other application higher up in z-order is hanging if we don't make our window topmost
     // SWP_NOACTIVATE is important so the currently active window doesn't lose focus
