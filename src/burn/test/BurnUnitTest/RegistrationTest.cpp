@@ -70,8 +70,8 @@ namespace Bootstrapper
 
                 LPCWSTR wzDocument =
                     L"<Bundle>"
-                    L"    <UX>"
-                    L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
+                    L"    <UX PrimaryPayloadId='ux.exe'>"
+                    L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
                     L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
@@ -87,7 +87,7 @@ namespace Bootstrapper
                 hr = VariableInitialize(&variables);
                 TestThrowOnFailure(hr, L"Failed to initialize variables.");
 
-                hr = UserExperienceParseFromXml(&userExperience, pixeBundle);
+                hr = BootstrapperApplicationParseFromXml(&userExperience, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse UX from XML.");
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
@@ -130,7 +130,7 @@ namespace Bootstrapper
             {
                 ReleaseStr(sczCurrentProcess);
                 ReleaseObject(pixeBundle);
-                UserExperienceUninitialize(&userExperience);
+                BootstrapperApplicationUninitialize(&userExperience);
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
@@ -170,8 +170,8 @@ namespace Bootstrapper
 
                 LPCWSTR wzDocument =
                     L"<Bundle>"
-                    L"    <UX>"
-                    L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
+                    L"    <UX PrimaryPayloadId='ux.exe'>"
+                    L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
                     L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='Product1' InProgressDisplayName='Product1 Installation' DisplayVersion='1.0.0.0' />"
@@ -187,7 +187,7 @@ namespace Bootstrapper
                 hr = VariableInitialize(&variables);
                 TestThrowOnFailure(hr, L"Failed to initialize variables.");
 
-                hr = UserExperienceParseFromXml(&userExperience, pixeBundle);
+                hr = BootstrapperApplicationParseFromXml(&userExperience, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse UX from XML.");
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
@@ -251,7 +251,7 @@ namespace Bootstrapper
             {
                 ReleaseStr(sczCurrentProcess);
                 ReleaseObject(pixeBundle);
-                UserExperienceUninitialize(&userExperience);
+                BootstrapperApplicationUninitialize(&userExperience);
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
@@ -291,8 +291,8 @@ namespace Bootstrapper
 
                 LPCWSTR wzDocument =
                     L"<Bundle>"
-                    L"    <UX>"
-                    L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
+                    L"    <UX PrimaryPayloadId='ux.exe'>"
+                    L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
                     L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='bar' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='Product1' DisplayVersion='1.0.0.0' />"
@@ -308,7 +308,7 @@ namespace Bootstrapper
                 hr = VariableInitialize(&variables);
                 TestThrowOnFailure(hr, L"Failed to initialize variables.");
 
-                hr = UserExperienceParseFromXml(&userExperience, pixeBundle);
+                hr = BootstrapperApplicationParseFromXml(&userExperience, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse UX from XML.");
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
@@ -372,7 +372,7 @@ namespace Bootstrapper
             {
                 ReleaseStr(sczCurrentProcess);
                 ReleaseObject(pixeBundle);
-                UserExperienceUninitialize(&userExperience);
+                BootstrapperApplicationUninitialize(&userExperience);
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
@@ -412,8 +412,8 @@ namespace Bootstrapper
 
                 LPCWSTR wzDocument =
                     L"<Bundle>"
-                    L"    <UX UxDllPayloadId='ux.dll'>"
-                    L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
+                    L"    <UX PrimaryPayloadId='ux.exe'>"
+                    L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
                     L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' DisplayName='DisplayName1' DisplayVersion='1.2.3.4' Publisher='Publisher1' HelpLink='http://www.microsoft.com/help'"
@@ -431,7 +431,7 @@ namespace Bootstrapper
                 hr = VariableInitialize(&variables);
                 TestThrowOnFailure(hr, L"Failed to initialize variables.");
 
-                hr = UserExperienceParseFromXml(&userExperience, pixeBundle);
+                hr = BootstrapperApplicationParseFromXml(&userExperience, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse UX from XML.");
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
@@ -505,7 +505,7 @@ namespace Bootstrapper
             {
                 ReleaseStr(sczCurrentProcess);
                 ReleaseObject(pixeBundle);
-                UserExperienceUninitialize(&userExperience);
+                BootstrapperApplicationUninitialize(&userExperience);
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
@@ -540,7 +540,7 @@ namespace Bootstrapper
             SIZE_T cbBuffer = 0;
             DWORD dwRegistrationOptions = 0;
             DWORD64 qwEstimatedSize = 1024;
-            
+
             String^ cacheDirectory = Path::Combine(Path::Combine(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData), gcnew String(L"Package Cache")), gcnew String(TEST_BUNDLE_ID));
             try
             {
@@ -550,8 +550,8 @@ namespace Bootstrapper
 
                 LPCWSTR wzDocument =
                     L"<Bundle>"
-                    L"    <UX>"
-                    L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
+                    L"    <UX PrimaryPayloadId='ux.exe'>"
+                    L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
                     L"    <RelatedBundle Id='" TEST_BUNDLE_UPGRADE_CODE L"' Action='Upgrade' />"
                     L"    <Registration Id='" TEST_BUNDLE_ID L"' Tag='foo' ProviderKey='" TEST_BUNDLE_ID L"' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
@@ -576,7 +576,7 @@ namespace Bootstrapper
                 hr = VariablesParseFromXml(&variables, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse variables from XML.");
 
-                hr = UserExperienceParseFromXml(&userExperience, pixeBundle);
+                hr = BootstrapperApplicationParseFromXml(&userExperience, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse UX from XML.");
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
@@ -612,7 +612,7 @@ namespace Bootstrapper
                 hr = RegistrationSaveState(&registration, pbBuffer, cbBuffer);
                 TestThrowOnFailure(hr, L"Failed to save state.");
 
-                ReleaseNullBuffer(pbBuffer);
+                ReleaseNullMem(pbBuffer);
                 cbBuffer = 0;
 
                 // Verify the variables exist
@@ -646,7 +646,7 @@ namespace Bootstrapper
                 ReleaseStr(sczRelatedBundleId);
                 ReleaseStr(sczCurrentProcess);
                 ReleaseObject(pixeBundle);
-                UserExperienceUninitialize(&userExperience);
+                BootstrapperApplicationUninitialize(&userExperience);
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
@@ -691,8 +691,8 @@ namespace Bootstrapper
 
                 LPCWSTR wzDocument =
                     L"<Bundle>"
-                    L"    <UX>"
-                    L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' Hash='000000000000' />"
+                    L"    <UX PrimaryPayloadId='ux.exe'>"
+                    L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
                     L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
@@ -714,7 +714,7 @@ namespace Bootstrapper
                 hr = VariablesParseFromXml(&variables, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse variables from XML.");
 
-                hr = UserExperienceParseFromXml(&userExperience, pixeBundle);
+                hr = BootstrapperApplicationParseFromXml(&userExperience, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse UX from XML.");
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
@@ -755,7 +755,7 @@ namespace Bootstrapper
                 hr = RegistrationSaveState(&registration, pbBuffer, cbBuffer);
                 TestThrowOnFailure(hr, L"Failed to save state.");
 
-                ReleaseNullBuffer(pbBuffer);
+                ReleaseNullMem(pbBuffer);
                 cbBuffer = 0;
 
                 // Verify the variables exist
@@ -816,7 +816,7 @@ namespace Bootstrapper
             {
                 ReleaseStr(sczCurrentProcess);
                 ReleaseObject(pixeBundle);
-                UserExperienceUninitialize(&userExperience);
+                BootstrapperApplicationUninitialize(&userExperience);
                 RegistrationUninitialize(&registration);
                 VariablesUninitialize(&variables);
 
@@ -836,7 +836,7 @@ namespace Bootstrapper
 
         void ValidateRunOnceKeyEntry(String^ exePath)
         {
-            this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, String::Concat(L"\"", exePath, L"\" /burn.clean.room /burn.runonce"));
+            this->ValidateRunOnceKeyString(TEST_BUNDLE_ID, String::Concat(L"\"", exePath, L"\" /burn.runonce"));
         }
 
         void ValidateUninstallKeyNull(LPCWSTR valueName)

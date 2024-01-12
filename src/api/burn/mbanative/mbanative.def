@@ -8,8 +8,8 @@ EXPORTS
     BalGetVersionVariableFromEngine
     BalGetRelatedBundleVariableFromEngine
     BalVariableExistsFromEngine
-    InitializeFromCreateArgs
-    StoreBAInCreateResults
+    BootstrapperApplicationDebuggerCheck
+    BootstrapperApplicationRun
     StrFree
     VerCompareParsedVersions
     VerCompareStringVersions

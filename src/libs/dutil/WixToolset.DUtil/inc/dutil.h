@@ -41,6 +41,13 @@ HRESULT DAPI DutilInitialize(
 *******************************************************************/
 void DAPI DutilUninitialize();
 
+/*******************************************************************
+ DutilSizetToDword - safely convert SIZE_T to DWORD.
+
+ Returns
+   E_INVALIDARG - If SIZE_T value is greater than DWORD_MAX.
+********************************************************************/
+HRESULT DAPI DutilSizetToDword(SIZE_T sizet, DWORD* pdw);
 
 /********************************************************************
  DutilSuppressTraceErrorSource - tells dutil to skip calling

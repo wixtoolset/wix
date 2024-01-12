@@ -2,36 +2,25 @@
 
 #include "precomp.h"
 #include "BalBaseBootstrapperApplication.h"
-#include "BalBaseBootstrapperApplicationProc.h"
 
 class CTestBootstrapperApplication : public CBalBaseBootstrapperApplication
 {
 public:
-    CTestBootstrapperApplication(
-        __in IBootstrapperEngine* pEngine
-        ) : CBalBaseBootstrapperApplication(pEngine)
+    CTestBootstrapperApplication() : CBalBaseBootstrapperApplication()
     {
     }
 };
 
 HRESULT CreateBootstrapperApplication(
-    __in IBootstrapperEngine* pEngine,
-    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults,
     __out IBootstrapperApplication** ppApplication
     )
 {
     HRESULT hr = S_OK;
     CTestBootstrapperApplication* pApplication = NULL;
 
-    pApplication = new CTestBootstrapperApplication(pEngine);
+    pApplication = new CTestBootstrapperApplication();
     ExitOnNull(pApplication, hr, E_OUTOFMEMORY, "Failed to create new test bootstrapper application object.");
 
-    hr = pApplication->Initialize(pArgs);
-    ExitOnFailure(hr, "CTestBootstrapperApplication initialization failed.");
-
-    pResults->pfnBootstrapperApplicationProc = BalBaseBootstrapperApplicationProc;
-    pResults->pvBootstrapperApplicationProcContext = pApplication;
     *ppApplication = pApplication;
     pApplication = NULL;
 

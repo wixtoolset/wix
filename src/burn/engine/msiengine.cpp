@@ -489,7 +489,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
         {
             LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, pPackage->Msi.sczProductCode, LoggingPerMachineToString(pPackage->fPerMachine), pVersion->sczVersion, pPackage->Msi.dwLanguage, LoggingRelatedOperationToString(pPackage->Msi.operation));
 
-            hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pPackage->Msi.sczUpgradeCode, pPackage->Msi.sczProductCode, pPackage->fPerMachine, pVersion, pPackage->Msi.operation);
+            hr = BACallbackOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pPackage->Msi.sczUpgradeCode, pPackage->Msi.sczProductCode, pPackage->fPerMachine, pVersion, pPackage->Msi.operation);
             ExitOnRootFailure(hr, "BA aborted detect related MSI package.");
         }
     }
@@ -651,7 +651,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
             LogId(REPORT_STANDARD, MSG_DETECTED_RELATED_PACKAGE, wzProductCode, LoggingPerMachineToString(fPerMachine), pVersion->sczVersion, uLcid, LoggingRelatedOperationToString(relatedMsiOperation));
 
             // Pass to BA.
-            hr = UserExperienceOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pRelatedMsi->sczUpgradeCode, wzProductCode, fPerMachine, pVersion, relatedMsiOperation);
+            hr = BACallbackOnDetectRelatedMsiPackage(pUserExperience, pPackage->sczId, pRelatedMsi->sczUpgradeCode, wzProductCode, fPerMachine, pVersion, relatedMsiOperation);
             ExitOnRootFailure(hr, "BA aborted detect related MSI package.");
         }
     }
@@ -700,7 +700,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
             }
 
             // Pass to BA.
-            hr = UserExperienceOnDetectMsiFeature(pUserExperience, pPackage->sczId, pFeature->sczId, pFeature->currentState);
+            hr = BACallbackOnDetectMsiFeature(pUserExperience, pPackage->sczId, pFeature->sczId, pFeature->currentState);
             ExitOnRootFailure(hr, "BA aborted detect MSI feature.");
         }
     }
@@ -747,7 +747,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
 
                 LogId(REPORT_STANDARD, MSG_DETECTED_COMPATIBLE_PACKAGE_FROM_PROVIDER, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczProviderKey, wzCompatibleProductCode, wzCompatibleInstalledVersion, pPackage->Msi.sczProductCode);
 
-                hr = UserExperienceOnDetectCompatibleMsiPackage(pUserExperience, pPackage->sczId, wzCompatibleProductCode, pPackage->compatiblePackage.Msi.pVersion);
+                hr = BACallbackOnDetectCompatibleMsiPackage(pUserExperience, pPackage->sczId, wzCompatibleProductCode, pPackage->compatiblePackage.Msi.pVersion);
                 ExitOnRootFailure(hr, "BA aborted detect compatible MSI package.");
             }
         }
@@ -828,7 +828,7 @@ extern "C" HRESULT MsiEnginePlanInitializePackage(
             pFeature->requested = pFeature->defaultRequested;
 
             // Send plan MSI feature message to BA.
-            hr = UserExperienceOnPlanMsiFeature(pUserExperience, pPackage->sczId, pFeature->sczId, &pFeature->requested);
+            hr = BACallbackOnPlanMsiFeature(pUserExperience, pPackage->sczId, pFeature->sczId, &pFeature->requested);
             ExitOnRootFailure(hr, "BA aborted plan MSI feature.");
         }
     }
@@ -840,8 +840,8 @@ extern "C" HRESULT MsiEnginePlanInitializePackage(
         pPackage->compatiblePackage.fDefaultRequested = BOOTSTRAPPER_ACTION_UNINSTALL == overallAction || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == overallAction;
         pPackage->compatiblePackage.fRequested = pPackage->compatiblePackage.fDefaultRequested;
 
-        hr = UserExperienceOnPlanCompatibleMsiPackageBegin(pUserExperience, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, pPackage->compatiblePackage.Msi.pVersion, &pPackage->compatiblePackage.fRequested);
-        UserExperienceOnPlanCompatibleMsiPackageComplete(pUserExperience, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, hr, pPackage->compatiblePackage.fRequested);
+        hr = BACallbackOnPlanCompatibleMsiPackageBegin(pUserExperience, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, pPackage->compatiblePackage.Msi.pVersion, &pPackage->compatiblePackage.fRequested);
+        BACallbackOnPlanCompatibleMsiPackageComplete(pUserExperience, pPackage->sczId, pPackage->compatiblePackage.compatibleEntry.sczId, hr, pPackage->compatiblePackage.fRequested);
         ExitOnRootFailure(hr, "BA aborted plan compatible MSI package begin.");
     }
 
@@ -1679,7 +1679,7 @@ extern "C" HRESULT MsiEnginePlanPackageOptions(
         break;
     }
 
-    return UserExperienceOnPlanMsiPackage(pUserExperience, wzPackageId, fExecute, actionState, pActionMsiProperty, pUiLevel, pfDisableExternalUiHandler, pFileVersioning);
+    return BACallbackOnPlanMsiPackage(pUserExperience, wzPackageId, fExecute, actionState, pActionMsiProperty, pUiLevel, pfDisableExternalUiHandler, pFileVersioning);
 }
 
 extern "C" void MsiEngineUpdateInstallRegistrationState(

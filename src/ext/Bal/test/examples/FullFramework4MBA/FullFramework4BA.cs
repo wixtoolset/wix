@@ -6,14 +6,9 @@ namespace Example.FullFramework4MBA
 
     public class FullFramework4BA : BootstrapperApplication
     {
-        public FullFramework4BA(IEngine engine)
-            : base(engine)
-        {
-
-        }
-
         protected override void Run()
         {
+            this.engine.Quit(0);
         }
 
         protected override void OnStartup(StartupEventArgs args)

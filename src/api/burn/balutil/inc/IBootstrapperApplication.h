@@ -1,6 +1,8 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+#include <batypes.h>
+
 
 DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-AB06-099D717C67FE")
 {
@@ -9,8 +11,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     STDMETHOD(BAProc)(
         __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
         __in const LPVOID pvArgs,
-        __inout LPVOID pvResults,
-        __in_opt LPVOID pvContext
+        __inout LPVOID pvResults
         ) = 0;
 
     // BAProcFallback - The PFN_BOOTSTRAPPER_APPLICATION_PROC can call this method
@@ -20,9 +21,21 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
         __in const LPVOID pvArgs,
         __inout LPVOID pvResults,
-        __inout HRESULT* phr,
-        __in_opt LPVOID pvContext
+        __inout HRESULT* phr
         ) = 0;
+
+    // OnCreate - called when the bootstrapper application is created.
+    //
+    virtual STDMETHODIMP OnCreate(
+        __in IBootstrapperEngine* pEngine,
+        __in BOOTSTRAPPER_COMMAND* pCommand
+        ) = 0;
+
+    // OnDestroy - called before the bootstrapper application stops.
+    //
+    STDMETHOD(OnDestroy)(
+        __in BOOL fReload
+    ) = 0;
 
     // OnStartup - called when the engine is ready for the bootstrapper application to start.
     //
@@ -686,14 +699,6 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         __in_z_opt LPCWSTR wzContainerId,
         __in_z_opt LPCWSTR wzPayloadId,
         __in HRESULT hrStatus
-        ) = 0;
-
-    STDMETHOD(OnSetUpdateBegin)() = 0;
-
-    STDMETHOD(OnSetUpdateComplete)(
-        __in HRESULT hrStatus,
-        __in_z_opt LPCWSTR wzPreviousPackageId,
-        __in_z_opt LPCWSTR wzNewPackageId
         ) = 0;
 
     // OnPlanRestoreRelatedBundle - called when the engine begins planning an upgrade related bundle for restoring in case of failure.

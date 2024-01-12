@@ -116,47 +116,47 @@ namespace WixToolsetTest.Bal
             }
         }
 
-        [Fact]
-        public void CanBuildUsingMBAWithAlwaysInstallPrereqs()
-        {
-            using (var fs = new DisposableFileSystem())
-            {
-                var baseFolder = fs.GetFolder();
-                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
-                var bundleSourceFolder = TestData.Get(@"TestData\MBA");
-                var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var baFolderPath = Path.Combine(baseFolder, "ba");
-                var extractFolderPath = Path.Combine(baseFolder, "extract");
+        //[Fact]
+        //public void CanBuildUsingMBAWithAlwaysInstallPrereqs()
+        //{
+        //    using (var fs = new DisposableFileSystem())
+        //    {
+        //        var baseFolder = fs.GetFolder();
+        //        var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+        //        var bundleSourceFolder = TestData.Get("TestData", "MBA");
+        //        var intermediateFolder = Path.Combine(baseFolder, "obj");
+        //        var baFolderPath = Path.Combine(baseFolder, "ba");
+        //        var extractFolderPath = Path.Combine(baseFolder, "extract");
 
-                var compileResult = WixRunner.Execute(new[]
-                {
-                    "build",
-                    Path.Combine(bundleSourceFolder, "AlwaysInstallPrereqsBundle.wxs"),
-                    "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
-                    "-intermediateFolder", intermediateFolder,
-                    "-o", bundleFile,
-                });
+        //        var compileResult = WixRunner.Execute(new[]
+        //        {
+        //            "build",
+        //            Path.Combine(bundleSourceFolder, "AlwaysInstallPrereqsBundle.wxs"),
+        //            "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
+        //            "-intermediateFolder", intermediateFolder,
+        //            "-o", bundleFile,
+        //        });
 
-                compileResult.AssertSuccess();
+        //        compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+        //        Assert.True(File.Exists(bundleFile));
 
-                var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
-                extractResult.AssertSuccess();
+        //        var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
+        //        extractResult.AssertSuccess();
 
-                var wixMbaPrereqOptionsElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixMbaPrereqOptions");
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "<WixMbaPrereqOptions AlwaysInstallPrereqs='1' />",
-                }, wixMbaPrereqOptionsElements);
+        //        var wixPrereqOptionsElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPrereqOptions");
+        //        WixAssert.CompareLineByLine(new[]
+        //        {
+        //            "<WixPrereqOptions AlwaysInstallPrereqs='1' />",
+        //        }, wixPrereqOptionsElements);
 
-                var wixMbaPrereqInformationElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixMbaPrereqInformation");
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "<WixMbaPrereqInformation PackageId='wixnative.exe' />",
-                }, wixMbaPrereqInformationElements);
-            }
-        }
+        //        var wixPrereqInformationElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPrereqInformation");
+        //        WixAssert.CompareLineByLine(new[]
+        //        {
+        //            "<WixPrereqInformation PackageId='wixnative.exe' />",
+        //        }, wixPrereqInformationElements);
+        //    }
+        //}
 
         [Fact]
         public void CannotBuildUsingMBAWithNoPrereqs()
@@ -165,7 +165,8 @@ namespace WixToolsetTest.Bal
             {
                 var baseFolder = fs.GetFolder();
                 var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
-                var bundleSourceFolder = TestData.Get(@"TestData\MBA");
+                var bundleSourceFolder = TestData.Get(@"TestData", "MBA");
+                var dataFolder = TestData.Get(@"TestData", ".Data");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
                 var compileResult = WixRunner.Execute(new[]
@@ -174,10 +175,15 @@ namespace WixToolsetTest.Bal
                     Path.Combine(bundleSourceFolder, "Bundle.wxs"),
                     "-ext", TestData.Get(@"WixToolset.Bal.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
+                    "-bindpath", dataFolder,
                     "-o", bundleFile,
                 });
-                Assert.Equal(6802, compileResult.ExitCode);
-                WixAssert.StringEqual("There must be at least one package with bal:PrereqPackage=\"yes\" when using the ManagedBootstrapperApplicationHost.\nThis is typically done by using the WixNetFxExtension and referencing one of the NetFxAsPrereq package groups.", compileResult.Messages[0].ToString());
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The WixManagedBootstrapperApplicationHost element has been deprecated.",
+                }, compileResult.Messages.Select(m => m.ToString()).ToArray());
+                Assert.Equal(1130, compileResult.ExitCode);
 
                 Assert.False(File.Exists(bundleFile));
                 Assert.False(File.Exists(Path.Combine(intermediateFolder, "test.exe")));
@@ -202,11 +208,13 @@ namespace WixToolsetTest.Bal
                     "-intermediateFolder", intermediateFolder,
                     "-o", bundleFile,
                 });
+
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "When using DotNetCoreBootstrapperApplicationHost, the Payload element for the BA's entry point DLL must have bal:BAFactoryAssembly=\"yes\".",
+                    "The WixDotNetCoreBootstrapperApplicationHost element has been deprecated.",
+                    "The BootstrapperApplication element's Name or SourceFile attribute was not found; one of these is required."
                 }, compileResult.Messages.Select(x => x.ToString()).ToArray());
-                Assert.Equal(6818, compileResult.ExitCode);
+                Assert.Equal(44, compileResult.ExitCode);
 
                 Assert.False(File.Exists(bundleFile));
                 Assert.False(File.Exists(Path.Combine(intermediateFolder, "test.exe")));

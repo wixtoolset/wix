@@ -4,6 +4,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
+    <OutputType>WinExe</OutputType>
     <AssemblyName>Example.FullFramework2MBA</AssemblyName>
     <RootNamespace>Example.FullFramework2MBA</RootNamespace>
     <DebugType>embedded</DebugType>
@@ -11,10 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="WixToolset.Mba.Host.config" CopyToOutputDirectory="PreserveNewest" />
+    <PackageReference Include="WixToolset.Mba.Core" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Mba.Core" />
+    <ProjectReference Include="..\..\..\..\..\api\burn\WixToolset.Mba.Core\WixToolset.Mba.Core.csproj" />
   </ItemGroup>
 </Project>

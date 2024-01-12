@@ -7,6 +7,7 @@ namespace WixToolset.Bal
     using System.Xml.Linq;
     using WixToolset.Bal.Symbols;
     using WixToolset.Data;
+    using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -17,16 +18,9 @@ namespace WixToolset.Bal
     public sealed class BalCompiler : BaseCompilerExtension
     {
         private readonly Dictionary<string, WixBalPackageInfoSymbol> packageInfoSymbolsByPackageId = new Dictionary<string, WixBalPackageInfoSymbol>();
-        private readonly Dictionary<string, WixMbaPrereqInformationSymbol> prereqInfoSymbolsByPackageId = new Dictionary<string, WixMbaPrereqInformationSymbol>();
+        private readonly Dictionary<string, WixPrereqInformationSymbol> prereqInfoSymbolsByPackageId = new Dictionary<string, WixPrereqInformationSymbol>();
 
-        private enum WixDotNetCoreBootstrapperApplicationHostTheme
-        {
-            Unknown,
-            None,
-            Standard,
-        }
-
-        private enum WixManagedBootstrapperApplicationHostTheme
+        private enum WixPrerequisiteBootstrapperApplicationTheme
         {
             Unknown,
             None,
@@ -63,17 +57,35 @@ namespace WixToolset.Bal
         /// <param name="context">Extra information about the context in which this element is being parsed.</param>
         public override void ParseElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
         {
+            this.ParsePossibleKeyPathElement(intermediate, section, parentElement, element, context);
+        }
+
+        /// <summary>
+        /// Processes an element for the Compiler.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
+        /// <param name="parentElement">Parent element of element to process.</param>
+        /// <param name="element">Element to process.</param>
+        /// <param name="contextValues">Extra information about the context in which this element is being parsed.</param>
+        public override IComponentKeyPath ParsePossibleKeyPathElement(Intermediate intermediate, IntermediateSection section, XElement parentElement, XElement element, IDictionary<string, string> context)
+        {
+            IComponentKeyPath exePayloadRef = null;
+
             switch (parentElement.Name.LocalName)
             {
                 case "Bundle":
                 case "Fragment":
                     switch (element.Name.LocalName)
                     {
+                        case "BootstrapperApplicationPrerequisiteInformation":
+                            this.ParseBootstrapperApplicationPrerequisiteInformationElement(intermediate, section, element);
+                            break;
                         case "Condition":
                             this.ParseConditionElement(intermediate, section, element);
                             break;
                         case "ManagedBootstrapperApplicationPrereqInformation":
-                            this.ParseMbaPrereqInfoElement(intermediate, section, element);
+                            this.Messaging.Write(WarningMessages.DeprecatedElement(this.ParseHelper.GetSourceLineNumbers(element), element.Name.LocalName, "BootstrapperApplicationPrerequisiteInformation"));
+                            this.ParseBootstrapperApplicationPrerequisiteInformationElement(intermediate, section, element);
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
@@ -84,16 +96,19 @@ namespace WixToolset.Bal
                     switch (element.Name.LocalName)
                     {
                         case "WixInternalUIBootstrapperApplication":
-                            this.ParseWixInternalUIBootstrapperApplicationElement(intermediate, section, element);
+                            exePayloadRef = this.ParseWixInternalUIBootstrapperApplicationElement(intermediate, section, element);
+                            break;
+                        case "WixPrerequisiteBootstrapperApplication":
+                            this.ParseWixPrerequisiteBootstrapperApplicationElement(intermediate, section, element, context);
                             break;
                         case "WixStandardBootstrapperApplication":
-                            this.ParseWixStandardBootstrapperApplicationElement(intermediate, section, element);
+                            exePayloadRef = this.ParseWixStandardBootstrapperApplicationElement(intermediate, section, element);
                             break;
                         case "WixManagedBootstrapperApplicationHost":
-                            this.ParseWixManagedBootstrapperApplicationHostElement(intermediate, section, element);
+                            this.Messaging.Write(WarningMessages.DeprecatedElement(this.ParseHelper.GetSourceLineNumbers(element), element.Name.LocalName));
                             break;
                         case "WixDotNetCoreBootstrapperApplicationHost":
-                            this.ParseWixDotNetCoreBootstrapperApplicationHostElement(intermediate, section, element);
+                            this.Messaging.Write(WarningMessages.DeprecatedElement(this.ParseHelper.GetSourceLineNumbers(element), element.Name.LocalName));
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(parentElement, element);
@@ -104,6 +119,8 @@ namespace WixToolset.Bal
                     this.ParseHelper.UnexpectedElement(parentElement, element);
                     break;
             }
+
+            return exePayloadRef;
         }
 
         /// <summary>
@@ -282,15 +299,7 @@ namespace WixToolset.Bal
                         switch (attribute.Name.LocalName)
                         {
                             case "BAFactoryAssembly":
-                                if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute))
-                                {
-                                    // There can only be one.
-                                    var id = new Identifier(AccessModifier.Global, "TheBAFactoryAssembly");
-                                    section.AddSymbol(new WixBalBAFactoryAssemblySymbol(sourceLineNumbers, id)
-                                    {
-                                        PayloadId = payloadId,
-                                    });
-                                }
+                                this.Messaging.Write(BalWarnings.DeprecatedBAFactoryAssemblyAttribute(this.ParseHelper.GetSourceLineNumbers(parentElement), parentElement.Name.LocalName, attribute.Name.LocalName));
                                 break;
                             case "BAFunctions":
                                 if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attribute))
@@ -352,15 +361,15 @@ namespace WixToolset.Bal
             return packageInfo;
         }
 
-        private WixMbaPrereqInformationSymbol GetMbaPrereqInformationSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, XAttribute prereqAttribute, string packageId)
+        private WixPrereqInformationSymbol GetMbaPrereqInformationSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, XAttribute prereqAttribute, string packageId)
         {
-            WixMbaPrereqInformationSymbol prereqInfo = null;
+            WixPrereqInformationSymbol prereqInfo = null;
 
             if (prereqAttribute != null && YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, prereqAttribute))
             {
                 if (!this.prereqInfoSymbolsByPackageId.TryGetValue(packageId, out prereqInfo))
                 {
-                    prereqInfo = section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, packageId))
+                    prereqInfo = section.AddSymbol(new WixPrereqInformationSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, packageId))
                     {
                         PackageId = packageId,
                     });
@@ -432,7 +441,7 @@ namespace WixToolset.Bal
         /// Parses a Condition element for Bundles.
         /// </summary>
         /// <param name="node">The element to parse.</param>
-        private void ParseMbaPrereqInfoElement(Intermediate intermediate, IntermediateSection section, XElement node)
+        private void ParseBootstrapperApplicationPrerequisiteInformationElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             string packageId = null;
@@ -480,7 +489,7 @@ namespace WixToolset.Bal
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddSymbol(new WixMbaPrereqInformationSymbol(sourceLineNumbers)
+                section.AddSymbol(new WixPrereqInformationSymbol(sourceLineNumbers)
                 {
                     PackageId = packageId,
                     LicenseFile = licenseFile,
@@ -490,13 +499,15 @@ namespace WixToolset.Bal
             }
         }
 
-        private void ParseWixInternalUIBootstrapperApplicationElement(Intermediate intermediate, IntermediateSection section, XElement node)
+        private IComponentKeyPath ParseWixInternalUIBootstrapperApplicationElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
-            WixInternalUIBootstrapperApplicationTheme? theme = null;
+            var theme = WixInternalUIBootstrapperApplicationTheme.Standard;
             string themeFile = null;
             string logoFile = null;
             string localizationFile = null;
+
+            IComponentKeyPath exePayloadRef = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -542,11 +553,6 @@ namespace WixToolset.Bal
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
 
-            if (!theme.HasValue)
-            {
-                theme = WixInternalUIBootstrapperApplicationTheme.Standard;
-            }
-
             if (!this.Messaging.EncounteredError)
             {
                 if (!String.IsNullOrEmpty(logoFile))
@@ -573,23 +579,41 @@ namespace WixToolset.Bal
                     });
                 }
 
-                var baId = "WixInternalUIBootstrapperApplication";
                 switch (theme)
                 {
                     case WixInternalUIBootstrapperApplicationTheme.Standard:
-                        baId = "WixInternalUIBootstrapperApplication.Standard";
+                        this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixIuibaStandardPayloads", platformSpecific: false);
                         break;
                 }
 
-                this.CreateBARef(section, sourceLineNumbers, node, baId, WixBalBootstrapperApplicationType.InternalUi);
+                section.AddSymbol(new WixBalBootstrapperApplicationSymbol(sourceLineNumbers)
+                {
+                    Type = WixBalBootstrapperApplicationType.InternalUi,
+                });
+
+                section.AddSymbol(new WixPrereqOptionsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixPrereqOptions"))
+                {
+                    Primary = 1,
+                    HandleHelp = 1,
+                    HandleLayout = 1,
+                });
+
+                var exePayloadId = this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixInternalUIBootstrapperApplication", platformSpecific: true);
+
+                exePayloadRef = this.CreateComponentKeyPath();
+                exePayloadRef.Id = new Identifier(AccessModifier.Section, exePayloadId);
+                exePayloadRef.Explicit = true; // Internal UI BA is always secondary because the PrereqBA is always primary to handle the help and layout options.
+                exePayloadRef.Type = PossibleKeyPathType.File;
             }
+
+            return exePayloadRef;
         }
 
         /// <summary>
         /// Parses a WixStandardBootstrapperApplication element for Bundles.
         /// </summary>
         /// <param name="node">The element to parse.</param>
-        private void ParseWixStandardBootstrapperApplicationElement(Intermediate intermediate, IntermediateSection section, XElement node)
+        private IComponentKeyPath ParseWixStandardBootstrapperApplicationElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             string launchTarget = null;
@@ -609,6 +633,8 @@ namespace WixToolset.Bal
             var suppressRepair = YesNoType.NotSet;
             var showVersion = YesNoType.NotSet;
             var supportCacheOnly = YesNoType.NotSet;
+
+            IComponentKeyPath exePayloadRef = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -840,35 +866,159 @@ namespace WixToolset.Bal
                     }
                 }
 
-                var baId = "WixStandardBootstrapperApplication";
                 switch (theme)
                 {
                     case WixStandardBootstrapperApplicationTheme.HyperlinkLargeLicense:
-                        baId = "WixStandardBootstrapperApplication.HyperlinkLargeLicense";
+                        this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixStdbaHyperlinkLargeLicensePayloads", platformSpecific: false);
                         break;
                     case WixStandardBootstrapperApplicationTheme.HyperlinkLicense:
-                        baId = "WixStandardBootstrapperApplication.HyperlinkLicense";
+                        this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixStdbaHyperlinkLicensePayloads", platformSpecific: false);
                         break;
                     case WixStandardBootstrapperApplicationTheme.HyperlinkSidebarLicense:
-                        baId = "WixStandardBootstrapperApplication.HyperlinkSidebarLicense";
+                        this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixStdbaHyperlinkSidebarLicensePayloads", platformSpecific: false);
                         break;
                     case WixStandardBootstrapperApplicationTheme.RtfLargeLicense:
-                        baId = "WixStandardBootstrapperApplication.RtfLargeLicense";
+                        this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixStdbaRtfLargeLicensePayloads", platformSpecific: false);
                         break;
                     case WixStandardBootstrapperApplicationTheme.RtfLicense:
-                        baId = "WixStandardBootstrapperApplication.RtfLicense";
+                        this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixStdbaRtfLicensePayloads", platformSpecific: false);
                         break;
                 }
 
-                this.CreateBARef(section, sourceLineNumbers, node, baId, WixBalBootstrapperApplicationType.Standard);
+                section.AddSymbol(new WixBalBootstrapperApplicationSymbol(sourceLineNumbers)
+                {
+                    Type = WixBalBootstrapperApplicationType.Standard,
+                });
+
+                var exePayloadId = this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixStandardBootstrapperApplication", platformSpecific: true);
+
+                exePayloadRef = this.CreateComponentKeyPath();
+                exePayloadRef.Id = new Identifier(AccessModifier.Section, exePayloadId);
+                exePayloadRef.Type = PossibleKeyPathType.File;
             }
+
+            return exePayloadRef;
         }
 
         /// <summary>
         /// Parses a WixManagedBootstrapperApplicationHost element for Bundles.
         /// </summary>
         /// <param name="node">The element to parse.</param>
-        private void ParseWixManagedBootstrapperApplicationHostElement(Intermediate intermediate, IntermediateSection section, XElement node)
+        private void ParseWixPrerequisiteBootstrapperApplicationElement(Intermediate intermediate, IntermediateSection section, XElement node, IDictionary<string, string> context)
+        {
+            var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
+            string logoFile = null;
+            string themeFile = null;
+            string localizationFile = null;
+            var theme = WixPrerequisiteBootstrapperApplicationTheme.Standard;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || this.Namespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "LogoFile":
+                            logoFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ThemeFile":
+                            themeFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "LocalizationFile":
+                            localizationFile = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Theme":
+                            var themeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (themeValue)
+                            {
+                                case "none":
+                                    theme = WixPrerequisiteBootstrapperApplicationTheme.None;
+                                    break;
+                                case "standard":
+                                    theme = WixPrerequisiteBootstrapperApplicationTheme.Standard;
+                                    break;
+                                default:
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Theme", themeValue, "none", "standard"));
+                                    theme = WixPrerequisiteBootstrapperApplicationTheme.Unknown;
+                                    break;
+                            }
+                            break;
+                        default:
+                            this.ParseHelper.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionAttribute(this.Context.Extensions, intermediate, section, node, attrib);
+                }
+            }
+
+            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, node);
+
+            if (!this.Messaging.EncounteredError)
+            {
+                if (!String.IsNullOrEmpty(logoFile))
+                {
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixPreqbaLogo"))
+                    {
+                        Value = logoFile,
+                    });
+                }
+
+                if (!String.IsNullOrEmpty(themeFile))
+                {
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixPreqbaThemeXml"))
+                    {
+                        Value = themeFile,
+                    });
+                }
+
+                if (!String.IsNullOrEmpty(localizationFile))
+                {
+                    section.AddSymbol(new WixVariableSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixPreqbaThemeWxl"))
+                    {
+                        Value = localizationFile,
+                    });
+                }
+
+                switch (theme)
+                {
+                    case WixPrerequisiteBootstrapperApplicationTheme.Standard:
+                        this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixPreqbaStandardPayloads", platformSpecific: false);
+                        break;
+                }
+
+                section.AddSymbol(new WixBalBootstrapperApplicationSymbol(sourceLineNumbers)
+                {
+                    Type = WixBalBootstrapperApplicationType.Prerequisite,
+                });
+
+                var primary = context.TryGetValue("Secondary", out var parentSecondaryValue) && "True".Equals(parentSecondaryValue, StringComparison.OrdinalIgnoreCase) ? true : false;
+
+                var baId = this.CreateIdentifierFromPlatform(sourceLineNumbers, node, primary ? "WixPrereqBootstrapperApplication.Primary" : "WixPrereqBootstrapperApplication.Secondary");
+
+                if (!String.IsNullOrEmpty(baId))
+                {
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBootstrapperApplication, baId);
+                }
+
+                if (primary)
+                {
+                    section.AddSymbol(new WixPrereqOptionsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixPrereqOptions"))
+                    {
+                        Primary = 1
+                    });
+                }
+            }
+        }
+
+#if DELETE
+        /// <summary>
+        /// Parses a WixManagedBootstrapperApplicationHost element for Bundles.
+        /// </summary>
+        /// <param name="node">The element to parse.</param>
+        private IComponentKeyPath ParseWixManagedBootstrapperApplicationHostElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             bool alwaysInstallPrereqs = false;
@@ -876,6 +1026,8 @@ namespace WixToolset.Bal
             string themeFile = null;
             string localizationFile = null;
             WixManagedBootstrapperApplicationHostTheme? theme = null;
+
+            IComponentKeyPath exePayloadRef = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -963,23 +1115,25 @@ namespace WixToolset.Bal
                         break;
                 }
 
-                this.CreateBARef(section, sourceLineNumbers, node, baId, WixBalBootstrapperApplicationType.ManagedHost);
+                exePayloadRef = this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixManagedBootstrapperApplicationHost", baId, WixBalBootstrapperApplicationType.ManagedHost);
 
                 if (alwaysInstallPrereqs)
                 {
-                    section.AddSymbol(new WixMbaPrereqOptionsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixMbaPrereqOptions"))
+                    section.AddSymbol(new WixPrereqOptionsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixPrereqOptions"))
                     {
                         AlwaysInstallPrereqs = 1,
                     });
                 }
             }
+
+            return exePayloadRef;
         }
 
         /// <summary>
         /// Parses a WixDotNetCoreBootstrapperApplication element for Bundles.
         /// </summary>
         /// <param name="node">The element to parse.</param>
-        private void ParseWixDotNetCoreBootstrapperApplicationHostElement(Intermediate intermediate, IntermediateSection section, XElement node)
+        private IComponentKeyPath ParseWixDotNetCoreBootstrapperApplicationHostElement(Intermediate intermediate, IntermediateSection section, XElement node)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             bool alwaysInstallPrereqs = false;
@@ -988,6 +1142,8 @@ namespace WixToolset.Bal
             string localizationFile = null;
             var selfContainedDeployment = YesNoType.NotSet;
             WixDotNetCoreBootstrapperApplicationHostTheme? theme = null;
+
+            IComponentKeyPath exePayloadRef = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -1086,19 +1242,36 @@ namespace WixToolset.Bal
                         break;
                 }
 
-                this.CreateBARef(section, sourceLineNumbers, node, baId, WixBalBootstrapperApplicationType.DotNetCoreHost);
+                exePayloadRef = this.CreatePayloadGroupRef(section, sourceLineNumbers, node, "WixDotNetCoreBootstrapperApplicationHost", baId, WixBalBootstrapperApplicationType.DotNetCoreHost);
 
                 if (alwaysInstallPrereqs)
                 {
-                    section.AddSymbol(new WixMbaPrereqOptionsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixMbaPrereqOptions"))
+                    section.AddSymbol(new WixPrereqOptionsSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "WixPrereqOptions"))
                     {
                         AlwaysInstallPrereqs = 1,
                     });
                 }
             }
+
+            return exePayloadRef;
+        }
+#endif
+
+        private string CreatePayloadGroupRef(IntermediateSection section, SourceLineNumber sourceLineNumbers, XElement node, string basePayloadGroupId, bool platformSpecific)
+        {
+            var id = platformSpecific ? this.CreateIdentifierFromPlatform(sourceLineNumbers, node, basePayloadGroupId) : basePayloadGroupId;
+
+            if (!String.IsNullOrEmpty(id))
+            {
+                this.ParseHelper.CreateWixGroupSymbol(section, sourceLineNumbers, ComplexReferenceParentType.Container, BurnConstants.BurnUXContainerName, ComplexReferenceChildType.PayloadGroup, id);
+
+                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundlePayloadGroup, id);
+            }
+
+            return id;
         }
 
-        private void CreateBARef(IntermediateSection section, SourceLineNumber sourceLineNumbers, XElement node, string name, WixBalBootstrapperApplicationType baType)
+        private string CreateIdentifierFromPlatform(SourceLineNumber sourceLineNumbers, XElement node, string name)
         {
             var id = this.ParseHelper.CreateIdentifierValueFromPlatform(name, this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
             if (id == null)
@@ -1106,15 +1279,7 @@ namespace WixToolset.Bal
                 this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), node.Name.LocalName));
             }
 
-            if (!this.Messaging.EncounteredError)
-            {
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBootstrapperApplication, id);
-
-                section.AddSymbol(new WixBalBootstrapperApplicationSymbol(sourceLineNumbers)
-                {
-                    Type = baType,
-                });
-            }
+            return id;
         }
     }
 }

@@ -954,7 +954,7 @@ DAPI_(HRESULT) ThemeLocalize(
 
 LExit:
     ReleaseStr(sczCaption);
-    
+
     return hr;
 }
 
@@ -6312,7 +6312,7 @@ static HRESULT LoadControls(
         }
 
         pControl->hWnd = ::CreateWindowExW(dwWindowExBits, wzWindowClass, pControl->sczText, pControl->dwStyle | dwWindowBits, x, y, w, h, hwndParent, reinterpret_cast<HMENU>(wControlId), NULL, pControl);
-        ThmExitOnNullWithLastError(pControl->hWnd, hr, "Failed to create window.");
+        ThmExitOnNullWithLastError(pControl->hWnd, hr, "Failed to create control %ls window.", wzWindowClass);
 
         if (pControl->sczTooltip)
         {

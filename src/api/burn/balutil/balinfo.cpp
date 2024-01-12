@@ -223,7 +223,6 @@ LExit:
 DAPI_(HRESULT) BalInfoAddUpdateBundleAsPackage(
     __in BAL_INFO_PACKAGES* pPackages,
     __in_z LPCWSTR wzId,
-    __in_z LPCWSTR /*wzPreviousId*/,
     __out_opt BAL_INFO_PACKAGE** ppPackage
     )
 {
@@ -356,7 +355,7 @@ DAPI_(HRESULT) BalSetOverridableVariablesFromEngine(
         LPCWSTR wzVariableValue = pCommand->rgVariableValues[i];
 
         hr = DictGetValue(pOverridableVariables->sdVariables, wzVariableName, reinterpret_cast<void**>(&pOverridableVariable));
-        if (E_NOTFOUND == hr)
+        if (E_NOTFOUND == hr || E_INVALIDARG == hr)
         {
             BalLog(BOOTSTRAPPER_LOG_LEVEL_ERROR, "Ignoring attempt to set non-overridable variable: '%ls'.", wzVariableName);
             hr = S_OK;
@@ -549,16 +548,16 @@ static HRESULT ParseBalPackageInfoFromXml(
     }
     ExitOnFailure(hr, "Failed to parse all WixBalPackageInfo elements.");
 
-    hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixMbaPrereqInformation", &pNodeList);
+    hr = XmlSelectNodes(pixdManifest, L"/BootstrapperApplicationData/WixPrereqInformation", &pNodeList);
     ExitOnFailure(hr, "Failed to select all packages.");
 
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, NULL)))
     {
         hr = XmlGetAttributeEx(pNode, L"PackageId", &scz);
-        ExitOnRequiredXmlQueryFailure(hr, "Failed to get package identifier for WixMbaPrereqInformation.");
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get package identifier for WixPrereqInformation.");
 
         hr = BalInfoFindPackageById(pPackages, scz, &pPackage);
-        ExitOnFailure(hr, "Failed to find package specified in WixMbaPrereqInformation: %ls", scz);
+        ExitOnFailure(hr, "Failed to find package specified in WixPrereqInformation: %ls", scz);
 
         pPackage->fPrereqPackage = TRUE;
 
@@ -570,7 +569,7 @@ static HRESULT ParseBalPackageInfoFromXml(
 
         ReleaseNullObject(pNode);
     }
-    ExitOnFailure(hr, "Failed to parse all WixMbaPrereqInformation elements.");
+    ExitOnFailure(hr, "Failed to parse all WixPrereqInformation elements.");
 
     if (S_FALSE == hr)
     {

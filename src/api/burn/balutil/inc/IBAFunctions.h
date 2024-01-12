@@ -2,6 +2,8 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 
+#include "IBootstrapperApplication.h"
+
 DECLARE_INTERFACE_IID_(IBAFunctions, IBootstrapperApplication, "0FB445ED-17BD-49C7-BE19-479776F8AE96")
 {
     // OnThemeLoaded - Called after the BA finished loading all the controls for the theme.

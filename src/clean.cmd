@@ -35,7 +35,6 @@ if exist "%_NUGET_CACHE%\wixtoolset.core.windowsinstaller" rd /s/q "%_NUGET_CACH
 if exist "%_NUGET_CACHE%\wixtoolset.data" rd /s/q "%_NUGET_CACHE%\wixtoolset.data"
 if exist "%_NUGET_CACHE%\wixtoolset.dependency.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.dependency.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.directx.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.directx.wixext"
-if exist "%_NUGET_CACHE%\wixtoolset.dnc.hostgenerator" rd /s/q "%_NUGET_CACHE%\wixtoolset.dnc.hostgenerator"
 if exist "%_NUGET_CACHE%\wixtoolset.dtf.compression" rd /s/q "%_NUGET_CACHE%\wixtoolset.dtf.compression"
 if exist "%_NUGET_CACHE%\wixtoolset.dtf.compression.cab" rd /s/q "%_NUGET_CACHE%\wixtoolset.dtf.compression.cab"
 if exist "%_NUGET_CACHE%\wixtoolset.dtf.compression.zip" rd /s/q "%_NUGET_CACHE%\wixtoolset.dtf.compression.zip"

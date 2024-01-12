@@ -2,7 +2,6 @@
 
 #include "precomp.h"
 
-
 namespace Microsoft
 {
 namespace Tools

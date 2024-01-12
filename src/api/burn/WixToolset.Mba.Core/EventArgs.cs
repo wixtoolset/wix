@@ -198,6 +198,54 @@ namespace WixToolset.Mba.Core
     }
 
     /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.Create"/>.
+    /// </summary>
+    [Serializable]
+    public class CreateEventArgs : HResultEventArgs
+    {
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
+        public CreateEventArgs(IEngine engine, IBootstrapperCommand command)
+        {
+            this.Engine = engine;
+            this.Command = command;
+        }
+
+        /// <summary>
+        /// Engine running the application.
+        /// </summary>
+        public IEngine Engine { get; }
+
+        /// <summary>
+        /// Command line arguments.
+        /// </summary>
+        public IBootstrapperCommand Command { get; }
+    }
+
+    /// <summary>
+    /// Event arguments for <see cref="IDefaultBootstrapperApplication.Destroy"/>.
+    /// </summary>
+    [Serializable]
+    public class DestroyEventArgs : HResultEventArgs
+    {
+        /// <summary>
+        /// This class is for events raised by the engine.
+        /// It is not intended to be instantiated by user code.
+        /// </summary>
+        public DestroyEventArgs(bool reload)
+        {
+            this.Reload = reload;
+        }
+
+        /// <summary>
+        /// Bootstrapper application is being reloaded.
+        /// </summary>
+        public bool Reload { get; }
+    }
+
+    /// <summary>
     /// Event arguments for <see cref="IDefaultBootstrapperApplication.Startup"/>.
     /// </summary>
     [Serializable]
@@ -2564,49 +2612,6 @@ namespace WixToolset.Mba.Core
         /// Gets the identifier of the payload.
         /// </summary>
         public string PayloadId { get; private set; }
-    }
-
-    /// <summary>
-    /// EventArgs for <see cref="IDefaultBootstrapperApplication.SetUpdateBegin"/>.
-    /// </summary>
-    [Serializable]
-    public class SetUpdateBeginEventArgs : HResultEventArgs
-    {
-        /// <summary>
-        /// This class is for events raised by the engine.
-        /// It is not intended to be instantiated by user code.
-        /// </summary>
-        public SetUpdateBeginEventArgs()
-        {
-        }
-    }
-
-    /// <summary>
-    /// Event arguments for <see cref="IDefaultBootstrapperApplication.SetUpdateComplete"/>
-    /// </summary>
-    [Serializable]
-    public class SetUpdateCompleteEventArgs : StatusEventArgs
-    {
-        /// <summary>
-        /// This class is for events raised by the engine.
-        /// It is not intended to be instantiated by user code.
-        /// </summary>
-        public SetUpdateCompleteEventArgs(int hrStatus, string previousPackageId, string newPackageId)
-            : base(hrStatus)
-        {
-            this.PreviousPackageId = previousPackageId;
-            this.NewPackageId = newPackageId;
-        }
-
-        /// <summary>
-        /// Gets the identifier of the update package that was removed.
-        /// </summary>
-        public string PreviousPackageId { get; private set; }
-
-        /// <summary>
-        /// Gets the identifier of the update package that was added.
-        /// </summary>
-        public string NewPackageId { get; private set; }
     }
 
     /// <summary>

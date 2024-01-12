@@ -4,6 +4,7 @@ namespace WixToolset.Core.Burn
 {
     using System;
     using WixToolset.Data;
+    using WixToolset.Data.Symbols;
 
     internal static class BurnBackendErrors
     {
@@ -100,6 +101,23 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.MultipleSingletonSymbolsFound, "The Bundle requires a single {0}, but found another at: {1}", friendlyName, collisionSourceLineNumbers.ToString());
         }
 
+        public static Message MissingPrimaryBootstrapperApplication()
+        {
+            return Message(null, Ids.MissingPrimaryBootstrapperApplication, "A BundleApplication is required to build a bundle.");
+        }
+
+        public static Message TooManyBootstrapperApplications(SourceLineNumber sourceLineNumbers, WixBootstrapperApplicationSymbol symbol)
+        {
+            var secondary = symbol.Secondary == true ? "secondary " : String.Empty;
+
+            return Message(sourceLineNumbers, Ids.MultipleSingletonSymbolsFound, "Multiple {0}BootstrapperApplications defined. You can have at most one BootstrapperAppplication of primary and secondary.", secondary);
+        }
+
+        public static Message BundleMissingBootstrapperApplicationContainer(SourceLineNumber sourceLineNumbers, string path)
+        {
+            return Message(sourceLineNumbers, Ids.BundleMissingBootstrapperApplicationContainer, "Bundle is invalid. The BoostrapperApplication attached container is missing from the file: {0}", path);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -122,6 +140,9 @@ namespace WixToolset.Core.Burn
             InvalidBundleManifest = 8012,
             BundleMultipleProviders = 8013,
             MultipleSingletonSymbolsFound = 8014,
+            MissingPrimaryBootstrapperApplication = 8015,
+            TooManyBootstrapperApplications = 8016,
+            BundleMissingBootstrapperApplicationContainer = 8017,
         } // last available is 8499. 8500 is BurnBackendWarnings.
     }
 }

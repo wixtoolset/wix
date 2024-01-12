@@ -39,6 +39,7 @@ extern "C" void UpdateUninitialize(
 {
     PackageUninitialize(&pUpdate->package);
 
+    ReleaseStr(pUpdate->sczAuthorizationHeader);
     ReleaseStr(pUpdate->sczUpdateSource);
     memset(pUpdate, 0, sizeof(BURN_UPDATE));
 }

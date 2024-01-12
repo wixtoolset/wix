@@ -302,8 +302,6 @@ extern "C" HRESULT VariableInitialize(
         {BURN_BUNDLE_ELEVATED, InitializeVariableNumeric, 0, FALSE, TRUE},
         {BURN_BUNDLE_ACTIVE_PARENT, InitializeVariableString, NULL, FALSE, TRUE},
         {BURN_BUNDLE_PROVIDER_KEY, InitializeVariableString, (DWORD_PTR)L"", FALSE, TRUE},
-        {BURN_BUNDLE_SOURCE_PROCESS_PATH, InitializeVariableString, NULL, FALSE, TRUE},
-        {BURN_BUNDLE_SOURCE_PROCESS_FOLDER, InitializeVariableString, NULL, FALSE, TRUE},
         {BURN_BUNDLE_TAG, InitializeVariableString, (DWORD_PTR)L"", FALSE, TRUE},
         {BURN_BUNDLE_UILEVEL, InitializeVariableNumeric, 0, FALSE, TRUE},
         {BURN_BUNDLE_VERSION, InitializeVariableVersion, (DWORD_PTR)L"0", FALSE, TRUE},
@@ -1950,13 +1948,13 @@ static HRESULT InitializeVariableNativeMachine(
     )
 {
     UNREFERENCED_PARAMETER(dwpData);
-    
+
     HRESULT hr = S_OK;
     USHORT usNativeMachine = IMAGE_FILE_MACHINE_UNKNOWN;
 
     hr = ProcNativeMachine(::GetCurrentProcess(), &usNativeMachine);
     ExitOnFailure(hr, "Failed to get native machine value.");
-    
+
     if (S_FALSE != hr)
     {
         hr = BVariantSetNumeric(pValue, usNativeMachine);

@@ -34,17 +34,17 @@ namespace WixToolset.Mba.Core
         }
 
         /// <inheritdoc/>
-        public IPackageInfo AddRelatedBundleAsPackage(DetectRelatedBundleEventArgs e)
+        public IPackageInfo AddRelatedBundleAsPackage(string productCode, RelationType relationType, bool perMachine, string version)
         {
-            var package = PackageInfo.GetRelatedBundleAsPackage(e.ProductCode, e.RelationType, e.PerMachine, e.Version);
+            var package = PackageInfo.GetRelatedBundleAsPackage(productCode, relationType, perMachine, version);
             this.Packages.Add(package.Id, package);
             return package;
         }
 
         /// <inheritdoc/>
-        public IPackageInfo AddUpdateBundleAsPackage(SetUpdateCompleteEventArgs e)
+        public IPackageInfo AddUpdateBundleAsPackage(string packageId)
         {
-            var package = PackageInfo.GetUpdateBundleAsPackage(e.NewPackageId);
+            var package = PackageInfo.GetUpdateBundleAsPackage(packageId);
             this.Packages.Add(package.Id, package);
             return package;
         }

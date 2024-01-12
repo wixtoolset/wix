@@ -1,12 +1,12 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
     <Bundle Name="FDDx86LatestCoreMBA" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="{E547C546-5E0E-4BF9-A675-BBEF4C77FF0D}">
-        <BootstrapperApplication>
+        <BootstrapperApplication SourceFile="publish\Example.LatestCoreMBA\fdd-x86\Example.LatestCoreMBA.exe">
             <Payload SourceFile="publish\Example.LatestCoreMBA\fdd-x86\Example.LatestCoreMBA.deps.json" Name="Example.LatestCoreMBA.deps.json" />
-            <Payload SourceFile="publish\Example.LatestCoreMBA\fdd-x86\Example.LatestCoreMBA.dll" Name="Example.LatestCoreMBA.dll" bal:BAFactoryAssembly="yes" />
+            <!-- <Payload SourceFile="publish\Example.LatestCoreMBA\fdd-x86\Example.LatestCoreMBA.dll" Name="Example.LatestCoreMBA.dll" bal:BAFactoryAssembly="yes" /> -->
             <Payload SourceFile="publish\Example.LatestCoreMBA\fdd-x86\Example.LatestCoreMBA.runtimeconfig.json" Name="Example.LatestCoreMBA.runtimeconfig.json" />
             <Payload SourceFile="publish\Example.LatestCoreMBA\fdd-x86\mbanative.dll" Name="mbanative.dll" />
             <Payload SourceFile="publish\Example.LatestCoreMBA\fdd-x86\WixToolset.Mba.Core.dll" Name="WixToolset.Mba.Core.dll" />
-            <bal:WixDotNetCoreBootstrapperApplicationHost />
+            <!-- <bal:WixDotNetCoreBootstrapperApplicationHost /> -->
         </BootstrapperApplication>
         <Chain>
             <ExePackage DetectCondition="none" UninstallArguments="-foo" SourceFile="..\.data\notanexe.exe" bal:PrereqPackage="yes" />

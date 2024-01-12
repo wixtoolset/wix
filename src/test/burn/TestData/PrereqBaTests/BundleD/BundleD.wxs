@@ -3,14 +3,14 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Fragment>
-    <BootstrapperApplication Id="BrokenMbaAlwaysPrereq">
-      <Payload Name="good.config" SourceFile="!(bindpath.net2x86)\TestBA.BootstrapperCore.config" />
-      <Payload Name="WixToolset.Mba.Host.config" SourceFile="bad.config" />
-      <Payload SourceFile="!(bindpath.net2x86)\TestBA.dll" />
+    <BootstrapperApplication Id="BrokenMbaAlwaysPrereq" SourceFile="!(bindpath.net2x86)\TestBA.exe" Secondary="true">
+      <Payload Name="good.config" SourceFile="!(bindpath.net2x86)\TestBA.exe.config" />
+      <Payload Name="TestBA.exe.config" SourceFile="bad.config" />
       <Payload SourceFile="!(bindpath.net2x86)\mbanative.dll" />
       <Payload SourceFile="!(bindpath.net2x86)\WixToolset.Mba.Core.dll" />
       <Payload SourceFile="$(var.PrereqBaf.TargetPath)" bal:BAFunctions="yes" />
-      <bal:WixManagedBootstrapperApplicationHost AlwaysInstallPrereqs="yes" />
+
+      <bal:WixPrerequisiteBootstrapperApplication />
     </BootstrapperApplication>
   </Fragment>
 
@@ -21,7 +21,7 @@
     <PackageGroup Id="BundlePackages">
       <ExePackage SourceFile="$(var.ReplaceConfig.TargetPath)" bal:PrereqPackage="yes"
                   Permanent="yes" DetectCondition="NOT GoodConfigPresent OR CAUSEINFINITELOOP = 1"
-                  InstallArguments="&quot;[BARuntimeDirectory]WixToolset.Mba.Host.config&quot; &quot;[BARuntimeDirectory]good.config&quot; &quot;[BARuntimeDirectory]bad.config&quot;" />
+                  InstallArguments="&quot;[BARuntimeDirectory]TestBA.exe.config&quot; &quot;[BARuntimeDirectory]good.config&quot; &quot;[BARuntimeDirectory]bad.config&quot;" />
       <MsiPackage Id="PackageB" SourceFile="$(var.PackageB.TargetPath)" bal:PrereqPackage="yes" Permanent="yes" />
       <MsiPackage Id="PackageC" SourceFile="$(var.PackageC.TargetPath)" />
     </PackageGroup>

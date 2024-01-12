@@ -3,5 +3,4 @@
 <Project>
   <Import Project="$(MsbuildThisFileDirectory)..\..\..\..\Directory.Build.targets" />
   <Import Project="Directory.wixproj.targets" Condition=" '$(MSBuildProjectExtension)'=='.wixproj' " />
-  <Import Project="DncBA.targets" Condition=" '$(IsDncBA)'=='true' " />
 </Project>

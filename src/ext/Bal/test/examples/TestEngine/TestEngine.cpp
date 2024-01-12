@@ -26,15 +26,11 @@ HRESULT TestEngine::LoadBA(
 {
     HRESULT hr = S_OK;
     BOOTSTRAPPER_COMMAND command = { };
-    BOOTSTRAPPER_CREATE_ARGS args = { };
-    PFN_BOOTSTRAPPER_APPLICATION_CREATE pfnCreate = NULL;
 
-    if (m_pCreateResults || m_hBAModule)
+    if (m_hBAModule)
     {
         ExitFunction1(hr = E_INVALIDSTATE);
     }
-
-    m_pCreateResults = static_cast<BOOTSTRAPPER_CREATE_RESULTS*>(MemAlloc(sizeof(BOOTSTRAPPER_CREATE_RESULTS), TRUE));
 
     command.cbSize = sizeof(BOOTSTRAPPER_COMMAND);
 
@@ -44,14 +40,7 @@ HRESULT TestEngine::LoadBA(
     hr = PathConcat(command.wzBootstrapperWorkingFolder, L"BootstrapperApplicationData.xml", &command.wzBootstrapperApplicationDataPath);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to allocate wzBootstrapperApplicationDataPath");
 
-    args.cbSize = sizeof(BOOTSTRAPPER_CREATE_ARGS);
-    args.pCommand = &command;
-    args.pfnBootstrapperEngineProc = TestEngine::EngineProc;
-    args.pvBootstrapperEngineProcContext = this;
-    args.qwEngineAPIVersion = MAKEQWORDVERSION(0, 0, 0, 1);
-
-    m_pCreateResults->cbSize = sizeof(BOOTSTRAPPER_CREATE_RESULTS);
-
+#ifdef TODO_DELETE
     m_hBAModule = ::LoadLibraryExW(wzBAFilePath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
     ConsoleExitOnNullWithLastError(m_hBAModule, hr, CONSOLE_COLOR_RED, "Failed to load BA dll.");
 
@@ -60,6 +49,7 @@ HRESULT TestEngine::LoadBA(
 
     hr = pfnCreate(&args, m_pCreateResults);
     ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "BA returned failure on BootstrapperApplicationCreate.");
+#endif
 
 LExit:
     ReleaseStr(command.wzBootstrapperApplicationDataPath);
@@ -117,7 +107,7 @@ HRESULT TestEngine::SendShutdownEvent(
     shutdownArgs.cbSize = sizeof(BA_ONSHUTDOWN_ARGS);
     shutdownResults.action = defaultAction;
     shutdownResults.cbSize = sizeof(BA_ONSHUTDOWN_RESULTS);
-    hr = m_pCreateResults->pfnBootstrapperApplicationProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSHUTDOWN, &shutdownArgs, &shutdownResults, m_pCreateResults->pvBootstrapperApplicationProcContext);
+    // hr = m_pCreateResults->pfnBootstrapperApplicationProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSHUTDOWN, &shutdownArgs, &shutdownResults, m_pCreateResults->pvBootstrapperApplicationProcContext);
     return hr;
 }
 
@@ -128,7 +118,7 @@ HRESULT TestEngine::SendStartupEvent()
     BA_ONSTARTUP_RESULTS startupResults = { };
     startupArgs.cbSize = sizeof(BA_ONSTARTUP_ARGS);
     startupResults.cbSize = sizeof(BA_ONSTARTUP_RESULTS);
-    hr = m_pCreateResults->pfnBootstrapperApplicationProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSTARTUP, &startupArgs, &startupResults, m_pCreateResults->pvBootstrapperApplicationProcContext);
+    // hr = m_pCreateResults->pfnBootstrapperApplicationProc(BOOTSTRAPPER_APPLICATION_MESSAGE_ONSTARTUP, &startupArgs, &startupResults, m_pCreateResults->pvBootstrapperApplicationProcContext);
     return hr;
 }
 
@@ -151,6 +141,7 @@ void TestEngine::UnloadBA(
     __in BOOL fReload
     )
 {
+#ifdef TODO_DELETE
     PFN_BOOTSTRAPPER_APPLICATION_DESTROY pfnDestroy = NULL;
     BOOTSTRAPPER_DESTROY_ARGS args = { };
     BOOTSTRAPPER_DESTROY_RESULTS results = { };
@@ -178,6 +169,7 @@ void TestEngine::UnloadBA(
 
         m_hBAModule = NULL;
     }
+#endif
 }
 
 HRESULT TestEngine::BAEngineLog(
@@ -254,11 +246,9 @@ HRESULT TestEngine::ProcessBAMessage(
 TestEngine::TestEngine()
 {
     m_hBAModule = NULL;
-    m_pCreateResults = NULL;
     m_dwThreadId = ::GetCurrentThreadId();
 }
 
 TestEngine::~TestEngine()
 {
-    ReleaseMem(m_pCreateResults);
 }

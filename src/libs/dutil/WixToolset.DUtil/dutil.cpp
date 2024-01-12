@@ -50,6 +50,19 @@ DAPI_(void) DutilUninitialize()
     vpfnTraceErrorCallback = NULL;
 }
 
+
+DAPI_(HRESULT) DutilSizetToDword(SIZE_T sizet, DWORD* pdw)
+{
+    if (DWORD_MAX < sizet)
+    {
+        return E_INVALIDARG;
+    }
+
+    *pdw = static_cast<DWORD>(sizet);
+    return S_OK;
+}
+
+
 DAPI_(BOOL) DutilSuppressTraceErrorSource()
 {
     if (DWORD_MAX == vtdwSuppressTraceErrorSource)
@@ -169,7 +182,7 @@ extern "C" void DAPI Dutil_AssertMsg(
             DExitOnFailure(hr, "failed to concat string while building assert message");
 
             id = ::MessageBoxA(0, szMsg, "Debug Assert Message",
-                MB_SERVICE_NOTIFICATION | MB_TOPMOST | 
+                MB_SERVICE_NOTIFICATION | MB_TOPMOST |
                 MB_DEFBUTTON2 | MB_ABORTRETRYIGNORE);
         }
     }
@@ -206,7 +219,7 @@ Dutil_Assert
 
 *******************************************************************/
 extern "C" void DAPI Dutil_Assert(
-    __in_z LPCSTR szFile, 
+    __in_z LPCSTR szFile,
     __in int iLine
     )
 {
@@ -229,8 +242,8 @@ Dutil_AssertSz
 
 *******************************************************************/
 extern "C" void DAPI Dutil_AssertSz(
-    __in_z LPCSTR szFile, 
-    __in int iLine, 
+    __in_z LPCSTR szFile,
+    __in int iLine,
     __in_z __format_string LPCSTR szMsg
     )
 {
@@ -278,10 +291,10 @@ Dutil_Trace
 
 *******************************************************************/
 extern "C" void DAPIV Dutil_Trace(
-    __in_z LPCSTR szFile, 
-    __in int iLine, 
-    __in REPORT_LEVEL rl, 
-    __in_z __format_string LPCSTR szFormat, 
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in REPORT_LEVEL rl,
+    __in_z __format_string LPCSTR szFormat,
     ...
     )
 {
@@ -355,11 +368,11 @@ Dutil_TraceError
 
 *******************************************************************/
 extern "C" void DAPIV Dutil_TraceError(
-    __in_z LPCSTR szFile, 
-    __in int iLine, 
-    __in REPORT_LEVEL rl, 
-    __in HRESULT hrError, 
-    __in_z __format_string LPCSTR szFormat, 
+    __in_z LPCSTR szFile,
+    __in int iLine,
+    __in REPORT_LEVEL rl,
+    __in HRESULT hrError,
+    __in_z __format_string LPCSTR szFormat,
     ...
     )
 {

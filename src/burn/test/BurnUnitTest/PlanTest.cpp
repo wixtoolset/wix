@@ -1028,7 +1028,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
         }
 
-        [Fact]
+        [Fact(Skip = "Need to reimplement PlanTestBAProc() using a fake out of proc BA")]
         void RelatedBundlesAreSortedByPlanType()
         {
             HRESULT hr = S_OK;
@@ -1598,7 +1598,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN, BURN_PACKAGE_REGISTRATION_STATE_UNKNOWN);
         }
 
-        [Fact]
+        [Fact(Skip = "Need to reimplement PlanTestBAProc() using a fake out of proc BA")]
         void SingleMsiForceAbsentTest()
         {
             HRESULT hr = S_OK;
@@ -1688,7 +1688,7 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[0], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_ABSENT, BURN_PACKAGE_REGISTRATION_STATE_ABSENT);
         }
 
-        [Fact]
+        [Fact(Skip = "Need to reimplement PlanTestBAProc() using a fake out of proc BA")]
         void SingleMsiForcePresentTest()
         {
             HRESULT hr = S_OK;
@@ -3031,11 +3031,13 @@ namespace Bootstrapper
             hr = CoreInitializeConstants(pEngineState);
             NativeAssert::Succeeded(hr, "Failed to initialize core constants");
 
-            hr = CacheInitializeSources(&pEngineState->cache, &pEngineState->registration, &pEngineState->variables, &pEngineState->internalCommand);
+            hr = CacheInitializeSources(&pEngineState->cache, &pEngineState->registration, &pEngineState->variables);
             NativeAssert::Succeeded(hr, "Failed to initialize cache sources.");
 
-            pEngineState->userExperience.hUXModule = reinterpret_cast<HMODULE>(1);
-            pEngineState->userExperience.pfnBAProc = PlanTestBAProc;
+#if TODO_REIMPLEMENT
+             pEngineState->userExperience.hUXModule = reinterpret_cast<HMODULE>(1);
+             pEngineState->userExperience.pfnBAProc = PlanTestBAProc;
+#endif
         }
 
         void PlanTestDetect(BURN_ENGINE_STATE* pEngineState)
@@ -3800,6 +3802,8 @@ namespace Bootstrapper
 }
 }
 
+#if TODO_REIMPLEMENT
+
 static HRESULT WINAPI PlanTestBAProc(
     __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
     __in const LPVOID /*pvArgs*/,
@@ -3834,3 +3838,5 @@ static HRESULT WINAPI PlanTestBAProc(
 
     return S_OK;
 }
+
+#endif

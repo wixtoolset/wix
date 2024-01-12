@@ -12,28 +12,21 @@ namespace BalUtilTests
     public ref class BootstrapperApplication
     {
     public:
-        [Fact]
+        [Fact(Skip = "Need a mock implementation of IBootstrapperEngine to test BootstrapperApplication.")]
         void CanCreateTestBootstrapperApplication()
         {
             HRESULT hr = S_OK;
-            BOOTSTRAPPER_CREATE_ARGS args = { };
-            BOOTSTRAPPER_COMMAND command = { };
-            BOOTSTRAPPER_CREATE_RESULTS results = { };
-            IBootstrapperEngine* pEngine = NULL;
             IBootstrapperApplication* pApplication = NULL;
-
-            args.cbSize = sizeof(args);
-            args.pCommand = &command;
-
-            results.cbSize = sizeof(results);
+            IBootstrapperEngine* pEngine = NULL;
+            BOOTSTRAPPER_COMMAND command = { };
 
             try
             {
-                hr = BalInitializeFromCreateArgs(&args, &pEngine);
-                NativeAssert::Succeeded(hr, "Failed to create engine.");
-
-                hr = CreateBootstrapperApplication(pEngine, &args, &results, &pApplication);
+                hr = CreateBootstrapperApplication(&pApplication);
                 NativeAssert::Succeeded(hr, "Failed to create BootstrapperApplication.");
+
+                hr = pApplication->OnCreate(pEngine, &command);
+                NativeAssert::Succeeded(hr, "Failed to initialize BootstrapperApplication.");
             }
             finally
             {

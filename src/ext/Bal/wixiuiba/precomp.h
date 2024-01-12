@@ -15,8 +15,9 @@
 #include <strutil.h>
 #include <xmlutil.h>
 
-#include <BootstrapperEngine.h>
-#include <BootstrapperApplication.h>
+#include <baenginetypes.h>
+#include <batypes.h>
+
 #include <IBootstrapperEngine.h>
 #include <IBootstrapperApplication.h>
 
@@ -24,7 +25,4 @@
 #include <balinfo.h>
 #include <balcondition.h>
 
-#include <preqba.h>
-
 #include "WixInternalUIBootstrapperApplication.h"
-#include "wixiuiba.h"

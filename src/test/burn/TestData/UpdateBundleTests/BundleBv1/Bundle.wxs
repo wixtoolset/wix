@@ -22,9 +22,7 @@
     <?elseif $(var.BA) = "TestBAdnc"?>
       <!-- pulled in through the PackageGroupRef below -->
     <?elseif $(var.BA) = "hyperlinkLicense"?>
-      <BootstrapperApplication>
-        <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" />
-      </BootstrapperApplication>
+      <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" />
     <?else?>
       <BootstrapperApplicationRef Id="$(var.BA)" />
     <?endif?>

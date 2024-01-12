@@ -33,6 +33,11 @@ namespace WixToolset.Bal
             return Message(sourceLineNumbers, Ids.UnmarkedBAFunctionsDLL, "WixStandardBootstrapperApplication doesn't automatically load BAFunctions.dll. Use the bal:BAFunctions attribute to indicate that it should be loaded.");
         }
 
+        public static Message DeprecatedBAFactoryAssemblyAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)
+        {
+            return Message(sourceLineNumbers, Ids.DeprecatedBAFactoryAssemblyAttribute, "The {0}/@{1} attribute has been deprecated. Move the Payload/@SourceFile attribute to be the BootstrapperApplication/@SourceFile attribute and remove the Payload element.", elementName, attributeName);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -50,6 +55,7 @@ namespace WixToolset.Bal
             IuibaPrimaryPackageInstallCondition = 6503,
             IuibaPrimaryPackageDisplayInternalUICondition = 6504,
             IuibaPrereqPackageAfterPrimaryPackage = 6505,
+            DeprecatedBAFactoryAssemblyAttribute = 6506,
         }
     }
 }

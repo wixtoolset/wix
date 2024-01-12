@@ -3,8 +3,6 @@
 #include <windows.h>
 #include <msiquery.h>
 
-#include "BootstrapperEngine.h"
-#include "BootstrapperApplication.h"
 #include "IBootstrapperEngine.h"
 #include "IBootstrapperApplication.h"
 
@@ -12,7 +10,9 @@
 #include "balinfo.h"
 #include "balretry.h"
 
-class CBalBaseBootstrapperApplication : public IBootstrapperApplication
+#define CBalBaseBootstrapperApplication CBootstrapperApplication
+
+class CBootstrapperApplication : public IBootstrapperApplication
 {
 public: // IUnknown
     virtual STDMETHODIMP QueryInterface(
@@ -65,8 +65,7 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP_(HRESULT) BAProc(
         __in BOOTSTRAPPER_APPLICATION_MESSAGE /*message*/,
         __in const LPVOID /*pvArgs*/,
-        __inout LPVOID /*pvResults*/,
-        __in_opt LPVOID /*pvContext*/
+        __inout LPVOID /*pvResults*/
         )
     {
         return E_NOTIMPL;
@@ -76,10 +75,35 @@ public: // IBootstrapperApplication
         __in BOOTSTRAPPER_APPLICATION_MESSAGE /*message*/,
         __in const LPVOID /*pvArgs*/,
         __inout LPVOID /*pvResults*/,
-        __inout HRESULT* /*phr*/,
-        __in_opt LPVOID /*pvContext*/
+        __inout HRESULT* /*phr*/
         )
     {
+    }
+
+    virtual STDMETHODIMP OnCreate(
+        __in IBootstrapperEngine* pEngine,
+        __in BOOTSTRAPPER_COMMAND* pCommand
+        )
+    {
+        HRESULT hr = S_OK;
+
+        m_commandDisplay = pCommand->display;
+
+        hr = BalInfoParseCommandLine(&m_BalInfoCommand, pCommand);
+        BalExitOnFailure(hr, "Failed to parse command line with balutil.");
+
+        pEngine->AddRef();
+        m_pEngine = pEngine;
+
+    LExit:
+        return hr;
+    }
+
+    virtual STDMETHODIMP OnDestroy(
+        __in BOOL /*fReload*/
+        )
+    {
+        return S_OK;
     }
 
     virtual STDMETHODIMP OnStartup()
@@ -429,7 +453,7 @@ public: // IBootstrapperApplication
         m_dwProgressPercentage = dwProgressPercentage;
         m_dwOverallProgressPercentage = dwOverallProgressPercentage;
 
-        if (BOOTSTRAPPER_DISPLAY_EMBEDDED == m_display)
+        if (BOOTSTRAPPER_DISPLAY_EMBEDDED == m_commandDisplay)
         {
             hr = m_pEngine->SendEmbeddedProgress(m_dwProgressPercentage, m_dwOverallProgressPercentage, &nResult);
             BalExitOnFailure(hr, "Failed to send embedded overall progress.");
@@ -463,7 +487,7 @@ public: // IBootstrapperApplication
     {
         BalRetryErrorOccurred(wzPackageId, dwCode);
 
-        if (BOOTSTRAPPER_DISPLAY_EMBEDDED == m_display)
+        if (BOOTSTRAPPER_DISPLAY_EMBEDDED == m_commandDisplay)
         {
             HRESULT hr = m_pEngine->SendEmbeddedError(dwCode, wzError, dwUIHint, pResult);
             if (FAILED(hr))
@@ -475,7 +499,7 @@ public: // IBootstrapperApplication
         {
             *pResult = IDCANCEL;
         }
-        else if (BOOTSTRAPPER_DISPLAY_FULL == m_display)
+        else if (BOOTSTRAPPER_DISPLAY_FULL == m_commandDisplay)
         {
             if (BOOTSTRAPPER_ERROR_TYPE_HTTP_AUTH_SERVER == errorType || BOOTSTRAPPER_ERROR_TYPE_HTTP_AUTH_PROXY == errorType)
             {
@@ -553,7 +577,7 @@ public: // IBootstrapperApplication
 
         // Send progress even though we don't update the numbers to at least give the caller an opportunity
         // to cancel.
-        if (BOOTSTRAPPER_DISPLAY_EMBEDDED == m_display)
+        if (BOOTSTRAPPER_DISPLAY_EMBEDDED == m_commandDisplay)
         {
             hr = m_pEngine->SendEmbeddedProgress(m_dwProgressPercentage, m_dwOverallProgressPercentage, &nResult);
             BalExitOnFailure(hr, "Failed to send embedded cache progress.");
@@ -733,7 +757,7 @@ public: // IBootstrapperApplication
 
         // Send progress even though we don't update the numbers to at least give the caller an opportunity
         // to cancel.
-        if (BOOTSTRAPPER_DISPLAY_EMBEDDED == m_display)
+        if (BOOTSTRAPPER_DISPLAY_EMBEDDED == m_commandDisplay)
         {
             hr = m_pEngine->SendEmbeddedProgress(m_dwProgressPercentage, m_dwOverallProgressPercentage, &nResult);
             BalExitOnFailure(hr, "Failed to send embedded execute progress.");
@@ -848,7 +872,7 @@ public: // IBootstrapperApplication
     {
         HRESULT hr = S_OK;
         BOOL fRestartRequired = BOOTSTRAPPER_APPLY_RESTART_REQUIRED == restart;
-        BOOL fShouldBlockRestart = BOOTSTRAPPER_DISPLAY_FULL <= m_display && BAL_INFO_RESTART_PROMPT >= m_BalInfoCommand.restart;
+        BOOL fShouldBlockRestart = BOOTSTRAPPER_DISPLAY_FULL <= m_commandDisplay && BAL_INFO_RESTART_PROMPT >= m_BalInfoCommand.restart;
 
         if (fRestartRequired && !fShouldBlockRestart)
         {
@@ -1050,20 +1074,6 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
-    virtual STDMETHODIMP OnSetUpdateBegin()
-    {
-        return S_OK;
-    }
-
-    virtual STDMETHODIMP OnSetUpdateComplete(
-        __in HRESULT /*hrStatus*/,
-        __in_z_opt LPCWSTR /*wzPreviousPackageId*/,
-        __in_z_opt LPCWSTR /*wzNewPackageId*/
-        )
-    {
-        return S_OK;
-    }
-
     virtual STDMETHODIMP OnPlanRestoreRelatedBundle(
         __in_z LPCWSTR /*wzBundleId*/,
         __in BOOTSTRAPPER_REQUEST_STATE /*recommendedState*/,
@@ -1127,22 +1137,6 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
-public: //CBalBaseBootstrapperApplication
-    virtual STDMETHODIMP Initialize(
-        __in const BOOTSTRAPPER_CREATE_ARGS* pCreateArgs
-        )
-    {
-        HRESULT hr = S_OK;
-
-        m_display = pCreateArgs->pCommand->display;
-
-        hr = BalInfoParseCommandLine(&m_BalInfoCommand, pCreateArgs->pCommand);
-        BalExitOnFailure(hr, "Failed to parse command line with balutil.");
-
-    LExit:
-        return hr;
-    }
-
 protected:
     //
     // PromptCancel - prompts the user to close (if not forced).
@@ -1195,16 +1189,14 @@ protected:
     }
 
     CBalBaseBootstrapperApplication(
-        __in IBootstrapperEngine* pEngine,
         __in DWORD dwRetryCount = 0,
         __in DWORD dwRetryTimeout = 1000
         )
     {
         m_cReferences = 1;
-        m_display = BOOTSTRAPPER_DISPLAY_UNKNOWN;
+        m_commandDisplay = BOOTSTRAPPER_DISPLAY_UNKNOWN;
 
-        pEngine->AddRef();
-        m_pEngine = pEngine;
+        m_pEngine = NULL;
 
         ::InitializeCriticalSection(&m_csCanceled);
         m_fCanceled = FALSE;
@@ -1230,12 +1222,12 @@ protected:
     CRITICAL_SECTION m_csCanceled;
     BOOL m_fCanceled;
 
+    IBootstrapperEngine* m_pEngine;
     BAL_INFO_COMMAND m_BalInfoCommand;
 
 private:
     long m_cReferences;
-    BOOTSTRAPPER_DISPLAY m_display;
-    IBootstrapperEngine* m_pEngine;
+    BOOTSTRAPPER_DISPLAY m_commandDisplay;
 
     BOOL m_fRollingBack;
 

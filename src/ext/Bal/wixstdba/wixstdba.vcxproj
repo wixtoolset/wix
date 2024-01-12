@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-<Project DefaultTargets="Build" Toolsxmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|ARM64">
       <Configuration>Debug</Configuration>
@@ -31,49 +31,58 @@
 
   <PropertyGroup Label="Globals">
     <ProjectGuid>{41085A22-E6AA-4E8B-AB1B-DDEE0DC89DFA}</ProjectGuid>
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <Keyword>Win32Proj</Keyword>
+    <ConfigurationType>Application</ConfigurationType>
+    <ProjectSubSystem>Windows</ProjectSubSystem>
     <CharacterSet>Unicode</CharacterSet>
-    <TargetName>WixStdBA</TargetName>
-    <ProjectModuleDefinitionFile>wixstdba.def</ProjectModuleDefinitionFile>
+    <Description>WiX Standard Bootstrapper Application</Description>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+
   <PropertyGroup>
-    <ProjectAdditionalLinkLibraries>comctl32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;wininet.lib;wixstdba.res</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalIncludeDirectories>$(ProjectDir)..\stdbas\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalLinkLibraries>comctl32.lib;gdiplus.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;stdbas.res</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
+  <ItemDefinitionGroup>
+    <Link>
+      <DelayLoadDLLs>comctl32.dll;gdiplus.dll;shlwapi.dll;version.dll;wininet.dll</DelayLoadDLLs>
+      <AdditionalOptions>/DEPENDENTLOADFLAG:0x800 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+
   <ItemGroup>
-    <ClCompile Include="precomp.cpp">
-      <PrecompiledHeader>Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="WixStandardBootstrapperApplication.cpp" />
-    <ClCompile Include="wixstdba.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="inc\preqba.h" />
     <ClInclude Include="precomp.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="wixstdba.def" />
+    <ClCompile Include="precomp.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="wixstdba.cpp" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="packages.config" />
+    <Manifest Include="..\stdbas\stdbas.manifest" />
+    <ResourceCompile Include="wixstdba.rc" />
   </ItemGroup>
+
   <ItemGroup>
-    <CustomBuild Include="wixstdba.mc">
-      <Message>Compiling message file...</Message>
-      <Command>mc.exe -h "$(IntDir)." -r "$(IntDir)." -A -c -z wixstdba.messages "$(InputDir)wixstdba.mc"
-rc.exe -fo "$(OutDir)wixstdba.res" "$(IntDir)wixstdba.messages.rc"</Command>
-      <Outputs>$(IntDir)wixstdba.messages.h;$(IntDir)wixstdba.messages.rc</Outputs>
-    </CustomBuild>
+    <ProjectReference Include="..\stdbas\stdbas.vcxproj">
+      <Project>{DBBF5F32-BAEA-46A8-99A0-17277A906456}</Project>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="WixToolset.BalUtil" />
-
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
 

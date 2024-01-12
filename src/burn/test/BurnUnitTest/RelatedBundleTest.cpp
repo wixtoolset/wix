@@ -46,7 +46,7 @@ namespace Bootstrapper
                 LPCWSTR wzDocument =
                     L"<Bundle>"
                     L"    <UX>"
-                    L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' />"
+                    L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' />"
                     L"    </UX>"
                     L"    <RelatedBundle Id='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Action='Upgrade' />"
                     L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='yes'>"
@@ -98,7 +98,7 @@ namespace Bootstrapper
                 LPCWSTR wzDocument =
                     L"<Bundle>"
                     L"    <UX>"
-                    L"        <Payload Id='ux.dll' FilePath='ux.dll' Packaging='embedded' SourcePath='ux.dll' />"
+                    L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' />"
                     L"    </UX>"
                     L"    <RelatedBundle Id='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Action='Upgrade' />"
                     L"    <Registration Id='{3DB49D3D-1FB8-4147-A465-BBE8BFD0DAD0}' Tag='foo' ProviderKey='foo' Version='4.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"

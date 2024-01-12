@@ -103,10 +103,21 @@ namespace WixToolset.Core.Burn
 
             bundleSymbol.PerMachine = true; // default to per-machine but the first-per user package wil flip the bundle per-user.
 
-            this.NormalizeRelatedBundles(bundleSymbol, section);
+            {
+                var command = new NormalizeRelatedBundlesCommand(this.Messaging, bundleSymbol, section);
+                command.Execute();
+            }
 
-            // Ensure there is one and only one WixBootstrapperApplicationDllSymbol.
-            var bundleApplicationDllSymbol = this.GetSingleSymbol<WixBootstrapperApplicationDllSymbol>("bootstrapper application");
+            // Find the primary boostrapper application and optional secondary.
+            WixBootstrapperApplicationSymbol primaryBootstrapperApplicationSymbol = null;
+            WixBootstrapperApplicationSymbol secondaryBootstrapperApplicationSymbol = null;
+            {
+                var command = new GetBootstrapperApplicationSymbolsCommand(this.Messaging, section);
+                command.Execute();
+
+                primaryBootstrapperApplicationSymbol = command.Primary;
+                secondaryBootstrapperApplicationSymbol = command.Secondary;
+            }
 
             // Ensure there is one and only one WixChainSymbol.
             var chainSymbol = this.GetSingleSymbol<WixChainSymbol>("package chain");
@@ -443,7 +454,7 @@ namespace WixToolset.Core.Burn
             WixBundleContainerSymbol uxContainer;
             IEnumerable<WixBundlePayloadSymbol> uxPayloads;
             {
-                var command = new CreateNonUXContainers(this.BackendHelper, this.Messaging, bundleApplicationDllSymbol, containers.Values, payloadSymbols, this.IntermediateFolder, layoutDirectory, this.DefaultCompressionLevel);
+                var command = new CreateNonUXContainers(this.BackendHelper, this.Messaging, containers.Values, payloadSymbols, this.IntermediateFolder, layoutDirectory, this.DefaultCompressionLevel);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
@@ -469,7 +480,7 @@ namespace WixToolset.Core.Burn
             {
                 var executableName = Path.GetFileName(this.OutputPath);
 
-                var command = new CreateBurnManifestCommand(executableName, section, bundleSymbol, containers.Values, chainSymbol, facades, boundaries, uxPayloads, payloadSymbols, packagesPayloads, orderedSearches, this.IntermediateFolder);
+                var command = new CreateBurnManifestCommand(executableName, section, bundleSymbol, primaryBootstrapperApplicationSymbol, secondaryBootstrapperApplicationSymbol, containers.Values, chainSymbol, facades, boundaries, uxPayloads, payloadSymbols, packagesPayloads, orderedSearches, this.IntermediateFolder);
                 command.Execute();
 
                 manifestPath = command.OutputPath;
@@ -488,7 +499,7 @@ namespace WixToolset.Core.Burn
             }
 
             {
-                var command = new CreateBundleExeCommand(this.Messaging, this.FileSystem, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleApplicationDllSymbol, bundleSymbol, uxContainer, containers.Values);
+                var command = new CreateBundleExeCommand(this.Messaging, this.FileSystem, this.BackendHelper, this.IntermediateFolder, this.OutputPath, bundleSymbol, uxContainer, containers.Values);
                 command.Execute();
 
                 fileTransfers.Add(command.Transfer);
@@ -501,27 +512,6 @@ namespace WixToolset.Core.Burn
             this.FileTransfers = fileTransfers;
             this.TrackedFiles = trackedFiles;
             this.Wixout = this.CreateWixout(trackedFiles, this.Output, manifestPath, baManifestPath, bextManifestPath);
-        }
-
-        private void NormalizeRelatedBundles(WixBundleSymbol bundleSymbol, IntermediateSection section)
-        {
-            var upgradeCode = bundleSymbol.UpgradeCode;
-
-            foreach (var relatedBundleSymbol in section.Symbols.OfType<WixRelatedBundleSymbol>())
-            {
-                var elementName = "RelatedBundle";
-                var attributeName = "Id";
-
-                if (upgradeCode == relatedBundleSymbol.BundleId)
-                {
-                    elementName = "Bundle";
-                    attributeName = "UpgradeCode";
-                }
-
-                relatedBundleSymbol.BundleId = this.NormalizeBundleRelatedBundleId(relatedBundleSymbol.SourceLineNumbers, relatedBundleSymbol.BundleId, elementName, attributeName);
-            }
-
-            bundleSymbol.UpgradeCode = this.NormalizeBundleRelatedBundleId(bundleSymbol.SourceLineNumbers, bundleSymbol.UpgradeCode, null, null);
         }
 
         private void ProcessBundleVersion(WixBundleSymbol bundleSymbol)
@@ -538,20 +528,6 @@ namespace WixToolset.Core.Burn
             {
                 this.Messaging.Write(ErrorMessages.IllegalVersionValue(bundleSymbol.SourceLineNumbers, "Bundle", "Version", bundleSymbol.Version));
             }
-        }
-
-        private string NormalizeBundleRelatedBundleId(SourceLineNumber sourceLineNumber, string relatedBundleId, string elementName, string attributeName)
-        {
-            if (Guid.TryParse(relatedBundleId, out var guid))
-            {
-                return guid.ToString("B").ToUpperInvariant();
-            }
-            else if (!String.IsNullOrEmpty(elementName))
-            {
-                this.Messaging.Write(ErrorMessages.IllegalGuidValue(sourceLineNumber, elementName, attributeName, relatedBundleId));
-            }
-
-            return relatedBundleId;
         }
 
         private WixOutput CreateWixout(List<ITrackedFile> trackedFiles, Intermediate intermediate, string manifestPath, string baDataPath, string bextDataPath)

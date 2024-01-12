@@ -152,7 +152,6 @@ DAPI_(HRESULT) BalInfoAddRelatedBundleAsPackage(
 DAPI_(HRESULT) BalInfoAddUpdateBundleAsPackage(
     __in BAL_INFO_PACKAGES* pPackages,
     __in_z LPCWSTR wzId,
-    __in_z LPCWSTR wzPreviousId,
     __out_opt BAL_INFO_PACKAGE** ppPackage
     );
 

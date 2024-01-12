@@ -10,8 +10,9 @@
   </Fragment>
 
   <Fragment>
-    <BootstrapperApplication Id="fakeba">
-      <BootstrapperApplicationDll SourceFile="example.txt" />
+    <BootstrapperApplication Id="fakeba"
+                             SourceFile="example.txt">
+      <!--<BootstrapperApplicationDll SourceFile="example.txt" />-->
     </BootstrapperApplication>
   </Fragment>
 

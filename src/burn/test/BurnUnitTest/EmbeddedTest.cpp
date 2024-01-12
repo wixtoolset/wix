@@ -2,7 +2,6 @@
 
 #include "precomp.h"
 
-
 const DWORD TEST_UNKNOWN_MESSAGE_ID = 0xFFFE;
 const HRESULT S_TEST_SUCCEEDED = 0x3133;
 const DWORD TEST_EXIT_CODE = 666;

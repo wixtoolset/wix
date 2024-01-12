@@ -46,7 +46,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ClCompile Include="mbanative.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

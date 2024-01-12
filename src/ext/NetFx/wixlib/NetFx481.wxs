@@ -63,7 +63,7 @@
       <PackageGroupRef Id="$(var.NetFx481WebId)" />
     </PackageGroup>
 
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx481WebId)" LicenseUrl="$(var.NetFx481EulaLink)" />
+    <bal:BootstrapperApplicationPrerequisiteInformation PackageId="$(var.NetFx481WebId)" LicenseUrl="$(var.NetFx481EulaLink)" />
   </Fragment>
 
   <Fragment>
@@ -74,28 +74,28 @@
     <WixVariable Id="NetFx481RedistPackageDirectory" Value="redist\" Overridable="yes" />
 
     <PackageGroup Id="$(var.NetFx481RedistId)">
-      <ExePackage 
-        CacheId="$(var.NetFx481RedistId)_AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173" 
-        InstallArguments="/q /norestart /log &quot;[NetFx481RedistLog].html&quot;" 
-        PerMachine="yes" 
-        DetectCondition="!(wix.NetFx481RedistDetectCondition)" 
-        InstallCondition="!(wix.NetFx481RedistInstallCondition)" 
-        Id="$(var.NetFx481RedistId)" 
-        Vital="yes" 
-        Permanent="yes" 
-        Protocol="netfx4" 
-        LogPathVariable="NetFx481RedistLog" 
+      <ExePackage
+        CacheId="$(var.NetFx481RedistId)_AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173"
+        InstallArguments="/q /norestart /log &quot;[NetFx481RedistLog].html&quot;"
+        PerMachine="yes"
+        DetectCondition="!(wix.NetFx481RedistDetectCondition)"
+        InstallCondition="!(wix.NetFx481RedistInstallCondition)"
+        Id="$(var.NetFx481RedistId)"
+        Vital="yes"
+        Permanent="yes"
+        Protocol="netfx4"
+        LogPathVariable="NetFx481RedistLog"
         Cache="remove">
 
-        <ExePackagePayload 
-          Name="!(wix.NetFx481RedistPackageDirectory)ndp481-x86-x64-allos-enu.exe" 
-          DownloadUrl="$(var.NetFx481RedistLink)" 
-          ProductName="Microsoft .NET Framework 4.8.1" 
-          Description="Microsoft .NET Framework 4.8.1 Setup" 
-          CertificatePublicKey="0A7D1EFF01D4EBAD21E85C51499576EBAA40E676" 
-          CertificateThumbprint="AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173" 
-          Size="63610344" 
-          Version="4.8.09037.06" 
+        <ExePackagePayload
+          Name="!(wix.NetFx481RedistPackageDirectory)ndp481-x86-x64-allos-enu.exe"
+          DownloadUrl="$(var.NetFx481RedistLink)"
+          ProductName="Microsoft .NET Framework 4.8.1"
+          Description="Microsoft .NET Framework 4.8.1 Setup"
+          CertificatePublicKey="0A7D1EFF01D4EBAD21E85C51499576EBAA40E676"
+          CertificateThumbprint="AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173"
+          Size="63610344"
+          Version="4.8.09037.06"
           />
       </ExePackage>
     </PackageGroup>
@@ -106,6 +106,6 @@
       <PackageGroupRef Id="$(var.NetFx481RedistId)" />
     </PackageGroup>
 
-    <bal:ManagedBootstrapperApplicationPrereqInformation PackageId="$(var.NetFx481RedistId)" LicenseUrl="$(var.NetFx481EulaLink)" />
+    <bal:BootstrapperApplicationPrerequisiteInformation PackageId="$(var.NetFx481RedistId)" LicenseUrl="$(var.NetFx481EulaLink)" />
   </Fragment>
 </Wix>

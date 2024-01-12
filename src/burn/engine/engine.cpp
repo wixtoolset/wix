@@ -16,9 +16,11 @@ static HRESULT InitializeEngineState(
 static void UninitializeEngineState(
     __in BURN_ENGINE_STATE* pEngineState
     );
+#if 0
 static HRESULT RunUntrusted(
     __in BURN_ENGINE_STATE* pEngineState
     );
+#endif
 static HRESULT RunNormal(
     __in HINSTANCE hInstance,
     __in BURN_ENGINE_STATE* pEngineState
@@ -38,12 +40,13 @@ static HRESULT RunRunOnce(
     );
 static HRESULT RunApplication(
     __in BURN_ENGINE_STATE* pEngineState,
+    __in BOOL fSecondaryBootstrapperApplication,
     __out BOOL* pfReloadApp,
     __out BOOL* pfSkipCleanup
     );
 static HRESULT ProcessMessage(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
-    __in BOOTSTRAPPER_ENGINE_ACTION* pAction
+    __in BAENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_ACTION* pAction
     );
 static HRESULT DAPI RedirectLoggingOverPipe(
     __in_z LPCSTR szString,
@@ -72,28 +75,6 @@ static void CALLBACK BurnTraceError(
 
 // function definitions
 
-extern "C" BOOL EngineInCleanRoom(
-    __in_z_opt LPCWSTR wzCommandLine
-    )
-{
-    // Be very careful with the functions you call from here.
-    // This function will be called before ::SetDefaultDllDirectories()
-    // has been called so dependencies outside of kernel32.dll are
-    // very likely to introduce DLL hijacking opportunities.
-
-    static DWORD cchCleanRoomSwitch = lstrlenW(BURN_COMMANDLINE_SWITCH_CLEAN_ROOM);
-
-    // This check is wholly dependent on the clean room command line switch being
-    // present at the beginning of the command line. Since Burn is the only thing
-    // that should be setting this command line option, that is in our control.
-    BOOL fInCleanRoom = (wzCommandLine &&
-        (wzCommandLine[0] == L'-' || wzCommandLine[0] == L'/') &&
-        CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzCommandLine + 1, cchCleanRoomSwitch, BURN_COMMANDLINE_SWITCH_CLEAN_ROOM, cchCleanRoomSwitch)
-    );
-
-    return fInCleanRoom;
-}
-
 extern "C" HRESULT EngineRun(
     __in HINSTANCE hInstance,
     __in HANDLE hEngineFile,
@@ -113,7 +94,6 @@ extern "C" HRESULT EngineRun(
     SYSTEM_INFO si = { };
     RTL_OSVERSIONINFOEXW ovix = { };
     LPWSTR sczExePath = NULL;
-    BOOL fRunUntrusted = FALSE;
     BOOL fRunNormal = FALSE;
     BOOL fRunElevated = FALSE;
     BOOL fRunRunOnce = FALSE;
@@ -214,25 +194,18 @@ extern "C" HRESULT EngineRun(
     // Select run mode.
     switch (engineState.internalCommand.mode)
     {
-    case BURN_MODE_UNTRUSTED:
-        fRunUntrusted = TRUE;
-
-        hr = RunUntrusted(&engineState);
-        ExitOnFailure(hr, "Failed to run untrusted mode.");
-        break;
-
     case BURN_MODE_NORMAL:
         fRunNormal = TRUE;
 
         hr = RunNormal(hInstance, &engineState);
-        ExitOnFailure(hr, "Failed to run per-user mode.");
+        ExitOnFailure(hr, "Failed to run normal mode.");
         break;
 
     case BURN_MODE_ELEVATED:
         fRunElevated = TRUE;
 
         hr = RunElevated(hInstance, wzCommandLine, &engineState);
-        ExitOnFailure(hr, "Failed to run per-machine mode.");
+        ExitOnFailure(hr, "Failed to run elevated mode.");
         break;
 
     case BURN_MODE_EMBEDDED:
@@ -266,7 +239,7 @@ LExit:
         LoggingOpenFailed();
     }
 
-    UserExperienceRemove(&engineState.userExperience);
+    BootstrapperApplicationRemove(&engineState.userExperience);
 
     CacheRemoveBaseWorkingFolder(&engineState.cache);
     CacheUninitialize(&engineState.cache);
@@ -283,10 +256,6 @@ LExit:
     if (fRunNormal)
     {
         LogId(REPORT_STANDARD, MSG_EXITING, FAILED(hr) ? (int)hr : *pdwExitCode, LoggingBoolToString(engineState.fRestart));
-    }
-    else if (fRunUntrusted)
-    {
-        LogId(REPORT_STANDARD, MSG_EXITING_CLEAN_ROOM, FAILED(hr) ? (int)hr : *pdwExitCode);
     }
     else if (fRunRunOnce)
     {
@@ -452,7 +421,7 @@ static void UninitializeEngineState(
     BurnExtensionUninitialize(&pEngineState->extensions);
 
     ::DeleteCriticalSection(&pEngineState->userExperience.csEngineActive);
-    UserExperienceUninitialize(&pEngineState->userExperience);
+    BootstrapperApplicationUninitialize(&pEngineState->userExperience);
 
     ApprovedExesUninitialize(&pEngineState->approvedExes);
     DependencyUninitialize(&pEngineState->dependencies);
@@ -475,7 +444,6 @@ static void UninitializeEngineState(
     ReleaseStr(pEngineState->internalCommand.sczIgnoreDependencies);
     ReleaseStr(pEngineState->internalCommand.sczLogFile);
     ReleaseStr(pEngineState->internalCommand.sczOriginalSource);
-    ReleaseStr(pEngineState->internalCommand.sczSourceProcessPath);
     ReleaseStr(pEngineState->internalCommand.sczEngineWorkingDirectory);
 
     ReleaseStr(pEngineState->log.sczExtension);
@@ -489,82 +457,6 @@ static void UninitializeEngineState(
     memset(pEngineState, 0, sizeof(BURN_ENGINE_STATE));
 }
 
-static HRESULT RunUntrusted(
-    __in BURN_ENGINE_STATE* pEngineState
-    )
-{
-    HRESULT hr = S_OK;
-    LPWSTR sczCurrentProcessPath = NULL;
-    LPWSTR wzCleanRoomBundlePath = NULL;
-    LPWSTR sczCachedCleanRoomBundlePath = NULL;
-    LPWSTR sczParameters = NULL;
-    LPWSTR sczFullCommandLine = NULL;
-    PROCESS_INFORMATION pi = { };
-    HANDLE hFileAttached = NULL;
-    HANDLE hFileSelf = NULL;
-    HANDLE hProcess = NULL;
-
-    // Initialize logging.
-    hr = LoggingOpen(&pEngineState->log, &pEngineState->internalCommand, &pEngineState->command, &pEngineState->variables, pEngineState->registration.sczDisplayName);
-    ExitOnFailure(hr, "Failed to open clean room log.");
-
-    hr = PathForCurrentProcess(&sczCurrentProcessPath, NULL);
-    ExitOnFailure(hr, "Failed to get path for current process.");
-
-    // If we're running from the package cache, we're in a secure
-    // folder (DLLs cannot be inserted here for hijacking purposes)
-    // so just launch the current process's path as the clean room
-    // process. Technically speaking, we'd be able to skip creating
-    // a clean room process at all (since we're already running from
-    // a secure folder) but it makes the code that only wants to run
-    // in clean room more complicated if we don't launch an explicit
-    // clean room process.
-    if (CacheBundleRunningFromCache(&pEngineState->cache))
-    {
-        wzCleanRoomBundlePath = sczCurrentProcessPath;
-    }
-    else
-    {
-        hr = CacheBundleToCleanRoom(&pEngineState->cache, &pEngineState->section, &sczCachedCleanRoomBundlePath);
-        ExitOnFailure(hr, "Failed to cache to clean room.");
-
-        wzCleanRoomBundlePath = sczCachedCleanRoomBundlePath;
-    }
-
-    hr = CoreCreateCleanRoomCommandLine(&sczParameters, pEngineState, wzCleanRoomBundlePath, sczCurrentProcessPath, &hFileAttached, &hFileSelf);
-    ExitOnFailure(hr, "Failed to create clean room command-line.");
-
-    hr = StrAllocFormattedSecure(&sczFullCommandLine, L"\"%ls\" %ls", wzCleanRoomBundlePath, sczParameters);
-    ExitOnFailure(hr, "Failed to allocate full command-line.");
-
-    hr = CoreCreateProcess(wzCleanRoomBundlePath, sczFullCommandLine, TRUE, 0, NULL, static_cast<WORD>(pEngineState->command.nCmdShow), &pi);
-    ExitOnFailure(hr, "Failed to launch clean room process: %ls", sczFullCommandLine);
-
-    hProcess = pi.hProcess;
-    pi.hProcess = NULL;
-
-    hr = ProcWaitForCompletion(hProcess, INFINITE, &pEngineState->userExperience.dwExitCode);
-    ExitOnFailure(hr, "Failed to wait for clean room process: %ls", wzCleanRoomBundlePath);
-
-LExit:
-    // If the splash screen is still around, close it.
-    if (::IsWindow(pEngineState->command.hwndSplashScreen))
-    {
-        ::PostMessageW(pEngineState->command.hwndSplashScreen, WM_CLOSE, 0, 0);
-    }
-
-    ReleaseHandle(pi.hThread);
-    ReleaseFileHandle(hFileSelf);
-    ReleaseFileHandle(hFileAttached);
-    ReleaseHandle(hProcess);
-    StrSecureZeroFreeString(sczFullCommandLine);
-    StrSecureZeroFreeString(sczParameters);
-    ReleaseStr(sczCachedCleanRoomBundlePath);
-    ReleaseStr(sczCurrentProcessPath);
-
-    return hr;
-}
-
 static HRESULT RunNormal(
     __in HINSTANCE hInstance,
     __in BURN_ENGINE_STATE* pEngineState
@@ -574,9 +466,10 @@ static HRESULT RunNormal(
     LPWSTR sczOriginalSource = NULL;
     LPWSTR sczCopiedOriginalSource = NULL;
     BOOL fContinueExecution = TRUE;
-    BOOL fReloadApp = FALSE;
+    BOOL fReloadApp = TRUE;
     BOOL fSkipCleanup = FALSE;
     BURN_EXTENSION_ENGINE_CONTEXT extensionEngineContext = { };
+    BOOL fRunSecondaryBootstrapperApplication = FALSE;
 
     // Initialize logging.
     hr = LoggingOpen(&pEngineState->log, &pEngineState->internalCommand, &pEngineState->command, &pEngineState->variables, pEngineState->registration.sczDisplayName);
@@ -644,14 +537,27 @@ static HRESULT RunNormal(
     hr = BurnExtensionLoad(&pEngineState->extensions, &extensionEngineContext);
     ExitOnFailure(hr, "Failed to load BundleExtensions.");
 
-    do
+    // The secondary bootstrapper application only gets one chance to execute. That means
+    // first time through we run the primary bootstrapper application and on reload we run
+    // the secondary bootstrapper application, and if the secondary bootstrapper application
+    // requests a reload, we load the primary bootstrapper application one last time.
+    for (DWORD i = 0; i < 3 && fReloadApp; i++)
     {
         fReloadApp = FALSE;
         pEngineState->fQuit = FALSE;
 
-        hr = RunApplication(pEngineState, &fReloadApp, &fSkipCleanup);
-        ExitOnFailure(hr, "Failed while running ");
-    } while (fReloadApp);
+        hr = RunApplication(pEngineState, fRunSecondaryBootstrapperApplication, &fReloadApp, &fSkipCleanup);
+
+        // If reloading, switch to the other bootstrapper application.
+        if (fReloadApp)
+        {
+            fRunSecondaryBootstrapperApplication = !fRunSecondaryBootstrapperApplication;
+        }
+        else if (FAILED(hr))
+        {
+            break;
+        }
+    }
 
 LExit:
     if (!fSkipCleanup)
@@ -790,73 +696,64 @@ LExit:
     return hr;
 }
 
-static void CALLBACK FreeQueueItem(
-    __in void* pvValue,
-    __in void* /*pvContext*/
-    )
-{
-    BOOTSTRAPPER_ENGINE_ACTION* pAction = reinterpret_cast<BOOTSTRAPPER_ENGINE_ACTION*>(pvValue);
-
-    LogId(REPORT_WARNING, MSG_IGNORE_OPERATION_AFTER_QUIT, LoggingBurnMessageToString(pAction->dwMessage));
-
-    CoreBootstrapperEngineActionUninitialize(pAction);
-    MemFree(pAction);
-}
-
 static HRESULT RunApplication(
     __in BURN_ENGINE_STATE* pEngineState,
+    __in BOOL fSecondaryBootstrapperApplication,
     __out BOOL* pfReloadApp,
     __out BOOL* pfSkipCleanup
     )
 {
     HRESULT hr = S_OK;
-    BOOTSTRAPPER_ENGINE_CONTEXT engineContext = { };
     BOOL fStartupCalled = FALSE;
+    BAENGINE_CONTEXT* pEngineContext = NULL;
+    HANDLE rghWait[2] = { };
+    DWORD dwSignaled = 0;
+    BAENGINE_ACTION* pAction = NULL;
     BOOTSTRAPPER_SHUTDOWN_ACTION shutdownAction = BOOTSTRAPPER_SHUTDOWN_ACTION_NONE;
-    BOOTSTRAPPER_ENGINE_ACTION* pAction = NULL;
 
-    // Setup the bootstrapper engine.
-    engineContext.pEngineState = pEngineState;
+    // Start the bootstrapper application.
+    hr = BootstrapperApplicationStart(pEngineState, fSecondaryBootstrapperApplication);
+    ExitOnFailure(hr, "Failed to start bootstrapper application.");
 
-    ::InitializeCriticalSection(&engineContext.csQueue);
-
-    engineContext.hQueueSemaphore = ::CreateSemaphoreW(NULL, 0, LONG_MAX, NULL);
-    ExitOnNullWithLastError(engineContext.hQueueSemaphore, hr, "Failed to create semaphore for queue.");
-
-    hr = QueCreate(&engineContext.hQueue);
-    ExitOnFailure(hr, "Failed to create queue for bootstrapper engine.");
-
-    // Load the bootstrapper application.
-    hr = UserExperienceLoad(&pEngineState->userExperience, &engineContext, &pEngineState->command);
-    ExitOnFailure(hr, "Failed to load BA.");
+    pEngineContext = pEngineState->userExperience.pEngineContext;
 
     fStartupCalled = TRUE;
-    hr = UserExperienceOnStartup(&pEngineState->userExperience);
+    hr = BACallbackOnStartup(&pEngineState->userExperience);
     ExitOnFailure(hr, "Failed to start bootstrapper application.");
+
+    rghWait[0] = pEngineState->userExperience.hBAProcess;
+    rghWait[1] = pEngineContext->hQueueSemaphore;
 
     while (!pEngineState->fQuit)
     {
-        hr = AppWaitForSingleObject(engineContext.hQueueSemaphore, INFINITE);
+        hr = AppWaitForMultipleObjects(countof(rghWait), rghWait, FALSE, INFINITE, &dwSignaled);
         ExitOnFailure(hr, "Failed to wait on queue event.");
 
-        ::EnterCriticalSection(&engineContext.csQueue);
+        // If the bootstrapper application process exited, bail.
+        if (0 == dwSignaled)
+        {
+            pEngineState->fQuit = TRUE;
+            break;
+        }
 
-        hr = QueDequeue(engineContext.hQueue, reinterpret_cast<void**>(&pAction));
+        ::EnterCriticalSection(&pEngineContext->csQueue);
 
-        ::LeaveCriticalSection(&engineContext.csQueue);
+        hr = QueDequeue(pEngineContext->hQueue, reinterpret_cast<void**>(&pAction));
+
+        ::LeaveCriticalSection(&pEngineContext->csQueue);
 
         ExitOnFailure(hr, "Failed to dequeue action.");
 
-        ProcessMessage(&engineContext, pAction);
+        ProcessMessage(pEngineContext, pAction);
 
-        CoreBootstrapperEngineActionUninitialize(pAction);
-        MemFree(pAction);
+        BAEngineFreeAction(pAction);
+        pAction = NULL;
     }
 
 LExit:
     if (fStartupCalled)
     {
-        UserExperienceOnShutdown(&pEngineState->userExperience, &shutdownAction);
+        BACallbackOnShutdown(&pEngineState->userExperience, &shutdownAction);
         if (BOOTSTRAPPER_SHUTDOWN_ACTION_RESTART == shutdownAction)
         {
             LogId(REPORT_STANDARD, MSG_BA_REQUESTED_RESTART, LoggingBoolToString(pEngineState->fRestart));
@@ -873,26 +770,34 @@ LExit:
             *pfSkipCleanup = TRUE;
         }
     }
+    else // if the bootstrapper application did not start, there won't be anything to clean up.
+    {
+        *pfSkipCleanup = TRUE;
+    }
 
-    // Unload BA.
-    UserExperienceUnload(&pEngineState->userExperience, *pfReloadApp);
+    // Stop the BA.
+    BootstrapperApplicationStop(&pEngineState->userExperience, pfReloadApp);
 
-    ::DeleteCriticalSection(&engineContext.csQueue);
-    ReleaseHandle(engineContext.hQueueSemaphore);
-    ReleaseQueue(engineContext.hQueue, FreeQueueItem, &engineContext);
+    if (*pfReloadApp && !pEngineState->userExperience.pSecondaryExePayload)
+    {
+        // If the BA requested a reload but we do not have a secondary EXE,
+        // then log a message and do not reload.
+        LogId(REPORT_STANDARD, MSG_BA_NO_SECONDARY_BOOSTRAPPER_SO_RELOAD_NOT_SUPPORTED);
+        *pfReloadApp = FALSE;
+    }
 
     return hr;
 }
 
 static HRESULT ProcessMessage(
-    __in BOOTSTRAPPER_ENGINE_CONTEXT* pEngineContext,
-    __in BOOTSTRAPPER_ENGINE_ACTION* pAction
+    __in BAENGINE_CONTEXT* pEngineContext,
+    __in BAENGINE_ACTION* pAction
     )
 {
     HRESULT hr = S_OK;
     BURN_ENGINE_STATE* pEngineState = pEngineContext->pEngineState;
 
-    UserExperienceActivateEngine(&pEngineState->userExperience);
+    BootstrapperApplicationActivateEngine(&pEngineState->userExperience);
 
     switch (pAction->dwMessage)
     {
@@ -921,7 +826,7 @@ static HRESULT ProcessMessage(
         break;
     }
 
-    UserExperienceDeactivateEngine(&pEngineState->userExperience);
+    BootstrapperApplicationDeactivateEngine(&pEngineState->userExperience);
 
     return hr;
 }
@@ -971,7 +876,7 @@ static HRESULT LogStringOverPipe(
     hr = (HRESULT)dwResult;
 
 LExit:
-    ReleaseBuffer(pbData);
+    ReleaseMem(pbData);
 
     return hr;
 }

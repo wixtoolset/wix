@@ -13,11 +13,11 @@ namespace WixToolset.Bal
         WixBalCondition,
         WixBalPackageInfo,
         WixDncOptions,
-        WixMbaPrereqInformation,
+        WixPrereqInformation,
         WixStdbaCommandLine,
         WixStdbaOptions,
         WixStdbaOverridableVariable,
-        WixMbaPrereqOptions,
+        WixPrereqOptions,
         WixBalBootstrapperApplication,
     }
 
@@ -37,8 +37,10 @@ namespace WixToolset.Bal
         {
             switch (type)
             {
+#pragma warning disable 0612 // obsolete
                 case BalSymbolDefinitionType.WixBalBAFactoryAssembly:
                     return BalSymbolDefinitions.WixBalBAFactoryAssembly;
+#pragma warning restore 0612
 
                 case BalSymbolDefinitionType.WixBalBAFunctions:
                     return BalSymbolDefinitions.WixBalBAFunctions;
@@ -49,11 +51,8 @@ namespace WixToolset.Bal
                 case BalSymbolDefinitionType.WixBalPackageInfo:
                     return BalSymbolDefinitions.WixBalPackageInfo;
 
-                case BalSymbolDefinitionType.WixDncOptions:
-                    return BalSymbolDefinitions.WixDncOptions;
-
-                case BalSymbolDefinitionType.WixMbaPrereqInformation:
-                    return BalSymbolDefinitions.WixMbaPrereqInformation;
+                case BalSymbolDefinitionType.WixPrereqInformation:
+                    return BalSymbolDefinitions.WixPrereqInformation;
 
                 case BalSymbolDefinitionType.WixStdbaCommandLine:
                     return BalSymbolDefinitions.WixStdbaCommandLine;
@@ -64,8 +63,8 @@ namespace WixToolset.Bal
                 case BalSymbolDefinitionType.WixStdbaOverridableVariable:
                     return BalSymbolDefinitions.WixStdbaOverridableVariable;
 
-                case BalSymbolDefinitionType.WixMbaPrereqOptions:
-                    return BalSymbolDefinitions.WixMbaPrereqOptions;
+                case BalSymbolDefinitionType.WixPrereqOptions:
+                    return BalSymbolDefinitions.WixPrereqOptions;
 
                 case BalSymbolDefinitionType.WixBalBootstrapperApplication:
                     return BalSymbolDefinitions.WixBalBootstrapperApplication;
@@ -77,16 +76,17 @@ namespace WixToolset.Bal
 
         static BalSymbolDefinitions()
         {
+#pragma warning disable 0612 // obsolete
             WixBalBAFactoryAssembly.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+#pragma warning restore 0612
             WixBalBAFunctions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixBalCondition.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixBalPackageInfo.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
-            WixDncOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
-            WixMbaPrereqInformation.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixPrereqInformation.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixStdbaCommandLine.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixStdbaOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
             WixStdbaOverridableVariable.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
-            WixMbaPrereqOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
+            WixPrereqOptions.AddTag(BurnConstants.BootstrapperApplicationDataSymbolDefinitionTag);
         }
     }
 }

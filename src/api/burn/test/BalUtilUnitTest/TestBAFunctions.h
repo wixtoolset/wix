@@ -3,8 +3,6 @@
 
 HRESULT CreateBAFunctions(
     __in HMODULE hModule,
-    __in IBootstrapperEngine* pEngine,
     __in const BA_FUNCTIONS_CREATE_ARGS* pArgs,
-    __in BA_FUNCTIONS_CREATE_RESULTS* pResults,
-    __out IBAFunctions** ppApplication
+    __inout BA_FUNCTIONS_CREATE_RESULTS* pResults
     );

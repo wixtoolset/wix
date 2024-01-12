@@ -6,13 +6,9 @@ namespace Example.LatestCoreMBA
 
     public class LatestCoreBA : BootstrapperApplication
     {
-        public LatestCoreBA(IEngine engine)
-            : base(engine)
-        {
-        }
-
         protected override void Run()
         {
+            this.engine.Quit(0);
         }
 
         protected override void OnStartup(StartupEventArgs args)

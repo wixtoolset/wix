@@ -12,32 +12,30 @@ namespace BalUtilTests
     public ref class BAFunctions
     {
     public:
-        [Fact]
+        [Fact(Skip = "Need a mock implementation of IBootstrapperEngine to test BAFunctions.")]
         void CanCreateTestBAFunctions()
         {
             HRESULT hr = S_OK;
-            BOOTSTRAPPER_CREATE_ARGS bootstrapperArgs = { };
-            BOOTSTRAPPER_COMMAND bootstrapperCommand = { };
             BA_FUNCTIONS_CREATE_ARGS args = { };
             BA_FUNCTIONS_CREATE_RESULTS results = { };
             IBootstrapperEngine* pEngine = NULL;
+            BOOTSTRAPPER_COMMAND command = { };
             IBAFunctions* pBAFunctions = NULL;
 
-            bootstrapperArgs.cbSize = sizeof(bootstrapperArgs);
-            bootstrapperArgs.pCommand = &bootstrapperCommand;
-
             args.cbSize = sizeof(args);
-            args.pBootstrapperCreateArgs = &bootstrapperArgs;
+            args.pEngine = pEngine;
+            args.pCommand = &command;
 
             results.cbSize = sizeof(results);
 
             try
             {
-                hr = BalInitializeFromCreateArgs(&bootstrapperArgs, &pEngine);
-                NativeAssert::Succeeded(hr, "Failed to create engine.");
+                BalInitialize(pEngine);
 
-                hr = CreateBAFunctions(NULL, pEngine, &args, &results, &pBAFunctions);
+                hr = CreateBAFunctions(NULL, &args, &results);
                 NativeAssert::Succeeded(hr, "Failed to create BAFunctions.");
+
+                pBAFunctions = reinterpret_cast<IBAFunctions*>(results.pvBAFunctionsProcContext);
             }
             finally
             {

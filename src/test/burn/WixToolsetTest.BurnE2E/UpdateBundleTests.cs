@@ -224,8 +224,14 @@ namespace WixToolsetTest.BurnE2E
             // Run the v1 bundle requesting an update bundle.
             bundleBv1.Modify(arguments: "-checkupdate");
 
-            // The modify -> update is asynchronous, so we need to wait until the real BundleB is done
-            var childBundles = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(bundleBv2.Bundle));
+            // The modify -> update is asynchronous, so we need to wait until all the bundles are done.
+            var childBundles = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(bundleBv1.Bundle));
+            foreach (var childBundle in childBundles)
+            {
+                childBundle.WaitForExit();
+            }
+
+            childBundles = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(bundleBv2.Bundle));
             foreach (var childBundle in childBundles)
             {
                 childBundle.WaitForExit();

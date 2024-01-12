@@ -2,7 +2,6 @@
 
 #include "precomp.h"
 
-static const LPCWSTR BUNDLE_CLEAN_ROOM_WORKING_FOLDER_NAME = L".cr";
 static const LPCWSTR BUNDLE_WORKING_FOLDER_NAME = L".be";
 static const LPCWSTR UNVERIFIED_CACHE_FOLDER_NAME = L".unverified";
 static const LPCWSTR PACKAGE_CACHE_FOLDER_NAME = L"Package Cache";
@@ -242,8 +241,7 @@ LExit:
 extern "C" HRESULT CacheInitializeSources(
     __in BURN_CACHE* pCache,
     __in BURN_REGISTRATION* pRegistration,
-    __in BURN_VARIABLES* pVariables,
-    __in BURN_ENGINE_COMMAND* pInternalCommand
+    __in BURN_VARIABLES* pVariables
     )
 {
     Assert(!pCache->fInitializedCacheSources);
@@ -255,7 +253,6 @@ extern "C" HRESULT CacheInitializeSources(
     LPWSTR sczOriginalSource = NULL;
     LPWSTR sczOriginalSourceFolder = NULL;
     BOOL fPathEqual = FALSE;
-    LPCWSTR wzSourceProcessPath = pInternalCommand->sczSourceProcessPath;
 
     hr = PathForCurrentProcess(&sczCurrentPath, NULL);
     ExitOnFailure(hr, "Failed to get current process path.");
@@ -272,15 +269,7 @@ extern "C" HRESULT CacheInitializeSources(
 
     pCache->fRunningFromCache = fPathEqual;
 
-    // If a source process path was not provided (e.g. we are not being
-    // run in a clean room) then use the current process path as the
-    // source process path.
-    if (!wzSourceProcessPath)
-    {
-        wzSourceProcessPath = sczCurrentPath;
-    }
-
-    hr = PathGetDirectory(wzSourceProcessPath, &pCache->sczSourceProcessFolder);
+    hr = PathGetDirectory(sczCurrentPath, &pCache->sczSourceProcessFolder);
     ExitOnFailure(hr, "Failed to initialize cache source folder.");
 
     // If we're not running from the cache, ensure the original source is set.
@@ -288,15 +277,14 @@ extern "C" HRESULT CacheInitializeSources(
     {
         // If the original source has not been set already then set it where the bundle is
         // running from right now. This value will be persisted and we'll use it when launched
-        // from the clean room or package cache since none of our packages will be relative to
-        // those locations.
+        // from the package cache since none of our packages will be relative to those locations.
         hr = VariableGetString(pVariables, BURN_BUNDLE_ORIGINAL_SOURCE, &sczOriginalSource);
         if (E_NOTFOUND == hr)
         {
-            hr = VariableSetString(pVariables, BURN_BUNDLE_ORIGINAL_SOURCE, wzSourceProcessPath, FALSE, FALSE);
+            hr = VariableSetString(pVariables, BURN_BUNDLE_ORIGINAL_SOURCE, sczCurrentPath, FALSE, FALSE);
             ExitOnFailure(hr, "Failed to set original source variable.");
 
-            hr = StrAllocString(&sczOriginalSource, wzSourceProcessPath, 0);
+            hr = StrAllocString(&sczOriginalSource, sczCurrentPath, 0);
             ExitOnFailure(hr, "Failed to copy current path to original source.");
         }
 
@@ -895,30 +883,6 @@ extern "C" HRESULT CachePreparePackage(
     {
         hr = CreateCompletedPath(pCache, pPackage->fPerMachine, pPackage->sczCacheId, NULL, &pPackage->sczCacheFolder);
     }
-
-    return hr;
-}
-
-extern "C" HRESULT CacheBundleToCleanRoom(
-    __in BURN_CACHE* pCache,
-    __in BURN_SECTION* pSection,
-    __deref_out_z_opt LPWSTR* psczCleanRoomBundlePath
-    )
-{
-    HRESULT hr = S_OK;
-    LPWSTR sczSourcePath = NULL;
-    LPWSTR wzExecutableName = NULL;
-
-    hr = PathForCurrentProcess(&sczSourcePath, NULL);
-    ExitOnFailure(hr, "Failed to get current path for process to cache to clean room.");
-
-    wzExecutableName = PathFile(sczSourcePath);
-
-    hr = CopyEngineToWorkingFolder(pCache, sczSourcePath, BUNDLE_CLEAN_ROOM_WORKING_FOLDER_NAME, wzExecutableName, pSection, psczCleanRoomBundlePath);
-    ExitOnFailure(hr, "Failed to cache bundle to clean room.");
-
-LExit:
-    ReleaseStr(sczSourcePath);
 
     return hr;
 }

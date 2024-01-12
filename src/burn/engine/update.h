@@ -13,6 +13,7 @@ typedef struct _BURN_UPDATE
 {
     BOOL fUpdateAvailable;
     LPWSTR sczUpdateSource;
+    LPWSTR sczAuthorizationHeader;
 
     BURN_PACKAGE package;
 } BURN_UPDATE;

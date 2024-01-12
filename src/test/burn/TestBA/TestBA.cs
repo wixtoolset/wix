@@ -42,17 +42,15 @@ namespace WixToolset.Test.BA
         private int retryExecuteFilesInUse;
         private bool rollingBack;
 
-        private IBootstrapperCommand Command { get; }
+        private IBootstrapperCommand Command { get; set; }
 
         private IEngine Engine => this.engine;
 
         /// <summary>
         /// Initializes test user experience.
         /// </summary>
-        public TestBA(IEngine engine, IBootstrapperCommand bootstrapperCommand)
-            : base(engine)
+        public TestBA()
         {
-            this.Command = bootstrapperCommand;
             this.wait = new ManualResetEvent(false);
         }
 
@@ -65,6 +63,12 @@ namespace WixToolset.Test.BA
         /// Indicates if DetectUpdate found a newer version to update.
         /// </summary>
         private bool UpdateAvailable { get; set; }
+
+        protected override void OnCreate(CreateEventArgs args)
+        {
+            base.OnCreate(args);
+            this.Command = args.Command;
+        }
 
         /// <summary>
         /// UI Thread entry point for TestUX.
@@ -97,7 +101,7 @@ namespace WixToolset.Test.BA
                 {
                     this.updateBundlePath = arg.Substring(14);
                     FileInfo info = new FileInfo(this.updateBundlePath);
-                    this.Engine.SetUpdate(this.updateBundlePath, null, info.Length, UpdateHashType.None, null);
+                    this.Engine.SetUpdate(this.updateBundlePath, null, info.Length, UpdateHashType.None, null, null);
                     this.UpdateAvailable = true;
                     this.action = LaunchAction.UpdateReplaceEmbedded;
                 }
@@ -124,9 +128,8 @@ namespace WixToolset.Test.BA
 
             base.OnStartup(args);
 
-            int redetectCount;
             string redetect = this.ReadPackageAction(null, "RedetectCount");
-            if (String.IsNullOrEmpty(redetect) || !Int32.TryParse(redetect, out redetectCount))
+            if (String.IsNullOrEmpty(redetect) || !Int32.TryParse(redetect, out var redetectCount))
             {
                 redetectCount = 0;
             }
@@ -163,7 +166,7 @@ namespace WixToolset.Test.BA
             if (this.action == LaunchAction.Help)
             {
                 this.Log("This is a BA for automated testing");
-                this.Engine.Quit(0);
+                this.ShutdownUiThread(0);
                 return;
             }
 
@@ -176,20 +179,15 @@ namespace WixToolset.Test.BA
 
         protected override void Run()
         {
-            this.dummyWindow = new Form();
-            this.windowHandle = this.dummyWindow.Handle;
-
-            this.Log("Running TestBA application");
-            this.wait.Set();
-            Application.Run();
-        }
-
-        private void ShutdownUiThread()
-        {
-            if (this.dummyWindow != null)
+            using (this.dummyWindow = new Form())
             {
-                this.dummyWindow.Invoke(new Action(Application.ExitThread));
-                this.dummyWindow.Dispose();
+                this.windowHandle = this.dummyWindow.Handle;
+
+                this.Log("Running TestBA application");
+                this.wait.Set();
+
+                Application.Run();
+                this.dummyWindow = null;
             }
 
             var exitCode = this.result;
@@ -199,6 +197,23 @@ namespace WixToolset.Test.BA
             }
 
             this.Engine.Quit(exitCode);
+        }
+
+        private void ShutdownUiThread(int? exitCode = null)
+        {
+            try
+            {
+                if (exitCode.HasValue)
+                {
+                    this.result = exitCode.Value;
+                }
+
+                this.dummyWindow?.Invoke(new Action(Application.ExitThread));
+            }
+            catch (Exception e)
+            {
+                this.Log("Failed to shutdown TestBA window, exception: {0}", e.Message);
+            }
         }
 
         protected override void OnDetectUpdateBegin(DetectUpdateBeginEventArgs args)
@@ -220,7 +235,7 @@ namespace WixToolset.Test.BA
             if (!this.UpdateAvailable && this.Engine.CompareVersions(e.Version, this.Version) > 0)
             {
                 this.Log(String.Format("Selected update v{0}", e.Version));
-                this.Engine.SetUpdate(null, e.UpdateLocation, e.Size, e.HashAlgorithm, e.Hash);
+                this.Engine.SetUpdate(null, e.UpdateLocation, e.Size, e.HashAlgorithm, e.Hash, null);
                 this.UpdateAvailable = true;
             }
         }
@@ -575,8 +590,7 @@ namespace WixToolset.Test.BA
             // Output what the privileges are now.
             this.Log("After elevation: WixBundleElevated = {0}", this.Engine.GetVariableNumeric("WixBundleElevated"));
 
-            this.result = args.Status;
-            this.ShutdownUiThread();
+            this.ShutdownUiThread(args.Status);
         }
 
         protected override void OnUnregisterBegin(UnregisterBeginEventArgs args)

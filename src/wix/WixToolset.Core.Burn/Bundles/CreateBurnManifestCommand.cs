@@ -13,16 +13,16 @@ namespace WixToolset.Core.Burn.Bundles
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
-    using WixToolset.Extensibility;
-    using WixToolset.Extensibility.Services;
 
     internal class CreateBurnManifestCommand
     {
-        public CreateBurnManifestCommand(string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, PackageFacades packageFacades, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
+        public CreateBurnManifestCommand(string executableName, IntermediateSection section, WixBundleSymbol bundleSymbol, WixBootstrapperApplicationSymbol primaryBundleApplicationSymbol, WixBootstrapperApplicationSymbol secondaryBundleApplicationSymbol, IEnumerable<WixBundleContainerSymbol> containers, WixChainSymbol chainSymbol, PackageFacades packageFacades, IEnumerable<WixBundleRollbackBoundarySymbol> boundaries, IEnumerable<WixBundlePayloadSymbol> uxPayloads, Dictionary<string, WixBundlePayloadSymbol> allPayloadsById, Dictionary<string, Dictionary<string, WixBundlePayloadSymbol>> packagesPayloads, IEnumerable<ISearchFacade> orderedSearches, string intermediateFolder)
         {
             this.ExecutableName = executableName;
             this.Section = section;
             this.BundleSymbol = bundleSymbol;
+            this.PrimaryBundleApplicationSymbol = primaryBundleApplicationSymbol;
+            this.SecondaryBundleApplicationSymbol = secondaryBundleApplicationSymbol;
             this.Chain = chainSymbol;
             this.Containers = containers;
             this.PackageFacades = packageFacades;
@@ -41,6 +41,10 @@ namespace WixToolset.Core.Burn.Bundles
         private IntermediateSection Section { get; }
 
         private WixBundleSymbol BundleSymbol { get; }
+
+        private WixBootstrapperApplicationSymbol PrimaryBundleApplicationSymbol { get; }
+
+        private WixBootstrapperApplicationSymbol SecondaryBundleApplicationSymbol { get; }
 
         private WixChainSymbol Chain { get; }
 
@@ -163,6 +167,13 @@ namespace WixToolset.Core.Burn.Bundles
 
                 // write the UX element
                 writer.WriteStartElement("UX");
+
+                writer.WriteAttributeString("PrimaryPayloadId", this.PrimaryBundleApplicationSymbol.Id.Id);
+
+                if (!String.IsNullOrEmpty(this.SecondaryBundleApplicationSymbol?.Id.Id))
+                {
+                    writer.WriteAttributeString("SecondaryPayloadId", this.SecondaryBundleApplicationSymbol.Id.Id);
+                }
 
                 // write the UX allPayloads...
                 foreach (var payload in this.UXContainerPayloads)
@@ -625,7 +636,7 @@ namespace WixToolset.Core.Burn.Bundles
                         if (null != relatedLanguages && 0 < relatedLanguages.Length)
                         {
                             writer.WriteAttributeString("LangInclusive", related.LangInclusive ? "yes" : "no");
-                            foreach (string language in relatedLanguages)
+                            foreach (var language in relatedLanguages)
                             {
                                 writer.WriteStartElement("Language");
                                 writer.WriteAttributeString("Id", language);

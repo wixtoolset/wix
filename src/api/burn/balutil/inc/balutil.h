@@ -39,10 +39,26 @@ const LPCWSTR BAL_MANIFEST_FILENAME = L"BootstrapperApplicationData.xml";
 
 static const HRESULT E_WIXSTDBA_CONDITION_FAILED = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_WIX, 1);
 
-static const HRESULT E_MBAHOST_NET452_ON_WIN7RTM = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_WIX, 1000);
-static const HRESULT E_DNCHOST_SCD_RUNTIME_FAILURE = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_WIX, 1001);
 static const HRESULT E_PREREQBA_INFINITE_LOOP = MAKE_HRESULT(SEVERITY_ERROR, FACILITY_WIX, 1002);
 
+
+/*******************************************************************
+ BootstrapperApplicationDebuggerCheck - allows bootstrapper application to
+        explicitly check whether a debugger should be attached to the boostrapper
+        application.
+
+ Note: Automatically called in BootstrapperApplicationRun().
+********************************************************************/
+DAPI_(VOID) BootstrapperApplicationDebuggerCheck();
+
+/*******************************************************************
+ BootstrapperApplicationRun - runs the IBootstrapperApplication until
+                              the application quits.
+
+********************************************************************/
+DAPI_(HRESULT) BootstrapperApplicationRun(
+    __in IBootstrapperApplication* pApplication
+    );
 
 /*******************************************************************
  BalInitialize - remembers the engine interface to enable logging and
@@ -51,16 +67,6 @@ static const HRESULT E_PREREQBA_INFINITE_LOOP = MAKE_HRESULT(SEVERITY_ERROR, FAC
 ********************************************************************/
 DAPI_(void) BalInitialize(
     __in IBootstrapperEngine* pEngine
-    );
-
-/*******************************************************************
- BalInitializeFromCreateArgs - convenience function to call BalBootstrapperEngineCreate
-                               then pass it along to BalInitialize.
-
-********************************************************************/
-DAPI_(HRESULT) BalInitializeFromCreateArgs(
-    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __out_opt IBootstrapperEngine** ppEngine
     );
 
 /*******************************************************************
@@ -292,7 +298,7 @@ DAPI_(HRESULT) BalLogErrorArgs(
     );
 
 /*******************************************************************
-BalLogId - logs a message with the engine with a string embedded in a 
+BalLogId - logs a message with the engine with a string embedded in a
            MESSAGETABLE resource.
 
 ********************************************************************/

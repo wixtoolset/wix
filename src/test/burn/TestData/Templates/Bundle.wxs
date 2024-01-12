@@ -32,6 +32,7 @@
     <?elseif $(var.BA) = "hyperlinkLicense"?>
       <BootstrapperApplication>
         <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" />
+        <PayloadGroupRef Id="ExtraPayloads" />
       </BootstrapperApplication>
     <?elseif $(var.BA) = "iui"?>
       <BootstrapperApplication>
@@ -59,4 +60,9 @@
       <PackageGroupRef Id="BundlePackages" />
     </Chain>
   </Bundle>
+
+  <Fragment>
+    <PayloadGroup Id="virtual ExtraPayloads" />
+  </Fragment>
+
 </Wix>

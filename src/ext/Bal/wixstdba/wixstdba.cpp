@@ -2,9 +2,6 @@
 
 #include "precomp.h"
 
-static HINSTANCE vhInstance = NULL;
-static IBootstrapperApplication* vpApplication = NULL;
-
 static void CALLBACK WixstdbaTraceError(
     __in_z LPCSTR szFile,
     __in int iLine,
@@ -15,94 +12,28 @@ static void CALLBACK WixstdbaTraceError(
     __in va_list args
     );
 
-extern "C" BOOL WINAPI DllMain(
-    IN HINSTANCE hInstance,
-    IN DWORD dwReason,
-    IN LPVOID /* pvReserved */
-    )
-{
-    switch(dwReason)
-    {
-    case DLL_PROCESS_ATTACH:
-        ::DisableThreadLibraryCalls(hInstance);
-        vhInstance = hInstance;
-        break;
-
-    case DLL_PROCESS_DETACH:
-        vhInstance = NULL;
-        break;
-    }
-
-    return TRUE;
-}
-
-
-extern "C" HRESULT WINAPI BootstrapperApplicationCreate(
-    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
+EXTERN_C int WINAPI wWinMain(
+    __in HINSTANCE hInstance,
+    __in_opt HINSTANCE /* hPrevInstance */,
+    __in_z_opt LPWSTR /*lpCmdLine*/,
+    __in int /*nCmdShow*/
     )
 {
     HRESULT hr = S_OK;
-    IBootstrapperEngine* pEngine = NULL;
+    IBootstrapperApplication* pApplication = NULL;
 
     DutilInitialize(&WixstdbaTraceError);
 
-    hr = BalInitializeFromCreateArgs(pArgs, &pEngine);
-    ExitOnFailure(hr, "Failed to initialize Bal.");
+    hr = CreateWixStandardBootstrapperApplication(hInstance, &pApplication);
+    ExitOnFailure(hr, "Failed to create WiX standard bootstrapper application.");
 
-    hr = CreateBootstrapperApplication(vhInstance, NULL, pEngine, pArgs, pResults, &vpApplication);
-    BalExitOnFailure(hr, "Failed to create bootstrapper application interface.");
-
-LExit:
-    ReleaseObject(pEngine);
-
-    return hr;
-}
-
-
-extern "C" void WINAPI BootstrapperApplicationDestroy(
-    __in const BOOTSTRAPPER_DESTROY_ARGS* pArgs,
-    __in BOOTSTRAPPER_DESTROY_RESULTS* pResults
-    )
-{
-    if (vpApplication)
-    {
-        DestroyBootstrapperApplication(vpApplication, pArgs, pResults);
-    }
-
-    ReleaseNullObject(vpApplication);
-    BalUninitialize();
-    DutilUninitialize();
-}
-
-
-extern "C" HRESULT WINAPI PrereqBootstrapperApplicationCreate(
-    __in_opt PREQBA_DATA* pPrereqData,
-    __in IBootstrapperEngine* pEngine,
-    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
-    )
-{
-    HRESULT hr = S_OK;
-
-    DutilInitialize(&WixstdbaTraceError);
-
-    BalInitialize(pEngine);
-
-    hr = CreateBootstrapperApplication(vhInstance, pPrereqData, pEngine, pArgs, pResults, &vpApplication);
-    BalExitOnFailure(hr, "Failed to create prerequisite bootstrapper application interface.");
+    hr = BootstrapperApplicationRun(pApplication);
+    ExitOnFailure(hr, "Failed to run WiX standard bootstrapper application.");
 
 LExit:
-    return hr;
-}
+    ReleaseObject(pApplication);
 
-
-extern "C" void WINAPI PrereqBootstrapperApplicationDestroy(
-    __in const BOOTSTRAPPER_DESTROY_ARGS* pArgs,
-    __in BOOTSTRAPPER_DESTROY_RESULTS* pResults
-    )
-{
-    BootstrapperApplicationDestroy(pArgs, pResults);
+    return 0;
 }
 
 static void CALLBACK WixstdbaTraceError(

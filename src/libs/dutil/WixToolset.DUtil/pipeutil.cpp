@@ -5,7 +5,7 @@
 
 static const DWORD PIPE_64KB = 64 * 1024;
 static const LPCWSTR PIPE_NAME_FORMAT_STRING = L"\\\\.\\pipe\\%ls";
-
+static const DWORD PIPE_MESSAGE_DISCONNECT = 0xFFFFFFFF;
 
 // Exit macros
 #define PipeExitOnLastError(x, s, ...) ExitOnLastErrorSource(DUTIL_SOURCE_PIPEUTIL, x, s, __VA_ARGS__)
@@ -113,8 +113,19 @@ DAPI_(void) PipeFreeMessage(
         ReleaseNullMem(pMsg->pvData);
         pMsg->fAllocatedData = FALSE;
     }
+
+    ZeroMemory(pMsg, sizeof(PIPE_MESSAGE));
 }
 
+DAPI_(void) PipeFreeRpcResult(
+    __in PIPE_RPC_RESULT* pResult
+)
+{
+    if (pResult->pbData)
+    {
+        ReleaseNullMem(pResult->pbData);
+    }
+}
 
 DAPI_(HRESULT) PipeOpen(
     __in_z LPCWSTR wzName,
@@ -166,39 +177,281 @@ DAPI_(HRESULT) PipeReadMessage(
 )
 {
     HRESULT hr = S_OK;
-    BYTE pbMessageIdAndByteCount[sizeof(DWORD) + sizeof(DWORD)] = { };
+    DWORD rgdwMessageIdAndByteCount[2] = { };
+    LPBYTE pbData = NULL;
+    DWORD cbData = 0;
 
-    hr = FileReadHandle(hPipe, pbMessageIdAndByteCount, sizeof(pbMessageIdAndByteCount));
+    hr = FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(rgdwMessageIdAndByteCount), sizeof(rgdwMessageIdAndByteCount));
     if (HRESULT_FROM_WIN32(ERROR_BROKEN_PIPE) == hr)
     {
-        memset(pbMessageIdAndByteCount, 0, sizeof(pbMessageIdAndByteCount));
+        memset(rgdwMessageIdAndByteCount, 0, sizeof(rgdwMessageIdAndByteCount));
         hr = S_FALSE;
     }
     PipeExitOnFailure(hr, "Failed to read message from pipe.");
 
-    pMsg->dwMessageType = *(DWORD*)(pbMessageIdAndByteCount);
-    pMsg->cbData = *(DWORD*)(pbMessageIdAndByteCount + sizeof(DWORD));
-    if (pMsg->cbData)
+    Trace(REPORT_STANDARD, "RPC pipe %p read message: %u recv cbData: %u", hPipe, rgdwMessageIdAndByteCount[0], rgdwMessageIdAndByteCount[1]);
+
+    cbData = rgdwMessageIdAndByteCount[1];
+    if (cbData)
     {
-        pMsg->pvData = MemAlloc(pMsg->cbData, FALSE);
-        PipeExitOnNull(pMsg->pvData, hr, E_OUTOFMEMORY, "Failed to allocate data for message.");
+        pbData = reinterpret_cast<LPBYTE>(MemAlloc(cbData, FALSE));
+        PipeExitOnNull(pbData, hr, E_OUTOFMEMORY, "Failed to allocate data for message.");
 
-        hr = FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(pMsg->pvData), pMsg->cbData);
+        hr = FileReadHandle(hPipe, pbData, cbData);
         PipeExitOnFailure(hr, "Failed to read data for message.");
+    }
 
-        pMsg->fAllocatedData = TRUE;
+    pMsg->dwMessageType = rgdwMessageIdAndByteCount[0];
+    pMsg->cbData = cbData;
+    pMsg->pvData = pbData;
+    pbData = NULL;
+
+    if (PIPE_MESSAGE_DISCONNECT == pMsg->dwMessageType)
+    {
+        hr = S_FALSE;
     }
 
 LExit:
-    if (!pMsg->fAllocatedData && pMsg->pvData)
+    ReleaseMem(pbData);
+
+    return hr;
+}
+
+DAPI_(void) PipeRpcInitialize(
+    __in PIPE_RPC_HANDLE* phRpcPipe,
+    __in HANDLE hPipe,
+    __in BOOL fTakeHandleOwnership
+)
+{
+    phRpcPipe->hPipe = hPipe;
+    if (phRpcPipe->hPipe != INVALID_HANDLE_VALUE)
     {
-        MemFree(pMsg->pvData);
+        ::InitializeCriticalSection(&phRpcPipe->cs);
+        phRpcPipe->fOwnHandle = fTakeHandleOwnership;
+        phRpcPipe->fInitialized = TRUE;
+    }
+}
+
+DAPI_(BOOL) PipeRpcInitialized(
+    __in PIPE_RPC_HANDLE* phRpcPipe
+)
+{
+    return phRpcPipe->fInitialized && phRpcPipe->hPipe != INVALID_HANDLE_VALUE;
+}
+
+DAPI_(void) PipeRpcUninitiailize(
+    __in PIPE_RPC_HANDLE* phRpcPipe
+)
+{
+    if (phRpcPipe->fInitialized)
+    {
+        ::DeleteCriticalSection(&phRpcPipe->cs);
+
+        if (phRpcPipe->fOwnHandle)
+        {
+            ::CloseHandle(phRpcPipe->hPipe);
+        }
+
+        phRpcPipe->hPipe = INVALID_HANDLE_VALUE;
+        phRpcPipe->fOwnHandle = FALSE;
+        phRpcPipe->fInitialized = FALSE;
+    }
+}
+
+DAPI_(HRESULT) PipeRpcReadMessage(
+    __in PIPE_RPC_HANDLE* phRpcPipe,
+    __in PIPE_MESSAGE* pMsg
+)
+{
+    HRESULT hr = S_OK;
+
+    ::EnterCriticalSection(&phRpcPipe->cs);
+
+    hr = PipeReadMessage(phRpcPipe->hPipe, pMsg);
+    PipeExitOnFailure(hr, "Failed to read message from RPC pipe.");
+
+LExit:
+    ::LeaveCriticalSection(&phRpcPipe->cs);
+
+    return hr;
+}
+
+DAPI_(HRESULT) PipeRpcRequest(
+    __in PIPE_RPC_HANDLE* phRpcPipe,
+    __in DWORD dwMessageType,
+    __in_bcount(cbArgs) LPVOID pvArgs,
+    __in SIZE_T cbArgs,
+    __in PIPE_RPC_RESULT* pResult
+)
+{
+    HRESULT hr = S_OK;
+    HANDLE hPipe = phRpcPipe->hPipe;
+    BOOL fLocked = FALSE;
+    DWORD rgResultAndDataSize[2] = { };
+    DWORD cbData = 0;
+    LPBYTE pbData = NULL;
+
+    if (hPipe == INVALID_HANDLE_VALUE)
+    {
+        ExitFunction();
+    }
+
+    Trace(REPORT_STANDARD, "RPC pipe %p request message: %d send cbArgs: %u", hPipe, dwMessageType, cbArgs);
+
+    ::EnterCriticalSection(&phRpcPipe->cs);
+    fLocked = TRUE;
+
+    // Send the message.
+    hr = PipeRpcWriteMessage(phRpcPipe, dwMessageType, pvArgs, cbArgs);
+    PipeExitOnFailure(hr, "Failed to send RPC pipe request.");
+
+    // Read the result and size of response data.
+    hr = FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(rgResultAndDataSize), sizeof(rgResultAndDataSize));
+    PipeExitOnFailure(hr, "Failed to read result and size of message.");
+
+    pResult->hr = rgResultAndDataSize[0];
+    cbData = rgResultAndDataSize[1];
+
+    Trace(REPORT_STANDARD, "RPC pipe %p request message: %d returned hr: 0x%x, cbData: %u", hPipe, dwMessageType, pResult->hr, cbData);
+    AssertSz(FAILED(pResult->hr) || pResult->hr == S_OK || pResult->hr == S_FALSE, "Unexpected HRESULT from RPC pipe request.");
+
+    if (cbData)
+    {
+        pbData = reinterpret_cast<LPBYTE>(MemAlloc(cbData, TRUE));
+        PipeExitOnNull(pbData, hr, E_OUTOFMEMORY, "Failed to allocate memory for RPC pipe results.");
+
+        hr = FileReadHandle(hPipe, pbData, cbData);
+        PipeExitOnFailure(hr, "Failed to read result data.");
+    }
+
+    pResult->cbData = cbData;
+    pResult->pbData = pbData;
+    pbData = NULL;
+
+    hr = pResult->hr;
+    PipeExitOnFailure(hr, "RPC pipe client reported failure.");
+
+LExit:
+    ReleaseMem(pbData);
+
+    if (fLocked)
+    {
+        ::LeaveCriticalSection(&phRpcPipe->cs);
     }
 
     return hr;
 }
 
+DAPI_(HRESULT) PipeRpcResponse(
+    __in PIPE_RPC_HANDLE* phRpcPipe,
+    __in DWORD
+#if DEBUG
+     dwMessageType
+#endif
+    ,
+    __in HRESULT hrResult,
+    __in_bcount(cbResult) LPVOID pvResult,
+    __in SIZE_T cbResult
+    )
+{
+    HRESULT hr = S_OK;
+    HANDLE hPipe = phRpcPipe->hPipe;
+    DWORD dwcbResult = 0;
+
+    hr = DutilSizetToDword(pvResult ? cbResult : 0, &dwcbResult);
+    PipeExitOnFailure(hr, "Pipe message is too large.");
+
+    Trace(REPORT_STANDARD, "RPC pipe %p response message: %d returned hr: 0x%x, cbResult: %u", hPipe, dwMessageType, hrResult, dwcbResult);
+
+    ::EnterCriticalSection(&phRpcPipe->cs);
+
+    hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(&hrResult), sizeof(hrResult));
+    PipeExitOnFailure(hr, "Failed to write RPC result code to pipe.");
+
+    hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(&dwcbResult), sizeof(dwcbResult));
+    PipeExitOnFailure(hr, "Failed to write RPC result size to pipe.");
+
+    if (dwcbResult)
+    {
+        hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(pvResult), dwcbResult);
+        PipeExitOnFailure(hr, "Failed to write RPC result data to pipe.");
+    }
+
+LExit:
+    ::LeaveCriticalSection(&phRpcPipe->cs);
+
+    return hr;
+}
+
+DAPI_(HRESULT) PipeRpcWriteMessage(
+    __in PIPE_RPC_HANDLE* phRpcPipe,
+    __in DWORD dwMessageType,
+    __in_bcount_opt(cbData) LPVOID pvData,
+    __in SIZE_T cbData
+)
+{
+    HRESULT hr = S_OK;
+
+    ::EnterCriticalSection(&phRpcPipe->cs);
+
+    hr = PipeWriteMessage(phRpcPipe->hPipe, dwMessageType, pvData, cbData);
+    PipeExitOnFailure(hr, "Failed to write message type to RPC pipe.");
+
+LExit:
+    ::LeaveCriticalSection(&phRpcPipe->cs);
+
+    return hr;
+}
+
+DAPI_(HRESULT) PipeRpcWriteMessageReadResponse(
+    __in PIPE_RPC_HANDLE* phRpcPipe,
+    __in DWORD dwMessageType,
+    __in_bcount_opt(cbData) LPBYTE pbArgData,
+    __in SIZE_T cbArgData,
+    __in PIPE_RPC_RESULT* pResult
+)
+{
+    HRESULT hr = S_OK;
+    DWORD rgResultAndSize[2] = { };
+    LPBYTE pbResultData = NULL;
+    DWORD cbResultData = 0;
+
+    hr = PipeWriteMessage(phRpcPipe->hPipe, dwMessageType, pbArgData, cbArgData);
+    PipeExitOnFailure(hr, "Failed to write message type to RPC pipe.");
+
+    // Read the result and size of response.
+    hr = FileReadHandle(phRpcPipe->hPipe, reinterpret_cast<LPBYTE>(rgResultAndSize), sizeof(rgResultAndSize));
+    ExitOnFailure(hr, "Failed to read result and size of message.");
+
+    pResult->hr = rgResultAndSize[0];
+    cbResultData = rgResultAndSize[1];
+
+    if (cbResultData)
+    {
+        pbResultData = reinterpret_cast<LPBYTE>(MemAlloc(cbResultData, TRUE));
+        ExitOnNull(pbResultData, hr, E_OUTOFMEMORY, "Failed to allocate memory for BA results.");
+
+        hr = FileReadHandle(phRpcPipe->hPipe, pbResultData, cbResultData);
+        ExitOnFailure(hr, "Failed to read result and size of message.");
+    }
+
+    pResult->cbData = cbResultData;
+    pResult->pbData = pbResultData;
+    pbResultData = NULL;
+
+    hr = pResult->hr;
+    ExitOnFailure(hr, "BA reported failure.");
+
+LExit:
+    ReleaseMem(pbResultData);
+
+    ::LeaveCriticalSection(&phRpcPipe->cs);
+
+    return hr;
+}
+
 DAPI_(HRESULT) PipeServerWaitForClientConnect(
+    __in HANDLE hClientProcess,
     __in HANDLE hPipe
 )
 {
@@ -206,13 +459,13 @@ DAPI_(HRESULT) PipeServerWaitForClientConnect(
     DWORD dwPipeState = PIPE_READMODE_BYTE | PIPE_NOWAIT;
 
     // Temporarily make the pipe non-blocking so we will not get stuck in ::ConnectNamedPipe() forever
-    // if the child decides not to show up.
+    // if the client decides not to show up.
     if (!::SetNamedPipeHandleState(hPipe, &dwPipeState, NULL, NULL))
     {
         PipeExitWithLastError(hr, "Failed to set pipe to non-blocking.");
     }
 
-    // Loop for a while waiting for a connection from child process.
+    // Loop for a while waiting for a connection from client process.
     DWORD cRetry = 0;
     do
     {
@@ -237,7 +490,19 @@ DAPI_(HRESULT) PipeServerWaitForClientConnect(
                 }
 
                 ++cRetry;
-                ::Sleep(PIPE_WAIT_FOR_CONNECTION);
+
+                // Ensure the client is still around.
+                hr = ::AppWaitForSingleObject(hClientProcess, PIPE_WAIT_FOR_CONNECTION);
+                if (HRESULT_FROM_WIN32(WAIT_TIMEOUT) == hr)
+                {
+                    // Timeout out means the process is still there, that's good.
+                    hr = HRESULT_FROM_WIN32(ERROR_PIPE_LISTENING);
+                }
+                else if (SUCCEEDED(hr))
+                {
+                    // Success means the process is gone, that's bad.
+                    hr = HRESULT_FROM_WIN32(WAIT_ABANDONED);
+                }
             }
             else
             {
@@ -259,6 +524,26 @@ LExit:
     return hr;
 }
 
+DAPI_(HRESULT) PipeWriteDisconnect(
+    __in HANDLE hPipe
+    )
+{
+    HRESULT hr = S_OK;
+    LPVOID pv = NULL;
+    SIZE_T cb = 0;
+
+    hr = AllocatePipeMessage(PIPE_MESSAGE_DISCONNECT, NULL, 0, &pv, &cb);
+    ExitOnFailure(hr, "Failed to allocate message to write.");
+
+    // Write the message.
+    hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(pv), cb);
+    ExitOnFailure(hr, "Failed to write message type to pipe.");
+
+LExit:
+    ReleaseMem(pv);
+    return hr;
+}
+
 DAPI_(HRESULT) PipeWriteMessage(
     __in HANDLE hPipe,
     __in DWORD dwMessageType,
@@ -266,22 +551,6 @@ DAPI_(HRESULT) PipeWriteMessage(
     __in SIZE_T cbData
 )
 {
-//    HRESULT hr = S_OK;
-//
-//    hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(&dwMessageType), sizeof(dwMessageType));
-//    PipeExitOnFailure(hr, "Failed to write message id to pipe.");
-//
-//    hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(&cbData), sizeof(cbData));
-//    PipeExitOnFailure(hr, "Failed to write message data size to pipe.");
-//
-//    if (pvData && cbData)
-//    {
-//        hr = FileWriteHandle(hPipe, reinterpret_cast<LPCBYTE>(pvData), cbData);
-//        PipeExitOnFailure(hr, "Failed to write message data to pipe.");
-//    }
-//
-//LExit:
-//    return hr;
     HRESULT hr = S_OK;
     LPVOID pv = NULL;
     SIZE_T cb = 0;
@@ -295,6 +564,7 @@ DAPI_(HRESULT) PipeWriteMessage(
 
 LExit:
     ReleaseMem(pv);
+
     return hr;
 }
 
@@ -302,7 +572,7 @@ static HRESULT AllocatePipeMessage(
     __in DWORD dwMessageType,
     __in_bcount_opt(cbData) LPVOID pvData,
     __in SIZE_T cbData,
-    __out_bcount(cb) LPVOID* ppvMessage,
+    __out_bcount(*pcbMessage) LPVOID* ppvMessage,
     __out SIZE_T* pcbMessage
 )
 {
@@ -311,20 +581,11 @@ static HRESULT AllocatePipeMessage(
     size_t cb = 0;
     DWORD dwcbData = 0;
 
-    // If no data was provided, ensure the count of bytes is zero.
-    if (!pvData)
-    {
-        cbData = 0;
-    }
-    else if (MAXDWORD < cbData)
-    {
-        ExitWithRootFailure(hr, E_INVALIDDATA, "Pipe message is too large.");
-    }
+    hr = DutilSizetToDword(pvData ? cbData : 0, &dwcbData);
+    PipeExitOnFailure(hr, "Pipe message is too large.");
 
-    hr = ::SizeTAdd(sizeof(dwMessageType) + sizeof(dwcbData), cbData, &cb);
+    hr = ::SizeTAdd(sizeof(dwMessageType) + sizeof(dwcbData), dwcbData, &cb);
     ExitOnRootFailure(hr, "Failed to calculate total pipe message size");
-
-    dwcbData = (DWORD)cbData;
 
     // Allocate the message.
     pv = MemAlloc(cb, FALSE);

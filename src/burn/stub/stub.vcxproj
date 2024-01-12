@@ -35,7 +35,6 @@
     <ProjectSubSystem>Windows</ProjectSubSystem>
     <TargetName>burn</TargetName>
     <CharacterSet>Unicode</CharacterSet>
-    <GenerateManifest>false</GenerateManifest>
     <Description>Native component of WixToolset.Burn</Description>
     <!-- NBGV properties -->
     <AssemblyLanguage>1033</AssemblyLanguage>
@@ -62,7 +61,7 @@
     <Link>
       <SwapRunFromCD>true</SwapRunFromCD>
       <SwapRunFromNET>true</SwapRunFromNET>
-      <DelayLoadDLLs>cabinet.dll;crypt32.dll;msi.dll;shlwapi.dll;userenv.dll;version.dll;wininet.dll;wintrust.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>cabinet.dll;crypt32.dll;msi.dll;rpcrt4.dll;shlwapi.dll;userenv.dll;version.dll;wininet.dll;wintrust.dll</DelayLoadDLLs>
       <AdditionalOptions>/DEPENDENTLOADFLAG:0x800 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -81,6 +80,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <Manifest Include="stub.manifest" />
     <ResourceCompile Include="stub.rc" />
   </ItemGroup>
 
@@ -91,9 +91,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
-
     <PackageReference Include="WixToolset.DUtil" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

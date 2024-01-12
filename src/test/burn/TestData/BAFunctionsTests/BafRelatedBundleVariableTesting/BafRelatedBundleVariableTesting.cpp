@@ -29,37 +29,28 @@ public: //IBootstrapperApplication
 
         hr = BalGetRelatedBundleVariable(wzBundleId, STRING_VARIABLE, &wzValue);
 
-        ExitOnFailure(hr, "Failed to get related bundle string variable.");
-
-        if (wzValue)
-        {
-            BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Retrieved related bundle variable with BAFunctions: AString = %ws", wzValue);
-        }
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Retrieved related bundle variable with BAFunctions: AString = %ws, Error: 0x%x", wzValue, hr);
 
         hr = BalGetRelatedBundleVariable(wzBundleId, NUMBER_VARIABLE, &wzValue);
 
-        if (wzValue)
-        {
-            BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Retrieved related bundle variable with BAFunctions: ANumber = %ws", wzValue);
-        }
+        BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Retrieved related bundle variable with BAFunctions: ANumber = %ws, Error: 0x%x", wzValue, hr);
 
         hr = __super::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
-    LExit:
+
         ReleaseStr(wzValue);
-        return hr;        
+        return hr;
     }
+
 private:
- 
+
 
 public:
     //
     // Constructor - initialize member variables.
     //
     CBafRelatedBundleVariableTesting(
-        __in HMODULE hModule,
-        __in IBootstrapperEngine* pEngine,
-        __in const BA_FUNCTIONS_CREATE_ARGS* pArgs
-        ) : CBalBaseBAFunctions(hModule, pEngine, pArgs)
+        __in HMODULE hModule
+        ) : CBalBaseBAFunctions(hModule)
     {
     }
 
@@ -82,13 +73,14 @@ HRESULT WINAPI CreateBAFunctions(
 {
     HRESULT hr = S_OK;
     CBafRelatedBundleVariableTesting* pBAFunctions = NULL;
-    IBootstrapperEngine* pEngine = NULL;
 
-    hr = BalInitializeFromCreateArgs(pArgs->pBootstrapperCreateArgs, &pEngine);
-    ExitOnFailure(hr, "Failed to initialize Bal.");
+    BalInitialize(pArgs->pEngine);
 
-    pBAFunctions = new CBafRelatedBundleVariableTesting(hModule, pEngine, pArgs);
+    pBAFunctions = new CBafRelatedBundleVariableTesting(hModule);
     ExitOnNull(pBAFunctions, hr, E_OUTOFMEMORY, "Failed to create new CBafRelatedBundleVariableTesting object.");
+
+    hr = pBAFunctions->OnCreate(pArgs->pEngine, pArgs->pCommand);
+    ExitOnFailure(hr, "Failed to create BA function");
 
     pResults->pfnBAFunctionsProc = BalBaseBAFunctionsProc;
     pResults->pvBAFunctionsProcContext = pBAFunctions;
@@ -96,7 +88,6 @@ HRESULT WINAPI CreateBAFunctions(
 
 LExit:
     ReleaseObject(pBAFunctions);
-    ReleaseObject(pEngine);
 
     return hr;
 }

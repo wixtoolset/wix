@@ -800,7 +800,7 @@ namespace WixToolset.Util
             }
 
             var componentKeyPath = this.CreateComponentKeyPath();
-            componentKeyPath.Id = id.Id;
+            componentKeyPath.Id = id;
             componentKeyPath.Explicit = isKeyPath;
             componentKeyPath.Type = PossibleKeyPathType.Registry;
             return componentKeyPath;

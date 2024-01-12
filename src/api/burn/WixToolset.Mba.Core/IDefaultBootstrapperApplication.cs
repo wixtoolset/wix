@@ -139,6 +139,16 @@ namespace WixToolset.Mba.Core
         event EventHandler<CommitMsiTransactionCompleteEventArgs> CommitMsiTransactionComplete;
 
         /// <summary>
+        /// Fired when the application is being created.
+        /// </summary>
+        event EventHandler<CreateEventArgs> Create;
+
+        /// <summary>
+        /// Fired when the application is being destroyed.
+        /// </summary>
+        event EventHandler<DestroyEventArgs> Destroy;
+
+        /// <summary>
         /// Fired when the overall detection phase has begun.
         /// </summary>
         event EventHandler<DetectBeginEventArgs> DetectBegin;
@@ -392,16 +402,6 @@ namespace WixToolset.Mba.Core
         /// Fired when the engine has completed rolling back an MSI transaction.
         /// </summary>
         event EventHandler<RollbackMsiTransactionCompleteEventArgs> RollbackMsiTransactionComplete;
-
-        /// <summary>
-        /// Fired when the engine has begun to setup the update package.
-        /// </summary>
-        event EventHandler<SetUpdateBeginEventArgs> SetUpdateBegin;
-
-        /// <summary>
-        /// Fired when the engine has completed setting up the update package.
-        /// </summary>
-        event EventHandler<SetUpdateCompleteEventArgs> SetUpdateComplete;
 
         /// <summary>
         /// Fired when the engine is shutting down the bootstrapper application.

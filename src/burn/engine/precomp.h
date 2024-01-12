@@ -61,8 +61,8 @@
 #include <dpiutil.h>
 #include <butil.h>
 
-#include "BootstrapperEngine.h"
-#include "BootstrapperApplication.h"
+#include "baenginetypes.h"
+#include "batypes.h"
 #include "BundleExtensionEngine.h"
 #include "BundleExtension.h"
 
@@ -77,6 +77,7 @@
 #include "cabextract.h"
 #include "burnextension.h"
 #include "search.h"
+#include "bootstrapperapplication.h"
 #include "userexperience.h"
 #include "package.h"
 #include "update.h"
@@ -104,7 +105,8 @@
 #include "netfxchainer.h"
 
 #include "externalengine.h"
-#include "EngineForApplication.h"
+#include "bacallback.h"
+#include "baengine.h"
 #include "EngineForExtension.h"
 #include "engine.messages.h"
 #include "engine.version.h"

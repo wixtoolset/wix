@@ -1,8 +1,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Bundle Name="MsiPackage-Bundle" Version="!(wix.VersionVar)" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
-    <BootstrapperApplication>
-      <BootstrapperApplicationDll SourceFile="fakeba.dll" />
-    </BootstrapperApplication>
+    <BootstrapperApplication SourceFile="fakeba.dll" />
 
     <Chain>
       <MsiPackage SourceFile="test1.msi" />

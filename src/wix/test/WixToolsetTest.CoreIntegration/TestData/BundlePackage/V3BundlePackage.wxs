@@ -1,8 +1,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Bundle Name="V3BundlePackageBundle" Version="1.1.1.1" Manufacturer="Example Corporation" UpgradeCode="{01369E89-159B-4622-8B91-70F51DEBCFE5}">
-    <BootstrapperApplication>
-      <BootstrapperApplicationDll SourceFile="fakeba.dll" />
-    </BootstrapperApplication>
+    <BootstrapperApplication SourceFile="fakeba.dll" />
+
     <Chain>
       <BundlePackage SourceFile="v3bundle.exe" RepairCondition="0" />
     </Chain>

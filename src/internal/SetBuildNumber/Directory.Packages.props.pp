@@ -23,7 +23,6 @@
     <PackageVersion Include="WixToolset.Versioning" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Burn" Version="{packageversion}" />
-    <PackageVersion Include="WixToolset.Dnc.HostGenerator" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Core" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Core.Burn" Version="{packageversion}" />

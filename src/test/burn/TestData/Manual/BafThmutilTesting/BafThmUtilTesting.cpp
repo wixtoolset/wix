@@ -44,6 +44,16 @@ static void CALLBACK BafThmUtilTestingTraceError(
 class CBafThmUtilTesting : public CBalBaseBAFunctions
 {
 public: // IBAFunctions
+    virtual STDMETHODIMP OnCreate(
+        __in IBootstrapperEngine* pEngine,
+        __in BOOTSTRAPPER_COMMAND* pCommand
+        )
+    {
+        m_commandDisplay = pCommand->display;
+
+        return __super::OnCreate(pEngine, pCommand);
+    }
+
     virtual STDMETHODIMP OnThemeControlLoading(
         __in LPCWSTR wzName,
         __inout BOOL* pfProcessed,
@@ -95,7 +105,7 @@ public: //IBootstrapperApplication
         __inout BOOL* pfCancel
         )
     {
-        if (BOOTSTRAPPER_DISPLAY_FULL <= m_command.display)
+        if (BOOTSTRAPPER_DISPLAY_FULL <= m_commandDisplay)
         {
             if (IDCANCEL == ::MessageBoxW(m_hwndParent, L"Shutdown requests should be denied right now.", L"OnExecuteBegin", MB_OKCANCEL))
             {
@@ -184,7 +194,7 @@ private:
         }
 
         hr = ThemeCreateParentWindow(m_pBafTheme, 0, wc.lpszClassName, m_pBafTheme->sczCaption, m_pBafTheme->dwStyle, x, y, m_hwndParent, m_hModule, this, THEME_WINDOW_INITIAL_POSITION_CENTER_MONITOR_FROM_COORDINATES, &m_hWndBaf);
-        ExitOnFailure(hr, "Failed to create window.");
+        ExitOnFailure(hr, "Failed to create baf testing window.");
 
         hr = S_OK;
 
@@ -330,7 +340,7 @@ private:
     {
         HRESULT hr = S_OK;
         BOOL fProcessed = FALSE;
-        
+
         for (DWORD iAssignControl = 0; iAssignControl < countof(vrgInitControls); ++iAssignControl)
         {
             if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pArgs->pThemeControl->sczName, -1, vrgInitControls[iAssignControl].wzName, -1))
@@ -371,7 +381,7 @@ private:
             }
 
             break;
-            
+
         case BAFTHMUTILTESTING_CONTROL_PROGRESSBAR_STANDARD:
             fProcessed = TRUE;
 
@@ -410,11 +420,10 @@ public:
     // Constructor - initialize member variables.
     //
     CBafThmUtilTesting(
-        __in HMODULE hModule,
-        __in IBootstrapperEngine* pEngine,
-        __in const BA_FUNCTIONS_CREATE_ARGS* pArgs
-        ) : CBalBaseBAFunctions(hModule, pEngine, pArgs)
+        __in HMODULE hModule
+        ) : CBalBaseBAFunctions(hModule)
     {
+        m_commandDisplay = BOOTSTRAPPER_DISPLAY_UNKNOWN;
         m_pBafTheme = NULL;
         m_fRegistered = FALSE;
         m_hWndBaf = NULL;
@@ -434,11 +443,11 @@ public:
     }
 
 private:
+    BOOTSTRAPPER_DISPLAY m_commandDisplay;
     THEME* m_pBafTheme;
     BOOL m_fRegistered;
     HWND m_hWndBaf;
 };
-
 
 HRESULT WINAPI CreateBAFunctions(
     __in HMODULE hModule,
@@ -448,15 +457,19 @@ HRESULT WINAPI CreateBAFunctions(
 {
     HRESULT hr = S_OK;
     CBafThmUtilTesting* pBAFunctions = NULL;
-    IBootstrapperEngine* pEngine = NULL;
 
     DutilInitialize(&BafThmUtilTestingTraceError);
 
+#if TODO_REWRITE
     hr = BalInitializeFromCreateArgs(pArgs->pBootstrapperCreateArgs, &pEngine);
     ExitOnFailure(hr, "Failed to initialize Bal.");
+#endif
 
-    pBAFunctions = new CBafThmUtilTesting(hModule, pEngine, pArgs);
+    pBAFunctions = new CBafThmUtilTesting(hModule);
     ExitOnNull(pBAFunctions, hr, E_OUTOFMEMORY, "Failed to create new CBafThmUtilTesting object.");
+
+    hr = pBAFunctions->OnCreate(pArgs->pEngine, pArgs->pCommand);
+    ExitOnFailure(hr, "Failed to call OnCreate CPrereqBaf.");
 
     pResults->pfnBAFunctionsProc = BalBaseBAFunctionsProc;
     pResults->pvBAFunctionsProcContext = pBAFunctions;
@@ -466,7 +479,6 @@ HRESULT WINAPI CreateBAFunctions(
 
 LExit:
     ReleaseObject(pBAFunctions);
-    ReleaseObject(pEngine);
 
     return hr;
 }

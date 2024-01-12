@@ -11,6 +11,7 @@ namespace WixToolset.Core
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
+    using WixToolset.Extensibility.Data;
 
     /// <summary>
     /// Compiler of the WiX toolset.
@@ -621,13 +622,16 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Parse the BoostrapperApplication element.
+        /// Parse the BootstrapperApplication element.
         /// </summary>
         /// <param name="node">Element to parse</param>
         private void ParseBootstrapperApplicationElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
+            var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node);
+            XElement exePayloadRefNode = null;
+            Identifier exePayloadRefId = null;
+            bool? secondary = null;
 
             foreach (var attrib in node.Attributes())
             {
@@ -636,8 +640,21 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            compilerPayload.ParseId(attrib);
                             break;
+
+                        case "Name":
+                            compilerPayload.ParseName(attrib);
+                            break;
+
+                        case "Secondary":
+                            secondary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes;
+                            break;
+
+                        case "SourceFile":
+                            compilerPayload.ParseSourceFile(attrib);
+                            break;
+
                         default:
                             this.Core.UnexpectedAttribute(node, attrib);
                             break;
@@ -652,14 +669,27 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                         case "BootstrapperApplicationDll":
-                            this.ParseBootstrapperApplicationDllElement(child, id);
+                            if (exePayloadRefId == null)
+                            {
+                                exePayloadRefNode = node;
+                                exePayloadRefId = this.ParseBootstrapperApplicationDllElement(child, compilerPayload.Id);
+                            }
+                            else
+                            {
+                                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                                var exePayloadSourceLineNumbers = Preprocessor.GetSourceLineNumbers(exePayloadRefNode);
+                                this.Messaging.Write(CompilerErrors.AlreadyDefinedBootstrapperApplicationSource(childSourceLineNumbers, exePayloadSourceLineNumbers, exePayloadRefNode.Name.LocalName));
+                            }
                             break;
+
                         case "Payload":
                             this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, isRemoteAllowed: false);
                             break;
+
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
                             break;
+
                         default:
                             this.Core.UnexpectedElement(node, child);
                             break;
@@ -667,29 +697,77 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    var context = new Dictionary<string, string>() { { "Id", compilerPayload.Id?.Id }, { "Name", compilerPayload.Name }, { "Secondary", secondary?.ToString() }, { "Source", compilerPayload.SourceFile }, };
+                    var possibleKeyPath = this.Core.ParsePossibleKeyPathExtensionElement(node, child, context);
+                    if (possibleKeyPath?.Type == PossibleKeyPathType.File)
+                    {
+                        if (exePayloadRefNode == null)
+                        {
+                            exePayloadRefNode = node;
+                            exePayloadRefId = possibleKeyPath.Id;
+                            secondary = possibleKeyPath.Explicit;
+                        }
+                        else
+                        {
+                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                            var exePayloadSourceLineNumbers = Preprocessor.GetSourceLineNumbers(exePayloadRefNode);
+                            this.Messaging.Write(CompilerErrors.AlreadyDefinedBootstrapperApplicationSource(childSourceLineNumbers, exePayloadSourceLineNumbers, exePayloadRefNode.Name.LocalName));
+                        }
+                    }
                 }
             }
 
-            if (id != null)
+            if (compilerPayload.Id == null)
             {
-                this.Core.AddSymbol(new WixBootstrapperApplicationSymbol(sourceLineNumbers, id));
+                compilerPayload.Id = exePayloadRefId ?? this.Core.CreateIdentifier("ba", compilerPayload.Name, compilerPayload.SourceFile);
+            }
+
+            if (String.IsNullOrEmpty(compilerPayload.SourceFile) && String.IsNullOrEmpty(compilerPayload.Name))
+            {
+                if (exePayloadRefId == null)
+                {
+                    compilerPayload.FinishCompilingPayload(Compiler.BurnUXContainerId.Id);
+                }
+            }
+            else if (exePayloadRefId != null)
+            {
+                var exePayloadSourceLineNumbers = Preprocessor.GetSourceLineNumbers(exePayloadRefNode);
+
+                this.Messaging.Write(CompilerErrors.AlreadyDefinedBootstrapperApplicationSource(exePayloadSourceLineNumbers, sourceLineNumbers, node.Name.LocalName));
+            }
+            else
+            {
+                compilerPayload.FinishCompilingPayload(Compiler.BurnUXContainerId.Id);
+
+                var exePayload = compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Container, Compiler.BurnUXContainerId.Id);
+
+                exePayloadRefId = exePayload?.Id;
+            }
+
+            if (!this.Core.EncounteredError)
+            {
+                this.Core.AddSymbol(new WixBootstrapperApplicationSymbol(sourceLineNumbers, compilerPayload.Id)
+                {
+                    ExePayloadRef = exePayloadRefId?.Id,
+                    Secondary = secondary
+                });
             }
         }
 
         /// <summary>
-        /// Parse the BoostrapperApplication element.
+        /// Parse the deprecated BootstrapperApplicationDll element.
         /// </summary>
         /// <param name="node">Element to parse</param>
-        /// <param name="defaultId"></param>
+        /// <param name="defaultId">Default bootstrapper application identifieir</param>
         private Identifier ParseBootstrapperApplicationDllElement(XElement node, Identifier defaultId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node)
             {
-                Id = defaultId,
+                Id = defaultId
             };
-            var dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.PerMonitorV2;
+
+            this.Core.Write(WarningMessages.DeprecatedElement(sourceLineNumbers, node.Name.LocalName));
 
             // This list lets us evaluate extension attributes *after* all core attributes
             // have been parsed and dealt with, regardless of authoring order.
@@ -711,28 +789,7 @@ namespace WixToolset.Core
                             compilerPayload.ParseSourceFile(attrib);
                             break;
                         case "DpiAwareness":
-                            var dpiAwarenessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            switch (dpiAwarenessValue)
-                            {
-                                case "gdiScaled":
-                                    dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.GdiScaled;
-                                    break;
-                                case "perMonitor":
-                                    dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.PerMonitor;
-                                    break;
-                                case "perMonitorV2":
-                                    dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.PerMonitorV2;
-                                    break;
-                                case "system":
-                                    dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.System;
-                                    break;
-                                case "unaware":
-                                    dpiAwareness = WixBootstrapperApplicationDpiAwarenessType.Unaware;
-                                    break;
-                                default:
-                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "DpiAwareness", dpiAwarenessValue, "gdiScaled", "perMonitor", "perMonitorV2", "system", "unaware"));
-                                    break;
-                            }
+                            // Ignore for backwards compatibility.
                             break;
                         default:
                             this.Core.UnexpectedAttribute(node, attrib);
@@ -758,38 +815,18 @@ namespace WixToolset.Core
                 this.Core.ParseExtensionAttribute(node, extensionAttribute, context);
             }
 
-            foreach (var child in node.Elements())
-            {
-                if (CompilerCore.WixNamespace == child.Name.Namespace)
-                {
-                    switch (child.Name.LocalName)
-                    {
-                        default:
-                            this.Core.UnexpectedElement(node, child);
-                            break;
-                    }
-                }
-                else
-                {
-                    this.Core.ParseExtensionElement(node, child);
-                }
-            }
+            this.Core.ParseForExtensionElements(node);
 
             if (!this.Core.EncounteredError)
             {
                 compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Container, Compiler.BurnUXContainerId.Id);
-
-                this.Core.AddSymbol(new WixBootstrapperApplicationDllSymbol(sourceLineNumbers, compilerPayload.Id)
-                {
-                    DpiAwareness = dpiAwareness,
-                });
             }
 
             return compilerPayload.Id;
         }
 
         /// <summary>
-        /// Parse the BoostrapperApplicationRef element.
+        /// Parse the BootstrapperApplicationRef element.
         /// </summary>
         /// <param name="node">Element to parse</param>
         private void ParseBootstrapperApplicationRefElement(XElement node)
@@ -839,7 +876,6 @@ namespace WixToolset.Core
                     this.Core.ParseExtensionElement(node, child);
                 }
             }
-
 
             if (String.IsNullOrEmpty(id))
             {
@@ -1997,7 +2033,7 @@ namespace WixToolset.Core
             var bundle = YesNoType.NotSet;
             var slipstream = YesNoType.NotSet;
             var hasPayloadInfo = false;
-            WixBundleExePackageDetectionType exeDetectionType = WixBundleExePackageDetectionType.None;
+            var exeDetectionType = WixBundleExePackageDetectionType.None;
             string arpId = null;
             string arpDisplayVersion = null;
             var arpWin64 = YesNoType.NotSet;

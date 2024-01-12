@@ -164,7 +164,7 @@ namespace WixToolset.WixBA
                 e.Skip = false;
             }
         }
-        
+
         private void DetectUpdate(object sender, DetectUpdateEventArgs e)
         {
             // The list of updates is sorted in descending version, so the first callback should be the largest update available.
@@ -174,7 +174,15 @@ namespace WixToolset.WixBA
             WixBA.Model.Engine.Log(LogLevel.Verbose, String.Format("Potential update v{0} from '{1}'; current version: v{2}", e.Version, e.UpdateLocation, WixBA.Model.Version));
             if (WixBA.Model.Engine.CompareVersions(e.Version, WixBA.Model.Version) > 0)
             {
-                WixBA.Model.Engine.SetUpdate(null, e.UpdateLocation, e.Size, UpdateHashType.None, null);
+                var updatePackageId = Guid.NewGuid().ToString("N");
+
+                WixBA.Model.Engine.SetUpdate(null, e.UpdateLocation, e.Size, UpdateHashType.None, null, updatePackageId);
+
+                if (!WixBA.Model.BAManifest.Bundle.Packages.ContainsKey(updatePackageId))
+                {
+                    WixBA.Model.BAManifest.Bundle.AddUpdateBundleAsPackage(updatePackageId);
+                }
+
                 this.UpdateVersion = String.Concat("v", e.Version.ToString());
                 string changesFormat = @"<body style='overflow: auto;'>{0}</body>";
                 this.UpdateChanges = String.Format(changesFormat, e.Content);

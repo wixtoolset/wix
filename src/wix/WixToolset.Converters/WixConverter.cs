@@ -1039,7 +1039,7 @@ namespace WixToolset.Converters
                 foreach (var xCondition in xConditions)
                 {
                     var action = UppercaseFirstChar(xCondition.Attribute("Action")?.Value);
-                   
+
                     if (!String.IsNullOrEmpty(action) &&
                         collector.CollectInnerTextAndCommentsForAttributeValue(xCondition, out string value) &&
                         this.OnInformation(ConverterTestType.InnerTextDeprecated, element, "Using {0} element text is deprecated. Use the '{1}Condition' attribute instead.", xCondition.Name.LocalName, action))

@@ -1,16 +1,12 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-
 #include <windows.h>
 #include <msiquery.h>
 
-#include "BAFunctions.h"
+#include <batypes.h>
+
 #include "IBAFunctions.h"
-#include "BootstrapperEngine.h"
-#include "BootstrapperApplication.h"
-#include "IBootstrapperEngine.h"
-#include "IBootstrapperApplication.h"
 
 class CBalBaseBAFunctions : public IBAFunctions
 {
@@ -69,8 +65,7 @@ public: // IBootstrapperApplication
     virtual STDMETHODIMP_(HRESULT) BAProc(
         __in BOOTSTRAPPER_APPLICATION_MESSAGE /*message*/,
         __in const LPVOID /*pvArgs*/,
-        __inout LPVOID /*pvResults*/,
-        __in_opt LPVOID /*pvContext*/
+        __inout LPVOID /*pvResults*/
         )
     {
         return E_NOTIMPL;
@@ -80,10 +75,29 @@ public: // IBootstrapperApplication
         __in BOOTSTRAPPER_APPLICATION_MESSAGE /*message*/,
         __in const LPVOID /*pvArgs*/,
         __inout LPVOID /*pvResults*/,
-        __inout HRESULT* /*phr*/,
-        __in_opt LPVOID /*pvContext*/
+        __inout HRESULT* /*phr*/
         )
     {
+    }
+
+    virtual STDMETHODIMP OnCreate(
+        __in IBootstrapperEngine* pEngine,
+        __in BOOTSTRAPPER_COMMAND* /*pCommand*/
+        )
+    {
+        HRESULT hr = S_OK;
+
+        pEngine->AddRef();
+        m_pEngine = pEngine;
+
+        return hr;
+    }
+
+    virtual STDMETHODIMP OnDestroy(
+        __in BOOL /*fReload*/
+    )
+    {
+        return S_OK;
     }
 
     virtual STDMETHODIMP OnStartup()
@@ -837,20 +851,6 @@ public: // IBootstrapperApplication
         return S_OK;
     }
 
-    virtual STDMETHODIMP OnSetUpdateBegin()
-    {
-        return S_OK;
-    }
-
-    virtual STDMETHODIMP OnSetUpdateComplete(
-        __in HRESULT /*hrStatus*/,
-        __in_z_opt LPCWSTR /*wzPreviousPackageId*/,
-        __in_z_opt LPCWSTR /*wzNewPackageId*/
-        )
-    {
-        return S_OK;
-    }
-
     virtual STDMETHODIMP OnPlanRestoreRelatedBundle(
         __in_z LPCWSTR /*wzBundleId*/,
         __in BOOTSTRAPPER_REQUEST_STATE /*recommendedState*/,
@@ -996,22 +996,13 @@ public: // IBAFunctions
     }
 
 protected:
-    CBalBaseBAFunctions(
-        __in HMODULE hModule,
-        __in IBootstrapperEngine* pEngine,
-        __in const BA_FUNCTIONS_CREATE_ARGS* pArgs
-        )
+    CBalBaseBAFunctions(HMODULE hModule)
     {
         m_cReferences = 1;
         m_hModule = hModule;
-        pEngine->AddRef();
-        m_pEngine = pEngine;
 
-        memcpy_s(&m_command, sizeof(m_command), pArgs->pBootstrapperCreateArgs->pCommand, sizeof(BOOTSTRAPPER_COMMAND));
-        memcpy_s(&m_baCreateArgs, sizeof(m_baCreateArgs), pArgs->pBootstrapperCreateArgs, sizeof(BOOTSTRAPPER_CREATE_ARGS));
-        memcpy_s(&m_bafCreateArgs, sizeof(m_bafCreateArgs), pArgs, sizeof(BA_FUNCTIONS_CREATE_ARGS));
-        m_baCreateArgs.pCommand = &m_command;
-        m_bafCreateArgs.pBootstrapperCreateArgs = &m_baCreateArgs;
+        m_hwndParent = NULL;
+        m_pEngine = NULL;
     }
 
     virtual ~CBalBaseBAFunctions()
@@ -1025,8 +1016,5 @@ private:
 protected:
     IBootstrapperEngine* m_pEngine;
     HMODULE m_hModule;
-    BA_FUNCTIONS_CREATE_ARGS m_bafCreateArgs;
-    BOOTSTRAPPER_CREATE_ARGS m_baCreateArgs;
-    BOOTSTRAPPER_COMMAND m_command;
     HWND m_hwndParent;
 };

@@ -98,7 +98,7 @@ jobs:
 
       # Do NOT publish logs on `master` branch as they may contain secrets in them.
       - name: Save logs
-        if: github.ref != 'refs/heads/master' && (success() || failure())
+        if: github.ref != 'refs/heads/master' && always()
         uses: actions/upload-artifact@v3
         with:
           name: logs_${{ github.run_id }}

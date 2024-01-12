@@ -337,7 +337,7 @@ static HRESULT LoadSplashScreen(
     }
 
     pSplashScreen->hWnd = ::CreateWindowExW(WS_EX_TOOLWINDOW, BURN_SPLASHSCREEN_CLASS_WINDOW, pContext->wzCaption, WS_POPUP | WS_VISIBLE, x, y, pSplashScreen->size.cx, pSplashScreen->size.cy, HWND_DESKTOP, NULL, pContext->hInstance, pSplashScreen);
-    ExitOnNullWithLastError(pSplashScreen->hWnd, hr, "Failed to create window.");
+    ExitOnNullWithLastError(pSplashScreen->hWnd, hr, "Failed to create splash screen window.");
 
 LExit:
     MemFree(pMonitorContext);

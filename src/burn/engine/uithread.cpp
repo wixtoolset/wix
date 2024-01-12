@@ -124,7 +124,7 @@ static DWORD WINAPI ThreadProc(
 
     // Create the window to handle reboots without activating it.
     hWnd = ::CreateWindowExW(WS_EX_NOACTIVATE, wc.lpszClassName, NULL, WS_POPUP, 0, 0, 0, 0, HWND_DESKTOP, NULL, pContext->hInstance, &info);
-    ExitOnNullWithLastError(hWnd, hr, "Failed to create window.");
+    ExitOnNullWithLastError(hWnd, hr, "Failed to create Burn UI thread window.");
 
     ::ShowWindow(hWnd, SW_SHOWNA);
 

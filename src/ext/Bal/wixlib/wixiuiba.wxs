@@ -4,9 +4,9 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <PayloadGroup Id="WixIuibaStandardPayloads">
-            <Payload Name="mbapreq.thm" SourceFile="!(wix.WixIuibaThemeXml=SourceDir\iuipreq.thm)" />
-            <Payload Name="mbapreq.png" SourceFile="!(wix.WixIuibaLogo=SourceDir\mbapreq.png)" />
-            <Payload Name="mbapreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl=SourceDir\iuipreq.wxl)" />
+            <Payload Name="wixpreq.thm" SourceFile="!(wix.WixIuibaThemeXml=SourceDir\iuipreq.thm)" />
+            <Payload Name="wixpreq.png" SourceFile="!(wix.WixIuibaLogo=SourceDir\wixpreq.png)" />
+            <Payload Name="wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl=SourceDir\wixpreq.wxl)" />
         </PayloadGroup>
     </Fragment>
 </Wix>

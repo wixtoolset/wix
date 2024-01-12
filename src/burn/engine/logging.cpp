@@ -74,9 +74,6 @@ extern "C" HRESULT LoggingOpen(
 
     switch (pInternalCommand->mode)
     {
-    case BURN_MODE_UNTRUSTED:
-        wzPostfix = L".cleanroom";
-        break;
     case BURN_MODE_ELEVATED:
         wzPostfix = L".elevated";
         break;
@@ -1014,7 +1011,7 @@ static HRESULT InitializeLogging(
 
     // The untrusted process needs a separate log file.
     // TODO: Burn crashes if they do try to use the same log file.
-    if (pInternalCommand->sczLogFile && BURN_MODE_UNTRUSTED != pInternalCommand->mode)
+    if (pInternalCommand->sczLogFile)
     {
         hr = StrAllocString(&pLog->sczPath, pInternalCommand->sczLogFile, 0);
         ExitOnFailure(hr, "Failed to copy log file path from command line.");

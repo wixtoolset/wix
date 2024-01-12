@@ -191,18 +191,24 @@ namespace WixToolsetTest.CoreIntegration
                 var manifestResource = new Resource(ResourceType.Manifest, "#1", 1033);
                 manifestResource.Load(exePath);
                 var actualManifestData = Encoding.UTF8.GetString(manifestResource.Data);
-                WixAssert.StringEqual("﻿<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-                    "<assembly manifestVersion=\"1.0\" xmlns=\"urn:schemas-microsoft-com:asm.v1\">" +
-                    "<assemblyIdentity name=\"test.exe\" version=\"1.0.0.0\" processorArchitecture=\"x86\" type=\"win32\" />" +
-                    "<description>~TestBundle</description>" +
-                    "<dependency><dependentAssembly><assemblyIdentity name=\"Microsoft.Windows.Common-Controls\" version=\"6.0.0.0\" processorArchitecture=\"x86\" publicKeyToken=\"6595b64144ccf1df\" language=\"*\" type=\"win32\" /></dependentAssembly></dependency>" +
-                    "<compatibility xmlns=\"urn:schemas-microsoft-com:compatibility.v1\"><application><supportedOS Id=\"{e2011457-1546-43c5-a5fe-008deee3d3f0}\" /><supportedOS Id=\"{35138b9a-5d96-4fbd-8e2d-a2440225f93a}\" /><supportedOS Id=\"{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}\" /><supportedOS Id=\"{1f676c76-80e1-4239-95bb-83d0f6d0da78}\" /><supportedOS Id=\"{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}\" /></application></compatibility>" +
-                    "<trustInfo xmlns=\"urn:schemas-microsoft-com:asm.v3\"><security><requestedPrivileges><requestedExecutionLevel level=\"asInvoker\" uiAccess=\"false\" /></requestedPrivileges></security></trustInfo>" +
-                    "<application xmlns=\"urn:schemas-microsoft-com:asm.v3\"><windowsSettings>" +
-                    "<dpiAware xmlns=\"http://schemas.microsoft.com/SMI/2005/WindowsSettings\">true/pm</dpiAware><dpiAwareness xmlns=\"http://schemas.microsoft.com/SMI/2016/WindowsSettings\">PerMonitorV2, PerMonitor</dpiAwareness>" +
-                    "<longPathAware xmlns=\"http://schemas.microsoft.com/SMI/2016/WindowsSettings\">true</longPathAware>" +
-                    "</windowsSettings></application>" +
-                    "</assembly>", actualManifestData);
+                WixAssert.StringEqual("﻿<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n" +
+                                      "<assembly xmlns=\"urn:schemas-microsoft-com:asm.v1\" manifestVersion=\"1.0\">" +
+                                      "<assemblyIdentity name=\"WixToolset.Burn\" version=\"5.0.0.0\" type=\"win32\"></assemblyIdentity><description>WiX Toolset Bootstrapper Engine</description>" +
+                                      "<trustInfo xmlns=\"urn:schemas-microsoft-com:asm.v3\"><security><requestedPrivileges><requestedExecutionLevel level=\"asInvoker\" uiAccess=\"false\"></requestedExecutionLevel></requestedPrivileges></security></trustInfo>" +
+                                      "<application xmlns=\"urn:schemas-microsoft-com:asm.v3\"><windowsSettings>" +
+                                      "<dpiAware xmlns=\"http://schemas.microsoft.com/SMI/2005/WindowsSettings\">true/pm</dpiAware>" +
+                                      "<dpiAwareness xmlns=\"http://schemas.microsoft.com/SMI/2016/WindowsSettings\">PerMonitorV2, PerMonitor, System</dpiAwareness>" +
+                                      "<longPathAware xmlns=\"http://schemas.microsoft.com/SMI/2016/WindowsSettings\">true</longPathAware>" +
+                                      "</windowsSettings></application>" +
+                                      "<ms_compatibility:compatibility xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" xmlns=\"urn:schemas-microsoft-com:compatibility.v1\">" +
+                                      "<ms_compatibility:application xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\">" +
+                                      "<ms_compatibility:supportedOS xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" Id=\"{e2011457-1546-43c5-a5fe-008deee3d3f0}\"></ms_compatibility:supportedOS>" +
+                                      "<ms_compatibility:supportedOS xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" Id=\"{35138b9a-5d96-4fbd-8e2d-a2440225f93a}\"></ms_compatibility:supportedOS>" +
+                                      "<ms_compatibility:supportedOS xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" Id=\"{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}\"></ms_compatibility:supportedOS>" +
+                                      "<ms_compatibility:supportedOS xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" Id=\"{1f676c76-80e1-4239-95bb-83d0f6d0da78}\"></ms_compatibility:supportedOS>" +
+                                      "<ms_compatibility:supportedOS xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" Id=\"{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}\"></ms_compatibility:supportedOS>" +
+                                      "</ms_compatibility:application></ms_compatibility:compatibility>" +
+                                      "</assembly>", actualManifestData);
             }
         }
 
@@ -240,18 +246,24 @@ namespace WixToolsetTest.CoreIntegration
                 var manifestResource = new Resource(ResourceType.Manifest, "#1", 1033);
                 manifestResource.Load(exePath);
                 var actualManifestData = Encoding.UTF8.GetString(manifestResource.Data);
-                WixAssert.StringEqual("﻿<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-                    "<assembly manifestVersion=\"1.0\" xmlns=\"urn:schemas-microsoft-com:asm.v1\">" +
-                    "<assemblyIdentity name=\"test.exe\" version=\"1.0.0.0\" processorArchitecture=\"amd64\" type=\"win32\" />" +
-                    "<description>~TestBundle</description>" +
-                    "<dependency><dependentAssembly><assemblyIdentity name=\"Microsoft.Windows.Common-Controls\" version=\"6.0.0.0\" processorArchitecture=\"amd64\" publicKeyToken=\"6595b64144ccf1df\" language=\"*\" type=\"win32\" /></dependentAssembly></dependency>" +
-                    "<compatibility xmlns=\"urn:schemas-microsoft-com:compatibility.v1\"><application><supportedOS Id=\"{e2011457-1546-43c5-a5fe-008deee3d3f0}\" /><supportedOS Id=\"{35138b9a-5d96-4fbd-8e2d-a2440225f93a}\" /><supportedOS Id=\"{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}\" /><supportedOS Id=\"{1f676c76-80e1-4239-95bb-83d0f6d0da78}\" /><supportedOS Id=\"{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}\" /></application></compatibility>" +
-                    "<trustInfo xmlns=\"urn:schemas-microsoft-com:asm.v3\"><security><requestedPrivileges><requestedExecutionLevel level=\"asInvoker\" uiAccess=\"false\" /></requestedPrivileges></security></trustInfo>" +
-                    "<application xmlns=\"urn:schemas-microsoft-com:asm.v3\"><windowsSettings>" +
-                    "<dpiAware xmlns=\"http://schemas.microsoft.com/SMI/2005/WindowsSettings\">true/pm</dpiAware><dpiAwareness xmlns=\"http://schemas.microsoft.com/SMI/2016/WindowsSettings\">PerMonitorV2, PerMonitor</dpiAwareness>" +
-                    "<longPathAware xmlns=\"http://schemas.microsoft.com/SMI/2016/WindowsSettings\">true</longPathAware>" +
-                    "</windowsSettings></application>" +
-                    "</assembly>", actualManifestData);
+                WixAssert.StringEqual("﻿<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n" +
+                                      "<assembly xmlns=\"urn:schemas-microsoft-com:asm.v1\" manifestVersion=\"1.0\">" +
+                                      "<assemblyIdentity name=\"WixToolset.Burn\" version=\"5.0.0.0\" type=\"win32\"></assemblyIdentity><description>WiX Toolset Bootstrapper Engine</description>" +
+                                      "<trustInfo xmlns=\"urn:schemas-microsoft-com:asm.v3\"><security><requestedPrivileges><requestedExecutionLevel level=\"asInvoker\" uiAccess=\"false\"></requestedExecutionLevel></requestedPrivileges></security></trustInfo>" +
+                                      "<application xmlns=\"urn:schemas-microsoft-com:asm.v3\"><windowsSettings>" +
+                                      "<dpiAware xmlns=\"http://schemas.microsoft.com/SMI/2005/WindowsSettings\">true/pm</dpiAware>" +
+                                      "<dpiAwareness xmlns=\"http://schemas.microsoft.com/SMI/2016/WindowsSettings\">PerMonitorV2, PerMonitor, System</dpiAwareness>" +
+                                      "<longPathAware xmlns=\"http://schemas.microsoft.com/SMI/2016/WindowsSettings\">true</longPathAware>" +
+                                      "</windowsSettings></application>" +
+                                      "<ms_compatibility:compatibility xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" xmlns=\"urn:schemas-microsoft-com:compatibility.v1\">" +
+                                      "<ms_compatibility:application xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\">" +
+                                      "<ms_compatibility:supportedOS xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" Id=\"{e2011457-1546-43c5-a5fe-008deee3d3f0}\"></ms_compatibility:supportedOS>" +
+                                      "<ms_compatibility:supportedOS xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" Id=\"{35138b9a-5d96-4fbd-8e2d-a2440225f93a}\"></ms_compatibility:supportedOS>" +
+                                      "<ms_compatibility:supportedOS xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" Id=\"{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}\"></ms_compatibility:supportedOS>" +
+                                      "<ms_compatibility:supportedOS xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" Id=\"{1f676c76-80e1-4239-95bb-83d0f6d0da78}\"></ms_compatibility:supportedOS>" +
+                                      "<ms_compatibility:supportedOS xmlns:ms_compatibility=\"urn:schemas-microsoft-com:compatibility.v1\" Id=\"{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}\"></ms_compatibility:supportedOS>" +
+                                      "</ms_compatibility:application></ms_compatibility:compatibility>" +
+                                      "</assembly>", actualManifestData);
 
                 var extractResult = BundleExtractor.ExtractAllContainers(null, exePath, baFolderPath, attachedFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -602,7 +614,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var exePath = Path.Combine(baseFolder, @"bin", "test.exe");
 
                 var result = WixRunner.Execute(new[]
                 {
@@ -615,42 +627,24 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", exePath,
                 });
 
-                var attachedContainerWarnings = result.Messages.Where(m => m.Id == 8500)
-                                                               .Select(m => m.ToString())
-                                                               .ToArray();
+                var messages = result.Messages.Select(WixMessageFormatter.FormatMessage).OrderBy(m => m).ToArray();
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "The Payload 'Auto2' has a duplicate Name 'burn.exe' in the attached container. When extracting the bundle with `wix burn extract`, the file will get overwritten.",
-                }, attachedContainerWarnings);
-
-                var baContainerErrors = result.Messages.Where(m => m.Id == 8002)
-                                                       .Select(m => m.ToString())
-                                                       .ToArray();
-                WixAssert.CompareLineByLine(new string[]
-                {
-                    "The Payload 'DuplicatePayloadNames.wxs' has a duplicate Name 'fakeba.dll' in the BA container. When extracting the container at runtime, the file will get overwritten.",
-                    "The Payload 'uxTxMXPVMXwQrPTMIGa5WGt93w0Ns' has a duplicate Name 'BootstrapperApplicationData.xml' in the BA container. When extracting the container at runtime, the file will get overwritten.",
-                    "The Payload 'uxYRbgitOs0K878jn5L_z7LdJ21KI' has a duplicate Name 'BundleExtensionData.xml' in the BA container. When extracting the container at runtime, the file will get overwritten.",
-                }, baContainerErrors);
-
-                var externalErrors = result.Messages.Where(m => m.Id == 8004)
-                                                    .Select(m => m.ToString())
-                                                    .ToArray();
-                WixAssert.CompareLineByLine(new string[]
-                {
-                    "The external Payload 'HiddenPersistedBundleVariable.wxs' has a duplicate Name 'PayloadCollision'. When building the bundle or laying out the bundle, the file will get overwritten.",
-                    "The external Container 'MsiPackagesContainer' has a duplicate Name 'ContainerCollision'. When building the bundle or laying out the bundle, the file will get overwritten.",
-                }, externalErrors);
-
-                var packageCacheErrors = result.Messages.Where(m => m.Id == 8006)
-                                                        .Select(m => m.ToString())
-                                                        .ToArray();
-                WixAssert.CompareLineByLine(new string[]
-                {
-                    "The Payload 'test.msi' has a duplicate Name 'test.msi' in package 'test.msi'. When caching the package, the file will get overwritten.",
-                }, packageCacheErrors);
-
-                Assert.Equal(14, result.Messages.Length);
+                    "Error 8002: The Payload 'DuplicatePayloadNames.wxs' has a duplicate Name 'fakeba.dll' in the BA container. When extracting the container at runtime, the file will get overwritten.",
+                    "Error 8002: The Payload 'uxTxMXPVMXwQrPTMIGa5WGt93w0Ns' has a duplicate Name 'BootstrapperApplicationData.xml' in the BA container. When extracting the container at runtime, the file will get overwritten.",
+                    "Error 8002: The Payload 'uxYRbgitOs0K878jn5L_z7LdJ21KI' has a duplicate Name 'BundleExtensionData.xml' in the BA container. When extracting the container at runtime, the file will get overwritten.",
+                    "Error 8003: The location of the payload related to the previous error.",
+                    "Error 8003: The location of the payload related to the previous error.",
+                    "Error 8003: The location of the payload related to the previous error.",
+                    "Error 8004: The external Container 'MsiPackagesContainer' has a duplicate Name 'ContainerCollision'. When building the bundle or laying out the bundle, the file will get overwritten.",
+                    "Error 8004: The external Payload 'HiddenPersistedBundleVariable.wxs' has a duplicate Name 'PayloadCollision'. When building the bundle or laying out the bundle, the file will get overwritten.",
+                    "Error 8005: The location of the symbol related to the previous error.",
+                    "Error 8005: The location of the symbol related to the previous error.",
+                    "Error 8006: The Payload 'test.msi' has a duplicate Name 'test.msi' in package 'test.msi'. When caching the package, the file will get overwritten.",
+                    "Error 8007: The location of the payload related to the previous error.",
+                    "Error 8500: The Payload 'Auto2' has a duplicate Name 'burn.exe' in the attached container. When extracting the bundle with `wix burn extract`, the file will get overwritten.",
+                    "Error 8501: The location of the payload related to the previous error."
+                }, messages);
             }
         }
 
@@ -798,26 +792,23 @@ namespace WixToolsetTest.CoreIntegration
             {
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
-                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+                var exePath = Path.Combine(baseFolder, "bin", "test.exe");
 
-                try
+                var result =  WixRunner.Execute(new[]
                 {
-                    WixRunner.Execute(new[]
-                    {
                     "build",
                     Path.Combine(folder, "BundleWithInvalid", "BundleWithMissingBA.wxs"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", exePath,
-                    });
-                }
-                catch (WixException we)
-                {
-                    Assert.Equal(341, we.Error.Id);
-                    return;
-                }
+                });
 
-                Assert.Fail("Expected exception not accepted.");
+                var messages = result.Messages.Select(WixMessageFormatter.FormatMessage).ToArray();
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "Error 8015: A BundleApplication is required to build a bundle."
+                }, messages);
             }
         }
 
@@ -847,6 +838,5 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
             }
         }
-
     }
 }
