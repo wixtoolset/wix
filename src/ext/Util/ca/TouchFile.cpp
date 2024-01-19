@@ -288,7 +288,7 @@ extern "C" UINT WINAPI WixExecuteTouchFile(
         {
             if (iTouchFileAttributes & TOUCH_FILE_ATTRIBUTE_VITAL)
             {
-                ExitOnFailure(hr, "Failed to touch file: '%ls' for: %ls", &sczPath, sczId);
+                ExitOnFailure(hr, "Failed to touch file: '%ls' for: %ls", sczPath, sczId);
             }
             else
             {

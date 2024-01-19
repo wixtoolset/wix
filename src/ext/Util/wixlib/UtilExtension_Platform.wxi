@@ -240,8 +240,8 @@
         <CustomAction Id="$(var.Prefix)RollbackTouchFile$(var.Suffix)" DllEntry="WixExecuteTouchFile" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)TouchFileDuringUninstall" Before="RemoveFiles" Overridable="yes" />
-            <Custom Action="$(var.Prefix)TouchFileDuringInstall" After="InstallFiles" Overridable="yes" />
+            <Custom Action="$(var.Prefix)TouchFileDuringUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes" />
+            <Custom Action="$(var.Prefix)TouchFileDuringInstall$(var.Suffix)" After="InstallFiles" Overridable="yes" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -317,7 +317,7 @@
             <Custom Action="$(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
-    
+
     <Fragment>
         <CustomAction Id="$(var.Prefix)QueryOsDirs$(var.Suffix)" DllEntry="WixQueryOsDirs" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
@@ -341,7 +341,7 @@
             <Custom Action="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
-    
+
     <Fragment>
         <CustomAction Id="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" DllEntry="WixQueryOsDriverInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
@@ -353,7 +353,7 @@
             <Custom Action="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
-    
+
     <Fragment>
         <CustomAction Id="$(var.Prefix)QueryNativeMachine$(var.Suffix)" DllEntry="WixQueryNativeMachine" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
