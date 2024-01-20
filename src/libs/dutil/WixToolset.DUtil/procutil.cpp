@@ -517,7 +517,7 @@ extern "C" HRESULT DAPI ProcWaitForIds(
     DWORD cProcesses = 0;
     BOOL fTimedOut = FALSE;
 
-    rghProcesses =  static_cast<HANDLE*>(MemAlloc(sizeof(DWORD) * cProcessIds, TRUE));
+    rghProcesses =  static_cast<HANDLE*>(MemAlloc(sizeof(HANDLE) * cProcessIds, TRUE));
     ProcExitOnNull(rgdwProcessIds, hr, E_OUTOFMEMORY, "Failed to allocate array for process ID Handles.");
 
     for (DWORD i = 0; i < cProcessIds; ++i)
