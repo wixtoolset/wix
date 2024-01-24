@@ -63,6 +63,7 @@
       <SwapRunFromCD>true</SwapRunFromCD>
       <SwapRunFromNET>true</SwapRunFromNET>
       <DelayLoadDLLs>cabinet.dll;crypt32.dll;msi.dll;shlwapi.dll;userenv.dll;version.dll;wininet.dll;wintrust.dll</DelayLoadDLLs>
+      <AdditionalOptions>/DEPENDENTLOADFLAG:0x800 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
 
