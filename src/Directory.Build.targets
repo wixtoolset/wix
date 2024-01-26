@@ -3,10 +3,9 @@
 
 <Project>
   <PropertyGroup>
-    <SigningToolFolder>$(ToolsFolder)</SigningToolFolder>
-    <SigningToolExe>$(SigningToolFolder)\sign.exe</SigningToolExe>
-    <SigningFilelist>$(MSBuildThisFileDirectory)signing-empty-file-list.txt</SigningFilelist>
-    <SigningConfiguration>--description "WiX Toolset" --description-url "https://wixtoolset.org/" --timestamp-url "http://timestamp.digicert.com" --file-list "$(SigningFilelist)" --azure-key-vault-managed-identity true --azure-key-vault-url "$(SigningVaultUri)" --azure-key-vault-certificate "$(SigningCertName)"</SigningConfiguration>
+    <SigningToolExe>$(ToolsFolder)\sign.exe</SigningToolExe>
+    <SigningCommand>code azure-key-vault</SigningCommand>
+    <SigningConfiguration>--description "WiX Toolset" --description-url "https://wixtoolset.org/" --timestamp-url "http://timestamp.digicert.com" --file-list "$(MSBuildThisFileDirectory)signing-empty-file-list.txt" --azure-key-vault-managed-identity true --azure-key-vault-url "$(SigningVaultUri)" --azure-key-vault-certificate "$(SigningCertName)"</SigningConfiguration>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(IsWixTestSupportProject)'=='true' ">
@@ -114,12 +113,12 @@
   </Target>
 
   <Target Name="SignOutput" AfterTargets="AfterBuild"
-          Condition=" '$(SigningCertName)'!='' and '$(SignOutput)'!='false' and 
+          Condition=" '$(SigningCertName)'!='' and '$(SignOutput)'!='false' and
                       ('$(MSBuildProjectExtension)'=='.csproj' or ('$(MSBuildProjectExtension)'=='.vcxproj' and '$(ConfigurationType)'!='StaticLibrary'))">
 
     <Message Importance="high" Text="Signing file: $(TargetPath)" />
 
-    <Exec Command='"$(SigningToolExe)" code azure-key-vault $(TargetPath) $(SigningConfiguration)'
+    <Exec Command='"$(SigningToolExe)" $(SigningCommand) $(SigningConfiguration) $(TargetPath)'
           WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
   </Target>
 
@@ -131,21 +130,21 @@
 
     <Message Importance="high" Text="Signing nupkg: @(SigningNupkgs->&apos;%(Identity)&apos;)" />
 
-    <Exec Command='"$(SigningToolExe)" code azure-key-vault "@(SigningNupkgs->&apos;%(Identity)&apos;)" $(SigningConfiguration)'
+    <Exec Command='"$(SigningToolExe)" $(SigningCommand) $(SigningConfiguration) "@(SigningNupkgs->&apos;%(Identity)&apos;)"'
           WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
   </Target>
 
   <Target Name="SignBundleEngine" Condition=" '$(SigningCertName)'!='' and '$(SignOutput)'!='false' ">
     <Message Importance="high" Text="Signing bundle engine: @(SignBundleEngine->&apos;%(Identity)&apos;)" />
 
-    <Exec Command='"$(SigningToolExe)" code azure-key-vault "@(SignBundleEngine->&apos;%(Identity)&apos;)" $(SigningConfiguration)'
+    <Exec Command='"$(SigningToolExe)" $(SigningCommand) $(SigningConfiguration) "@(SignBundleEngine->&apos;%(Identity)&apos;)"'
           WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
   </Target>
 
   <Target Name="SignBundle" Condition=" '$(SigningCertName)'!='' and '$(SignOutput)'!='false' ">
     <Message Importance="high" Text="Signing bundle: @(SignBundle->&apos;%(Identity)&apos;)" />
 
-    <Exec Command='"$(SigningToolExe)" code azure-key-vault "@(SignBundle->&apos;%(Identity)&apos;)" $(SigningConfiguration)'
+    <Exec Command='"$(SigningToolExe)" $(SigningCommand) $(SigningConfiguration) "@(SignBundle->&apos;%(Identity)&apos;)"'
           WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
   </Target>
 
