@@ -5,12 +5,12 @@ on:
     branches:
       - master
       - develop
-      - develop403
+      - develop404
   pull_request:
     branches:
       - master
       - develop
-      - develop403
+      - develop404
   workflow_dispatch:
     inputs:
       tags:
@@ -107,5 +107,5 @@ jobs:
           path: build/logs/
 
       - name: Push to GitHub Packages
-        if: github.event_name == 'push' && github.repository_owner == 'wixtoolset' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/develop403')
+        if: github.event_name == 'push' && github.repository_owner == 'wixtoolset' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/develop404')
         run: dotnet nuget push "build/artifacts/**/*.nupkg" --source https://nuget.pkg.github.com/wixtoolset/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
