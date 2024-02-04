@@ -3,6 +3,7 @@
 namespace WixToolset.Core
 {
     using WixToolset.Data;
+    using WixToolset.Data.Symbols;
 
     internal static class LinkerErrors
     {
@@ -99,6 +100,11 @@ namespace WixToolset.Core
         public static Message VirtualSymbolMustBeOverridden(IntermediateSymbol symbol)
         {
             return Message(symbol.SourceLineNumbers, Ids.VirtualSymbolMustBeOverridden, "The {0} symbol '{1}' conflicts with a virtual symbol. Use the 'override' access modifier to override the virtual symbol or use a different Id to avoid the conflict.", symbol.Definition.Name, symbol.Id.Id);
+        }
+
+        public static Message VirtualSymbolMustBeOverridden(WixActionSymbol actionSymbol)
+        {
+            return Message(actionSymbol.SourceLineNumbers, Ids.VirtualSymbolMustBeOverridden, "The action '{0}' conflicts with a virtual symbol with the same id. To override the virtual symbol (e.g., to reschedule a custom action), use the 'override' access modifier: 'override {0}'. If you didn't intend to override a virtual symbol, use a different id to avoid the conflict.", actionSymbol.Action);
         }
 
         public static Message VirtualSymbolMustBeOverridden(IntermediateSymbol symbol, SourceLineNumber referencingSourceLineNumber)

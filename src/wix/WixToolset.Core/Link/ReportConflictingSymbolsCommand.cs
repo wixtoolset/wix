@@ -5,6 +5,7 @@ namespace WixToolset.Core.Link
     using System.Collections.Generic;
     using System.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
 
     internal class ReportConflictingSymbolsCommand
@@ -62,7 +63,15 @@ namespace WixToolset.Core.Link
 
                             reportDuplicates = virtualConflicts;
 
-                            this.Messaging.Write(LinkerErrors.VirtualSymbolMustBeOverridden(first.Symbol, referencingSourceLineNumber));
+                            switch (first.Symbol)
+                            {
+                                case WixActionSymbol action:
+                                    this.Messaging.Write(LinkerErrors.VirtualSymbolMustBeOverridden(action));
+                                    break;
+                                default:
+                                    this.Messaging.Write(LinkerErrors.VirtualSymbolMustBeOverridden(first.Symbol, referencingSourceLineNumber));
+                                    break;
+                            }
                         }
                         else
                         {
