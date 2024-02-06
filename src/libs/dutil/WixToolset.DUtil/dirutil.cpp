@@ -26,7 +26,7 @@
 
 *******************************************************************/
 extern "C" BOOL DAPI DirExists(
-    __in_z LPCWSTR wzPath, 
+    __in_z LPCWSTR wzPath,
     __out_opt DWORD *pdwAttributes
     )
 {
@@ -73,7 +73,7 @@ extern "C" HRESULT DAPI DirCreateTempPath(
 
 *******************************************************************/
 extern "C" HRESULT DAPI DirEnsureExists(
-    __in_z LPCWSTR wzPath, 
+    __in_z LPCWSTR wzPath,
     __in_opt LPSECURITY_ATTRIBUTES psa
     )
 {
@@ -203,8 +203,8 @@ extern "C" HRESULT DAPI DirEnsureDeleteEx(
             }
         }
 
-        // If we're deleting files and/or child directories loop through the contents of the directory.
-        if (fDeleteFiles || fRecurse)
+        // If we're deleting files and/or child directories loop through the contents of the directory, but skip junctions.
+        if ((fDeleteFiles || fRecurse) && (0 == (dwAttrib & FILE_ATTRIBUTE_REPARSE_POINT)))
         {
             if (fScheduleDelete)
             {
