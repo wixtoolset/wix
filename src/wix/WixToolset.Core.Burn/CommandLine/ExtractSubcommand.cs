@@ -65,16 +65,25 @@ namespace WixToolset.Core.Burn.CommandLine
                         reader.ExtractUXContainer(this.ExtractBootstrapperApplicationPath, this.IntermediateFolder);
                     }
 
-                    try
+                    if (!String.IsNullOrEmpty(this.ExtractContainersPath))
                     {
-                        if (!String.IsNullOrEmpty(this.ExtractContainersPath))
+                        try
                         {
                             reader.ExtractAttachedContainers(this.ExtractContainersPath, this.IntermediateFolder);
                         }
-                    }
-                    catch
-                    {
-                        this.Messaging.Write(BurnBackendWarnings.FailedToExtractAttachedContainers(new SourceLineNumber(this.ExtractContainersPath)));
+                        catch
+                        {
+                            this.Messaging.Write(BurnBackendWarnings.FailedToExtractAttachedContainers(new SourceLineNumber(this.ExtractContainersPath)));
+                        }
+
+                        try
+                        {
+                            reader.ExtractDetachedContainers(this.ExtractContainersPath, this.IntermediateFolder, this.ExtractBootstrapperApplicationPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.Messaging.Write(BurnBackendWarnings.FailedToExtractDetachedContainers(new SourceLineNumber(this.ExtractContainersPath), ex.Message));
+                        }
                     }
                 }
             }
