@@ -23,8 +23,8 @@
         <CustomAction Id="$(var.Prefix)RollbackExecuteSqlStrings$(var.Suffix)" DllEntry="ExecuteSqlStrings" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" TerminalServerAware="yes" BinaryRef="SqlCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)UninstallSqlData$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="NOT SKIPUNINSTALLSQLDATA AND VersionNT &gt; 400" />
-            <Custom Action="$(var.Prefix)InstallSqlData$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="NOT SKIPINSTALLSQLDATA AND VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)UninstallSqlData$(var.Suffix)" Before="RemoveFiles" Condition="NOT SKIPUNINSTALLSQLDATA AND VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)InstallSqlData$(var.Suffix)" After="InstallFiles" Condition="NOT SKIPINSTALLSQLDATA AND VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 

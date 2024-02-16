@@ -3,7 +3,7 @@
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <?include ..\..\caDecor.wxi ?>
-  
+
   <Fragment>
     <UIRef Id="WixIIsErrors" />
     <UI>
@@ -35,7 +35,7 @@
     <CustomAction Id="$(var.Prefix)WriteIIS7ConfigChanges$(var.Suffix)" DllEntry="WriteIIS7ConfigChanges" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="IisCA$(var.Suffix)" />
 
     <InstallExecuteSequence>
-      <Custom Action="$(var.Prefix)ConfigureIIs$(var.Suffix)" Before="RegisterUser" Overridable="yes" Condition="NOT SKIPCONFIGUREIIS AND VersionNT &gt; 400" />
+      <Custom Action="virtual $(var.Prefix)ConfigureIIs$(var.Suffix)" Before="RegisterUser" Condition="NOT SKIPCONFIGUREIIS AND VersionNT &gt; 400" />
     </InstallExecuteSequence>
   </Fragment>
 
@@ -58,8 +58,8 @@
     <CustomAction Id="$(var.Prefix)RollbackDeleteMachineCertificate$(var.Suffix)" DllEntry="AddMachineCertificate" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="IisCA$(var.Suffix)" />
 
     <InstallExecuteSequence>
-      <Custom Action="$(var.Prefix)UninstallCertificates$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
-      <Custom Action="$(var.Prefix)InstallCertificates$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
+      <Custom Action="virtual $(var.Prefix)UninstallCertificates$(var.Suffix)" Before="RemoveFiles" Condition="VersionNT &gt; 400" />
+      <Custom Action="virtual $(var.Prefix)InstallCertificates$(var.Suffix)" After="InstallFiles" Condition="VersionNT &gt; 400" />
     </InstallExecuteSequence>
   </Fragment>
 

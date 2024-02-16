@@ -8,7 +8,7 @@
         <CustomAction Id="$(var.Prefix)FailWhenDeferred$(var.Suffix)" DllEntry="WixFailWhenDeferred" Execute="deferred" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)FailWhenDeferred$(var.Suffix)" Before="InstallFinalize" Overridable="yes" Condition="WIXFAILWHENDEFERRED=1 AND VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)FailWhenDeferred$(var.Suffix)" Before="InstallFinalize" Condition="WIXFAILWHENDEFERRED=1 AND VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -16,7 +16,7 @@
         <CustomAction Id="$(var.Prefix)WaitForEvent$(var.Suffix)" DllEntry="WixWaitForEvent" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)WaitForEvent$(var.Suffix)" Before="InstallFinalize" Overridable="yes" />
+            <Custom Action="virtual $(var.Prefix)WaitForEvent$(var.Suffix)" Before="InstallFinalize" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -24,7 +24,7 @@
         <CustomAction Id="$(var.Prefix)WaitForEventDeferred$(var.Suffix)" DllEntry="WixWaitForEvent" Execute="deferred" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)WaitForEventDeferred$(var.Suffix)" After="InstallInitialize" Overridable="yes" />
+            <Custom Action="virtual $(var.Prefix)WaitForEventDeferred$(var.Suffix)" After="InstallInitialize" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -32,7 +32,7 @@
         <CustomAction Id="$(var.Prefix)ExitEarlyWithSuccess$(var.Suffix)" DllEntry="WixExitEarlyWithSuccess" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)ExitEarlyWithSuccess$(var.Suffix)" After="FindRelatedProducts" Overridable="yes" Condition="NEWERVERSIONDETECTED AND VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)ExitEarlyWithSuccess$(var.Suffix)" After="FindRelatedProducts" Condition="NEWERVERSIONDETECTED AND VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -56,7 +56,7 @@
         <CustomAction Id="$(var.Prefix)BroadcastSettingChange$(var.Suffix)" DllEntry="WixBroadcastSettingChange" Execute="immediate" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)BroadcastSettingChange$(var.Suffix)" After="InstallFinalize" Overridable="yes" />
+            <Custom Action="virtual $(var.Prefix)BroadcastSettingChange$(var.Suffix)" After="InstallFinalize" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -64,7 +64,7 @@
         <CustomAction Id="$(var.Prefix)BroadcastEnvironmentChange$(var.Suffix)" DllEntry="WixBroadcastEnvironmentChange" Execute="immediate" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)BroadcastEnvironmentChange$(var.Suffix)" After="InstallFinalize" Overridable="yes" />
+            <Custom Action="virtual $(var.Prefix)BroadcastEnvironmentChange$(var.Suffix)" After="InstallFinalize" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -110,7 +110,7 @@
 
         <InstallExecuteSequence>
             <!-- Condition this so it runs on install and MMode, but not uninstall -->
-            <Custom Action="$(var.Prefix)CheckRebootRequired$(var.Suffix)" After="InstallFinalize" Overridable="yes" Condition="NOT REMOVE~=&quot;ALL&quot; AND VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)CheckRebootRequired$(var.Suffix)" After="InstallFinalize" Condition="NOT REMOVE~=&quot;ALL&quot; AND VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -120,7 +120,7 @@
         <CustomActionRef Id="$(var.Prefix)CheckRebootRequired$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)CloseApplications$(var.Suffix)" Before="InstallFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)CloseApplications$(var.Suffix)" Before="InstallFiles" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -128,7 +128,7 @@
         <CustomAction Id="$(var.Prefix)RegisterRestartResources$(var.Suffix)" DllEntry="WixRegisterRestartResources" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)RegisterRestartResources$(var.Suffix)" Before="InstallValidate" Overridable="yes" />
+            <Custom Action="virtual $(var.Prefix)RegisterRestartResources$(var.Suffix)" Before="InstallValidate" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -142,7 +142,7 @@
         <CustomAction Id="$(var.Prefix)RemoveUser$(var.Suffix)" DllEntry="RemoveUser" Impersonate="no" Execute="commit" Return="ignore" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)ConfigureUsers$(var.Suffix)" Before="InstallFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)ConfigureUsers$(var.Suffix)" Before="InstallFiles" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -157,8 +157,8 @@
         <CustomAction Id="$(var.Prefix)DropSmbRollback$(var.Suffix)" DllEntry="CreateSmb" Impersonate="no" Execute="rollback" Return="ignore" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)ConfigureSmbInstall$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
-            <Custom Action="$(var.Prefix)ConfigureSmbUninstall$(var.Suffix)" After="RemoveFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)ConfigureSmbInstall$(var.Suffix)" After="InstallFiles" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)ConfigureSmbUninstall$(var.Suffix)" After="RemoveFiles" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -173,8 +173,8 @@
         <CustomAction Id="$(var.Prefix)RollbackUnregisterPerfCounterData$(var.Suffix)" DllEntry="RegisterPerfCounterData" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)InstallPerfCounterData$(var.Suffix)" After="WriteRegistryValues" Overridable="yes" Condition="VersionNT &gt; 400" />
-            <Custom Action="$(var.Prefix)UninstallPerfCounterData$(var.Suffix)" Before="RemoveRegistryValues" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)InstallPerfCounterData$(var.Suffix)" After="WriteRegistryValues" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)UninstallPerfCounterData$(var.Suffix)" Before="RemoveRegistryValues" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -189,8 +189,8 @@
         <CustomAction Id="$(var.Prefix)RollbackUnregisterPerfmon$(var.Suffix)" DllEntry="RegisterPerfmon" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)ConfigurePerfmonInstall$(var.Suffix)" After="WriteRegistryValues" Overridable="yes" Condition="VersionNT &gt; 400" />
-            <Custom Action="$(var.Prefix)ConfigurePerfmonUninstall$(var.Suffix)" Before="RemoveRegistryValues" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)ConfigurePerfmonInstall$(var.Suffix)" After="WriteRegistryValues" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)ConfigurePerfmonUninstall$(var.Suffix)" Before="RemoveRegistryValues" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -203,8 +203,8 @@
         <CustomAction Id="$(var.Prefix)RollbackUnregisterPerfmonManifest$(var.Suffix)" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)ConfigurePerfmonManifestRegister$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
-            <Custom Action="$(var.Prefix)ConfigurePerfmonManifestUnregister$(var.Suffix)" After="RemoveRegistryValues" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)ConfigurePerfmonManifestRegister$(var.Suffix)" After="InstallFiles" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)ConfigurePerfmonManifestUnregister$(var.Suffix)" After="RemoveRegistryValues" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -217,8 +217,8 @@
         <CustomAction Id="$(var.Prefix)RollbackUnregisterEventManifest$(var.Suffix)" DllEntry="WixQuietExec" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)ConfigureEventManifestRegister$(var.Suffix)" After="$(var.Prefix)SchedXmlFile$(var.Suffix)" Overridable="yes" Condition="VersionNT &gt; 400" />
-            <Custom Action="$(var.Prefix)ConfigureEventManifestUnregister$(var.Suffix)" After="RemoveRegistryValues" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)ConfigureEventManifestRegister$(var.Suffix)" After="$(var.Prefix)SchedXmlFile$(var.Suffix)" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)ConfigureEventManifestUnregister$(var.Suffix)" After="RemoveRegistryValues" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -229,7 +229,7 @@
 
         <InstallExecuteSequence>
             <!-- Condition this so it runs on install and MMode, but not uninstall -->
-            <Custom Action="$(var.Prefix)SchedServiceConfig$(var.Suffix)" After="InstallServices" Overridable="yes" Condition="NOT REMOVE~=&quot;ALL&quot; AND VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)SchedServiceConfig$(var.Suffix)" After="InstallServices" Condition="NOT REMOVE~=&quot;ALL&quot; AND VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -240,8 +240,8 @@
         <CustomAction Id="$(var.Prefix)RollbackTouchFile$(var.Suffix)" DllEntry="WixExecuteTouchFile" Execute="rollback" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)TouchFileDuringUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes" />
-            <Custom Action="$(var.Prefix)TouchFileDuringInstall$(var.Suffix)" After="InstallFiles" Overridable="yes" />
+            <Custom Action="virtual $(var.Prefix)TouchFileDuringUninstall$(var.Suffix)" Before="RemoveFiles" />
+            <Custom Action="virtual $(var.Prefix)TouchFileDuringInstall$(var.Suffix)" After="InstallFiles" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -253,7 +253,7 @@
         <CustomAction Id="$(var.Prefix)ExecXmlFileRollback$(var.Suffix)" DllEntry="ExecXmlFileRollback" Execute="rollback" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)SchedXmlFile$(var.Suffix)" After="DuplicateFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)SchedXmlFile$(var.Suffix)" After="DuplicateFiles" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -265,7 +265,7 @@
         <CustomAction Id="$(var.Prefix)ExecXmlConfigRollback$(var.Suffix)" DllEntry="ExecXmlConfigRollback" Execute="rollback" Impersonate="no" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)SchedXmlConfig$(var.Suffix)" After="DuplicateFiles" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)SchedXmlConfig$(var.Suffix)" After="DuplicateFiles" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -275,9 +275,9 @@
         <CustomAction Id="$(var.Prefix)CreateInternetShortcuts$(var.Suffix)" DllEntry="WixCreateInternetShortcuts" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)SchedInternetShortcuts$(var.Suffix)" Before="RemoveFolders" Overridable="yes" Condition="VersionNT &gt; 400" />
-            <Custom Action="$(var.Prefix)RollbackInternetShortcuts$(var.Suffix)" Before="$(var.Prefix)CreateInternetShortcuts$(var.Suffix)" Overridable="yes" Condition="VersionNT &gt; 400" />
-            <Custom Action="$(var.Prefix)CreateInternetShortcuts$(var.Suffix)" After="CreateShortcuts" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)SchedInternetShortcuts$(var.Suffix)" Before="RemoveFolders" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)RollbackInternetShortcuts$(var.Suffix)" Before="$(var.Prefix)CreateInternetShortcuts$(var.Suffix)" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)CreateInternetShortcuts$(var.Suffix)" After="CreateShortcuts" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -291,8 +291,8 @@
 
         <InstallExecuteSequence>
             <!-- Condition this so it runs on install and MMode, but not uninstall -->
-            <Custom Action="$(var.Prefix)SchedSecureObjects$(var.Suffix)" After="InstallServices" Overridable="yes" Condition="NOT REMOVE~=&quot;ALL&quot; AND VersionNT &gt; 400" />
-            <Custom Action="$(var.Prefix)SchedSecureObjectsRollback$(var.Suffix)" After="UnpublishFeatures" Overridable="yes" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)SchedSecureObjects$(var.Suffix)" After="InstallServices" Condition="NOT REMOVE~=&quot;ALL&quot; AND VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix)SchedSecureObjectsRollback$(var.Suffix)" After="UnpublishFeatures" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -310,11 +310,11 @@
         <CustomAction Id="$(var.Prefix)QueryOsInfo$(var.Suffix)" DllEntry="WixQueryOsInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+            <Custom Action="virtual $(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallExecuteSequence>
 
         <InstallUISequence>
-            <Custom Action="$(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+            <Custom Action="virtual $(var.Prefix)QueryOsInfo$(var.Suffix)" After="AppSearch" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
 
@@ -322,11 +322,11 @@
         <CustomAction Id="$(var.Prefix)QueryOsDirs$(var.Suffix)" DllEntry="WixQueryOsDirs" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)QueryOsDirs$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+            <Custom Action="virtual $(var.Prefix)QueryOsDirs$(var.Suffix)" After="AppSearch" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallExecuteSequence>
 
         <InstallUISequence>
-            <Custom Action="$(var.Prefix)QueryOsDirs$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+            <Custom Action="virtual $(var.Prefix)QueryOsDirs$(var.Suffix)" After="AppSearch" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
 
@@ -334,11 +334,11 @@
         <CustomAction Id="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" DllEntry="WixQueryOsWellKnownSID" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+            <Custom Action="virtual $(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallExecuteSequence>
 
         <InstallUISequence>
-            <Custom Action="$(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+            <Custom Action="virtual $(var.Prefix)QueryOsWellKnownSID$(var.Suffix)" After="AppSearch" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
 
@@ -346,11 +346,11 @@
         <CustomAction Id="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" DllEntry="WixQueryOsDriverInfo" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+            <Custom Action="virtual $(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallExecuteSequence>
 
         <InstallUISequence>
-            <Custom Action="$(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+            <Custom Action="virtual $(var.Prefix)QueryOsDriverInfo$(var.Suffix)" After="AppSearch" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
 
@@ -358,11 +358,11 @@
         <CustomAction Id="$(var.Prefix)QueryNativeMachine$(var.Suffix)" DllEntry="WixQueryNativeMachine" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
 
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)QueryNativeMachine$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+            <Custom Action="virtual $(var.Prefix)QueryNativeMachine$(var.Suffix)" After="AppSearch" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallExecuteSequence>
 
         <InstallUISequence>
-            <Custom Action="$(var.Prefix)QueryNativeMachine$(var.Suffix)" After="AppSearch" Overridable="yes" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
+            <Custom Action="virtual $(var.Prefix)QueryNativeMachine$(var.Suffix)" After="AppSearch" Condition="VersionNT &gt; 400 OR (VersionNT = 400 AND ServicePackLevel &gt; 3)" />
         </InstallUISequence>
     </Fragment>
 
