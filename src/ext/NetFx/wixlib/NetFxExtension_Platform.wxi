@@ -12,11 +12,11 @@
     <CustomAction Id="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" DllEntry="ExecNetFx" Execute="commit" Impersonate="no" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
 
     <InstallExecuteSequence>
-      <Custom Action="$(var.Prefix)NetFxScheduleNativeImage$(var.Suffix)" Before="InstallFiles" Overridable="yes" />
-      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" After="MsiPublishAssemblies" Overridable="yes" Condition="RollbackDisabled &lt;&gt; 1" />
-      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" Overridable="yes" Condition="RollbackDisabled = 1" />
-      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" Overridable="yes" Condition="RollbackDisabled &lt;&gt; 1" />
-      <Custom Action="$(var.Prefix)NetFxExecuteNativeImageInstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" Overridable="yes" Condition="RollbackDisabled = 1" />
+      <Custom Action="virtual $(var.Prefix)NetFxScheduleNativeImage$(var.Suffix)" Before="InstallFiles" />
+      <Custom Action="virtual $(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" After="MsiPublishAssemblies" Condition="RollbackDisabled &lt;&gt; 1" />
+      <Custom Action="virtual $(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageCommitUninstall$(var.Suffix)" Condition="RollbackDisabled = 1" />
+      <Custom Action="virtual $(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageUninstall$(var.Suffix)" Condition="RollbackDisabled &lt;&gt; 1" />
+      <Custom Action="virtual $(var.Prefix)NetFxExecuteNativeImageInstall$(var.Suffix)" After="$(var.Prefix)NetFxExecuteNativeImageCommitInstall$(var.Suffix)" Condition="RollbackDisabled = 1" />
     </InstallExecuteSequence>
   </Fragment>
 
@@ -28,11 +28,11 @@
     <CustomAction Id="$(var.Prefix)NetFxDotNetCompatibilityCheck$(var.Suffix)" DllEntry="DotNetCompatibilityCheck" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)NetFxCA$(var.Suffix)" />
 
     <InstallExecuteSequence>
-      <Custom Action="$(var.Prefix)NetFxDotNetCompatibilityCheck$(var.Suffix)" Before="LaunchConditions" Overridable="yes" />
+      <Custom Action="virtual $(var.Prefix)NetFxDotNetCompatibilityCheck$(var.Suffix)" Before="LaunchConditions" />
     </InstallExecuteSequence>
 
     <InstallUISequence>
-      <Custom Action="$(var.Prefix)NetFxDotNetCompatibilityCheck$(var.Suffix)" Before="LaunchConditions" Overridable="yes" />
+      <Custom Action="virtual $(var.Prefix)NetFxDotNetCompatibilityCheck$(var.Suffix)" Before="LaunchConditions" />
     </InstallUISequence>
 
     <Binary Id="$(var.Prefix)NetCheck_x86" SourceFile="!(bindpath.x86)NetCoreCheck.exe" />

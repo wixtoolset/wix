@@ -5,6 +5,7 @@
 
     <Fragment>
         <UIRef Id="WixFirewallErrors" />
+
         <UI>
             <ProgressText Action="$(var.Prefix5)SchedFirewallExceptionsInstall$(var.Suffix)" Message="!(loc.WixSchedFirewallExceptionsInstall)" />
             <ProgressText Action="$(var.Prefix5)SchedFirewallExceptionsUninstall$(var.Suffix)" Message="!(loc.WixSchedFirewallExceptionsUninstall)" />
@@ -22,11 +23,11 @@
         <CustomAction Id="$(var.Prefix5)ExecFirewallExceptionsUninstall$(var.Suffix)" DllEntry="ExecFirewallExceptions" Execute="deferred" Impersonate="no" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix5)FWCA$(var.Suffix)" />
 
         <!--
-            We need the firewall on Windows Vista or later.
+        We need the firewall on Windows Vista or later.
         -->
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix5)SchedFirewallExceptionsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="VersionNT &gt;= 600" />
-            <Custom Action="$(var.Prefix5)SchedFirewallExceptionsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT &gt;= 600" />
+            <Custom Action="virtual $(var.Prefix5)SchedFirewallExceptionsUninstall$(var.Suffix)" Before="RemoveFiles" Condition="VersionNT &gt;= 600" />
+            <Custom Action="virtual $(var.Prefix5)SchedFirewallExceptionsInstall$(var.Suffix)" After="InstallFiles" Condition="VersionNT &gt;= 600" />
         </InstallExecuteSequence>
     </Fragment>
 

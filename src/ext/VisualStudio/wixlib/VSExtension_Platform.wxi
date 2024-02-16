@@ -6,10 +6,10 @@
     <Fragment>
         <CustomAction Id="$(var.Prefix)VSFindInstances$(var.Suffix)" DllEntry="FindInstances" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="VSCA$(var.Suffix)" />
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)VSFindInstances$(var.Suffix)" Before="AppSearch" Overridable="yes" />
+            <Custom Action="virtual $(var.Prefix)VSFindInstances$(var.Suffix)" Before="AppSearch" />
         </InstallExecuteSequence>
         <InstallUISequence>
-            <Custom Action="$(var.Prefix)VSFindInstances$(var.Suffix)" Before="AppSearch" Overridable="yes" />
+            <Custom Action="virtual $(var.Prefix)VSFindInstances$(var.Suffix)" Before="AppSearch" />
         </InstallUISequence>
     </Fragment>
 

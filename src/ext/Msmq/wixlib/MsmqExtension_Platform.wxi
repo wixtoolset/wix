@@ -15,8 +15,8 @@
     <CustomAction Id="$(var.Prefix)MessageQueuingRollbackUninstall$(var.Suffix)" DllEntry="MessageQueuingRollbackUninstall" Execute="rollback" Return="check" Impersonate="no" SuppressModularization="yes" BinaryRef="$(var.Prefix)MsmqCA$(var.Suffix)" />
 
     <InstallExecuteSequence>
-      <Custom Action="$(var.Prefix)MessageQueuingUninstall$(var.Suffix)" After="DeleteServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
-      <Custom Action="$(var.Prefix)MessageQueuingInstall$(var.Suffix)" Before="InstallServices" Overridable="yes" Condition="VersionNT &gt;= 500" />
+      <Custom Action="virtual $(var.Prefix)MessageQueuingUninstall$(var.Suffix)" After="DeleteServices" Condition="VersionNT &gt;= 500" />
+      <Custom Action="virtual $(var.Prefix)MessageQueuingInstall$(var.Suffix)" Before="InstallServices" Condition="VersionNT &gt;= 500" />
     </InstallExecuteSequence>
   </Fragment>
 

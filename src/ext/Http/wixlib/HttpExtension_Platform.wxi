@@ -26,8 +26,8 @@
             We need the HTTP server on Windows XP SP2 or later.
         -->
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)SchedHttpUrlReservationsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="VersionNT &gt;= 600 OR (VersionNT &gt;= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel &gt;= 2) OR (MsiNTProductType &gt; 1)))" />
-            <Custom Action="$(var.Prefix)SchedHttpUrlReservationsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT &gt;= 600 OR (VersionNT &gt;= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel &gt;= 2) OR (MsiNTProductType &gt; 1)))" />
+            <Custom Action="virtual $(var.Prefix)SchedHttpUrlReservationsUninstall$(var.Suffix)" Before="RemoveFiles" Condition="VersionNT &gt;= 600 OR (VersionNT &gt;= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel &gt;= 2) OR (MsiNTProductType &gt; 1)))" />
+            <Custom Action="virtual $(var.Prefix)SchedHttpUrlReservationsInstall$(var.Suffix)" After="InstallFiles" Condition="VersionNT &gt;= 600 OR (VersionNT &gt;= 501 AND ((MsiNTProductType = 1 AND ServicePackLevel &gt;= 2) OR (MsiNTProductType &gt; 1)))" />
         </InstallExecuteSequence>
     </Fragment>
 
@@ -53,8 +53,8 @@
             We need HTTP.SYS on Windows 8 or later for SNI SSL support.
         -->
         <InstallExecuteSequence>
-            <Custom Action="$(var.Prefix)SchedHttpSniSslCertsUninstall$(var.Suffix)" Before="RemoveFiles" Overridable="yes" Condition="VersionNT >= 602" />
-            <Custom Action="$(var.Prefix)SchedHttpSniSslCertsInstall$(var.Suffix)" After="InstallFiles" Overridable="yes" Condition="VersionNT >= 602" />
+            <Custom Action="virtual $(var.Prefix)SchedHttpSniSslCertsUninstall$(var.Suffix)" Before="RemoveFiles" Condition="VersionNT >= 602" />
+            <Custom Action="virtual $(var.Prefix)SchedHttpSniSslCertsInstall$(var.Suffix)" After="InstallFiles" Condition="VersionNT >= 602" />
         </InstallExecuteSequence>
     </Fragment>
 
