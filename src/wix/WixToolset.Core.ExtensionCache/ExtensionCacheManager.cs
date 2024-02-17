@@ -29,11 +29,15 @@ namespace WixToolset.Core.ExtensionCache
         {
             this.Messaging = messaging;
             this.ExtensionManager = extensionManager;
+
+            this.WixVersion = typeof(ExtensionCacheManager).Assembly.GetName().Version.Major.ToString();
         }
 
         private IMessaging Messaging { get; }
 
         private IExtensionManager ExtensionManager { get; }
+
+        public string WixVersion { get; }
 
         public async Task<bool> AddAsync(bool global, string extension, CancellationToken cancellationToken)
         {
@@ -212,11 +216,16 @@ namespace WixToolset.Core.ExtensionCache
                         {
                             stream.Position = 0;
 
-                            Directory.CreateDirectory(extensionFolder);
-
                             using (var archive = new PackageArchiveReader(stream))
                             {
                                 var files = archive.GetFiles(extensionPackageRootFolderName);
+                                if (!files.Any())
+                                {
+                                    this.Messaging.Write(ExtensionCacheWarnings.MissingExtensionPackageRootFolder(id, nugetVersion.ToString(), extensionPackageRootFolderName, this.WixVersion));
+                                    return false;
+                                }
+
+                                Directory.CreateDirectory(extensionFolder);
                                 await archive.CopyFilesAsync(extensionFolder, files, this.ExtractProgress, logger, cancellationToken);
                             }
 
@@ -266,6 +275,7 @@ namespace WixToolset.Core.ExtensionCache
             var extensionFolder = Path.Combine(baseFolder, extensionId, extensionVersion, packageRootFolderName);
             if (!Directory.Exists(extensionFolder))
             {
+                this.Messaging.Write(ExtensionCacheWarnings.MissingExtensionPackageRootFolder(extensionId, extensionVersion, packageRootFolderName, this.WixVersion));
                 return false;
             }
 
