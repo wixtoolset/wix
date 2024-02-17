@@ -74,6 +74,19 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanOverrideDefaultMajorUpgradeLaunchConditionMessage()
+        {
+            var folder = TestData.Get("TestData", "DefaultMajorUpgradeOverride");
+            var build = new Builder(folder, new Type[] { }, new[] { folder });
+
+            var results = build.BuildAndQuery(Build, "LaunchCondition");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "LaunchCondition:NOT WIX_DOWNGRADE_DETECTED\t[ProductName] does not support downgrading.",
+            }, results);
+        }
+
+        [Fact]
         public void UpgradeStrategyNoneDoesNotCreateDefaultMajorUpgrade()
         {
             var folder = TestData.Get("TestData", "DefaultMajorUpgradeNone");
