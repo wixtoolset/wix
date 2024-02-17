@@ -177,6 +177,15 @@ namespace WixToolsetTest.CoreIntegration
                     {
                         "<Payload Id='test.msi' FilePath='test.msi' FileSize='*' Hash='*' Packaging='embedded' SourcePath='a0' Container='WixAttachedContainer' />",
                     }, msiPayloads);
+
+                    var msiProperties = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsiPackage[@Id='test.msi']/burn:MsiProperty", ignoreAttributesByElementName);
+                    WixAssert.CompareLineByLine(new[]
+                    {
+                        "<MsiProperty Id='TEST' Value='1' />",
+                        "<MsiProperty Id='TESTBLANK' Value='' />",
+                        "<MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' />",
+                        "<MsiProperty Id='MSIFASTINSTALL' Value='7' />",
+                    }, msiProperties);
                 }
 
                 var manifestResource = new Resource(ResourceType.Manifest, "#1", 1033);

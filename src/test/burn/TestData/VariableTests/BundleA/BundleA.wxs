@@ -8,6 +8,7 @@
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)">
         <MsiProperty Name="INSTALLLOCATION" Value="[INSTALLLOCATION]" />
         <MsiProperty Name="LICENSEKEY" Value="[LICENSEKEY]" />
+        <MsiProperty Name="BLANKPROPERTY" Value="" />
       </MsiPackage>
     </PackageGroup>
 
