@@ -3340,7 +3340,7 @@ namespace WixToolset.Core
                             name = this.Core.GetAttributeMsiPropertyNameValue(sourceLineNumbers, attrib);
                             break;
                         case "Value":
-                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
                             break;
                         case "Condition":
                             condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);

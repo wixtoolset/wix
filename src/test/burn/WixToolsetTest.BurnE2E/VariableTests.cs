@@ -30,7 +30,7 @@ namespace WixToolsetTest.BurnE2E
             // Burn logging its command line.
             Assert.True(LogVerifier.MessageInLogFile(logFilePath, "InstallLocation=nothingtoseehere licensekey=*****"));
             // Burn logging the MSI install command line.
-            Assert.True(LogVerifier.MessageInLogFile(logFilePath, "INSTALLLOCATION=\"nothingtoseehere\" LICENSEKEY=\"*****\""));
+            Assert.True(LogVerifier.MessageInLogFile(logFilePath, "INSTALLLOCATION=\"nothingtoseehere\" LICENSEKEY=\"*****\" BLANKPROPERTY=\"\""));
             Assert.False(LogVerifier.MessageInLogFile(logFilePath, "supersecretkey"));
         }
 

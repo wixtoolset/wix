@@ -6,6 +6,7 @@
     <Chain>
       <MsiPackage SourceFile="test.msi">
         <MsiProperty Name="TEST" Value="1" />
+        <MsiProperty Name="TESTBLANK" Value="" />
       </MsiPackage>
     </Chain>
   </Bundle>
