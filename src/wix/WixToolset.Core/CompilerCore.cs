@@ -703,7 +703,9 @@ namespace WixToolset.Core
 
             if (0 < value.Length)
             {
-                if (!this.parseHelper.IsValidShortFilename(value, allowWildcards) && !Common.ContainsValidBinderVariable(value))
+                if (!this.parseHelper.IsValidShortFilename(value, allowWildcards)
+                    && !Common.ContainsValidBinderVariable(value)
+                    && !this.IsValidLocIdentifier(value))
                 {
                     this.Write(ErrorMessages.IllegalShortFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
