@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <Content Include="$(MSBuildProjectName).targets" PackagePath="build" />
-    <Content Include="$(TargetPath)" PackagePath="wixext4" />
+    <Content Include="$(TargetPath)" PackagePath="wixext5" />
 
     <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
   </ItemGroup>

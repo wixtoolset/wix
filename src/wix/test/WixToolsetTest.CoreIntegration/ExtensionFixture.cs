@@ -12,6 +12,8 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using Xunit;
+    using System.Diagnostics;
+    using System.Reflection;
 
     public class ExtensionFixture
     {
@@ -290,7 +292,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Depends on a v5 extension being available, which isn't true for nuget.org yet or this early in the build.")]
         public void CanManipulateExtensionCache()
         {
             var currentFolder = Environment.CurrentDirectory;
@@ -304,7 +306,7 @@ namespace WixToolsetTest.CoreIntegration
 
                     var result = WixRunner.Execute(new[]
                     {
-                        "extension", "add", "WixToolset.UI.wixext"
+                        "extension", "add", "WixToolset.UI.wixext",
                     });
 
                     result.AssertSuccess();
@@ -318,8 +320,12 @@ namespace WixToolsetTest.CoreIntegration
                     });
 
                     result.AssertSuccess();
+
                     var output = result.Messages.Select(m => m.ToString()).Single();
-                    Assert.StartsWith("WixToolset.UI.wixext 4.", output);
+                    var executingAssembly = Assembly.GetExecutingAssembly();
+                    var fileVersion = FileVersionInfo.GetVersionInfo(executingAssembly.Location);
+
+                    Assert.StartsWith($"WixToolset.UI.wixext {fileVersion.FileMajorPart}", output);
                     Assert.DoesNotContain("damaged", output);
 
                     result = WixRunner.Execute(new[]
@@ -329,6 +335,33 @@ namespace WixToolsetTest.CoreIntegration
 
                     result.AssertSuccess();
                     Assert.False(Directory.Exists(cacheFolder), $"Expected folder '{cacheFolder}' to NOT exist");
+                }
+            }
+            finally
+            {
+                Environment.CurrentDirectory = currentFolder;
+            }
+        }
+
+        [Fact]
+        public void TryingToAddAV4ExtensionFails()
+        {
+            var currentFolder = Environment.CurrentDirectory;
+
+            try
+            {
+                using (var fs = new DisposableFileSystem())
+                {
+                    var folder = fs.GetFolder(true);
+                    Environment.CurrentDirectory = folder;
+
+                    var result = WixRunner.Execute(new[]
+                    {
+                        "extension", "add", "WixToolset.UI.wixext/4.0.4",
+                    });
+
+                    Assert.Equal(2, result.ExitCode);
+                    Assert.Equal(6101, result.Messages.Single().Id);
                 }
             }
             finally
