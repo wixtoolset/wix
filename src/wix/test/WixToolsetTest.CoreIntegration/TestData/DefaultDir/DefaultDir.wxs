@@ -10,6 +10,7 @@
         <DirectoryRef Id="INSTALLFOLDER">
             <Directory Id="DUPLICATENAMEANDSHORTNAME" Name="duplicat" ShortName="duplicat"></Directory>
             <Directory Id="NAMEWITHSHORTVALUE" Name="SHORTVAL"></Directory>
+            <Directory Id="NAMEANDSHORTNAMEVIALOCSTRING" Name="ShortName" ShortName="!(loc.ShortVal)"></Directory>
             <Directory Id="NAMEANDSHORTNAME" Name="NameAndShortName" ShortName="SHORTNAM"></Directory>
             <Directory Id="SHORTNAMEONLY" Name="SHORTONL"></Directory>
             <Directory Id="SOURCENAME" Name="NameAndSourceName" SourceName="SourceNameWithName"></Directory>

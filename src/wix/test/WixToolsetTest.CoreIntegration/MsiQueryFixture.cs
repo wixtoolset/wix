@@ -233,6 +233,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-sw1031", // this is expected for this test
                     Path.Combine(folder, "DefaultDir", "DefaultDir.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-loc", Path.Combine(folder, "DefaultDir", "Package.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", msiPath
@@ -252,6 +253,7 @@ namespace WixToolsetTest.CoreIntegration
                     "Directory:GitFolder\tINSTALLFOLDER\t69sdfw2d|.git",
                     "Directory:INSTALLFOLDER\tProgramFiles6432Folder\t1egc1laj|MsiPackage",
                     "Directory:NAMEANDSHORTNAME\tINSTALLFOLDER\tSHORTNAM|NameAndShortName",
+                    "Directory:NAMEANDSHORTNAMEVIALOCSTRING\tINSTALLFOLDER\tSHRTNAME|ShortName",
                     "Directory:NAMEANDSHORTSOURCENAME\tINSTALLFOLDER\tNAMEASSN|NameAndShortSourceName",
                     "Directory:NAMEWITHSHORTVALUE\tINSTALLFOLDER\tSHORTVAL",
                     "Directory:ProgramFiles6432Folder\tProgramFilesFolder\t.",
