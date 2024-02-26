@@ -64,6 +64,13 @@ HRESULT DAPI LogOpen(
 void DAPI LogDisable();
 
 /********************************************************************
+ LogEnableConsole - Log to console as well
+********************************************************************/
+void DAPI LogEnableConsole(
+    __in BOOL fLogToConsole
+    );
+
+/********************************************************************
  LogRedirect - Redirects all logging strings to the specified
                function - or set NULL to disable the hook
 ********************************************************************/
@@ -132,7 +139,7 @@ REPORT_LEVEL DAPI LogGetLevel();
 
 ********************************************************************/
 HRESULT DAPI LogGetPath(
-    __out_ecount_z(cchLogPath) LPWSTR pwzLogPath, 
+    __out_ecount_z(cchLogPath) LPWSTR pwzLogPath,
     __in DWORD cchLogPath
     );
 
