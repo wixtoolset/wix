@@ -4506,7 +4506,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
             {
                 var xError = new XElement(Names.ErrorElement,
                     new XAttribute("Id", row.FieldAsString(0)),
-                    new XAttribute("Message", row.FieldAsString(1)));
+                    row.IsColumnNull(1) ? null : new XAttribute("Message", row.FieldAsString(1)));
 
                 this.UIElement.Add(xError);
             }
