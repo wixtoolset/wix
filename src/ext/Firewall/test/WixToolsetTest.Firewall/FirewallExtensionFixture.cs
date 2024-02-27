@@ -48,7 +48,7 @@ namespace WixToolsetTest.Firewall
                 "Wix5FirewallException:fexv60s7u2Dmd1imH5vEFYKPgEWhG4\tinterface nested\t127.0.0.1\t54671\t6\t\t0\t-2147483648\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tInterfaces with nested elements\t1\t-2147483648\t-2147483648\t-2147483648\t\t\tWi-Fi|Local Area Connection\t\t\t\t\t\t\t\t\t\t-2147483648",
                 "Wix5FirewallException:fexVr6uHcOCak5MHuTLwujjh_oKtbI\tGroupingExample2\t\t8732\t6\t\t0\t-2147483648\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tRule with grouping property\t1\t-2147483648\t-2147483648\t-2147483648\t[GROUPING_PROP]\t\t\t\t\t\t\t\t\t\t\t\t-2147483648",
                 "Wix5FirewallException:fexwjf4OTFVE9SNiC4goVxBA6ENJBE\tINetFwRule3 values\t*\t\t-2147483648\t\t16\t-2147483648\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tSimple INetFwRule3 values\t1\t-2147483648\t-2147483648\t-2147483648\t\t\t\t\t\t\t\tS-1-15-2-1239072475-3687740317-1842961305-3395936705-4023953123-1525404051-2779347315\tO:LSD:(A;;CC;;;S-1-5-84-0-0-0-0-0)\tS-1-5-21-1898747406-2352535518-1247798438-1914\t127.0.0.1\tO:LSD:(A;;CC;;;S-1-5-84-0-0-0-0-0)\t3",
-                "Wix5FirewallException:ServiceInstall.nested\tExampleNestedService\tLocalSubnet\t3546-7890\t6\t\t1\t-2147483648\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tA port-based firewall exception for a windows service\t1\t-2147483648\t-2147483648\t-2147483648\t\t\t\tLan,Wireless\t\t\tsvc1\t\t\t\t\t\t-2147483648",
+                "Wix5FirewallException:ServiceInstall.nested\tExampleNestedService\tLocalSubnet\t3546-7890\t6\t\t1\t-2147483648\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tA port-based firewall exception for a Windows service\t1\t-2147483648\t-2147483648\t-2147483648\t\t\t\tLan,Wireless\t\t\tsvc1\t\t\t\t\t\t-2147483648",
             }, results);
         }
 
@@ -87,7 +87,7 @@ namespace WixToolsetTest.Firewall
                 "Wix5FirewallException:fexv60s7u2Dmd1imH5vEFYKPgEWhG4\tinterface nested\t127.0.0.1\t54671\t6\t\t0\t-2147483648\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tInterfaces with nested elements\t1\t-2147483648\t-2147483648\t-2147483648\t\t\tWi-Fi|Local Area Connection\t\t\t\t\t\t\t\t\t\t-2147483648",
                 "Wix5FirewallException:fexVr6uHcOCak5MHuTLwujjh_oKtbI\tGroupingExample2\t\t8732\t6\t\t0\t-2147483648\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tRule with grouping property\t1\t-2147483648\t-2147483648\t-2147483648\t[GROUPING_PROP]\t\t\t\t\t\t\t\t\t\t\t\t-2147483648",
                 "Wix5FirewallException:fexwjf4OTFVE9SNiC4goVxBA6ENJBE\tINetFwRule3 values\t*\t\t-2147483648\t\t16\t-2147483648\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tSimple INetFwRule3 values\t1\t-2147483648\t-2147483648\t-2147483648\t\t\t\t\t\t\t\tS-1-15-2-1239072475-3687740317-1842961305-3395936705-4023953123-1525404051-2779347315\tO:LSD:(A;;CC;;;S-1-5-84-0-0-0-0-0)\tS-1-5-21-1898747406-2352535518-1247798438-1914\t127.0.0.1\tO:LSD:(A;;CC;;;S-1-5-84-0-0-0-0-0)\t3",
-                "Wix5FirewallException:ServiceInstall.nested\tExampleNestedService\tLocalSubnet\t3546-7890\t6\t\t1\t-2147483648\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tA port-based firewall exception for a windows service\t1\t-2147483648\t-2147483648\t-2147483648\t\t\t\tLan,Wireless\t\t\tsvc1\t\t\t\t\t\t-2147483648",
+                "Wix5FirewallException:ServiceInstall.nested\tExampleNestedService\tLocalSubnet\t3546-7890\t6\t\t1\t-2147483648\tfilNdJBJmq3UCUIwmXS8x21aAsvqzk\tA port-based firewall exception for a Windows service\t1\t-2147483648\t-2147483648\t-2147483648\t\t\t\tLan,Wireless\t\t\tsvc1\t\t\t\t\t\t-2147483648",
             }, results);
         }
 
@@ -224,7 +224,7 @@ namespace WixToolsetTest.Firewall
                 "Port=42",
                 "Protocol=tcp",
                 "Program=[#filNdJBJmq3UCUIwmXS8x21aAsvqzk]",
-                "OnUpdate=DoNothing",
+                "OnUpdate=doNothing",
                 "Description=An app-based firewall exception",
                 "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall",
             }, actual.Attributes);
@@ -241,7 +241,7 @@ namespace WixToolsetTest.Firewall
                 "Scope=localSubnet",
                 "Port=42",
                 "Protocol=tcp",
-                "OnUpdate=EnableOnly",
+                "OnUpdate=enableOnly",
                 "Description=A port-based firewall exception",
                 "Outbound=yes",
                 "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall",
@@ -330,7 +330,7 @@ namespace WixToolsetTest.Firewall
                 "LocalUserOwner=S-1-5-21-1898747406-2352535518-1247798438-1914",
                 "RemoteMachineAuthorizedList=127.0.0.1",
                 "RemoteUserAuthorizedList=O:LSD:(A;;CC;;;S-1-5-84-0-0-0-0-0)",
-                "IPSecSecureFlags=NegotiateEncryption",
+                "IPSecSecureFlags=negotiateEncryption",
                 "xmlns=http://wixtoolset.org/schemas/v4/wxs/firewall",
             }, actual.Attributes);
         }

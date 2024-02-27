@@ -155,6 +155,16 @@ namespace WixToolset.Firewall
                                 file = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             }
                             break;
+                        case "Program":
+                            if (fileId != null)
+                            {
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, "Program", parentElement.Name.LocalName));
+                            }
+                            else
+                            {
+                                program = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            }
+                            break;
                         case "IgnoreFailure":
                             if (this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes)
                             {
@@ -165,26 +175,16 @@ namespace WixToolset.Firewall
                             var onupdate = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (onupdate)
                             {
-                                case "DoNothing":
+                                case "doNothing":
                                     attributes |= 0x2; // feaIgnoreUpdates
                                     break;
-                                case "EnableOnly":
+                                case "enableOnly":
                                     attributes |= 0x4; // feaEnableOnUpdate
                                     break;
 
                                 default:
-                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "OnUpdate", onupdate, "EnableOnly", "DoNothing"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "OnUpdate", onupdate, "enableOnly", "doNothing"));
                                     break;
-                            }
-                            break;
-                        case "Program":
-                            if (fileId != null)
-                            {
-                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, element.Name.LocalName, "Program", parentElement.Name.LocalName));
-                            }
-                            else
-                            {
-                                program = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             }
                             break;
                         case "Port":
@@ -284,17 +284,17 @@ namespace WixToolset.Firewall
                             action = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (action)
                             {
-                                case "Block":
+                                case "block":
                                     action = "0";
                                     break;
-                                case "Allow":
+                                case "allow":
                                     action = "1";
                                     break;
 
                                 default:
                                     if (!this.ParseHelper.ContainsProperty(action))
                                     {
-                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Action", action, "Allow", "Block"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Action", action, "allow", "block"));
                                     }
                                     break;
                             }
@@ -303,17 +303,17 @@ namespace WixToolset.Firewall
                             edgeTraversal = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (edgeTraversal)
                             {
-                                case "Deny":
+                                case "deny":
                                     edgeTraversal = FirewallConstants.NET_FW_EDGE_TRAVERSAL_TYPE_DENY.ToString();
                                     break;
-                                case "Allow":
+                                case "allow":
                                     edgeTraversal = FirewallConstants.NET_FW_EDGE_TRAVERSAL_TYPE_ALLOW.ToString();
                                     break;
-                                case "DeferToApp":
+                                case "deferToApp":
                                     attributes |= 0x8; // feaAddINetFwRule2
                                     edgeTraversal = FirewallConstants.NET_FW_EDGE_TRAVERSAL_TYPE_DEFER_TO_APP.ToString();
                                     break;
-                                case "DeferToUser":
+                                case "deferToUser":
                                     attributes |= 0x8; // feaAddINetFwRule2
                                     edgeTraversal = FirewallConstants.NET_FW_EDGE_TRAVERSAL_TYPE_DEFER_TO_USER.ToString();
                                     break;
@@ -321,7 +321,7 @@ namespace WixToolset.Firewall
                                 default:
                                     if (!this.ParseHelper.ContainsProperty(edgeTraversal))
                                     {
-                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "EdgeTraversal", edgeTraversal, "Allow", "DeferToApp", "DeferToUser", "Deny"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "EdgeTraversal", edgeTraversal, "allow", "deferToApp", "deferToUser", "deny"));
                                     }
                                     break;
                             }
@@ -338,7 +338,6 @@ namespace WixToolset.Firewall
                                     case YesNoType.No:
                                         enabled = "0";
                                         break;
-
                                     default:
                                         this.Messaging.Write(ErrorMessages.IllegalYesNoValue(sourceLineNumbers, element.Name.LocalName, "Enabled", enabled));
                                         break;
@@ -359,16 +358,16 @@ namespace WixToolset.Firewall
                             interfaceTypeValue = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             switch (interfaceTypeValue)
                             {
-                                case "RemoteAccess":
-                                case "Wireless":
-                                case "Lan":
-                                case "All":
+                                case "remoteAccess":
+                                case "wireless":
+                                case "lan":
+                                case "all":
                                     break;
 
                                 default:
                                     if (!this.ParseHelper.ContainsProperty(interfaceTypeValue))
                                     {
-                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "InterfaceType", interfaceTypeValue, "RemoteAccess", "Wireless", "Lan", "All"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "InterfaceType", interfaceTypeValue, "remoteAccess", "wireless", "lan", "all"));
                                     }
                                     break;
                             }
@@ -449,23 +448,23 @@ namespace WixToolset.Firewall
                             {
                                 switch (secureFlags)
                                 {
-                                    case "None":
+                                    case "none":
                                         secureFlags = "0";
                                         break;
-                                    case "NoEncapsulation":
+                                    case "noEncapsulation":
                                         secureFlags = "1";
                                         break;
-                                    case "WithIntegrity":
+                                    case "withIntegrity":
                                         secureFlags = "2";
                                         break;
-                                    case "NegotiateEncryption":
+                                    case "negotiateEncryption":
                                         secureFlags = "3";
                                         break;
-                                    case "Encrypt":
+                                    case "encrypt":
                                         secureFlags = "4";
                                         break;
                                     default:
-                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "IPSecSecureFlags", secureFlags, "None", "NoEncapsulation", "WithIntegrity", "NegotiateEncryption", "Encrypt"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "IPSecSecureFlags", secureFlags, "none", "noEncapsulation", "withIntegrity", "negotiateEncryption", "encrypt"));
                                         break;
                                 }
                             }
@@ -573,43 +572,43 @@ namespace WixToolset.Firewall
 
                 if (String.IsNullOrEmpty(fileId) && String.IsNullOrEmpty(file) && String.IsNullOrEmpty(program))
                 {
-                    this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Program", "EdgeTraversal", "DeferToUser"));
+                    this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Program", "EdgeTraversal", "deferToUser"));
                 }
 
                 if (port != null)
                 {
-                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Port", "EdgeTraversal", "DeferToUser"));
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Port", "EdgeTraversal", "deferToUser"));
                 }
 
                 if (remotePort != null)
                 {
-                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "RemotePort", "EdgeTraversal", "DeferToUser"));
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "RemotePort", "EdgeTraversal", "deferToUser"));
                 }
 
                 if (localScope != null)
                 {
-                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "LocalScope", "EdgeTraversal", "DeferToUser"));
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "LocalScope", "EdgeTraversal", "deferToUser"));
                 }
 
                 if (scope != null)
                 {
-                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Scope", "EdgeTraversal", "DeferToUser"));
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Scope", "EdgeTraversal", "deferToUser"));
                 }
 
                 if (profile != null)
                 {
-                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Profile", "EdgeTraversal", "DeferToUser"));
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Profile", "EdgeTraversal", "deferToUser"));
                 }
 
                 if (service != null)
                 {
                     if (serviceName != null)
                     {
-                        this.Messaging.Write(ErrorMessages.IllegalAttributeValueWhenNested(sourceLineNumbers, element.Name.LocalName, "EdgeTraversal", "DeferToUser", parentElement.Name.LocalName));
+                        this.Messaging.Write(ErrorMessages.IllegalAttributeValueWhenNested(sourceLineNumbers, element.Name.LocalName, "EdgeTraversal", "deferToUser", parentElement.Name.LocalName));
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Service", "EdgeTraversal", "DeferToUser"));
+                        this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Service", "EdgeTraversal", "deferToUser"));
                     }
                 }
             }
@@ -807,16 +806,23 @@ namespace WixToolset.Firewall
             {
                 switch (value)
                 {
-                    case "RemoteAccess":
-                    case "Wireless":
-                    case "Lan":
-                    case "All":
+                    case "remoteAccess":
+                        value = "RemoteAccess";
+                        break;
+                    case "wireless":
+                        value = "Wireless";
+                        break;
+                    case "lan":
+                        value = "Lan";
+                        break;
+                    case "all":
+                        value = "All";
                         break;
 
                     default:
                         if (!this.ParseHelper.ContainsProperty(value))
                         {
-                            this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Value", value, "RemoteAccess", "Wireless", "Lan", "All"));
+                            this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Value", value, "remoteAccess", "wireless", "lan", "all"));
                             value = null;
                         }
                         break;
