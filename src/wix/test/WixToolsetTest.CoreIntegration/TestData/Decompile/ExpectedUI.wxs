@@ -542,6 +542,7 @@
     </UI>
     <CustomAction Id="WixUIValidatePath" Return="ignore" BinaryRef="WixUIWixca" DllEntry="ValidatePath" />
     <CustomAction Id="WixUIPrintEula" Return="ignore" BinaryRef="WixUIWixca" DllEntry="PrintEula" />
+    <Error Id="123" />
     <Feature Id="ProductFeature" Title="ui" Level="1">
       <ComponentRef Id="ProductComponent" />
     </Feature>
