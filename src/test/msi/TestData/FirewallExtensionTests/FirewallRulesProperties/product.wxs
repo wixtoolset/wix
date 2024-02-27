@@ -11,7 +11,7 @@
     <Fragment>
         <Component Id="FirewallComponent1" Guid="A1553D10-BEB7-4E60-A0DC-6F1EEE5A1719" Directory="INSTALLFOLDER">
                 <fw:FirewallException
-					Name="WiXToolset Test - 0028" OnUpdate="EnableOnly"
+					Name="WiXToolset Test - 0028" OnUpdate="enableOnly"
 					Port="[LOCALPORT]"
 					Protocol="[PROTOCOL]"
 					Program="[PROGRAM]"
@@ -35,7 +35,7 @@
 					IPSecSecureFlags="[SECUREFLAGS]"
 					/>
 
-                <fw:FirewallException Name="WiXToolset Test - 0029" OnUpdate="DoNothing" >
+                <fw:FirewallException Name="WiXToolset Test - 0029" OnUpdate="doNothing" >
 					<fw:RemoteAddress Value="[REMOTEADDRESS]" />
 					<fw:LocalAddress Value="[LOCALADDRESS]" />
                     <fw:InterfaceType Value="[INTERFACETYPE]" />

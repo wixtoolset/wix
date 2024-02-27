@@ -17,9 +17,9 @@
 					<fw:Interface Name="[INTERFACE1]" />
 					<fw:Interface Name="[INTERFACE2]" />
                     <fw:Interface Name="[INTERFACE3]" />
-                    <fw:InterfaceType Value="RemoteAccess" />
-                    <fw:InterfaceType Value="Lan" />
-                    <fw:InterfaceType Value="Wireless" />
+                    <fw:InterfaceType Value="remoteAccess" />
+                    <fw:InterfaceType Value="lan" />
+                    <fw:InterfaceType Value="wireless" />
                 </fw:FirewallException>
             </File>
 

@@ -4,6 +4,8 @@ namespace WixToolset.Firewall
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
+    using System.Security;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
@@ -161,11 +163,11 @@ namespace WixToolset.Firewall
 
                     if ((attr & 0x2) == 0x2)
                     {
-                        firewallException.Add(new XAttribute("OnUpdate", "DoNothing"));
+                        firewallException.Add(new XAttribute("OnUpdate", "doNothing"));
                     }
                     else if ((attr & 0x4) == 0x4)
                     {
-                        firewallException.Add(new XAttribute("OnUpdate", "EnableOnly"));
+                        firewallException.Add(new XAttribute("OnUpdate", "enableOnly"));
                     }
                 }
 
@@ -222,10 +224,10 @@ namespace WixToolset.Firewall
                             case FirewallConstants.IntegerNotSetString:
                                 break;
                             case "1":
-                                firewallException.Add(new XAttribute("Action", "Allow"));
+                                firewallException.Add(new XAttribute("Action", "allow"));
                                 break;
                             case "0":
-                                firewallException.Add(new XAttribute("Action", "Block"));
+                                firewallException.Add(new XAttribute("Action", "block"));
                                 break;
                             default:
                                 firewallException.Add(new XAttribute("Action", action));
@@ -241,16 +243,16 @@ namespace WixToolset.Firewall
                             case FirewallConstants.IntegerNotSetString:
                                 break;
                             case "0":
-                                firewallException.Add(new XAttribute("EdgeTraversal", "Deny"));
+                                firewallException.Add(new XAttribute("EdgeTraversal", "deny"));
                                 break;
                             case "1":
-                                firewallException.Add(new XAttribute("EdgeTraversal", "Allow"));
+                                firewallException.Add(new XAttribute("EdgeTraversal", "allow"));
                                 break;
                             case "2":
-                                firewallException.Add(new XAttribute("EdgeTraversal", "DeferToApp"));
+                                firewallException.Add(new XAttribute("EdgeTraversal", "deferToApp"));
                                 break;
                             case "3":
-                                firewallException.Add(new XAttribute("EdgeTraversal", "DeferToUser"));
+                                firewallException.Add(new XAttribute("EdgeTraversal", "deferToUser"));
                                 break;
                             default:
                                 firewallException.Add(new XAttribute("EdgeTraversal", edgeTraversal));
@@ -292,13 +294,13 @@ namespace WixToolset.Firewall
                         string[] interfaces = row.FieldAsString(16).Split(new[] { FirewallConstants.FORBIDDEN_FIREWALL_CHAR }, StringSplitOptions.RemoveEmptyEntries);
                         if (interfaces.Length == 1)
                         {
-                            firewallException.Add(new XAttribute("Interface", interfaces[0]));
+                            firewallException.Add(new XAttribute("Interface", interfaces[0].ToCamelCase()));
                         }
                         else
                         {
                             foreach (var interfaceItem in interfaces)
                             {
-                                FirewallDecompiler.AddInterface(firewallException, interfaceItem);
+                                FirewallDecompiler.AddInterface(firewallException, interfaceItem.ToCamelCase());
                             }
                         }
                     }
@@ -308,13 +310,13 @@ namespace WixToolset.Firewall
                         string[] interfaceTypes = row.FieldAsString(17).Split(',');
                         if (interfaceTypes.Length == 1)
                         {
-                            firewallException.Add(new XAttribute("InterfaceType", interfaceTypes[0]));
+                            firewallException.Add(new XAttribute("InterfaceType", interfaceTypes[0].ToCamelCase()));
                         }
                         else
                         {
                             foreach (var interfaceType in interfaceTypes)
                             {
-                                FirewallDecompiler.AddInterfaceType(firewallException, interfaceType);
+                                FirewallDecompiler.AddInterfaceType(firewallException, interfaceType.ToCamelCase());
                             }
                         }
                     }
@@ -408,19 +410,19 @@ namespace WixToolset.Firewall
                             case FirewallConstants.IntegerNotSetString:
                                 break;
                             case "0":
-                                firewallException.Add(new XAttribute("IPSecSecureFlags", "None"));
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", "none"));
                                 break;
                             case "1":
-                                firewallException.Add(new XAttribute("IPSecSecureFlags", "NoEncapsulation"));
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", "noEncapsulation"));
                                 break;
                             case "2":
-                                firewallException.Add(new XAttribute("IPSecSecureFlags", "WithIntegrity"));
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", "withIntegrity"));
                                 break;
                             case "3":
-                                firewallException.Add(new XAttribute("IPSecSecureFlags", "NegotiateEncryption"));
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", "negotiateEncryption"));
                                 break;
                             case "4":
-                                firewallException.Add(new XAttribute("IPSecSecureFlags", "Encrypt"));
+                                firewallException.Add(new XAttribute("IPSecSecureFlags", "encrypt"));
                                 break;
                             default:
                                 firewallException.Add(new XAttribute("IPSecSecureFlags", secureFlags));
@@ -497,6 +499,16 @@ namespace WixToolset.Firewall
                     }
                 }
             }
+        }
+    }
+
+    internal static class StringExtensions
+    {
+        public static string ToCamelCase(this string str)
+        {
+            var camelCase = str[0].ToString().ToLowerInvariant() + str.Substring(1);
+
+            return camelCase;
         }
     }
 }
