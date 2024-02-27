@@ -506,6 +506,11 @@ namespace WixToolset.Firewall
     {
         public static string ToCamelCase(this string str)
         {
+            if (String.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+
             var camelCase = str[0].ToString().ToLowerInvariant() + str.Substring(1);
 
             return camelCase;

@@ -369,7 +369,7 @@ HRESULT VerifySectionMatchesMemoryPEHeader(
     if (sizeof(BURN_SECTION_HEADER) > pSectionHeader->SizeOfRawData)
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Failed to read section info, data to short: %u", pSectionHeader->SizeOfRawData);
+        ExitOnRootFailure(hr, "Failed to read section info, data too short: %u", pSectionHeader->SizeOfRawData);
     }
 
     // Get Burn section info.
