@@ -72,9 +72,9 @@ namespace WixToolset.Core.Burn.CommandLine
                             reader.ExtractAttachedContainers(this.ExtractContainersPath, this.IntermediateFolder);
                         }
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        this.Messaging.Write(BurnBackendWarnings.FailedToExtractAttachedContainers(new SourceLineNumber(this.ExtractContainersPath)));
+                        this.Messaging.Write(BurnBackendWarnings.FailedToExtractAttachedContainers(new SourceLineNumber(this.ExtractContainersPath), e.Message));
                     }
                 }
             }

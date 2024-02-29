@@ -26,9 +26,9 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.EmptyContainer, "The Container '{0}' is being ignored because it doesn't have any payloads.", containerId);
         }
 
-        public static Message FailedToExtractAttachedContainers(SourceLineNumber sourceLineNumbers)
+        public static Message FailedToExtractAttachedContainers(SourceLineNumber sourceLineNumbers, string message)
         {
-            return Message(sourceLineNumbers, Ids.FailedToExtractAttachedContainers, "Failed to extract attached container. This most often happens when extracting a stripped bundle from the package cache, which is not supported.");
+            return Message(sourceLineNumbers, Ids.FailedToExtractAttachedContainers, "Failed to extract attached container. This most often happens when extracting a stripped bundle from the package cache, which is not supported. Detail: {0}", message);
         }
 
         public static Message HiddenBundleNotSupported(SourceLineNumber sourceLineNumbers, string packageId)
