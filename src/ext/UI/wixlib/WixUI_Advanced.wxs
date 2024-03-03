@@ -8,7 +8,7 @@ installs, install path, and features.
 WiX variables used:
  - WixUISupportPerMachine
  - WixUISupportPerUser
- 
+
 Todo:
  - Clicking Install doesn't work! - APPLICATIONFOLDER isn't set; need to accept another "incoming" property.
  - Replace this dialog set UI fragment with the UI extension.
@@ -33,8 +33,8 @@ Todo:
     <?endforeach?>
 
     <Fragment>
-        <WixVariable Id="WixUISupportPerUser" Value="1" Overridable="yes" />
-        <WixVariable Id="WixUISupportPerMachine" Value="1" Overridable="yes" />
+        <WixVariable Id="virtual WixUISupportPerUser" Value="1" />
+        <WixVariable Id="virtual WixUISupportPerMachine" Value="1" />
 
         <PropertyRef Id="ApplicationFolderName" />
 
@@ -119,7 +119,7 @@ Todo:
         </UI>
 
         <InstallUISequence>
-            <Show Dialog="WelcomeDlg" Before="AdvancedWelcomeEulaDlg" Condition="Installed AND PATCH" />
+            <Show Dialog="override WelcomeDlg" Before="AdvancedWelcomeEulaDlg" Condition="Installed AND PATCH" />
         </InstallUISequence>
 
         <Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONFOLDER" />

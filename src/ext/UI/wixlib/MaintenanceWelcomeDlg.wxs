@@ -19,7 +19,7 @@
             </Dialog>
 
             <InstallUISequence>
-                <Show Dialog="MaintenanceWelcomeDlg" Before="ProgressDlg" Overridable="yes" Condition="Installed AND NOT RESUME AND NOT Preselected AND NOT PATCH" />
+                <Show Dialog="virtual MaintenanceWelcomeDlg" Before="ProgressDlg" Condition="Installed AND NOT RESUME AND NOT Preselected AND NOT PATCH" />
             </InstallUISequence>
         </UI>
     </Fragment>

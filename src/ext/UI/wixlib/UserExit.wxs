@@ -17,11 +17,11 @@
             </Dialog>
 
             <InstallUISequence>
-                <Show Dialog="UserExit" OnExit="cancel" Overridable="yes" />
+                <Show Dialog="virtual UserExit" OnExit="cancel" />
             </InstallUISequence>
 
             <AdminUISequence>
-                <Show Dialog="UserExit" OnExit="cancel" Overridable="yes" />
+                <Show Dialog="virtual UserExit" OnExit="cancel" />
             </AdminUISequence>
         </UI>
     </Fragment>

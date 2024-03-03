@@ -17,11 +17,11 @@
             </Dialog>
 
             <InstallUISequence>
-                <Show Dialog="FatalError" OnExit="error" Overridable="yes" />
+                <Show Dialog="virtual FatalError" OnExit="error" />
             </InstallUISequence>
 
             <AdminUISequence>
-                <Show Dialog="FatalError" OnExit="error" Overridable="yes" />
+                <Show Dialog="virtual FatalError" OnExit="error" />
             </AdminUISequence>
         </UI>
     </Fragment>

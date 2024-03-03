@@ -37,7 +37,7 @@
         </UI>
 
         <InstallUISequence>
-            <Show Dialog="WelcomeEulaDlg" Before="ProgressDlg" Overridable="yes" Condition="NOT Installed" />
+            <Show Dialog="virtual WelcomeEulaDlg" Before="ProgressDlg" Condition="NOT Installed" />
         </InstallUISequence>
     </Fragment>
 </Wix>

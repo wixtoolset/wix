@@ -32,7 +32,7 @@
             </Dialog>
 
             <InstallUISequence>
-                <Show Dialog="ResumeDlg" Before="ProgressDlg" Overridable="yes" Condition="Installed AND (RESUME OR Preselected)" />
+                <Show Dialog="virtual ResumeDlg" Before="ProgressDlg" Condition="Installed AND (RESUME OR Preselected)" />
             </InstallUISequence>
         </UI>
     </Fragment>

@@ -34,7 +34,7 @@
             </Dialog>
 
             <InstallUISequence>
-                <Show Dialog="ProgressDlg" Before="ExecuteAction" Overridable="yes" />
+                <Show Dialog="virtual ProgressDlg" Before="ExecuteAction" />
             </InstallUISequence>
         </UI>
     </Fragment>
