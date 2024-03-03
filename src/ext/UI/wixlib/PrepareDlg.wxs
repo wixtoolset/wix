@@ -23,7 +23,7 @@
             </Dialog>
 
             <InstallUISequence>
-                <Show Dialog="PrepareDlg" Before="AppSearch" Overridable="yes" />
+                <Show Dialog="virtual PrepareDlg" Before="AppSearch" />
             </InstallUISequence>
         </UI>
     </Fragment>

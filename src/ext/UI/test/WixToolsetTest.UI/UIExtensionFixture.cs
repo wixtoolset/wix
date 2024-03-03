@@ -405,8 +405,8 @@ namespace WixToolsetTest.UI
 
         private static void Build(string[] args)
         {
-            var result = WixRunner.Execute(args)
-                                  .AssertSuccess();
+            var result = WixRunner.Execute(args);
+            result.AssertSuccess();
         }
 
         private static void BuildX64(string[] args)

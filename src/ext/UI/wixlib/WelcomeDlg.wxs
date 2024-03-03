@@ -20,7 +20,7 @@
             </Dialog>
 
             <InstallUISequence>
-                <Show Dialog="WelcomeDlg" Before="ProgressDlg" Overridable="yes" Condition="NOT Installed OR PATCH" />
+                <Show Dialog="virtual WelcomeDlg" Before="ProgressDlg" Condition="NOT Installed OR PATCH" />
             </InstallUISequence>
         </UI>
     </Fragment>
