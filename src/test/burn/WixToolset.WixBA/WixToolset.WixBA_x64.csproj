@@ -23,10 +23,6 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)'=='.NETFramework' ">
-    <Content Include="WixBA.BootstrapperCore.config" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
   <ItemGroup>
     <Resource Include="Resources\logo-white-hollow.png" />
     <Resource Include="Resources\logo-black-hollow.png" />
@@ -41,6 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Mba.Core" />
+    <PackageReference Include="WixToolset.BootstrapperApplicationApi" />
   </ItemGroup>
 </Project>

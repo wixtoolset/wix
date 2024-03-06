@@ -4,6 +4,8 @@
 
 #include "dutil.h"
 
+#include "IBundleExtensionEngine.h"
+#include "IBundleExtension.h"
 
 #ifdef __cplusplus
 extern "C" {

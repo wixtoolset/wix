@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <description>$description$</description>
+    <authors>$authors$</authors>
+    <icon>wix.png</icon>
+    <license type="expression">MS-RL</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>$copyright$</copyright>
+    <projectUrl>$projectUrl$</projectUrl>
+    <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+  </metadata>
+
+  <files>
+    <file src="$projectFolder$\..\..\..\internal\images\wix.png" />
+    <file src="$projectFolder$\WixToolset.Bal.wixext.targets"  target="build" />
+    <file src="WixToolset.BootstrapperApplications.wixext.dll" target="$wixExtensionPackageFolder$" />
+  </files>
+</package>

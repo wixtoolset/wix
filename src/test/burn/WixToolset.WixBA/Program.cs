@@ -2,7 +2,7 @@
 
 namespace WixToolset.WixBA
 {
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
 
     internal class Program
     {

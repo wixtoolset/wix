@@ -10,7 +10,7 @@ namespace WixToolset.Test.BA
     using System.Threading;
     using System.Windows.Forms;
     using Microsoft.Win32;
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
 
     /// <summary>
     /// A minimal UX used for testing.

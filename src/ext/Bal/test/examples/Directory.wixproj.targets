@@ -3,6 +3,6 @@
 <Project>
   <ItemGroup>
     <BindPath Include="$(OutputPath)" />
-    <WixExtension Include="$(OutputPath)..\netstandard2.0\WixToolset.Bal.wixext.dll" />
+    <WixExtension Include="$(OutputPath)..\netstandard2.0\WixToolset.BootstrapperApplications.wixext.dll" />
   </ItemGroup>
 </Project>

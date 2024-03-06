@@ -17,31 +17,34 @@
 @if "%_INC%"=="" call :clean
 @if NOT "%_CLEAN%"=="" goto :end
 
-@echo Building ext\Bal %_C% using %_N%
+@echo Building ext\BootstrapperApplications %_C% using %_N%
 
 :: Restore
 
 :: Build
-msbuild -Restore -p:Configuration=%_C% -tl -nologo -m -warnaserror test\WixToolsetTest.Bal\WixToolsetTest.Bal.csproj -bl:%_L%\ext_bal_build.binlog || exit /b
+msbuild -Restore -p:Configuration=%_C% -tl -nologo -m -warnaserror test\WixToolsetTest.BootstrapperApplications\WixToolsetTest.BootstrapperApplications.csproj -bl:%_L%\ext_bal_build.binlog || exit /b
 
 msbuild -Restore -p:Configuration=%_C% -tl -nologo -m -warnaserror test\examples\examples.proj -bl:%_L%\bal_examples_build.binlog  || exit /b
 
 :: Test
 dotnet test ^
-  %_B%\net6.0\WixToolsetTest.Bal.dll ^
+  %_B%\net6.0\WixToolsetTest.BootstrapperApplications.dll ^
   --nologo -l "trx;LogFileName=%_L%\TestResults\bal.wixext.trx" || exit /b
 
 :: Pack
-msbuild -t:Pack -p:Configuration=%_C% -tl -nologo -warnaserror -p:NoBuild=true wixext\WixToolset.Bal.wixext.csproj || exit /b
+msbuild -t:Pack -p:Configuration=%_C% -tl -nologo -warnaserror -p:NoBuild=true wixext\WixToolset.BootstrapperApplications.wixext.csproj || exit /b
+msbuild -t:Pack -Restore -p:Configuration=%_C% -tl -nologo -warnaserror wixext-backward-compatible\WixToolset.Bal.wixext.csproj || exit /b
 
 @goto :end
 
 :clean
 @rd /s/q "..\..\..\build\Bal.wixext" 2> nul
 @del "..\..\..\build\artifacts\WixToolset.Bal.wixext.*.nupkg" 2> nul
+@del "..\..\..\build\artifacts\WixToolset.BootstrapperApplications.wixext.*.nupkg" 2> nul
 @del "%_L%\ext_bal_build.binlog" 2> nul
 @del "%_L%\TestResults\bal.wixext.trx" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bal.wixext" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bootstrapperapplications.wixext" 2> nul
 @exit /b
 
 :end

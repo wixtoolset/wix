@@ -5,7 +5,7 @@ namespace WixToolset.WixBA
     using System;
     using System.ComponentModel;
     using System.Windows.Input;
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
 
     /// <summary>
     /// The states of the update view model.

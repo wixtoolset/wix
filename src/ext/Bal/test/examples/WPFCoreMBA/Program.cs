@@ -2,7 +2,7 @@
 
 namespace Example.WPFCoreMBA
 {
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
     // using WixToolset.BootstrapperApplications.Managed;
 
     public class Program

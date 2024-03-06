@@ -1,2 +1,2 @@
-# Bal.wixext
-WixToolset.Bal.wixext - Bootstrapper Application Layer WiX Toolset Extension 
+# WixToolset.BootstrapperApplications.wixext
+WixToolset.BootstrapperApplications.wixext - Bootstrapper Applications WiX Toolset Extension

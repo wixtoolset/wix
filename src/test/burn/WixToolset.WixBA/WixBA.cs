@@ -8,7 +8,7 @@ namespace WixToolset.WixBA
     using System.IO;
     using System.Net;
     using System.Text;
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
 
     using Threading = System.Windows.Threading;
     using WinForms = System.Windows.Forms;

@@ -42,7 +42,7 @@
   <Import Project="..\..\..\NativeMultiTargeting.Build.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>..\balutil\inc;..\WixToolset.BootstrapperCore.Native\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>..\balutil\inc;..\inc</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
 
   <ItemGroup>

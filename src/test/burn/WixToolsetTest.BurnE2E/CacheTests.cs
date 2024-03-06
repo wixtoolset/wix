@@ -8,7 +8,7 @@ namespace WixToolsetTest.BurnE2E
     using Microsoft.Win32;
     using WixInternal.TestSupport;
     using WixTestTools;
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
     using Xunit;
     using Xunit.Abstractions;
 

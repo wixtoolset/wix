@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>WixToolset.BootstrapperApplications</RootNamespace>
+    <Description>WiX Toolset BootstrapperApplications extension</Description>
+    <Title>WiX Toolset BootstrapperApplications extension</Title>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <Import Project="..\..\WixExt.props" />
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(OutputPath)..\bas.wixlib" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(NCrunch)'=='' ">
+    <ProjectReference Include="..\wixlib\bas.wixproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" />
+  </ItemGroup>
+</Project>

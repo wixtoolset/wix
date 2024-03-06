@@ -9,7 +9,7 @@
         <Payload Id="payO60IVK4ATGzPpMz3rwVbUWl6DyU" FilePath="WixToolset.Mba.Host.config" FileSize="783" Hash="B5BDD5E7179A94C2C817069913CA8C099DF811B9" Packaging="embedded" SourcePath="u0" />
         <Payload Id="payxj4zDAKL2NVlz4ohp0GvwFHepyI" FilePath="TestBA.dll" FileSize="25088" Hash="DB12DB6565CDBC4E9705204830E421ACEB710129" Packaging="embedded" SourcePath="u1" />
         <Payload Id="pay1hOSAUC8_D633cD2TXpIXCL30OU" FilePath="mbanative.dll" FileSize="118272" Hash="3A7A20D97B0546A23A025EE5774BE237C14D2957" Packaging="embedded" SourcePath="u2" />
-        <Payload Id="payujy6Izl_BlUNfHt2eI.ADfjYAv4" FilePath="WixToolset.Mba.Core.dll" FileSize="114688" Hash="56BA3EA94BEBF8EB562C914495E1594E74F05DBE" Packaging="embedded" SourcePath="u3" />
+        <Payload Id="payujy6Izl_BlUNfHt2eI.ADfjYAv4" FilePath="WixToolset.BootstrapperApplicationApi.dll" FileSize="114688" Hash="56BA3EA94BEBF8EB562C914495E1594E74F05DBE" Packaging="embedded" SourcePath="u3" />
         <Payload Id="payR4EbR4OTDZpPEycWaSSM_gZRBWM" FilePath="mbapreq.thm" FileSize="3599" Hash="8D9797C1E1A50AECB8B85FFCEA6A2A2EF611BD7F" Packaging="embedded" SourcePath="u4" />
         <Payload Id="paylVCy2Ecl8pHPdJTCQZryUG4T9us" FilePath="mbapreq.png" FileSize="797" Hash="75AE41181581FD6376CA9CA88147011E48BF9A30" Packaging="embedded" SourcePath="u5" />
         <Payload Id="payTaG4B_lob1aLcKFaOqSSG3MPMpU" FilePath="mbapreq.wxl" FileSize="2237" Hash="068B3C5E27AECE7987EABAA2802C9EB07B39EAF8" Packaging="embedded" SourcePath="u6" />

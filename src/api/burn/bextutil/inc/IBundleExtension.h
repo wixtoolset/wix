@@ -1,6 +1,7 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+#include <BundleExtension.h>
 
 DECLARE_INTERFACE_IID_(IBundleExtension, IUnknown, "93123C9D-796B-4FCD-A507-6EDEF9A925FD")
 {

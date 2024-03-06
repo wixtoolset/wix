@@ -35,7 +35,6 @@
     <TargetName>balutil</TargetName>
     <CharacterSet>MultiByte</CharacterSet>
     <Description>WiX Toolset Bootstrapper Application Layer native utility library</Description>
-    <PackageId>WixToolset.BalUtil</PackageId>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -49,7 +48,7 @@
   </ImportGroup>
 
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>inc;..\WixToolset.BootstrapperCore.Native\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>inc;..\inc</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
 
   <ItemGroup>

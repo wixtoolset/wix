@@ -2,7 +2,7 @@
 
 namespace Example.FullFramework4MBA
 {
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
 
     public class FullFramework4BA : BootstrapperApplication
     {

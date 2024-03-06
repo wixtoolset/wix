@@ -9,7 +9,7 @@
     <Feeds Include="*.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" />
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
     <PackageReference Include="WixToolset.NetFx.wixext" />
   </ItemGroup>
   <Target Name="CopyFeeds" AfterTargets="AfterBuild">

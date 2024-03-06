@@ -3,7 +3,7 @@
 namespace Example.WPFCoreMBA
 {
     using System.Windows.Threading;
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
 
     public class WPFCoreBA : BootstrapperApplication
     {

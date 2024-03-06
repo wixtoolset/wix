@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="4.0">
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <description>$description$</description>
+    <authors>$authors$</authors>
+    <icon>wix.png</icon>
+    <license type="expression">MS-RL</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>$copyright$</copyright>
+    <projectUrl>$projectUrl$</projectUrl>
+    <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.2" />
+      <group targetFramework=".NETStandard2.0" />
+      <group targetFramework="Native">
+        <dependency id="WixToolset.DUtil" version="[$version$,5)" />
+      </group>
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="$projectFolder$\..\..\..\internal\images\wix.png" />
+
+    <file src="$projectFolder$\build\WixToolset.BootstrapperApplicationApi.props" target="build\" />
+
+    <file src="$projectFolder$\build\_._" target="lib\native" />
+    <file src="net462\$id$.dll" target="lib\net462" />
+    <file src="net462\$id$.xml" target="lib\net462" />
+    <file src="netstandard2.0\$id$.dll" target="lib\netstandard2.0" />
+    <file src="netstandard2.0\$id$.xml" target="lib\netstandard2.0" />
+
+    <file src="v143\ARM64\mbanative.dll" target="runtimes\win-arm64\native" />
+    <file src="v143\x64\mbanative.dll" target="runtimes\win-x64\native" />
+    <file src="v143\x86\mbanative.dll" target="runtimes\win-x86\native" />
+
+    <file src="$projectFolder$\..\balutil\inc\*" target="build\native\include" />
+    <file src="$projectFolder$\..\inc\BootstrapperApplication.h" target="build\native\include" />
+    <file src="$projectFolder$\..\inc\BootstrapperEngine.h" target="build\native\include" />
+    <file src="v141\x86\balutil.lib" target="build\native\v14\x86" />
+    <file src="v141\x64\balutil.lib" target="build\native\v14\x64" />
+    <file src="v141\ARM64\balutil.lib" target="build\native\v14\ARM64" />
+  </files>
+</package>

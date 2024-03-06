@@ -62,8 +62,6 @@
 #include <butil.h>
 
 #include "BootstrapperApplication.h"
-
-#include "BundleExtensionEngine.h"
 #include "BundleExtension.h"
 
 #include "platform.h"

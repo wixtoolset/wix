@@ -2,7 +2,7 @@
 
 namespace Example.EarliestCoreMBA
 {
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
 
     public class EarliestCoreBA : BootstrapperApplication
     {

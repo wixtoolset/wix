@@ -10,7 +10,7 @@ namespace WixToolset.WixBA
     using System.Windows;
     using System.Windows.Input;
     using IO = System.IO;
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
 
     /// <summary>
     /// The states of detection.

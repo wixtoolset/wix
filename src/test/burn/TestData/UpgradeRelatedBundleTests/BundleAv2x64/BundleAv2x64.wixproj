@@ -8,10 +8,10 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\PackageAv2\PackageAv2.wixproj" />
-    <ProjectReference Include="..\..\TestBA\TestBAWixlib_x64\testbawixlib_x64.wixproj" /> 
+    <ProjectReference Include="..\..\TestBA\TestBAWixlib_x64\testbawixlib_x64.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" />
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
     <PackageReference Include="WixToolset.NetFx.wixext" />
   </ItemGroup>
 </Project>

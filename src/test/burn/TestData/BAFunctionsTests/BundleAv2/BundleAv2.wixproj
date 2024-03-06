@@ -8,6 +8,6 @@
     <ProjectReference Include="..\PackageAv2\PackageAv2.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" />
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
   </ItemGroup>
 </Project>

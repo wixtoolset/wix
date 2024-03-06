@@ -3,7 +3,7 @@
         <BootstrapperApplication SourceFile="Example.FullFramework2MBA\net462\win-x64\Example.FullFramework2MBA.exe">
             <Payload SourceFile="Example.FullFramework2MBA\net462\win-x64\Example.FullFramework2MBA.exe.config" />
             <Payload SourceFile="Example.FullFramework2MBA\net462\win-x64\mbanative.dll" />
-            <Payload SourceFile="Example.FullFramework2MBA\net462\win-x64\WixToolset.Mba.Core.dll" />
+            <Payload SourceFile="Example.FullFramework2MBA\net462\win-x64\WixToolset.BootstrapperApplicationApi.dll" />
             <!-- <bal:WixManagedBootstrapperApplicationHost /> -->
         </BootstrapperApplication>
         <Chain>

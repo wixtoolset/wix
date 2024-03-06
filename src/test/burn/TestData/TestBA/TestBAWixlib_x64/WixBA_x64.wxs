@@ -6,7 +6,7 @@
       <Payload SourceFile="!(bindpath.dncx64)\WixToolset.WixBA.dll" />
       <Payload SourceFile="!(bindpath.dncx64)\WixToolset.WixBA.runtimeconfig.json" />
       <Payload SourceFile="!(bindpath.dncx64)\mbanative.dll" />
-      <Payload SourceFile="!(bindpath.dncx64)\WixToolset.Mba.Core.dll" />
+      <Payload SourceFile="!(bindpath.dncx64)\WixToolset.BootstrapperApplicationApi.dll" />
       <Payload SourceFile='..\..\..\..\..\..\License.txt' />
     </BootstrapperApplication>
 

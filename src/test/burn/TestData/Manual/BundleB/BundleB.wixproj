@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="WixToolset.Heat" />
-    <PackageReference Include="WixToolset.Bal.wixext" />
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
   </ItemGroup>
 
   <!-- We do this dynamically to avoid committing so many files to source control. -->

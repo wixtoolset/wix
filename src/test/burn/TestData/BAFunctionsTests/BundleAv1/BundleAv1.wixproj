@@ -5,6 +5,7 @@
     <ProjectReference Include="..\PackageAv1\PackageAv1.wixproj" />
   </ItemGroup>
   <ItemGroup>
+    <!-- For testing purposes: Use old Bal WiX extension instead of new BoostrapperApplications.wixext -->
     <PackageReference Include="WixToolset.Bal.wixext" />
   </ItemGroup>
 </Project>
