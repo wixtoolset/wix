@@ -30,13 +30,6 @@
 #include <thmutil.h>
 #include <xmlutil.h>
 
-#include <baenginetypes.h>
-#include <batypes.h>
-
-#include "IBootstrapperEngine.h"
-#include "IBootstrapperApplication.h"
-
-#include "BAFunctions.h"
 #include "IBAFunctions.h"
 
 #include "balutil.h"

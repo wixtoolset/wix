@@ -1,7 +1,7 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-#include <baenginetypes.h>
+#include "BootstrapperEngine.h"
 
 DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-81512C29C2FB")
 {

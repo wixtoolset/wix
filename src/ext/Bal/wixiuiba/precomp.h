@@ -15,10 +15,6 @@
 #include <strutil.h>
 #include <xmlutil.h>
 
-#include <baenginetypes.h>
-#include <batypes.h>
-
-#include <IBootstrapperEngine.h>
 #include <IBootstrapperApplication.h>
 
 #include <balutil.h>

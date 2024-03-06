@@ -36,7 +36,6 @@
 #include <uriutil.h>
 #include <xmlutil.h>
 
-#include <IBootstrapperEngine.h>
 #include <IBootstrapperApplication.h>
 
 #include <balutil.h>

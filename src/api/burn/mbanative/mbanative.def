@@ -8,7 +8,7 @@ EXPORTS
     BalGetVersionVariableFromEngine
     BalGetRelatedBundleVariableFromEngine
     BalVariableExistsFromEngine
-    BootstrapperApplicationDebuggerCheck
+    BalDebuggerCheck
     BootstrapperApplicationRun
     StrFree
     VerCompareParsedVersions

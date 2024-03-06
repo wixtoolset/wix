@@ -11,8 +11,8 @@
 #include "pathutil.h"
 #include "strutil.h"
 
-#include <baenginetypes.h>
-#include <batypes.h>
+// #include <baenginetypes.h>
+// #include <batypes.h>
 
 #include "TestEngine.h"
 #include "ReloadEngine.h"

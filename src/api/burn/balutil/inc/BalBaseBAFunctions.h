@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <msiquery.h>
 
-#include <batypes.h>
+#include <BootstrapperApplication.h>
 
 #include "IBAFunctions.h"
 

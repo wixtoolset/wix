@@ -43,15 +43,6 @@ static const HRESULT E_PREREQBA_INFINITE_LOOP = MAKE_HRESULT(SEVERITY_ERROR, FAC
 
 
 /*******************************************************************
- BootstrapperApplicationDebuggerCheck - allows bootstrapper application to
-        explicitly check whether a debugger should be attached to the boostrapper
-        application.
-
- Note: Automatically called in BootstrapperApplicationRun().
-********************************************************************/
-DAPI_(VOID) BootstrapperApplicationDebuggerCheck();
-
-/*******************************************************************
  BootstrapperApplicationRun - runs the IBootstrapperApplication until
                               the application quits.
 
@@ -59,6 +50,14 @@ DAPI_(VOID) BootstrapperApplicationDebuggerCheck();
 DAPI_(HRESULT) BootstrapperApplicationRun(
     __in IBootstrapperApplication* pApplication
     );
+
+/*******************************************************************
+ BalDebuggerCheck - allows bootstrapper application to explicitly check
+        whether a debugger should be attached to the boostrapper application.
+
+ Note: Automatically called in BootstrapperApplicationRun().
+********************************************************************/
+DAPI_(VOID) BalDebuggerCheck();
 
 /*******************************************************************
  BalInitialize - remembers the engine interface to enable logging and
