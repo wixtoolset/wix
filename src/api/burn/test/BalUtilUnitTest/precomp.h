@@ -15,11 +15,6 @@
 #include <dutil.h>
 #include <dictutil.h>
 
-#include <baenginetypes.h>
-#include <batypes.h>
-
-#include <BAFunctions.h>
-#include <IBootstrapperEngine.h>
 #include <IBootstrapperApplication.h>
 #include <IBAFunctions.h>
 #include <balutil.h>

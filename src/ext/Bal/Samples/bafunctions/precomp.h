@@ -34,7 +34,6 @@
 //#include "xmlutil.h"
 #include "regutil.h"
 
-//#include "IBootstrapperEngine.h"
 //#include "IBootstrapperApplication.h"
 
 #include "BalBaseBootstrapperApplication.h"

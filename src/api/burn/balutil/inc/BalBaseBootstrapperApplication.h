@@ -3,7 +3,6 @@
 #include <windows.h>
 #include <msiquery.h>
 
-#include "IBootstrapperEngine.h"
 #include "IBootstrapperApplication.h"
 
 #include "balutil.h"

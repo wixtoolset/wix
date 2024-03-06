@@ -102,12 +102,12 @@
   <ItemGroup>
     <ClInclude Include="apply.h" />
     <ClInclude Include="approvedexe.h" />
-    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\batypes.h" />
-    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\baenginetypes.h" />
+    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BootstrapperApplication.h" />
+    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BootstrapperEngine.h" />
     <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BundleExtension.h" />
     <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BundleExtensionEngine.h" />
+    <ClInclude Include="ba.h" />
     <ClInclude Include="bacallback.h" />
-    <ClInclude Include="bootstrapperapplication.h" />
     <ClInclude Include="bundlepackageengine.h" />
     <ClInclude Include="burnextension.h" />
     <ClInclude Include="cabextract.h" />

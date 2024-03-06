@@ -38,21 +38,6 @@ static void MsgProc(
 
 // prototypes
 
-DAPI_(void) BalInitialize(
-    __in IBootstrapperEngine* pEngine
-    )
-{
-    pEngine->AddRef();
-
-    ReleaseObject(vpEngine);
-    vpEngine = pEngine;
-}
-
-DAPI_(void) BalUninitialize()
-{
-    ReleaseNullObject(vpEngine);
-}
-
 DAPI_(HRESULT) BootstrapperApplicationRun(
     __in IBootstrapperApplication* pApplication
     )
@@ -86,7 +71,7 @@ DAPI_(HRESULT) BootstrapperApplicationRun(
     BalInitialize(pEngine);
     fInitializedBal = TRUE;
 
-    BootstrapperApplicationDebuggerCheck();
+    BalDebuggerCheck();
 
     hr = MsgPump(hBAPipe, pApplication, pEngine);
     BalExitOnFailure(hr, "Failed while pumping messages.");
@@ -111,7 +96,22 @@ LExit:
     return hr;
 }
 
-DAPI_(VOID) BootstrapperApplicationDebuggerCheck()
+DAPI_(void) BalInitialize(
+    __in IBootstrapperEngine* pEngine
+    )
+{
+    pEngine->AddRef();
+
+    ReleaseObject(vpEngine);
+    vpEngine = pEngine;
+}
+
+DAPI_(void) BalUninitialize()
+{
+    ReleaseNullObject(vpEngine);
+}
+
+DAPI_(VOID) BalDebuggerCheck()
 {
     HRESULT hr = S_OK;
     HKEY hk = NULL;

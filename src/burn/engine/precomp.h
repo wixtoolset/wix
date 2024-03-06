@@ -61,8 +61,8 @@
 #include <dpiutil.h>
 #include <butil.h>
 
-#include "baenginetypes.h"
-#include "batypes.h"
+#include "BootstrapperApplication.h"
+
 #include "BundleExtensionEngine.h"
 #include "BundleExtension.h"
 
@@ -77,7 +77,7 @@
 #include "cabextract.h"
 #include "burnextension.h"
 #include "search.h"
-#include "bootstrapperapplication.h"
+#include "ba.h"
 #include "userexperience.h"
 #include "package.h"
 #include "update.h"
