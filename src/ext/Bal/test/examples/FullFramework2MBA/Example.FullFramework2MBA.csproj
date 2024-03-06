@@ -12,10 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Mba.Core" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\api\burn\WixToolset.Mba.Core\WixToolset.Mba.Core.csproj" />
+    <PackageReference Include="WixToolset.BootstrapperApplicationApi" />
   </ItemGroup>
 </Project>

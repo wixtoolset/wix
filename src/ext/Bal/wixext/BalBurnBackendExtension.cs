@@ -1,13 +1,13 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Bal
+namespace WixToolset.BootstrapperApplications
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Xml;
-    using WixToolset.Bal.Symbols;
+    using WixToolset.BootstrapperApplications.Symbols;
     using WixToolset.Data;
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;

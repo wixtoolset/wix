@@ -4,7 +4,7 @@ namespace WixToolsetTest.BurnE2E
 {
     using System;
     using WixTestTools;
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
     using Xunit;
     using Xunit.Abstractions;
 
@@ -170,7 +170,7 @@ namespace WixToolsetTest.BurnE2E
             packageAv2.VerifyInstalled(true);
             bundleAv2.VerifyPackageIsCached("PackageA");
             bundleAv1.VerifyExeTestRegistryValue(testRegistryValueExe, "2.0.0.0");
-            
+
             // Verify https://github.com/wixtoolset/issues/issues/3190
             bundleB.Uninstall();
 

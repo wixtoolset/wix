@@ -16,7 +16,7 @@
     <ProjectReference Include="..\..\..\WixToolset.WixBA\WixToolset.WixBA.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" />
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
     <PackageReference Include="WixToolset.Netfx.wixext" />
   </ItemGroup>
 </Project>

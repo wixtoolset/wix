@@ -6,11 +6,12 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <NoWarn>NU5100</NoWarn>
+    <WixExtensionPackageFolder>wixext5</WixExtensionPackageFolder>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="$(MSBuildProjectName).targets" PackagePath="build" />
-    <Content Include="$(TargetPath)" PackagePath="wixext5" />
+    <Content Include="$(TargetPath)" PackagePath="$(WixExtensionPackageFolder)" />
 
     <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
   </ItemGroup>

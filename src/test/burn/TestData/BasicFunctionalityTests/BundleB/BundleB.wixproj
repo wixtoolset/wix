@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\TestBA\TestBAWixlib\testbawixlib.wixproj" />
   </ItemGroup>
   <ItemGroup>
+    <!-- For testing purposes: Use old Bal WiX extension instead of new BoostrapperApplications.wixext -->
     <PackageReference Include="WixToolset.Bal.wixext" />
     <PackageReference Include="WixToolset.NetFx.wixext" />
   </ItemGroup>

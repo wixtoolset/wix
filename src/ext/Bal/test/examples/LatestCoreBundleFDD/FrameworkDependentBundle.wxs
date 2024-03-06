@@ -5,7 +5,7 @@
             <!-- <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\Example.LatestCoreMBA.dll" Name="Example.LatestCoreMBA.dll" bal:BAFactoryAssembly="yes" /> -->
             <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\Example.LatestCoreMBA.runtimeconfig.json" Name="Example.LatestCoreMBA.runtimeconfig.json" />
             <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\mbanative.dll" Name="mbanative.dll" />
-            <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\WixToolset.Mba.Core.dll" Name="WixToolset.Mba.Core.dll" />
+            <Payload SourceFile="publish\Example.LatestCoreMBA\fdd\WixToolset.BootstrapperApplicationApi.dll" Name="WixToolset.BootstrapperApplicationApi.dll" />
             <!-- <bal:WixDotNetCoreBootstrapperApplicationHost /> -->
         </BootstrapperApplication>
         <Chain>

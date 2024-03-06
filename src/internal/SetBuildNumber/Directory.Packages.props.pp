@@ -13,10 +13,8 @@
     <PackageVersion Include="WixToolset.DUtil" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.WcaUtil" Version="{packageversion}" />
 
-    <PackageVersion Include="WixToolset.BootstrapperCore.Native" Version="{packageversion}" />
-    <PackageVersion Include="WixToolset.BalUtil" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.BextUtil" Version="{packageversion}" />
-    <PackageVersion Include="WixToolset.Mba.Core" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.BootstrapperApplicationApi" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Data" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Extensibility" Version="{packageversion}" />
@@ -32,6 +30,7 @@
     <PackageVersion Include="WixToolset.Heat" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Bal.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.BootstrapperApplications.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dependency.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.NetFx.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.UI.wixext" Version="{packageversion}" />

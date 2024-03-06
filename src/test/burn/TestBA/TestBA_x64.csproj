@@ -20,6 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Mba.Core" />
+    <PackageReference Include="WixToolset.BootstrapperApplicationApi" />
   </ItemGroup>
 </Project>

@@ -2,7 +2,7 @@
 
 namespace Example.FullFramework2MBA
 {
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
 
     internal class Program
     {

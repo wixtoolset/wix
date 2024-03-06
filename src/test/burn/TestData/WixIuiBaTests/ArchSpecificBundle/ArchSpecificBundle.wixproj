@@ -12,6 +12,6 @@
     <ProjectReference Include="..\InternalUIx86Package\InternalUIx86Package.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" />
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
   </ItemGroup>
 </Project>

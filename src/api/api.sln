@@ -23,9 +23,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BalUtilUnitTest", "burn\tes
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BextUtilUnitTest", "burn\test\BextUtilUnitTest\BextUtilUnitTest.vcxproj", "{B69E6422-49B0-4E28-92F9-B8A7410A6ED9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Mba.Core", "burn\test\WixToolsetTest.Mba.Core\WixToolsetTest.Mba.Core.csproj", "{17DA3E92-40C5-4328-9BA5-1FE459A13719}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.BootstrapperApplicationApi", "burn\test\WixToolsetTest.BootstrapperApplicationApi\WixToolsetTest.BootstrapperApplicationApi.csproj", "{17DA3E92-40C5-4328-9BA5-1FE459A13719}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Mba.Core", "burn\WixToolset.Mba.Core\WixToolset.Mba.Core.csproj", "{47029283-43EC-4F22-9417-A02B28594912}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.BootstrapperApplicationApi", "burn\WixToolset.BootstrapperApplicationApi\WixToolset.BootstrapperApplicationApi.csproj", "{47029283-43EC-4F22-9417-A02B28594912}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

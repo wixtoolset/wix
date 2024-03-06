@@ -9,7 +9,7 @@
       <Payload Name="good.runtimeconfig.json" SourceFile="!(bindpath.dncx86)\TestBA.runtimeconfig.json" />
       <Payload Name="TestBA.runtimeconfig.json" SourceFile="bad.runtimeconfig.json" />
       <Payload SourceFile="!(bindpath.dncx86)\mbanative.dll" />
-      <Payload SourceFile="!(bindpath.dncx86)\WixToolset.Mba.Core.dll" />
+      <Payload SourceFile="!(bindpath.dncx86)\WixToolset.BootstrapperApplicationApi.dll" />
       <Payload SourceFile="$(var.PrereqBaf.TargetPath)" bal:BAFunctions="yes" />
 
       <bal:WixPrerequisiteBootstrapperApplication />

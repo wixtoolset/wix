@@ -4,10 +4,8 @@
 
 #include <windows.h>
 
-#include "BundleExtensionEngine.h"
-#include "BundleExtension.h"
-#include "IBundleExtensionEngine.h"
-#include "IBundleExtension.h"
+#include <IBundleExtensionEngine.h>
+#include <IBundleExtension.h>
 
 static HRESULT BextBaseBEProcSearch(
     __in IBundleExtension* pBE,
@@ -33,7 +31,7 @@ static HRESULT WINAPI BextBaseBundleExtensionProc(
 {
     IBundleExtension* pBE = reinterpret_cast<IBundleExtension*>(pvContext);
     HRESULT hr = pBE->BundleExtensionProc(message, pvArgs, pvResults, pvContext);
-    
+
     if (E_NOTIMPL == hr)
     {
         switch (message)

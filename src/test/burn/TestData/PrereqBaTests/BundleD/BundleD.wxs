@@ -7,7 +7,7 @@
       <Payload Name="good.config" SourceFile="!(bindpath.net2x86)\TestBA.exe.config" />
       <Payload Name="TestBA.exe.config" SourceFile="bad.config" />
       <Payload SourceFile="!(bindpath.net2x86)\mbanative.dll" />
-      <Payload SourceFile="!(bindpath.net2x86)\WixToolset.Mba.Core.dll" />
+      <Payload SourceFile="!(bindpath.net2x86)\WixToolset.BootstrapperApplicationApi.dll" />
       <Payload SourceFile="$(var.PrereqBaf.TargetPath)" bal:BAFunctions="yes" />
 
       <bal:WixPrerequisiteBootstrapperApplication />

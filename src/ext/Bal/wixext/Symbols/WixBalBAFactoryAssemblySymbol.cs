@@ -1,10 +1,10 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixToolset.Bal
+namespace WixToolset.BootstrapperApplications
 {
     using System;
     using WixToolset.Data;
-    using WixToolset.Bal.Symbols;
+    using WixToolset.BootstrapperApplications.Symbols;
 
     public static partial class BalSymbolDefinitions
     {
@@ -20,7 +20,7 @@ namespace WixToolset.Bal
     }
 }
 
-namespace WixToolset.Bal.Symbols
+namespace WixToolset.BootstrapperApplications.Symbols
 {
     using System;
     using WixToolset.Data;

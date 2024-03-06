@@ -22,6 +22,6 @@
     <PackageReference Include="System.Security.Principal.Windows" />
     <PackageReference Include="WixInternal.TestSupport" />
     <PackageReference Include="WixToolset.Data" />
-    <PackageReference Include="WixToolset.Mba.Core" />
+    <PackageReference Include="WixToolset.BootstrapperApplicationApi" />
   </ItemGroup>
 </Project>

@@ -42,7 +42,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>..\..\api\burn\WixToolset.BootstrapperCore.Native\inc;$(BurnGeneratedHeaderDirectory);$(ProjectAdditionalIncludeDirectories)</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>..\..\api\burn\inc;$(BurnGeneratedHeaderDirectory);$(ProjectAdditionalIncludeDirectories)</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
 
   <ImportGroup Label="ExtensionSettings">
@@ -102,10 +102,10 @@
   <ItemGroup>
     <ClInclude Include="apply.h" />
     <ClInclude Include="approvedexe.h" />
-    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BootstrapperApplication.h" />
-    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BootstrapperEngine.h" />
-    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BundleExtension.h" />
-    <ClInclude Include="..\..\api\burn\WixToolset.BootstrapperCore.Native\inc\BundleExtensionEngine.h" />
+    <ClInclude Include="..\..\api\burn\inc\BootstrapperApplication.h" />
+    <ClInclude Include="..\..\api\burn\inc\BootstrapperEngine.h" />
+    <ClInclude Include="..\..\api\burn\inc\BundleExtension.h" />
+    <ClInclude Include="..\..\api\burn\inc\BundleExtensionEngine.h" />
     <ClInclude Include="ba.h" />
     <ClInclude Include="bacallback.h" />
     <ClInclude Include="bundlepackageengine.h" />

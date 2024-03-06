@@ -6,7 +6,7 @@
       <Payload SourceFile="!(bindpath.dncx64)\TestBA.dll" />
       <Payload SourceFile="!(bindpath.dncx64)\TestBA.runtimeconfig.json" />
       <Payload SourceFile="!(bindpath.dncx64)\mbanative.dll" />
-      <Payload SourceFile="!(bindpath.dncx64)\WixToolset.Mba.Core.dll" />
+      <Payload SourceFile="!(bindpath.dncx64)\WixToolset.BootstrapperApplicationApi.dll" />
     </BootstrapperApplication>
 
     <PackageGroup Id="TestBAdnc_x64">
@@ -17,7 +17,7 @@
     <BootstrapperApplication SourceFile="!(bindpath.net2x64)\TestBA.exe">
       <Payload SourceFile="!(bindpath.net2x64)\TestBA.exe.config" />
       <Payload SourceFile="!(bindpath.net2x64)\mbanative.dll" />
-      <Payload SourceFile="!(bindpath.net2x64)\WixToolset.Mba.Core.dll" />
+      <Payload SourceFile="!(bindpath.net2x64)\WixToolset.BootstrapperApplicationApi.dll" />
     </BootstrapperApplication>
 
     <PackageGroup Id="TestBA_x64">

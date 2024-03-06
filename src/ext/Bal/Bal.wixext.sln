@@ -7,11 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bafunctions", "Samples\bafu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wixstdba", "wixstdba\wixstdba.vcxproj", "{41085A22-E6AA-4E8B-AB1B-DDEE0DC89DFA}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "bal", "wixlib\bal.wixproj", "{3444D952-F21C-496F-AB6B-56435BFD0787}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "bas", "wixlib\bas.wixproj", "{3444D952-F21C-496F-AB6B-56435BFD0787}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Bal.wixext", "wixext\WixToolset.Bal.wixext.csproj", "{BF720A63-9D7B-456E-B60C-8122852D9FED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.BootstrapperApplications.wixext", "wixext\WixToolset.BootstrapperApplications.wixext.csproj", "{BF720A63-9D7B-456E-B60C-8122852D9FED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Bal", "test\WixToolsetTest.Bal\WixToolsetTest.Bal.csproj", "{89D479FC-20DA-44D8-AE38-48F063223498}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.BootstrapperApplications", "test\WixToolsetTest.BootstrapperApplications\WixToolsetTest.BootstrapperApplications.csproj", "{89D479FC-20DA-44D8-AE38-48F063223498}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wixiuiba", "wixiuiba\wixiuiba.vcxproj", "{0F73E566-925C-448D-99CB-3A7F5DF399C8}"
 EndProject

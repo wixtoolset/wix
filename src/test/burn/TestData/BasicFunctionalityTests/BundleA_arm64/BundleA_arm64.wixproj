@@ -13,6 +13,6 @@
     <ProjectReference Include="..\PackageA_arm64\PackageA_arm64.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" />
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
   </ItemGroup>
 </Project>

@@ -10,7 +10,7 @@
         <Payload Id="payO60IVK4ATGzPpMz3rwVbUWl6DyU" FilePath="WixToolset.Mba.Host.config" SourcePath="u0" />
         <Payload Id="payxj4zDAKL2NVlz4ohp0GvwFHepyI" FilePath="TestBA.dll" SourcePath="u1" />
         <Payload Id="pay1hOSAUC8_D633cD2TXpIXCL30OU" FilePath="mbanative.dll" SourcePath="u2" />
-        <Payload Id="payujy6Izl_BlUNfHt2eI.ADfjYAv4" FilePath="WixToolset.Mba.Core.dll" SourcePath="u3" />
+        <Payload Id="payujy6Izl_BlUNfHt2eI.ADfjYAv4" FilePath="WixToolset.BootstrapperApplicationApi.dll" SourcePath="u3" />
         <Payload Id="payR4EbR4OTDZpPEycWaSSM_gZRBWM" FilePath="mbapreq.thm" SourcePath="u4" />
         <Payload Id="paylVCy2Ecl8pHPdJTCQZryUG4T9us" FilePath="mbapreq.png" SourcePath="u5" />
         <Payload Id="payTaG4B_lob1aLcKFaOqSSG3MPMpU" FilePath="mbapreq.wxl" SourcePath="u6" />

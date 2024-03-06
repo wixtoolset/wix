@@ -49,7 +49,7 @@
   </ImportGroup>
 
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>inc;..\WixToolset.BootstrapperCore.Native\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>inc;..\inc</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
 
   <ItemGroup>

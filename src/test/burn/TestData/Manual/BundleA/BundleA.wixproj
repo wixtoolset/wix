@@ -14,7 +14,7 @@
     <ProjectReference Include="..\..\TestBA\TestBAWixlib\testbawixlib.wixproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="WixToolset.Bal.wixext" />
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
   </ItemGroup>
   <Target Name="CopyManualInstructions" AfterTargets="AfterBuild">
     <Copy SourceFiles="ManualTests.txt" DestinationFiles="$(OutputPath)ManualTests.txt" />

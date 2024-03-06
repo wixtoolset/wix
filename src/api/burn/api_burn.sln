@@ -7,11 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "balutil", "balutil\balutil.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bextutil", "bextutil\bextutil.vcxproj", "{06027492-1CB9-48BC-B31E-C1F9356ED07E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.Mba.Core", "WixToolset.Mba.Core\WixToolset.Mba.Core.csproj", "{E7E1841E-A58E-4901-B9CA-4845B807D45F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolset.BootstrapperApplicationApi", "WixToolset.BootstrapperApplicationApi\WixToolset.BootstrapperApplicationApi.csproj", "{E7E1841E-A58E-4901-B9CA-4845B807D45F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mbanative", "mbanative\mbanative.vcxproj", "{665E0441-17F9-4105-B202-EDF274657F6E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Mba.Core", "test\WixToolsetTest.Mba.Core\WixToolsetTest.Mba.Core.csproj", "{F54997F7-10D7-409B-B9F2-DB546490EDC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.BootstrapperApplicationApi", "test\WixToolsetTest.BootstrapperApplicationApi\WixToolsetTest.BootstrapperApplicationApi.csproj", "{F54997F7-10D7-409B-B9F2-DB546490EDC0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BalUtilUnitTest", "test\BalUtilUnitTest\BalUtilUnitTest.vcxproj", "{9B507AF9-035E-4DB6-8C0C-5DCC3FEF2631}"
 EndProject

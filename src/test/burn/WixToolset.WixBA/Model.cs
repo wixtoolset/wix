@@ -5,7 +5,7 @@ namespace WixToolset.WixBA
     using System;
     using System.Collections.Generic;
     using System.Net;
-    using WixToolset.Mba.Core;
+    using WixToolset.BootstrapperApplicationApi;
 
     /// <summary>
     /// The model.

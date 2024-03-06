@@ -28,7 +28,7 @@ msbuild api_t.proj -p:Configuration=%_C% -tl -nologo -warnaserror -bl:%_L%\api_b
 :: Test
 dotnet test ^
  %_B%\net6.0\WixToolsetTest.Data.dll ^
- %_B%\net6.0\win-x86\WixToolsetTest.Mba.Core.dll ^
+ %_B%\net6.0\win-x86\WixToolsetTest.BootstrapperApplicationApi.dll ^
  %_B%\x86\BalUtilUnitTest.dll ^
  %_B%\x86\BextUtilUnitTest.dll ^
  --nologo -l "trx;LogFileName=%_L%\TestResults\api.trx" || exit /b
@@ -37,19 +37,15 @@ dotnet test ^
 
 :clean
 @rd /s/q "..\..\build\api" 2> nul
-@del "..\..\build\artifacts\WixToolset.BalUtil.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.BextUtil.*.nupkg" 2> nul
-@del "..\..\build\artifacts\WixToolset.BootstrapperCore.Native.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.Data.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.Extensibility.*.nupkg" 2> nul
-@del "..\..\build\artifacts\WixToolset.Mba.Core.*.nupkg" 2> nul
+@del "..\..\build\artifacts\WixToolset.BootstrapperApplicationApi.*.nupkg" 2> nul
 @del "%_L%\TestResults\api.trx" 2> nul
-@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.balutil" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bextutil" 2> nul
-@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bootstrappercore.native" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.data" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.extensibility" 2> nul
-@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.mba.core" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bootstrapperapplicationapi" 2> nul
 @exit /b
 
 :end

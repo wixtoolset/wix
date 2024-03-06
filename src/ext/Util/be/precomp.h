@@ -23,11 +23,6 @@
 #include <pathutil.h>
 #include <xmlutil.h>
 
-#include <BundleExtensionEngine.h>
-#include <BundleExtension.h>
-
-#include <IBundleExtensionEngine.h>
-#include <IBundleExtension.h>
 #include <bextutil.h>
 #include <BextBundleExtensionEngine.h>
 
