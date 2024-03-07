@@ -52,7 +52,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ClCompile Include="BalBaseBAFunctionsProc.cpp" />
     <ClCompile Include="BalBootstrapperEngine.cpp" />
     <ClCompile Include="balcondition.cpp" />
     <ClCompile Include="balinfo.cpp" />
@@ -64,15 +63,11 @@
     <ClCompile Include="msg.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\BAFunctions.h" />
-    <ClInclude Include="inc\BalBaseBAFunctions.h" />
-    <ClInclude Include="inc\BalBaseBAFunctionsProc.h" />
     <ClInclude Include="inc\BalBaseBootstrapperApplication.h" />
     <ClInclude Include="inc\balcondition.h" />
     <ClInclude Include="inc\balinfo.h" />
     <ClInclude Include="inc\balretry.h" />
     <ClInclude Include="inc\balutil.h" />
-    <ClInclude Include="inc\IBAFunctions.h" />
     <ClInclude Include="inc\IBootstrapperApplication.h" />
     <ClInclude Include="inc\IBootstrapperEngine.h" />
     <ClInclude Include="BalBootstrapperEngine.h" />

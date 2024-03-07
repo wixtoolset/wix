@@ -31,7 +31,9 @@ extern "C" HRESULT WINAPI BAFunctionsCreate(
     )
 {
     HRESULT hr = S_OK;
-    
+
+    BalInitialize(pArgs->pEngine);
+
     hr = CreateBAFunctions(vhInstance, pArgs, pResults);
     BalExitOnFailure(hr, "Failed to create BAFunctions interface.");
 

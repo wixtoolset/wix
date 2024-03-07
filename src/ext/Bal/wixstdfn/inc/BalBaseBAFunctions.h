@@ -4,9 +4,7 @@
 #include <windows.h>
 #include <msiquery.h>
 
-#include <BootstrapperApplication.h>
-
-#include "IBAFunctions.h"
+#include <IBAFunctions.h>
 
 class CBalBaseBAFunctions : public IBAFunctions
 {

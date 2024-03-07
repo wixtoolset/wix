@@ -30,13 +30,11 @@
 #include <thmutil.h>
 #include <xmlutil.h>
 
-#include "IBAFunctions.h"
+#include "IBootstrapperApplication.h"
 
 #include "balutil.h"
 #include "BalBootstrapperEngine.h"
 #include "balcondition.h"
 #include "balinfo.h"
 #include "balretry.h"
-
-#include "BalBaseBAFunctionsProc.h"
 #include "msg.h"

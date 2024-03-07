@@ -48,7 +48,7 @@
   </ImportGroup>
 
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>$(ProjectDir)..\stdbas\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>$(ProjectDir)..\stdbas\inc;$(ProjectDir)..\wixstdfn\inc</ProjectAdditionalIncludeDirectories>
     <ProjectAdditionalLinkLibraries>comctl32.lib;gdiplus.lib;rpcrt4.lib;shlwapi.lib;wininet.lib;stdbas.res</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 

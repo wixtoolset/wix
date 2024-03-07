@@ -16,9 +16,11 @@
 #include <dictutil.h>
 
 #include <IBootstrapperApplication.h>
+#include <IBAFunctions.h>
 #include <balutil.h>
 #include <balretry.h>
 
+#include "TestBAFunctions.h"
 #include "TestBootstrapperApplication.h"
 
 #pragma managed

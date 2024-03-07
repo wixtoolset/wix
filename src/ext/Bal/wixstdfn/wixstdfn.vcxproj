@@ -30,16 +30,17 @@
   </ItemGroup>
 
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DBBF5F32-BAEA-46A8-99A0-17277A906456}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{D786C02F-9488-421F-A5A5-D1D31E8E648B}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <CharacterSet>Unicode</CharacterSet>
-    <Description>WiX Standard Bootstrapper Applications</Description>
-    <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+    <TargetName>wixstdfn</TargetName>
+    <CharacterSet>MultiByte</CharacterSet>
+    <Description>WiX Toolset Standard BootstrapperApplication Functions API</Description>
+    <PackageId>WixToolset.WixStandardBootstrapperApplicationFunctionApi</PackageId>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="..\..\..\NativeMultiTargeting.Build.props" />
 
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
@@ -48,35 +49,27 @@
   </ImportGroup>
 
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>inc;..\wixstdfn\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalIncludeDirectories>inc</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
 
   <ItemGroup>
-    <ClInclude Include="inc\WixInternalUIBootstrapperApplication.h" />
-    <ClInclude Include="inc\WixStandardBootstrapperApplication.h" />
-    <ClInclude Include="precomp.h" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="BalBaseBAFunctionsProc.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="WixInternalUIBootstrapperApplication.cpp" />
-    <ClCompile Include="WixStandardBootstrapperApplication.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\BAFunctions.h" />
+    <ClInclude Include="inc\BalBaseBAFunctions.h" />
+    <ClInclude Include="inc\BalBaseBAFunctionsProc.h" />
+    <ClInclude Include="inc\IBAFunctions.h" />
+    <ClInclude Include="precomp.h" />
   </ItemGroup>
 
-  <ItemDefinitionGroup>
-    <CustomBuildStep>
-      <Message>Compiling message file...</Message>
-      <Command>mc.exe -h "$(IntDir)." -r "$(IntDir)." -A -c -z stdbas.messages "$(InputDir)stdbas.mc"
-rc.exe -fo "$(OutDir)stdbas.res" "$(IntDir)stdbas.messages.rc"</Command>
-      <Inputs>$(InputDir)stdbas.mc</Inputs>
-      <Outputs>$(IntDir)stdbas.messages.h;$(IntDir)stdbas.messages.rc</Outputs>
-    </CustomBuildStep>
-  </ItemDefinitionGroup>
-
   <ItemGroup>
-    <PackageReference Include="WixToolset.BootstrapperApplicationApi" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+
+    <PackageReference Include="WixToolset.BootstrapperApplicationApi" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

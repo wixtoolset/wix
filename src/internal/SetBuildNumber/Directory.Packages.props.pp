@@ -15,6 +15,7 @@
 
     <PackageVersion Include="WixToolset.BextUtil" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.BootstrapperApplicationApi" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.WixStandardBootstrapperApplicationFunctionApi" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Data" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Extensibility" Version="{packageversion}" />

@@ -32,28 +32,28 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalIncludeDirectories>..\..\balutil\inc;..\..\inc;..\..\..\..\libs\dutil\WixToolset.Dutil\inc</ProjectAdditionalIncludeDirectories>
-    <ProjectAdditionalLinkLibraries>comctl32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;$(RootBuildFolder)libs\$(Configuration)\$(WixNativeSdkLibraryToolset)\$(PlatformTarget)\dutil.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalIncludeDirectories>..\..\..\..\api\burn\inc;..\..\..\..\api\burn\balutil\inc;..\..\wixstdfn\inc;..\..\..\..\libs\dutil\WixToolset.Dutil\inc</ProjectAdditionalIncludeDirectories>
+    <ProjectAdditionalLinkLibraries>comctl32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;$(RootBuildFolder)libs\$(Configuration)\$(WixNativeSdkLibraryToolset)\$(PlatformTarget)\dutil.lib;$(RootBuildFolder)api\$(Configuration)\$(WixNativeSdkLibraryToolset)\$(PlatformTarget)\balutil.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>
-    <ClCompile Include="BootstrapperApplicationTests.cpp" />
+    <ClCompile Include="BAFunctionsTests.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
       <!-- Warnings from referencing netstandard dlls -->
       <DisableSpecificWarnings>4564;4691</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="TestBootstrapperApplication.cpp" />
+    <ClCompile Include="TestBAFunctions.cpp" />
   </ItemGroup>
 
   <ItemGroup>
     <ClInclude Include="precomp.h" />
-    <ClInclude Include="TestBootstrapperApplication.h" />
+    <ClInclude Include="TestBAFunctions.h" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\balutil\balutil.vcxproj">
-      <Project>{EDCB8095-0E6A-43E0-BC33-C4F762FC5CDB}</Project>
+    <ProjectReference Include="..\..\wixstdfn\wixstdfn.vcxproj">
+      <Project>{D786C02F-9488-421F-A5A5-D1D31E8E648B}</Project>
     </ProjectReference>
   </ItemGroup>
 
