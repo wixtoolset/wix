@@ -36,18 +36,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ClCompile Include="BundleExtensionTests.cpp" />
+    <ClCompile Include="BootstrapperExtensionTests.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
       <!-- Warnings from referencing netstandard dlls -->
       <DisableSpecificWarnings>4564;4691</DisableSpecificWarnings>
     </ClCompile>
-    <ClCompile Include="TestBundleExtension.cpp" />
+    <ClCompile Include="TestBootstrapperExtension.cpp" />
   </ItemGroup>
 
   <ItemGroup>
     <ClInclude Include="precomp.h" />
-    <ClInclude Include="TestBundleExtension.h" />
+    <ClInclude Include="TestBootstrapperExtension.h" />
   </ItemGroup>
 
   <ItemGroup>

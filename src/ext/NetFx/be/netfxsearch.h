@@ -68,7 +68,7 @@ typedef struct _NETFX_SEARCHES
 
 STDMETHODIMP NetfxSearchParseFromXml(
     __in NETFX_SEARCHES* pSearches,
-    __in IXMLDOMNode* pixnBundleExtension
+    __in IXMLDOMNode* pixnBootstrapperExtension
     );
 
 void NetfxSearchUninitialize(
@@ -79,7 +79,7 @@ STDMETHODIMP NetfxSearchExecute(
     __in NETFX_SEARCHES* pSearches,
     __in LPCWSTR wzSearchId,
     __in LPCWSTR wzVariable,
-    __in IBundleExtensionEngine* pEngine,
+    __in IBootstrapperExtensionEngine* pEngine,
     __in LPCWSTR wzBaseDirectory
     );
 

@@ -13,14 +13,14 @@ namespace WixInternal.Core.TestPackage
     public class ExtractBAContainerResult
     {
         /// <summary>
-        /// <see cref="XmlDocument"/> for BundleExtensionData.xml.
+        /// <see cref="XmlDocument"/> for BootstrapperExtensionData.xml.
         /// </summary>
-        public XmlDocument BundleExtensionDataDocument { get; set; }
+        public XmlDocument BootstrapperExtensionDataDocument { get; set; }
 
         /// <summary>
-        /// <see cref="XmlNamespaceManager"/> for BundleExtensionData.xml.
+        /// <see cref="XmlNamespaceManager"/> for BootstrapperExtensionData.xml.
         /// </summary>
-        public XmlNamespaceManager BundleExtensionDataNamespaceManager { get; set; }
+        public XmlNamespaceManager BootstrapperExtensionDataNamespaceManager { get; set; }
 
         /// <summary>
         /// <see cref="XmlDocument"/> for BootstrapperApplicationData.xml.
@@ -53,7 +53,7 @@ namespace WixInternal.Core.TestPackage
         public bool? AttachedContainersSuccess { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public ExtractBAContainerResult AssertSuccess()
@@ -77,12 +77,12 @@ namespace WixInternal.Core.TestPackage
         }
 
         /// <summary>
-        /// Returns the relative path of the BundleExtension entry point dll in the given folder.
+        /// Returns the relative path of the BootstrapperExtension entry point dll in the given folder.
         /// </summary>
         /// <param name="extractedBAContainerFolderPath"></param>
         /// <param name="extensionId"></param>
         /// <returns></returns>
-        public string GetBundleExtensionFilePath(string extractedBAContainerFolderPath, string extensionId)
+        public string GetBootstrapperExtensionFilePath(string extractedBAContainerFolderPath, string extensionId)
         {
             var uxPayloads = this.SelectManifestNodes($"/burn:BurnManifest/burn:UX/burn:Payload[@Id='{extensionId}']");
             var bextPayload = uxPayloads[0];
@@ -91,7 +91,7 @@ namespace WixInternal.Core.TestPackage
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="xpath">elements must have the 'ba' prefix</param>
         /// <returns></returns>
@@ -101,7 +101,7 @@ namespace WixInternal.Core.TestPackage
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="xpath">elements must have the 'ba' prefix</param>
         /// <param name="ignoredAttributesByElementName">Attributes for which the value should be set to '*'.</param>
@@ -112,28 +112,28 @@ namespace WixInternal.Core.TestPackage
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="xpath">elements must have the 'be' prefix</param>
         /// <returns></returns>
-        public XmlNodeList SelectBundleExtensionDataNodes(string xpath)
+        public XmlNodeList SelectBootstrapperExtensionDataNodes(string xpath)
         {
-            return this.BundleExtensionDataDocument.SelectNodes(xpath, this.BundleExtensionDataNamespaceManager);
+            return this.BootstrapperExtensionDataDocument.SelectNodes(xpath, this.BootstrapperExtensionDataNamespaceManager);
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="xpath">elements must have the 'be' prefix</param>
         /// <param name="ignoredAttributesByElementName">Attributes for which the value should be set to '*'.</param>
         /// <returns></returns>
-        public string[] GetBundleExtensionTestXmlLines(string xpath, Dictionary<string, List<string>> ignoredAttributesByElementName = null)
+        public string[] GetBootstrapperExtensionTestXmlLines(string xpath, Dictionary<string, List<string>> ignoredAttributesByElementName = null)
         {
-            return this.SelectBundleExtensionDataNodes(xpath).GetTestXmlLines(ignoredAttributesByElementName);
+            return this.SelectBootstrapperExtensionDataNodes(xpath).GetTestXmlLines(ignoredAttributesByElementName);
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="xpath">elements must have the 'burn' prefix</param>
         /// <returns></returns>
@@ -143,7 +143,7 @@ namespace WixInternal.Core.TestPackage
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="xpath">elements must have the 'burn' prefix</param>
         /// <param name="ignoredAttributesByElementName">Attributes for which the value should be set to '*'.</param>

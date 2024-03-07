@@ -329,7 +329,7 @@ namespace WixToolset.Core.Burn.Bundles
                 .OfType<WixSetVariableSymbol>()
                 .ToDictionary(t => t.Id.Id);
             var extensionSearchesById = this.Section.Symbols
-                .Where(t => t.Definition.HasTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag))
+                .Where(t => t.Definition.HasTag(BurnConstants.BootstrapperExtensionSearchSymbolDefinitionTag))
                 .ToDictionary(t => t.Id.Id);
 
             foreach (var searchId in sortedIds)
@@ -348,10 +348,10 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     orderedSearchFacades.Add(new ExtensionSearchFacade(searchSymbol));
 
-                    if (!extensionSearchSymbolsByExtensionId.TryGetValue(searchSymbol.BundleExtensionRef, out var extensionSearchSymbols))
+                    if (!extensionSearchSymbolsByExtensionId.TryGetValue(searchSymbol.BootstrapperExtensionRef, out var extensionSearchSymbols))
                     {
                         extensionSearchSymbols = new List<IntermediateSymbol>();
-                        extensionSearchSymbolsByExtensionId[searchSymbol.BundleExtensionRef] = extensionSearchSymbols;
+                        extensionSearchSymbolsByExtensionId[searchSymbol.BootstrapperExtensionRef] = extensionSearchSymbols;
                     }
                     extensionSearchSymbols.Add(extensionSearchSymbol);
                 }

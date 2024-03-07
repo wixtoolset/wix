@@ -4,6 +4,6 @@
 HRESULT NetfxPerformDetectNetCore(
     __in LPCWSTR wzVariable,
     __in NETFX_SEARCH* pSearch,
-    __in IBundleExtensionEngine* pEngine,
+    __in IBootstrapperExtensionEngine* pEngine,
     __in LPCWSTR wzBaseDirectory
     );

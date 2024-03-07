@@ -4,7 +4,7 @@
 
 #include "bextutil.h"
 
-class CBextBaseBundleExtension : public IBundleExtension
+class CBextBaseBootstrapperExtension : public IBootstrapperExtension
 {
 public: // IUnknown
     virtual STDMETHODIMP QueryInterface(
@@ -19,9 +19,9 @@ public: // IUnknown
 
         *ppvObject = NULL;
 
-        if (::IsEqualIID(__uuidof(IBundleExtension), riid))
+        if (::IsEqualIID(__uuidof(IBootstrapperExtension), riid))
         {
-            *ppvObject = static_cast<IBundleExtension*>(this);
+            *ppvObject = static_cast<IBootstrapperExtension*>(this);
         }
         else if (::IsEqualIID(IID_IUnknown, riid))
         {
@@ -53,7 +53,7 @@ public: // IUnknown
         return 0;
     }
 
-public: // IBundleExtension
+public: // IBootstrapperExtension
     virtual STDMETHODIMP Search(
         __in LPCWSTR /*wzId*/,
         __in LPCWSTR /*wzVariable*/
@@ -62,8 +62,8 @@ public: // IBundleExtension
         return E_NOTIMPL;
     }
 
-    virtual STDMETHODIMP BundleExtensionProc(
-        __in BUNDLE_EXTENSION_MESSAGE /*message*/,
+    virtual STDMETHODIMP BootstrapperExtensionProc(
+        __in BOOTSTRAPPER_EXTENSION_MESSAGE /*message*/,
         __in const LPVOID /*pvArgs*/,
         __inout LPVOID /*pvResults*/,
         __in_opt LPVOID /*pvContext*/
@@ -72,15 +72,15 @@ public: // IBundleExtension
         return E_NOTIMPL;
     }
 
-public: //CBextBaseBundleExtension
+public: //CBextBaseBootstrapperExtension
     virtual STDMETHODIMP Initialize(
-        __in const BUNDLE_EXTENSION_CREATE_ARGS* pCreateArgs
+        __in const BOOTSTRAPPER_EXTENSION_CREATE_ARGS* pCreateArgs
         )
     {
         HRESULT hr = S_OK;
 
-        hr = StrAllocString(&m_sczBundleExtensionDataPath, pCreateArgs->wzBundleExtensionDataPath, 0);
-        ExitOnFailure(hr, "Failed to copy BundleExtensionDataPath.");
+        hr = StrAllocString(&m_sczBootstrapperExtensionDataPath, pCreateArgs->wzBootstrapperExtensionDataPath, 0);
+        ExitOnFailure(hr, "Failed to copy BootstrapperExtensionDataPath.");
 
     LExit:
         return hr;
@@ -88,8 +88,8 @@ public: //CBextBaseBundleExtension
 
 protected:
 
-    CBextBaseBundleExtension(
-        __in IBundleExtensionEngine* pEngine
+    CBextBaseBootstrapperExtension(
+        __in IBootstrapperExtensionEngine* pEngine
         )
     {
         m_cReferences = 1;
@@ -97,18 +97,18 @@ protected:
         pEngine->AddRef();
         m_pEngine = pEngine;
 
-        m_sczBundleExtensionDataPath = NULL;
+        m_sczBootstrapperExtensionDataPath = NULL;
     }
 
-    virtual ~CBextBaseBundleExtension()
+    virtual ~CBextBaseBootstrapperExtension()
     {
         ReleaseNullObject(m_pEngine);
-        ReleaseStr(m_sczBundleExtensionDataPath);
+        ReleaseStr(m_sczBootstrapperExtensionDataPath);
     }
 
 protected:
-    IBundleExtensionEngine* m_pEngine;
-    LPWSTR m_sczBundleExtensionDataPath;
+    IBootstrapperExtensionEngine* m_pEngine;
+    LPWSTR m_sczBootstrapperExtensionDataPath;
 
 private:
     long m_cReferences;

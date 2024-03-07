@@ -34,8 +34,8 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <TargetName>bextutil</TargetName>
     <CharacterSet>MultiByte</CharacterSet>
-    <Description>WiX Toolset Bundle Extension native utility library</Description>
-    <PackageId>WixToolset.BextUtil</PackageId>
+    <Description>WiX Toolset Bundle Extension API</Description>
+    <PackageId>WixToolset.BootstrapperExtensionApi</PackageId>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -53,19 +53,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ClCompile Include="BextBundleExtensionEngine.cpp" />
+    <ClCompile Include="BextBootstrapperExtensionEngine.cpp" />
     <ClCompile Include="bextutil.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\BextBaseBundleExtension.h" />
-    <ClInclude Include="inc\BextBaseBundleExtensionProc.h" />
-    <ClInclude Include="inc\BextBundleExtensionEngine.h" />
+    <ClInclude Include="inc\BextBaseBootstrapperExtension.h" />
+    <ClInclude Include="inc\BextBaseBootstrapperExtensionProc.h" />
+    <ClInclude Include="inc\BextBootstrapperExtensionEngine.h" />
     <ClInclude Include="inc\bextutil.h" />
-    <ClInclude Include="inc\IBundleExtension.h" />
-    <ClInclude Include="inc\IBundleExtensionEngine.h" />
+    <ClInclude Include="inc\IBootstrapperExtension.h" />
+    <ClInclude Include="inc\IBootstrapperExtensionEngine.h" />
     <ClInclude Include="precomp.h" />
   </ItemGroup>
 

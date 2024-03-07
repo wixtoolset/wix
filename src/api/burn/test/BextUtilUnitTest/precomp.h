@@ -9,7 +9,7 @@
 #include <strutil.h>
 #include <bextutil.h>
 
-#include "TestBundleExtension.h"
+#include "TestBootstrapperExtension.h"
 
 #pragma managed
 #include <vcclr.h>

@@ -12,7 +12,7 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(WixBundleCustomDataSymbolFields.AttributeNames), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleCustomDataSymbolFields.Type), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleCustomDataSymbolFields.BundleExtensionRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleCustomDataSymbolFields.BootstrapperExtensionRef), IntermediateFieldType.String),
             },
             typeof(WixBundleCustomDataSymbol));
     }
@@ -24,14 +24,14 @@ namespace WixToolset.Data.Symbols
     {
         AttributeNames,
         Type,
-        BundleExtensionRef,
+        BootstrapperExtensionRef,
     }
 
     public enum WixBundleCustomDataType
     {
         Unknown,
         BootstrapperApplication,
-        BundleExtension,
+        BootstrapperExtension,
     }
 
     public class WixBundleCustomDataSymbol : IntermediateSymbol
@@ -60,10 +60,10 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleCustomDataSymbolFields.Type, (int)value);
         }
 
-        public string BundleExtensionRef
+        public string BootstrapperExtensionRef
         {
-            get => (string)this.Fields[(int)WixBundleCustomDataSymbolFields.BundleExtensionRef];
-            set => this.Set((int)WixBundleCustomDataSymbolFields.BundleExtensionRef, value);
+            get => (string)this.Fields[(int)WixBundleCustomDataSymbolFields.BootstrapperExtensionRef];
+            set => this.Set((int)WixBundleCustomDataSymbolFields.BootstrapperExtensionRef, value);
         }
 
         public string[] AttributeNamesSeparated => this.AttributeNames.Split(AttributeNamesSeparator);

@@ -35,7 +35,7 @@
     <TargetName>netfxbe</TargetName>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>netfxbe.def</ProjectModuleDefinitionFile>
-    <Description>WiX Toolset Netfx BundleExtension</Description>
+    <Description>WiX Toolset Netfx BootstrapperExtension</Description>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -50,7 +50,7 @@
     <ClCompile Include="detectnetcoresdk.cpp" />
     <ClCompile Include="detectnetcoresdkfeatureband.cpp" />
     <ClCompile Include="netfxbe.cpp" />
-    <ClCompile Include="NetfxBundleExtension.cpp" />
+    <ClCompile Include="NetfxBootstrapperExtension.cpp" />
     <ClCompile Include="netfxsearch.cpp" />
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
@@ -62,7 +62,7 @@
     <ClInclude Include="detectnetcore.h" />
     <ClInclude Include="detectnetcoresdk.h" />
     <ClInclude Include="detectnetcoresdkfeatureband.h" />
-    <ClInclude Include="NetfxBundleExtension.h" />
+    <ClInclude Include="NetfxBootstrapperExtension.h" />
     <ClInclude Include="netfxsearch.h" />
     <ClInclude Include="precomp.h" />
     <ClInclude Include="runnetcoresearch.h" />
@@ -73,7 +73,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.BextUtil" />
+    <PackageReference Include="WixToolset.BootstrapperExtensionApi" />
 
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>

@@ -12,7 +12,7 @@ namespace WixToolset.Core.Burn.Bundles
     /// <summary>
     /// Common functionality for Burn PE Writer &amp; Reader for the WiX toolset.
     /// </summary>
-    /// <remarks>This class encapsulates common functionality related to 
+    /// <remarks>This class encapsulates common functionality related to
     /// bundled/chained setup packages.</remarks>
     /// <example>
     /// </example>
@@ -25,7 +25,7 @@ namespace WixToolset.Core.Burn.Bundles
 
         public const string BADataFileName = "BootstrapperApplicationData.xml";
 
-        public const string BundleExtensionDataFileName = "BundleExtensionData.xml";
+        public const string BootstrapperExtensionDataFileName = "BootstrapperExtensionData.xml";
 
         // See WinNT.h for details about the PE format, including the
         // structure and offsets for IMAGE_DOS_HEADER, IMAGE_NT_HEADERS32,
@@ -320,7 +320,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 this.wixburnRawDataSize = BurnCommon.ReadUInt32(bytes, IMAGE_SECTION_HEADER_OFFSET_SIZEOFRAWDATA);
 
-                // we need 52 bytes for the manifest header, which is always going to fit in 
+                // we need 52 bytes for the manifest header, which is always going to fit in
                 // the smallest alignment (512 bytes), but just to be paranoid...
                 if (BURN_SECTION_MIN_SIZE > this.wixburnRawDataSize)
                 {

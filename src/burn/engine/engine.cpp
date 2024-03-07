@@ -535,7 +535,7 @@ static HRESULT RunNormal(
 
     // Load the extensions.
     hr = BurnExtensionLoad(&pEngineState->extensions, &extensionEngineContext);
-    ExitOnFailure(hr, "Failed to load BundleExtensions.");
+    ExitOnFailure(hr, "Failed to load BootstrapperExtensions.");
 
     // The secondary bootstrapper application only gets one chance to execute. That means
     // first time through we run the primary bootstrapper application and on reload we run

@@ -192,7 +192,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void PopulatesBEManifestWithBundleExtensionBundleCustomData()
+        public void PopulatesBEManifestWithBootstrapperExtensionBundleCustomData()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -222,7 +222,7 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var customElements = extractResult.GetBundleExtensionTestXmlLines("/be:BundleExtensionData/be:BundleExtension[@Id='CustomTableExtension']/be:BundleCustomTableBE");
+                var customElements = extractResult.GetBootstrapperExtensionTestXmlLines("/be:BootstrapperExtensionData/be:BootstrapperExtension[@Id='CustomTableExtension']/be:BundleCustomTableBE");
                 WixAssert.CompareLineByLine(new[]
                 {
                     "<BundleCustomTableBE Id='one' Column2='two' />",
@@ -233,7 +233,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void PopulatesManifestWithBundleExtension()
+        public void PopulatesManifestWithBootstrapperExtension()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -248,8 +248,8 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
-                    Path.Combine(folder, "BundleExtension", "BundleExtension.wxs"),
-                    Path.Combine(folder, "BundleExtension", "SimpleBundleExtension.wxs"),
+                    Path.Combine(folder, "BootstrapperExtension", "BootstrapperExtension.wxs"),
+                    Path.Combine(folder, "BootstrapperExtension", "SimpleBootstrapperExtension.wxs"),
                     Path.Combine(folder, "BundleWithPackageGroupRef", "MinimalPackageGroup.wxs"),
                     Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
@@ -264,22 +264,22 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var bundleExtensions = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:BundleExtension");
+                var bootstrapperExtensions = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:BootstrapperExtension");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<BundleExtension Id='ExampleBext' EntryPayloadSourcePath='u1' />",
-                }, bundleExtensions);
+                    "<BootstrapperExtension Id='ExampleBext' EntryPayloadSourcePath='u1' />",
+                }, bootstrapperExtensions);
 
-                var bundleExtensionPayloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:UX/burn:Payload[@Id='ExampleBext']");
+                var bootstrapperExtensionPayloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:UX/burn:Payload[@Id='ExampleBext']");
                 WixAssert.CompareLineByLine(new[]
                 {
                     "<Payload Id='ExampleBext' FilePath='fakebext.dll' SourcePath='u1' />",
-                }, bundleExtensionPayloads);
+                }, bootstrapperExtensionPayloads);
             }
         }
 
         [Fact]
-        public void PopulatesManifestWithBundleExtensionSearches()
+        public void PopulatesManifestWithBootstrapperExtensionSearches()
         {
             var folder = TestData.Get(@"TestData");
 
@@ -294,8 +294,8 @@ namespace WixToolsetTest.CoreIntegration
                 var result = WixRunner.Execute(new[]
                 {
                     "build",
-                    Path.Combine(folder, "BundleExtension", "BundleExtensionSearches.wxs"),
-                    Path.Combine(folder, "BundleExtension", "BundleWithSearches.wxs"),
+                    Path.Combine(folder, "BootstrapperExtension", "BootstrapperExtensionSearches.wxs"),
+                    Path.Combine(folder, "BootstrapperExtension", "BundleWithSearches.wxs"),
                     Path.Combine(folder, "BundleWithPackageGroupRef", "MinimalPackageGroup.wxs"),
                     Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
                     "-ext", ExtensionPaths.ExampleExtensionPath,
@@ -311,29 +311,29 @@ namespace WixToolsetTest.CoreIntegration
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
-                var bundleExtensions = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:BundleExtension");
+                var bootstrapperExtensions = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:BootstrapperExtension");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<BundleExtension Id='ExampleBundleExtension' EntryPayloadSourcePath='u1' />",
-                }, bundleExtensions);
+                    "<BootstrapperExtension Id='ExampleBootstrapperExtension' EntryPayloadSourcePath='u1' />",
+                }, bootstrapperExtensions);
 
                 var extensionSearches = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:ExtensionSearch");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<ExtensionSearch Id='ExampleSearchBar' Variable='SearchBar' Condition='WixBundleInstalled' ExtensionId='ExampleBundleExtension' />",
-                    "<ExtensionSearch Id='ExampleSearchFoo' Variable='SearchFoo' ExtensionId='ExampleBundleExtension' />",
+                    "<ExtensionSearch Id='ExampleSearchBar' Variable='SearchBar' Condition='WixBundleInstalled' ExtensionId='ExampleBootstrapperExtension' />",
+                    "<ExtensionSearch Id='ExampleSearchFoo' Variable='SearchFoo' ExtensionId='ExampleBootstrapperExtension' />",
                 }, extensionSearches);
 
-                var bundleExtensionDatas = extractResult.GetBundleExtensionTestXmlLines("/be:BundleExtensionData/be:BundleExtension[@Id='ExampleBundleExtension']");
+                var bootstrapperExtensionDatas = extractResult.GetBootstrapperExtensionTestXmlLines("/be:BootstrapperExtensionData/be:BootstrapperExtension[@Id='ExampleBootstrapperExtension']");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<BundleExtension Id='ExampleBundleExtension'>" +
+                    "<BootstrapperExtension Id='ExampleBootstrapperExtension'>" +
                     "<ExampleSearch Id='ExampleSearchBar' SearchFor='Bar' />" +
                     "<ExampleSearch Id='ExampleSearchFoo' SearchFor='Foo' />" +
-                    "</BundleExtension>"
-                }, bundleExtensionDatas);
+                    "</BootstrapperExtension>"
+                }, bootstrapperExtensionDatas);
 
-                var exampleSearches = extractResult.GetBundleExtensionTestXmlLines("/be:BundleExtensionData/be:BundleExtension[@Id='ExampleBundleExtension']/be:ExampleSearch");
+                var exampleSearches = extractResult.GetBootstrapperExtensionTestXmlLines("/be:BootstrapperExtensionData/be:BootstrapperExtension[@Id='ExampleBootstrapperExtension']/be:ExampleSearch");
                 WixAssert.CompareLineByLine(new[]
                 {
                     "<ExampleSearch Id='ExampleSearchBar' SearchFor='Bar' />",

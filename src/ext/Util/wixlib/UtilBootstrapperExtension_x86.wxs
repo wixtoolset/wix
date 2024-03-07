@@ -3,5 +3,5 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <?define platform=x86 ?>
-    <?include NetfxBundleExtension_Platform.wxi ?>
+    <?include UtilBootstrapperExtension_Platform.wxi ?>
 </Wix>

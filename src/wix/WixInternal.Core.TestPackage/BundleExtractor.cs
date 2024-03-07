@@ -16,7 +16,7 @@ namespace WixInternal.Core.TestPackage
     {
         private const string BurnNamespace = "http://wixtoolset.org/schemas/v4/2008/Burn";
         private const string BADataFileName = "BootstrapperApplicationData.xml";
-        private const string BundleExtensionDataFileName = "BundleExtensionData.xml";
+        private const string BootstrapperExtensionDataFileName = "BootstrapperExtensionData.xml";
 
         /// <summary>
         /// Extracts the BA container.
@@ -71,8 +71,8 @@ namespace WixInternal.Core.TestPackage
                 result.BADataDocument = LoadBAData(baFolderPath);
                 result.BADataNamespaceManager = GetBADataNamespaceManager(result.BADataDocument, "ba");
 
-                result.BundleExtensionDataDocument = LoadBundleExtensionData(baFolderPath);
-                result.BundleExtensionDataNamespaceManager = GetBundleExtensionDataNamespaceManager(result.BundleExtensionDataDocument, "be");
+                result.BootstrapperExtensionDataDocument = LoadBootstrapperExtensionData(baFolderPath);
+                result.BootstrapperExtensionDataNamespaceManager = GetBootstrapperExtensionDataNamespaceManager(result.BootstrapperExtensionDataDocument, "be");
             }
 
             return result;
@@ -92,15 +92,15 @@ namespace WixInternal.Core.TestPackage
         }
 
         /// <summary>
-        /// Gets an <see cref="XmlNamespaceManager"/> for BundleExtensionData.xml with the given prefix assigned to the root namespace.
+        /// Gets an <see cref="XmlNamespaceManager"/> for BootstrapperExtensionData.xml with the given prefix assigned to the root namespace.
         /// </summary>
         /// <param name="document"></param>
         /// <param name="prefix"></param>
         /// <returns></returns>
-        public static XmlNamespaceManager GetBundleExtensionDataNamespaceManager(XmlDocument document, string prefix)
+        public static XmlNamespaceManager GetBootstrapperExtensionDataNamespaceManager(XmlDocument document, string prefix)
         {
             var namespaceManager = new XmlNamespaceManager(document.NameTable);
-            namespaceManager.AddNamespace(prefix, BurnConstants.BundleExtensionDataNamespace);
+            namespaceManager.AddNamespace(prefix, BurnConstants.BootstrapperExtensionDataNamespace);
             return namespaceManager;
         }
 
@@ -134,10 +134,10 @@ namespace WixInternal.Core.TestPackage
         /// </summary>
         /// <param name="baFolderPath"></param>
         /// <returns></returns>
-        public static XmlDocument LoadBundleExtensionData(string baFolderPath)
+        public static XmlDocument LoadBootstrapperExtensionData(string baFolderPath)
         {
             var document = new XmlDocument();
-            document.Load(Path.Combine(baFolderPath, BundleExtensionDataFileName));
+            document.Load(Path.Combine(baFolderPath, BootstrapperExtensionDataFileName));
             return document;
         }
 

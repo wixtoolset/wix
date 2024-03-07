@@ -1,10 +1,10 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 #include "precomp.h"
-#include "BextBaseBundleExtensionProc.h"
+#include "BextBaseBootstrapperExtensionProc.h"
 
 static HINSTANCE vhInstance = NULL;
-static IBundleExtension* vpBundleExtension = NULL;
+static IBootstrapperExtension* vpBootstrapperExtension = NULL;
 
 // function definitions
 
@@ -28,13 +28,13 @@ extern "C" BOOL WINAPI DllMain(
     return TRUE;
 }
 
-extern "C" HRESULT WINAPI BundleExtensionCreate(
-    __in const BUNDLE_EXTENSION_CREATE_ARGS* pArgs,
-    __inout BUNDLE_EXTENSION_CREATE_RESULTS* pResults
+extern "C" HRESULT WINAPI BootstrapperExtensionCreate(
+    __in const BOOTSTRAPPER_EXTENSION_CREATE_ARGS* pArgs,
+    __inout BOOTSTRAPPER_EXTENSION_CREATE_RESULTS* pResults
     )
 {
     HRESULT hr = S_OK;
-    IBundleExtensionEngine* pEngine = NULL;
+    IBootstrapperExtensionEngine* pEngine = NULL;
 
     hr = XmlInitialize();
     ExitOnFailure(hr, "Failed to initialize XML.");
@@ -42,11 +42,11 @@ extern "C" HRESULT WINAPI BundleExtensionCreate(
     hr = BextInitializeFromCreateArgs(pArgs, &pEngine);
     ExitOnFailure(hr, "Failed to initialize bext");
 
-    hr = NetfxBundleExtensionCreate(vhInstance, pEngine, pArgs, &vpBundleExtension);
-    BextExitOnFailure(hr, "Failed to create WixNetfxBundleExtension");
+    hr = NetfxBootstrapperExtensionCreate(vhInstance, pEngine, pArgs, &vpBootstrapperExtension);
+    BextExitOnFailure(hr, "Failed to create WixNetfxBootstrapperExtension");
 
-    pResults->pfnBundleExtensionProc = BextBaseBundleExtensionProc;
-    pResults->pvBundleExtensionProcContext = vpBundleExtension;
+    pResults->pfnBootstrapperExtensionProc = BextBaseBootstrapperExtensionProc;
+    pResults->pvBootstrapperExtensionProcContext = vpBootstrapperExtension;
 
 LExit:
     ReleaseObject(pEngine);
@@ -54,9 +54,9 @@ LExit:
     return hr;
 }
 
-extern "C" void WINAPI BundleExtensionDestroy()
+extern "C" void WINAPI BootstrapperExtensionDestroy()
 {
     BextUninitialize();
-    ReleaseNullObject(vpBundleExtension);
+    ReleaseNullObject(vpBootstrapperExtension);
     XmlUninitialize();
 }

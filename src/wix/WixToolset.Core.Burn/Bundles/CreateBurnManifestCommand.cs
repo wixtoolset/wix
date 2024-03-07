@@ -702,16 +702,16 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteEndElement();
                 }
 
-                // Write the BundleExtension elements.
-                var bundleExtensions = this.Section.Symbols.OfType<WixBundleExtensionSymbol>();
+                // Write the BootstrapperExtension elements.
+                var bootstrapperExtensions = this.Section.Symbols.OfType<WixBootstrapperExtensionSymbol>();
                 var uxPayloadsById = this.UXContainerPayloads.ToDictionary(p => p.Id.Id);
 
-                foreach (var bundleExtension in bundleExtensions)
+                foreach (var bootstrapperExtension in bootstrapperExtensions)
                 {
-                    var entryPayload = uxPayloadsById[bundleExtension.PayloadRef];
+                    var entryPayload = uxPayloadsById[bootstrapperExtension.PayloadRef];
 
-                    writer.WriteStartElement("BundleExtension");
-                    writer.WriteAttributeString("Id", bundleExtension.Id.Id);
+                    writer.WriteStartElement("BootstrapperExtension");
+                    writer.WriteAttributeString("Id", bootstrapperExtension.Id.Id);
                     writer.WriteAttributeString("EntryPayloadSourcePath", entryPayload.EmbeddedId);
 
                     writer.WriteEndElement();

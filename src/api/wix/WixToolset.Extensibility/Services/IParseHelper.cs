@@ -201,8 +201,8 @@ namespace WixToolset.Extensibility.Services
         /// <param name="variable">The Burn variable to store the result into.</param>
         /// <param name="condition">A condition to test before evaluating the search.</param>
         /// <param name="after">The search that this one will execute after.</param>
-        /// <param name="bundleExtensionId">The id of the bundle extension that handles this search.</param>
-        void CreateWixSearchSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bundleExtensionId);
+        /// <param name="bootstrapperExtensionId">The id of the bootstrapper extension that handles this search.</param>
+        void CreateWixSearchSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bootstrapperExtensionId);
 
         /// <summary>
         ///

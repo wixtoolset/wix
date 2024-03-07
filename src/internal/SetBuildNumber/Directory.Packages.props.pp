@@ -13,8 +13,8 @@
     <PackageVersion Include="WixToolset.DUtil" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.WcaUtil" Version="{packageversion}" />
 
-    <PackageVersion Include="WixToolset.BextUtil" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.BootstrapperApplicationApi" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.BootstrapperExtensionApi" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.WixStandardBootstrapperApplicationFunctionApi" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Data" Version="{packageversion}" />
@@ -55,17 +55,6 @@
     <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="3.1.13" />
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="1.16.30" />
     <PackageVersion Include="Microsoft.Win32.Registry" Version="4.7.0" />
-  </ItemGroup>
-
-  <!--
-    Refer to this documentation when updating the versions of these packages:
-    https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md
-  -->
-  <ItemGroup>
-    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing.XUnit" Version="1.1.1" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
   </ItemGroup>
 
   <ItemGroup>

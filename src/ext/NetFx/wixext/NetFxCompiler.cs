@@ -225,15 +225,15 @@ namespace WixToolset.Netfx
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            var bundleExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4NetfxBundleExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
-            if (bundleExtensionId == null)
+            var bootstrapperExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4NetfxBootstrapperExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
+            if (bootstrapperExtensionId == null)
             {
                 this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), element.Name.LocalName));
             }
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bundleExtensionId);
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bootstrapperExtensionId);
 
                 section.AddSymbol(new NetFxNetCoreSearchSymbol(sourceLineNumbers, id)
                 {
@@ -354,15 +354,15 @@ namespace WixToolset.Netfx
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            var bundleExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4NetfxBundleExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
-            if (bundleExtensionId == null)
+            var bootstrapperExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4NetfxBootstrapperExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
+            if (bootstrapperExtensionId == null)
             {
                 this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), element.Name.LocalName));
             }
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bundleExtensionId);
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bootstrapperExtensionId);
 
                 section.AddSymbol(new NetFxNetCoreSdkSearchSymbol(sourceLineNumbers, id)
                 {
@@ -503,15 +503,15 @@ namespace WixToolset.Netfx
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            var bundleExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4NetfxBundleExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
-            if (bundleExtensionId == null)
+            var bootstrapperExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4NetfxBootstrapperExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
+            if (bootstrapperExtensionId == null)
             {
                 this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), element.Name.LocalName));
             }
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bundleExtensionId);
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bootstrapperExtensionId);
 
                 section.AddSymbol(new NetFxNetCoreSdkFeatureBandSearchSymbol(sourceLineNumbers, id)
                 {

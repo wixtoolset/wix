@@ -104,8 +104,8 @@
     <ClInclude Include="approvedexe.h" />
     <ClInclude Include="..\..\api\burn\inc\BootstrapperApplication.h" />
     <ClInclude Include="..\..\api\burn\inc\BootstrapperEngine.h" />
-    <ClInclude Include="..\..\api\burn\inc\BundleExtension.h" />
-    <ClInclude Include="..\..\api\burn\inc\BundleExtensionEngine.h" />
+    <ClInclude Include="..\..\api\burn\inc\BootstrapperExtension.h" />
+    <ClInclude Include="..\..\api\burn\inc\BootstrapperExtensionEngine.h" />
     <ClInclude Include="ba.h" />
     <ClInclude Include="bacallback.h" />
     <ClInclude Include="bundlepackageengine.h" />

@@ -6083,11 +6083,11 @@ namespace WixToolset.Core
                     case "BundleCustomDataRef":
                         this.ParseBundleCustomDataRefElement(child);
                         break;
-                    case "BundleExtension":
-                        this.ParseBundleExtensionElement(child);
+                    case "BootstrapperExtension":
+                        this.ParseBootstrapperExtensionElement(child);
                         break;
-                    case "BundleExtensionRef":
-                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixBundleExtension);
+                    case "BootstrapperExtensionRef":
+                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixBootstrapperExtension);
                         break;
                     case "ComplianceCheck":
                         this.ParseComplianceCheckElement(child);

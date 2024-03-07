@@ -28,14 +28,14 @@ namespace WixToolset.Extensibility.Services
         void AddBootstrapperApplicationData(IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false);
 
         /// <summary>
-        /// Adds the given XML to the BundleExtensionData manifest for the given bundle extension.
+        /// Adds the given XML to the BootstrapperExtensionData manifest for the given bundle extension.
         /// </summary>
         /// <param name="extensionId">The bundle extension's id.</param>
         /// <param name="xml">A valid XML fragment.</param>
-        void AddBundleExtensionData(string extensionId, string xml);
+        void AddBootstrapperExtensionData(string extensionId, string xml);
 
         /// <summary>
-        /// Adds an XML element for the given symbol to the BundleExtensionData manifest for the given bundle extension.
+        /// Adds an XML element for the given symbol to the BootstrapperExtensionData manifest for the given bundle extension.
         /// The symbol's name is used for the element's name.
         /// All of the symbol's fields are used for the element's attributes.
         /// </summary>
@@ -45,6 +45,6 @@ namespace WixToolset.Extensibility.Services
         /// If true and the symbol has an Id,
         /// then an Id attribute is created with a value of the symbol's Id.
         /// </param>
-        void AddBundleExtensionData(string extensionId, IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false);
+        void AddBootstrapperExtensionData(string extensionId, IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false);
     }
 }

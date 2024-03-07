@@ -11,13 +11,13 @@ namespace WixToolset.Data.Burn
         public const string BundleLayoutOnlyPayloadsName = "BundleLayoutOnlyPayloads";
 
         public const string BurnManifestWixOutputStreamName = "wix-burndata.xml";
-        public const string BundleExtensionDataWixOutputStreamName = "wix-bextdata";
+        public const string BootstrapperExtensionDataWixOutputStreamName = "wix-bextdata";
         public const string BootstrapperApplicationDataWixOutputStreamName = "wix-badata.xml";
 
         public const string BootstrapperApplicationDataNamespace = "http://wixtoolset.org/schemas/v4/BootstrapperApplicationData";
-        public const string BundleExtensionDataNamespace = "http://wixtoolset.org/schemas/v4/BundleExtensionData";
+        public const string BootstrapperExtensionDataNamespace = "http://wixtoolset.org/schemas/v4/BootstrapperExtensionData";
 
         public const string BootstrapperApplicationDataSymbolDefinitionTag = "WixBootstrapperApplicationData";
-        public const string BundleExtensionSearchSymbolDefinitionTag = "WixBundleExtensionSearch";
+        public const string BootstrapperExtensionSearchSymbolDefinitionTag = "WixBootstrapperExtensionSearch";
     }
 }

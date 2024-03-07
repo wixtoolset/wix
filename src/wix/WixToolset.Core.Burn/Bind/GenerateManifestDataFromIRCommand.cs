@@ -48,7 +48,7 @@ namespace WixToolset.Core.Burn.Bind
                 var extensionSearchSymbols = kvp.Value;
                 foreach (var extensionSearchSymbol in extensionSearchSymbols)
                 {
-                    this.BackendHelper.AddBundleExtensionData(extensionId, extensionSearchSymbol, symbolIdIsIdAttribute: true);
+                    this.BackendHelper.AddBootstrapperExtensionData(extensionId, extensionSearchSymbol, symbolIdIsIdAttribute: true);
                     symbols.Remove(extensionSearchSymbol);
                 }
             }
@@ -70,7 +70,7 @@ namespace WixToolset.Core.Burn.Bind
                     case SymbolDefinitionType.WixBundleBundlePackagePayload:
                     case SymbolDefinitionType.WixBundleExePackage:
                     case SymbolDefinitionType.WixBundleExePackagePayload:
-                    case SymbolDefinitionType.WixBundleExtension:
+                    case SymbolDefinitionType.WixBootstrapperExtension:
                     case SymbolDefinitionType.WixBundleHarvestedBundlePackage:
                     case SymbolDefinitionType.WixBundleHarvestedDependencyProvider:
                     case SymbolDefinitionType.WixBundleHarvestedMsiPackage:
@@ -153,7 +153,7 @@ namespace WixToolset.Core.Burn.Bind
             switch (wixBundleCustomDataSymbol.Type)
             {
                 case WixBundleCustomDataType.BootstrapperApplication:
-                case WixBundleCustomDataType.BundleExtension:
+                case WixBundleCustomDataType.BootstrapperExtension:
                     break;
                 default:
                     return false;
@@ -195,8 +195,8 @@ namespace WixToolset.Core.Burn.Bind
                         case WixBundleCustomDataType.BootstrapperApplication:
                             writer.WriteStartElement(elementName, BurnConstants.BootstrapperApplicationDataNamespace);
                             break;
-                        case WixBundleCustomDataType.BundleExtension:
-                            writer.WriteStartElement(elementName, BurnConstants.BundleExtensionDataNamespace);
+                        case WixBundleCustomDataType.BootstrapperExtension:
+                            writer.WriteStartElement(elementName, BurnConstants.BootstrapperExtensionDataNamespace);
                             break;
                         default:
                             throw new NotImplementedException();
@@ -219,8 +219,8 @@ namespace WixToolset.Core.Burn.Bind
                     case WixBundleCustomDataType.BootstrapperApplication:
                         this.BackendHelper.AddBootstrapperApplicationData(sb.ToString());
                         break;
-                    case WixBundleCustomDataType.BundleExtension:
-                        this.BackendHelper.AddBundleExtensionData(customDataSymbol.BundleExtensionRef, sb.ToString());
+                    case WixBundleCustomDataType.BootstrapperExtension:
+                        this.BackendHelper.AddBootstrapperExtensionData(customDataSymbol.BootstrapperExtensionRef, sb.ToString());
                         break;
                     default:
                         throw new NotImplementedException();

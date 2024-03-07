@@ -4,5 +4,5 @@
 HRESULT UtilPerformDetectSHA2CodeSigning(
     __in LPCWSTR wzVariable,
     __in UTIL_SEARCH* pSearch,
-    __in IBundleExtensionEngine* pEngine
+    __in IBootstrapperExtensionEngine* pEngine
     );

@@ -18,9 +18,9 @@ namespace WixToolset.Core.Burn
             {
                 writer.WriteAttributeString("Condition", this.SearchSymbol.Condition);
             }
-            if (!String.IsNullOrEmpty(this.SearchSymbol.BundleExtensionRef))
+            if (!String.IsNullOrEmpty(this.SearchSymbol.BootstrapperExtensionRef))
             {
-                writer.WriteAttributeString("ExtensionId", this.SearchSymbol.BundleExtensionRef);
+                writer.WriteAttributeString("ExtensionId", this.SearchSymbol.BootstrapperExtensionRef);
             }
         }
     }

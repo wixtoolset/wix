@@ -24,9 +24,9 @@
 #include <xmlutil.h>
 
 #include <bextutil.h>
-#include <BextBundleExtensionEngine.h>
+#include <BextBootstrapperExtensionEngine.h>
 
 #include "..\..\beDecor.h"
 #include "utilsearch.h"
 #include "detectsha2support.h"
-#include "UtilBundleExtension.h"
+#include "UtilBootstrapperExtension.h"

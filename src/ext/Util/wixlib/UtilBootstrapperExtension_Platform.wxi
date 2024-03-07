@@ -5,6 +5,6 @@
     <?include ..\..\caDecor.wxi ?>
 
     <Fragment>
-        <BundleExtension Id="$(var.Prefix)UtilBundleExtension$(var.Suffix)" SourceFile="!(bindpath.utilbe.$(var.platform))utilbe.dll" Name="$(var.Prefix)UtilBundleExtension$(var.Suffix)\utilbe.dll" />
+        <BootstrapperExtension Id="$(var.Prefix)UtilBootstrapperExtension$(var.Suffix)" SourceFile="!(bindpath.utilbe.$(var.platform))utilbe.dll" Name="$(var.Prefix)UtilBootstrapperExtension$(var.Suffix)\utilbe.dll" />
     </Fragment>
 </Include>

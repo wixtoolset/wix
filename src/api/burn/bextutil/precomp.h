@@ -13,4 +13,4 @@
 #include <xmlutil.h>
 
 #include "bextutil.h"
-#include "BextBundleExtensionEngine.h"
+#include "BextBootstrapperExtensionEngine.h"

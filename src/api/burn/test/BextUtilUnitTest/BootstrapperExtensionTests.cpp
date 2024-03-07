@@ -9,20 +9,20 @@ using namespace WixInternal::TestSupport::XunitExtensions;
 
 namespace BextUtilTests
 {
-    public ref class BundleExtension
+    public ref class BootstrapperExtension
     {
     public:
         [Fact]
-        void CanCreateTestBundleExtension()
+        void CanCreateTestBootstrapperExtension()
         {
             HRESULT hr = S_OK;
-            BUNDLE_EXTENSION_CREATE_ARGS args = { };
-            BUNDLE_EXTENSION_CREATE_RESULTS results = { };
-            IBundleExtensionEngine* pEngine = NULL;
-            IBundleExtension* pBundleExtension = NULL;
+            BOOTSTRAPPER_EXTENSION_CREATE_ARGS args = { };
+            BOOTSTRAPPER_EXTENSION_CREATE_RESULTS results = { };
+            IBootstrapperExtensionEngine* pEngine = NULL;
+            IBootstrapperExtension* pBootstrapperExtension = NULL;
 
             args.cbSize = sizeof(args);
-            args.wzBundleExtensionDataPath = L"test.xml";
+            args.wzBootstrapperExtensionDataPath = L"test.xml";
 
             results.cbSize = sizeof(results);
 
@@ -31,13 +31,13 @@ namespace BextUtilTests
                 hr = BextInitializeFromCreateArgs(&args, &pEngine);
                 NativeAssert::Succeeded(hr, "Failed to create engine.");
 
-                hr = TestBundleExtensionCreate(pEngine, &args, &results, &pBundleExtension);
+                hr = TestBootstrapperExtensionCreate(pEngine, &args, &results, &pBootstrapperExtension);
                 NativeAssert::Succeeded(hr, "Failed to create BootstrapperApplication.");
             }
             finally
             {
                 ReleaseObject(pEngine);
-                ReleaseObject(pBundleExtension);
+                ReleaseObject(pBootstrapperExtension);
             }
         }
     };

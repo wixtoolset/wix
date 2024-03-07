@@ -3,7 +3,7 @@
 #include "precomp.h"
 
 
-class CBextBundleExtensionEngine : public IBundleExtensionEngine
+class CBextBootstrapperExtensionEngine : public IBootstrapperExtensionEngine
 {
 public: // IUnknown
     virtual STDMETHODIMP QueryInterface(
@@ -18,9 +18,9 @@ public: // IUnknown
 
         *ppvObject = NULL;
 
-        if (::IsEqualIID(__uuidof(IBundleExtensionEngine), riid))
+        if (::IsEqualIID(__uuidof(IBootstrapperExtensionEngine), riid))
         {
-            *ppvObject = static_cast<IBundleExtensionEngine*>(this);
+            *ppvObject = static_cast<IBootstrapperExtensionEngine*>(this);
         }
         else if (::IsEqualIID(IID_IUnknown, riid))
         {
@@ -52,7 +52,7 @@ public: // IUnknown
         return 0;
     }
 
-public: // IBundleExtensionEngine
+public: // IBootstrapperExtensionEngine
     virtual STDMETHODIMP EscapeString(
         __in_z LPCWSTR wzIn,
         __out_ecount_opt(*pcchOut) LPWSTR wzOut,
@@ -60,8 +60,8 @@ public: // IBundleExtensionEngine
         )
     {
         HRESULT hr = S_OK;
-        BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_ESCAPESTRING_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_ESCAPESTRING_RESULTS results = { };
 
         ExitOnNull(pcchOut, hr, E_INVALIDARG, "pcchOut is required");
 
@@ -72,7 +72,7 @@ public: // IBundleExtensionEngine
         results.wzOut = wzOut;
         results.cchOut = *pcchOut;
 
-        hr = m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_ESCAPESTRING, &args, &results, m_pvBundleExtensionEngineProcContext);
+        hr = m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_ESCAPESTRING, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
 
         *pcchOut = results.cchOut;
 
@@ -86,8 +86,8 @@ public: // IBundleExtensionEngine
         )
     {
         HRESULT hr = S_OK;
-        BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_EVALUATECONDITION_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_EVALUATECONDITION_RESULTS results = { };
 
         ExitOnNull(pf, hr, E_INVALIDARG, "pf is required");
 
@@ -96,7 +96,7 @@ public: // IBundleExtensionEngine
 
         results.cbSize = sizeof(results);
 
-        hr = m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_EVALUATECONDITION, &args, &results, m_pvBundleExtensionEngineProcContext);
+        hr = m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_EVALUATECONDITION, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
 
         *pf = results.f;
 
@@ -111,8 +111,8 @@ public: // IBundleExtensionEngine
         )
     {
         HRESULT hr = S_OK;
-        BUNDLE_EXTENSION_ENGINE_FORMATSTRING_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_FORMATSTRING_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_FORMATSTRING_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_FORMATSTRING_RESULTS results = { };
 
         ExitOnNull(pcchOut, hr, E_INVALIDARG, "pcchOut is required");
 
@@ -123,7 +123,7 @@ public: // IBundleExtensionEngine
         results.wzOut = wzOut;
         results.cchOut = *pcchOut;
 
-        hr = m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_FORMATSTRING, &args, &results, m_pvBundleExtensionEngineProcContext);
+        hr = m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_FORMATSTRING, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
 
         *pcchOut = results.cchOut;
 
@@ -137,8 +137,8 @@ public: // IBundleExtensionEngine
         )
     {
         HRESULT hr = S_OK;
-        BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLENUMERIC_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLENUMERIC_RESULTS results = { };
 
         ExitOnNull(pllValue, hr, E_INVALIDARG, "pllValue is required");
 
@@ -147,7 +147,7 @@ public: // IBundleExtensionEngine
 
         results.cbSize = sizeof(results);
 
-        hr = m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_GETVARIABLENUMERIC, &args, &results, m_pvBundleExtensionEngineProcContext);
+        hr = m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_GETVARIABLENUMERIC, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
 
         *pllValue = results.llValue;
 
@@ -163,8 +163,8 @@ public: // IBundleExtensionEngine
         )
     {
         HRESULT hr = S_OK;
-        BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLESTRING_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLESTRING_RESULTS results = { };
 
         ExitOnNull(pcchValue, hr, E_INVALIDARG, "pcchValue is required");
 
@@ -175,7 +175,7 @@ public: // IBundleExtensionEngine
         results.wzValue = wzValue;
         results.cchValue = *pcchValue;
 
-        hr = m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_GETVARIABLESTRING, &args, &results, m_pvBundleExtensionEngineProcContext);
+        hr = m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_GETVARIABLESTRING, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
 
         *pcchValue = results.cchValue;
 
@@ -190,8 +190,8 @@ public: // IBundleExtensionEngine
         )
     {
         HRESULT hr = S_OK;
-        BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLEVERSION_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLEVERSION_RESULTS results = { };
 
         ExitOnNull(pcchValue, hr, E_INVALIDARG, "pcchValue is required");
 
@@ -202,7 +202,7 @@ public: // IBundleExtensionEngine
         results.wzValue = wzValue;
         results.cchValue = *pcchValue;
 
-        hr = m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_GETVARIABLEVERSION, &args, &results, m_pvBundleExtensionEngineProcContext);
+        hr = m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_GETVARIABLEVERSION, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
 
         *pcchValue = results.cchValue;
 
@@ -211,12 +211,12 @@ public: // IBundleExtensionEngine
     }
 
     virtual STDMETHODIMP Log(
-        __in BUNDLE_EXTENSION_LOG_LEVEL level,
+        __in BOOTSTRAPPER_EXTENSION_LOG_LEVEL level,
         __in_z LPCWSTR wzMessage
         )
     {
-        BUNDLE_EXTENSION_ENGINE_LOG_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_LOG_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_LOG_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_LOG_RESULTS results = { };
 
         args.cbSize = sizeof(args);
         args.level = level;
@@ -224,7 +224,7 @@ public: // IBundleExtensionEngine
 
         results.cbSize = sizeof(results);
 
-        return m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_LOG, &args, &results, m_pvBundleExtensionEngineProcContext);
+        return m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_LOG, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
     }
 
     virtual STDMETHODIMP SetVariableNumeric(
@@ -232,8 +232,8 @@ public: // IBundleExtensionEngine
         __in LONGLONG llValue
         )
     {
-        BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLENUMERIC_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLENUMERIC_RESULTS results = { };
 
         args.cbSize = sizeof(args);
         args.wzVariable = wzVariable;
@@ -241,7 +241,7 @@ public: // IBundleExtensionEngine
 
         results.cbSize = sizeof(results);
 
-        return m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLENUMERIC, &args, &results, m_pvBundleExtensionEngineProcContext);
+        return m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_SETVARIABLENUMERIC, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
     }
 
     virtual STDMETHODIMP SetVariableString(
@@ -250,8 +250,8 @@ public: // IBundleExtensionEngine
         __in BOOL fFormatted
         )
     {
-        BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLESTRING_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLESTRING_RESULTS results = { };
 
         args.cbSize = sizeof(args);
         args.wzVariable = wzVariable;
@@ -260,7 +260,7 @@ public: // IBundleExtensionEngine
 
         results.cbSize = sizeof(results);
 
-        return m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLESTRING, &args, &results, m_pvBundleExtensionEngineProcContext);
+        return m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_SETVARIABLESTRING, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
     }
 
     virtual STDMETHODIMP SetVariableVersion(
@@ -268,8 +268,8 @@ public: // IBundleExtensionEngine
         __in_z_opt LPCWSTR wzValue
         )
     {
-        BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLEVERSION_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLEVERSION_RESULTS results = { };
 
         args.cbSize = sizeof(args);
         args.wzVariable = wzVariable;
@@ -277,7 +277,7 @@ public: // IBundleExtensionEngine
 
         results.cbSize = sizeof(results);
 
-        return m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLEVERSION, &args, &results, m_pvBundleExtensionEngineProcContext);
+        return m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_SETVARIABLEVERSION, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
     }
 
     virtual STDMETHODIMP CompareVersions(
@@ -287,8 +287,8 @@ public: // IBundleExtensionEngine
         )
     {
         HRESULT hr = S_OK;
-        BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_COMPAREVERSIONS_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_COMPAREVERSIONS_RESULTS results = { };
 
         ExitOnNull(pnResult, hr, E_INVALIDARG, "pnResult is required");
 
@@ -298,7 +298,7 @@ public: // IBundleExtensionEngine
 
         results.cbSize = sizeof(results);
 
-        hr = m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_COMPAREVERSIONS, &args, &results, m_pvBundleExtensionEngineProcContext);
+        hr = m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_COMPAREVERSIONS, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
 
         *pnResult = results.nResult;
 
@@ -314,8 +314,8 @@ public: // IBundleExtensionEngine
     )
     {
         HRESULT hr = S_OK;
-        BUNDLE_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_ARGS args = { };
-        BUNDLE_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_RESULTS results = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_ARGS args = { };
+        BOOTSTRAPPER_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_RESULTS results = { };
 
         ExitOnNull(pcchValue, hr, E_INVALIDARG, "pcchValue is required");
 
@@ -327,7 +327,7 @@ public: // IBundleExtensionEngine
         results.wzValue = wzValue;
         results.cchValue = *pcchValue;
 
-        hr = m_pfnBundleExtensionEngineProc(BUNDLE_EXTENSION_ENGINE_MESSAGE_GETRELATEDBUNDLEVARIABLE, &args, &results, m_pvBundleExtensionEngineProcContext);
+        hr = m_pfnBootstrapperExtensionEngineProc(BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_GETRELATEDBUNDLEVARIABLE, &args, &results, m_pvBootstrapperExtensionEngineProcContext);
 
         *pcchValue = results.cchValue;
 
@@ -336,38 +336,38 @@ public: // IBundleExtensionEngine
     }
 
 public:
-    CBextBundleExtensionEngine(
-        __in PFN_BUNDLE_EXTENSION_ENGINE_PROC pfnBundleExtensionEngineProc,
-        __in_opt LPVOID pvBundleExtensionEngineProcContext
+    CBextBootstrapperExtensionEngine(
+        __in PFN_BOOTSTRAPPER_EXTENSION_ENGINE_PROC pfnBootstrapperExtensionEngineProc,
+        __in_opt LPVOID pvBootstrapperExtensionEngineProcContext
         )
     {
         m_cReferences = 1;
-        m_pfnBundleExtensionEngineProc = pfnBundleExtensionEngineProc;
-        m_pvBundleExtensionEngineProcContext = pvBundleExtensionEngineProcContext;
+        m_pfnBootstrapperExtensionEngineProc = pfnBootstrapperExtensionEngineProc;
+        m_pvBootstrapperExtensionEngineProcContext = pvBootstrapperExtensionEngineProcContext;
     }
 
 private:
     long m_cReferences;
-    PFN_BUNDLE_EXTENSION_ENGINE_PROC m_pfnBundleExtensionEngineProc;
-    LPVOID m_pvBundleExtensionEngineProcContext;
+    PFN_BOOTSTRAPPER_EXTENSION_ENGINE_PROC m_pfnBootstrapperExtensionEngineProc;
+    LPVOID m_pvBootstrapperExtensionEngineProcContext;
 };
 
-HRESULT BextBundleExtensionEngineCreate(
-    __in PFN_BUNDLE_EXTENSION_ENGINE_PROC pfnBundleExtensionEngineProc,
-    __in_opt LPVOID pvBundleExtensionEngineProcContext,
-    __out IBundleExtensionEngine** ppEngineForExtension
+HRESULT BextBootstrapperExtensionEngineCreate(
+    __in PFN_BOOTSTRAPPER_EXTENSION_ENGINE_PROC pfnBootstrapperExtensionEngineProc,
+    __in_opt LPVOID pvBootstrapperExtensionEngineProcContext,
+    __out IBootstrapperExtensionEngine** ppEngineForExtension
     )
 {
     HRESULT hr = S_OK;
-    CBextBundleExtensionEngine* pBundleExtensionEngine = NULL;
+    CBextBootstrapperExtensionEngine* pBootstrapperExtensionEngine = NULL;
 
-    pBundleExtensionEngine = new CBextBundleExtensionEngine(pfnBundleExtensionEngineProc, pvBundleExtensionEngineProcContext);
-    ExitOnNull(pBundleExtensionEngine, hr, E_OUTOFMEMORY, "Failed to allocate new BextBundleExtensionEngine object.");
+    pBootstrapperExtensionEngine = new CBextBootstrapperExtensionEngine(pfnBootstrapperExtensionEngineProc, pvBootstrapperExtensionEngineProcContext);
+    ExitOnNull(pBootstrapperExtensionEngine, hr, E_OUTOFMEMORY, "Failed to allocate new BextBootstrapperExtensionEngine object.");
 
-    hr = pBundleExtensionEngine->QueryInterface(IID_PPV_ARGS(ppEngineForExtension));
-    ExitOnFailure(hr, "Failed to QI for IBundleExtensionEngine from BextBundleExtensionEngine object.");
+    hr = pBootstrapperExtensionEngine->QueryInterface(IID_PPV_ARGS(ppEngineForExtension));
+    ExitOnFailure(hr, "Failed to QI for IBootstrapperExtensionEngine from BextBootstrapperExtensionEngine object.");
 
 LExit:
-    ReleaseObject(pBundleExtensionEngine);
+    ReleaseObject(pBootstrapperExtensionEngine);
     return hr;
 }

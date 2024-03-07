@@ -48,6 +48,6 @@
             </BundleElement>
         </BundleCustomDataRef>
 
-        <BundleExtension Id="CustomTableExtension" SourceFile="fakeba.dll" Name="fakebext.dll" />
+        <BootstrapperExtension Id="CustomTableExtension" SourceFile="fakeba.dll" Name="fakebext.dll" />
     </Fragment>
 </Wix>

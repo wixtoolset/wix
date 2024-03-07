@@ -312,11 +312,13 @@ namespace WixToolset.Core
                         case "BundleCustomDataRef":
                             this.ParseBundleCustomDataRefElement(child);
                             break;
-                        case "BundleExtension":
-                            this.ParseBundleExtensionElement(child);
+                        case "BundleExtension":     // kept for backward compatibility
+                        case "BootstrapperExtension":
+                            this.ParseBootstrapperExtensionElement(child);
                             break;
-                        case "BundleExtensionRef":
-                            this.ParseSimpleRefElement(child, SymbolDefinitions.WixBundleExtension);
+                        case "BundleExtensionRef":  // kept for backward compatibility
+                        case "BootstrapperExtensionRef":
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.WixBootstrapperExtension);
                             break;
                         case "OptionalUpdateRegistration":
                             this.ParseOptionalUpdateRegistrationElement(child, manufacturer, parentName, name);
@@ -916,18 +918,19 @@ namespace WixToolset.Core
                                 case "bootstrapperApplication":
                                     customDataType = WixBundleCustomDataType.BootstrapperApplication;
                                     break;
-                                case "bundleExtension":
-                                    customDataType = WixBundleCustomDataType.BundleExtension;
+                                case "bundleExtension":         // kept for backward compatibility
+                                case "bootstrapperExtension":
+                                    customDataType = WixBundleCustomDataType.BootstrapperExtension;
                                     break;
                                 default:
-                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "bootstrapperApplication", "bundleExtension"));
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "bootstrapperApplication", "bootstrapperExtension"));
                                     customDataType = WixBundleCustomDataType.Unknown; // set a value to prevent expected attribute error below.
                                     break;
                             }
                             break;
                         case "ExtensionId":
                             extensionId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBundleExtension, extensionId);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixBootstrapperExtension, extensionId);
                             break;
                         default:
                             this.Core.UnexpectedAttribute(node, attrib);
@@ -948,7 +951,7 @@ namespace WixToolset.Core
             var hasExtensionId = null != extensionId;
             if (!customDataType.HasValue)
             {
-                customDataType = hasExtensionId ? WixBundleCustomDataType.BundleExtension : WixBundleCustomDataType.BootstrapperApplication;
+                customDataType = hasExtensionId ? WixBundleCustomDataType.BootstrapperExtension : WixBundleCustomDataType.BootstrapperApplication;
             }
 
             if (!customDataType.HasValue)
@@ -962,9 +965,9 @@ namespace WixToolset.Core
                     this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "ExtensonId", "Type", "bootstrapperApplication"));
                 }
             }
-            else if (customDataType.Value == WixBundleCustomDataType.BundleExtension)
+            else if (customDataType.Value == WixBundleCustomDataType.BootstrapperExtension)
             {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ExtensionId", "Type", "bundleExtension"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ExtensionId", "Type", "bootstrapperExtension"));
             }
 
             foreach (var child in node.Elements())
@@ -1007,7 +1010,7 @@ namespace WixToolset.Core
                     {
                         AttributeNames = attributeNames,
                         Type = customDataType.Value,
-                        BundleExtensionRef = extensionId,
+                        BootstrapperExtensionRef = extensionId,
                     });
                 }
             }
@@ -1185,10 +1188,10 @@ namespace WixToolset.Core
         }
 
         /// <summary>
-        /// Parse the BundleExtension element.
+        /// Parse the BootstrapperExtension element.
         /// </summary>
         /// <param name="node">Element to parse</param>
-        private void ParseBundleExtensionElement(XElement node)
+        private void ParseBootstrapperExtensionElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
             var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node);
@@ -1261,10 +1264,10 @@ namespace WixToolset.Core
                 }
             }
 
-            // Add the BundleExtension.
+            // Add the BootstrapperExtension.
             if (!this.Core.EncounteredError)
             {
-                this.Core.AddSymbol(new WixBundleExtensionSymbol(sourceLineNumbers, compilerPayload.Id)
+                this.Core.AddSymbol(new WixBootstrapperExtensionSymbol(sourceLineNumbers, compilerPayload.Id)
                 {
                     PayloadRef = compilerPayload.Id.Id,
                 });

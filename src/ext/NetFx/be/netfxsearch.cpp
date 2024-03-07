@@ -5,7 +5,7 @@
 
 STDMETHODIMP NetfxSearchParseFromXml(
     __in NETFX_SEARCHES* pSearches,
-    __in IXMLDOMNode* pixnBundleExtension
+    __in IXMLDOMNode* pixnBootstrapperExtension
     )
 {
     HRESULT hr = S_OK;
@@ -15,7 +15,7 @@ STDMETHODIMP NetfxSearchParseFromXml(
     BSTR bstrNodeName = NULL;
 
     // Select Netfx search nodes.
-    hr = XmlSelectNodes(pixnBundleExtension, L"NetFxNetCoreSearch|NetFxNetCoreSdkSearch|NetFxNetCoreSdkFeatureBandSearch", &pixnNodes);
+    hr = XmlSelectNodes(pixnBootstrapperExtension, L"NetFxNetCoreSearch|NetFxNetCoreSdkSearch|NetFxNetCoreSdkFeatureBandSearch", &pixnNodes);
     BextExitOnFailure(hr, "Failed to select Netfx search nodes.");
 
     // Get Netfx search node count.
@@ -135,7 +135,7 @@ STDMETHODIMP NetfxSearchExecute(
     __in NETFX_SEARCHES* pSearches,
     __in LPCWSTR wzSearchId,
     __in LPCWSTR wzVariable,
-    __in IBundleExtensionEngine* pEngine,
+    __in IBootstrapperExtensionEngine* pEngine,
     __in LPCWSTR wzBaseDirectory
     )
 {
