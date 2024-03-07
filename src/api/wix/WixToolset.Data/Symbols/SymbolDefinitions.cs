@@ -130,7 +130,7 @@ namespace WixToolset.Data
         WixBundleBundlePackagePayload,
         WixBundleExePackage,
         WixBundleExePackagePayload,
-        WixBundleExtension,
+        WixBootstrapperExtension,
         WixBundleHarvestedBundlePackage,
         WixBundleHarvestedDependencyProvider,
         WixBundleHarvestedMsiPackage,
@@ -579,8 +579,8 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.WixBundleCustomDataCell:
                     return SymbolDefinitions.WixBundleCustomDataCell;
 
-                case SymbolDefinitionType.WixBundleExtension:
-                    return SymbolDefinitions.WixBundleExtension;
+                case SymbolDefinitionType.WixBootstrapperExtension:
+                    return SymbolDefinitions.WixBootstrapperExtension;
 
                 case SymbolDefinitionType.WixBundleExePackage:
                     return SymbolDefinitions.WixBundleExePackage;

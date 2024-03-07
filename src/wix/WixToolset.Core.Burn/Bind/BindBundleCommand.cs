@@ -427,10 +427,10 @@ namespace WixToolset.Core.Burn
             // Generate the bundle extension manifest...
             string bextManifestPath;
             {
-                var command = new CreateBundleExtensionManifestCommand(section, bundleSymbol, uxPayloadIndex, this.IntermediateFolder, this.InternalBurnBackendHelper);
+                var command = new CreateBootstrapperExtensionManifestCommand(section, bundleSymbol, uxPayloadIndex, this.IntermediateFolder, this.InternalBurnBackendHelper);
                 command.Execute();
 
-                var bextManifestPayload = command.BundleExtensionManifestPayloadRow;
+                var bextManifestPayload = command.BootstrapperExtensionManifestPayloadRow;
                 bextManifestPath = command.OutputPath;
                 payloadSymbols.Add(bextManifestPayload.Id.Id, bextManifestPayload);
                 ++uxPayloadIndex;
@@ -550,7 +550,7 @@ namespace WixToolset.Core.Burn
 
             wixout.ImportDataStream(BurnConstants.BurnManifestWixOutputStreamName, manifestPath);
             wixout.ImportDataStream(BurnConstants.BootstrapperApplicationDataWixOutputStreamName, baDataPath);
-            wixout.ImportDataStream(BurnConstants.BundleExtensionDataWixOutputStreamName, bextDataPath);
+            wixout.ImportDataStream(BurnConstants.BootstrapperExtensionDataWixOutputStreamName, bextDataPath);
 
             wixout.Reopen();
 

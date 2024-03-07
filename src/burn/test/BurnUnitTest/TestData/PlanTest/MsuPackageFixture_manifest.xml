@@ -4,8 +4,8 @@
     <RelatedBundle Id="{B94478B1-E1F3-4700-9CE8-6AA090854AEC}" Action="Upgrade" />
     <UX PrimaryPayloadId="payaQenPi7_8hq6T._EXtBW0NvR7gA">
         <Payload Id="payaQenPi7_8hq6T._EXtBW0NvR7gA" FilePath="fakeba.exe" SourcePath="u0" />
-        <Payload Id="uxTxMXPVMXwQrPTMIGa5WGt93w0Ns" FilePath="BootstrapperApplicationData.xml" SourcePath="u1" />
-        <Payload Id="uxYRbgitOs0K878jn5L_z7LdJ21KI" FilePath="BundleExtensionData.xml" SourcePath="u2" />
+        <Payload Id="uxmKgAFS4cS31ZH_Myfqo5J4kHixQ" FilePath="BootstrapperApplicationData.xml" SourcePath="u1" />
+        <Payload Id="uxYRbgitOs0K878jn5L_z7LdJ21KI" FilePath="BootstrapperExtensionData.xml" SourcePath="u2" />
     </UX>
     <Container Id="WixAttachedContainer" FileSize="119" Hash="06D28293FD57CD231E125EF9C82418A488928A98832A6937A77A3283A17A5C37F8D619C51759319A57E8F8A948FA73E8C5814185A0114130F3213AB268073555" FilePath="test.exe" AttachedIndex="1" Attached="yes" Primary="yes" />
     <Payload Id="test.msu" FilePath="test.msu" FileSize="28" Hash="B040F02D2F90E04E9AFBDC91C00CEB5DF97D48E205D96DC0A44E10AF8870794DAE62CA70224F12BE9112AA730BBE470CA81FB5617AAC690E832F3F84510E92BA" Packaging="embedded" SourcePath="a0" Container="WixAttachedContainer" />

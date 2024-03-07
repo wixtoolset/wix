@@ -8,8 +8,8 @@
         <Payload Id="pay00kQk8rVqabvZJ20B.w1mpx7GDo" FilePath="thm.xml" FileSize="7980" Hash="7A88582165EEE4CA1D23F1B7DD58F8023552E049" Packaging="embedded" SourcePath="u0" />
         <Payload Id="payI2_GHsNfx8LnXWC6YRRG.VuyhI4" FilePath="thm.wxl" FileSize="4194" Hash="906294A9515835C5C8F4C5E86A32E179041C90DD" Packaging="embedded" SourcePath="u1" />
         <Payload Id="payjqSD44latbvJnf4vAQuVMUST73A" FilePath="logo.png" FileSize="852" Hash="239F10674BF6022854C1F1BF7C91955BDE34D3E4" Packaging="embedded" SourcePath="u2" />
-        <Payload Id="uxTxMXPVMXwQrPTMIGa5WGt93w0Ns" FilePath="BootstrapperApplicationData.xml" FileSize="3698" Hash="AADECC6EF50E87D0642A5667CD612EF53E2CFB9A" Packaging="embedded" SourcePath="u4" />
-        <Payload Id="uxYRbgitOs0K878jn5L_z7LdJ21KI" FilePath="BundleExtensionData.xml" FileSize="252" Hash="86688B13D3364ADB90BBA552F544D4D546AFD63D" Packaging="embedded" SourcePath="u5" />
+        <Payload Id="uxmKgAFS4cS31ZH_Myfqo5J4kHixQ" FilePath="BootstrapperApplicationData.xml" FileSize="3698" Hash="AADECC6EF50E87D0642A5667CD612EF53E2CFB9A" Packaging="embedded" SourcePath="u4" />
+        <Payload Id="uxYRbgitOs0K878jn5L_z7LdJ21KI" FilePath="BootstrapperExtensionData.xml" FileSize="252" Hash="86688B13D3364ADB90BBA552F544D4D546AFD63D" Packaging="embedded" SourcePath="u5" />
     </UX>
     <Container Id="WixAttachedContainer" FileSize="6959" Hash="4FC82B3432B5892D2A4EC593264A916DBDA9CE45" FilePath="BundleA.exe" AttachedIndex="1" Attached="yes" Primary="yes" />
     <Payload Id="PackageA" FilePath="PackageA.msi" FileSize="32768" Hash="89C61F8A105A81B08036401152A1FDE67CDC0158" Packaging="embedded" SourcePath="a0" Container="WixAttachedContainer" />

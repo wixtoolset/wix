@@ -242,7 +242,7 @@ namespace WixToolset.Core.ExtensibilityServices
             });
         }
 
-        public void CreateWixSearchSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bundleExtensionId)
+        public void CreateWixSearchSymbol(IntermediateSection section, SourceLineNumber sourceLineNumbers, string elementName, Identifier id, string variable, string condition, string after, string bootstrapperExtensionId)
         {
             if (variable == null)
             {
@@ -257,7 +257,7 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 Variable = variable,
                 Condition = condition,
-                BundleExtensionRef = bundleExtensionId,
+                BootstrapperExtensionRef = bootstrapperExtensionId,
             });
 
             if (after != null)
@@ -267,9 +267,9 @@ namespace WixToolset.Core.ExtensibilityServices
                 this.CreateWixSearchRelationSymbol(section, sourceLineNumbers, id, after, 2);
             }
 
-            if (!String.IsNullOrEmpty(bundleExtensionId))
+            if (!String.IsNullOrEmpty(bootstrapperExtensionId))
             {
-                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBundleExtension, bundleExtensionId);
+                this.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixBootstrapperExtension, bootstrapperExtensionId);
             }
         }
 

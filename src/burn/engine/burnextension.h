@@ -18,7 +18,7 @@ typedef struct _BURN_EXTENSION
     BURN_PAYLOAD* pEntryPayload;
 
     HMODULE hBextModule;
-    PFN_BUNDLE_EXTENSION_PROC pfnBurnExtensionProc;
+    PFN_BOOTSTRAPPER_EXTENSION_PROC pfnBurnExtensionProc;
     LPVOID pvBurnExtensionProcContext;
 } BURN_EXTENSION;
 

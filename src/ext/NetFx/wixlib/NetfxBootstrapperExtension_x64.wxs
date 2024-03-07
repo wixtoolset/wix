@@ -2,6 +2,6 @@
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <?define platform=arm64 ?>
-    <?include UtilBundleExtension_Platform.wxi ?>
+    <?define platform=x64 ?>
+    <?include NetfxBootstrapperExtension_Platform.wxi ?>
 </Wix>

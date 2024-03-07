@@ -4,8 +4,8 @@
 
 #include "dutil.h"
 
-#include "IBundleExtensionEngine.h"
-#include "IBundleExtension.h"
+#include "IBootstrapperExtensionEngine.h"
+#include "IBootstrapperExtension.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,7 +33,7 @@ extern "C" {
 #define BextExitOnOptionalXmlQueryFailure(x, b, f, ...) BextExitOnOptionalXmlQueryFailureSource(DUTIL_SOURCE_DEFAULT, x, b, f, __VA_ARGS__)
 #define BextExitOnRequiredXmlQueryFailure(x, f, ...) BextExitOnRequiredXmlQueryFailureSource(DUTIL_SOURCE_DEFAULT, x, f, __VA_ARGS__)
 
-const LPCWSTR BUNDLE_EXTENSION_MANIFEST_FILENAME = L"BundleExtensionData.xml";
+const LPCWSTR BOOTSTRAPPER_EXTENSION_MANIFEST_FILENAME = L"BootstrapperExtensionData.xml";
 
 
 /*******************************************************************
@@ -42,17 +42,17 @@ const LPCWSTR BUNDLE_EXTENSION_MANIFEST_FILENAME = L"BundleExtensionData.xml";
 
 ********************************************************************/
 DAPI_(void) BextInitialize(
-    __in IBundleExtensionEngine* pEngine
+    __in IBootstrapperExtensionEngine* pEngine
     );
 
 /*******************************************************************
- BextInitializeFromCreateArgs - convenience function to call BextBundleExtensionEngineCreate
+ BextInitializeFromCreateArgs - convenience function to call BextBootstrapperExtensionEngineCreate
                                 then pass it along to BextInitialize.
 
 ********************************************************************/
 DAPI_(HRESULT) BextInitializeFromCreateArgs(
-    __in const BUNDLE_EXTENSION_CREATE_ARGS* pArgs,
-    __out IBundleExtensionEngine** ppEngine
+    __in const BOOTSTRAPPER_EXTENSION_CREATE_ARGS* pArgs,
+    __out IBootstrapperExtensionEngine** ppEngine
     );
 
 /*******************************************************************
@@ -62,13 +62,13 @@ DAPI_(HRESULT) BextInitializeFromCreateArgs(
 DAPI_(void) BextUninitialize();
 
 /*******************************************************************
- BextGetBundleExtensionDataNode - gets the requested BundleExtension node.
+ BextGetBootstrapperExtensionDataNode - gets the requested BootstrapperExtension node.
 
 ********************************************************************/
-DAPI_(HRESULT) BextGetBundleExtensionDataNode(
+DAPI_(HRESULT) BextGetBootstrapperExtensionDataNode(
     __in IXMLDOMDocument* pixdManifest,
     __in LPCWSTR wzExtensionId,
-    __out IXMLDOMNode** ppixnBundleExtension
+    __out IXMLDOMNode** ppixnBootstrapperExtension
     );
 
 /*******************************************************************
@@ -76,7 +76,7 @@ DAPI_(HRESULT) BextGetBundleExtensionDataNode(
 
 ********************************************************************/
 DAPIV_(HRESULT) BextLog(
-    __in BUNDLE_EXTENSION_LOG_LEVEL level,
+    __in BOOTSTRAPPER_EXTENSION_LOG_LEVEL level,
     __in_z __format_string LPCSTR szFormat,
     ...
     );
@@ -86,7 +86,7 @@ DAPIV_(HRESULT) BextLog(
 
 ********************************************************************/
 DAPI_(HRESULT) BextLogArgs(
-    __in BUNDLE_EXTENSION_LOG_LEVEL level,
+    __in BOOTSTRAPPER_EXTENSION_LOG_LEVEL level,
     __in_z __format_string LPCSTR szFormat,
     __in va_list args
     );

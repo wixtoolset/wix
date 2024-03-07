@@ -131,8 +131,8 @@ namespace WixToolsetTest.CoreIntegration
                     var extractedBaManifestData = File.ReadAllText(Path.Combine(baFolderPath, "BootstrapperApplicationData.xml"), Encoding.UTF8);
                     WixAssert.StringEqual(extractedBaManifestData, baManifestData);
 
-                    var bextManifestData = wixOutput.GetData(BurnConstants.BundleExtensionDataWixOutputStreamName);
-                    var extractedBextManifestData = File.ReadAllText(Path.Combine(baFolderPath, "BundleExtensionData.xml"), Encoding.UTF8);
+                    var bextManifestData = wixOutput.GetData(BurnConstants.BootstrapperExtensionDataWixOutputStreamName);
+                    var extractedBextManifestData = File.ReadAllText(Path.Combine(baFolderPath, "BootstrapperExtensionData.xml"), Encoding.UTF8);
                     WixAssert.StringEqual(extractedBextManifestData, bextManifestData);
 
                     foreach (XmlAttribute attribute in extractResult.ManifestDocument.DocumentElement.Attributes)
@@ -631,8 +631,8 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new string[]
                 {
                     "Error 8002: The Payload 'DuplicatePayloadNames.wxs' has a duplicate Name 'fakeba.dll' in the BA container. When extracting the container at runtime, the file will get overwritten.",
+                    "Error 8002: The Payload 'uxmKgAFS4cS31ZH_Myfqo5J4kHixQ' has a duplicate Name 'BootstrapperExtensionData.xml' in the BA container. When extracting the container at runtime, the file will get overwritten.",
                     "Error 8002: The Payload 'uxTxMXPVMXwQrPTMIGa5WGt93w0Ns' has a duplicate Name 'BootstrapperApplicationData.xml' in the BA container. When extracting the container at runtime, the file will get overwritten.",
-                    "Error 8002: The Payload 'uxYRbgitOs0K878jn5L_z7LdJ21KI' has a duplicate Name 'BundleExtensionData.xml' in the BA container. When extracting the container at runtime, the file will get overwritten.",
                     "Error 8003: The location of the payload related to the previous error.",
                     "Error 8003: The location of the payload related to the previous error.",
                     "Error 8003: The location of the payload related to the previous error.",

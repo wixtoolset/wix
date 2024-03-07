@@ -53,9 +53,9 @@ namespace WixToolset.Netfx
 
         static NetfxSymbolDefinitions()
         {
-            NetFxNetCoreSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
-            NetFxNetCoreSdkSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
-            NetFxNetCoreSdkFeatureBandSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
+            NetFxNetCoreSearch.AddTag(BurnConstants.BootstrapperExtensionSearchSymbolDefinitionTag);
+            NetFxNetCoreSdkSearch.AddTag(BurnConstants.BootstrapperExtensionSearchSymbolDefinitionTag);
+            NetFxNetCoreSdkFeatureBandSearch.AddTag(BurnConstants.BootstrapperExtensionSearchSymbolDefinitionTag);
         }
     }
 }

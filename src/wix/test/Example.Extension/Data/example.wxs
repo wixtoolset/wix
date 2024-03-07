@@ -17,6 +17,6 @@
   </Fragment>
 
   <Fragment>
-    <BundleExtension Id="ExampleBundleExtension" SourceFile="example.txt" />
+    <BootstrapperExtension Id="ExampleBootstrapperExtension" SourceFile="example.txt" />
   </Fragment>
 </Wix>

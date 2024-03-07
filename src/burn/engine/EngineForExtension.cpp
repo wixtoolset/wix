@@ -10,8 +10,8 @@ static HRESULT BEEngineEscapeString(
     )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_ESCAPESTRING_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_ESCAPESTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_ESCAPESTRING_RESULTS, pResults);
 
     hr = ExternalEngineEscapeString(pArgs->wzIn, pResults->wzOut, &pResults->cchOut);
 
@@ -26,8 +26,8 @@ static HRESULT BEEngineEvaluateCondition(
     )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_EVALUATECONDITION_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_EVALUATECONDITION_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_EVALUATECONDITION_RESULTS, pResults);
 
     hr = ExternalEngineEvaluateCondition(pContext->pEngineState, pArgs->wzCondition, &pResults->f);
 
@@ -42,8 +42,8 @@ static HRESULT BEEngineFormatString(
     )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_FORMATSTRING_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_FORMATSTRING_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_FORMATSTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_FORMATSTRING_RESULTS, pResults);
 
     hr = ExternalEngineFormatString(pContext->pEngineState, pArgs->wzIn, pResults->wzOut, &pResults->cchOut);
 
@@ -58,8 +58,8 @@ static HRESULT BEEngineGetVariableNumeric(
     )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_GETVARIABLENUMERIC_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLENUMERIC_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLENUMERIC_RESULTS, pResults);
 
     hr = ExternalEngineGetVariableNumeric(pContext->pEngineState, pArgs->wzVariable, &pResults->llValue);
 
@@ -74,8 +74,8 @@ static HRESULT BEEngineGetVariableString(
     )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_GETVARIABLESTRING_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLESTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLESTRING_RESULTS, pResults);
 
     hr = ExternalEngineGetVariableString(pContext->pEngineState, pArgs->wzVariable, pResults->wzValue, &pResults->cchValue);
 
@@ -90,8 +90,8 @@ static HRESULT BEEngineGetVariableVersion(
     )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_GETVARIABLEVERSION_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLEVERSION_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_GETVARIABLEVERSION_RESULTS, pResults);
 
     hr = ExternalEngineGetVariableVersion(pContext->pEngineState, pArgs->wzVariable, pResults->wzValue, &pResults->cchValue);
 
@@ -107,24 +107,24 @@ static HRESULT BEEngineLog(
 {
     HRESULT hr = S_OK;
     REPORT_LEVEL rl = REPORT_NONE;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_LOG_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_LOG_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_LOG_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_LOG_RESULTS, pResults);
 
     switch (pArgs->level)
     {
-    case BUNDLE_EXTENSION_LOG_LEVEL_STANDARD:
+    case BOOTSTRAPPER_EXTENSION_LOG_LEVEL_STANDARD:
         rl = REPORT_STANDARD;
         break;
 
-    case BUNDLE_EXTENSION_LOG_LEVEL_VERBOSE:
+    case BOOTSTRAPPER_EXTENSION_LOG_LEVEL_VERBOSE:
         rl = REPORT_VERBOSE;
         break;
 
-    case BUNDLE_EXTENSION_LOG_LEVEL_DEBUG:
+    case BOOTSTRAPPER_EXTENSION_LOG_LEVEL_DEBUG:
         rl = REPORT_DEBUG;
         break;
 
-    case BUNDLE_EXTENSION_LOG_LEVEL_ERROR:
+    case BOOTSTRAPPER_EXTENSION_LOG_LEVEL_ERROR:
         rl = REPORT_ERROR;
         break;
 
@@ -146,8 +146,8 @@ static HRESULT BEEngineSetVariableNumeric(
     )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_SETVARIABLENUMERIC_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLENUMERIC_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLENUMERIC_RESULTS, pResults);
 
     hr = ExternalEngineSetVariableNumeric(pContext->pEngineState, pArgs->wzVariable, pArgs->llValue);
 
@@ -162,8 +162,8 @@ static HRESULT BEEngineSetVariableString(
     )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_SETVARIABLESTRING_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLESTRING_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLESTRING_RESULTS, pResults);
 
     hr = ExternalEngineSetVariableString(pContext->pEngineState, pArgs->wzVariable, pArgs->wzValue, pArgs->fFormatted);
 
@@ -178,8 +178,8 @@ static HRESULT BEEngineSetVariableVersion(
     )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_SETVARIABLEVERSION_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLEVERSION_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_SETVARIABLEVERSION_RESULTS, pResults);
 
     hr = ExternalEngineSetVariableVersion(pContext->pEngineState, pArgs->wzVariable, pArgs->wzValue);
 
@@ -194,8 +194,8 @@ static HRESULT BEEngineCompareVersions(
     )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_COMPAREVERSIONS_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_COMPAREVERSIONS_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_COMPAREVERSIONS_RESULTS, pResults);
 
     hr = ExternalEngineCompareVersions(pArgs->wzVersion1, pArgs->wzVersion2, &pResults->nResult);
 
@@ -210,8 +210,8 @@ static HRESULT BEEngineGetRelatedBundleVariable(
 )
 {
     HRESULT hr = S_OK;
-    ValidateMessageArgs(hr, pvArgs, BUNDLE_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_ARGS, pArgs);
-    ValidateMessageResults(hr, pvResults, BUNDLE_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_RESULTS, pResults);
+    ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_ARGS, pArgs);
+    ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_RESULTS, pResults);
 
     hr = ExternalEngineGetRelatedBundleVariable(pContext->pEngineState, pArgs->wzBundleId, pArgs->wzVariable, pResults->wzValue, &pResults->cchValue);
 
@@ -220,7 +220,7 @@ LExit:
 }
 
 HRESULT WINAPI EngineForExtensionProc(
-    __in BUNDLE_EXTENSION_ENGINE_MESSAGE message,
+    __in BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE message,
     __in const LPVOID pvArgs,
     __inout LPVOID pvResults,
     __in_opt LPVOID pvContext
@@ -236,40 +236,40 @@ HRESULT WINAPI EngineForExtensionProc(
 
     switch (message)
     {
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_ESCAPESTRING:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_ESCAPESTRING:
         hr = BEEngineEscapeString(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_EVALUATECONDITION:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_EVALUATECONDITION:
         hr = BEEngineEvaluateCondition(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_FORMATSTRING:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_FORMATSTRING:
         hr = BEEngineFormatString(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_GETVARIABLENUMERIC:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_GETVARIABLENUMERIC:
         hr = BEEngineGetVariableNumeric(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_GETVARIABLESTRING:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_GETVARIABLESTRING:
         hr = BEEngineGetVariableString(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_GETVARIABLEVERSION:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_GETVARIABLEVERSION:
         hr = BEEngineGetVariableVersion(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_LOG:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_LOG:
         hr = BEEngineLog(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLENUMERIC:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_SETVARIABLENUMERIC:
         hr = BEEngineSetVariableNumeric(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLESTRING:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_SETVARIABLESTRING:
         hr = BEEngineSetVariableString(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_SETVARIABLEVERSION:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_SETVARIABLEVERSION:
         hr = BEEngineSetVariableVersion(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_COMPAREVERSIONS:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_COMPAREVERSIONS:
         hr = BEEngineCompareVersions(pContext, pvArgs, pvResults);
         break;
-    case BUNDLE_EXTENSION_ENGINE_MESSAGE_GETRELATEDBUNDLEVARIABLE:
+    case BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE_GETRELATEDBUNDLEVARIABLE:
         hr = BEEngineGetRelatedBundleVariable(pContext, pvArgs, pvResults);
         break;
     default:

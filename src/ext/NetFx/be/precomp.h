@@ -20,12 +20,12 @@
 #include <xmlutil.h>
 
 #include <bextutil.h>
-#include <BextBundleExtensionEngine.h>
+#include <BextBootstrapperExtensionEngine.h>
 
 #include "..\..\beDecor.h"
 #include "netfxsearch.h"
 #include "detectnetcore.h"
 #include "detectnetcoresdk.h"
 #include "detectnetcoresdkfeatureband.h"
-#include "NetfxBundleExtension.h"
+#include "NetfxBootstrapperExtension.h"
 #include "runnetcoresearch.h"

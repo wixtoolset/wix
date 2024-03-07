@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BundleExtensionTests.cpp">
+    <ClCompile Include="BootstrapperExtensionTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="precomp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TestBundleExtension.cpp">
+    <ClCompile Include="TestBootstrapperExtension.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,7 +29,7 @@
     <ClInclude Include="precomp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TestBundleExtension.h">
+    <ClInclude Include="TestBootstrapperExtension.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

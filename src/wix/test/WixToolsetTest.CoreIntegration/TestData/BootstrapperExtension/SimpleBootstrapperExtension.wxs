@@ -5,6 +5,6 @@
             <PackageGroupRef Id="MinimalPackageGroup" />
         </PackageGroup>
 
-        <BundleExtensionRef Id="ExampleBext" />
+        <BootstrapperExtensionRef Id="ExampleBext" />
     </Fragment>
 </Wix>

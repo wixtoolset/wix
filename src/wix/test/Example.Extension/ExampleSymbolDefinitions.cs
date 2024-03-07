@@ -33,7 +33,7 @@ namespace Example.Extension
 
         static ExampleSymbolDefinitions()
         {
-            ExampleSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
+            ExampleSearch.AddTag(BurnConstants.BootstrapperExtensionSearchSymbolDefinitionTag);
         }
 
         public static bool TryGetSymbolType(string name, out ExampleSymbolDefinitionType type)

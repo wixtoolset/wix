@@ -44,7 +44,7 @@ typedef struct _UTIL_SEARCHES
 
 STDMETHODIMP UtilSearchParseFromXml(
     __in UTIL_SEARCHES* pSearches,
-    __in IXMLDOMNode* pixnBundleExtension
+    __in IXMLDOMNode* pixnBootstrapperExtension
     );
 
 void UtilSearchUninitialize(
@@ -55,7 +55,7 @@ STDMETHODIMP UtilSearchExecute(
     __in UTIL_SEARCHES* pSearches,
     __in LPCWSTR wzSearchId,
     __in LPCWSTR wzVariable,
-    __in IBundleExtensionEngine* pEngine
+    __in IBootstrapperExtensionEngine* pEngine
     );
 
 STDMETHODIMP UtilSearchFindById(

@@ -11,7 +11,7 @@ namespace Example.Extension
 
     internal class ExampleCompilerExtension : BaseCompilerExtension
     {
-        private const string BundleExtensionId = "ExampleBundleExtension";
+        private const string BootstrapperExtensionId = "ExampleBootstrapperExtension";
 
         public override XNamespace Namespace => ExampleConstants.Namespace;
 
@@ -228,7 +228,7 @@ namespace Example.Extension
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, BundleExtensionId);
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, BootstrapperExtensionId);
             }
 
             if (!this.Messaging.EncounteredError)

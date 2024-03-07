@@ -5,7 +5,7 @@
 
 static HRESULT SendRequiredBextMessage(
     __in BURN_EXTENSION* pExtension,
-    __in BUNDLE_EXTENSION_MESSAGE message,
+    __in BOOTSTRAPPER_EXTENSION_MESSAGE message,
     __in const LPVOID pvArgs,
     __inout LPVOID pvResults
     );
@@ -13,7 +13,7 @@ static HRESULT SendRequiredBextMessage(
 // function definitions
 
 /*******************************************************************
- BurnExtensionParseFromXml - 
+ BurnExtensionParseFromXml -
 
 *******************************************************************/
 EXTERN_C HRESULT BurnExtensionParseFromXml(
@@ -28,22 +28,22 @@ EXTERN_C HRESULT BurnExtensionParseFromXml(
     DWORD cNodes = 0;
     LPWSTR scz = NULL;
 
-    // Select BundleExtension nodes.
-    hr = XmlSelectNodes(pixnBundle, L"BundleExtension", &pixnNodes);
-    ExitOnFailure(hr, "Failed to select BundleExtension nodes.");
+    // Select BootstrapperExtension nodes.
+    hr = XmlSelectNodes(pixnBundle, L"BootstrapperExtension", &pixnNodes);
+    ExitOnFailure(hr, "Failed to select BootstrapperExtension nodes.");
 
-    // Get BundleExtension node count.
+    // Get BootstrapperExtension node count.
     hr = pixnNodes->get_length((long*)&cNodes);
-    ExitOnFailure(hr, "Failed to get BundleExtension node count.");
+    ExitOnFailure(hr, "Failed to get BootstrapperExtension node count.");
 
     if (!cNodes)
     {
         ExitFunction();
     }
 
-    // Allocate memory for BundleExtensions.
+    // Allocate memory for BootstrapperExtensions.
     pBurnExtensions->rgExtensions = (BURN_EXTENSION*)MemAlloc(sizeof(BURN_EXTENSION) * cNodes, TRUE);
-    ExitOnNull(pBurnExtensions->rgExtensions, hr, E_OUTOFMEMORY, "Failed to allocate memory for BundleExtension structs.");
+    ExitOnNull(pBurnExtensions->rgExtensions, hr, E_OUTOFMEMORY, "Failed to allocate memory for BootstrapperExtension structs.");
 
     pBurnExtensions->cExtensions = cNodes;
 
@@ -64,7 +64,7 @@ EXTERN_C HRESULT BurnExtensionParseFromXml(
         ExitOnFailure(hr, "Failed to get @EntryPayloadSourcePath.");
 
         hr = PayloadFindEmbeddedBySourcePath(pBaPayloads->sdhPayloads, scz, &pExtension->pEntryPayload);
-        ExitOnFailure(hr, "Failed to find BundleExtension EntryPayload '%ls'.", pExtension->sczId);
+        ExitOnFailure(hr, "Failed to find BootstrapperExtension EntryPayload '%ls'.", pExtension->sczId);
 
         // prepare next iteration
         ReleaseNullObject(pixnNode);
@@ -81,7 +81,7 @@ LExit:
 }
 
 /*******************************************************************
- BurnExtensionUninitialize - 
+ BurnExtensionUninitialize -
 
 *******************************************************************/
 EXTERN_C void BurnExtensionUninitialize(
@@ -104,7 +104,7 @@ EXTERN_C void BurnExtensionUninitialize(
 }
 
 /*******************************************************************
- BurnExtensionLoad - 
+ BurnExtensionLoad -
 
 *******************************************************************/
 EXTERN_C HRESULT BurnExtensionLoad(
@@ -113,59 +113,59 @@ EXTERN_C HRESULT BurnExtensionLoad(
     )
 {
     HRESULT hr = S_OK;
-    LPWSTR sczBundleExtensionDataPath = NULL;
-    BUNDLE_EXTENSION_CREATE_ARGS args = { };
-    BUNDLE_EXTENSION_CREATE_RESULTS results = { };
+    LPWSTR sczBootstrapperExtensionDataPath = NULL;
+    BOOTSTRAPPER_EXTENSION_CREATE_ARGS args = { };
+    BOOTSTRAPPER_EXTENSION_CREATE_RESULTS results = { };
 
     if (!pBurnExtensions->rgExtensions || !pBurnExtensions->cExtensions)
     {
         ExitFunction();
     }
 
-    hr = PathConcat(pEngineContext->pEngineState->userExperience.sczTempDirectory, L"BundleExtensionData.xml", &sczBundleExtensionDataPath);
-    ExitOnFailure(hr, "Failed to get BundleExtensionDataPath.");
+    hr = PathConcat(pEngineContext->pEngineState->userExperience.sczTempDirectory, L"BootstrapperExtensionData.xml", &sczBootstrapperExtensionDataPath);
+    ExitOnFailure(hr, "Failed to get BootstrapperExtensionDataPath.");
 
     for (DWORD i = 0; i < pBurnExtensions->cExtensions; ++i)
     {
         BURN_EXTENSION* pExtension = &pBurnExtensions->rgExtensions[i];
 
-        memset(&args, 0, sizeof(BUNDLE_EXTENSION_CREATE_ARGS));
-        memset(&results, 0, sizeof(BUNDLE_EXTENSION_CREATE_RESULTS));
+        memset(&args, 0, sizeof(BOOTSTRAPPER_EXTENSION_CREATE_ARGS));
+        memset(&results, 0, sizeof(BOOTSTRAPPER_EXTENSION_CREATE_RESULTS));
 
-        args.cbSize = sizeof(BUNDLE_EXTENSION_CREATE_ARGS);
-        args.pfnBundleExtensionEngineProc = EngineForExtensionProc;
-        args.pvBundleExtensionEngineProcContext = pEngineContext;
+        args.cbSize = sizeof(BOOTSTRAPPER_EXTENSION_CREATE_ARGS);
+        args.pfnBootstrapperExtensionEngineProc = EngineForExtensionProc;
+        args.pvBootstrapperExtensionEngineProcContext = pEngineContext;
         args.qwEngineAPIVersion = MAKEQWORDVERSION(2021, 4, 27, 0);
         args.wzBootstrapperWorkingFolder = pEngineContext->pEngineState->userExperience.sczTempDirectory;
-        args.wzBundleExtensionDataPath = sczBundleExtensionDataPath;
+        args.wzBootstrapperExtensionDataPath = sczBootstrapperExtensionDataPath;
         args.wzExtensionId = pExtension->sczId;
 
-        results.cbSize = sizeof(BUNDLE_EXTENSION_CREATE_RESULTS);
+        results.cbSize = sizeof(BOOTSTRAPPER_EXTENSION_CREATE_RESULTS);
 
-        // Load BundleExtension DLL.
+        // Load BootstrapperExtension DLL.
         pExtension->hBextModule = ::LoadLibraryExW(pExtension->pEntryPayload->sczLocalFilePath, NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
-        ExitOnNullWithLastError(pExtension->hBextModule, hr, "Failed to load BundleExtension DLL '%ls': '%ls'.", pExtension->sczId, pExtension->pEntryPayload->sczLocalFilePath);
+        ExitOnNullWithLastError(pExtension->hBextModule, hr, "Failed to load BootstrapperExtension DLL '%ls': '%ls'.", pExtension->sczId, pExtension->pEntryPayload->sczLocalFilePath);
 
-        // Get BundleExtensionCreate entry-point.
-        PFN_BUNDLE_EXTENSION_CREATE pfnCreate = (PFN_BUNDLE_EXTENSION_CREATE)::GetProcAddress(pExtension->hBextModule, "BundleExtensionCreate");
-        ExitOnNullWithLastError(pfnCreate, hr, "Failed to get BundleExtensionCreate entry-point '%ls'.", pExtension->sczId);
+        // Get BootstrapperExtensionCreate entry-point.
+        PFN_BOOTSTRAPPER_EXTENSION_CREATE pfnCreate = (PFN_BOOTSTRAPPER_EXTENSION_CREATE)::GetProcAddress(pExtension->hBextModule, "BootstrapperExtensionCreate");
+        ExitOnNullWithLastError(pfnCreate, hr, "Failed to get BootstrapperExtensionCreate entry-point '%ls'.", pExtension->sczId);
 
-        // Create BundleExtension.
+        // Create BootstrapperExtension.
         hr = pfnCreate(&args, &results);
-        ExitOnFailure(hr, "Failed to create BundleExtension '%ls'.", pExtension->sczId);
+        ExitOnFailure(hr, "Failed to create BootstrapperExtension '%ls'.", pExtension->sczId);
 
-        pExtension->pfnBurnExtensionProc = results.pfnBundleExtensionProc;
-        pExtension->pvBurnExtensionProcContext = results.pvBundleExtensionProcContext;
+        pExtension->pfnBurnExtensionProc = results.pfnBootstrapperExtensionProc;
+        pExtension->pvBurnExtensionProcContext = results.pvBootstrapperExtensionProcContext;
     }
 
 LExit:
-    ReleaseStr(sczBundleExtensionDataPath);
+    ReleaseStr(sczBootstrapperExtensionDataPath);
 
     return hr;
 }
 
 /*******************************************************************
- BurnExtensionUnload - 
+ BurnExtensionUnload -
 
 *******************************************************************/
 EXTERN_C void BurnExtensionUnload(
@@ -182,18 +182,18 @@ EXTERN_C void BurnExtensionUnload(
 
             if (pExtension->hBextModule)
             {
-                // Get BundleExtensionDestroy entry-point and call it if it exists.
-                PFN_BUNDLE_EXTENSION_DESTROY pfnDestroy = (PFN_BUNDLE_EXTENSION_DESTROY)::GetProcAddress(pExtension->hBextModule, "BundleExtensionDestroy");
+                // Get BootstrapperExtensionDestroy entry-point and call it if it exists.
+                PFN_BOOTSTRAPPER_EXTENSION_DESTROY pfnDestroy = (PFN_BOOTSTRAPPER_EXTENSION_DESTROY)::GetProcAddress(pExtension->hBextModule, "BootstrapperExtensionDestroy");
                 if (pfnDestroy)
                 {
                     pfnDestroy();
                 }
 
-                // Free BundleExtension DLL.
+                // Free BootstrapperExtension DLL.
                 if (!::FreeLibrary(pExtension->hBextModule))
                 {
                     hr = HRESULT_FROM_WIN32(::GetLastError());
-                    TraceError(hr, "Failed to unload BundleExtension DLL.");
+                    TraceError(hr, "Failed to unload BootstrapperExtension DLL.");
                 }
                 pExtension->hBextModule = NULL;
             }
@@ -234,8 +234,8 @@ EXTERN_C BEEAPI BurnExtensionPerformSearch(
     )
 {
     HRESULT hr = S_OK;
-    BUNDLE_EXTENSION_SEARCH_ARGS args = { };
-    BUNDLE_EXTENSION_SEARCH_RESULTS results = { };
+    BOOTSTRAPPER_EXTENSION_SEARCH_ARGS args = { };
+    BOOTSTRAPPER_EXTENSION_SEARCH_RESULTS results = { };
 
     args.cbSize = sizeof(args);
     args.wzId = wzSearchId;
@@ -243,8 +243,8 @@ EXTERN_C BEEAPI BurnExtensionPerformSearch(
 
     results.cbSize = sizeof(results);
 
-    hr = SendRequiredBextMessage(pExtension, BUNDLE_EXTENSION_MESSAGE_SEARCH, &args, &results);
-    ExitOnFailure(hr, "BundleExtension '%ls' Search '%ls' failed.", pExtension->sczId, wzSearchId);
+    hr = SendRequiredBextMessage(pExtension, BOOTSTRAPPER_EXTENSION_MESSAGE_SEARCH, &args, &results);
+    ExitOnFailure(hr, "BootstrapperExtension '%ls' Search '%ls' failed.", pExtension->sczId, wzSearchId);
 
 LExit:
     return hr;
@@ -252,7 +252,7 @@ LExit:
 
 static HRESULT SendRequiredBextMessage(
     __in BURN_EXTENSION* pExtension,
-    __in BUNDLE_EXTENSION_MESSAGE message,
+    __in BOOTSTRAPPER_EXTENSION_MESSAGE message,
     __in const LPVOID pvArgs,
     __inout LPVOID pvResults
     )

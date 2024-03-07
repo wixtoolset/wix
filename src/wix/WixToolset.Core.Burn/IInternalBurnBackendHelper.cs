@@ -9,6 +9,6 @@ namespace WixToolset.Core.Burn
     {
         void WriteBootstrapperApplicationData(XmlWriter writer);
 
-        void WriteBundleExtensionData(XmlWriter writer);
+        void WriteBootstrapperExtensionData(XmlWriter writer);
     }
 }

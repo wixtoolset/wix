@@ -62,7 +62,7 @@
 #include <butil.h>
 
 #include "BootstrapperApplication.h"
-#include "BundleExtension.h"
+#include "BootstrapperExtension.h"
 
 #include "platform.h"
 #include "variant.h"

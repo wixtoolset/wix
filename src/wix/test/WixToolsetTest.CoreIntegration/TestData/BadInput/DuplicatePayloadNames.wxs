@@ -5,7 +5,7 @@
         <PayloadGroup Id="override ExtraBoostrapperApplicationPayloads">
             <Payload Id="DuplicatePayloadNames.wxs" SourceFile="$(sys.SOURCEFILEPATH)" Name="fakeba.dll" />
             <Payload Id="UnscheduledPackage.wxs" SourceFile="$(sys.SOURCEFILEDIR)UnscheduledPackage.wxs" Name="BootstrapperApplicationData.xml" />
-            <Payload Id="UnscheduledRollbackBoundary.wxs" SourceFile="$(sys.SOURCEFILEDIR)UnscheduledRollbackBoundary.wxs" Name="BundleExtensionData.xml" />
+            <Payload Id="UnscheduledRollbackBoundary.wxs" SourceFile="$(sys.SOURCEFILEDIR)UnscheduledRollbackBoundary.wxs" Name="BootstrapperExtensionData.xml" />
         </PayloadGroup>
     </Fragment>
 

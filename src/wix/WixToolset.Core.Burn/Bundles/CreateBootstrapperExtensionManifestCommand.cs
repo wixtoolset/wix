@@ -11,9 +11,9 @@ namespace WixToolset.Core.Burn.Bundles
     using WixToolset.Data.Burn;
     using WixToolset.Data.Symbols;
 
-    internal class CreateBundleExtensionManifestCommand
+    internal class CreateBootstrapperExtensionManifestCommand
     {
-        public CreateBundleExtensionManifestCommand(IntermediateSection section, WixBundleSymbol bundleSymbol, int lastUXPayloadIndex, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
+        public CreateBootstrapperExtensionManifestCommand(IntermediateSection section, WixBundleSymbol bundleSymbol, int lastUXPayloadIndex, string intermediateFolder, IInternalBurnBackendHelper internalBurnBackendHelper)
         {
             this.Section = section;
             this.BundleSymbol = bundleSymbol;
@@ -32,18 +32,18 @@ namespace WixToolset.Core.Burn.Bundles
 
         private string IntermediateFolder { get; }
 
-        public WixBundlePayloadSymbol BundleExtensionManifestPayloadRow { get; private set; }
+        public WixBundlePayloadSymbol BootstrapperExtensionManifestPayloadRow { get; private set; }
 
         public string OutputPath { get; private set; }
 
         public void Execute()
         {
-            this.OutputPath = this.CreateBundleExtensionManifest();
+            this.OutputPath = this.CreateBootstrapperExtensionManifest();
 
-            this.BundleExtensionManifestPayloadRow = this.CreateBundleExtensionManifestPayloadRow(this.OutputPath);
+            this.BootstrapperExtensionManifestPayloadRow = this.CreateBootstrapperExtensionManifestPayloadRow(this.OutputPath);
         }
 
-        private string CreateBundleExtensionManifest()
+        private string CreateBootstrapperExtensionManifest()
         {
             var path = Path.Combine(this.IntermediateFolder, "wix-bextdata.xml");
 
@@ -53,9 +53,9 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 writer.Formatting = Formatting.Indented;
                 writer.WriteStartDocument();
-                writer.WriteStartElement("BundleExtensionData", BurnConstants.BundleExtensionDataNamespace);
+                writer.WriteStartElement("BootstrapperExtensionData", BurnConstants.BootstrapperExtensionDataNamespace);
 
-                this.InternalBurnBackendHelper.WriteBundleExtensionData(writer);
+                this.InternalBurnBackendHelper.WriteBootstrapperExtensionData(writer);
 
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
@@ -64,9 +64,9 @@ namespace WixToolset.Core.Burn.Bundles
             return path;
         }
 
-        private WixBundlePayloadSymbol CreateBundleExtensionManifestPayloadRow(string bextManifestPath)
+        private WixBundlePayloadSymbol CreateBootstrapperExtensionManifestPayloadRow(string bextManifestPath)
         {
-            var generatedId = this.InternalBurnBackendHelper.GenerateIdentifier("ux", BurnCommon.BundleExtensionDataFileName);
+            var generatedId = this.InternalBurnBackendHelper.GenerateIdentifier("ux", BurnCommon.BootstrapperExtensionDataFileName);
 
             this.Section.AddSymbol(new WixGroupSymbol(this.BundleSymbol.SourceLineNumbers)
             {
@@ -78,7 +78,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             var symbol = this.Section.AddSymbol(new WixBundlePayloadSymbol(this.BundleSymbol.SourceLineNumbers, new Identifier(AccessModifier.Section, generatedId))
             {
-                Name = BurnCommon.BundleExtensionDataFileName,
+                Name = BurnCommon.BootstrapperExtensionDataFileName,
                 SourceFile = new IntermediateFieldPathValue { Path = bextManifestPath },
                 Compressed = true,
                 UnresolvedSourceFile = bextManifestPath,

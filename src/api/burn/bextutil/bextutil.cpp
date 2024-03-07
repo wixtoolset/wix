@@ -2,12 +2,12 @@
 
 #include "precomp.h"
 
-static IBundleExtensionEngine* vpEngine = NULL;
+static IBootstrapperExtensionEngine* vpEngine = NULL;
 
 // prototypes
 
 DAPI_(void) BextInitialize(
-    __in IBundleExtensionEngine* pEngine
+    __in IBootstrapperExtensionEngine* pEngine
     )
 {
     pEngine->AddRef();
@@ -17,15 +17,15 @@ DAPI_(void) BextInitialize(
 }
 
 DAPI_(HRESULT) BextInitializeFromCreateArgs(
-    __in const BUNDLE_EXTENSION_CREATE_ARGS* pArgs,
-    __out_opt IBundleExtensionEngine** ppEngine
+    __in const BOOTSTRAPPER_EXTENSION_CREATE_ARGS* pArgs,
+    __out_opt IBootstrapperExtensionEngine** ppEngine
     )
 {
     HRESULT hr = S_OK;
-    IBundleExtensionEngine* pEngine = NULL;
+    IBootstrapperExtensionEngine* pEngine = NULL;
 
-    hr = BextBundleExtensionEngineCreate(pArgs->pfnBundleExtensionEngineProc, pArgs->pvBundleExtensionEngineProcContext, &pEngine);
-    ExitOnFailure(hr, "Failed to create BextBundleExtensionEngine.");
+    hr = BextBootstrapperExtensionEngineCreate(pArgs->pfnBootstrapperExtensionEngineProc, pArgs->pvBootstrapperExtensionEngineProcContext, &pEngine);
+    ExitOnFailure(hr, "Failed to create BextBootstrapperExtensionEngine.");
 
     BextInitialize(pEngine);
 
@@ -47,30 +47,30 @@ DAPI_(void) BextUninitialize()
     ReleaseNullObject(vpEngine);
 }
 
-DAPI_(HRESULT) BextGetBundleExtensionDataNode(
+DAPI_(HRESULT) BextGetBootstrapperExtensionDataNode(
     __in IXMLDOMDocument* pixdManifest,
     __in LPCWSTR wzExtensionId,
-    __out IXMLDOMNode** ppixnBundleExtension
+    __out IXMLDOMNode** ppixnBootstrapperExtension
     )
 {
     HRESULT hr = S_OK;
-    IXMLDOMElement* pixeBundleExtensionData = NULL;
+    IXMLDOMElement* pixeBootstrapperExtensionData = NULL;
     IXMLDOMNodeList* pixnNodes = NULL;
     IXMLDOMNode* pixnNode = NULL;
     DWORD cNodes = 0;
     LPWSTR sczId = NULL;
 
-    // Get BundleExtensionData element.
-    hr = pixdManifest->get_documentElement(&pixeBundleExtensionData);
-    ExitOnFailure(hr, "Failed to get BundleExtensionData element.");
+    // Get BootstrapperExtensionData element.
+    hr = pixdManifest->get_documentElement(&pixeBootstrapperExtensionData);
+    ExitOnFailure(hr, "Failed to get BootstrapperExtensionData element.");
 
-    // Select BundleExtension nodes.
-    hr = XmlSelectNodes(pixeBundleExtensionData, L"BundleExtension", &pixnNodes);
-    ExitOnFailure(hr, "Failed to select BundleExtension nodes.");
+    // Select BootstrapperExtension nodes.
+    hr = XmlSelectNodes(pixeBootstrapperExtensionData, L"BootstrapperExtension", &pixnNodes);
+    ExitOnFailure(hr, "Failed to select BootstrapperExtension nodes.");
 
-    // Get BundleExtension node count.
+    // Get BootstrapperExtension node count.
     hr = pixnNodes->get_length((long*)&cNodes);
-    ExitOnFailure(hr, "Failed to get BundleExtension node count.");
+    ExitOnFailure(hr, "Failed to get BootstrapperExtension node count.");
 
     if (!cNodes)
     {
@@ -89,7 +89,7 @@ DAPI_(HRESULT) BextGetBundleExtensionDataNode(
 
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczId, -1, wzExtensionId, -1))
         {
-            *ppixnBundleExtension = pixnNode;
+            *ppixnBootstrapperExtension = pixnNode;
             pixnNode = NULL;
 
             ExitFunction1(hr = S_OK);
@@ -105,14 +105,14 @@ LExit:
     ReleaseStr(sczId);
     ReleaseObject(pixnNode);
     ReleaseObject(pixnNodes);
-    ReleaseObject(pixeBundleExtensionData);
+    ReleaseObject(pixeBootstrapperExtensionData);
 
     return hr;
 }
 
 
 DAPIV_(HRESULT) BextLog(
-    __in BUNDLE_EXTENSION_LOG_LEVEL level,
+    __in BOOTSTRAPPER_EXTENSION_LOG_LEVEL level,
     __in_z __format_string LPCSTR szFormat,
     ...
     )
@@ -136,7 +136,7 @@ LExit:
 
 
 DAPI_(HRESULT) BextLogArgs(
-    __in BUNDLE_EXTENSION_LOG_LEVEL level,
+    __in BOOTSTRAPPER_EXTENSION_LOG_LEVEL level,
     __in_z __format_string LPCSTR szFormat,
     __in va_list args
     )
@@ -212,7 +212,7 @@ DAPI_(HRESULT) BextLogErrorArgs(
     hr = StrAllocFormatted(&sczMessage, L"Error 0x%08x: %S", hrError, sczFormattedAnsi);
     ExitOnFailure(hr, "Failed to prepend error number to error log string.");
 
-    hr = vpEngine->Log(BUNDLE_EXTENSION_LOG_LEVEL_ERROR, sczMessage);
+    hr = vpEngine->Log(BOOTSTRAPPER_EXTENSION_LOG_LEVEL_ERROR, sczMessage);
 
 LExit:
     ReleaseStr(sczMessage);

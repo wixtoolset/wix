@@ -12,7 +12,7 @@ namespace WixToolset.Data
             {
                 new IntermediateFieldDefinition(nameof(WixSearchSymbolFields.Variable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixSearchSymbolFields.Condition), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixSearchSymbolFields.BundleExtensionRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixSearchSymbolFields.BootstrapperExtensionRef), IntermediateFieldType.String),
             },
             typeof(WixSearchSymbol));
     }
@@ -24,7 +24,7 @@ namespace WixToolset.Data.Symbols
     {
         Variable,
         Condition,
-        BundleExtensionRef,
+        BootstrapperExtensionRef,
     }
 
     public class WixSearchSymbol : IntermediateSymbol
@@ -51,10 +51,10 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixSearchSymbolFields.Condition, value);
         }
 
-        public string BundleExtensionRef
+        public string BootstrapperExtensionRef
         {
-            get => (string)this.Fields[(int)WixSearchSymbolFields.BundleExtensionRef];
-            set => this.Set((int)WixSearchSymbolFields.BundleExtensionRef, value);
+            get => (string)this.Fields[(int)WixSearchSymbolFields.BootstrapperExtensionRef];
+            set => this.Set((int)WixSearchSymbolFields.BootstrapperExtensionRef, value);
         }
     }
 }

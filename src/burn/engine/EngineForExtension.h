@@ -16,7 +16,7 @@ typedef struct _BURN_EXTENSION_ENGINE_CONTEXT
 // function declarations
 
 HRESULT WINAPI EngineForExtensionProc(
-    __in BUNDLE_EXTENSION_ENGINE_MESSAGE message,
+    __in BOOTSTRAPPER_EXTENSION_ENGINE_MESSAGE message,
     __in const LPVOID pvArgs,
     __inout LPVOID pvResults,
     __in_opt LPVOID pvContext

@@ -94,7 +94,7 @@ namespace WixToolset.Util
 
                 case UtilSymbolDefinitionType.WixRemoveRegistryKeyEx:
                     return UtilSymbolDefinitions.WixRemoveRegistryKeyEx;
-                    
+
                 case UtilSymbolDefinitionType.WixRestartResource:
                     return UtilSymbolDefinitions.WixRestartResource;
 
@@ -117,7 +117,7 @@ namespace WixToolset.Util
 
         static UtilSymbolDefinitions()
         {
-            WixWindowsFeatureSearch.AddTag(BurnConstants.BundleExtensionSearchSymbolDefinitionTag);
+            WixWindowsFeatureSearch.AddTag(BurnConstants.BootstrapperExtensionSearchSymbolDefinitionTag);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
         private ManifestData BootstrapperApplicationManifestData { get; } = new ManifestData();
 
-        private Dictionary<string, ManifestData> BundleExtensionDataById { get; } = new Dictionary<string, ManifestData>();
+        private Dictionary<string, ManifestData> BootstrapperExtensionDataById { get; } = new Dictionary<string, ManifestData>();
 
         public BurnBackendHelper(IServiceProvider serviceProvider)
         {
@@ -149,16 +149,16 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
             this.BootstrapperApplicationManifestData.AddSymbol(symbol, symbolIdIsIdAttribute, BurnConstants.BootstrapperApplicationDataNamespace);
         }
 
-        public void AddBundleExtensionData(string extensionId, string xml)
+        public void AddBootstrapperExtensionData(string extensionId, string xml)
         {
-            var manifestData = this.GetBundleExtensionManifestData(extensionId);
+            var manifestData = this.GetBootstrapperExtensionManifestData(extensionId);
             manifestData.AddXml(xml);
         }
 
-        public void AddBundleExtensionData(string extensionId, IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false)
+        public void AddBootstrapperExtensionData(string extensionId, IntermediateSymbol symbol, bool symbolIdIsIdAttribute = false)
         {
-            var manifestData = this.GetBundleExtensionManifestData(extensionId);
-            manifestData.AddSymbol(symbol, symbolIdIsIdAttribute, BurnConstants.BundleExtensionDataNamespace);
+            var manifestData = this.GetBootstrapperExtensionManifestData(extensionId);
+            manifestData.AddSymbol(symbol, symbolIdIsIdAttribute, BurnConstants.BootstrapperExtensionDataNamespace);
         }
 
         #endregion
@@ -204,9 +204,9 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
             this.BootstrapperApplicationManifestData.Write(writer);
         }
 
-        public void WriteBundleExtensionData(XmlWriter writer)
+        public void WriteBootstrapperExtensionData(XmlWriter writer)
         {
-            foreach (var kvp in this.BundleExtensionDataById)
+            foreach (var kvp in this.BootstrapperExtensionDataById)
             {
                 this.WriteExtension(writer, kvp.Key, kvp.Value);
             }
@@ -214,17 +214,17 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
         #endregion
 
-        private ManifestData GetBundleExtensionManifestData(string extensionId)
+        private ManifestData GetBootstrapperExtensionManifestData(string extensionId)
         {
             if (!this.backendHelper.IsValidIdentifier(extensionId))
             {
                 throw new ArgumentException($"'{extensionId}' is not a valid extensionId");
             }
 
-            if (!this.BundleExtensionDataById.TryGetValue(extensionId, out var manifestData))
+            if (!this.BootstrapperExtensionDataById.TryGetValue(extensionId, out var manifestData))
             {
                 manifestData = new ManifestData();
-                this.BundleExtensionDataById.Add(extensionId, manifestData);
+                this.BootstrapperExtensionDataById.Add(extensionId, manifestData);
             }
 
             return manifestData;
@@ -232,7 +232,7 @@ namespace WixToolset.Core.Burn.ExtensibilityServices
 
         private void WriteExtension(XmlWriter writer, string extensionId, ManifestData manifestData)
         {
-            writer.WriteStartElement("BundleExtension");
+            writer.WriteStartElement("BootstrapperExtension");
 
             writer.WriteAttributeString("Id", extensionId);
 

@@ -611,15 +611,15 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            var bundleExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4UtilBundleExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
-            if (bundleExtensionId == null)
+            var bootstrapperExtensionId = this.ParseHelper.CreateIdentifierValueFromPlatform("Wix4UtilBootstrapperExtension", this.Context.Platform, BurnPlatforms.X86 | BurnPlatforms.X64 | BurnPlatforms.ARM64);
+            if (bootstrapperExtensionId == null)
             {
                 this.Messaging.Write(ErrorMessages.UnsupportedPlatformForElement(sourceLineNumbers, this.Context.Platform.ToString(), element.Name.LocalName));
             }
 
             if (!this.Messaging.EncounteredError)
             {
-                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bundleExtensionId);
+                this.ParseHelper.CreateWixSearchSymbol(section, sourceLineNumbers, element.Name.LocalName, id, variable, condition, after, bootstrapperExtensionId);
 
                 section.AddSymbol(new WixWindowsFeatureSearchSymbol(sourceLineNumbers, id)
                 {

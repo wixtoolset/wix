@@ -41,11 +41,13 @@ dotnet test ^
 @del "..\..\build\artifacts\WixToolset.Data.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.Extensibility.*.nupkg" 2> nul
 @del "..\..\build\artifacts\WixToolset.BootstrapperApplicationApi.*.nupkg" 2> nul
+@del "..\..\build\artifacts\WixToolset.BootstrapperExtensionApi.*.nupkg" 2> nul
 @del "%_L%\TestResults\api.trx" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bextutil" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.data" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.extensibility" 2> nul
 @rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bootstrapperapplicationapi" 2> nul
+@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.bootstrapperextensionapi" 2> nul
 @exit /b
 
 :end

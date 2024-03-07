@@ -22,6 +22,7 @@ if exist "%_NUGET_CACHE%\wixinternal.testsupport" rd /s/q "%_NUGET_CACHE%\wixint
 if exist "%_NUGET_CACHE%\wixinternal.core.testpackage" rd /s/q "%_NUGET_CACHE%\wixinternal.core.testpackage"
 if exist "%_NUGET_CACHE%\wixtoolset.bal.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.bal.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.bootstrapperapplications.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.bootstrapperapplications.wixext"
+if exist "%_NUGET_CACHE%\wixtoolset.bootstrapperextensionapi" rd /s/q "%_NUGET_CACHE%\wixtoolset.bootstrapperextensionapi"
 if exist "%_NUGET_CACHE%\wixtoolset.bextutil" rd /s/q "%_NUGET_CACHE%\wixtoolset.bextutil"
 if exist "%_NUGET_CACHE%\wixtoolset.burn" rd /s/q "%_NUGET_CACHE%\wixtoolset.burn"
 if exist "%_NUGET_CACHE%\wixtoolset.complus.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.complus.wixext"

@@ -1,7 +1,7 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-#include <IBundleExtensionEngine.h>
+#include <IBootstrapperExtensionEngine.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -9,10 +9,10 @@ extern "C" {
 
 // function declarations
 
-HRESULT BextBundleExtensionEngineCreate(
-    __in PFN_BUNDLE_EXTENSION_ENGINE_PROC pfnBundleExtensionEngineProc,
-    __in_opt LPVOID pvBundleExtensionEngineProcContext,
-    __out IBundleExtensionEngine** ppEngineForExtension
+HRESULT BextBootstrapperExtensionEngineCreate(
+    __in PFN_BOOTSTRAPPER_EXTENSION_ENGINE_PROC pfnBootstrapperExtensionEngineProc,
+    __in_opt LPVOID pvBootstrapperExtensionEngineProcContext,
+    __out IBootstrapperExtensionEngine** ppEngineForExtension
     );
 
 #ifdef __cplusplus

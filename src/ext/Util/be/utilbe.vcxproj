@@ -35,7 +35,7 @@
     <TargetName>utilbe</TargetName>
     <CharacterSet>Unicode</CharacterSet>
     <ProjectModuleDefinitionFile>utilbe.def</ProjectModuleDefinitionFile>
-    <Description>WiX Toolset Util BundleExtension</Description>
+    <Description>WiX Toolset Util BootstrapperExtension</Description>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -51,14 +51,14 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="utilbe.cpp" />
-    <ClCompile Include="UtilBundleExtension.cpp" />
+    <ClCompile Include="UtilBootstrapperExtension.cpp" />
     <ClCompile Include="utilsearch.cpp" />
   </ItemGroup>
 
   <ItemGroup>
     <ClInclude Include="detectsha2support.h" />
     <ClInclude Include="precomp.h" />
-    <ClInclude Include="UtilBundleExtension.h" />
+    <ClInclude Include="UtilBootstrapperExtension.h" />
     <ClInclude Include="utilsearch.h" />
   </ItemGroup>
 
@@ -67,7 +67,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.BextUtil" />
+    <PackageReference Include="WixToolset.BootstrapperExtensionApi" />
 
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>

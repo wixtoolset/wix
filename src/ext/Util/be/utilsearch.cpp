@@ -5,7 +5,7 @@
 
 STDMETHODIMP UtilSearchParseFromXml(
     __in UTIL_SEARCHES* pSearches,
-    __in IXMLDOMNode* pixnBundleExtension
+    __in IXMLDOMNode* pixnBootstrapperExtension
     )
 {
     HRESULT hr = S_OK;
@@ -16,7 +16,7 @@ STDMETHODIMP UtilSearchParseFromXml(
     LPWSTR scz = NULL;
 
     // Select Util search nodes.
-    hr = XmlSelectNodes(pixnBundleExtension, L"WixWindowsFeatureSearch", &pixnNodes);
+    hr = XmlSelectNodes(pixnBootstrapperExtension, L"WixWindowsFeatureSearch", &pixnNodes);
     BextExitOnFailure(hr, "Failed to select Util search nodes.");
 
     // Get Util search node count.
@@ -103,7 +103,7 @@ STDMETHODIMP UtilSearchExecute(
     __in UTIL_SEARCHES* pSearches,
     __in LPCWSTR wzSearchId,
     __in LPCWSTR wzVariable,
-    __in IBundleExtensionEngine* pEngine
+    __in IBootstrapperExtensionEngine* pEngine
     )
 {
     HRESULT hr = S_OK;
