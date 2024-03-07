@@ -77,8 +77,6 @@ HRESULT WINAPI CreateBAFunctions(
     HRESULT hr = S_OK;
     CPrereqBaf* pBAFunctions = NULL;
 
-    BalInitialize(pArgs->pEngine);
-
     pBAFunctions = new CPrereqBaf(hModule);
     ExitOnNull(pBAFunctions, hr, E_OUTOFMEMORY, "Failed to create new CPrereqBaf object.");
 

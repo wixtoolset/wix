@@ -74,9 +74,6 @@ HRESULT WINAPI CreateBAFunctions(
     HRESULT hr = S_OK;
     CWixSampleBAFunctions* pBAFunctions = NULL;
 
-    // This is required to enable logging functions.
-    BalInitialize(pArgs->pEngine);
-
     pBAFunctions = new CWixSampleBAFunctions(hModule);
     ExitOnNull(pBAFunctions, hr, E_OUTOFMEMORY, "Failed to create new CWixSampleBAFunctions object.");
 

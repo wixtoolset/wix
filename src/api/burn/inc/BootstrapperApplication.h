@@ -729,21 +729,6 @@ struct BA_ONCREATE_ARGS
 {
     DWORD dwApiVersion;
     BOOTSTRAPPER_COMMAND command;
-    // BOOTSTRAPPER_ACTION action;
-    // BOOTSTRAPPER_DISPLAY display;
-
-    // LPWSTR wzCommandLine;
-    // INT32 nCmdShow;
-
-    // BOOTSTRAPPER_RESUME_TYPE resumeType;
-    // HWND hwndSplashScreen;
-
-    // BOOTSTRAPPER_RELATION_TYPE relationType;
-    // BOOL fPassthrough;
-
-    // LPWSTR wzLayoutDirectory;
-    // LPWSTR wzBootstrapperWorkingFolder;
-    // LPWSTR wzBootstrapperApplicationDataPath;
 };
 
 struct BA_ONCREATE_RESULTS

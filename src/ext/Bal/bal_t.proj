@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <!-- Restore: Explicitly restore the test projects, which need some hand-holding. -->
+    <ProjectReference Include="test\WixStdFnUnitTest\WixStdFnUnitTest.vcxproj" Targets="Restore" BuildInParallel="false" />
+    <ProjectReference Include="test\examples\examples.proj" Targets="Restore" />
+    <ProjectReference Include="wixext-backward-compatible\WixToolset.Bal.wixext.csproj" Targets="Restore" />
+
+    <!-- Build -->
+
+    <!-- C++/CLI projects will try to build their dependent projects in parallel with others, so they must be built first. -->
+    <ProjectReference Include="test\WixStdFnUnitTest\WixStdFnUnitTest.vcxproj" Properties="Platform=x86" BuildInParallel="false" />
+
+    <!-- wixstdfn x86 is built by WixStdFnUnitTest -->
+    <ProjectReference Include="wixstdfn\wixstdfn.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="wixstdfn\wixstdfn.vcxproj" Properties="Platform=ARM64" />
+
+    <ProjectReference Include="test\examples\examples.proj" />
+
+    <!-- Pack -->
+    <ProjectReference Include="wixstdfn\wixstdfn.vcxproj" Properties="NoBuild=true" Targets="PackNative" />
+    <ProjectReference Include="wixext\WixToolset.BootstrapperApplications.wixext.csproj" Properties="NoBuild=true" Targets="Pack" />
+    <ProjectReference Include="wixext-backward-compatible\WixToolset.Bal.wixext.csproj" Targets="Pack" />
+  </ItemGroup>
+</Project>
