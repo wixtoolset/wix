@@ -22,7 +22,7 @@
 
   <Fragment>
     <Directory Id="override TARGETDIR" Name="SourceDir">
-      <Directory Id="override ProgramFilesFolder">
+      <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
       </Directory>
     </Directory>

@@ -63,6 +63,18 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanCompileVirtualSymbolThatDoesNotGetOverridden()
+        {
+            var dirSymbols = BuildToGetDirectorySymbols("TestData", "AccessModifier", "VirtualSymbolThatDoesNotGetOverridden.wxs");
+            WixAssert.CompareLineByLine(new[]
+            {
+                "virtual:ProgramFilesFolder:TARGETDIR:PFiles",
+                "virtual:TARGETDIR::SourceDir",
+                "virtual:TestFolder:ProgramFilesFolder:Used",
+            }, dirSymbols.OrderBy(d => d.Id.Id).Select(d => d.Id.Access.AsString() + ":" + d.Id.Id + ":" + d.ParentDirectoryRef + ":" + d.Name).ToArray());
+        }
+
+        [Fact]
         public void CannotCompileInvalidCrossFragmentReference()
         {
             var errors = BuildForFailure("TestData", "AccessModifier", "InvalidCrossFragmentReference.wxs");
@@ -78,8 +90,9 @@ namespace WixToolsetTest.CoreIntegration
             var errors = BuildForFailure("TestData", "AccessModifier", "DuplicateCrossFragmentReference.wxs");
             WixAssert.CompareLineByLine(new[]
             {
-                "ln 12: Duplicate Directory with identifier 'TestFolder' referenced by <sourceFolder>\\DuplicateCrossFragmentReference.wxs(4). Ensure all your identifiers of a given type (Directory, File, etc.) are unique or use an access modifier to scope the identfier.",
-                "ln 8: Location of symbol related to previous error."
+                "ln 8: Duplicate Directory with identifier 'TestFolder' referenced by <sourceFolder>\\DuplicateCrossFragmentReference.wxs(4). Ensure all your identifiers of a given type (Directory, File, etc.) are unique or use an access modifier to scope the identfier.",
+                "ln 12: Location of symbol related to previous error.",
+                "ln 16: Location of symbol related to previous error."
             }, errors);
         }
 
@@ -99,8 +112,8 @@ namespace WixToolsetTest.CoreIntegration
             var errors = BuildForFailure("TestData", "AccessModifier", "DuplicatedOverrideVirtualSymbol.wxs");
             WixAssert.CompareLineByLine(new[]
             {
-                "ln 14: Duplicate Directory with identifier 'TestFolder' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
-                "ln 6: Location of symbol related to previous error."
+                "ln 6: Duplicate Directory with identifier 'TestFolder' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
+                "ln 14: Location of symbol related to previous error."
             }, errors);
         }
 
@@ -132,8 +145,8 @@ namespace WixToolsetTest.CoreIntegration
             var errors = BuildForFailure("TestData", "AccessModifier", "DuplicatePublicOverrideVirtualSymbol.wxs");
             WixAssert.CompareLineByLine(new[]
             {
-                "ln 14: Duplicate Directory with identifier 'TestFolder' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
-                "ln 6: Location of symbol related to previous error."
+                "ln 14: The Directory symbol 'TestFolder' conflicts with a virtual symbol. Use the 'override' access modifier to override the virtual symbol or use a different Id to avoid the conflict.",
+                "ln 10: Location of symbol related to previous error."
             }, errors);
         }
 

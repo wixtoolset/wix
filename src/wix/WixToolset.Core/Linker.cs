@@ -190,10 +190,13 @@ namespace WixToolset.Core
                     }
                 }
 
-                // Report duplicates that would ultimately end up being primary key collisions.
+                // Process conflicts that may be overridden virtual symbols (that's okay) or end up as primary key collisions (those need to be reported as errors).
+                ISet<IntermediateSymbol> overriddenSymbols;
                 {
-                    var reportDupes = new ReportConflictingSymbolsCommand(this.Messaging, find.PossibleConflicts, resolve.ResolvedSections);
+                    var reportDupes = new ProcessConflictingSymbolsCommand(this.Messaging, find.PossibleConflicts, find.OverrideSymbols, resolve.ResolvedSections);
                     reportDupes.Execute();
+
+                    overriddenSymbols = reportDupes.OverriddenSymbols;
                 }
 
                 if (this.Messaging.EncounteredError)
@@ -222,7 +225,7 @@ namespace WixToolset.Core
                                 continue;
                             }
                         }
-                        else if (find.OverriddenSymbols.Contains(symbol))
+                        else if (overriddenSymbols.Contains(symbol))
                         {
                             // Skip the symbols that were overridden.
                             continue;

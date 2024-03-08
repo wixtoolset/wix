@@ -11,4 +11,8 @@
     <Fragment>
         <Directory Id="TestFolder" Name="Dupe 2" />
     </Fragment>
+
+    <Fragment>
+        <Directory Id="TestFolder" Name="Dupe 3" />
+    </Fragment>
 </Wix>
