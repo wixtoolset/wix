@@ -102,10 +102,9 @@ namespace WixToolsetTest.CoreIntegration
                                      .ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "ln 8: Duplicate Registry with identifier 'regJnkjRU9YGaMJhQOqKmivWKf_VdY' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
-                    "ln 7: Location of symbol related to previous error.",
-                    "ln 9: Duplicate Registry with identifier 'regJnkjRU9YGaMJhQOqKmivWKf_VdY' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
-                    "ln 7: Location of symbol related to previous error."
+                    "ln 7: Duplicate Registry with identifier 'regJnkjRU9YGaMJhQOqKmivWKf_VdY' found. Access modifiers (global, library, file, section) cannot prevent these conflicts. Ensure all your identifiers of a given type (Directory, File, etc.) are unique.",
+                    "ln 8: Location of symbol related to previous error.",
+                    "ln 9: Location of symbol related to previous error."
                 }, errors);
             }
         }

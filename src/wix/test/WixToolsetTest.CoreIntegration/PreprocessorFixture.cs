@@ -4,9 +4,9 @@ namespace WixToolsetTest.CoreIntegration
 {
     using System.IO;
     using System.Linq;
+    using WixInternal.Core.TestPackage;
     using WixInternal.TestSupport;
     using WixToolset.Core;
-    using WixInternal.Core.TestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Data;
@@ -101,7 +101,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void VariableRedefinitionIsAWarning()
         {
-            var folder = TestData.Get(@"TestData\Variables");
+            var folder = TestData.Get(@"TestData", "Variables");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -121,8 +121,15 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var warning = result.Messages.Where(message => message.Id == (int)WarningMessages.Ids.VariableDeclarationCollision);
-                Assert.Single(warning);
+                var warning = result.Messages.Where(m => m.Level == MessageLevel.Warning || m.Level == MessageLevel.Error)
+                                      .Select(m => $"ln {m.SourceLineNumbers.LineNumber}: {m.Level.ToString().ToLowerInvariant()}: {m}".Replace(baseFolder, "<baseFolder>"))
+                                      .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "ln 5: warning: The variable 'Bar' with value 'Baz' was previously declared with value 'Bar'.",
+                    "ln 24: warning: It is no longer necessary to define the standard directory 'TARGETDIR'. Use the StandardDirectory element instead.",
+                    "ln 25: warning: It is no longer necessary to define the standard directory 'ProgramFilesFolder'. Use the StandardDirectory element instead."
+                }, warning);
             }
         }
 

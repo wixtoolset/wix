@@ -125,7 +125,7 @@ namespace WixToolsetTest.UI
             }, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).ToArray());
         }
 
-        [Fact(Skip = "Linker problem")]
+        [Fact]
         public void CanBuildUsingWixUIFeatureTree()
         {
             var folder = TestData.Get(@"TestData", "WixUI_FeatureTree");
@@ -161,7 +161,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
         }
 
-        [Fact(Skip = "Linker problem")]
+        [Fact]
         public void CanBuildWithWixUIInstallDirWithCustomizedEula()
         {
             var folder = TestData.Get(@"TestData", "WixUI_InstallDir");
@@ -274,7 +274,7 @@ namespace WixToolsetTest.UI
             }
         }
 
-        [Fact(Skip = "Linker problem")]
+        [Fact]
         public void CanBuildUsingWixUIMondo()
         {
             var folder = TestData.Get(@"TestData", "WixUI_Mondo");
@@ -307,7 +307,7 @@ namespace WixToolsetTest.UI
             }, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).ToArray());
             WixAssert.CompareLineByLine(new[]
             {
-                "InstallUISequence:WelcomeDlg\tInstalled AND PATCH\t1295",
+                "InstallUISequence:WelcomeDlg\tNOT Installed OR PATCH\t1297",
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
         }
 
@@ -325,7 +325,7 @@ namespace WixToolsetTest.UI
             }, results.Where(s => s.StartsWith("Control:ErrorDlg\tY")).Select(s => s.Split('\t')[9]).ToArray());
         }
 
-        [Fact(Skip = "Linker problem")]
+        [Fact]
         public void CanBuildWithInstallDirAndRemovedDialog()
         {
             var folder = TestData.Get(@"TestData", "InstallDir_NoLicense");
@@ -366,7 +366,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
         }
 
-        [Fact(Skip = "Linker problem")]
+        [Fact]
         public void CanBuildWithInstallDirAndAddedDialog()
         {
             var folder = TestData.Get(@"TestData", "InstallDir_SpecialDlg");

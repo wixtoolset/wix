@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="Override Without Virtual Symbol" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <PropertyRef Id="DoesGetReferenced" />
+    </Package>
+
+    <Fragment>
+        <Property Id="DoesNotGetReferenced1" Value="Does Not Get Referenced" />
+
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="override TestFolder" Name="IsNotUsed1" />
+        </StandardDirectory>
+    </Fragment>
+
+    <Fragment>
+        <Property Id="DoesNotGetReferenced2" Value="Does Not Get Referenced" />
+
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="override TestFolder" Name="IsNotUsed2" />
+        </StandardDirectory>
+    </Fragment>
+
+    <Fragment>
+        <Property Id="DoesGetReferenced" Value="Is Referenced" />
+
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="virtual TestFolder" Name="Used" />
+        </StandardDirectory>
+    </Fragment>
+</Wix>

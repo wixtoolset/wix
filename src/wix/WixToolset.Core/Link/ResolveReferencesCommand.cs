@@ -76,6 +76,7 @@ namespace WixToolset.Core.Link
                 if (this.symbolsWithSections.TryGetValue(reference.SymbolicName, out var symbolWithSection))
                 {
                     var accessible = this.DetermineAccessibleSymbols(section, symbolWithSection);
+
                     if (accessible.Count == 1)
                     {
                         var accessibleSymbol = accessible[0];
@@ -91,7 +92,7 @@ namespace WixToolset.Core.Link
                     {
                         this.Messaging.Write(ErrorMessages.UnresolvedReference(reference.SourceLineNumbers, reference.SymbolicName, symbolWithSection.Access));
                     }
-                    else // multiple symbols referenced creates conflicting symbols.
+                    else // multiple accessible symbols referenced creates conflicting symbols.
                     {
                         // Remember the direct reference to the symbol for the error reporting later,
                         // but do NOT continue resolving references found in these conflicting symbols.
@@ -122,7 +123,7 @@ namespace WixToolset.Core.Link
         }
 
         /// <summary>
-        /// Determine if the symbol and any of its duplicates are accessbile by referencing section.
+        /// Determine if the symbol and any of its duplicates are accessbile by the referencing section.
         /// </summary>
         /// <param name="referencingSection">Section referencing the symbol.</param>
         /// <param name="symbolWithSection">Symbol being referenced.</param>
@@ -130,21 +131,75 @@ namespace WixToolset.Core.Link
         private List<SymbolWithSection> DetermineAccessibleSymbols(IntermediateSection referencingSection, SymbolWithSection symbolWithSection)
         {
             var accessibleSymbols = new List<SymbolWithSection>();
+            List<SymbolWithSection> virtualSymbols = null;
 
             if (this.AccessibleSymbol(referencingSection, symbolWithSection))
             {
-                accessibleSymbols.Add(symbolWithSection);
+                AddSymbolToCorrectCollection(symbolWithSection, accessibleSymbols, ref virtualSymbols);
             }
 
             foreach (var dupe in symbolWithSection.PossiblyConflicts)
             {
                 if (this.AccessibleSymbol(referencingSection, dupe))
                 {
-                    accessibleSymbols.Add(dupe);
+                    AddSymbolToCorrectCollection(dupe, accessibleSymbols, ref virtualSymbols);
+                }
+            }
+
+            // If a virtual symbol is accessible we have some extra work to do.
+            if (virtualSymbols != null)
+            {
+                // If there are multiple virtual symbols accessible that's an error case so add them all and
+                // they'll be reported as conflicts later.
+                if (virtualSymbols.Count > 1)
+                {
+                    accessibleSymbols.AddRange(virtualSymbols);
+                }
+                else
+                {
+                    var overrode = false;
+
+                    // If there are any override symbols, skip adding the virtual symbols because they are "overridden".
+                    foreach (var overrideSymbol in accessibleSymbols.Where(symbol => symbol.Access == AccessModifier.Override))
+                    {
+                        overrideSymbol.OverrideVirtualSymbol(virtualSymbols[0]);
+
+                        overrode = true;
+                    }
+
+                    // If there are no overriding symbols, add the virtual symbol (there is only one but we'll add the collection just in case)
+                    // so it will be reported as a conflict later.
+                    if (!overrode)
+                    {
+                        accessibleSymbols.AddRange(virtualSymbols);
+                    }
                 }
             }
 
             return accessibleSymbols;
+        }
+
+        /// <summary>
+        /// Add a symbol to the correct collection based on its access.
+        /// </summary>
+        /// <param name="symbolWithSection"></param>
+        /// <param name="accessibleSymbols">Collection of non-virtual symbol that was accessible.</param>
+        /// <param name="virtualSymbols">Collection of virtual symbol that was accessible</param>
+        private static void AddSymbolToCorrectCollection(SymbolWithSection symbolWithSection, List<SymbolWithSection> accessibleSymbols, ref List<SymbolWithSection> virtualSymbols)
+        {
+            if (symbolWithSection.Access == AccessModifier.Virtual)
+            {
+                if (virtualSymbols == null)
+                {
+                    virtualSymbols = new List<SymbolWithSection>();
+                }
+
+                virtualSymbols.Add(symbolWithSection);
+            }
+            else
+            {
+                accessibleSymbols.Add(symbolWithSection);
+            }
         }
 
         /// <summary>
