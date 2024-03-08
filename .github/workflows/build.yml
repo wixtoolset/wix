@@ -61,7 +61,6 @@ jobs:
           allow-no-subscriptions: true
           client-id: ${{ secrets.WIX_SIGNING_CLIENTID }}
           tenant-id: ${{ secrets.WIX_SIGNING_TENANTID }}
-          subscription-id: ${{ secrets.WIX_SIGNING_SUBSCRIPTIONID }}
 
       - name: Build wix5
         shell: cmd
