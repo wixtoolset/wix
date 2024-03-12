@@ -65,7 +65,7 @@ namespace WixToolset.Core.Link
                 }
             }
 
-            return new Localization(existingLocalization.Codepage ?? localization.Codepage, existingLocalization.SummaryInformationCodepage ?? localization.SummaryInformationCodepage, existingLocalization.Culture, variables, controls);
+            return new Localization(existingLocalization.Location, existingLocalization.Codepage ?? localization.Codepage, existingLocalization.SummaryInformationCodepage ?? localization.SummaryInformationCodepage, existingLocalization.Culture, variables, controls);
         }
     }
 }
