@@ -63,6 +63,12 @@ namespace WixTestTools
             return row.Value;
         }
 
+        public string GetControlText(string dialog, string control)
+        {
+            var row = this.WiData.Tables["Control"].Rows.Cast<ControlRow>().Single(r => r.Dialog == dialog && r.Control == control);
+            return row.Text;
+        }
+
         public bool IsInstalled()
         {
             var productCode = this.GetProperty("ProductCode");

@@ -322,6 +322,9 @@ namespace WixToolset.Data
                 case SymbolDefinitionType.FileSFPCatalog:
                     return SymbolDefinitions.FileSFPCatalog;
 
+                case SymbolDefinitionType.HarvestFiles:
+                    return SymbolDefinitions.HarvestFiles;
+
                 case SymbolDefinitionType.Icon:
                     return SymbolDefinitions.Icon;
 
