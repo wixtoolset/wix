@@ -94,7 +94,6 @@
     <ClCompile Include="splashscreen.cpp" />
     <ClCompile Include="uithread.cpp" />
     <ClCompile Include="update.cpp" />
-    <ClCompile Include="userexperience.cpp" />
     <ClCompile Include="variable.cpp" />
     <ClCompile Include="variant.cpp" />
   </ItemGroup>
@@ -145,7 +144,6 @@
     <ClInclude Include="splashscreen.h" />
     <ClInclude Include="uithread.h" />
     <ClInclude Include="update.h" />
-    <ClInclude Include="userexperience.h" />
     <ClInclude Include="variable.h" />
     <ClInclude Include="variant.h" />
   </ItemGroup>
