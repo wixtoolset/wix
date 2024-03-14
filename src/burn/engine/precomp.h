@@ -76,7 +76,6 @@
 #include "burnextension.h"
 #include "search.h"
 #include "ba.h"
-#include "userexperience.h"
 #include "package.h"
 #include "update.h"
 #include "pseudobundle.h"

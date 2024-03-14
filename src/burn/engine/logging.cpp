@@ -110,7 +110,7 @@ extern "C" HRESULT LoggingOpen(
         }
     }
 
-    // Open the log approriately.
+    // Open the log appropriately.
     if (pLog->sczPath && *pLog->sczPath)
     {
         DWORD cRetry = 0;
