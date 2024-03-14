@@ -48,6 +48,9 @@ static HRESULT PerformSetVariable(
     __in BURN_SEARCH* pSearch,
     __in BURN_VARIABLES* pVariables
 );
+static LPCWSTR HkeyToString(
+    __in const HKEY hKey
+);
 
 
 // function definitions
@@ -896,11 +899,11 @@ static HRESULT RegistrySearchExists(
 
     // open key
     hr = RegOpenEx(pSearch->RegistrySearch.hRoot, sczKey, KEY_QUERY_VALUE, pSearch->RegistrySearch.fWin64 ? REG_KEY_64BIT : REG_KEY_32BIT, &hKey);
-    ExitOnPathFailure(hr, fExists, "Failed to open registry key. Key = '%ls'", pSearch->RegistrySearch.sczKey);
+    ExitOnPathFailure(hr, fExists, "Failed to open registry key. Root = '%ls', Key = '%ls'", HkeyToString(pSearch->RegistrySearch.hRoot), pSearch->RegistrySearch.sczKey);
 
     if (!fExists)
     {
-        LogStringLine(REPORT_STANDARD, "Registry key not found. Key = '%ls'", pSearch->RegistrySearch.sczKey);
+        LogStringLine(REPORT_STANDARD, "Registry key not found. Root = '%ls', Key = '%ls'", HkeyToString(pSearch->RegistrySearch.hRoot), pSearch->RegistrySearch.sczKey);
     }
     else if (pSearch->RegistrySearch.sczValue)
     {
@@ -916,7 +919,7 @@ static HRESULT RegistrySearchExists(
             fExists = TRUE;
             break;
         case ERROR_FILE_NOT_FOUND:
-            LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", pSearch->RegistrySearch.sczKey, pSearch->RegistrySearch.sczValue);
+            LogStringLine(REPORT_STANDARD, "Registry value not found. Root = '%ls', Key = '%ls', Value = '%ls'", HkeyToString(pSearch->RegistrySearch.hRoot), pSearch->RegistrySearch.sczKey, pSearch->RegistrySearch.sczValue);
             fExists = FALSE;
             break;
         default:
@@ -975,7 +978,7 @@ static HRESULT RegistrySearchValue(
 
     if (!fExists)
     {
-        LogStringLine(REPORT_STANDARD, "Registry key not found. Key = '%ls'", pSearch->RegistrySearch.sczKey);
+        LogStringLine(REPORT_STANDARD, "Registry key not found. Root = '%ls', Key = '%ls'", HkeyToString(pSearch->RegistrySearch.hRoot), pSearch->RegistrySearch.sczKey);
 
         ExitFunction();
     }
@@ -984,7 +987,7 @@ static HRESULT RegistrySearchValue(
     hr = RegReadValue(hKey, sczValue, pSearch->RegistrySearch.fExpandEnvironment, &pData, &cbData, &dwType);
     if (E_FILENOTFOUND == hr)
     {
-        LogStringLine(REPORT_STANDARD, "Registry value not found. Key = '%ls', Value = '%ls'", pSearch->RegistrySearch.sczKey, pSearch->RegistrySearch.sczValue);
+        LogStringLine(REPORT_STANDARD, "Registry value not found. Root = '%ls', Key = '%ls', Value = '%ls'", HkeyToString(pSearch->RegistrySearch.hRoot), pSearch->RegistrySearch.sczKey, pSearch->RegistrySearch.sczValue);
 
         ExitFunction1(hr = S_OK);
     }
@@ -1307,4 +1310,20 @@ LExit:
     BVariantUninitialize(&newValue);
 
     return hr;
+}
+
+static LPCWSTR HkeyToString(
+    __in const HKEY hKey
+)
+{
+    if (hKey == HKEY_CLASSES_ROOT)
+        return L"HKCR";
+    else if (hKey == HKEY_CURRENT_USER)
+        return L"HKCU";
+    else if (hKey == HKEY_LOCAL_MACHINE)
+        return L"HKLM";
+    else if (hKey == HKEY_USERS)
+        return L"HKU";
+    else
+        return L"Invalid";
 }
