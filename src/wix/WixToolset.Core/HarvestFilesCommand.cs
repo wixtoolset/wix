@@ -45,8 +45,6 @@ namespace WixToolset.Core
         {
             var unusedSectionCachedInlinedDirectoryIds = new Dictionary<string, string>();
 
-            var directoryId = harvestFile.DirectoryRef;
-
             var inclusions = harvestFile.Inclusions.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
             var exclusions = harvestFile.Exclusions.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -75,6 +73,8 @@ namespace WixToolset.Core
 
             foreach (var fileByRecursiveDir in resolvedFiles.GroupBy(resolvedFile => resolvedFile.RecursiveDir, resolvedFile => resolvedFile.Path))
             {
+                var directoryId = harvestFile.DirectoryRef;
+
                 var recursiveDir = fileByRecursiveDir.Key;
 
                 if (!String.IsNullOrEmpty(recursiveDir))

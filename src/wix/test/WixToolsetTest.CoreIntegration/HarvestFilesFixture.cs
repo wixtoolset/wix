@@ -14,7 +14,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void MustIncludeSomeFiles()
         {
-            var messages = BuildAndQueryComponentAndFileTables("BadAuthoring.wxs", isPackage: true, 10);
+            var messages = BuildAndQueryComponentFileDirectoryTables("BadAuthoring.wxs", isPackage: true, 10);
             Assert.Equal(new[]
             {
                 "10",
@@ -24,7 +24,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void ZeroFilesHarvestedIsAWarning()
         {
-            var messages = BuildAndQueryComponentAndFileTables("ZeroFiles.wxs", isPackage: true, 8600);
+            var messages = BuildAndQueryComponentFileDirectoryTables("ZeroFiles.wxs", isPackage: true, 8600);
             Assert.Equal(new[]
             {
                 "8600",
@@ -34,7 +34,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void MissingHarvestDirectoryIsAWarning()
         {
-            var messages = BuildAndQueryComponentAndFileTables("BadDirectory.wxs", isPackage: true, 8601);
+            var messages = BuildAndQueryComponentFileDirectoryTables("BadDirectory.wxs", isPackage: true, 8601);
             Assert.Equal(new[]
             {
                 "8601",
@@ -45,7 +45,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void DuplicateFilesSomethingSomething()
         {
-            var messages = BuildAndQueryComponentAndFileTables("DuplicateFiles.wxs", isPackage: true, 8602);
+            var messages = BuildAndQueryComponentFileDirectoryTables("DuplicateFiles.wxs", isPackage: true, 8602);
             Assert.Equal(new[]
             {
                 "8602",
@@ -58,7 +58,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanHarvestFilesInComponentGroup()
         {
-            BuildQueryAssertFiles("ComponentGroup.wxs",  new[]
+            BuildQueryAssertFiles("ComponentGroup.wxs", new[]
             {
                 "FileName.Extension",
                 "test20.txt",
@@ -71,7 +71,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanHarvestFilesInDirectory()
         {
-            BuildQueryAssertFiles("Directory.wxs",  new[]
+            BuildQueryAssertFiles("Directory.wxs", new[]
             {
                 "test10.txt",
                 "test120.txt",
@@ -101,7 +101,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanHarvestFilesInFeature()
         {
-            var rows = BuildAndQueryComponentAndFileTables("Feature.wxs");
+            var rows = BuildAndQueryComponentFileDirectoryTables("Feature.wxs");
 
             AssertFileComponentIds(3, rows);
         }
@@ -121,6 +121,22 @@ namespace WixToolsetTest.CoreIntegration
                 "test3.txt",
                 "test4.txt",
             });
+        }
+
+        [Fact]
+        public void CanHarvestFilesInStraightAndCrookedTrees()
+        {
+            var rows = BuildAndQueryComponentFileDirectoryTables("CrookedTree.wxs");
+            var directoryRows = rows.Where(row => row.StartsWith("Directory:")).Select(d => d.Substring(10)).ToArray();
+
+            var rootDirectoryId = directoryRows.Single(r => r.EndsWith("\troot")).Split('\t')[0];
+
+            foreach (var ch in new[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'z' })
+            {
+                var directoryRow = directoryRows.Single(r => r.EndsWith($"\t{ch}"));
+                var parentDirectory = directoryRow.Split('\t')[1];
+                Assert.Equal(rootDirectoryId, parentDirectory);
+            }
         }
 
         [Fact]
@@ -186,7 +202,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void HarvestedFilesUnderPackageWithAuthoredFeatureAreOrphaned()
         {
-            var messages = BuildAndQueryComponentAndFileTables("PackageWithoutDefaultFeature.wxs", isPackage: true, 267);
+            var messages = BuildAndQueryComponentFileDirectoryTables("PackageWithoutDefaultFeature.wxs", isPackage: true, 267);
             Assert.Equal(new[]
             {
                 "267",
@@ -232,14 +248,23 @@ namespace WixToolsetTest.CoreIntegration
 
         private static void BuildQueryAssertFiles(string file, string[] expectedFileNames, bool isPackage = true, int? exitCode = null)
         {
-            var rows = BuildAndQueryComponentAndFileTables(file, isPackage, exitCode);
+            var rows = BuildAndQueryComponentFileDirectoryTables(file, isPackage, exitCode);
 
             var fileNames = AssertFileComponentIds(expectedFileNames.Length, rows);
 
             Assert.Equal(expectedFileNames, fileNames);
         }
 
-        private static string[] BuildAndQueryComponentAndFileTables(string file, bool isPackage = true, int? exitCode = null)
+        private static void BuildQueryDirectoryComponent(string file, string[] expectedFileNames, bool isPackage = true, int? exitCode = null)
+        {
+            var rows = BuildAndQueryComponentFileDirectoryTables(file, isPackage, exitCode);
+
+            var fileNames = AssertFileComponentIds(expectedFileNames.Length, rows);
+
+            Assert.Equal(expectedFileNames, fileNames);
+        }
+
+        private static string[] BuildAndQueryComponentFileDirectoryTables(string file, bool isPackage = true, int? exitCode = null)
         {
             var folder = TestData.Get("TestData", "HarvestFiles");
 
@@ -273,7 +298,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     result.AssertSuccess();
 
-                    return Query.QueryDatabase(msiPath, new[] { "Component", "File" })
+                    return Query.QueryDatabase(msiPath, new[] { "Component", "File", "Directory" })
                         .OrderBy(s => s)
                         .ToArray();
                 }
