@@ -654,7 +654,7 @@ namespace WixToolsetTest.Firewall
             var build = new Builder(folder, typeof(FirewallExtensionFactory), new[] { folder });
             var output = Path.Combine(folder, $"Firewall{ruleName}.xml");
 
-            build.BuildAndDecompileAndBuild(Build, Decompile, output);
+            build.BuildAndDecompileAndBuild(Build, Decompile, output, validate: true);
 
             var doc = XDocument.Load(output);
             var actual = doc.Descendants()
