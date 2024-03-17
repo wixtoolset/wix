@@ -4,6 +4,7 @@
     <Fragment>
         <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
             <Component Id="FirewallComponent" Guid="28DF3387-F30E-4DBE-90E2-D2C760CB4DD9">
+                <File Source="$(sys.SOURCEFILEPATH)" />
                 <fw:FirewallException
 					Name="[NAME]"
 					Port="[LOCALPORT]"
@@ -31,8 +32,8 @@
 					/>
 
                 <fw:FirewallException Name="Single Nested properties" >
-					<fw:RemoteAddress Value="[REMOTEADDRESS]" />
-					<fw:LocalAddress Value="[LOCALADDRESS]" />
+                    <fw:RemoteAddress Value="[REMOTEADDRESS]" />
+                    <fw:LocalAddress Value="[LOCALADDRESS]" />
                     <fw:InterfaceType Value="[INTERFACETYPE]" />
                     <fw:Interface Name="[INTERFACE]" />
                 </fw:FirewallException>

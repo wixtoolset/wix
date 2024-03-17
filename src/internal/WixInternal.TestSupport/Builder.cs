@@ -100,7 +100,7 @@ namespace WixInternal.TestSupport
             }
         }
 
-        public void BuildAndDecompileAndBuild(Action<string[]> buildFunc, Action<string[]> decompileFunc, string decompilePath)
+        public void BuildAndDecompileAndBuild(Action<string[]> buildFunc, Action<string[]> decompileFunc, string decompilePath, bool validate = false)
         {
             var sourceFiles = Directory.GetFiles(this.SourceFolder, "*.wxs");
             var wxlFiles = Directory.GetFiles(this.SourceFolder, "*.wxl");
@@ -144,6 +144,19 @@ namespace WixInternal.TestSupport
                 }
 
                 buildFunc(firstBuildArgs.ToArray());
+
+                if (validate)
+                {
+                    firstBuildArgs = new List<string>
+                    {
+                        "msi",
+                        "validate",
+                        "-intermediateFolder", intermediateFolder,
+                        outputPath,
+                    };
+
+                    buildFunc(firstBuildArgs.ToArray());
+                }
 
                 // Decompile built output.
                 var decompileArgs = new List<string>
