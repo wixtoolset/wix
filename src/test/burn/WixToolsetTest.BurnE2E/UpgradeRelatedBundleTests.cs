@@ -102,7 +102,7 @@ namespace WixToolsetTest.BurnE2E
             bundleAv2x64.VerifyRegisteredAndInPackageCache();
 
             bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
-            
+
             Assert.True(LogVerifier.MessageInLogFileRegex(bundleAv2x64InstallLogFilePath, @"Detected related package: \{[0-9A-Za-z\-]{36}\}, scope: PerMachine, version: 1.0.0.0, language: 1033 operation: MajorUpgrade"));
         }
 
@@ -119,8 +119,23 @@ namespace WixToolsetTest.BurnE2E
 
             bundleAv2.Install();
             bundleAv2.VerifyRegisteredAndInPackageCache();
-             
+
             bundleAv1x64.VerifyUnregisteredAndRemovedFromPackageCache();
+        }
+
+        [RuntimeFact]
+        public void DncBABundleUpgradesDncBABundle()
+        {
+            var bundleDv2 = this.CreateBundleInstaller("BundleD_x64_v2");
+            var bundleDv3 = this.CreateBundleInstaller("BundleD_x64_v3");
+
+            bundleDv2.Install();
+            bundleDv2.VerifyRegisteredAndInPackageCache();
+
+            bundleDv3.Install();
+            bundleDv3.VerifyRegisteredAndInPackageCache();
+
+            bundleDv2.VerifyUnregisteredAndRemovedFromPackageCache();
         }
     }
 }
