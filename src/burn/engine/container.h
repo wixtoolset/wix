@@ -33,13 +33,17 @@ extern "C" {
 //    );
 
 
+// Forward declarations
+typedef struct _BURN_EXTENSION BURN_EXTENSION;
+typedef struct _BURN_EXTENSIONS BURN_EXTENSIONS;
+
 // constants
 
 enum BURN_CONTAINER_TYPE
 {
     BURN_CONTAINER_TYPE_NONE,
     BURN_CONTAINER_TYPE_CABINET,
-    BURN_CONTAINER_TYPE_SEVENZIP,
+    BURN_CONTAINER_TYPE_EXTENSION,
 };
 
 enum BURN_CAB_OPERATION
@@ -80,6 +84,8 @@ typedef struct _BURN_CONTAINER
     BURN_CONTAINER_VERIFICATION verification;
     DWORD64 qwAttachedOffset;
     BOOL fActuallyAttached;     // indicates whether an attached container is attached or missing.
+
+    BURN_EXTENSION* pExtension;
 
     // mutable members
     BOOL fPlanned;
@@ -127,6 +133,13 @@ typedef struct _BURN_CONTAINER_CONTEXT_CABINET
     DWORD cVirtualFilePointers;
 } BURN_CONTAINER_CONTEXT_CABINET;
 
+typedef struct _BURN_CONTAINER_CONTEXT_BEX
+{
+    BURN_EXTENSION* pExtension;
+    LPWSTR szTempContainerPath;
+    LPVOID pExtensionContext;
+} BURN_CONTAINER_CONTEXT_BEX;
+
 typedef struct _BURN_CONTAINER_CONTEXT
 {
     HANDLE hFile;
@@ -143,6 +156,7 @@ typedef struct _BURN_CONTAINER_CONTEXT
     union
     {
         BURN_CONTAINER_CONTEXT_CABINET Cabinet;
+        BURN_CONTAINER_CONTEXT_BEX Bex;
     };
 
 } BURN_CONTAINER_CONTEXT;
@@ -152,7 +166,8 @@ typedef struct _BURN_CONTAINER_CONTEXT
 
 HRESULT ContainersParseFromXml(
     __in BURN_CONTAINERS* pContainers,
-    __in IXMLDOMNode* pixnBundle
+    __in IXMLDOMNode* pixnBundle,
+    __in BURN_EXTENSIONS* pBurnExtensions
     );
 HRESULT ContainersInitialize(
     __in BURN_CONTAINERS* pContainers,
@@ -171,21 +186,11 @@ HRESULT ContainerOpen(
     __in HANDLE hContainerFile,
     __in_z LPCWSTR wzFilePath
     );
-HRESULT ContainerNextStream(
+HRESULT ContainerExtractFiles(
     __in BURN_CONTAINER_CONTEXT* pContext,
-    __inout_z LPWSTR* psczStreamName
-    );
-HRESULT ContainerStreamToFile(
-    __in BURN_CONTAINER_CONTEXT* pContext,
-    __in_z LPCWSTR wzFileName
-    );
-HRESULT ContainerStreamToBuffer(
-    __in BURN_CONTAINER_CONTEXT* pContext,
-    __out BYTE** ppbBuffer,
-    __out SIZE_T* pcbBuffer
-    );
-HRESULT ContainerSkipStream(
-    __in BURN_CONTAINER_CONTEXT* pContext
+    __in DWORD cFiles,
+    __in LPCWSTR *psczEmbeddedIds,
+    __in LPCWSTR *psczTargetPaths
     );
 HRESULT ContainerClose(
     __in BURN_CONTAINER_CONTEXT* pContext

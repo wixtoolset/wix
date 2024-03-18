@@ -17,6 +17,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.Hash), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.AttachedContainerIndex), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.WorkingPath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleContainerSymbolFields.BundleExtensionRef), IntermediateFieldType.String),
             },
             typeof(WixBundleContainerSymbol));
     }
@@ -35,6 +36,7 @@ namespace WixToolset.Data.Symbols
         Hash,
         AttachedContainerIndex,
         WorkingPath,
+        BundleExtensionRef,
     }
 
     /// <summary>
@@ -98,6 +100,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)WixBundleContainerSymbolFields.WorkingPath];
             set => this.Set((int)WixBundleContainerSymbolFields.WorkingPath, value);
+        }
+
+        public string BundleExtensionRef
+        {
+            get => (string)this.Fields[(int)WixBundleContainerSymbolFields.BundleExtensionRef];
+            set => this.Set((int)WixBundleContainerSymbolFields.BundleExtensionRef, value);
         }
     }
 }

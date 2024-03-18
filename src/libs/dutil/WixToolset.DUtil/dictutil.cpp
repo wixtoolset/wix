@@ -362,6 +362,29 @@ LExit:
     return hr;
 }
 
+HRESULT DAPI DictGetByIndex(
+    __in_bcount(STRINGDICT_HANDLE_BYTES) C_STRINGDICT_HANDLE sdHandle,
+    __in DWORD dwIndex,
+    __out void **ppvValue
+    )
+{
+    HRESULT hr = S_OK;
+
+    DictExitOnNull(sdHandle, hr, E_INVALIDARG, "Handle not specified while searching dict");
+
+    const STRINGDICT_STRUCT *psd = static_cast<const STRINGDICT_STRUCT *>(sdHandle);
+    if (dwIndex >= psd->dwNumItems)
+    {
+        hr = E_NOMOREITEMS;
+        ExitFunction();
+    }
+
+    *ppvValue = psd->ppvItemList[dwIndex];
+
+LExit:
+    return hr;
+}
+
 extern "C" HRESULT DAPI DictKeyExists(
     __in_bcount(STRINGDICT_HANDLE_BYTES) C_STRINGDICT_HANDLE sdHandle,
     __in_z LPCWSTR pszString
@@ -605,7 +628,7 @@ static HRESULT GetInsertIndex(
         // If we wrapped all the way back around to our original index, the dict is full - throw an error
         if (dwIndexCandidate == dwOriginalIndexCandidate)
         {
-            // The dict table is full - this error seems to be a reasonably close match 
+            // The dict table is full - this error seems to be a reasonably close match
             hr = HRESULT_FROM_WIN32(ERROR_DATABASE_FULL);
             DictExitOnRootFailure(hr, "Failed to add item '%ls' to dict table because dict table is full of items", pszString);
         }

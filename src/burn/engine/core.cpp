@@ -106,10 +106,10 @@ extern "C" HRESULT CoreInitialize(
     ExitOnFailure(hr, "Failed to open attached UX container.");
 
     // Load manifest.
-    hr = ContainerNextStream(&containerContext, &sczStreamName);
+    hr = CabExtractNextStream(&containerContext, &sczStreamName);
     ExitOnFailure(hr, "Failed to open manifest stream.");
 
-    hr = ContainerStreamToBuffer(&containerContext, &pbBuffer, &cbBuffer);
+    hr = CabExtractStreamToBuffer(&containerContext, &pbBuffer, &cbBuffer);
     ExitOnFailure(hr, "Failed to get manifest stream from container.");
 
     hr = ManifestLoadXmlFromBuffer(pbBuffer, cbBuffer, pEngineState);

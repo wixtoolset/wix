@@ -133,7 +133,7 @@ static HRESULT ParseFromXml(
     ExitOnFailure(hr, "Failed to parse update.");
 
     // parse containers
-    hr = ContainersParseFromXml(&pEngineState->containers, pixeBundle);
+    hr = ContainersParseFromXml(&pEngineState->containers, pixeBundle, &pEngineState->extensions);
     ExitOnFailure(hr, "Failed to parse containers.");
 
     // parse payloads

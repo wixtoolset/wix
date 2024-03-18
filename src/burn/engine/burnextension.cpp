@@ -250,6 +250,108 @@ LExit:
     return hr;
 }
 
+EXTERN_C BEEAPI BurnExtensionContainerOpen(
+    __in BURN_EXTENSION* pExtension,
+    __in LPCWSTR wzContainerId,
+    __in LPCWSTR wzFilePath,
+    __in BURN_CONTAINER_CONTEXT* pContext
+)
+{
+    HRESULT hr = S_OK;
+    BUNDLE_EXTENSION_CONTAINER_OPEN_ARGS args = { };
+    BUNDLE_EXTENSION_CONTAINER_OPEN_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzContainerId = wzContainerId;
+    args.wzFilePath = wzFilePath;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendRequiredBextMessage(pExtension, BUNDLE_EXTENSION_MESSAGE_CONTAINER_OPEN, &args, &results);
+    pContext->Bex.pExtensionContext = results.pContext;
+    ExitOnFailure(hr, "BundleExtension '%ls' open container '%ls' failed.", pExtension->sczId, wzFilePath);
+
+LExit:
+    return hr;
+}
+
+EXTERN_C BEEAPI BurnExtensionContainerOpenAttached(
+    __in BURN_EXTENSION* pExtension,
+    __in LPCWSTR wzContainerId,
+    __in HANDLE hBundle,
+    __in DWORD64 qwContainerStartPos,
+    __in DWORD64 qwContainerSize,
+    __in BURN_CONTAINER_CONTEXT* pContext
+)
+{
+    HRESULT hr = S_OK;
+    BUNDLE_EXTENSION_CONTAINER_OPEN_ATTACHED_ARGS args = { };
+    BUNDLE_EXTENSION_CONTAINER_OPEN_ATTACHED_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.wzContainerId = wzContainerId;
+    args.hBundle = hBundle;
+    args.qwContainerStartPos = qwContainerStartPos;
+    args.qwContainerSize = qwContainerSize;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendRequiredBextMessage(pExtension, BUNDLE_EXTENSION_MESSAGE_CONTAINER_OPEN_ATTACHED, &args, &results);
+    pContext->Bex.pExtensionContext = results.pContext;
+    ExitOnFailure(hr, "BundleExtension '%ls' open attached container failed.", pExtension->sczId);
+
+LExit:
+    return hr;
+}
+
+BEEAPI BurnExtensionContainerExtractFiles(
+    __in BURN_EXTENSION* pExtension,
+    __in DWORD cFiles,
+    __in LPCWSTR *psczEmbeddedIds,
+    __in LPCWSTR *psczTargetPaths,
+    __in BURN_CONTAINER_CONTEXT* pContext
+)
+{
+    HRESULT hr = S_OK;
+    BUNDLE_EXTENSION_CONTAINER_EXTRACT_FILES_ARGS args = { };
+    BUNDLE_EXTENSION_CONTAINER_EXTRACT_FILES_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.pContext = pContext->Bex.pExtensionContext;
+    args.cFiles = cFiles;
+    args.psczEmbeddedIds = psczEmbeddedIds;
+    args.psczTargetPaths = psczTargetPaths;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendRequiredBextMessage(pExtension, BUNDLE_EXTENSION_MESSAGE_CONTAINER_EXTRACT_FILES, &args, &results);
+    ExitOnFailure(hr, "BundleExtension '%ls' failed to extract files.", pExtension->sczId);
+
+LExit:
+    return hr;
+}
+
+BEEAPI BurnExtensionContainerClose(
+    __in BURN_EXTENSION* pExtension,
+    __in BURN_CONTAINER_CONTEXT* pContext
+)
+{
+    HRESULT hr = S_OK;
+    BUNDLE_EXTENSION_CONTAINER_CLOSE_ARGS args = { };
+    BUNDLE_EXTENSION_CONTAINER_CLOSE_RESULTS results = { };
+
+    args.cbSize = sizeof(args);
+    args.pContext = pContext->Bex.pExtensionContext;
+
+    results.cbSize = sizeof(results);
+
+    hr = SendRequiredBextMessage(pExtension, BUNDLE_EXTENSION_MESSAGE_CONTAINER_CLOSE, &args, &results);
+    ExitOnFailure(hr, "BundleExtension '%ls' failed to close container.", pExtension->sczId);
+
+LExit:
+    return hr;
+}
+
 static HRESULT SendRequiredBextMessage(
     __in BURN_EXTENSION* pExtension,
     __in BOOTSTRAPPER_EXTENSION_MESSAGE message,

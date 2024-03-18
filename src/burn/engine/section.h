@@ -43,7 +43,6 @@ void SectionUninitialize(
 HRESULT SectionGetAttachedContainerInfo(
     __in BURN_SECTION* pSection,
     __in DWORD iContainerIndex,
-    __in DWORD dwExpectedType,
     __out DWORD64* pqwOffset,
     __out DWORD64* pqwSize,
     __out BOOL* pfPresent

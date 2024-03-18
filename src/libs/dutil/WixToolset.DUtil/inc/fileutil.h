@@ -49,8 +49,8 @@ HRESULT DAPI FileAddSuffixToBaseName(
     __out_z LPWSTR* psczNewFileName
     );
 HRESULT DAPI FileVersionFromString(
-    __in_z LPCWSTR wzVersion, 
-    __out DWORD *pdwVerMajor, 
+    __in_z LPCWSTR wzVersion,
+    __out DWORD *pdwVerMajor,
     __out DWORD* pdwVerMinor
     );
 HRESULT DAPI FileVersionFromStringEx(
@@ -73,11 +73,11 @@ HRESULT DAPI FileSize(
     __out LONGLONG* pllSize
     );
 HRESULT DAPI FileSizeByHandle(
-    __in HANDLE hFile, 
+    __in HANDLE hFile,
     __out LONGLONG* pllSize
     );
 BOOL DAPI FileExistsEx(
-    __in_z LPCWSTR wzPath, 
+    __in_z LPCWSTR wzPath,
     __out_opt DWORD *pdwAttributes
     );
 BOOL DAPI FileExistsAfterRestart(
@@ -140,6 +140,12 @@ HRESULT DAPI FileWriteHandle(
     __in_bcount_opt(cbData) LPCBYTE pbData,
     __in SIZE_T cbData
     );
+HRESULT DAPI FileCopyPartial(
+    __in HANDLE hSource,
+    __in DWORD64 cbStart,
+    __in DWORD64 cbCopy,
+    __in_z LPCWSTR wzTarget
+    );
 HRESULT DAPI FileCopyUsingHandles(
     __in HANDLE hSource,
     __in HANDLE hTarget,
@@ -166,8 +172,8 @@ HRESULT DAPI FileEnsureCopyWithRetry(
     __in DWORD dwWaitMilliseconds
     );
 HRESULT DAPI FileEnsureMove(
-    __in_z LPCWSTR wzSource, 
-    __in_z LPCWSTR wzTarget, 
+    __in_z LPCWSTR wzSource,
+    __in_z LPCWSTR wzTarget,
     __in BOOL fOverwrite,
     __in BOOL fAllowCopy
     );
@@ -192,8 +198,8 @@ HRESULT DAPI FileCreateTempW(
     __out_opt HANDLE* phTempFile
     );
 HRESULT DAPI FileVersion(
-    __in_z LPCWSTR wzFilename, 
-    __out DWORD *pdwVerMajor, 
+    __in_z LPCWSTR wzFilename,
+    __out DWORD *pdwVerMajor,
     __out DWORD* pdwVerMinor
     );
 HRESULT DAPI FileIsSame(
@@ -205,7 +211,7 @@ HRESULT DAPI FileEnsureDelete(
     __in_z LPCWSTR wzFile
     );
 HRESULT DAPI FileGetTime(
-    __in_z LPCWSTR wzFile,  
+    __in_z LPCWSTR wzFile,
     __out_opt  LPFILETIME lpCreationTime,
     __out_opt  LPFILETIME lpLastAccessTime,
     __out_opt  LPFILETIME lpLastWriteTime

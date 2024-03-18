@@ -2266,6 +2266,21 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.IllegalAttributeWhenNested, "The File element contains an attribute '{0}' that cannot be used in a File element that is a child of a Component element.", attributeName);
         }
 
+        public static Message MissingContainerExtension(SourceLineNumber sourceLineNumber, string containerId, string bundleExtensionRef)
+        {
+            return Message(sourceLineNumber, Ids.MissingContainerExtension, "Container '{0}' has BundleExtensionRef set to '{1}', which could not be resolved to a container extension.", containerId, bundleExtensionRef);
+        }
+
+        public static Message ContainerExtractFailed(SourceLineNumber sourceLineNumber, string containerId, string bundleExtensionRef, string errorMessage)
+        {
+            return Message(sourceLineNumber, Ids.ContainerExtractFailed, "Container '{0}' with BundleExtensionRef set to '{1}' failed to extract the container. {2}", containerId, bundleExtensionRef, errorMessage);
+        }
+
+        public static Message InvalidBurnManifestContainers(SourceLineNumber sourceLineNumber, int containersCount, int missingIndex)
+        {
+            return Message(sourceLineNumber, Ids.InvalidBurnManifestContainers, "The burn manifest file contains {0} containers, yet container with index {1} was not found.", containersCount, missingIndex);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -2667,6 +2682,9 @@ namespace WixToolset.Data
             MsiTransactionInvalidPackage2 = 412,
             ExpectedAttributeOrElementWithOtherAttribute = 413,
             ExpectedAttributeOrElementWithoutOtherAttribute = 414,
+            MissingContainerExtension = 415,
+            ContainerExtractFailed = 416,
+            InvalidBurnManifestContainers = 417,
         }
     }
 }

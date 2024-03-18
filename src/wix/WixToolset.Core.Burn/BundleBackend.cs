@@ -13,13 +13,19 @@ namespace WixToolset.Core.Burn
             var extensionManager = context.ServiceProvider.GetService<IExtensionManager>();
 
             var backendExtensions = extensionManager.GetServices<IBurnBackendBinderExtension>();
+            var containerExtensions = extensionManager.GetServices<IBurnContainerExtension>();
 
             foreach (var extension in backendExtensions)
             {
                 extension.PreBackendBind(context);
             }
 
-            var command = new BindBundleCommand(context, backendExtensions);
+            foreach (var extension in containerExtensions)
+            {
+                extension.PreBackendBind(context);
+            }
+
+            var command = new BindBundleCommand(context, backendExtensions, containerExtensions);
             command.Execute();
 
             var result = context.ServiceProvider.GetService<IBindResult>();

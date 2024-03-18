@@ -60,6 +60,11 @@ HRESULT DAPI DictGetValue(
     __in_z LPCWSTR szString,
     __out void **ppvValue
     );
+HRESULT DAPI DictGetByIndex(
+    __in_bcount(STRINGDICT_HANDLE_BYTES) C_STRINGDICT_HANDLE sdHandle,
+    __in DWORD dwIndex,
+    __out void **ppvValue
+    );
 void DAPI DictDestroy(
     __in_bcount(STRINGDICT_HANDLE_BYTES) STRINGDICT_HANDLE sdHandle
     );

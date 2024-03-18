@@ -6,8 +6,12 @@ namespace WixToolset.Core.Burn.Bundles
     using System.Collections;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Xml;
     using WixToolset.Core.Native;
+    using WixToolset.Data;
+    using WixToolset.Data.Burn;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Services;
 
     /// <summary>
@@ -26,7 +30,7 @@ namespace WixToolset.Core.Burn.Bundles
         private bool disposed;
 
         private BinaryReader binaryReader;
-        private readonly List<DictionaryEntry> attachedContainerPayloadNames;
+        private readonly Dictionary<string, string> attachedContainerPayloadNames;
         private readonly IFileSystem fileSystem;
 
         /// <summary>
@@ -38,7 +42,7 @@ namespace WixToolset.Core.Burn.Bundles
         private BurnReader(IMessaging messaging, IFileSystem fileSystem, string fileExe)
             : base(messaging, fileExe)
         {
-            this.attachedContainerPayloadNames = new List<DictionaryEntry>();
+            this.attachedContainerPayloadNames = new Dictionary<string, string>();
             this.fileSystem = fileSystem;
         }
 
@@ -85,6 +89,7 @@ namespace WixToolset.Core.Burn.Bundles
                 return false;
             }
 
+            Directory.CreateDirectory(tempDirectory);
             Directory.CreateDirectory(outputDirectory);
             var tempCabPath = Path.Combine(tempDirectory, "ux.cab");
             var manifestOriginalPath = Path.Combine(outputDirectory, "0");
@@ -94,7 +99,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.binaryReader.BaseStream.Seek(this.UXAddress, SeekOrigin.Begin);
             using (Stream tempCab = this.fileSystem.OpenFile(null, tempCabPath, FileMode.Create, FileAccess.Write, FileShare.Read))
             {
-                BurnCommon.CopyStream(this.binaryReader.BaseStream, tempCab, (int)uxContainerSlot.Size);
+                BurnCommon.CopyStream(this.binaryReader.BaseStream, tempCab, uxContainerSlot.Size);
             }
 
             var cabinet = new Cabinet(tempCabPath);
@@ -135,7 +140,7 @@ namespace WixToolset.Core.Burn.Bundles
                     var sourcePath = sourcePathNode.Value;
                     var destinationPath = Path.Combine(containerNode.Value, filePathNode.Value);
 
-                    this.attachedContainerPayloadNames.Add(new DictionaryEntry(sourcePath, destinationPath));
+                    this.attachedContainerPayloadNames[sourcePath] = destinationPath;
                 }
             }
 
@@ -147,8 +152,10 @@ namespace WixToolset.Core.Burn.Bundles
         /// </summary>
         /// <param name="outputDirectory">Directory to write extracted files to.</param>
         /// <param name="tempDirectory">Scratch directory.</param>
+        /// <param name="uxOutputDirectory">UX extraction folder. If null or empty, a UX folder will be created within tempDirectory</param>
+        /// <param name="containerExtensions">Container extensions</param>
         /// <returns>True if successful, false otherwise</returns>
-        public bool ExtractAttachedContainers(string outputDirectory, string tempDirectory)
+        public bool ExtractAttachedContainers(string outputDirectory, string tempDirectory, string uxOutputDirectory, IEnumerable<IBurnContainerExtension> containerExtensions)
         {
             // No attached containers to extract
             if (this.AttachedContainers.Count < 2)
@@ -161,21 +168,44 @@ namespace WixToolset.Core.Burn.Bundles
                 return false;
             }
 
+            if (String.IsNullOrEmpty(uxOutputDirectory))
+            {
+                uxOutputDirectory = Path.Combine(tempDirectory, "UX", "Final");
+            }
+
+            var uxTempDirectory = Path.Combine(tempDirectory, "UX", "Temp");
+            if (!this.ExtractUXContainer(uxOutputDirectory, uxTempDirectory))
+            {
+                return false;
+            }
+
+            var extensionManifestPath = Path.Combine(uxOutputDirectory, BurnCommon.BootstrapperExtensionDataFileName);
+            var manifestPath = Path.Combine(uxOutputDirectory, "manifest.xml");
+            var document = new XmlDocument();
+            document.Load(manifestPath);
+            var nsmgr = new XmlNamespaceManager(document.NameTable);
+            nsmgr.AddNamespace("burn", BurnCommon.BurnNamespace);
+
             Directory.CreateDirectory(outputDirectory);
             var nextAddress = this.EngineSize;
             for (var i = 1; i < this.AttachedContainers.Count; i++)
             {
                 var cntnr = this.AttachedContainers[i];
-                var tempCabPath = Path.Combine(tempDirectory, $"a{i}.cab");
+                var tempCabPath = Path.Combine(tempDirectory, $"a{i}.data");
 
                 this.binaryReader.BaseStream.Seek(nextAddress, SeekOrigin.Begin);
                 using (Stream tempCab = this.fileSystem.OpenFile(null, tempCabPath, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
-                    BurnCommon.CopyStream(this.binaryReader.BaseStream, tempCab, (int)cntnr.Size);
+                    BurnCommon.CopyStream(this.binaryReader.BaseStream, tempCab, cntnr.Size);
                 }
 
-                var cabinet = new Cabinet(tempCabPath);
-                cabinet.Extract(outputDirectory);
+                if (!(document.SelectSingleNode($"/burn:BurnManifest/burn:Container[@Attached = 'yes' and @AttachedIndex = {i}]", nsmgr) is XmlElement containerElement))
+                {
+                    this.Messaging.Write(ErrorMessages.InvalidBurnManifestContainers(null, this.AttachedContainers.Count, i));
+                    return false;
+                }
+                var containerId = containerElement.GetAttribute("Id");
+                this.ExtractContainer(containerId, tempCabPath, outputDirectory, containerElement, containerExtensions, extensionManifestPath);
 
                 nextAddress += cntnr.Size;
             }
@@ -189,6 +219,55 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             return true;
+        }
+
+        private void ExtractContainer(string containerId, string containerPath, string outputDirectory, XmlElement containerElement, IEnumerable<IBurnContainerExtension> containerExtensions, string extensionManifestPath)
+        {
+            string containerType = containerElement.GetAttribute("Type");
+            if (containerType.Equals("Extension"))
+            {
+                IBurnContainerExtension containerExtension = null;
+                string containerExtensionId = containerElement.GetAttribute("ExtensionId");
+                if ((containerExtensions != null) && !String.IsNullOrEmpty(containerExtensionId))
+                {
+                    foreach (var extension in containerExtensions)
+                    {
+                        if (extension.ContainerExtensionIds.Contains(containerExtensionId))
+                        {
+                            containerExtension = extension;
+                            break;
+                        }
+                    }
+                }
+
+                if (containerExtension == null)
+                {
+                    this.Messaging.Write(WarningMessages.MissingContainerExtension(null, containerId, containerExtensionId));
+                    return;
+                }
+
+                // Get extension data from manifest
+                var extensionManifestDocument = new XmlDocument();
+                extensionManifestDocument.Load(extensionManifestPath);
+                var extensionNsmgr = new XmlNamespaceManager(extensionManifestDocument.NameTable);
+                extensionNsmgr.AddNamespace("ed", BurnConstants.BootstrapperExtensionDataNamespace);
+                var extensionDataNode = extensionManifestDocument.SelectSingleNode($"/ed:BundleExtensionData/ed:BundleExtension[@Id='{containerExtensionId}']", extensionNsmgr) as XmlElement;
+
+                try
+                {
+                    containerExtension.ExtractContainer(containerPath, outputDirectory, containerId, extensionDataNode);
+                }
+                catch (Exception ex)
+                {
+                    this.Messaging.Write(ErrorMessages.ContainerExtractFailed(null, containerId, containerExtensionId, ex.Message));
+                    return;
+                }
+            }
+            else
+            {
+                var cabinet = new Cabinet(containerPath);
+                cabinet.Extract(outputDirectory);
+            }
         }
 
         /// <summary>
