@@ -1335,9 +1335,11 @@ static HRESULT ExtractContainer(
     HRESULT hr = S_OK;
     BURN_CONTAINER_CONTEXT context = { };
     HANDLE hContainerHandle = INVALID_HANDLE_VALUE;
-    LPWSTR sczStreamName = NULL;
     BURN_PAYLOAD* pExtract = NULL;
     BURN_CACHE_PROGRESS_CONTEXT progress = { };
+    LPWSTR* psczExtractFiles = NULL;
+    LPWSTR* psczTargetPaths = NULL;
+    DWORD cExtractFiles = 0;
 
     progress.pCacheContext = pContext;
     progress.pContainer = pContainer;
@@ -1352,63 +1354,63 @@ static HRESULT ExtractContainer(
     hr = ContainerOpen(&context, pContainer, hContainerHandle, pContainer->sczUnverifiedPath);
     ExitOnFailure(hr, "Failed to open container: %ls.", pContainer->sczId);
 
-    while (S_OK == (hr = ContainerNextStream(&context, &sczStreamName)))
+    MemAllocArray(reinterpret_cast<LPVOID*>(&psczExtractFiles), sizeof(LPWSTR), pContainer->cParsedPayloads);
+    ExitOnNull(psczExtractFiles, hr, E_OUTOFMEMORY, "Failed to allocate extract files array.");
+
+    MemAllocArray(reinterpret_cast<LPVOID*>(&psczTargetPaths), sizeof(LPWSTR), pContainer->cParsedPayloads);
+    ExitOnNull(psczTargetPaths, hr, E_OUTOFMEMORY, "Failed to allocate target files array.");
+
+    for (DWORD i = 0; i < pContainer->cParsedPayloads; ++i)
     {
-        BOOL fExtracted = FALSE;
+        hr = DictGetByIndex(pContainer->sdhPayloads, i, reinterpret_cast<LPVOID*>(&pExtract));
+        ExitOnFailure(hr, "Failed to get payload %u from container: %ls.", i, pContainer->sczId);
 
-        hr = PayloadFindEmbeddedBySourcePath(pContainer->sdhPayloads, sczStreamName, &pExtract);
-        if (E_NOTFOUND != hr)
+        // Skip payloads that weren't planned or have already been cached.
+        if (pExtract->sczUnverifiedPath && pExtract->cRemainingInstances)
         {
-            ExitOnFailure(hr, "Failed to find embedded payload by source path: %ls container: %ls", sczStreamName, pContainer->sczId);
+            hr = PreparePayloadDestinationPath(pExtract->sczUnverifiedPath);
+            ExitOnFailure(hr, "Failed to prepare payload destination path: %ls", pExtract->sczUnverifiedPath);
 
-            // Skip payloads that weren't planned or have already been cached.
-            if (pExtract->sczUnverifiedPath && pExtract->cRemainingInstances)
+            hr = BACallbackOnCachePayloadExtractBegin(pContext->pUX, pContainer->sczId, pExtract->sczKey);
+            if (FAILED(hr))
             {
-                progress.pPayload = pExtract;
-
-                hr = PreparePayloadDestinationPath(pExtract->sczUnverifiedPath);
-                ExitOnFailure(hr, "Failed to prepare payload destination path: %ls", pExtract->sczUnverifiedPath);
-
-                hr = BACallbackOnCachePayloadExtractBegin(pContext->pUX, pContainer->sczId, pExtract->sczKey);
-                if (FAILED(hr))
-                {
-                    BACallbackOnCachePayloadExtractComplete(pContext->pUX, pContainer->sczId, pExtract->sczKey, hr);
-                    ExitOnRootFailure(hr, "BA aborted cache payload extract begin.");
-                }
-
-                // TODO: Send progress when extracting stream to file.
-                hr = ContainerStreamToFile(&context, pExtract->sczUnverifiedPath);
-                // Error handling happens after sending complete message to BA.
-
-                // If succeeded, send 100% complete here to make sure progress was sent to the BA.
-                if (SUCCEEDED(hr))
-                {
-                    hr = CompleteCacheProgress(&progress, pExtract->qwFileSize);
-                }
-
                 BACallbackOnCachePayloadExtractComplete(pContext->pUX, pContainer->sczId, pExtract->sczKey, hr);
-                ExitOnFailure(hr, "Failed to extract payload: %ls from container: %ls", sczStreamName, pContainer->sczId);
-
-                fExtracted = TRUE;
+                ExitOnRootFailure(hr, "BA aborted cache payload extract begin.");
             }
-        }
 
-        if (!fExtracted)
-        {
-            hr = ContainerSkipStream(&context);
-            ExitOnFailure(hr, "Failed to skip the extraction of payload: %ls from container: %ls", sczStreamName, pContainer->sczId);
+            hr = StrAllocString(&psczExtractFiles[cExtractFiles], pExtract->sczSourcePath, 0);
+            ExitOnFailure(hr, "Failed to copy string");
+
+            hr = StrAllocString(&psczTargetPaths[cExtractFiles], pExtract->sczUnverifiedPath, 0);
+            ExitOnFailure(hr, "Failed to copy string");
+
+            ++cExtractFiles;
         }
     }
 
-    if (E_NOMOREITEMS == hr)
+    hr = ContainerExtractFiles(&context, cExtractFiles, (LPCWSTR*)psczExtractFiles, (LPCWSTR*)psczTargetPaths);
+    ExitOnFailure(hr, "Failed to extract files from container '%ls'", pContainer->sczId);
+
+    for (DWORD i = 0; i < cExtractFiles; ++i)
     {
-        hr = S_OK;
+        hr = DictGetValue(pContainer->sdhPayloads, psczExtractFiles[i], (LPVOID*)&pExtract);
+        ExitOnFailure(hr, "Failed to get payload");
+
+        hr = CompleteCacheProgress(&progress, pExtract->qwFileSize);
+
+        BACallbackOnCachePayloadExtractComplete(pContext->pUX, pContainer->sczId, pExtract->sczKey, hr);
+        ExitOnFailure(hr, "Failed to extract payload: %ls from container: %ls", psczExtractFiles[i], pContainer->sczId);
     }
-    ExitOnFailure(hr, "Failed to extract all payloads from container: %ls", pContainer->sczId);
 
 LExit:
-    ReleaseStr(sczStreamName);
     ContainerClose(&context);
+    for (DWORD i = 0; i < cExtractFiles; ++i)
+    {
+        ReleaseStr(psczExtractFiles[i]);
+        ReleaseStr(psczTargetPaths[i]);
+    }
+    ReleaseMem(psczExtractFiles);
+    ReleaseMem(psczTargetPaths);
 
     return hr;
 }

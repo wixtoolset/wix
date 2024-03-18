@@ -62,6 +62,44 @@ public: // IBootstrapperExtension
         return E_NOTIMPL;
     }
 
+    virtual STDMETHODIMP ContainerOpen(
+        __in LPCWSTR /*wzContainerId*/,
+        __in LPCWSTR /*wzFilePath*/,
+        __out LPVOID* /*pContext*/
+        )
+    {
+        return E_NOTIMPL;
+    }
+
+    virtual STDMETHODIMP ContainerOpenAttached(
+            __in LPCWSTR /*wzContainerId*/,
+            __in HANDLE /*hBundle*/,
+            __in DWORD64 /*qwContainerStartPos*/,
+            __in DWORD64 /*qwContainerSize*/,
+            __out LPVOID* /*ppContext*/
+        )
+    {
+        return E_NOTIMPL;
+    }
+
+    virtual STDMETHODIMP ContainerExtractFiles(
+            __in LPVOID /*pContext*/,
+            __in DWORD /*cFiles*/,
+            __in LPCWSTR */*psczEmbeddedIds*/,
+            __in LPCWSTR */*psczTargetPaths*/
+        )
+    {
+        return E_NOTIMPL;
+    }
+
+    // Don't forget to release everything in the context
+    virtual STDMETHODIMP ContainerClose(
+        __in LPVOID /*pContext*/
+        )
+    {
+        return E_NOTIMPL;
+    }
+
     virtual STDMETHODIMP BootstrapperExtensionProc(
         __in BOOTSTRAPPER_EXTENSION_MESSAGE /*message*/,
         __in const LPVOID /*pvArgs*/,
