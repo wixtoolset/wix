@@ -5,9 +5,9 @@ namespace WixToolset.Data.Symbols
     public enum IniFileActionType
     {
         AddLine,
-        AddTag,
         CreateLine,
         RemoveLine,
+        AddTag,
         RemoveTag,
     }
 }

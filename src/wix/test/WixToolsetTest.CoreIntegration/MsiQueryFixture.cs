@@ -526,11 +526,24 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
+                result = WixRunner.Execute(new[]
+                {
+                    "msi",
+                    "validate",
+                    msiPath
+                });
+
+                result.AssertSuccess();
+
                 Assert.True(File.Exists(msiPath));
-                var results = Query.QueryDatabase(msiPath, new[] { "IniFile" });
+                var results = Query.QueryDatabase(msiPath, new[] { "IniFile", "RemoveIniFile" });
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "IniFile:iniRVwYTVbDGRcXg7ckoDxDHV1iRaQ\ttest.txt\tINSTALLFOLDER\tTestSection\tSomeKey\tSomeValue\t2\tIniComp",
+                    "IniFile:IniAddLine\ttest.txt\tINSTALLFOLDER\tTestSection\tSomeOtherKey\tSomeOtherValue\t0\tIniComp",
+                    "IniFile:IniAddTag\ttest.txt\tINSTALLFOLDER\tTestSection\tSomeOtherKey\tAnotherValueEntirely\t3\tIniComp",
+                    "IniFile:IniCreateLine\ttest.txt\tINSTALLFOLDER\tTestSection\tSomeKey\tSomeValue\t1\tIniComp",
+                    "RemoveIniFile:IniRemoveLine\ttest.txt\tINSTALLFOLDER\tTestSection\tSomeKey\t\t2\tIniComp",
+                    "RemoveIniFile:IniRemoveTag\ttest.txt\tINSTALLFOLDER\tTestSection\tSomeOtherKey\tAnotherValueEntirely\t4\tIniComp",
                 }, results);
             }
         }
