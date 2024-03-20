@@ -539,7 +539,7 @@ namespace WixToolset.Data
 
         public static Message ServiceConfigFamilyNotSupported(SourceLineNumber sourceLineNumbers, string elementName)
         {
-            return Message(sourceLineNumbers, Ids.ServiceConfigFamilyNotSupported, "{0} functionality is documented in the Windows Installer SDK to \"not [work] as expected.\" Consider replacing {0} with the WixUtilExtension ServiceConfig element.", elementName);
+            return Message(sourceLineNumbers, Ids.ServiceConfigFamilyNotSupported, "{0} functionality is documented in the Windows Installer SDK to \"not [work] as expected.\" Consider replacing {0} with the WixToolset.Util.wixext ServiceConfig element.", elementName);
         }
 
         public static Message SkippingMergeModuleTable(SourceLineNumber sourceLineNumbers, string tableName)
