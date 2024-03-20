@@ -5,7 +5,15 @@
             <Component Id="IniComp" Directory="INSTALLFOLDER">
                 <File Id="test.txt" Source="test.txt" />
 
-                <IniFile Action="createLine" Directory="INSTALLFOLDER" Name="test.txt" Section="TestSection" Key="SomeKey" Value="SomeValue" />
+                <IniFile Action="createLine" Directory="INSTALLFOLDER" Name="test.txt" Section="TestSection" Key="SomeKey" Value="SomeValue" Id="IniCreateLine" />
+
+                <IniFile Action="addLine" Directory="INSTALLFOLDER" Name="test.txt" Section="TestSection" Key="SomeOtherKey" Value="SomeOtherValue" Id="IniAddLine" />
+
+                <IniFile Action="addTag" Directory="INSTALLFOLDER" Name="test.txt" Section="TestSection" Key="SomeOtherKey" Value="AnotherValueEntirely" Id="IniAddTag" />
+
+                <IniFile Action="removeLine" Directory="INSTALLFOLDER" Name="test.txt" Section="TestSection" Key="SomeKey" Id="IniRemoveLine" />
+
+                <IniFile Action="removeTag" Directory="INSTALLFOLDER" Name="test.txt" Section="TestSection" Key="SomeOtherKey" Value="AnotherValueEntirely" Id="IniRemoveTag" />
             </Component>
         </ComponentGroup>
     </Fragment>
