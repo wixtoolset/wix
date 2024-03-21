@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 #include "precomp.h"
-#include "BalBaseBootstrapperApplication.h"
 
 static const LPCWSTR WIXIUIBA_WINDOW_CLASS = L"WixInternalUIBA";
 
@@ -15,10 +14,10 @@ enum WM_WIXIUIBA
 };
 
 
-class CWixInternalUIBootstrapperApplication : public CBalBaseBootstrapperApplication
+class CWixInternalUIBootstrapperApplication : public CBootstrapperApplicationBase
 {
 public: // IBootstrapperApplication
-    STDMETHODIMP OnCreate(
+    virtual STDMETHODIMP OnCreate(
         __in IBootstrapperEngine* pEngine,
         __in BOOTSTRAPPER_COMMAND* pCommand
     )
@@ -26,7 +25,7 @@ public: // IBootstrapperApplication
         HRESULT hr = S_OK;
 
         hr = __super::OnCreate(pEngine, pCommand);
-        BalExitOnFailure(hr, "CBalBaseBootstrapperApplication initialization failed.");
+        BalExitOnFailure(hr, "CBootstrapperApplicationBase initialization failed.");
 
         m_commandAction = pCommand->action;
         m_commandDisplay = pCommand->display;
@@ -794,7 +793,7 @@ public:
     //
     CWixInternalUIBootstrapperApplication(
         __in HMODULE hModule
-        ) : CBalBaseBootstrapperApplication(3, 3000)
+        ) : CBootstrapperApplicationBase(3, 3000)
     {
         m_hModule = hModule;
         m_commandAction = BOOTSTRAPPER_ACTION_UNKNOWN;

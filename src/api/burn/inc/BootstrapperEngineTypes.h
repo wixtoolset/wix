@@ -448,13 +448,6 @@ typedef struct _BAENGINE_GETRELATEDBUNDLEVARIABLE_RESULTS
     DWORD cchValue;
 } BAENGINE_GETRELATEDBUNDLEVARIABLE_RESULTS;
 
-// extern "C" typedef HRESULT(WINAPI *PFN_BOOTSTRAPPER_ENGINE_PROC)(
-//     __in BOOTSTRAPPER_ENGINE_MESSAGE message,
-//     __in const LPVOID pvArgs,
-//     __inout LPVOID pvResults,
-//     __in_opt LPVOID pvContext
-//     );
-
 #if defined(__cplusplus)
 }
 #endif

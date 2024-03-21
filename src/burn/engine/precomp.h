@@ -61,8 +61,8 @@
 #include <dpiutil.h>
 #include <butil.h>
 
-#include "BootstrapperApplication.h"
-#include "BootstrapperExtension.h"
+#include "BootstrapperApplicationTypes.h"
+#include "BootstrapperExtensionTypes.h"
 
 #include "platform.h"
 #include "variant.h"

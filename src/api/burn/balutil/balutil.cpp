@@ -38,7 +38,7 @@ static void MsgProc(
 
 // prototypes
 
-DAPI_(HRESULT) BootstrapperApplicationRun(
+EXTERN_C HRESULT __stdcall BootstrapperApplicationRun(
     __in IBootstrapperApplication* pApplication
     )
 {

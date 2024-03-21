@@ -1,7 +1,7 @@
 #pragma once
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-#include "BootstrapperEngine.h"
+#include "BootstrapperEngineTypes.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -1534,57 +1534,6 @@ struct BA_ONUNREGISTERCOMPLETE_RESULTS
 {
     DWORD dwApiVersion;
 };
-
-#ifdef TODO_DELETE
-
-extern "C" typedef HRESULT(WINAPI *PFN_BOOTSTRAPPER_APPLICATION_PROC)(
-    __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
-    __in const LPVOID pvArgs,
-    __inout LPVOID pvResults,
-    __in_opt LPVOID pvContext
-    );
-
-struct BOOTSTRAPPER_DESTROY_ARGS
-{
-    DWORD dwApiVersion;
-    BOOL fReload;
-};
-
-struct BOOTSTRAPPER_DESTROY_RESULTS
-{
-    DWORD dwApiVersion;
-    BOOL fDisableUnloading; // indicates the BA dll must not be unloaded after BootstrapperApplicationDestroy.
-};
-
-extern "C" typedef void (WINAPI *PFN_BOOTSTRAPPER_APPLICATION_DESTROY)(
-    __in const BOOTSTRAPPER_DESTROY_ARGS* pArgs,
-    __inout BOOTSTRAPPER_DESTROY_RESULTS* pResults
-    );
-
-
-
-struct BOOTSTRAPPER_CREATE_ARGS
-{
-    DWORD dwApiVersion;
-    DWORD64 qwEngineAPIVersion;
-    PFN_BOOTSTRAPPER_ENGINE_PROC pfnBootstrapperEngineProc;
-    LPVOID pvBootstrapperEngineProcContext;
-    BOOTSTRAPPER_COMMAND* pCommand;
-};
-
-struct BOOTSTRAPPER_CREATE_RESULTS
-{
-    DWORD dwApiVersion;
-    PFN_BOOTSTRAPPER_APPLICATION_PROC pfnBootstrapperApplicationProc;
-    LPVOID pvBootstrapperApplicationProcContext;
-};
-
-extern "C" typedef HRESULT(WINAPI *PFN_BOOTSTRAPPER_APPLICATION_CREATE)(
-    __in const BOOTSTRAPPER_CREATE_ARGS* pArgs,
-    __inout BOOTSTRAPPER_CREATE_RESULTS* pResults
-    );
-
-#endif
 
 #if defined(__cplusplus)
 }

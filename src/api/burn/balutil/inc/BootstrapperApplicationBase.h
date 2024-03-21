@@ -9,9 +9,9 @@
 #include "balinfo.h"
 #include "balretry.h"
 
-#define CBalBaseBootstrapperApplication CBootstrapperApplication
+#define CBalBaseBootstrapperApplication CBootstrapperApplicationBase
 
-class CBootstrapperApplication : public IBootstrapperApplication
+class CBootstrapperApplicationBase : public IBootstrapperApplication
 {
 public: // IUnknown
     virtual STDMETHODIMP QueryInterface(
@@ -1187,7 +1187,7 @@ protected:
         return m_fCanceled;
     }
 
-    CBalBaseBootstrapperApplication(
+    CBootstrapperApplicationBase(
         __in DWORD dwRetryCount = 0,
         __in DWORD dwRetryTimeout = 1000
         )
@@ -1208,7 +1208,7 @@ protected:
         BalRetryInitialize(dwRetryCount, dwRetryTimeout);
     }
 
-    virtual ~CBalBaseBootstrapperApplication()
+    virtual ~CBootstrapperApplicationBase()
     {
         BalInfoUninitializeCommandLine(&m_BalInfoCommand);
         BalRetryUninitialize();

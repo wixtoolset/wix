@@ -34,12 +34,7 @@
 //#include "xmlutil.h"
 #include "regutil.h"
 
-//#include "IBootstrapperApplication.h"
-
-#include "BalBaseBootstrapperApplication.h"
-//#include "balinfo.h"
-//#include "balcondition.h"
-#include "balutil.h"
+#include "BootstrapperApplicationBase.h"
 
 #include "BAFunctions.h"
 #include "IBAFunctions.h"
