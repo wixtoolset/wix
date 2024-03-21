@@ -96,6 +96,7 @@ HRESULT CacheEnsureAcquisitionFolder(
     __in BURN_CACHE* pCache
     );
 HRESULT CacheEnsureBaseWorkingFolder(
+    __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __deref_out_z_opt LPWSTR* psczBaseWorkingFolder
     );
@@ -171,6 +172,7 @@ HRESULT CachePreparePackage(
     __in BURN_PACKAGE* pPackage
     );
 HRESULT CacheBundleToWorkingDirectory(
+    __in BOOL fElvated,
     __in BURN_CACHE* pCache,
     __in_z LPCWSTR wzExecutableName,
     __in BURN_SECTION* pSection,

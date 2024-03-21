@@ -276,6 +276,7 @@ EXTERN_C HRESULT BootstrapperApplicationInterpretExecuteResult(
 }
 
 EXTERN_C HRESULT BootstrapperApplicationEnsureWorkingFolder(
+    __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __deref_out_z LPWSTR* psczUserExperienceWorkingFolder
     )
@@ -283,7 +284,7 @@ EXTERN_C HRESULT BootstrapperApplicationEnsureWorkingFolder(
     HRESULT hr = S_OK;
     LPWSTR sczWorkingFolder = NULL;
 
-    hr = CacheEnsureBaseWorkingFolder(pCache, &sczWorkingFolder);
+    hr = CacheEnsureBaseWorkingFolder(fElevated, pCache, &sczWorkingFolder);
     ExitOnFailure(hr, "Failed to create working folder.");
 
     hr = StrAllocFormatted(psczUserExperienceWorkingFolder, L"%ls%ls\\", sczWorkingFolder, L".ba");

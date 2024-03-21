@@ -165,7 +165,7 @@ extern "C" HRESULT CoreInitialize(
     if (BURN_MODE_NORMAL == pEngineState->internalCommand.mode || BURN_MODE_EMBEDDED == pEngineState->internalCommand.mode)
     {
         // Extract all UX payloads to working folder.
-        hr = BootstrapperApplicationEnsureWorkingFolder(&pEngineState->cache, &pEngineState->userExperience.sczTempDirectory);
+        hr = BootstrapperApplicationEnsureWorkingFolder(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, &pEngineState->userExperience.sczTempDirectory);
         ExitOnFailure(hr, "Failed to get unique temporary folder for bootstrapper application.");
 
         hr = PayloadExtractUXContainer(&pEngineState->userExperience.payloads, &containerContext, pEngineState->userExperience.sczTempDirectory);
@@ -588,7 +588,7 @@ extern "C" HRESULT CoreElevate(
         // If the elevated companion pipe isn't created yet, let's make that happen.
         if (!pEngineState->sczBundleEngineWorkingPath)
         {
-            hr = CacheBundleToWorkingDirectory(&pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
+            hr = CacheBundleToWorkingDirectory(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
             ExitOnFailure(hr, "Failed to cache engine to working directory.");
         }
 
@@ -697,7 +697,7 @@ extern "C" HRESULT CoreApply(
     // Ensure the engine is cached to the working path.
     if (!pEngineState->sczBundleEngineWorkingPath)
     {
-        hr = CacheBundleToWorkingDirectory(&pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
+        hr = CacheBundleToWorkingDirectory(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
         ExitOnFailure(hr, "Failed to cache engine to working directory.");
     }
 
