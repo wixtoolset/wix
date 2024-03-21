@@ -43,15 +43,6 @@ static const HRESULT E_PREREQBA_INFINITE_LOOP = MAKE_HRESULT(SEVERITY_ERROR, FAC
 
 
 /*******************************************************************
- BootstrapperApplicationRun - runs the IBootstrapperApplication until
-                              the application quits.
-
-********************************************************************/
-DAPI_(HRESULT) BootstrapperApplicationRun(
-    __in IBootstrapperApplication* pApplication
-    );
-
-/*******************************************************************
  BalDebuggerCheck - allows bootstrapper application to explicitly check
         whether a debugger should be attached to the boostrapper application.
 

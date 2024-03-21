@@ -18,8 +18,7 @@
 #include "pathutil.h"
 #include "strutil.h"
 
-#include "BalBaseBootstrapperApplication.h"
-#include "balutil.h"
+#include <BootstrapperApplicationBase.h>
 
 #include "BAFunctions.h"
 #include "IBAFunctions.h"

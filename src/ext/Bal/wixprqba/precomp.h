@@ -35,12 +35,7 @@
 #include <uriutil.h>
 #include <xmlutil.h>
 
-#include <IBootstrapperApplication.h>
-
-#include <balutil.h>
-#include <balinfo.h>
-#include <balcondition.h>
-
+#include <BootstrapperApplication.h>
 #include <BAFunctions.h>
 
 #include "WixStandardBootstrapperApplication.h"

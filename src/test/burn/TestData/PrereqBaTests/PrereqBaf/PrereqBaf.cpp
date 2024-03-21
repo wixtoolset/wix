@@ -9,7 +9,7 @@ class CPrereqBaf : public CBalBaseBAFunctions
 public: // IBAFunctions
 
 public: //IBootstrapperApplication
-    STDMETHODIMP OnCreate(
+    virtual STDMETHODIMP OnCreate(
         __in IBootstrapperEngine* pEngine,
         __in BOOTSTRAPPER_COMMAND* pCommand
     )
@@ -17,7 +17,7 @@ public: //IBootstrapperApplication
         HRESULT hr = S_OK;
 
         hr = __super::OnCreate(pEngine, pCommand);
-        ExitOnFailure(hr, "CBalBaseBootstrapperApplication initialization failed.");
+        ExitOnFailure(hr, "CPrereqBaf initialization failed.");
 
         hr = StrAllocString(&m_sczBARuntimeDirectory, pCommand->wzBootstrapperWorkingFolder, 0);
         ExitOnFailure(hr, "Failed to copy working folder");

@@ -15,9 +15,7 @@
 #include <dutil.h>
 #include <dictutil.h>
 
-#include <IBootstrapperApplication.h>
-#include <balutil.h>
-#include <balretry.h>
+#include <BootstrapperApplicationBase.h>
 
 #include "TestBootstrapperApplication.h"
 

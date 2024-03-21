@@ -101,10 +101,10 @@
   <ItemGroup>
     <ClInclude Include="apply.h" />
     <ClInclude Include="approvedexe.h" />
-    <ClInclude Include="..\..\api\burn\inc\BootstrapperApplication.h" />
-    <ClInclude Include="..\..\api\burn\inc\BootstrapperEngine.h" />
-    <ClInclude Include="..\..\api\burn\inc\BootstrapperExtension.h" />
-    <ClInclude Include="..\..\api\burn\inc\BootstrapperExtensionEngine.h" />
+    <ClInclude Include="..\..\api\burn\inc\BootstrapperApplicationTypes.h" />
+    <ClInclude Include="..\..\api\burn\inc\BootstrapperEngineTypes.h" />
+    <ClInclude Include="..\..\api\burn\inc\BootstrapperExtensionTypes.h" />
+    <ClInclude Include="..\..\api\burn\inc\BootstrapperExtensionEngineTypes.h" />
     <ClInclude Include="ba.h" />
     <ClInclude Include="bacallback.h" />
     <ClInclude Include="bundlepackageengine.h" />

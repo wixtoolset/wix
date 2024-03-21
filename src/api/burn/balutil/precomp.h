@@ -30,7 +30,7 @@
 #include <thmutil.h>
 #include <xmlutil.h>
 
-#include "IBootstrapperApplication.h"
+#include "BootstrapperApplication.h"
 
 #include "balutil.h"
 #include "BalBootstrapperEngine.h"

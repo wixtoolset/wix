@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 #include "precomp.h"
-#include "BalBaseBootstrapperApplication.h"
 
 static const LPCWSTR WIXBUNDLE_VARIABLE_CANRESTART = L"WixCanRestart";
 static const LPCWSTR WIXBUNDLE_VARIABLE_ELEVATED = L"WixBundleElevated";
@@ -178,10 +177,10 @@ static LPCSTR LoggingMsiFeatureStateToString(
     );
 
 
-class CWixStandardBootstrapperApplication : public CBalBaseBootstrapperApplication
+class CWixStandardBootstrapperApplication : public CBootstrapperApplicationBase
 {
 public: // IBootstrapperApplication
-    STDMETHODIMP OnCreate(
+    virtual STDMETHODIMP OnCreate(
         __in IBootstrapperEngine* pEngine,
         __in BOOTSTRAPPER_COMMAND* pCommand
     )
@@ -189,7 +188,7 @@ public: // IBootstrapperApplication
         HRESULT hr = S_OK;
 
         hr = __super::OnCreate(pEngine, pCommand);
-        BalExitOnFailure(hr, "CBalBaseBootstrapperApplication initialization failed.");
+        BalExitOnFailure(hr, "CBootstrapperApplicationBase initialization failed.");
 
         m_commandAction = pCommand->action;
         m_commandDisplay = pCommand->display;
@@ -388,7 +387,7 @@ public: // IBootstrapperApplication
         }
 
     LExit:
-        return CBalBaseBootstrapperApplication::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
+        return CBootstrapperApplicationBase::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
     }
 
 
@@ -563,7 +562,7 @@ public: // IBootstrapperApplication
             *pRequestedType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE;
         }
 
-        return CBalBaseBootstrapperApplication::OnPlanRelatedBundleType(wzBundleId, recommendedType, pRequestedType, pfCancel);
+        return CBootstrapperApplicationBase::OnPlanRelatedBundleType(wzBundleId, recommendedType, pRequestedType, pfCancel);
     }
 
 
@@ -633,7 +632,7 @@ public: // IBootstrapperApplication
             }
         }
 
-        return CBalBaseBootstrapperApplication::OnPlanPackageBegin(wzPackageId, state, fCached, installCondition, repairCondition, recommendedState, recommendedCacheType, pRequestState, pRequestedCacheType, pfCancel);
+        return CBootstrapperApplicationBase::OnPlanPackageBegin(wzPackageId, state, fCached, installCondition, repairCondition, recommendedState, recommendedCacheType, pRequestState, pRequestedCacheType, pfCancel);
     }
 
 
@@ -4778,7 +4777,7 @@ public:
     CWixStandardBootstrapperApplication(
         __in HMODULE hModule,
         __in BOOL fRunAsPrereqBA
-        ) : CBalBaseBootstrapperApplication(3, 3000)
+        ) : CBootstrapperApplicationBase(3, 3000)
     {
         THEME_ASSIGN_CONTROL_ID* pAssignControl = NULL;
         DWORD dwAutomaticBehaviorType = THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ENABLED | THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VISIBLE | THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ACTION | THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VALUE;
