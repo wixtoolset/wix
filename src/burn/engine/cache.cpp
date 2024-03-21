@@ -107,6 +107,7 @@ static HRESULT SecurePath(
     __in LPCWSTR wzPath
     );
 static HRESULT CopyEngineToWorkingFolder(
+    __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzWorkingFolderName,
@@ -342,6 +343,7 @@ LExit:
 }
 
 extern "C" HRESULT CacheEnsureBaseWorkingFolder(
+    __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __deref_out_z_opt LPWSTR* psczBaseWorkingFolder
     )
@@ -350,15 +352,32 @@ extern "C" HRESULT CacheEnsureBaseWorkingFolder(
 
     HRESULT hr = S_OK;
     LPWSTR sczPotential = NULL;
+    PSECURITY_DESCRIPTOR psd = NULL;
+    LPSECURITY_ATTRIBUTES pWorkingFolderAcl = NULL;
 
     if (!pCache->fInitializedBaseWorkingFolder)
     {
+        // If elevated, allocate the pWorkingFolderAcl to protect the working folder to only SYSTEM and Admins.
+        if (fElevated)
+        {
+            LPCWSTR wzSddl = L"D:PAI(A;;FA;;;BA)(A;OICIIO;GA;;;BA)(A;;FA;;;SY)(A;OICIIO;GA;;;SY)";
+            if (!::ConvertStringSecurityDescriptorToSecurityDescriptorW(wzSddl, SDDL_REVISION_1, &psd, NULL))
+            {
+                ExitWithLastError(hr, "Failed to create the security descriptor for the working folder.");
+            }
+
+            pWorkingFolderAcl = reinterpret_cast<LPSECURITY_ATTRIBUTES>(MemAlloc(sizeof(SECURITY_ATTRIBUTES), TRUE));
+            pWorkingFolderAcl->nLength = sizeof(SECURITY_ATTRIBUTES);
+            pWorkingFolderAcl->lpSecurityDescriptor = psd;
+            pWorkingFolderAcl->bInheritHandle = FALSE;
+        }
+
         for (DWORD i = 0; i < pCache->cPotentialBaseWorkingFolders; ++i)
         {
             hr = PathConcatRelativeToFullyQualifiedBase(pCache->rgsczPotentialBaseWorkingFolders[i], pCache->wzGuid, &sczPotential);
             if (SUCCEEDED(hr))
             {
-                hr = DirEnsureExists(sczPotential, NULL);
+                hr = DirEnsureExists(sczPotential, pWorkingFolderAcl);
                 if (SUCCEEDED(hr))
                 {
                     pCache->sczBaseWorkingFolder = sczPotential;
@@ -385,6 +404,11 @@ extern "C" HRESULT CacheEnsureBaseWorkingFolder(
     }
 
 LExit:
+    ReleaseMem(pWorkingFolderAcl);
+    if (psd)
+    {
+        ::LocalFree(psd);
+    }
     ReleaseStr(sczPotential);
 
     return hr;
@@ -900,6 +924,7 @@ extern "C" HRESULT CachePreparePackage(
 }
 
 extern "C" HRESULT CacheBundleToCleanRoom(
+    __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczCleanRoomBundlePath
@@ -914,7 +939,7 @@ extern "C" HRESULT CacheBundleToCleanRoom(
 
     wzExecutableName = PathFile(sczSourcePath);
 
-    hr = CopyEngineToWorkingFolder(pCache, sczSourcePath, BUNDLE_CLEAN_ROOM_WORKING_FOLDER_NAME, wzExecutableName, pSection, psczCleanRoomBundlePath);
+    hr = CopyEngineToWorkingFolder(fElevated, pCache, sczSourcePath, BUNDLE_CLEAN_ROOM_WORKING_FOLDER_NAME, wzExecutableName, pSection, psczCleanRoomBundlePath);
     ExitOnFailure(hr, "Failed to cache bundle to clean room.");
 
 LExit:
@@ -924,6 +949,7 @@ LExit:
 }
 
 extern "C" HRESULT CacheBundleToWorkingDirectory(
+    __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __in_z LPCWSTR wzExecutableName,
     __in BURN_SECTION* pSection,
@@ -948,7 +974,7 @@ extern "C" HRESULT CacheBundleToWorkingDirectory(
     }
     else // otherwise, carry on putting the bundle in the working folder.
     {
-        hr = CopyEngineToWorkingFolder(pCache, sczSourcePath, BUNDLE_WORKING_FOLDER_NAME, wzExecutableName, pSection, psczEngineWorkingPath);
+        hr = CopyEngineToWorkingFolder(fElevated, pCache, sczSourcePath, BUNDLE_WORKING_FOLDER_NAME, wzExecutableName, pSection, psczEngineWorkingPath);
         ExitOnFailure(hr, "Failed to copy engine to working folder.");
     }
 
@@ -2099,6 +2125,7 @@ LExit:
 
 
 static HRESULT CopyEngineToWorkingFolder(
+    __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzWorkingFolderName,
@@ -2115,7 +2142,7 @@ static HRESULT CopyEngineToWorkingFolder(
     LPWSTR sczPayloadSourcePath = NULL;
     LPWSTR sczPayloadTargetPath = NULL;
 
-    hr = CacheEnsureBaseWorkingFolder(pCache, &sczWorkingFolder);
+    hr = CacheEnsureBaseWorkingFolder(fElevated, pCache, &sczWorkingFolder);
     ExitOnFailure(hr, "Failed to create working path to copy engine.");
 
     hr = PathConcatRelativeToFullyQualifiedBase(sczWorkingFolder, wzWorkingFolderName, &sczTargetDirectory);

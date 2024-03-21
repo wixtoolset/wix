@@ -525,7 +525,7 @@ static HRESULT RunUntrusted(
     }
     else
     {
-        hr = CacheBundleToCleanRoom(&pEngineState->cache, &pEngineState->section, &sczCachedCleanRoomBundlePath);
+        hr = CacheBundleToCleanRoom(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, &pEngineState->section, &sczCachedCleanRoomBundlePath);
         ExitOnFailure(hr, "Failed to cache to clean room.");
 
         wzCleanRoomBundlePath = sczCachedCleanRoomBundlePath;

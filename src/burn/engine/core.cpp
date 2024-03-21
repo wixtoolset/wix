@@ -182,7 +182,7 @@ extern "C" HRESULT CoreInitialize(
     if (BURN_MODE_NORMAL == pEngineState->internalCommand.mode || BURN_MODE_EMBEDDED == pEngineState->internalCommand.mode)
     {
         // Extract all UX payloads to working folder.
-        hr = UserExperienceEnsureWorkingFolder(&pEngineState->cache, &pEngineState->userExperience.sczTempDirectory);
+        hr = UserExperienceEnsureWorkingFolder(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, &pEngineState->userExperience.sczTempDirectory);
         ExitOnFailure(hr, "Failed to get unique temporary folder for bootstrapper application.");
 
         hr = PayloadExtractUXContainer(&pEngineState->userExperience.payloads, &containerContext, pEngineState->userExperience.sczTempDirectory);
@@ -227,7 +227,7 @@ extern "C" HRESULT CoreInitializeConstants(
         hr = StrAllocString(&pRegistration->sczBundlePackageAncestors, pRegistration->sczId, 0);
         ExitOnFailure(hr, "Failed to copy self to bundle package ancestors.");
     }
-    
+
     for (DWORD i = 0; i < pEngineState->packages.cPackages; ++i)
     {
         BURN_PACKAGE* pPackage = pEngineState->packages.rgPackages + i;
@@ -605,7 +605,7 @@ extern "C" HRESULT CoreElevate(
         // If the elevated companion pipe isn't created yet, let's make that happen.
         if (!pEngineState->sczBundleEngineWorkingPath)
         {
-            hr = CacheBundleToWorkingDirectory(&pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
+            hr = CacheBundleToWorkingDirectory(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
             ExitOnFailure(hr, "Failed to cache engine to working directory.");
         }
 
@@ -714,7 +714,7 @@ extern "C" HRESULT CoreApply(
     // Ensure the engine is cached to the working path.
     if (!pEngineState->sczBundleEngineWorkingPath)
     {
-        hr = CacheBundleToWorkingDirectory(&pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
+        hr = CacheBundleToWorkingDirectory(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
         ExitOnFailure(hr, "Failed to cache engine to working directory.");
     }
 
@@ -2285,7 +2285,7 @@ static HRESULT DetectPackage(
 {
     HRESULT hr = S_OK;
     BOOL fBegan = FALSE;
-    
+
     fBegan = TRUE;
     hr = UserExperienceOnDetectPackageBegin(&pEngineState->userExperience, pPackage->sczId);
     ExitOnRootFailure(hr, "BA aborted detect package begin.");

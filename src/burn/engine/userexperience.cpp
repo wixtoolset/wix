@@ -169,6 +169,7 @@ extern "C" HRESULT UserExperienceUnload(
 }
 
 extern "C" HRESULT UserExperienceEnsureWorkingFolder(
+    __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __deref_out_z LPWSTR* psczUserExperienceWorkingFolder
     )
@@ -176,7 +177,7 @@ extern "C" HRESULT UserExperienceEnsureWorkingFolder(
     HRESULT hr = S_OK;
     LPWSTR sczWorkingFolder = NULL;
 
-    hr = CacheEnsureBaseWorkingFolder(pCache, &sczWorkingFolder);
+    hr = CacheEnsureBaseWorkingFolder(fElevated, pCache, &sczWorkingFolder);
     ExitOnFailure(hr, "Failed to create working folder.");
 
     hr = StrAllocFormatted(psczUserExperienceWorkingFolder, L"%ls%ls\\", sczWorkingFolder, L".ba");

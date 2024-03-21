@@ -64,6 +64,7 @@ HRESULT UserExperienceUnload(
     __in BOOL fReload
     );
 HRESULT UserExperienceEnsureWorkingFolder(
+    __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __deref_out_z LPWSTR* psczUserExperienceWorkingFolder
     );
