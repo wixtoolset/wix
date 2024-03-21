@@ -14,6 +14,12 @@ HRESULT CabExtractOpen(
     __in BURN_CONTAINER_CONTEXT* pContext,
     __in LPCWSTR wzFilePath
     );
+HRESULT CabExtractFiles(
+    __in BURN_CONTAINER_CONTEXT* pContext,
+    __in DWORD cFiles,
+    __in LPCWSTR* psczEmbeddedIds,
+    __in LPCWSTR* psczTargetPaths
+    );
 HRESULT CabExtractNextStream(
     __in BURN_CONTAINER_CONTEXT* pContext,
     __inout_z LPWSTR* psczStreamName

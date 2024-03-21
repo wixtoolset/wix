@@ -255,7 +255,6 @@ extern "C" void SectionUninitialize(
 extern "C" HRESULT SectionGetAttachedContainerInfo(
     __in BURN_SECTION* pSection,
     __in DWORD iContainerIndex,
-    __in DWORD dwExpectedType,
     __out DWORD64* pqwOffset,
     __out DWORD64* pqwSize,
     __out BOOL* pfPresent
@@ -268,11 +267,6 @@ extern "C" HRESULT SectionGetAttachedContainerInfo(
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
         ExitOnRootFailure(hr, "Failed to find container info, too few elements: %u", pSection->cContainers);
-    }
-    else if (dwExpectedType != pSection->dwFormat)
-    {
-        hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
-        ExitOnRootFailure(hr, "Unexpected container format.");
     }
 
     // If we are asking for the UX container, find it right after the stub.

@@ -178,13 +178,13 @@ namespace WixToolset.Core.Burn.Bundles
         /// <param name="input">Input stream.</param>
         /// <param name="output">Output stream.</param>
         /// <param name="size">Optional count of bytes to copy. 0 indicates whole input stream from current should be copied.</param>
-        protected static int CopyStream(Stream input, Stream output, int size)
+        protected static void CopyStream(Stream input, Stream output, uint size)
         {
             var bytes = new byte[4096];
-            var total = 0;
+            var total = 0u;
             do
             {
-                var read = Math.Min(bytes.Length, size - total);
+                var read = (int)Math.Min(bytes.Length, size - total);
                 read = input.Read(bytes, 0, read);
                 if (0 == read)
                 {
@@ -192,10 +192,8 @@ namespace WixToolset.Core.Burn.Bundles
                 }
 
                 output.Write(bytes, 0, read);
-                total += read;
-            } while (0 == size || total < size);
-
-            return total;
+                total += (uint)read;
+            } while (0u == size || total < size);
         }
 
         /// <summary>

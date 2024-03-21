@@ -283,7 +283,7 @@ extern "C" HRESULT PayloadExtractUXContainer(
     for (;;)
     {
         // get next stream
-        hr = ContainerNextStream(pContainerContext, &sczStreamName);
+        hr = CabExtractNextStream(pContainerContext, &sczStreamName);
         if (E_NOMOREITEMS == hr)
         {
             hr = S_OK;
@@ -306,7 +306,7 @@ extern "C" HRESULT PayloadExtractUXContainer(
         hr = DirEnsureExists(sczDirectory, NULL);
         ExitOnFailure(hr, "Failed to ensure directory exists");
 
-        hr = ContainerStreamToFile(pContainerContext, pPayload->sczLocalFilePath);
+        hr = CabExtractStreamToFile(pContainerContext, pPayload->sczLocalFilePath);
         ExitOnFailure(hr, "Failed to extract file.");
 
         // flag that the payload has been acquired

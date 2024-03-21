@@ -55,6 +55,32 @@ BEEAPI BurnExtensionPerformSearch(
     __in LPWSTR wzSearchId,
     __in LPWSTR wzVariable
     );
+BEEAPI BurnExtensionContainerOpen(
+    __in BURN_EXTENSION* pExtension,
+    __in LPCWSTR wzContainerId,
+    __in LPCWSTR wzFilePath,
+    __in BURN_CONTAINER_CONTEXT* pContext
+    );
+BEEAPI BurnExtensionContainerOpenAttached(
+    __in BURN_EXTENSION* pExtension,
+    __in LPCWSTR wzContainerId,
+    __in HANDLE hBundle,
+    __in DWORD64 qwContainerStartPos,
+    __in DWORD64 qwContainerSize,
+    __in BURN_CONTAINER_CONTEXT* pContext
+    );
+BEEAPI BurnExtensionContainerExtractFiles(
+    __in BURN_EXTENSION* pExtension,
+    __in DWORD cFiles,
+    __in LPCWSTR *psczEmbeddedIds,
+    __in LPCWSTR *psczTargetPaths,
+    __in BURN_CONTAINER_CONTEXT* pContext
+    );
+BEEAPI BurnExtensionContainerClose(
+    __in BURN_EXTENSION* pExtension,
+    __in BURN_CONTAINER_CONTEXT* pContext
+    );
+
 #if defined(__cplusplus)
 }
 #endif

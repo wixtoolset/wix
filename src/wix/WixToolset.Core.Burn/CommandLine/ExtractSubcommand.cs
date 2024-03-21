@@ -3,11 +3,13 @@
 namespace WixToolset.Core.Burn.CommandLine
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
     using WixToolset.Core.Burn.Bundles;
     using WixToolset.Data;
+    using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
@@ -17,11 +19,16 @@ namespace WixToolset.Core.Burn.CommandLine
         {
             this.Messaging = serviceProvider.GetService<IMessaging>();
             this.FileSystem = serviceProvider.GetService<IFileSystem>();
+
+            var extensionManager = serviceProvider.GetService<IExtensionManager>();
+            this.ContainerExtensions = extensionManager.GetServices<IBurnContainerExtension>();
         }
 
         private IMessaging Messaging { get; }
 
         private IFileSystem FileSystem { get; }
+
+        private IEnumerable<IBurnContainerExtension> ContainerExtensions { get; }
 
         private string InputPath { get; set; }
 
@@ -35,7 +42,7 @@ namespace WixToolset.Core.Burn.CommandLine
         {
             return new CommandLineHelp("Extracts the contents of a bundle.", "burn extract [options] bundle.exe -o outputfolder", new[]
             {
-                new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified %TMP% will be used."),
+                new CommandLineHelpSwitch("-intermediateFolder", "Optional working folder. If not specified a subfolder will be created under %TMP% folder."),
                 new CommandLineHelpSwitch("-outba", "-oba", "Folder to extract the bundle bootstrapper application to."),
                 new CommandLineHelpSwitch("-out", "-o", "Folder to extract the bundle contents to."),
             });
@@ -55,7 +62,8 @@ namespace WixToolset.Core.Burn.CommandLine
             {
                 if (String.IsNullOrEmpty(this.IntermediateFolder))
                 {
-                    this.IntermediateFolder = Path.GetTempPath();
+                    this.IntermediateFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+                    Directory.CreateDirectory(this.IntermediateFolder);
                 }
 
                 using (var reader = BurnReader.Open(this.Messaging, this.FileSystem, this.InputPath))
@@ -69,7 +77,7 @@ namespace WixToolset.Core.Burn.CommandLine
                     {
                         if (!String.IsNullOrEmpty(this.ExtractContainersPath))
                         {
-                            reader.ExtractAttachedContainers(this.ExtractContainersPath, this.IntermediateFolder);
+                            reader.ExtractAttachedContainers(this.ExtractContainersPath, this.IntermediateFolder, this.ExtractBootstrapperApplicationPath, this.ContainerExtensions);
                         }
                     }
                     catch (Exception e)

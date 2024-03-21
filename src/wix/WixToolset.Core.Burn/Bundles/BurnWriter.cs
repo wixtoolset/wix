@@ -255,7 +255,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             // Append the container to the end of the existing bits.
             this.binaryWriter.BaseStream.Seek(0, SeekOrigin.End);
-            BurnCommon.CopyStream(containerStream, this.binaryWriter.BaseStream, (int)containerSize);
+            BurnCommon.CopyStream(containerStream, this.binaryWriter.BaseStream, containerSize);
             this.binaryWriter.BaseStream.Flush();
 
             return true;

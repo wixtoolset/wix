@@ -154,6 +154,54 @@ LExit:
     return hr;
 }
 
+extern "C" HRESULT CabExtractFiles(
+    __in BURN_CONTAINER_CONTEXT * pContext,
+    __in DWORD cFiles,
+    __in LPCWSTR * psczEmbeddedIds,
+    __in LPCWSTR * psczTargetPaths
+    )
+{
+    HRESULT hr = S_OK;
+    DWORD dwFound = 0;
+    LPWSTR szStream = NULL;
+
+    while (SUCCEEDED(hr) && cFiles > dwFound)
+    {
+        BOOL fExtracted = FALSE;
+
+        hr = CabExtractNextStream(pContext, &szStream);
+        if (E_NOMOREITEMS == hr)
+        {
+            ExitOnNull((dwFound == cFiles), hr, E_NOTFOUND, "Failed to find some files in container. Found %u/%u files", dwFound, cFiles);
+            hr = S_OK;
+            break;
+        }
+        ExitOnFailure(hr, "Failed to get next stream name");
+
+        for (DWORD i = 0; !fExtracted && i < cFiles; ++i)
+        {
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, psczEmbeddedIds[i], -1, szStream, -1))
+            {
+                fExtracted = TRUE;
+                ++dwFound;
+
+                hr = CabExtractStreamToFile(pContext, psczTargetPaths[i]);
+                ExitOnFailure(hr, "Failed to extract stream '%ls'", szStream);
+            }
+        }
+        if (!fExtracted)
+        {
+            hr = CabExtractSkipStream(pContext);
+            ExitOnFailure(hr, "Failed to skip stream '%ls'", szStream);
+        }
+    }
+
+LExit:
+    ReleaseStr(szStream);
+
+    return hr;
+}
+
 extern "C" HRESULT CabExtractNextStream(
     __in BURN_CONTAINER_CONTEXT* pContext,
     __inout_z LPWSTR* psczStreamName
