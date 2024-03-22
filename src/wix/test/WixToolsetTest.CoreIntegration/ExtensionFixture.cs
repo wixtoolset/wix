@@ -231,7 +231,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Blocked by issue #8033.")]
         public void CanManipulateExtensionCache()
         {
             var currentFolder = Environment.CurrentDirectory;
