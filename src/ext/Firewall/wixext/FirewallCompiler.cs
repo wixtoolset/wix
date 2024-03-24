@@ -227,12 +227,15 @@ namespace WixToolset.Firewall
                                     remoteAddresses = "LocalSubnet";
                                     break;
                                 case "DNS":
+                                case "dns":
                                     remoteAddresses = "dns";
                                     break;
                                 case "DHCP":
+                                case "dhcp":
                                     remoteAddresses = "dhcp";
                                     break;
                                 case "WINS":
+                                case "wins":
                                     remoteAddresses = "wins";
                                     break;
                                 case "defaultGateway":
@@ -242,7 +245,7 @@ namespace WixToolset.Firewall
                                     remoteAddresses = scope;
                                     if (!this.ParseHelper.ContainsProperty(scope))
                                     {
-                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Scope", scope, "any", "localSubnet", "DNS", "DHCP", "WINS", "defaultGateway"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "Scope", scope, "any", "localSubnet", "dns", "dhcp", "wins", "defaultGateway"));
                                     }
                                     break;
                             }
@@ -384,12 +387,15 @@ namespace WixToolset.Firewall
                                     localAddresses = "LocalSubnet";
                                     break;
                                 case "DNS":
+                                case "dns":
                                     localAddresses = "dns";
                                     break;
                                 case "DHCP":
+                                case "dhcp":
                                     localAddresses = "dhcp";
                                     break;
                                 case "WINS":
+                                case "wins":
                                     localAddresses = "wins";
                                     break;
                                 case "defaultGateway":
@@ -399,7 +405,7 @@ namespace WixToolset.Firewall
                                 default:
                                     if (!this.ParseHelper.ContainsProperty(localScope))
                                     {
-                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "LocalScope", localScope, "any", "localSubnet", "DNS", "DHCP", "WINS", "defaultGateway"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "LocalScope", localScope, "any", "localSubnet", "dns", "dhcp", "wins", "defaultGateway"));
                                     }
                                     else
                                     {

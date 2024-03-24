@@ -18,13 +18,13 @@
                 Name="WiXToolset401 Test - 0013" Scope="localSubnet" Port="1300" />
             <fw:FirewallException Id="FirewallException14"
                 Description="WiX Toolset firewall exception rule integration test - scope DNS"
-                Name="WiXToolset401 Test - 0014" Scope="DNS" Port="1400" />
+                Name="WiXToolset401 Test - 0014" Scope="dns" Port="1400" />
             <fw:FirewallException Id="FirewallException15"
                 Description="WiX Toolset firewall exception rule integration test - scope DHCP"
-                Name="WiXToolset401 Test - 0015" Scope="DHCP" Port="1500" />
+                Name="WiXToolset401 Test - 0015" Scope="dhcp" Port="1500" />
             <fw:FirewallException Id="FirewallException16"
                 Description="WiX Toolset firewall exception rule integration test - scope WINS"
-                Name="WiXToolset401 Test - 0016" Scope="WINS" Port="1600"  />
+                Name="WiXToolset401 Test - 0016" Scope="wins" Port="1600"  />
             <fw:FirewallException Id="FirewallException17"
                 Description="WiX Toolset firewall exception rule integration test - scope default gateway"
                 Name="WiXToolset401 Test - 0017" Scope="defaultGateway" Port="1700"  />
