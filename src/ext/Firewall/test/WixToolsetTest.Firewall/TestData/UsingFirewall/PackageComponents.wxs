@@ -12,9 +12,9 @@
                 </File>
 
                 <fw:FirewallException Description="A port-based firewall exception" Name="ExamplePort" Port="42" Outbound="yes" Scope="localSubnet" OnUpdate="enableOnly" />
-                <fw:FirewallException Description="DNS scope firewall exception" Name="ExampleDNSScope" Port="356" Protocol="udp" Scope="DNS" />
-                <fw:FirewallException Description="DHCP scope firewall exception" Name="ExampleDHCPScope" Program="test.exe" Protocol="211" Scope="DHCP" Profile="public" />
-                <fw:FirewallException Description="WINS scope firewall exception" Name="ExampleWINSScope" Port="6573" Scope="WINS" Profile="domain"/>
+                <fw:FirewallException Description="DNS scope firewall exception" Name="ExampleDNSScope" Port="356" Protocol="udp" Scope="dns" />
+                <fw:FirewallException Description="DHCP scope firewall exception" Name="ExampleDHCPScope" Program="test.exe" Protocol="211" Scope="dhcp" Profile="public" />
+                <fw:FirewallException Description="WINS scope firewall exception" Name="ExampleWINSScope" Port="6573" Scope="wins" Profile="domain"/>
                 <fw:FirewallException Description="defaultGateway scope firewall exception" Name="ExampleDefaultGatewayScope" Port="4432" Scope="defaultGateway" Profile="private" />
 
                 <fw:FirewallException Description="Defer to user edge traversal" Name="defertouser" Program="fw.exe" EdgeTraversal="deferToUser" />
