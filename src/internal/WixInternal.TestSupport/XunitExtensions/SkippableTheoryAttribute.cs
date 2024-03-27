@@ -5,7 +5,7 @@ namespace WixInternal.TestSupport.XunitExtensions
     using Xunit;
     using Xunit.Sdk;
 
-    [XunitTestCaseDiscoverer("WixInternal.TestSupport.XunitExtensions.SkippableFactDiscoverer", "WixInternal.TestSupport")]
+    [XunitTestCaseDiscoverer("WixInternal.TestSupport.XunitExtensions.SkippableTheoryDiscoverer", "WixInternal.TestSupport")]
     public class SkippableTheoryAttribute : TheoryAttribute
     {
     }
