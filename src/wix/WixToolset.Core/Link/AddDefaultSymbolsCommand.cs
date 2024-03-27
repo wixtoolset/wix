@@ -99,6 +99,7 @@ namespace WixToolset.Core.Link
                     SequenceTable = SequenceTable.InstallExecuteSequence,
                     Action = "RemoveExistingProducts",
                     After = "InstallValidate",
+                    Overridable = true,
                 },
                 new WixSimpleReferenceSymbol(packageSymbol.SourceLineNumbers)
                 {
@@ -126,7 +127,10 @@ namespace WixToolset.Core.Link
                 {
                     var symbolWithSection = new SymbolWithSection(section, symbol);
                     var fullName = symbolWithSection.GetFullName();
-                    this.Find.SymbolsByName.Add(fullName, symbolWithSection);
+                    if (!this.Find.SymbolsByName.ContainsKey(fullName))
+                    {
+                        this.Find.SymbolsByName.Add(fullName, symbolWithSection);
+                    }
                 }
             }
         }
