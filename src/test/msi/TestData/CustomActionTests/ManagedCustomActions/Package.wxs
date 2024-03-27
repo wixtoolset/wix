@@ -1,0 +1,32 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="~Managed Custom Actions" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="41B5F815-E7F6-44E0-B92A-AE95DFF683F9">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <Feature Id="ProductFeature" Title="Feature with merged modules">
+      <Component Directory="INSTALLFOLDER">
+        <File Source="$(sys.SOURCEFILEPATH)" />
+      </Component>
+    </Feature>
+
+    <Binary Id="ManagedCA" SourceFile="TestCA.CA.dll" />
+
+    <CustomAction Id="ImmediateCA" BinaryRef="ManagedCA" DllEntry="ImmediateCA" Execute="immediate" Return="check" />
+    <CustomAction Id="DeferredCA" BinaryRef="ManagedCA" DllEntry="DeferredCA" Execute="deferred" Return="check" />
+
+    <InstallUISequence>
+      <Custom Action="ImmediateCA" Before="CostFinalize" />
+    </InstallUISequence>
+
+    <InstallExecuteSequence>
+      <Custom Action="DeferredCA" After="InstallFiles" />
+    </InstallExecuteSequence>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="ManagedCA" />
+    </StandardDirectory>
+  </Fragment>
+</Wix>
