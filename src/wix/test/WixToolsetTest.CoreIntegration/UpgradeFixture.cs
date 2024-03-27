@@ -74,6 +74,20 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanRescheduleRemoveExistingProductsWithDefaultMajorUpgrade()
+        {
+            var folder = TestData.Get("TestData", "DefaultMajorUpgradeReschedule");
+            var build = new Builder(folder, new Type[] { }, new[] { folder });
+
+            var results = build.BuildAndQuery(Build, "InstallExecuteSequence").Where(r => r.StartsWith("InstallExecuteSequence:RemoveExistingProducts") || r.StartsWith("InstallExecuteSequence:InstallFinalize")).ToArray();
+            WixAssert.CompareLineByLine(new[]
+            {
+                "InstallExecuteSequence:InstallFinalize\t\t6600",
+                "InstallExecuteSequence:RemoveExistingProducts\t\t6601",
+            }, results);
+        }
+
+        [Fact]
         public void CanOverrideDefaultMajorUpgradeLaunchConditionMessage()
         {
             var folder = TestData.Get("TestData", "DefaultMajorUpgradeOverride");
