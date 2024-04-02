@@ -14,8 +14,8 @@
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
     <dependencies>
       <group targetFramework="Native">
-        <dependency id="WixToolset.BootstrapperApplicationApi" version="[$version$,5)" />
-        <dependency id="WixToolset.DUtil" version="[$version$,5)" />
+        <dependency id="WixToolset.BootstrapperApplicationApi" version="[$version$,6)" />
+        <dependency id="WixToolset.DUtil" version="[$version$,6)" />
       </group>
     </dependencies>
   </metadata>
