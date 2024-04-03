@@ -5,10 +5,15 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Description>WiX Toolset MSBuild integration</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishDir>$(PublishRoot)WixToolset.Sdk\</PublishDir>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
     <NuspecBasePath>$(PublishDir)</NuspecBasePath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="build\$(MSBuildThisFileName).targets" CopyToOutputDirectory="PreserveNewest" />

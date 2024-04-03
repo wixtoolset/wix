@@ -12,6 +12,7 @@
     <copyright>$copyright$</copyright>
     <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
+    <readme>README.md</readme>
     <dependencies>
       <group targetFramework="Native">
         <dependency id="WixToolset.BootstrapperApplicationApi" version="[$version$,6)" />
@@ -21,6 +22,7 @@
   </metadata>
 
   <files>
+    <file src="$projectFolder$\README.md" />
     <file src="$projectFolder$\build\$id$.props" target="build\" />
     <file src="$projectFolder$\..\..\..\internal\images\wix.png" />
     <file src="$projectFolder$\inc\*" target="lib\native\include" />

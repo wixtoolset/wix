@@ -7,7 +7,12 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <Title>The WiX Toolset command-line interface.</Title>
     <Description>The WiX Toolset lets developers create installers for Windows. This package contains the WiX Toolset command-line interface.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageId>wix</PackageId>
     <NuspecBasePath>$(OutputPath)publish\wix\</NuspecBasePath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>
