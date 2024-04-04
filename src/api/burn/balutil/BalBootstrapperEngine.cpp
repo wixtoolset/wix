@@ -216,6 +216,10 @@ public: // IBootstrapperEngine
         if (wzValue)
         {
             hr = ::StringCchCopyW(wzValue, *pcchValue, results.wzValue);
+            if (E_INSUFFICIENT_BUFFER == hr)
+            {
+                hr = E_MOREDATA;
+            }
         }
         else if (results.cchValue)
         {
@@ -292,6 +296,10 @@ public: // IBootstrapperEngine
         if (wzValue)
         {
             hr = ::StringCchCopyW(wzValue, *pcchValue, results.wzValue);
+            if (E_INSUFFICIENT_BUFFER == hr)
+            {
+                hr = E_MOREDATA;
+            }
         }
         else if (results.cchValue)
         {
@@ -373,6 +381,10 @@ public: // IBootstrapperEngine
         if (wzValue)
         {
             hr = ::StringCchCopyW(wzValue, *pcchValue, results.wzValue);
+            if (E_INSUFFICIENT_BUFFER == hr)
+            {
+                hr = E_MOREDATA;
+            }
         }
         else if (results.cchValue)
         {
@@ -449,6 +461,10 @@ public: // IBootstrapperEngine
         if (wzOut)
         {
             hr = ::StringCchCopyW(wzOut, *pcchOut, results.wzOut);
+            if (E_INSUFFICIENT_BUFFER == hr)
+            {
+                hr = E_MOREDATA;
+            }
         }
         else if (results.cchOut)
         {
@@ -525,6 +541,10 @@ public: // IBootstrapperEngine
         if (wzOut)
         {
             hr = ::StringCchCopyW(wzOut, *pcchOut, results.wzOut);
+            if (E_INSUFFICIENT_BUFFER == hr)
+            {
+                hr = E_MOREDATA;
+            }
         }
         else if (results.cchOut)
         {
