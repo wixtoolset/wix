@@ -128,7 +128,7 @@ namespace WixToolset.Core
         private IEnumerable<WildcardFile> GetWildcardFiles(HarvestFilesSymbol harvestFile, IEnumerable<string> patterns)
         {
             var sourceLineNumbers = harvestFile.SourceLineNumbers;
-            var sourcePath = harvestFile.SourcePath;
+            var sourcePath = harvestFile.SourcePath?.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
             var files = new List<WildcardFile>();
 
@@ -158,7 +158,7 @@ namespace WixToolset.Core
                     else if (!Path.IsPathRooted(directoryPortion))
                     {
                         directoryPortion = Path.Combine(sourceDirectory, directoryPortion);
-                        recursiveDirOffset = sourceDirectory.Length + 1;
+                        recursiveDirOffset = directoryPortion.Length + 1;
                     }
 
                     var foundFiles = Directory.EnumerateFiles(directoryPortion, filePortion, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);

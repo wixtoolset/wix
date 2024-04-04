@@ -5,6 +5,7 @@
     <PackageVersion Include="WixToolset.Dtf.CustomAction" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dtf.Resources" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dtf.WindowsInstaller" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Dtf.WindowsInstaller.Package" Version="{packageversion}" />
 
     <PackageVersion Include="WixInternal.TestSupport" Version="{packageversion}" />
     <PackageVersion Include="WixInternal.TestSupport.Native" Version="{packageversion}" />
