@@ -10,6 +10,23 @@ namespace WixToolsetTest.BurnE2E
         public WixStdBaTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
 
         [RuntimeFact]
+        public void SucceedsWithMultipleConditions()
+        {
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var bundle = this.CreateBundleInstaller("BalCondition");
+
+            packageA.VerifyInstalled(false);
+
+            bundle.Install();
+            bundle.VerifyRegisteredAndInPackageCache();
+            packageA.VerifyInstalled(true);
+
+            bundle.Uninstall();
+            bundle.VerifyUnregisteredAndRemovedFromPackageCache();
+            packageA.VerifyInstalled(false);
+        }
+
+        [RuntimeFact]
         public void ExitsWithErrorWhenDowngradingWithoutSuppression()
         {
             var packageA = this.CreatePackageInstaller("PackageA");
