@@ -13,13 +13,17 @@
     <Binary Id="ManagedCA" SourceFile="TestCA.CA.dll" />
 
     <CustomAction Id="ImmediateCA" BinaryRef="ManagedCA" DllEntry="ImmediateCA" Execute="immediate" Return="check" />
-    <CustomAction Id="DeferredCA" BinaryRef="ManagedCA" DllEntry="DeferredCA" Execute="deferred" Return="check" />
+    <CustomAction Id="ExecuteImmediateCA" BinaryRef="ManagedCA" DllEntry="ExecuteImmediateCA" Execute="immediate" Return="check" />
+    <CustomAction Id="ImpersonatedDeferredCA" BinaryRef="ManagedCA" DllEntry="ImpersonatedDeferredCA" Execute="deferred" Impersonate="yes" Return="check" />
+    <CustomAction Id="DeferredCA" BinaryRef="ManagedCA" DllEntry="DeferredCA" Execute="deferred" Impersonate="no" Return="check" />
 
     <InstallUISequence>
       <Custom Action="ImmediateCA" Before="CostFinalize" />
     </InstallUISequence>
 
     <InstallExecuteSequence>
+      <Custom Action="ExecuteImmediateCA" Before="CostFinalize" />
+      <Custom Action="ImpersonatedDeferredCA" Before="InstallFiles" />
       <Custom Action="DeferredCA" After="InstallFiles" />
     </InstallExecuteSequence>
   </Package>
