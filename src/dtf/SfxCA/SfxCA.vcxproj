@@ -41,7 +41,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
 
   <PropertyGroup>
-    <ProjectAdditionalLinkLibraries>msi.lib;cabinet.lib;shlwapi.lib</ProjectAdditionalLinkLibraries>
+    <ProjectAdditionalLinkLibraries>msi.lib;cabinet.lib;rpcrt4.lib;shlwapi.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
 
   <ItemGroup>

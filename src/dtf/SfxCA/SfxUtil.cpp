@@ -3,6 +3,8 @@
 #include "precomp.h"
 #include "SfxUtil.h"
 
+#define GUID_STRING_LENGTH 39
+
 /// <summary>
 /// Writes a formatted message to the MSI log.
 /// Does out-of-proc MSI calls if necessary.
@@ -110,20 +112,75 @@ bool DeleteDirectory(const wchar_t* szDir)
                         hSearch = INVALID_HANDLE_VALUE;
                 }
         }
-        return RemoveDirectory(szDir) != 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (::RemoveDirectory(szDir))
+            {
+                return true;
+            }
+
+            ::Sleep(100);
+        }
+
+        return false;
 }
 
-bool DirectoryExists(const wchar_t* szDir)
+static HRESULT CreateGuid(
+    _Out_z_cap_c_(GUID_STRING_LENGTH) wchar_t* wzGuid)
 {
-        if (szDir != NULL)
+        HRESULT hr = S_OK;
+        RPC_STATUS rs = RPC_S_OK;
+        UUID guid = {};
+
+        rs = ::UuidCreate(&guid);
+        if (rs != RPC_S_OK)
         {
-                DWORD dwAttrs = GetFileAttributes(szDir);
-                if (dwAttrs != -1 && (dwAttrs & FILE_ATTRIBUTE_DIRECTORY) != 0)
-                {
-                        return true;
-                }
+                hr = (HRESULT)(rs | FACILITY_RPC);
         }
-        return false;
+        else if (!::StringFromGUID2(guid, wzGuid, GUID_STRING_LENGTH))
+        {
+                hr = E_OUTOFMEMORY;
+        }
+        else // make the temp directory more recognizable for easy deletion.
+        {
+                // Copy the first four hex chars of the GUID over the dashes in the GUID and trim the, so
+                // '{1234ABCD-ABCD-ABCD-ABCD-ABCDABCDABCD}' turns into '{1234ABCD1ABCD2ABCD3ABCD4ABCDABCDABCD}'
+                wzGuid[9] = wzGuid[1];
+                wzGuid[14] = wzGuid[2];
+                wzGuid[19] = wzGuid[3];
+                wzGuid[24] = wzGuid[4];
+
+                // Now '{1234ABCD1ABCD2ABCD3ABCD4ABCDABCDABCD}' turns into 'SFXCAABCD1ABCD2ABCD3ABCD4ABCDABCDABCD'
+                wzGuid[0] = L'S';
+                wzGuid[1] = L'F';
+                wzGuid[2] = L'X';
+                wzGuid[3] = L'C';
+                wzGuid[4] = L'A';
+                wzGuid[GUID_STRING_LENGTH - 2] = L'\0';
+        }
+
+        return hr;
+}
+
+static HRESULT ProcessElevated()
+{
+        HRESULT hr = S_OK;
+        HANDLE hToken = NULL;
+        TOKEN_ELEVATION tokenElevated = {};
+        DWORD cbToken = 0;
+
+        if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &hToken) &&
+            ::GetTokenInformation(hToken, TokenElevation, &tokenElevated, sizeof(TOKEN_ELEVATION), &cbToken))
+        {
+                hr = (0 != tokenElevated.TokenIsElevated) ? S_OK : S_FALSE;
+        }
+        else
+        {
+                hr = HRESULT_FROM_WIN32(::GetLastError());
+        }
+
+        return hr;
 }
 
 /// <summary>
@@ -143,49 +200,95 @@ __success(return != false)
 bool ExtractToTempDirectory(__in MSIHANDLE hSession, __in HMODULE hModule,
         __out_ecount_z(cchTempDirBuf) wchar_t* szTempDir, DWORD cchTempDirBuf)
 {
-        wchar_t szModule[MAX_PATH];
-        DWORD cchCopied = GetModuleFileName(hModule, szModule, MAX_PATH - 1);
-        if (cchCopied == 0)
+        HRESULT hr = S_OK;
+        wchar_t szModule[MAX_PATH] = {};
+        wchar_t szGuid[GUID_STRING_LENGTH] = {};
+
+        DWORD cchCopied = ::GetModuleFileName(hModule, szModule, MAX_PATH - 1);
+        if (cchCopied == 0 || cchCopied == MAX_PATH - 1)
         {
-                Log(hSession, L"Failed to get module path. Error code %d.", GetLastError());
-                return false;
-        }
-        else if (cchCopied == MAX_PATH - 1)
-        {
-                Log(hSession, L"Failed to get module path -- path is too long.");
-                return false;
+                hr = HRESULT_FROM_WIN32(::GetLastError());
+                if (SUCCEEDED(hr))
+                {
+                        hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
+                }
+
+                Log(hSession, L"Failed to get module path. Error code 0x%x.", hr);
+                goto LExit;
         }
 
-        if (szTempDir == NULL || cchTempDirBuf < wcslen(szModule) + 1)
+        hr = CreateGuid(szGuid);
+        if (FAILED(hr))
         {
-                Log(hSession, L"Temp directory buffer is NULL or too small.");
-                return false;
-        }
-        StringCchCopy(szTempDir, cchTempDirBuf, szModule);
-        StringCchCat(szTempDir, cchTempDirBuf, L"-");
-
-        BOOL fCreatedDirectory = FALSE;
-        DWORD cchTempDir = (DWORD) wcslen(szTempDir);
-        for (int i = 0; i < 10000 && !fCreatedDirectory; i++)
-        {
-                swprintf_s(szTempDir + cchTempDir, cchTempDirBuf - cchTempDir, L"%d", i);
-                fCreatedDirectory = ::CreateDirectory(szTempDir, NULL);
+                Log(hSession, L"Failed to create a GUID. Error code 0x%x", hr);
+                goto LExit;
         }
 
-        if (!fCreatedDirectory)
+        // Unelevated we use the user's temp directory.
+        hr = ProcessElevated();
+        if (S_FALSE == hr)
         {
-                Log(hSession, L"Failed to create temp directory. Error code %d", ::GetLastError());
-                return false;
+                // Temp path is documented to be returned with a trailing backslash.
+                cchCopied = ::GetTempPath(cchTempDirBuf, szTempDir);
+                if (cchCopied == 0 || cchCopied >= cchTempDirBuf)
+                {
+                        hr = HRESULT_FROM_WIN32(::GetLastError());
+                        if (SUCCEEDED(hr))
+                        {
+                                hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
+                        }
+
+                        Log(hSession, L"Failed to get user temp directory. Error code 0x%x", hr);
+                        goto LExit;
+                }
+        }
+        else // elevated or we couldn't check (in the latter case, assume we're elevated since it's safer to use)
+        {
+                // Windows directory will not contain a trailing backslash, so we add it next.
+                cchCopied = ::GetWindowsDirectoryW(szTempDir, cchTempDirBuf);
+                if (cchCopied == 0 || cchCopied >= cchTempDirBuf)
+                {
+                        hr = HRESULT_FROM_WIN32(::GetLastError());
+                        if (SUCCEEDED(hr))
+                        {
+                                hr = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
+                        }
+
+                        Log(hSession, L"Failed to get Windows directory. Error code 0x%x", hr);
+                        goto LExit;
+                }
+
+                hr = ::StringCchCat(szTempDir, cchTempDirBuf, L"\\Installer\\");
+                if (FAILED(hr))
+                {
+                        Log(hSession, L"Failed append 'Installer' to Windows directory. Error code 0x%x", hr);
+                        goto LExit;
+                }
+        }
+
+        hr = ::StringCchCat(szTempDir, cchTempDirBuf, szGuid);
+        if (FAILED(hr))
+        {
+                Log(hSession, L"Failed append GUID to temp path. Error code 0x%x", hr);
+                goto LExit;
+        }
+
+        if (!::CreateDirectory(szTempDir, NULL))
+        {
+                hr = HRESULT_FROM_WIN32(::GetLastError());
+                Log(hSession, L"Failed to create temp directory. Error code 0x%x", hr);
+                goto LExit;
         }
 
         Log(hSession, L"Extracting custom action to temporary directory: %s\\", szTempDir);
         int err = ExtractCabinet(szModule, szTempDir);
         if (err != 0)
         {
+                hr = E_FAIL;
                 Log(hSession, L"Failed to extract to temporary directory. Cabinet error code %d.", err);
                 DeleteDirectory(szTempDir);
-                return false;
         }
-        return true;
-}
 
+LExit:
+        return SUCCEEDED(hr);
+}
