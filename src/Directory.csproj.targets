@@ -5,15 +5,7 @@
     <CreateDocumentation Condition=" '$(CreateDocumentationFile)'!='true' ">false</CreateDocumentation>
     <DocumentationFile Condition=" '$(CreateDocumentationFile)'=='true' ">$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
     <DefineConstants Condition=" '$(Configuration)'=='Debug' ">$(DefineConstants);DEBUG</DefineConstants>
-
-    <WixVersionThisAssemblyFile>$(RootBuildFolder)ThisAssembly.WixVer.cs</WixVersionThisAssemblyFile>
   </PropertyGroup>
-
-  <ItemGroup Condition=" '$(IncludeThisAssembly)'=='true' ">
-    <Compile Include="$(WixVersionThisAssemblyFile)" />
-  </ItemGroup>
-
-  <Target Name="__SetAssemblyInfoFromGit" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="GetAssemblyVersion" />
 
   <PropertyGroup Condition=" '$(IsWixTestProject)'=='true' ">
     <RollForward>Major</RollForward>

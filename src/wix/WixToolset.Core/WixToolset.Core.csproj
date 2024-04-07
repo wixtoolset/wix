@@ -9,7 +9,7 @@
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <CreateDocumentationFile>true</CreateDocumentationFile>
-    <IncludeThisAssembly>true</IncludeThisAssembly>
+    <IncludeSomeVerInfo>true</IncludeSomeVerInfo>
   </PropertyGroup>
 
   <ItemGroup>

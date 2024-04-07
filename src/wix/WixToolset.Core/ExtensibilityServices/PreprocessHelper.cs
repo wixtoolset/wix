@@ -87,7 +87,7 @@ namespace WixToolset.Core.ExtensibilityServices
 
             var result = this.EvaluateFunction(context, prefix, functionName, args);
 
-            // If the function didn't evaluate, try to evaluate the original value as a variable to support 
+            // If the function didn't evaluate, try to evaluate the original value as a variable to support
             // the use of open and closed parens inside variable names. Example: $(env.ProgramFiles(x86)) should resolve.
             if (result == null)
             {
@@ -262,10 +262,10 @@ namespace WixToolset.Core.ExtensibilityServices
                             }
 
                         case "WIXMAJORVERSION":
-                            return ThisAssembly.Git.BaseVersion.Major;
+                            return SomeVerInfo.Major;
 
                         case "WIXVERSION":
-                            return $"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}";
+                            return $"{SomeVerInfo.Major}.{SomeVerInfo.Minor}.{SomeVerInfo.Patch}.{SomeVerInfo.Commits}";
 
                         default:
                             return null;

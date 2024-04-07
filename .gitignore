@@ -393,8 +393,7 @@ FodyWeavers.xsd
 # Ignore global.json and Directory.Package.props since they are generated
 global.json
 Directory.Packages.props
-build/wixver.props
-build/ThisAssembly.WixVer.cs
+build/SomeVerInfo.*
 
 # Ignore downloaded tools
 build/.tools/

@@ -158,12 +158,12 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
 
-  <Target Name="SetWixVersion" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="ClCompile">
+  <Target Name="SetWixVersion" BeforeTargets="ClCompile">
     <PropertyGroup>
-      <rmj>$(GitBaseVersionMajor)</rmj>
-      <rmm>$(GitBaseVersionMinor)</rmm>
-      <rup>$(GitBaseVersionPatch)</rup>
-      <rpr>$(GitCommits)</rpr>
+      <rmj>$(SomeVerInfoMajor)</rmj>
+      <rmm>$(SomeVerInfoMinor)</rmm>
+      <rup>$(SomeVerInfoPatch)</rup>
+      <rpr>$(SomeVerInfoHeight)</rpr>
       <szVerMajorMinorBuild>$(rmj).$(rmm).$(rup).$(rpr)</szVerMajorMinorBuild>
       <szInformationalVersion>$(InformationalVersion)</szInformationalVersion>
     </PropertyGroup>

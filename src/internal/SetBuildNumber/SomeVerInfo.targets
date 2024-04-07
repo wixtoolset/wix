@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project>
+  <Import Project="SomeVerInit.props" Condition=" '$(SomeVerInitImported)'!='true'" />
+
+  <ItemGroup Condition=" '$(IncludeSomeVerInfo)' == 'true' ">
+    <Compile Include="$(SomeVerInfoCsFile)" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(Language)'=='C++' ">
+    <PrepareForBuildDependsOn>
+      $(PrepareForBuildDependsOn);
+      __SetVersionResource
+    </PrepareForBuildDependsOn>
+  </PropertyGroup>
+
+  <Target Name="__SetVersionResource"
+          Inputs="$(SomeVerInfoRcFile)"
+          Outputs="$(TargetPath)"
+          Condition=" '$(ConfigurationType)'=='Application' or '$(ConfigurationType)'=='DynamicLibrary' ">
+    <PropertyGroup>
+      <_ResourceFileType Condition=" '$(ConfigurationType)'=='Application' ">VFT_APP</_ResourceFileType>
+      <_ResourceFileType Condition=" '$(ConfigurationType)'=='DynamicLibrary' ">VFT_DLL</_ResourceFileType>
+      <Lcid Condition=" '$(Lcid)'=='' ">0x0409</Lcid>
+      <Description Condition=" '$(Description)'=='' ">$(TargetName)</Description>
+      <Title Condition=" '$(Title)'=='' ">$(Description)</Title>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ResourceCompile Include="$(SomeVerInfoRcFile)">
+        <PreprocessorDefinitions>
+          %(PreprocessorDefinitions);
+          SOMEVER_FILE_TYPE=$(_ResourceFileType);
+          SOMEVER_CODEPAGE=0;
+          SOMEVER_LCID=$([System.Convert]::ToInt32('$(Lcid)', 16));
+          SOMEVER_VERSION_BLOCK=$([System.Convert]::ToString($([MSBuild]::Multiply($([System.Convert]::ToUint64('$(Lcid)', 16)), 65536)), 16).PadLeft(8, '0'));
+          SOMEVER_COMPANY=$(Company);
+          SOMEVER_COPYRIGHT=$(Copyright);
+          SOMEVER_TITLE=$(Title);
+          SOMEVER_PRODUCT=$(Product);
+          SOMEVER_INTERNAL_NAME=$(TargetName);
+          SOMEVER_FILE_NAME=$(TargetFileName);
+        </PreprocessorDefinitions>
+      </ResourceCompile>
+    </ItemGroup>
+  </Target>
+
+</Project>

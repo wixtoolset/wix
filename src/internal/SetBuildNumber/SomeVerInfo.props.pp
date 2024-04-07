@@ -1,0 +1,25 @@
+<Project>
+  <PropertyGroup>
+    <SomeVerInfoImported>true</SomeVerInfoImported>
+    <SomeVerInfoFromCache>true</SomeVerInfoFromCache>
+    <SomeVerInfoNextMajor>{nextmajor}</SomeVerInfoNextMajor>
+    <SomeVerInfoNextMinor>{nextminor}</SomeVerInfoNextMinor>
+    <SomeVerInfoMajor>{major}</SomeVerInfoMajor>
+    <SomeVerInfoMinor>{minor}</SomeVerInfoMinor>
+    <SomeVerInfoPatch>{patch}</SomeVerInfoPatch>
+    <SomeVerInfoHeight>{height}</SomeVerInfoHeight>
+    <SomeVerInfoFullHeight>{fullheight}</SomeVerInfoFullHeight>
+    <SomeVerInfoLabel>{label}</SomeVerInfoLabel>
+    <SomeVerInfoDashLabel>{dashlabel}</SomeVerInfoDashLabel>
+    <SomeVerInfoSha>{sha}</SomeVerInfoSha>
+    <SomeVerInfoShortSha>{shortsha}</SomeVerInfoShortSha>
+    <SomeVerInfoVersion>{informationalversion}</SomeVerInfoVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyVersion>{major}.0.0.0</AssemblyVersion>
+    <FileVersion>{major}.{minor}.{patch}.{fullheight}</FileVersion>
+    <InformationalVersion>{informationalversion}</InformationalVersion>
+    <PackageVersion>{major}.{minor}.{patch}{dashlabel}</PackageVersion>
+  </PropertyGroup>
+</Project>

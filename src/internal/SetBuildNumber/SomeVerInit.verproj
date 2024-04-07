@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="SomeVer/0.1.1">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <!-- Disable central package version management since this project will write the central package version management file -->
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+
+    <!-- Explicitly set the restore sources because this project may run before the build\artifacts folder has been created -->
+    <RestoreSources>https://api.nuget.org/v3/index.json</RestoreSources>
+    <RestoreIgnoreFailedSources>true</RestoreIgnoreFailedSources>
+
+    <!-- SomeVer configuration -->
+    <SomeVerAutoIncrement>major</SomeVerAutoIncrement>
+    <SomeVerDefaultPreReleaseIdentifiers>build</SomeVerDefaultPreReleaseIdentifiers>
+    <SomeVerIncludeDefaultPreReleaseIdentifiersWithPrereleases>true</SomeVerIncludeDefaultPreReleaseIdentifiersWithPrereleases>
+    <SomeVerTagPrefix>v</SomeVerTagPrefix>
+
+    <!-- Pretend that the SomeVer information was imported because we'll actually be creating it here -->
+    <SomeVerInfoImported>true</SomeVerInfoImported>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <VersionTemplate Include="global.json.pp" OutputPath="$(GlobalJsonFile)" />
+    <VersionTemplate Include="Directory.Packages.props.pp" OutputPath="$(CentralPackageVersionsPath)" />
+    <VersionTemplate Include="SomeVerInfo.cs.pp" OutputPath="$(SomeVerInfoCsFile)" />
+    <VersionTemplate Include="SomeVerInfo.rc.pp" OutputPath="$(SomeVerInfoRcFile)" />
+    <VersionTemplate Include="SomeVerInfo.props.pp" OutputPath="$(SomeVerInfoPropsFile)" />
+  </ItemGroup>
+
+</Project>

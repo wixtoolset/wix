@@ -5,7 +5,7 @@ md ..\build\artifacts
 md ..\build\logs\crashdumps
 md ..\build\logs\TestResults
 
-msbuild -Restore internal\SetBuildNumber\SetBuildNumber.proj -nologo
+msbuild -Restore internal\SetBuildNumber\SomeVerInit.verproj -nologo
 
 @popd
 @endlocal
