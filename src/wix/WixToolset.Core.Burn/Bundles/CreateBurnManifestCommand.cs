@@ -75,7 +75,7 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteStartElement("BurnManifest", BurnCommon.BurnNamespace);
 
                 // Write attributes to support harvesting bundles.
-                writer.WriteAttributeString("EngineVersion", $"{ThisAssembly.Git.BaseVersion.Major}.{ThisAssembly.Git.BaseVersion.Minor}.{ThisAssembly.Git.BaseVersion.Patch}.{ThisAssembly.Git.Commits}");
+                writer.WriteAttributeString("EngineVersion", $"{SomeVerInfo.Major}.{SomeVerInfo.Minor}.{SomeVerInfo.Patch}.{SomeVerInfo.Commits}");
                 writer.WriteAttributeString("ProtocolVersion", BurnCommon.BURN_PROTOCOL_VERSION.ToString());
                 writer.WriteAttributeString("Win64", this.BundleSymbol.Platform == Platform.X86 ? "no" : "yes");
 

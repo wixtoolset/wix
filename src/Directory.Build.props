@@ -32,11 +32,7 @@
     <ProjectUrl>https://wixtoolset.org/</ProjectUrl>
     <PackageIcon>wix.png</PackageIcon>
 
-    <GitThisAssembly>false</GitThisAssembly>
     <GitVersionFile>version.txt</GitVersionFile>
-    <GitIgnoreTagVersion>true</GitIgnoreTagVersion>
-    <GitInfoReportImportance>low</GitInfoReportImportance>
-    <GitBaseVersionRegex Condition="'$(GitBaseVersionRegex)' == ''">v?(?&lt;MAJOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;MINOR&gt;(\d+|{[\dA-za-z\-\.]+}))(?:\-(?&lt;LABEL&gt;[\dA-Za-z\-\.{}]+))?$|^v?(?&lt;MAJOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;MINOR&gt;(\d+|{[\dA-za-z\-\.]+}))\.(?&lt;PATCH&gt;\d+|{[\dA-za-z\-\.]+})(?:\-(?&lt;LABEL&gt;[\dA-Za-z\-\.{}]+))?$|^(?&lt;LABEL&gt;[\dA-Za-z\-\.{}]+)\-v?(?&lt;MAJOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;MINOR&gt;\d+|{[\dA-za-z\-\.]+})\.(?&lt;PATCH&gt;\d+|{[\dA-za-z\-\.]+})$</GitBaseVersionRegex>
   </PropertyGroup>
 
   <Import Project="Directory$(MSBuildProjectExtension).props" Condition=" Exists('Directory$(MSBuildProjectExtension).props') " />

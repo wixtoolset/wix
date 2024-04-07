@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project>
+  <PropertyGroup>
+    <GlobalJsonFile>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\global.json))</GlobalJsonFile>
+    <CentralPackageVersionsPath>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\Directory.Packages.props))</CentralPackageVersionsPath>
+    <SomeVerInfoCsFile>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\build\SomeVerInfo.cs))</SomeVerInfoCsFile>
+    <SomeVerInfoRcFile>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\build\SomeVerInfo.rc))</SomeVerInfoRcFile>
+    <SomeVerInfoPropsFile>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\..\..\build\SomeVerInfo.props))</SomeVerInfoPropsFile>
+
+    <SomeVerInitImported>true</SomeVerInitImported>
+  </PropertyGroup>
+</Project>

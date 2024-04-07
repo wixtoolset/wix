@@ -16,93 +16,42 @@
     <ProjectCapability Remove="TestContainer" />
   </ItemGroup>
 
-  <!-- If the GitInfo package wasn't imported, use the calculated version properties. -->
-  <Import Project="$(RootBuildFolder)wixver.props" Condition=" '$(GitInfoImported)'!='true' " />
-
-  <Target Name="__FixupGitBaseVersion" BeforeTargets="_GitPopulateVersionInfo">
-    <PropertyGroup>
-      <GitBaseVersion>$(GitBaseVersion.Replace('{apiversion}', '$(ApiVersion)'))</GitBaseVersion>
-      <GitBaseVersion>$(GitBaseVersion.Replace('{height}', '$(GitCommits)'))</GitBaseVersion>
-      <GitBaseVersion>$(GitBaseVersion.Replace('{commits}', '$(GitCommits)'))</GitBaseVersion>
-    </PropertyGroup>
-  </Target>
+  <!-- If the git information wasn't imported yet, import the cached git information. -->
+  <Import Project="$(RootBuildFolder)SomeVerInfo.props" Condition=" '$(SomeVerInfoImported)'!='true' " />
+  <Import Project="internal/SetBuildNumber/SomeVerInfo.targets" />
 
   <PropertyGroup>
-    <GetPackageVersionDependsOn>
-      $(GetPackageVersionDependsOn);
-      __SetPropertiesFromGit;
-    </GetPackageVersionDependsOn>
+    <RepositoryUrl Condition=" '$(RepositoryUrl)'=='' ">https://github.com/wixtoolset/wix</RepositoryUrl>
+    <RepositoryType Condition=" '$(RepositoryType)'=='' ">git</RepositoryType>
+    <RepositoryCommit Condition=" '$(RepositoryCommit)'=='' ">$(SomeVerInfoSha)</RepositoryCommit>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
 
-    <__SetPropertiesFromGitDependsOn Condition=" '$(GitInfoFromCache)'!='true' ">
-      GitVersion
-    </__SetPropertiesFromGitDependsOn>
+    <ProjectUrl Condition=" '$(ProjectUrl)'=='' and '$(RepositoryUrl)'!='' ">$(RepositoryUrl)</ProjectUrl>
   </PropertyGroup>
-
-  <Target Name="__SetPropertiesFromGit" DependsOnTargets="$(__SetPropertiesFromGitDependsOn)">
-    <PropertyGroup>
-      <AssemblyVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).0.0</AssemblyVersion>
-      <FileVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch).$(GitCommits)</FileVersion>
-      <PackageVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)</PackageVersion>
-      <MajorMinorVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor)</MajorMinorVersion>
-      <Version>$(PackageVersion)</Version>
-      <InformationalVersion>$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)+$(GitSha)</InformationalVersion>
-      <!-- We already included the $(GitSha) in the informational version so do not include it again.  -->
-      <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-
-      <RepositoryUrl Condition=" '$(RepositoryUrl)'=='' and '$(GitRepositoryUrl)'!='' ">$(GitRepositoryUrl.Replace('.git',''))</RepositoryUrl>
-      <RepositoryType Condition=" '$(RepositoryType)'=='' ">git</RepositoryType>
-      <RepositoryCommit Condition=" '$(RepositoryCommit)'=='' ">$(GitSha)</RepositoryCommit>
-      <PublishRepositoryUrl>true</PublishRepositoryUrl>
-
-      <ProjectUrl Condition=" '$(ProjectUrl)'=='' and '$(RepositoryUrl)'!='' ">$(RepositoryUrl)</ProjectUrl>
-
-      <WixMajorVersion>$(GitBaseVersionMajor)</WixMajorVersion>
-      <WixMinorVersion>$(GitBaseVersionMinor)</WixMinorVersion>
-      <WixPatchVersion>$(GitBaseVersionPatch)</WixPatchVersion>
-    </PropertyGroup>
-
-    <Message Importance="$(GitInfoReportImportance)" Text="Properties from Git:
-  GitCommits: $(GitCommits)
-  AssemblyVersion: $(AssemblyVersion)
-  FileVersion: $(FileVersion)
-  InformationalVersion: $(InformationalVersion)
-  PackageVersion: $(PackageVersion)
-" />
-  </Target>
 
   <PropertyGroup>
     <GenerateNuspecDependsOn>
       $(GenerateNuspecDependsOn);
-      __SetPropertiesFromGit;
       __SetNuspecProperties
     </GenerateNuspecDependsOn>
   </PropertyGroup>
 
-  <Target Name="__SetNuspecProperties" DependsOnTargets="__SetPropertiesFromGit"
+  <Target Name="__SetNuspecProperties"
           Condition=" Exists('$(MSBuildProjectName).nuspec') ">
     <PropertyGroup>
       <NuspecFile Condition=" '$(NuspecFile)'=='' ">$(MSBuildProjectName).nuspec</NuspecFile>
       <PackageId Condition=" '$(PackageId)'=='' ">$(MSBuildProjectName)</PackageId>
       <Title Condition=" '$(Title)'=='' ">$(Description)</Title>
       <NuspecBasePath Condition=" '$(NuspecBasePath)'=='' ">$(OutputPath)</NuspecBasePath>
-      <NuspecProperties>$(NuspecProperties);Id=$(PackageId);Version=$(PackageVersion);Authors=$(Authors);Configuration=$(Configuration)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);Id=$(PackageId);Version=$(PackageVersion);MajorVersion=$(SomeVerInfoMajor);NextMajorVersion=$(SomeVerInfoNextMajor);Authors=$(Authors);Configuration=$(Configuration)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);Copyright=$(Copyright);Description=$(Description);Title=$(Title)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);RepositoryType=$(RepositoryType);RepositoryCommit=$(RepositoryCommit);RepositoryUrl=$(RepositoryUrl)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);ProjectUrl=$(ProjectUrl);ProjectFolder=$(MSBuildProjectDirectory)</NuspecProperties>
     </PropertyGroup>
-
-    <Message Importance="$(GitInfoReportImportance)" Text="NuSpec info:
-  NuspecFile: $(NuspecFile)
-  NuspecBasePath: $(NuspecBasePath)
-  NuspecProperties: $(NuspecProperties)
-" />
-
   </Target>
 
   <Target Name="PackNative" DependsOnTargets="__SetNuspecProperties"
           Condition=" Exists('$(MSBuildProjectName).nuspec') ">
-    <Error Text="There must be package reference to 'GitInfo'. Ensure the project was restored as well."
-           Condition=" '$(GitInfoImported)'!='true' " />
 
     <Exec Command='nuget pack $(NuspecFile) -OutputDirectory "$(PackageOutputPath.Trim(&quot;\&quot;))" -BasePath $(NuspecBasePath) -Properties "$(NuspecProperties)"'
           WorkingDirectory="$(MSBuildProjectDirectory)" />

@@ -6,7 +6,7 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
 
-  <Target Name="ZipPdbs" DependsOnTargets="__SetPropertiesFromGit" BeforeTargets="AfterBuild">
+  <Target Name="ZipPdbs" BeforeTargets="AfterBuild">
     <ZipDirectory
         SourceDirectory="$(PdbsFolder)"
         DestinationFile="$(ArtifactsFolder)\wix-pdbs.$(Version).zip"

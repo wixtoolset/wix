@@ -13,7 +13,7 @@
     <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
     <dependencies>
-      <dependency id="WixToolset.DUtil" version="[$version$,6)" />
+      <dependency id="WixToolset.DUtil" version="[$version$,$nextmajorversion$)" />
     </dependencies>
   </metadata>
 

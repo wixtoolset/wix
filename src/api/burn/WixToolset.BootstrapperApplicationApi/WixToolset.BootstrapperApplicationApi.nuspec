@@ -16,7 +16,7 @@
       <group targetFramework=".NETFramework4.6.2" />
       <group targetFramework=".NETStandard2.0" />
       <group targetFramework="Native">
-        <dependency id="WixToolset.DUtil" version="[$version$,6)" />
+        <dependency id="WixToolset.DUtil" version="[$version$,$nextmajorversion$)" />
       </group>
     </dependencies>
   </metadata>

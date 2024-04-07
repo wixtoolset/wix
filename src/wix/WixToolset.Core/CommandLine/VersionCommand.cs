@@ -19,11 +19,11 @@ namespace WixToolset.Core.CommandLine
         public override Task<int> ExecuteAsync(CancellationToken cancellationToken)
         {
             // $(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch)$(GitSemVerDashLabel)+$(Commit)
-            Console.WriteLine("{0}.{1}.{2}{3}+{4}", ThisAssembly.Git.BaseVersion.Major
-                                                  , ThisAssembly.Git.BaseVersion.Minor
-                                                  , ThisAssembly.Git.BaseVersion.Patch
-                                                  , ThisAssembly.Git.SemVer.DashLabel
-                                                  , ThisAssembly.Git.Commit);
+            Console.WriteLine("{0}.{1}.{2}{3}+{4}", SomeVerInfo.Major
+                                                  , SomeVerInfo.Minor
+                                                  , SomeVerInfo.Patch
+                                                  , SomeVerInfo.Label
+                                                  , SomeVerInfo.ShortSha);
             return Task.FromResult(0);
         }
 
