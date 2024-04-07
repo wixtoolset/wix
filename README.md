@@ -2,7 +2,7 @@
 
 [![latest version](https://img.shields.io/nuget/vpre/wix)](https://www.nuget.org/packages/wix)
 [![download count](https://img.shields.io/nuget/dt/wix)](https://www.nuget.org/stats/packages/WiX?groupby=Version)
-[![build status](https://img.shields.io/github/actions/workflow/status/wixtoolset/wix/build.yml?branch=develop)](https://github.com/wixtoolset/wix/actions/workflows/build.yml?query=branch%3Adevelop)
+[![build status](https://img.shields.io/github/actions/workflow/status/wixtoolset/wix/build.yml?branch=main)](https://github.com/wixtoolset/wix/actions/workflows/build.yml?query=branch%3Amain)
 
 # WiX Toolset
 
@@ -37,9 +37,9 @@ This repository contains the WiX Toolset codebase.
 
 ##### Getting started:
 
-* Fork the WiX repository (https://github.com/wixtoolset/wix.git)
- into a GitHub domain that you control
-* Clone the WiX repository from your fork (git clone https://github.com/yourdomain/wix.git)
+* [Fork the WiX repository](https://github.com/wixtoolset/wix/fork)
+ into your own GitHub repository
+* Clone the WiX repository from your fork (`git clone https://github.com/yourdomain/wix.git`)
  into the directory of your choice
 
 ##### To build the WiX toolset:
@@ -50,15 +50,14 @@ This repository contains the WiX Toolset codebase.
 
  ##### Executing your newly built WiX toolset
 
- * `build\wix\Debug\publish\wix\wix --help` (Of course changing Debug to Release if you built in Release mode)
+ * `build\wix\Debug\publish\wix\wix --help` (Change `Debug` to `Release` if you built in release mode)
 
  ##### Pull request expectations
 
- * Pick an outstanding WiX issue (or create one). Add a comment requesting that you be assigned to the issue. Wait for confirmation.
- * To create a PR fork a new branch from the develop branch
- * Make changes to effect whatever changed behaviour is required for the PR
+ * Pick an [outstanding WiX issue](https://github.com/wixtoolset/issues/issues?q=is%3Aissue+is%3Aopen+label%3A%22up+for+grabs%22) (or [create a new one](https://github.com/wixtoolset/issues/issues/new/choose)). Add a comment requesting that you be assigned to the issue. Wait for confirmation.
+ * To create a pull request, [fork a new branch](https://github.com/wixtoolset/wix/fork) from the `main` branch
+ * Make changes to effect whatever changed behavior is required for the pull request
  * Push the changes to your repository origin as needed
- * If there are multiple commits squash them down to one commit.
- * If the develop branch has changed since you created your new branch rebase to the current development branch.
+ * If the `main` branch has changed since you created your branch, rebase to the latest updates.
  * If needed (ie, you squashed or rebased), do a force push of your branch
- * Create a PR with your branch against the WiX repository.
+ * Create a pull request with your branch against the WiX repository.

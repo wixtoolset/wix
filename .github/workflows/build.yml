@@ -1,14 +1,12 @@
-name: Build WiX Toolset v5
+name: Build WiX Toolset v6
 
 on:
   push:
     branches:
-      - master
-      - develop
+      - main
   pull_request:
     branches:
-      - master
-      - develop
+      - main
   workflow_dispatch:
     inputs:
       tags:
@@ -29,9 +27,10 @@ jobs:
       id-token: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          filter: tree:0
 
       # - name: Configure Visual Studio
       #   shell: cmd
@@ -40,7 +39,7 @@ jobs:
       - name: Install sign tool
         if: (github.ref == 'refs/heads/master')
         shell: cmd
-        run: dotnet tool install --tool-path build\.tools sign --version 0.9.1-beta.23356.1
+        run: dotnet tool install --tool-path build\.tools sign --version 0.9.1-beta.24170.3
 
       - name: Configure automated logging and crash dumps
         shell: cmd
@@ -62,7 +61,7 @@ jobs:
           client-id: ${{ secrets.WIX_SIGNING_CLIENTID }}
           tenant-id: ${{ secrets.WIX_SIGNING_TENANTID }}
 
-      - name: Build wix5
+      - name: Build wix6
         shell: cmd
         run: ./src/build_official.cmd
         env:
@@ -107,5 +106,5 @@ jobs:
           path: build/logs/
 
       - name: Push to GitHub Packages
-        if: github.event_name == 'push' && github.repository_owner == 'wixtoolset' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')
+        if: github.event_name == 'push' && github.repository_owner == 'wixtoolset' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
         run: dotnet nuget push "build/artifacts/**/*.nupkg" --source https://nuget.pkg.github.com/wixtoolset/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
