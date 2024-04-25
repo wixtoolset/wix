@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
     <UpgradeCode>{353B5A34-3B46-424E-8817-25B3D01C8C16}</UpgradeCode>
-    <Version>1.0.1.0</Version>
+    <TestVersion>1.0.1.0</TestVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />

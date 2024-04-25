@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
     <UpgradeCode>{7D977157-06C9-4176-A931-AC16E18AAB51}</UpgradeCode>
-    <DefineConstants>$(DefineConstants);Version=12.34;UpdateFeed=http://wixtoolsetZZZ.org/releases/feed/vSECRET.FEED</DefineConstants>
+    <DefineConstants>$(DefineConstants);TestVersion=12.34;UpdateFeed=http://wixtoolsetZZZ.org/releases/feed/vSECRET.FEED</DefineConstants>
     <OutputName>WixStdBaTest_BadUpdateFeed</OutputName>
   </PropertyGroup>
   <ItemGroup>

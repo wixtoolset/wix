@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
     <UpgradeCode>{228859BB-F917-4F43-A1E0-50C8DCCA92EF}</UpgradeCode>
-    <Version>1.0.0.0</Version>
+    <TestVersion>1.0.0.0</TestVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\PackageAv1\PackageAv1.wixproj" />

@@ -8,9 +8,9 @@
 
     <PackageGroup Id="BundlePackages">
       <ExePackage Id="ExeA" Cache="remove" PerMachine="yes"
-                  DetectCondition="ExeA_Version AND ExeA_Version &gt;= v$(var.Version)"
-                  InstallArguments="/s 5000 /regw &quot;HKLM\$(var.TestExeRegistryKey),Version,String,$(var.Version)&quot;"
-                  RepairArguments="/regw &quot;HKLM\$(var.TestExeRegistryKey),Version,String,$(var.Version)&quot;"
+                  DetectCondition="ExeA_Version AND ExeA_Version &gt;= v$(var.TestVersion)"
+                  InstallArguments="/s 5000 /regw &quot;HKLM\$(var.TestExeRegistryKey),Version,String,$(var.TestVersion)&quot;"
+                  RepairArguments="/regw &quot;HKLM\$(var.TestExeRegistryKey),Version,String,$(var.TestVersion)&quot;"
                   UninstallArguments="/regd &quot;HKLM\$(var.TestExeRegistryKey),Version&quot;">
         <PayloadGroupRef Id="TestExePayloads" />
       </ExePackage>

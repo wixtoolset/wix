@@ -5,7 +5,7 @@
     <OutputType>Bundle</OutputType>
     <BA>hyperlinkLicense</BA>
     <UpgradeCode>{42CCE8AB-777A-481F-9EA2-0B5B10179E8A}</UpgradeCode>
-    <DefineConstants>$(DefineConstants);Version=1.0</DefineConstants>
+    <DefineConstants>$(DefineConstants);TestVersion=1.0</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

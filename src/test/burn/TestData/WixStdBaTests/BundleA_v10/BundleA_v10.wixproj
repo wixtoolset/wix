@@ -4,7 +4,7 @@
     <OutputType>Bundle</OutputType>
     <BA>hyperlinkLicense</BA>
     <UpgradeCode>{7D977157-06C9-4176-A931-AC16E18AAB51}</UpgradeCode>
-    <DefineConstants>$(DefineConstants);Version=1.0</DefineConstants>
+    <DefineConstants>$(DefineConstants);TestVersion=1.0</DefineConstants>
     <OutputName>WixStdBaTest1_v10</OutputName>
   </PropertyGroup>
   <ItemGroup>

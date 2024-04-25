@@ -5,7 +5,7 @@
     <BA>WixBAdnc_x64</BA>
     <UpgradeCode>{62E3DFA4-6849-44F0-93A1-C8F60DBB76E3}</UpgradeCode>
     <InstallerPlatform>x64</InstallerPlatform>
-    <Version>3.0.0.0</Version>
+    <TestVersion>3.0.0.0</TestVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
