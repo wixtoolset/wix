@@ -2,6 +2,6 @@
 <Project Sdk="WixToolset.Sdk">
   <Import Project="..\PackageGv1\PackageGv1.props" />
   <PropertyGroup>
-    <Version>1.0.1.0</Version>
+    <TestVersion>1.0.1.0</TestVersion>
   </PropertyGroup>
 </Project>

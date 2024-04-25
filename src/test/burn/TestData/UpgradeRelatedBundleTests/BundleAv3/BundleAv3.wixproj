@@ -2,7 +2,7 @@
 <Project Sdk="WixToolset.Sdk">
   <Import Project="..\BundleAv1\BundleA.props" />
   <PropertyGroup>
-    <Version>3.0.0.0</Version>
+    <TestVersion>3.0.0.0</TestVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\PackageAv3\PackageAv3.wixproj" />

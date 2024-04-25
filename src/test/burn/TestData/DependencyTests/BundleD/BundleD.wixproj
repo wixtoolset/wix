@@ -4,7 +4,7 @@
     <OutputType>Bundle</OutputType>
     <!-- Same as BundleA -->
     <UpgradeCode>{6950EF3F-674E-4689-A5C8-80D12AB6E34F}</UpgradeCode>
-    <Version>1.0.1.0</Version>
+    <TestVersion>1.0.1.0</TestVersion>
     <SuppressSpecificWarnings>1153</SuppressSpecificWarnings>
   </PropertyGroup>
   <ItemGroup>

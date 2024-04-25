@@ -3,7 +3,7 @@
   <Import Project="BundleF.props" />
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
-    <Version>1.0.0.0</Version>
+    <TestVersion>1.0.0.0</TestVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\PackageAv1\PackageAv1.wixproj" />

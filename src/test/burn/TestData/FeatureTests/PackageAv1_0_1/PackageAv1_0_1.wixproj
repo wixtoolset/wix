@@ -2,7 +2,7 @@
 <Project Sdk="WixToolset.Sdk">
   <Import Project="..\PackageAv1\PackageAv1.props" />
   <PropertyGroup>
-    <Version>1.0.1.0</Version>
+    <TestVersion>1.0.1.0</TestVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\PackageAv1\Package.wxs" Link="Package.wxs" />

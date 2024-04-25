@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
     <UpgradeCode>{7D977157-06C9-4176-A931-AC16E18AAB51}</UpgradeCode>
-    <DefineConstants>$(DefineConstants);Version=1.3</DefineConstants>
+    <DefineConstants>$(DefineConstants);TestVersion=1.3</DefineConstants>
     <OutputName>WixStdBaTest1_v13</OutputName>
   </PropertyGroup>
   <ItemGroup>

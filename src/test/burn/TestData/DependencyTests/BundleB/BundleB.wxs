@@ -10,11 +10,11 @@
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageAv1.TargetPath)" />
       <MsiPackage Id="PackageB" SourceFile="$(var.PackageB.TargetPath)" />
       <ExePackage Id="ExeA" Cache="remove" PerMachine="yes"
-                  DetectCondition="ExeA_Version AND ExeA_Version &gt;= v$(var.Version)"
-                  InstallArguments="/regw &quot;HKLM\$(var.TestExeRegistryKey),Version,String,$(var.Version)&quot;"
-                  RepairArguments="/regw &quot;HKLM\$(var.TestExeRegistryKey),Version,String,$(var.Version)&quot;"
+                  DetectCondition="ExeA_Version AND ExeA_Version &gt;= v$(var.TestVersion)"
+                  InstallArguments="/regw &quot;HKLM\$(var.TestExeRegistryKey),Version,String,$(var.TestVersion)&quot;"
+                  RepairArguments="/regw &quot;HKLM\$(var.TestExeRegistryKey),Version,String,$(var.TestVersion)&quot;"
                   UninstallArguments="/regd &quot;HKLM\$(var.TestExeRegistryKey),Version&quot;">
-        <Provides Key="$(var.TestGroupName)_ExeA,v1.0" Version="$(var.Version)" />
+        <Provides Key="$(var.TestGroupName)_ExeA,v1.0" Version="$(var.TestVersion)" />
         <PayloadGroupRef Id="TestExePayloads" />
       </ExePackage>
     </PackageGroup>

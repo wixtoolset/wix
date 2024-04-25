@@ -4,7 +4,7 @@
   <PropertyGroup>
     <BA>TestBA_x64</BA>
     <InstallerPlatform>X64</InstallerPlatform>
-    <Version>2.0.0.0</Version>
+    <TestVersion>2.0.0.0</TestVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\PackageAv2\PackageAv2.wixproj" />

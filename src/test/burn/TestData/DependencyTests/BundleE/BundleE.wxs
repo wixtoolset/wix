@@ -10,8 +10,8 @@
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageAv1.TargetPath)" />
       <MsiPackage Id="PackageC" SourceFile="$(var.PackageC.TargetPath)" Vital="no" />
       <ExePackage Id="ExeA" Cache="remove" Vital="no" PerMachine="yes" InstallArguments="/ec 1603" UninstallArguments=""
-                  DetectCondition="ExeA_Version AND ExeA_Version &gt;= v$(var.Version)">
-        <Provides Key="$(var.TestGroupName)_ExeA,v1.0" Version="$(var.Version)" />
+                  DetectCondition="ExeA_Version AND ExeA_Version &gt;= v$(var.TestVersion)">
+        <Provides Key="$(var.TestGroupName)_ExeA,v1.0" Version="$(var.TestVersion)" />
         <PayloadGroupRef Id="TestExePayloads" />
       </ExePackage>
     </PackageGroup>

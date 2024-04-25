@@ -8,7 +8,7 @@
 
     <PackageGroup Id="BundlePackages">
       <MspPackage Id="PatchA" SourceFile="$(var.PatchA.TargetPath)">
-        <Provides Key="$(var.TestGroupName)_PatchA" Version="$(var.Version)" />
+        <Provides Key="$(var.TestGroupName)_PatchA" Version="$(var.TestVersion)" />
       </MspPackage>
       <MsiPackage Id="PackageE" Name="PackageEv1.msi" SourceFile="$(var.PackageEv1_0_1.TargetPath)" />
     </PackageGroup>
