@@ -6,7 +6,7 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <NoWarn>NU5100</NoWarn>
-    <WixExtensionPackageFolder>wixext5</WixExtensionPackageFolder>
+    <WixExtensionPackageFolder>wixext6</WixExtensionPackageFolder>
   </PropertyGroup>
 
   <ItemGroup>

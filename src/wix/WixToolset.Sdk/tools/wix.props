@@ -9,7 +9,7 @@
     <WixToolsetPatchVersion>$$WixToolsetPatchVersion$$</WixToolsetPatchVersion>
     <WixToolsetMajorMinorVersion>$$WixToolsetMajorMinorVersion$$</WixToolsetMajorMinorVersion>
     <WixToolsetVersion>$$WixToolsetVersion$$</WixToolsetVersion>
-    <WixToolsetExtensionPackageFolder>wixext5</WixToolsetExtensionPackageFolder>
+    <WixToolsetExtensionPackageFolder>wixext6</WixToolsetExtensionPackageFolder>
   </PropertyGroup>
 
   <ImportGroup>
