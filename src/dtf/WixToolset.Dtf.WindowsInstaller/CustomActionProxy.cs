@@ -101,8 +101,13 @@ namespace WixToolset.Dtf.WindowsInstaller
                 return (int) ActionResult.Failure;
             }
 
+            string originalCurrentDirectory = null;
+
             try
             {
+                // Save current directory to restore after custom action invocation.
+                originalCurrentDirectory = Environment.CurrentDirectory;
+
                 // Set the current directory to the location of the extracted files.
                 Environment.CurrentDirectory =
                     AppDomain.CurrentDomain.BaseDirectory;
@@ -141,6 +146,20 @@ namespace WixToolset.Dtf.WindowsInstaller
                 session.Log("Exception thrown by custom action:");
                 session.Log(ex.ToString());
                 return (int) ActionResult.Failure;
+            }
+            finally
+            {
+                try
+                {
+                    if (originalCurrentDirectory != null)
+                    {
+                        Environment.CurrentDirectory = originalCurrentDirectory;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    session.Log("Cannot set current directory: {0}", ex.Message);
+                }
             }
         }
 
