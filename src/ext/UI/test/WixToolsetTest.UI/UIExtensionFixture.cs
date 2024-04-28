@@ -405,7 +405,7 @@ namespace WixToolsetTest.UI
                 "InstallUISequence:WelcomeDlg\tNOT Installed OR PATCH\t1297",
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
 
-            Assert.Equal(8, results.Where(result => result.StartsWith("Control:") && result.Contains("SpecialDlg")).Count());
+            Assert.Equal(10, results.Where(result => result.StartsWith("Control:") && result.Contains("SpecialDlg")).Count());
             Assert.Equal(5, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("SpecialDlg")).Count());
             Assert.Single(results.Where(result => result.StartsWith("Dialog:") && result.Contains("SpecialDlg")));
         }

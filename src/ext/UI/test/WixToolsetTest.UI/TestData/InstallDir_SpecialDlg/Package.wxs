@@ -1,5 +1,5 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
-    <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+    <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a" Codepage="65001">
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 
         <Feature Id="ProductFeature" Title="MsiPackage">
@@ -24,6 +24,8 @@
     <Fragment>
         <UI>
             <Dialog Id="SpecialDlg" Width="370" Height="270" Title="My Special Dialog">
+                <Control Id="Bitmap" Type="Bitmap" X="92" Y="80" Width="185" Height="117" TabSkip="no" Text="WixUI_Bmp_Dialog" />
+                <Control Id="GotoBlog" Type="Hyperlink" Transparent="yes" X="96" Y="121" Width="178" Height="17" Text='Visit &lt;a href="https://www.firegiant.com/blog/"&gt;the FireGiant blog!&lt;/a&gt;' />
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
                 <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Text="!(loc.WixUINext)" />
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
@@ -32,8 +34,8 @@
                 <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
                 <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
                 <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
-                <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="My Special Dialog" />
-                <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="A dialog where special stuff happens" />
+                <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="My Special Dialog &amp; Stuff" />
+                <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="&#x2714; A dialog where special stuff happens" />
             </Dialog>
         </UI>
     </Fragment>
