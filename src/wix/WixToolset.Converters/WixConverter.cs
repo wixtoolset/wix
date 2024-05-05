@@ -443,7 +443,7 @@ namespace WixToolset.Converters
 
             if (this.TryOpenSourceFile(ConvertOperation.Format, sourceFile))
             {
-                this.FormatDocument(this.State.XDocument);
+                this.FormatDocument(this.State.XDocument, sourceFile);
 
                 // Fix Messages if requested and necessary.
                 if (saveConvertedFile && 0 < this.ConversionMessages.Count)
