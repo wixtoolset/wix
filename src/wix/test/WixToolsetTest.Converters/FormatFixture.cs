@@ -3,8 +3,10 @@
 namespace WixToolsetTest.Converters
 {
     using System;
+    using System.IO;
     using System.Xml.Linq;
     using WixToolset.Converters;
+    using WixToolset.Extensibility.Services;
     using WixToolsetTest.Converters.Mocks;
     using Xunit;
 
@@ -112,6 +114,33 @@ namespace WixToolsetTest.Converters
 
             Assert.Equal(expected, actual);
             Assert.Equal(3, conversions);
+        }
+        [Fact]
+        public void CanSaveInPlace()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<?xml version='1.0' encoding='utf-8'?>",
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <Fragment>",
+                "    <Property Id='Prop'",
+                "              Value='Val'>",
+                "    </Property>",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = String.Join(Environment.NewLine,
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "    <Fragment>",
+                "        <Property Id=\"Prop\" Value=\"Val\" />",
+                "    </Fragment>",
+                "</Wix>");
+            var tempFileName = Path.GetTempFileName();
+            File.WriteAllText(tempFileName, parse, System.Text.Encoding.UTF8);
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 4, null, null);
+            converter.FormatFile(tempFileName, true);
+            var actual = File.ReadAllText(tempFileName, System.Text.Encoding.UTF8);
+            Assert.Equal(expected, actual);
         }
     }
 }
