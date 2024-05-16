@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+    <Bundle Name="WixIuiBa" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="{1CD73801-0B08-4B39-B371-00DA49EF715F}">
+        <BootstrapperApplication>
+            <Payload SourceFile="preqs.wxl" />
+            <bal:WixInternalUIBootstrapperApplication LocalizationFile="preqs.wxl" />
+        </BootstrapperApplication>
+        <Chain>
+            <ExePackage Permanent="yes" DetectCondition="none" SourceFile="runtimes\win-x86\native\wixnative.exe" />
+            <MsiPackage SourceFile="test.msi" Cache="force" />
+        </Chain>
+    </Bundle>
+</Wix>

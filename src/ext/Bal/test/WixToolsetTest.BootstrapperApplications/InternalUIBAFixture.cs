@@ -2,11 +2,11 @@
 
 namespace WixToolsetTest.BootstrapperApplications
 {
-    using System;
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
+    using System.Xml;
     using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
     using Xunit;
 
     public class InternalUIBAFixture
@@ -191,6 +191,72 @@ namespace WixToolsetTest.BootstrapperApplications
 
                 Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
                 Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
+            }
+        }
+
+        [Fact]
+        public void CanBuildUsingWixIuiBaAndForcedCachePrimaryPackage()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\WixIuiBa");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var compileResult = WixRunner.Execute(warningsAsErrors: false, new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "CanForceCachePrimaryPackage.wxs"),
+                    "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindpath", TestData.Get(@"TestData\WixStdBa\Data"),
+                    "-o", bundleFile,
+                });
+
+                compileResult.AssertSuccess();
+
+                Assert.True(File.Exists(bundleFile));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var wixPackageProperties = extractResult.SelectBADataNodes("/ba:BootstrapperApplicationData/ba:WixPackageProperties");
+                AssertCacheType(wixPackageProperties[0]);
+                AssertCacheType(wixPackageProperties[1]);
+
+                var balPackageInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixBalPackageInfo");
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<WixBalPackageInfo PackageId='test.msi' PrimaryPackageType='default' />",
+                }, balPackageInfos);
+
+                var mbaPrereqInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPrereqInformation");
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "<WixPrereqInformation PackageId='wixnative.exe' />",
+                }, mbaPrereqInfos);
+
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
+                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
+            }
+
+            static void AssertCacheType(XmlNode node)
+            {
+                var element = node as XmlElement;
+                var package = element?.GetAttribute("Package");
+                var cache = element?.GetAttribute("Cache");
+
+                if (package == "test.msi")
+                {
+                    Assert.Equal("force", cache);
+                }
+                else if (package == "wixnative.exe")
+                {
+                    Assert.Equal("keep", cache);
+                }
             }
         }
 

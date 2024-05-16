@@ -43,11 +43,6 @@ namespace WixToolset.BootstrapperApplications
             return Message(sourceLineNumbers, Ids.IuibaPrimaryPackageEnableFeatureSelection, "When using WixInternalUIBootstrapperApplication, primary packages must not have feature selection enabled because it interferes with the user selecting feature through the MSI UI.");
         }
 
-        public static Message MissingDNCBAFactoryAssembly(SourceLineNumber sourceLineNumbers)
-        {
-            return Message(sourceLineNumbers, Ids.MissingDNCBAFactoryAssembly, "When using DotNetCoreBootstrapperApplicationHost, the Payload element for the BA's entry point DLL must have bal:BAFactoryAssembly=\"yes\".");
-        }
-
         public static Message MissingPrereq(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.MissingPrereq, "There must be at least one package with bal:PrereqPackage=\"yes\" when using the bal:WixPrerequisiteBootstrapperApplication.");
