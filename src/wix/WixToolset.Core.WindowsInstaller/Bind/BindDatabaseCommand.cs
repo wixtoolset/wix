@@ -6,6 +6,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
@@ -50,6 +51,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.PatchSubStorages = patchSubStorages;
 
             this.BackendExtensions = backendExtension;
+
+            this.CancellationToken = context.CancellationToken;
         }
 
         private IServiceProvider ServiceProvider { get; }
@@ -99,6 +102,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private bool SuppressLayout { get; }
 
         private string IntermediateFolder { get; }
+
+        private CancellationToken CancellationToken { get; }
 
         public IBindResult Execute()
         {
@@ -275,7 +280,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Gather information about files that do not come from merge modules.
             {
-                var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, section, allFileFacades, fileFacadesFromIntermediate, variableCache, overwriteHash: true);
+                var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, section, allFileFacades, fileFacadesFromIntermediate, variableCache, overwriteHash: true, this.CancellationToken);
                 command.Execute();
             }
 
@@ -319,7 +324,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         var updatedFacades = reresolvedFiles.Select(f => allFileFacades.First(ff => ff.Id == f.Id?.Id));
 
-                        var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, section, allFileFacades, updatedFacades, variableCache, overwriteHash: false);
+                        var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, section, allFileFacades, updatedFacades, variableCache, overwriteHash: false, this.CancellationToken);
                         command.Execute();
                     }
                 }
