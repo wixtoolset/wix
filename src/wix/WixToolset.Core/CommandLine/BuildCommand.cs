@@ -56,7 +56,7 @@ namespace WixToolset.Core.CommandLine
                 new CommandLineHelpSwitch("-culture", "Adds a culture to filter localization files."),
                 new CommandLineHelpSwitch("-define", "-d", "Sets a preprocessor variable."),
                 new CommandLineHelpSwitch("-defaultcompressionlevel", "-dcl", "Default compression level; see Compression levels below."),
-                new CommandLineHelpSwitch("-include", "-i", "Folder to search for include files."),
+                new CommandLineHelpSwitch("-includepath", "-i", "Folder to search for include files."),
                 new CommandLineHelpSwitch("-intermediatefolder", "Optional working folder. If not specified a folder in %TMP% will be created."),
                 new CommandLineHelpSwitch("-loc", "Localization file to use in the build. By default, .wxl files are recognized as localization."),
                 new CommandLineHelpSwitch("-lib", "Library file to use in the build. By default, .wixlib files are recognized as libraries."),
