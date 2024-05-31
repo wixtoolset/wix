@@ -32,9 +32,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Configure Visual Studio
-      #   shell: cmd
-      #   run: ./src/vs_config.cmd
+      - name: Configure Visual Studio
+        shell: cmd
+        run: ./src/vs_config.cmd
 
       - name: Install sign tool
         if: (github.ref == 'refs/heads/master')

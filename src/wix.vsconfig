@@ -1,6 +1,7 @@
 {
   "version": "1.0",
   "components": [
+    "Microsoft.VisualStudio.Component.VC.v141.x86.x64.Spectre",
     "Microsoft.VisualStudio.Component.VC.v141.ARM64.Spectre"
   ]
 }
