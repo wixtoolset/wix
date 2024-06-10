@@ -20,7 +20,7 @@
     <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
 
     <!-- This is C++-specific but used from managed projects to pick up native build artifacts. -->
-    <WixNativeSdkLibraryToolset>v141</WixNativeSdkLibraryToolset>
+    <WixNativeSdkLibraryToolset>v143</WixNativeSdkLibraryToolset>
     <PlatformToolset Condition=" '$(ConfigurationType)' == 'StaticLibrary' ">$(WixNativeSdkLibraryToolset)</PlatformToolset>
     <PlatformToolset Condition=" '$(PlatformToolset)' == '' ">v143</PlatformToolset>
 
