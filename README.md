@@ -24,9 +24,8 @@ This repository contains the WiX Toolset v4 codebase.
 | :-------------------- |
 | .NET Framework 4.7.2 SDK |
 | .NET Framework 4.7.2 targeting pack |
-| MSVC v141 - VS 2017 C++ ARM64 build tools (v14.16) |
-| MSVC v141 - VS 2017 C++ x64/x86 build tools (v14.16) |
-| MSVC v143 - VS 2022 C++ ARM64 build tools (Latest) |
+| .NET Framework 4.6.2 targeting pack |
+| MSVC v143 - VS 2022 C++ ARM64/ARM64EC build tools (Latest) |
 | MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest) |
 
 - [Download the latest nuget.exe command-line tool](https://www.nuget.org/downloads) and put it in a directory on the path.
