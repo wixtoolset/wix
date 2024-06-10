@@ -39,8 +39,8 @@
     <file src="$projectFolder$\..\balutil\inc\*" target="build\native\include" />
     <file src="$projectFolder$\..\inc\BootstrapperApplicationTypes.h" target="build\native\include" />
     <file src="$projectFolder$\..\inc\BootstrapperEngineTypes.h" target="build\native\include" />
-    <file src="v141\x86\balutil.lib" target="build\native\v14\x86" />
-    <file src="v141\x64\balutil.lib" target="build\native\v14\x64" />
-    <file src="v141\ARM64\balutil.lib" target="build\native\v14\ARM64" />
+    <file src="v143\x86\balutil.lib" target="build\native\v14\x86" />
+    <file src="v143\x64\balutil.lib" target="build\native\v14\x64" />
+    <file src="v143\ARM64\balutil.lib" target="build\native\v14\ARM64" />
   </files>
 </package>
