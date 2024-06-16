@@ -5,20 +5,27 @@
     <String Id="msierrUSRFailedUserCreate" Overridable="yes" Value="Falha ao criar usuário. ([2] [3] [4] [5])" />
     <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes" Value="Falha ao criar usuário devido a senha inválida. ([2] [3] [4] [5])" />
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="Falha ao adicionar o usuário ao grupo. ([2] [3] [4] [5])" />
+    <String Id="msierrUSRFailedGrantLogonAsService" Overridable="yes" Value="Não foi possível conceder ao usuário direitos de 'fazer logon como serviço'. ([2] [3] [4] [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="Falha ao criar o usuário, porque ele já existe. ([2] [3] [4] [5])" />
+
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Falha ao criar o compartilhamento de rede. ([2] [3] [4] [5])" />
     <String Id="msierrSMBFailedDrop" Overridable="yes" Value="Falha ao cair compartilhamento de rede. ([2] [3] [4] [5])" />
+
     <String Id="msierrPERFMONFailedRegisterDLL" Overridable="yes" Value="Falha ao registrar DLL com PerfMon. ([2] [3] [4] [5])" />
     <String Id="msierrPERFMONFailedUnregisterDLL" Overridable="yes" Value="Falha ao cancelar o registro de DLL com PerfMon. ([2] [3] [4] [5])" />
+
     <String Id="msierrInstallPerfCounterData" Overridable="yes" Value="Falha ao instalar contadores de desempenho. ([2] [3] [4] [5])" />
     <String Id="msierrUninstallPerfCounterData" Overridable="yes" Value="Falha ao desinstalar contadores de desempenho. ([2] [3] [4] [5])" />
+
     <String Id="msierrSecureObjectsFailedCreateSD" Overridable="yes" Value="Falha ao criar o descritor de segurança [3] \ [4], erro do sistema: [2]" />
     <String Id="msierrSecureObjectsFailedSet" Overridable="yes" Value="Falha ao definir o descritor de segurança sobre o objeto [3], erro do sistema: [2]" />
     <String Id="msierrSecureObjectsUnknownType" Overridable="yes" Value="Objeto Desconhecido Tipo [3], erro do sistema: [2]" />
+
     <String Id="msierrXmlFileFailedRead" Overridable="yes" Value="Houve uma falha ao configurar arquivos XML." />
     <String Id="msierrXmlFileFailedOpen" Overridable="yes" Value="Falha ao abrir o arquivo XML [3], erro do sistema: [2]" />
     <String Id="msierrXmlFileFailedSelect" Overridable="yes" Value="Falha ao localizar nó: [3] no arquivo XML: [4], erro do sistema: [2]" />
     <String Id="msierrXmlFileFailedSave" Overridable="yes" Value="Falha ao salvar as alterações para o arquivo XML [3], erro do sistema: [2]" />
+
     <String Id="msierrXmlConfigFailedRead" Overridable="yes" Value="Houve uma falha ao configurar arquivos XML." />
     <String Id="msierrXmlConfigFailedOpen" Overridable="yes" Value="Falha ao abrir o arquivo XML [3], erro do sistema: [2]" />
     <String Id="msierrXmlConfigFailedSelect" Overridable="yes" Value="Falha ao localizar nó: [3] no arquivo XML: [4], erro do sistema: [2]" />
