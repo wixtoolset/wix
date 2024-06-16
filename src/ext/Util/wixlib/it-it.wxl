@@ -5,6 +5,7 @@
     <String Id="msierrUSRFailedUserCreate" Overridable="yes" Value="Impossibile creare l'utente.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes" Value="Impossibile creare l'utente perchè la password è errata.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="Impossibile aggiungere l'utente al gruppo.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrUSRFailedGrantLogonAsService" Overridable="yes" Value="Impossibile concedere i 'accedere come servizio' diritti all'utente.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="Impossibile creare l'utente perchè già esistente.  ([2]   [3]   [4]   [5])" />
 
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Impossibile creare la risorsa di rete.  ([2]   [3]   [4]   [5])" />
