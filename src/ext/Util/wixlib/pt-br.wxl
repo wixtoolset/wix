@@ -8,6 +8,10 @@
     <String Id="msierrUSRFailedGrantLogonAsService" Overridable="yes" Value="Não foi possível conceder ao usuário direitos de 'fazer logon como serviço'. ([2] [3] [4] [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="Falha ao criar o usuário, porque ele já existe. ([2] [3] [4] [5])" />
 
+    <String Id="msierrGRPFailedGroupCreate" Overridable="yes" Value="Falha ao criar grupo. ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupGroupAdd" Overridable="yes" Value="Falha ao adicionar o grupo ao grupo. ([2] [3] [4] [5])" />
+    <String Id="msierrGRPFailedGroupCreateExists" Overridable="yes" Value="Falha ao criar o grupo, porque ele já existe. ([2]   [3]   [4]   [5])" />
+
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Falha ao criar o compartilhamento de rede. ([2] [3] [4] [5])" />
     <String Id="msierrSMBFailedDrop" Overridable="yes" Value="Falha ao cair compartilhamento de rede. ([2] [3] [4] [5])" />
 
