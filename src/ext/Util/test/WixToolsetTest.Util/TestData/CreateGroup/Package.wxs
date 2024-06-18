@@ -1,0 +1,15 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="CreateGroup" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+        <Feature Id="ProductFeature" Title="MsiPackage">
+            <ComponentGroupRef Id="ProductComponents" />
+        </Feature>
+    </Package>
+
+    <Fragment>
+            <StandardDirectory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLFOLDER" Name="CreateGroup" />
+            </StandardDirectory>
+        </Fragment>
+</Wix>

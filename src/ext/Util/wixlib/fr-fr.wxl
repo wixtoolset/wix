@@ -7,6 +7,10 @@
   <String Id="msierrUSRFailedGrantLogonAsService" Overridable="yes" Value="Échec de l'octroi des droits de « connexion en tant que service » à l'utilisateur.  ([2]   [3]   [4]   [5])" />
   <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="La création de l'utilisateur a échoué car il existe dejà.  ([2]   [3]   [4]   [5])" />
 
+  <String Id="msierrGRPFailedGroupCreate" Overridable="yes" Value="La création du groupe a échoué.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupGroupAdd" Overridable="yes" Value="L'ajout du groupe au groupe a échoué.  ([2]   [3]   [4]   [5])" />
+  <String Id="msierrGRPFailedGroupCreateExists" Overridable="yes" Value="La création du groupe a échoué car il existe dejà.  ([2]   [3]   [4]   [5])" />
+
   <String Id="msierrSMBFailedCreate" Overridable="yes" Value="La création du partage reseau a échoué.  ([2]   [3]   [4]   [5])" />
   <String Id="msierrSMBFailedDrop" Overridable="yes" Value="La suppression du partage reseau a échoué.  ([2]   [3]   [4]   [5])" />
 
