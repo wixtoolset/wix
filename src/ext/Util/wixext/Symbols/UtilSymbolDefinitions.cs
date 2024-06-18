@@ -12,6 +12,8 @@ namespace WixToolset.Util
         FileShare,
         FileSharePermissions,
         Group,
+        Group6,
+        GroupGroup,
         Perfmon,
         PerfmonManifest,
         PerformanceCategory,
@@ -58,6 +60,12 @@ namespace WixToolset.Util
 
                 case UtilSymbolDefinitionType.Group:
                     return UtilSymbolDefinitions.Group;
+
+                case UtilSymbolDefinitionType.Group6:
+                    return UtilSymbolDefinitions.Group6;
+
+                case UtilSymbolDefinitionType.GroupGroup:
+                    return UtilSymbolDefinitions.GroupGroup;
 
                 case UtilSymbolDefinitionType.Perfmon:
                     return UtilSymbolDefinitions.Perfmon;
