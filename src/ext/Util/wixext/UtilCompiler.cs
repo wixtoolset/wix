@@ -139,6 +139,9 @@ namespace WixToolset.Util
                         case "TouchFile":
                             this.ParseTouchFileElement(intermediate, section, element, componentId, componentWin64);
                             break;
+                        case "Group":
+                            this.ParseGroupElement(intermediate, section, element, componentId);
+                            break;
                         case "User":
                             this.ParseUserElement(intermediate, section, element, componentId);
                             break;
@@ -1357,6 +1360,8 @@ namespace WixToolset.Util
             Identifier id = null;
             string domain = null;
             string name = null;
+            string comment = null;
+            Group6Symbol.SymbolAttributes attributes = Group6Symbol.SymbolAttributes.None;
 
             foreach (var attrib in element.Attributes())
             {
@@ -1372,6 +1377,75 @@ namespace WixToolset.Util
                             break;
                         case "Domain":
                             domain = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Comment":
+                            if (null == componentId)
+                            {
+                                this.Messaging.Write(UtilErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
+                            }
+
+                            comment = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "CreateGroup":
+                            if (null == componentId)
+                            {
+                                this.Messaging.Write(UtilErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
+                            }
+
+                            if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= Group6Symbol.SymbolAttributes.DontCreateGroup;
+                            }
+                            break;
+                        case "FailIfExists":
+                            if (null == componentId)
+                            {
+                                this.Messaging.Write(UtilErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
+                            }
+
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= Group6Symbol.SymbolAttributes.FailIfExists;
+                            }
+                            break;
+                        case "UpdateIfExists":
+                            if (null == componentId)
+                            {
+                                this.Messaging.Write(UtilErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
+                            }
+
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= Group6Symbol.SymbolAttributes.UpdateIfExists;
+                            }
+                            break;
+                        case "RemoveComment":
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= Group6Symbol.SymbolAttributes.RemoveComment;
+                            }
+                            break;
+                        case "RemoveOnUninstall":
+                            if (null == componentId)
+                            {
+                                this.Messaging.Write(UtilErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
+                            }
+
+                            if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= Group6Symbol.SymbolAttributes.DontRemoveOnUninstall;
+                            }
+                            break;
+                        case "Vital":
+                            if (null == componentId)
+                            {
+                                this.Messaging.Write(UtilErrors.IllegalAttributeWithoutComponent(sourceLineNumbers, element.Name.LocalName, attrib.Name.LocalName));
+                            }
+
+                            if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= Group6Symbol.SymbolAttributes.NonVital;
+                            }
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -1389,7 +1463,40 @@ namespace WixToolset.Util
                 id = this.ParseHelper.CreateIdentifier("ugr", componentId, domain, name);
             }
 
-            this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
+            if (null == name)
+            {
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
+            }
+
+            if (null != comment && (Group6Symbol.SymbolAttributes.RemoveComment & attributes) != 0)
+            {
+                this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Comment", "RemoveComment"));
+            }
+
+            if (null != componentId)
+            {
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4ConfigureGroups", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+            }
+
+            foreach (var child in element.Elements())
+            {
+                if (this.Namespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                        case "GroupRef":
+                            this.ParseGroupRefElement(intermediate, section, child,  id.Id, groupType:true);
+                            break;
+                        default:
+                            //this.ParseHelper.UnexpectedElement(element, child);
+                            break;
+                    }
+                }
+                else
+                {
+                    this.ParseHelper.ParseExtensionElement(this.Context.Extensions, intermediate, section, element, child);
+                }
+            }
 
             if (!this.Messaging.EncounteredError)
             {
@@ -1399,6 +1506,12 @@ namespace WixToolset.Util
                     Name = name,
                     Domain = domain,
                 });
+                section.AddSymbol(new Group6Symbol(sourceLineNumbers, id)
+                {
+                    GroupRef = id.Id,
+                    Comment = comment,
+                    Attributes = attributes,
+                });
             }
         }
 
@@ -1406,8 +1519,9 @@ namespace WixToolset.Util
         /// Parses a GroupRef element
         /// </summary>
         /// <param name="element">Element to parse.</param>
-        /// <param name="userId">Required user id to be joined to the group.</param>
-        private void ParseGroupRefElement(Intermediate intermediate, IntermediateSection section, XElement element, string userId)
+        /// <param name="childId">Required child id to be joined to the group.</param>
+        /// <param name="groupType">whether the child is a group (true) or a user (false)</param>
+        private void ParseGroupRefElement(Intermediate intermediate, IntermediateSection section, XElement element, string childId, bool groupType=false)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string groupId = null;
@@ -1437,11 +1551,22 @@ namespace WixToolset.Util
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddSymbol(new UserGroupSymbol(sourceLineNumbers)
+                if (!groupType)
                 {
-                    UserRef = userId,
-                    GroupRef = groupId,
-                });
+                    section.AddSymbol(new UserGroupSymbol(sourceLineNumbers)
+                    {
+                        UserRef = childId,
+                        GroupRef = groupId,
+                    });
+                }
+                else
+                {
+                    section.AddSymbol(new GroupGroupSymbol(sourceLineNumbers)
+                    {
+                        ChildGroupRef = childId,
+                        ParentGroupRef = groupId,
+                    });
+                }
             }
         }
 
@@ -3460,7 +3585,7 @@ namespace WixToolset.Util
                                 this.Messaging.Write(UtilErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseGroupRefElement(intermediate, section, child, id.Id);
+                            this.ParseGroupRefElement(intermediate, section, child, id.Id, groupType:false);
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(element, child);

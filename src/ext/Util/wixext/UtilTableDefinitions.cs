@@ -105,6 +105,29 @@ namespace WixToolset.Util
             symbolIdIsPrimaryKey: true
         );
 
+        public static readonly TableDefinition Wix6Group = new TableDefinition(
+            "Wix6Group",
+            UtilSymbolDefinitions.Group6,
+            new[]
+            {
+                        new ColumnDefinition("Group_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4Group", keyColumn: 1, description: "Primary key, non-localized token", modularizeType: ColumnModularizeType.Column),
+                        new ColumnDefinition("Comment", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Group comment", modularizeType: ColumnModularizeType.Property),
+                        new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, minValue: 0, maxValue: 65535, description: "Attributes describing how to create the group"),
+            },
+            symbolIdIsPrimaryKey: false
+        );
+
+        public static readonly TableDefinition Wix6GroupGroup = new TableDefinition(
+            "Wix6GroupGroup",
+            UtilSymbolDefinitions.GroupGroup,
+            new[]
+            {
+                        new ColumnDefinition("Parent_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4Group", keyColumn: 1, description: "Parent Group", modularizeType: ColumnModularizeType.Column),
+                        new ColumnDefinition("Child_", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, keyTable: "Wix4Group", keyColumn: 1, description: "Child Group, a member of the Parent Group", modularizeType: ColumnModularizeType.Column),
+            },
+            symbolIdIsPrimaryKey: false
+        );
+
         public static readonly TableDefinition Wix4InternetShortcut = new TableDefinition(
             "Wix4InternetShortcut",
             UtilSymbolDefinitions.WixInternetShortcut,
@@ -302,6 +325,8 @@ namespace WixToolset.Util
             Wix4FileShare,
             Wix4FileSharePermissions,
             Wix4Group,
+            Wix6Group,
+            Wix6GroupGroup,
             Wix4InternetShortcut,
             Wix4PerformanceCategory,
             Wix4Perfmon,

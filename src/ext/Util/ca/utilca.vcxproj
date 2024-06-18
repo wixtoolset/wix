@@ -61,7 +61,9 @@
     <ClCompile Include="RemoveRegistryKeysEx.cpp" />
     <ClCompile Include="RestartManager.cpp" />
     <ClCompile Include="scaexec.cpp" />
+    <ClCompile Include="scagroup.cpp" />
     <ClCompile Include="scamanifest.cpp" />
+    <ClCompile Include="scanet.cpp" />
     <ClCompile Include="scaperf.cpp" />
     <ClCompile Include="scaperfexec.cpp" />
     <ClCompile Include="scasched.cpp" />
@@ -84,6 +86,8 @@
     <ClInclude Include="precomp.h" />
     <ClInclude Include="sca.h" />
     <ClInclude Include="scacost.h" />
+    <ClInclude Include="scagroup.h" />
+    <ClInclude Include="scanet.h" />
     <ClInclude Include="scasmb.h" />
     <ClInclude Include="scasmbexec.h" />
     <ClInclude Include="scauser.h" />

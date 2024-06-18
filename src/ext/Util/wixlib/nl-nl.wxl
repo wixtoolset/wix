@@ -7,6 +7,10 @@
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="De gebruikersgroep kon niet worden toegevoegd.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="De gebruiker kon niet worden aangemaakt omdat hij al bestond.  ([2]   [3]   [4]   [5])" />
 
+    <String Id="msierrGRPFailedGroupCreate" Overridable="yes" Value="De groep kan niet worden aangemaakt.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupGroupAdd" Overridable="yes" Value="De groep kan niet worden toegevoegd.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupCreateExists" Overridable="yes" Value="De groep kan niet worden aangemaakt omdat hij al bestond.  ([2]   [3]   [4]   [5])" />
+
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Netwerk delen kon niet worden aangemaakt.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrSMBFailedDrop" Overridable="yes" Value="Netwerk delen kon niet worden verwijderd.  ([2]   [3]   [4]   [5])" />
 

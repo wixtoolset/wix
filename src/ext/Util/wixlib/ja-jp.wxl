@@ -7,6 +7,10 @@
   <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="ユーザーをグループに追加でいませんでした。  ([2]   [3]   [4]   [5])" />
   <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="ユーザーが既に存在するため作成できませんでした。  ([2]   [3]   [4]   [5])" />
 
+  <String Id="msierrGRPFailedGroupCreate" Overridable="yes" Value="グループの作成に失敗しました。  ([2]   [3]   [4]   [5])" />
+  <String Id="msierrGRPFailedGroupGroupAdd" Overridable="yes" Value="グループをグループに追加でいませんでした。  ([2]   [3]   [4]   [5])" />
+  <String Id="msierrGRPFailedGroupCreateExists" Overridable="yes" Value="グループがすでに存在するため、作成できませんでした。  ([2]   [3]   [4]   [5])" />
+
   <String Id="msierrSMBFailedCreate" Overridable="yes" Value="ネットワーク共有の作成に失敗しました。  ([2]   [3]   [4]   [5])" />
   <String Id="msierrSMBFailedDrop" Overridable="yes" Value="ネットワーク共有の削除に失敗しました。  ([2]   [3]   [4]   [5])" />
 

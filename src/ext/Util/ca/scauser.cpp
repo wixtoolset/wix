@@ -5,9 +5,6 @@
 LPCWSTR vcsUserQuery = L"SELECT `User`, `Component_`, `Name`, `Domain`, `Comment`, `Password` FROM `Wix4User` WHERE `User`=?";
 enum eUserQuery { vuqUser = 1, vuqComponent, vuqName, vuqDomain, vuqComment, vuqPassword };
 
-LPCWSTR vcsGroupQuery = L"SELECT `Group`, `Component_`, `Name`, `Domain` FROM `Wix4Group` WHERE `Group`=?";
-enum eGroupQuery { vgqGroup = 1, vgqComponent, vgqName, vgqDomain };
-
 LPCWSTR vcsUserGroupQuery = L"SELECT `User_`, `Group_` FROM `Wix4UserGroup` WHERE `User_`=?";
 enum eUserGroupQuery { vugqUser = 1, vugqGroup };
 
@@ -185,71 +182,6 @@ LExit:
     return hr;
 }
 
-
-HRESULT __stdcall ScaGetGroup(
-    __in LPCWSTR wzGroup,
-    __out SCA_GROUP* pscag
-    )
-{
-    if (!wzGroup || !pscag)
-    {
-        return E_INVALIDARG;
-    }
-
-    HRESULT hr = S_OK;
-    PMSIHANDLE hView, hRec;
-
-    LPWSTR pwzData = NULL;
-
-    hRec = ::MsiCreateRecord(1);
-    hr = WcaSetRecordString(hRec, 1, wzGroup);
-    ExitOnFailure(hr, "Failed to look up Group");
-
-    hr = WcaOpenView(vcsGroupQuery, &hView);
-    ExitOnFailure(hr, "Failed to open view on Wix4Group table");
-    hr = WcaExecuteView(hView, hRec);
-    ExitOnFailure(hr, "Failed to execute view on Wix4Group table");
-
-    hr = WcaFetchSingleRecord(hView, &hRec);
-    if (S_OK == hr)
-    {
-        hr = WcaGetRecordString(hRec, vgqGroup, &pwzData);
-        ExitOnFailure(hr, "Failed to get Wix4Group.Group.");
-        hr = ::StringCchCopyW(pscag->wzKey, countof(pscag->wzKey), pwzData);
-        ExitOnFailure(hr, "Failed to copy Wix4Group.Group.");
-
-        hr = WcaGetRecordString(hRec, vgqComponent, &pwzData);
-        ExitOnFailure(hr, "Failed to get Wix4Group.Component_");
-        hr = ::StringCchCopyW(pscag->wzComponent, countof(pscag->wzComponent), pwzData);
-        ExitOnFailure(hr, "Failed to copy Wix4Group.Component_.");
-
-        hr = WcaGetRecordFormattedString(hRec, vgqName, &pwzData);
-        ExitOnFailure(hr, "Failed to get Wix4Group.Name");
-        hr = ::StringCchCopyW(pscag->wzName, countof(pscag->wzName), pwzData);
-        ExitOnFailure(hr, "Failed to copy Wix4Group.Name.");
-
-        hr = WcaGetRecordFormattedString(hRec, vgqDomain, &pwzData);
-        ExitOnFailure(hr, "Failed to get Wix4Group.Domain");
-        hr = ::StringCchCopyW(pscag->wzDomain, countof(pscag->wzDomain), pwzData);
-        ExitOnFailure(hr, "Failed to copy Wix4Group.Domain.");
-    }
-    else if (E_NOMOREITEMS == hr)
-    {
-        WcaLog(LOGMSG_STANDARD, "Error: Cannot locate Wix4Group.Group='%ls'", wzGroup);
-        hr = E_FAIL;
-    }
-    else
-    {
-        ExitOnFailure(hr, "Error or found multiple matching Wix4Group rows");
-    }
-
-LExit:
-    ReleaseStr(pwzData);
-
-    return hr;
-}
-
-
 void ScaUserFreeList(
     __in SCA_USER* psuList
     )
@@ -262,21 +194,6 @@ void ScaUserFreeList(
 
         ScaGroupFreeList(psuDelete->psgGroups);
         MemFree(psuDelete);
-    }
-}
-
-
-void ScaGroupFreeList(
-    __in SCA_GROUP* psgList
-    )
-{
-    SCA_GROUP* psgDelete = psgList;
-    while (psgList)
-    {
-        psgDelete = psgList;
-        psgList = psgList->psgNext;
-
-        MemFree(psgDelete);
     }
 }
 

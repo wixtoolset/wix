@@ -43,6 +43,9 @@ EXPORTS
     UnregisterPerfmon
     CreateSmb
     DropSmb
+    CreateGroup
+    CreateGroupRollback
+    RemoveGroup
     CreateUser
     CreateUserRollback
     RemoveUser
@@ -51,6 +54,7 @@ EXPORTS
     ConfigurePerfmonUninstall
     ConfigureSmbInstall
     ConfigureSmbUninstall
+    ConfigureGroups
     ConfigureUsers
     InstallPerfCounterData
     UninstallPerfCounterData
