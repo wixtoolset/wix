@@ -5,6 +5,7 @@
     <String Id="msierrUSRFailedUserCreate" Overridable="yes" Value="De gebruiker kon niet worden aangemaakt.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes" Value="De gebruiker kon niet worden aangemaakt vanwege een ongeldig wachtwoord.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="De gebruikersgroep kon niet worden toegevoegd.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrUSRFailedGrantLogonAsService" Overridable="yes" Value="De gebruiker kon niet worden rechten verlenen 'aanmelden als service'.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="De gebruiker kon niet worden aangemaakt omdat hij al bestond.  ([2]   [3]   [4]   [5])" />
 
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Netwerk delen kon niet worden aangemaakt.  ([2]   [3]   [4]   [5])" />

@@ -4,6 +4,7 @@
   <String Id="msierrUSRFailedUserCreate" Overridable="yes" Value="La creación del usuario ha fracasado. ([2] [3] [4] [5])" />
   <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes" Value="La creación del usuario ha fracasado porque la contraseña es incorrecta. ([2] [3] [4] [5])" />
   <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="El aditamento del usuario al grupo ha fracasado. ([2] [3] [4] [5])" />
+  <String Id="msierrUSRFailedGrantLogonAsService" Overridable="yes" Value="No se pudieron otorgar derechos de 'iniciar sesión como servicio' al usuario. ([2] [3] [4] [5])" />
   <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="La creación del usuario ha fracasado porque ya existe. ([2] [3] [4] [5])" />
 
   <String Id="msierrSMBFailedCreate" Overridable="yes" Value="La creación de la red compartida ha fracasado. ([2] [3] [4] [5])" />
