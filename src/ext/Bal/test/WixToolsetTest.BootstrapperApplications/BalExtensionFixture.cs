@@ -3,10 +3,9 @@
 namespace WixToolsetTest.BootstrapperApplications
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Xml;
-    using WixToolset.BootstrapperApplications;
     using WixInternal.Core.TestPackage;
     using WixInternal.TestSupport;
     using Xunit;
@@ -48,6 +47,47 @@ namespace WixToolsetTest.BootstrapperApplications
                 }, balPackageInfos);
 
                 Assert.True(File.Exists(Path.Combine(baFolderPath, "thm.wxl")));
+            }
+        }
+
+        [Fact]
+        public void CanBuildUsingBootstrapperApplicationId()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get("TestData", "WixStdBa");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "BootstrapperApplicationId.wxs"),
+                    "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindpath", Path.Combine(bundleSourceFolder, "data"),
+                    "-o", bundleFile,
+                });
+                compileResult.AssertSuccess();
+
+                Assert.True(File.Exists(bundleFile));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var ignoreAttributesByElementName = new Dictionary<string, List<string>>
+                {
+                    { "Payload", new List<string> { "SourcePath" } },
+                };
+
+                var wixStdBaPayloadInfo = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:UX/burn:Payload[@FilePath='wixstdba.exe']", ignoreAttributesByElementName);
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    $@"<Payload Id='WixStandardBootstrapperApplication_X86' FilePath='wixstdba.exe' SourcePath='*' />"
+                }, wixStdBaPayloadInfo);
             }
         }
 

@@ -168,11 +168,11 @@ namespace WixToolset.Core.Burn.Bundles
                 // write the UX element
                 writer.WriteStartElement("UX");
 
-                writer.WriteAttributeString("PrimaryPayloadId", this.PrimaryBundleApplicationSymbol.Id.Id);
+                writer.WriteAttributeString("PrimaryPayloadId", this.PrimaryBundleApplicationSymbol.ExePayloadRef);
 
-                if (!String.IsNullOrEmpty(this.SecondaryBundleApplicationSymbol?.Id.Id))
+                if (!String.IsNullOrEmpty(this.SecondaryBundleApplicationSymbol?.ExePayloadRef))
                 {
-                    writer.WriteAttributeString("SecondaryPayloadId", this.SecondaryBundleApplicationSymbol.Id.Id);
+                    writer.WriteAttributeString("SecondaryPayloadId", this.SecondaryBundleApplicationSymbol.ExePayloadRef);
                 }
 
                 // write the UX allPayloads...
