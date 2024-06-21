@@ -45,4 +45,4 @@ dotnet help
 
 @popd
 cd c:\build
-start cmd
+start cmd /c C:\sandbox\runtest_menu.bat
