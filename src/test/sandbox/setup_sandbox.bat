@@ -24,10 +24,13 @@ if "!VsInstallDir!"=="" (
 	  set VsInstallDir=%%i
 	)
 )
-if "!VsInstallDir!"=="" (
-	set /P "Confirm=Have found VisualStudio Debugger at '%VsInstallDir%', Do you wish to copy it for use by the Sandbox? (Y / N):"
-	if "%Confirm%"=="Y" (
-		XCOPY "%VsInstallDir%\Common7\IDE\Remote Debugger\*" ".\Debugger\" /E
+if not "!VsInstallDir!"=="" (
+	echo.
+	echo Have found VisualStudio Debugger at '%VsInstallDir%'
+	set /P "Confirm=Do you wish to copy it for use by the Sandbox? (Y / N):"
+	echo Confirm = %Confirm%
+	@if "%Confirm%"=="Y" or "%Confirm%"="y" (
+		XCOPY "%VsInstallDir%\Common7\IDE\Remote Debugger\*" ".\Debugger\" /E /Y
 	)
 )
 
