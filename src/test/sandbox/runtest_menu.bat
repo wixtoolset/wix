@@ -16,6 +16,9 @@ for /f "tokens=2 delims=[]" %%a in ('ping -n 1 -4 ""') do set IPAddr=%%a
 		set "MsVsMonPath=C:\sandbox\Debugger\x64\msvsmon.exe /noauth /anyuser /nosecuritywarn"
 	)
 )
+FOR /F "tokens=* USEBACKQ" %%F IN (`powershell -Command "[System.Net.Dns]::GetHostEntry('localhost').HostName"`) DO (
+SET "Hostname=%%F"
+)
 
 :TestSelect
 cls
@@ -24,7 +27,7 @@ REM Show the test select menu
 REM We start with an entry for the Debugger if available
 set index=0
 if not "%MsVsMonPath%"=="" (
-	echo [!index!] Run Remote Debugger [SandboxIP=%IPAddr%]
+	echo [!index!] Run Remote Debugger [IP=%IPAddr%] [Hostname=%Hostname%]
 	set "option[!index!]=%MsVsMonPath%"
 )
 
