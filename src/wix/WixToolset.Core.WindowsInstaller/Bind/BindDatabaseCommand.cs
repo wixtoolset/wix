@@ -50,6 +50,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.PatchSubStorages = patchSubStorages;
 
             this.BackendExtensions = backendExtension;
+            this.NormalizeVersion = context.NormalizeVersion;
         }
 
         private IServiceProvider ServiceProvider { get; }
@@ -112,6 +113,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var packageSymbol = (section.Type == SectionType.Package) ? this.GetSingleSymbol<WixPackageSymbol>(section) : null;
             var moduleSymbol = (section.Type == SectionType.Module) ? this.GetSingleSymbol<WixModuleSymbol>(section) : null;
             var patchSymbol = (section.Type == SectionType.Patch) ? this.GetSingleSymbol<WixPatchSymbol>(section) : null;
+            bool normalizeVersion = NormalizeVersion;
 
             var fileTransfers = new List<IFileTransfer>();
             var trackedFiles = new List<ITrackedFile>();
@@ -129,7 +131,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (section.Type == SectionType.Package)
             {
-                this.ProcessProductVersion(packageSymbol, section, validate: false);
+                this.ProcessProductVersion(packageSymbol, section, validate: false, normalizeWixVersion: normalizeVersion);
             }
 
             // Calculate codepage
@@ -295,7 +297,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // which will short circuit duplicate errors later if the ProductVersion is invalid.
             if (SectionType.Package == section.Type)
             {
-                this.ProcessProductVersion(packageSymbol, section, validate: true);
+                this.ProcessProductVersion(packageSymbol, section, validate: true, normalizeWixVersion: normalizeVersion);
             }
 
             // If there are any backend extensions, give them the opportunity to process
@@ -522,11 +524,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return result;
         }
 
-        private void ProcessProductVersion(WixPackageSymbol packageSymbol, IntermediateSection section, bool validate)
+        public bool NormalizeVersion { get; }
+
+        private void ProcessProductVersion(WixPackageSymbol packageSymbol, IntermediateSection section, bool validate, bool normalizeWixVersion = false)
         {
             if (this.WindowsInstallerBackendHelper.TryParseMsiProductVersion(packageSymbol.Version, strict: false, out var version))
             {
-                if (packageSymbol.Version != version)
+                if (normalizeWixVersion && packageSymbol.Version != version)
                 {
                     packageSymbol.Version = version;
 

@@ -103,6 +103,11 @@ namespace WixToolset.Extensibility.Data
         bool SuppressLayout { get; set; }
 
         /// <summary>
+        /// Convert e.g. 1.1.0001.002 version to 1.1.1.2
+        /// </summary>
+        bool NormalizeVersion { get; set; }
+
+        /// <summary>
         /// Cancellation token.
         /// </summary>
         CancellationToken CancellationToken { get; set; }

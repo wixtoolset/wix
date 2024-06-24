@@ -56,6 +56,9 @@ namespace WixToolset.Core
 
         public bool SuppressLayout { get; set; }
 
+        /// <summary>Convert e.g. 1.1.0001.002 version to 1.1.1.2</summary>
+        public bool NormalizeVersion { get; set; }
+
         public CancellationToken CancellationToken { get; set; }
     }
 }

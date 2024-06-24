@@ -98,6 +98,8 @@ namespace WixToolset.Core.CommandLine
 
             this.OutputPath = inputsOutputs.OutputPath;
 
+            var normalizeVersion = this.commandLine.NormalizeVersion;
+
             if (this.Messaging.EncounteredError)
             {
                 return Task.FromResult(this.Messaging.LastErrorNumber);
@@ -149,7 +151,7 @@ namespace WixToolset.Core.CommandLine
                         {
                             using (new IntermediateFieldContext("wix.bind"))
                             {
-                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.CabbingThreadCount, this.commandLine.BindPaths, this.commandLine.BindVariables, inputsOutputs, cancellationToken);
+                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.CabbingThreadCount, this.commandLine.BindPaths, this.commandLine.BindVariables, inputsOutputs, cancellationToken, normalizeVersion);
                             }
                         }
                     }
@@ -268,7 +270,7 @@ namespace WixToolset.Core.CommandLine
             return linker.Link(context);
         }
 
-        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, int cabbingThreadCount, IReadOnlyCollection<IBindPath> bindPaths, Dictionary<string, string> bindVariables, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
+        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, int cabbingThreadCount, IReadOnlyCollection<IBindPath> bindPaths, Dictionary<string, string> bindVariables, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken, bool normalizeVersion)
         {
             IResolveResult resolveResult;
             {
@@ -315,6 +317,7 @@ namespace WixToolset.Core.CommandLine
                     context.PdbType = inputsOutputs.PdbType;
                     context.PdbPath = inputsOutputs.PdbPath;
                     context.CancellationToken = cancellationToken;
+                    context.NormalizeVersion = normalizeVersion;
 
                     if (context is BindContext bindContext)
                     {
@@ -512,6 +515,8 @@ namespace WixToolset.Core.CommandLine
 
             public bool ResetAcls { get; set; }
 
+            public bool NormalizeVersion { get; set; }
+
             public CommandLine(IServiceProvider serviceProvider, IMessaging messaging)
             {
                 this.ServiceProvider = serviceProvider;
@@ -704,6 +709,9 @@ namespace WixToolset.Core.CommandLine
 
                         case "resetacls":
                             this.ResetAcls = true;
+                            return true;
+                        case "normalizeversion":
+                            this.NormalizeVersion = true;
                             return true;
                     }
 
