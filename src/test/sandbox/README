@@ -1,0 +1,2 @@
+1. Run setup_sandbox.bat from the Host, pick whether you want to use the EXE or the ZIP to install Dotnet.  The chosen option will be automatically downloaded.
+2. Once you have built Wix Toolset and wish to perform integration testing, you can just launch the Sandbox by double-clicking (or executing) TestSandbox.wsb
