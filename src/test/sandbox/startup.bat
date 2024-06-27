@@ -12,44 +12,45 @@ goto ERROR_NO_CONFIG
 
 :ZIP
 mkdir "%ProgramFiles%\dotnet"
-if exist %SANDBOX_FILES%\dotnet-sdk.zip (
-	tar -oxzf "%SANDBOX_FILES%\dotnet-sdk.zip" -C "%ProgramFiles%\dotnet"
+if exist %SANDBOX_FILES%\assets\dotnet-sdk-64.zip (
+	tar -oxzf "%SANDBOX_FILES%\assets\dotnet-sdk-64.zip" -C "%ProgramFiles%\dotnet"
 ) else (
-	if %PROCESSOR_ARCHITECTURE%=="ARM64" (
-		curl -L https://aka.ms/dotnet/%DOTNET_VERSION%/dotnet-sdk-win-arm64.zip --output dotnet-sdk.zip
-	) else (
-		curl -L https://aka.ms/dotnet/%DOTNET_VERSION%/dotnet-sdk-win-x64.zip --output dotnet-sdk.zip
-	)
-	if %errorlevel% NEQ 0 (
-		echo "No pre-provided dotnet sdk, and failed to download.  Confirm networking is available."
-		goto ERROR_NO_DOTNET
-	)
-	tar -oxzf dotnet-sdk.zip -C "%ProgramFiles%\dotnet"
-	del dotnet-sdk.zip
+	goto ERROR_NO_DOTNET
+)
+if exist %SANDBOX_FILES%\assets\windowsdesktop-runtime-64.zip (
+	tar -oxzf "%SANDBOX_FILES%\assets\windowsdesktop-runtime-64.zip" -C "%ProgramFiles%\dotnet"
+) else (
+	goto ERROR_NO_DOTNET
+)
+if exist %SANDBOX_FILES%\assets\dotnet-runtime-x86.zip (
+	mkdir "%ProgramFiles(x86)%\dotnet"
+	tar -oxzf "%SANDBOX_FILES%\assets\dotnet-runtime-x86.zip" -C "%ProgramFiles(x86)%\dotnet"
+)
+if exist %SANDBOX_FILES%\assets\windowsdesktop-runtime-x86.zip (
+	tar -oxzf "%SANDBOX_FILES%\assets\windowsdesktop-runtime-x86.zip" -C "%ProgramFiles(x86)%\dotnet"
 )
 goto PROCEED
 
 :EXE
-if exist %SANDBOX_FILES%\dotnet-sdk.exe (
-	"%SANDBOX_FILES%\dotnet-sdk.exe" /install /quiet /norestart
+if exist %SANDBOX_FILES%\assets\dotnet-sdk-64.exe (
+	"%SANDBOX_FILES%\assets\dotnet-sdk-64.exe" /install /quiet /norestart
 ) else (
-	if %PROCESSOR_ARCHITECTURE%=="ARM64" (
-		curl -L https://aka.ms/dotnet/%DOTNET_VERSION%/dotnet-sdk-win-arm64.exe --output dotnet-sdk.exe
-	) else (
-		curl -L https://aka.ms/dotnet/%DOTNET_VERSION%/dotnet-sdk-win-x64.exe --output dotnet-sdk.exe
-	)
-	if %errorlevel% NEQ 0 (
-		echo "No pre-provided dotnet sdk, and failed to download.  Confirm networking is available."
-		goto ERROR_NO_DOTNET
-	)
-	dotnet-sdk.exe /install /quiet /norestart
+	goto ERROR_NO_DOTNET
+)
+if exist %SANDBOX_FILES%\assets\windowsdesktop-runtime-64.exe (
+	"%SANDBOX_FILES%\assets\windowsdesktop-runtime-64.exe" /install /quiet /norestart
+) else (
+	goto ERROR_NO_DOTNET
+)
+if exist %SANDBOX_FILES%\assets\windowsdesktop-runtime-x86.exe (
+	"%SANDBOX_FILES%\assets\windowsdesktop-runtime-x86.exe" /install /quiet /norestart
 )
 goto PROCEED
 
 :PROCEED
 endlocal
-SETX PATH "%PATH%;%ProgramFiles%\dotnet" /M
-SET PATH=%PATH%;%ProgramFiles%\dotnet
+SETX PATH "%PATH%;%ProgramFiles%\dotnet;%ProgramFiles(x86)%\dotnet" /M
+SET PATH=%PATH%;%ProgramFiles%\dotnet;%ProgramFiles(x86)%\dotnet
 
 dotnet nuget locals all --clear
 dotnet help
@@ -65,6 +66,6 @@ goto END
 
 
 :ERROR_NO_DOTNET
-start "ERROR" CMD /c echo ERROR: Failed to find dotnet install, and download failed. Run setup_sandbox.bat again ^& pause
+start "ERROR" CMD /c echo ERROR: Failed to find dotnet install files. Run setup_sandbox.bat again ^& pause
 
 :END

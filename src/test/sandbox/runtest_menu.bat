@@ -8,12 +8,12 @@ REM If we do offer the debugger, we better show the IP address too, since it see
 REM to change for each invocation of the Sandbox environment
 for /f "tokens=2 delims=[]" %%a in ('ping -n 1 -4 ""') do set IPAddr=%%a
 @if %PROCESSOR_ARCHITECTURE%=="ARM64" (
-	@if exist C:\sandbox\Debugger\ARM64\msvsmon.exe (
-		set "MsVsMonPath=C:\sandbox\Debugger\ARM64\msvsmon.exe /noauth /anyuser /nosecuritywarn"
+	@if exist C:\sandbox\assets\Debugger\ARM64\msvsmon.exe (
+		set "MsVsMonPath=C:\sandbox\assets\Debugger\ARM64\msvsmon.exe /noauth /anyuser /nosecuritywarn"
 	)
 ) else (
-	@if exist C:\sandbox\Debugger\x64\msvsmon.exe (
-		set "MsVsMonPath=C:\sandbox\Debugger\x64\msvsmon.exe /noauth /anyuser /nosecuritywarn"
+	@if exist C:\sandbox\assets\Debugger\x64\msvsmon.exe (
+		set "MsVsMonPath=C:\sandbox\assets\Debugger\x64\msvsmon.exe /noauth /anyuser /nosecuritywarn"
 	)
 )
 FOR /F "tokens=* USEBACKQ" %%F IN (`powershell -Command "[System.Net.Dns]::GetHostEntry('localhost').HostName"`) DO (
