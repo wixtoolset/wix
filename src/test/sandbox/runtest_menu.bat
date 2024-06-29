@@ -32,7 +32,7 @@ if not "%MsVsMonPath%"=="" (
 )
 
 REM And then for each 'runtests.cmd' file we find
-for /f %%i in ('where /R c:\build runtests.cmd') do (
+for /f %%i in ('where /R C:\build runtests.cmd') do (
   set /A "index+=1"
   echo [!index!] %%i
   set "option[!index!]=%%i!"
