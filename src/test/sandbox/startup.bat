@@ -48,6 +48,7 @@ if exist %SANDBOX_FILES%\assets\windowsdesktop-runtime-x86.exe (
 goto PROCEED
 
 :PROCEED
+regedit /s "%SANDBOX_FILES%\sandbox_registry"
 endlocal
 SETX PATH "%PATH%;%ProgramFiles%\dotnet;%ProgramFiles(x86)%\dotnet" /M
 SET PATH=%PATH%;%ProgramFiles%\dotnet;%ProgramFiles(x86)%\dotnet
