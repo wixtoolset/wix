@@ -1,0 +1,80 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="Component1" />
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <Component Id="Component1" Guid="00030829-0000-0000-C000-000000000046" Directory="INSTALLFOLDER">
+            <util:Group Id="TEST_GROUP00" Name="testName00" Comment="Test Comment 1" FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP01" Name="testName01" Comment="Test Comment 1" FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP02" Name="testName02"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="no"/>
+            <util:Group Id="TEST_GROUP03" Name="testName03"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP04" Name="testName04" Comment="Test Comment 1" FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="yes" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP05" Name="testName05" Comment="Test Comment 1" FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="yes" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP06" Name="testName06"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="yes" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP07" Name="testName07"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="yes" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP08" Name="testName08" Comment="Test Comment 1" FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="no" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP09" Name="testName09" Comment="Test Comment 1" FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="no" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP10" Name="testName10"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="no" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP11" Name="testName11"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="no" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP12" Name="testName12" Comment="Test Comment 1" FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="no" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP13" Name="testName13" Comment="Test Comment 1" FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="no" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP14" Name="testName14"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="no" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP15" Name="testName15"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="no" Vital="yes" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP16" Name="testName16" Comment="Test Comment 1" FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="yes" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP17" Name="testName17" Comment="Test Comment 1" FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="yes" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP18" Name="testName18"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="yes" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP19" Name="testName19"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="yes" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP20" Name="testName20" Comment="Test Comment 1" FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="yes" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP21" Name="testName21" Comment="Test Comment 1" FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="yes" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP22" Name="testName22"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="yes" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP23" Name="testName23"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="yes" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP24" Name="testName24" Comment="Test Comment 1" FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="no" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP25" Name="testName25" Comment="Test Comment 1" FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="no" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP26" Name="testName26"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="no" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP27" Name="testName27"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="no" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP28" Name="testName28" Comment="Test Comment 1" FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="no" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP29" Name="testName29" Comment="Test Comment 1" FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="no" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP30" Name="testName30"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="no" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP31" Name="testName31"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="no" Vital="no" RemoveComment="no" />
+            <util:Group Id="TEST_GROUP32" Name="testName32"                          FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP33" Name="testName33"                          FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP34" Name="testName34"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP35" Name="testName35"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP36" Name="testName36"                          FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="yes" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP37" Name="testName37"                          FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="yes" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP38" Name="testName38"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="yes" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP39" Name="testName39"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="yes" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP40" Name="testName40"                          FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="no" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP41" Name="testName41"                          FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="no" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP42" Name="testName42"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="no" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP43" Name="testName43"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="no" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP44" Name="testName44"                          FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="no" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP45" Name="testName45"                          FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="no" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP46" Name="testName46"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="no" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP47" Name="testName47"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="no" Vital="yes" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP48" Name="testName48"                          FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="yes" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP49" Name="testName49"                          FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="yes" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP50" Name="testName50"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="yes" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP51" Name="testName51"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="yes" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP52" Name="testName52"                          FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="yes" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP53" Name="testName53"                          FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="yes" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP54" Name="testName54"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="yes" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP55" Name="testName55"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="yes" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP56" Name="testName56"                          FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="no" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP57" Name="testName57"                          FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="no" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP58" Name="testName58"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="no" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP59" Name="testName59"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="no" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP60" Name="testName60"                          FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="no" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP61" Name="testName61"                          FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="no" CreateGroup="no" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP62" Name="testName62"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="no" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP63" Name="testName63"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="no" CreateGroup="no" Vital="no" RemoveComment="yes" />
+            <util:Group Id="TEST_GROUP64" Name="testName64" Comment="Test Comment 1" FailIfExists="no" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="no"  Domain="testDomain00" />
+            <util:Group Id="TEST_GROUP65" Name="testName65" Comment="Test Comment 1" FailIfExists="yes" UpdateIfExists="no" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="no"  Domain="testDomain01"  />
+            <util:Group Id="TEST_GROUP66" Name="testName66"                          FailIfExists="no" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="no" Domain="testDomain02"  />
+            <util:Group Id="TEST_GROUP67" Name="testName67"                          FailIfExists="yes" UpdateIfExists="yes" RemoveOnUninstall="yes" CreateGroup="yes" Vital="yes" RemoveComment="no"  Domain="testDomain03"  />
+        </Component>
+    </Fragment>
+</Wix>

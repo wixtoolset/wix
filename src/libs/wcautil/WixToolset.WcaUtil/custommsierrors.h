@@ -87,6 +87,9 @@
 #define msierrUSRFailedUserCreateExists        26404
 #define msierrUSRFailedGrantLogonAsService     26405
 
+#define msierrGRPFailedGroupCreate             26421
+#define msierrGRPFailedGroupCreateExists       26422
+
 #define msierrDependencyMissingDependencies    26451
 #define msierrDependencyHasDependents          26452
 

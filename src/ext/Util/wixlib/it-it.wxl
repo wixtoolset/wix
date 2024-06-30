@@ -7,6 +7,10 @@
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="Impossibile aggiungere l'utente al gruppo.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="Impossibile creare l'utente perchè già esistente.  ([2]   [3]   [4]   [5])" />
 
+    <String Id="msierrGRPFailedGroupCreate" Overridable="yes" Value="Impossibile creare il gruppo.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupGroupAdd" Overridable="yes" Value="Impossibile aggiungere il gruppo al gruppo.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupCreateExists" Overridable="yes" Value="Impossibile creare il gruppo perchè già esistente.  ([2]   [3]   [4]   [5])" />
+
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Impossibile creare la risorsa di rete.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrSMBFailedDrop" Overridable="yes" Value="Impossibile eliminare la risorsa di rete.  ([2]   [3]   [4]   [5])" />
 

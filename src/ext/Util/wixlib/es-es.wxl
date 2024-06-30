@@ -6,6 +6,10 @@
   <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="El aditamento del usuario al grupo ha fracasado. ([2] [3] [4] [5])" />
   <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="La creación del usuario ha fracasado porque ya existe. ([2] [3] [4] [5])" />
 
+  <String Id="msierrGRPFailedGroupCreate" Overridable="yes" Value="La creación del grupo ha fracasado. ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupGroupAdd" Overridable="yes" Value="El aditamento del grupo al grupo ha fracasado. ([2]   [3]   [4]   [5])" />
+  <String Id="msierrGRPFailedGroupCreateExists" Overridable="yes" Value="La creación del grupo ha fracasado porque ya existe. ([2]   [3]   [4]   [5])" />
+
   <String Id="msierrSMBFailedCreate" Overridable="yes" Value="La creación de la red compartida ha fracasado. ([2] [3] [4] [5])" />
   <String Id="msierrSMBFailedDrop" Overridable="yes" Value="La eliminación de la red compartida ha fracasado. ([2] [3] [4] [5])" />
 
