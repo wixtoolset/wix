@@ -1,0 +1,21 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Installer]
+"Logging"="voicewarmupx"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Windows Error Reporting\LocalDumps]
+"DumpFolder"=hex(2):43,00,3a,00,5c,00,62,00,75,00,69,00,6c,00,64,00,5c,00,6c,\
+  00,6f,00,67,00,73,00,5c,00,63,00,72,00,61,00,73,00,68,00,64,00,75,00,6d,00,\
+  70,00,73,00,00,00
+"DumpCount"=dword:0000000a
+"DumpType"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Policies\Microsoft\Windows\Installer]
+"Logging"="voicewarmupx"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\Windows Error Reporting\LocalDumps]
+"DumpFolder"=hex(2):43,00,3a,00,5c,00,62,00,75,00,69,00,6c,00,64,00,5c,00,6c,\
+  00,6f,00,67,00,73,00,5c,00,63,00,72,00,61,00,73,00,68,00,64,00,75,00,6d,00,\
+  70,00,73,00,00,00
+"DumpCount"=dword:0000000a
+"DumpType"=dword:00000001
