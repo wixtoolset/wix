@@ -43,13 +43,13 @@ namespace WixTestTools
         /// <param name="userName"></param>
         /// <param name="password"></param>
         /// <remarks>Has to be run as an Admin</remarks>
-        public static void CreateLocalUser(string userName, string password)
+        public static void CreateLocalUser(string userName, string password, string comment = "")
         {
             DeleteLocalUser(userName);
             UserPrincipal newUser = new UserPrincipal(new PrincipalContext(ContextType.Machine));
             newUser.SetPassword(password);
             newUser.Name = userName;
-            newUser.Description = String.Empty;
+            newUser.Description = comment;
             newUser.UserCannotChangePassword = true;
             newUser.PasswordNeverExpires = false;
             newUser.Save();
