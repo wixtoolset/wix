@@ -48,7 +48,8 @@ namespace WixToolsetTest.MsiE2E
         [RuntimeFact]
         public void CanRollbackUsers()
         {
-            UserVerifier.CreateLocalUser("testName3", "test123!@#");
+            UserVerifier.CreateLocalUser("testName3", "test123!@#", "User3 comment");
+            UserVerifier.AddUserToGroup("testName3", "Backup Operators");
             var productFail = this.CreatePackageInstaller("ProductFail");
 
             // make sure the user accounts are deleted before we start
@@ -63,6 +64,10 @@ namespace WixToolsetTest.MsiE2E
 
             // Verify that user added to power users group is removed from power users group on rollback.
             UserVerifier.VerifyUserIsNotMemberOf("", "testName3", "Power Users");
+            // but is not removed from Backup Operators
+            UserVerifier.VerifyUserIsMemberOf(string.Empty, "testName3", "Backup Operators");
+            // and has their original comment set back
+            UserVerifier.VerifyUserComment(string.Empty, "testName3", "User3 comment");
 
             // clean up
             UserVerifier.DeleteLocalUser("testName1");
@@ -71,7 +76,7 @@ namespace WixToolsetTest.MsiE2E
         }
 
 
-        // Verify that command-line parameters aer not blocked by repair switches.
+        // Verify that command-line parameters are not blocked by repair switches.
         // Original code signalled repair mode by using "-f ", which silently
         // terminated the command-line parsing, ignoring any parameters that followed.
         [RuntimeFact()]

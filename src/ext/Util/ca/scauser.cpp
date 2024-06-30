@@ -520,10 +520,6 @@ HRESULT ScaUserExecute(
         // Check to see if the user already exists since we have to be very careful when adding
         // and removing users.  Note: MSDN says that it is safe to call these APIs from any
         // user, so we should be safe calling it during immediate mode.
-        er = ::NetApiBufferAllocate(sizeof(USER_INFO_0), reinterpret_cast<LPVOID*>(&pUserInfo));
-        hr = HRESULT_FROM_WIN32(er);
-        ExitOnFailure(hr, "Failed to allocate memory to check existence of user: %ls", psu->wzName);
-
         LPCWSTR wzDomain = psu->wzDomain;
         if (wzDomain && *wzDomain)
         {
@@ -547,7 +543,7 @@ HRESULT ScaUserExecute(
             }
         }
 
-        er = ::NetUserGetInfo(wzDomain, psu->wzName, 0, reinterpret_cast<LPBYTE*>(pUserInfo));
+        er = ::NetUserGetInfo(wzDomain, psu->wzName, 0, reinterpret_cast<LPBYTE*>(&pUserInfo));
         if (NERR_Success == er)
         {
             ueUserExists = USER_EXISTS_YES;
