@@ -409,3 +409,6 @@ src/test/burn/TestData/Manual/BundleB/PackagePayloads
 # Allow the projects that end in ".Cab"
 !src/dtf/test/WixToolset.Dtf.Compression.Cab
 !src/dtf/test/WixToolsetTests.Dtf.Compression.Cab
+
+#ignore the Sandbox
+src/test/sandbox/
