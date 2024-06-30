@@ -1948,10 +1948,10 @@ namespace WixToolset.Core
                         signature = this.ParseComponentSearchElement(child);
                         break;
                     case "DirectorySearch":
-                        signature = this.ParseDirectorySearchElement(child, String.Empty);
+                        signature = this.ParseDirectorySearchElement(child, null);
                         break;
                     case "DirectorySearchRef":
-                        signature = this.ParseDirectorySearchRefElement(child, String.Empty);
+                        signature = this.ParseDirectorySearchRefElement(child, null);
                         break;
                     case "IniFileSearch":
                         signature = this.ParseIniFileSearchElement(child);

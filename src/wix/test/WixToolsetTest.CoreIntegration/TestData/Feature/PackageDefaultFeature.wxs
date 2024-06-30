@@ -47,4 +47,10 @@
             <File Name="test4.txt" Source="test.txt" />
         </Component>
     </Fragment>
+
+    <Fragment>
+        <Component Id="UnreferencedComponentInAFragment" Directory="INSTALLFOLDER">
+            <File Name="test5.txt" Source="test.txt" />
+        </Component>
+    </Fragment>
 </Wix>

@@ -138,15 +138,8 @@ namespace WixToolset.Core
                     command.Execute();
                 }
 
-                // If there are no authored features, create a default feature and assign
-                // the components to it.
-                {
-                    var command = new AssignDefaultFeatureCommand(find, sections);
-                    command.Execute();
-                }
-
                 // Resolve the symbol references to find the set of sections we care about for linking.
-                // Of course, we start with the entry section (that's how it got its name after all).
+                // Of course, we start with the entry section (that's how it got its name, after all).
                 var resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.SymbolsByName);
                 resolve.Execute();
 
@@ -154,6 +147,17 @@ namespace WixToolset.Core
                 {
                     return null;
                 }
+
+                // If there are no authored features, assign the referenced components to
+                // the StdLib default feature, then re-run resolve to pick up the default
+                // feature from the StdLib.
+                {
+                    var command = new AssignDefaultFeatureCommand(find, resolve.ResolvedSections);
+                    command.Execute();
+                }
+
+                resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.SymbolsByName);
+                resolve.Execute();
 
                 // Reset the sections to only those that were resolved then flatten the complex
                 // references that particpate in groups.

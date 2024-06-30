@@ -10,7 +10,7 @@ namespace WixToolset.Core
 
     internal class AssignDefaultFeatureCommand
     {
-        public AssignDefaultFeatureCommand(FindEntrySectionAndLoadSymbolsCommand find, List<IntermediateSection> sections)
+        public AssignDefaultFeatureCommand(FindEntrySectionAndLoadSymbolsCommand find, IEnumerable<IntermediateSection> sections)
         {
             this.Find = find;
             this.Sections = sections;
