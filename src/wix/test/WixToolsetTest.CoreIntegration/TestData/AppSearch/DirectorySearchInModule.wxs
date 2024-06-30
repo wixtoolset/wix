@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Module Id="DirectorySearchModule" Language="1033" Version="1.0.0.0"
+              Guid="{7361203A-597E-4DA2-9024-27246B8446B2}">
+        <Property Id="SYSTEM32FOLDER">
+            <DirectorySearch Id="WindowsDrLocator" Path="[WindowsFolder]System32" />
+        </Property>
+    </Module>
+</Wix>
