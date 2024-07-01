@@ -1,0 +1,32 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="ru-ru" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+    <String Id="msierrUSRFailedUserCreate" Overridable="yes" Value="Не удалось создать пользователя.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes" Value="Не удалось создать пользователя из-за неверного пароля.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="Не удалось добавить пользователя в группу. ([2]   [3]   [4]   [5])" />
+    <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="Не удалось создать пользователя, поскольку он уже существует.  ([2]   [3]   [4]   [5])" />
+
+    <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Не удалось создать общий сетевой ресурс.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrSMBFailedDrop" Overridable="yes" Value="Не удалось удалить общий сетевой ресурс.  ([2]   [3]   [4]   [5])" />
+
+    <String Id="msierrPERFMONFailedRegisterDLL" Overridable="yes" Value="Не удалось зарегестрировать DLL с помощью PerfMon.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrPERFMONFailedUnregisterDLL" Overridable="yes" Value="Не удалось отменить регистрацию DLL с помощью PerfMon.  ([2]   [3]   [4]   [5])" />
+
+    <String Id="msierrInstallPerfCounterData" Overridable="yes" Value="Не удалось установить счетчики производительности.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrUninstallPerfCounterData" Overridable="yes" Value="Не удалось удалить счетчики производительности.  ([2]   [3]   [4]   [5])" />
+
+    <String Id="msierrSecureObjectsFailedCreateSD" Overridable="yes" Value="Не удалось создать дескриптор безопасности для [3]\[4], системная ошибка: [2]" />
+    <String Id="msierrSecureObjectsFailedSet" Overridable="yes" Value="Не удалось установить дескриптор безопасности для объекта [3], системная ошибка: [2]" />
+    <String Id="msierrSecureObjectsUnknownType" Overridable="yes" Value="Неизвестный тип объекта [3], системная ошибка: [2]" />
+
+    <String Id="msierrXmlFileFailedRead" Overridable="yes" Value="При настройке XML файлов произошел сбой." />
+    <String Id="msierrXmlFileFailedOpen" Overridable="yes" Value="Не удалось открыть XML файл. [3], системная ошибка: [2]" />
+    <String Id="msierrXmlFileFailedSelect" Overridable="yes" Value="Не удалось найти узел(node): [3] в XML файле: [4], системная ошибка: [2]" />
+    <String Id="msierrXmlFileFailedSave" Overridable="yes" Value="Не удалось сохранить изменения в XML файле [3], системная ошибка: [2]" />
+
+    <String Id="msierrXmlConfigFailedRead" Overridable="yes" Value="При настройке XML файлов произошел сбой." />
+    <String Id="msierrXmlConfigFailedOpen" Overridable="yes" Value="Не удалось открыть XML файл. [3], системная ошибка: [2]" />
+    <String Id="msierrXmlConfigFailedSelect" Overridable="yes" Value="Не удалось найти узел(node): [3] в XML файле: [4], системная ошибка: [2]" />
+    <String Id="msierrXmlConfigFailedSave" Overridable="yes" Value="Не удалось сохранить изменения в XML файле [3], системная ошибка: [2]" />
+</WixLocalization>
