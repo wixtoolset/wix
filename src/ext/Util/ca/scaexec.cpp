@@ -291,146 +291,6 @@ LExit:
     return hr;
 }
 
-static HRESULT AddGroupToGroup(
-    __in LPWSTR wzMember,
-    __in LPCWSTR wzMemberDomain,
-    __in LPCWSTR wzGroup,
-    __in LPCWSTR wzGroupDomain
-)
-{
-    Assert(wzMember && *wzMember && wzMemberDomain && wzGroup && *wzGroup && wzGroupDomain);
-
-    HRESULT hr = S_OK;
-    IADsGroup* pGroup = NULL;
-    BSTR bstrMember = NULL;
-    BSTR bstrGroup = NULL;
-    LPWSTR pwzMember = NULL;
-    LPWSTR pwzServerName = NULL;
-    LOCALGROUP_MEMBERS_INFO_3 lgmi {};
-
-    GetDomainServerName(wzGroupDomain, &pwzServerName);
-
-    // Try adding it to the local group
-    if (wzMemberDomain)
-    {
-        hr = StrAllocFormatted(&pwzMember, L"%s\\%s", wzMemberDomain, wzMember);
-        ExitOnFailure(hr, "failed to allocate group domain string");
-    }
-
-    lgmi.lgrmi3_domainandname = (NULL == pwzMember ? wzMember : pwzMember);
-    NET_API_STATUS ui = ::NetLocalGroupAddMembers(pwzServerName, wzGroup, 3, reinterpret_cast<LPBYTE>(&lgmi), 1);
-    hr = HRESULT_FROM_WIN32(ui);
-    if (HRESULT_FROM_WIN32(ERROR_MEMBER_IN_ALIAS) == hr) // if they're already a member of the group don't report an error
-    {
-        hr = S_OK;
-    }
-
-    //
-    // If we failed, try active directory
-    //
-    if (FAILED(hr))
-    {
-        WcaLog(LOGMSG_VERBOSE, "Failed to add group: %ls, domain %ls to group: %ls, domain: %ls with error 0x%x.  Attempting to use Active Directory", wzMember, wzMemberDomain, wzGroup, wzGroupDomain, hr);
-
-        hr = UserCreateADsPath(wzMemberDomain, wzMember, &bstrMember);
-        ExitOnFailure(hr, "failed to create group ADsPath for group: %ls domain: %ls", wzMember, wzMemberDomain);
-
-        hr = UserCreateADsPath(wzGroupDomain, wzGroup, &bstrGroup);
-        ExitOnFailure(hr, "failed to create group ADsPath for group: %ls domain: %ls", wzGroup, wzGroupDomain);
-
-        hr = ::ADsGetObject(bstrGroup, IID_IADsGroup, reinterpret_cast<void**>(&pGroup));
-        ExitOnFailure(hr, "Failed to get group '%ls'.", reinterpret_cast<WCHAR*>(bstrGroup));
-
-        hr = pGroup->Add(bstrMember);
-        if ((HRESULT_FROM_WIN32(ERROR_OBJECT_ALREADY_EXISTS) == hr) || (HRESULT_FROM_WIN32(ERROR_MEMBER_IN_ALIAS) == hr))
-            hr = S_OK;
-
-        ExitOnFailure(hr, "Failed to add group %ls to group '%ls'.", reinterpret_cast<WCHAR*>(bstrMember), reinterpret_cast<WCHAR*>(bstrGroup));
-    }
-
-LExit:
-    ReleaseStr(pwzServerName);
-    ReleaseStr(pwzMember);
-    ReleaseBSTR(bstrMember);
-    ReleaseBSTR(bstrGroup);
-    ReleaseObject(pGroup);
-
-    return hr;
-}
-
-static HRESULT RemoveGroupFromGroup(
-    __in LPWSTR wzMember,
-    __in LPCWSTR wzMemberDomain,
-    __in LPCWSTR wzGroup,
-    __in LPCWSTR wzGroupDomain
-)
-{
-    Assert(wzMember && *wzMember && wzMemberDomain && wzGroup && *wzGroup && wzGroupDomain);
-
-    HRESULT hr = S_OK;
-    IADsGroup* pGroup = NULL;
-    BSTR bstrMember = NULL;
-    BSTR bstrGroup = NULL;
-    LPWSTR pwzMember = NULL;
-    LPWSTR pwzServerName = NULL;
-    LOCALGROUP_MEMBERS_INFO_3 lgmi {};
-
-    GetDomainServerName(wzGroupDomain, &pwzServerName, DS_WRITABLE_REQUIRED);
-
-    // Try removing it from the local group
-    if (wzMemberDomain)
-    {
-        hr = StrAllocFormatted(&pwzMember, L"%s\\%s", wzMemberDomain, wzMember);
-        ExitOnFailure(hr, "failed to allocate group domain string");
-    }
-
-    lgmi.lgrmi3_domainandname = (NULL == pwzMember ? wzMember : pwzMember);
-    NET_API_STATUS ui = ::NetLocalGroupDelMembers(pwzServerName, wzGroup, 3, reinterpret_cast<LPBYTE>(&lgmi), 1);
-    hr = HRESULT_FROM_WIN32(ui);
-    if (HRESULT_FROM_WIN32(ERROR_MEMBER_NOT_IN_ALIAS) == hr
-        || HRESULT_FROM_WIN32(NERR_GroupNotFound) == hr
-        || HRESULT_FROM_WIN32(ERROR_NO_SUCH_MEMBER) == hr) // if they're already not a member of the group, or the group doesn't exist, don't report an error
-    {
-        hr = S_OK;
-    }
-
-    //
-    // If we failed, try active directory
-    //
-    if (FAILED(hr))
-    {
-        WcaLog(LOGMSG_VERBOSE, "Failed to remove group: %ls, domain %ls from group: %ls, domain: %ls with error 0x%x.  Attempting to use Active Directory", wzMember, wzMemberDomain, wzGroup, wzGroupDomain, hr);
-
-        hr = UserCreateADsPath(wzMemberDomain, wzMember, &bstrMember);
-        ExitOnFailure(hr, "failed to create group ADsPath in order to remove group: %ls domain: %ls from a group", wzMember, wzMemberDomain);
-
-        hr = UserCreateADsPath(wzGroupDomain, wzGroup, &bstrGroup);
-        ExitOnFailure(hr, "failed to create group ADsPath in order to remove group from group: %ls domain: %ls", wzGroup, wzGroupDomain);
-
-        hr = ::ADsGetObject(bstrGroup, IID_IADsGroup, reinterpret_cast<void**>(&pGroup));
-        if ((HRESULT_FROM_WIN32(ERROR_FILE_NOT_FOUND) == hr)) // if parent group not found, no need to remove membership from group
-        {
-            hr = S_OK;
-            ExitFunction();
-        }
-        ExitOnFailure(hr, "Failed to get group '%ls'.", reinterpret_cast<WCHAR*>(bstrGroup));
-
-        hr = pGroup->Remove(bstrMember);
-        if ((HRESULT_FROM_WIN32(ERROR_MEMBER_NOT_IN_ALIAS) == hr)) // if already not a member, no need to worry about error
-            hr = S_OK;
-        ExitOnFailure(hr, "Failed to remove group %ls from group '%ls'.", reinterpret_cast<WCHAR*>(bstrMember), reinterpret_cast<WCHAR*>(bstrGroup));
-    }
-
-LExit:
-    ReleaseStr(pwzServerName);
-    ReleaseStr(pwzMember);
-    ReleaseBSTR(bstrMember);
-    ReleaseBSTR(bstrGroup);
-    ReleaseObject(pGroup);
-
-    return hr;
-}
-
 static HRESULT GetUserHasRight(
     __in LSA_HANDLE hPolicy,
     __in PSID pUserSid,
@@ -842,7 +702,6 @@ LExit:
 }
 
 static HRESULT RemoveGroupInternal(
-    LPWSTR wzGroupCaData,
     LPWSTR wzDomain,
     LPWSTR wzName,
     int iAttributes
@@ -850,9 +709,6 @@ static HRESULT RemoveGroupInternal(
 {
     HRESULT hr = S_OK;
 
-    LPWSTR pwz = NULL;
-    LPWSTR pwzGroup = NULL;
-    LPWSTR pwzGroupDomain = NULL;
     LPWSTR pwzServerName = NULL;
 
     //
@@ -871,41 +727,9 @@ static HRESULT RemoveGroupInternal(
         }
         ExitOnFailure(hr, "failed to delete group: %ls", wzName);
     }
-    else
-    {
-        //
-        // Remove the group from other groups
-        //
-        pwz = wzGroupCaData;
-        while (S_OK == (hr = WcaReadStringFromCaData(&pwz, &pwzGroup)))
-        {
-            hr = WcaReadStringFromCaData(&pwz, &pwzGroupDomain);
 
-            if (FAILED(hr))
-            {
-                WcaLogError(hr, "failed to get domain for group: %ls, continuing anyway.", pwzGroup);
-            }
-            else
-            {
-                hr = RemoveGroupFromGroup(wzName, wzDomain, pwzGroup, pwzGroupDomain);
-                if (FAILED(hr))
-                {
-                    WcaLogError(hr, "failed to remove group: %ls from group %ls, continuing anyway.", wzName, pwzGroup);
-                }
-            }
-        }
-
-        if (E_NOMOREITEMS == hr) // if there are no more items, all is well
-        {
-            hr = S_OK;
-        }
-
-        ExitOnFailure(hr, "failed to get next group from which to remove group:%ls", wzName);
-    }
 LExit:
     ReleaseStr(pwzServerName);
-    ReleaseStr(pwzGroup);
-    ReleaseStr(pwzGroupDomain);
 
     return hr;
 }
@@ -1392,6 +1216,7 @@ LExit:
     return WcaFinalize(er);
 }
 
+
 /********************************************************************
  CreateGroup - CUSTOM ACTION ENTRY POINT for creating groups
 
@@ -1412,8 +1237,6 @@ extern "C" UINT __stdcall CreateGroup(
     LPWSTR pwzDomain = NULL;
     LPWSTR pwzComment = NULL;
     LPWSTR pwzScriptKey = NULL;
-    LPWSTR pwzGroup = NULL;
-    LPWSTR pwzGroupDomain = NULL;
     int iAttributes = 0;
     BOOL fInitializedCom = FALSE;
 
@@ -1553,24 +1376,6 @@ extern "C" UINT __stdcall CreateGroup(
             }
         }
         MessageExitOnFailure(hr, msierrGRPFailedGroupCreate, "failed to create group: %ls", pwzName);
-
-        //
-        // Add the groups to groups
-        //
-        while (S_OK == (hr = WcaReadStringFromCaData(&pwz, &pwzGroup)))
-        {
-            hr = WcaReadStringFromCaData(&pwz, &pwzGroupDomain);
-            ExitOnFailure(hr, "failed to get domain for group: %ls", pwzGroup);
-
-            WcaLog(LOGMSG_STANDARD, "Adding group %ls\\%ls to group %ls\\%ls", pwzDomain, pwzName, pwzGroupDomain, pwzGroup);
-            hr = AddGroupToGroup(pwzName, pwzDomain, pwzGroup, pwzGroupDomain);
-            MessageExitOnFailure(hr, msierrUSRFailedUserGroupAdd, "failed to add group: %ls to group %ls", pwzName, pwzGroup);
-        }
-        if (E_NOMOREITEMS == hr) // if there are no more items, all is well
-        {
-            hr = S_OK;
-        }
-        ExitOnFailure(hr, "failed to get next group in which to include group: %ls", pwzName);
     }
 
 LExit:
@@ -1586,8 +1391,6 @@ LExit:
     ReleaseStr(pwzDomain);
     ReleaseStr(pwzComment);
     ReleaseStr(pwzScriptKey);
-    ReleaseStr(pwzGroup);
-    ReleaseStr(pwzGroupDomain);
 
     if (fInitializedCom)
     {
@@ -1704,7 +1507,7 @@ extern "C" UINT __stdcall CreateGroupRollback(
         }
     }
 
-    hr = RemoveGroupInternal(pwz, pwzDomain, pwzName, iAttributes);
+    hr = RemoveGroupInternal(pwzDomain, pwzName, iAttributes);
 
 LExit:
     WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_DELETE);
@@ -1781,7 +1584,7 @@ extern "C" UINT __stdcall RemoveGroup(
     hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
     ExitOnFailure(hr, "failed to read attributes from custom action data");
 
-    hr = RemoveGroupInternal(pwz, pwzDomain, pwzName, iAttributes);
+    hr = RemoveGroupInternal(pwzDomain, pwzName, iAttributes);
 
 LExit:
     ReleaseStr(pwzData);
@@ -1800,4 +1603,255 @@ LExit:
     }
 
     return WcaFinalize(er);
+}
+
+HRESULT AlterGroupMembership(bool remove, bool isRollback = false)
+{
+    HRESULT hr = S_OK;
+    NET_API_STATUS er = ERROR_SUCCESS;
+
+    LPWSTR pwzData = NULL;
+    LPWSTR pwz = NULL;
+    LPWSTR pwzParentName = NULL;
+    LPWSTR pwzParentDomain = NULL;
+    LPWSTR pwzChildName = NULL;
+    LPWSTR pwzChildDomain = NULL;
+    int iAttributes = 0;
+    LPWSTR pwzChildFullName = NULL;
+    LPWSTR pwzServerName = NULL;
+    LOCALGROUP_MEMBERS_INFO_3 memberInfo3 = {};
+    WCA_CASCRIPT_HANDLE phRollbackScript = NULL;
+
+    if (isRollback)
+    {
+        // Get a CaScript key
+        hr = WcaCaScriptOpen(WCA_ACTION_NONE, WCA_CASCRIPT_ROLLBACK, FALSE, remove ? L"AddGroupMembershipRollback" : L"RemoveGroupMembershipRollback", &phRollbackScript);
+        hr = WcaCaScriptReadAsCustomActionData(phRollbackScript, &pwzData);
+    }
+    else
+    {
+        hr = WcaCaScriptCreate(WCA_ACTION_NONE, WCA_CASCRIPT_ROLLBACK, FALSE, remove ? L"RemoveGroupMembershipRollback" : L"AddGroupMembershipRollback", TRUE, &phRollbackScript);
+        hr = WcaGetProperty(L"CustomActionData", &pwzData);
+    }
+    ExitOnFailure(hr, "failed to get CustomActionData");
+
+    WcaLog(LOGMSG_TRACEONLY, "CustomActionData: %ls", pwzData);
+
+    //
+    // Read in the CustomActionData
+    //
+    pwz = pwzData;
+    hr = WcaReadStringFromCaData(&pwz, &pwzParentName);
+    ExitOnFailure(hr, "failed to read group name from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzParentDomain);
+    ExitOnFailure(hr, "failed to read domain from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzChildName);
+    ExitOnFailure(hr, "failed to read group comment from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzChildDomain);
+    ExitOnFailure(hr, "failed to read group comment from custom action data");
+
+    hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
+    ExitOnFailure(hr, "failed to read attributes from custom action data");
+
+    hr = GetDomainServerName(pwzParentDomain, &pwzServerName, DS_WRITABLE_REQUIRED);
+    ExitOnFailure(hr, "failed to contact domain server %ls", pwzParentDomain);
+
+    if (*pwzChildDomain)
+    {
+        StrAllocFormatted(&pwzChildFullName, L"%ls\\%ls", pwzChildDomain, pwzChildName);
+    }
+    else
+    {
+        StrAllocFormatted(&pwzChildFullName, L"%ls", pwzChildName);
+    }
+    memberInfo3.lgrmi3_domainandname = pwzChildFullName;
+
+    if (remove)
+    {
+        er = ::NetLocalGroupDelMembers(pwzServerName, pwzParentName, 3, (LPBYTE)&memberInfo3, 1);
+    }
+    else
+    {
+        er = ::NetLocalGroupAddMembers(pwzServerName, pwzParentName, 3, (LPBYTE)&memberInfo3, 1);
+    }
+    hr = HRESULT_FROM_WIN32(er);
+
+    if (S_OK == hr && !isRollback)
+    {
+        // we need to log rollback data, we can just use exactly the same data we used to do the initial action though
+        WcaCaScriptWriteString(phRollbackScript, pwzParentName);
+        WcaCaScriptWriteString(phRollbackScript, pwzParentDomain);
+        WcaCaScriptWriteString(phRollbackScript, pwzChildName);
+        WcaCaScriptWriteString(phRollbackScript, pwzChildDomain);
+        WcaCaScriptWriteNumber(phRollbackScript, iAttributes);
+        WcaCaScriptFlush(phRollbackScript);
+        WcaCaScriptClose(phRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
+    }
+
+    if (remove)
+    {
+        if (HRESULT_FROM_WIN32(NERR_GroupNotFound) == hr
+            || HRESULT_FROM_WIN32(ERROR_NO_SUCH_MEMBER) == hr
+            || HRESULT_FROM_WIN32(ERROR_MEMBER_NOT_IN_ALIAS) == hr)
+        {
+            hr = S_OK;
+        }
+    }
+    else
+    {
+        if (HRESULT_FROM_WIN32(ERROR_MEMBER_IN_ALIAS) == hr)
+        {
+            hr = S_OK;
+        }
+    }
+
+LExit:
+    ReleaseStr(pwzData);
+    ReleaseStr(pwzParentName);
+    ReleaseStr(pwzParentDomain);
+    ReleaseStr(pwzChildName);
+    ReleaseStr(pwzChildDomain);
+    ReleaseStr(pwzChildFullName);
+    ReleaseStr(pwzServerName);
+
+    if (SCAG_NON_VITAL & iAttributes)
+    {
+        return S_OK;
+    }
+    return hr;
+}
+
+/********************************************************************
+ AddGroupmembership - CUSTOM ACTION ENTRY POINT for creating groups
+
+  Input:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes
+ * *****************************************************************/
+extern "C" UINT __stdcall AddGroupMembership(
+    __in MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug AddGroupMembership");
+
+    HRESULT hr = S_OK;
+
+    BOOL fInitializedCom = FALSE;
+
+    hr = WcaInitialize(hInstall, "AddGroupMembership");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = AlterGroupMembership(false, false);
+
+LExit:
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+    return WcaFinalize(FAILED(hr) ? ERROR_INSTALL_FAILED : ERROR_SUCCESS);
+}
+
+/********************************************************************
+ AddGroupmembership - CUSTOM ACTION ENTRY POINT for creating groups
+
+  Input:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes
+ * *****************************************************************/
+extern "C" UINT __stdcall AddGroupMembershipRollback(
+    __in MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug AddGroupMembershipRollback");
+
+    HRESULT hr = S_OK;
+
+    BOOL fInitializedCom = FALSE;
+
+    hr = WcaInitialize(hInstall, "AddGroupMembershipRollback");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = AlterGroupMembership(true, true);
+
+LExit:
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+    return WcaFinalize(FAILED(hr) ? ERROR_INSTALL_FAILED : ERROR_SUCCESS);
+}
+
+/********************************************************************
+ RemoveGroupMembership - CUSTOM ACTION ENTRY POINT for creating groups
+
+  Input:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes
+ * *****************************************************************/
+extern "C" UINT __stdcall RemoveGroupMembership(
+    __in MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug RemoveGroupMembership");
+
+    HRESULT hr = S_OK;
+
+    BOOL fInitializedCom = FALSE;
+
+    hr = WcaInitialize(hInstall, "RemoveGroupMembership");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = AlterGroupMembership(true, false);
+
+LExit:
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+    return WcaFinalize(FAILED(hr) ? ERROR_INSTALL_FAILED : ERROR_SUCCESS);
+}
+
+/********************************************************************
+ RemoveGroupMembershipRollback - CUSTOM ACTION ENTRY POINT for creating groups
+
+  Input:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes
+ * *****************************************************************/
+extern "C" UINT __stdcall RemoveGroupMembershipRollback(
+    __in MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug RemoveGroupMembershipRollback");
+
+    HRESULT hr = S_OK;
+
+    BOOL fInitializedCom = FALSE;
+
+    hr = WcaInitialize(hInstall, "RemoveGroupMembershipRollback");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = AlterGroupMembership(false, true);
+
+LExit:
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+    return WcaFinalize(FAILED(hr) ? ERROR_INSTALL_FAILED : ERROR_SUCCESS);
 }

@@ -404,10 +404,10 @@ namespace WixToolsetTest.Util
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:Wix4UtilCA_X64\t[Binary data]",
-                "CustomAction:Wix4ConfigureGroups_X64\t1\tWix4UtilCA_X64\tConfigureGroups\t",
-                "CustomAction:Wix4CreateGroup_X64\t11265\tWix4UtilCA_X64\tCreateGroup\t",
-                "CustomAction:Wix4CreateGroupRollback_X64\t11521\tWix4UtilCA_X64\tCreateGroupRollback\t",
-                "CustomAction:Wix4RemoveGroup_X64\t11841\tWix4UtilCA_X64\tRemoveGroup\t",
+                "CustomAction:Wix6ConfigureGroups_X64\t1\tWix4UtilCA_X64\tConfigureGroups\t",
+                "CustomAction:Wix6CreateGroup_X64\t3073\tWix4UtilCA_X64\tCreateGroup\t",
+                "CustomAction:Wix6CreateGroupRollback_X64\t3329\tWix4UtilCA_X64\tCreateGroupRollback\t",
+                "CustomAction:Wix6RemoveGroup_X64\t3649\tWix4UtilCA_X64\tRemoveGroup\t",
                 "Wix4Group:TEST_GROUP00\tComponent1\ttestName00\t",
                 "Wix4Group:TEST_GROUP01\tComponent1\ttestName01\t",
                 "Wix4Group:TEST_GROUP02\tComponent1\ttestName02\t",

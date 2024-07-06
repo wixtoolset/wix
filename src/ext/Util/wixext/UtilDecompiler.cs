@@ -478,14 +478,26 @@ namespace WixToolset.Util
         {
             foreach (var row in table.Rows)
             {
+                var parentId = row.FieldAsString(0);
+                var parentExists = this.DecompilerHelper.TryGetIndexedElement("Group", parentId, out var parentGroup);
+
                 var childId = row.FieldAsString(1);
-                if (this.DecompilerHelper.TryGetIndexedElement("Group", childId, out var group))
+                var childExists = this.DecompilerHelper.TryGetIndexedElement("Group", childId, out var childGroup);
+
+                if (parentExists && childExists)
                 {
-                    group.Add(new XElement(UtilConstants.GroupRefName, new XAttribute("Id", row.FieldAsString(0))));
+                    childGroup.Add(new XElement(UtilConstants.GroupRefName, new XAttribute("Id", parentId)));
                 }
                 else
                 {
-                    this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Parent_", childId, "Group"));
+                    if(!parentExists)
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Parent_", parentId, "Group"));
+                    }
+                    if (!childExists)
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Child_", childId, "Group"));
+                    }
                 }
             }
         }
