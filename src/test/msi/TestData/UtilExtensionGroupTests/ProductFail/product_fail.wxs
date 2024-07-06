@@ -11,7 +11,7 @@
         <Property Id="TEMPUSERNAME" Secure="yes" />
 
         <InstallExecuteSequence>
-            <Custom Action="CaFail" After="Wix4ConfigureGroups_X86" />
+            <Custom Action="CaFail" After="Wix6ConfigureGroups_X86" />
         </InstallExecuteSequence>
     </Fragment>
 

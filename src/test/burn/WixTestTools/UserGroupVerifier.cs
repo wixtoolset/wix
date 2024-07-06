@@ -151,7 +151,7 @@ namespace WixTestTools
         /// <param name="groupNames">list of groups to check for membership</param>
         private static void IsMemberOf(string domainName, string memberName, bool shouldBeMember, params string[] groupNames)
         {
-            GroupPrincipal group = GetGroup(domainName, memberName);
+            Principal group = GetPrincipal(domainName, memberName);
             Assert.False(null == group, String.Format("Group '{0}' was not found under domain '{1}'.", memberName, domainName));
 
             bool missedAGroup = false;
@@ -186,11 +186,29 @@ namespace WixTestTools
         {
             if (String.IsNullOrEmpty(domainName))
             {
-                return GroupPrincipal.FindByIdentity(new PrincipalContext(ContextType.Machine), IdentityType.Name, groupName);
+                return GroupPrincipal.FindByIdentity(new PrincipalContext(ContextType.Machine), groupName);
             }
             else
             {
-                return GroupPrincipal.FindByIdentity(new PrincipalContext(ContextType.Domain,domainName), IdentityType.Name, groupName);
+                return GroupPrincipal.FindByIdentity(new PrincipalContext(ContextType.Domain,domainName), groupName);
+            }
+        }
+
+        /// <summary>
+        /// Returns the Principal object for a given name
+        /// </summary>
+        /// <param name="domainName">Domain name to look under, if Empty the LocalMachine is assumed as the domain</param>
+        /// <param name="name"></param>
+        /// <returns>Principal Object if found, or null other wise</returns>
+        private static Principal GetPrincipal(string domainName, string name)
+        {
+            if (String.IsNullOrEmpty(domainName))
+            {
+                return Principal.FindByIdentity(new PrincipalContext(ContextType.Machine), name);
+            }
+            else
+            {
+                return Principal.FindByIdentity(new PrincipalContext(ContextType.Domain, domainName), name);
             }
         }
     }

@@ -134,16 +134,22 @@
 
     <Fragment>
         <UIRef Id="ConfigureGroupsErrorText" />
-
-        <CustomAction Id="$(var.Prefix)ConfigureGroups$(var.Suffix)" DllEntry="ConfigureGroups" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
-        <CustomAction Id="$(var.Prefix)CreateGroup$(var.Suffix)" DllEntry="CreateGroup" Impersonate="no" Execute="deferred" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
-        <CustomAction Id="$(var.Prefix)CreateGroupRollback$(var.Suffix)" DllEntry="CreateGroupRollback" Impersonate="no" Execute="rollback" Return="check" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix6)ConfigureGroups$(var.Suffix)" DllEntry="ConfigureGroups" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix6)CreateGroup$(var.Suffix)" DllEntry="CreateGroup" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix6)CreateGroupRollback$(var.Suffix)" DllEntry="CreateGroupRollback" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
         <!-- RemoveGroup is a type commit action because it is not possible to rollback the removal of a group -->
-        <CustomAction Id="$(var.Prefix)RemoveGroup$(var.Suffix)" DllEntry="RemoveGroup" Impersonate="no" Execute="commit" Return="ignore" HideTarget="yes" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
-
+        <CustomAction Id="$(var.Prefix6)RemoveGroup$(var.Suffix)" DllEntry="RemoveGroup" Impersonate="no" Execute="commit" Return="ignore" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
         <InstallExecuteSequence>
-            <Custom Action="virtual $(var.Prefix)ConfigureGroups$(var.Suffix)" Before="InstallFiles" Condition="VersionNT &gt; 400" />
+            <Custom Action="virtual $(var.Prefix6)ConfigureGroups$(var.Suffix)" Before="InstallFiles" Condition="VersionNT &gt; 400" />
         </InstallExecuteSequence>
+    </Fragment>
+
+    <Fragment>
+        <UIRef Id="ConfigureGroupGroupsErrorText" />
+        <CustomAction Id="$(var.Prefix6)AddGroupMembership$(var.Suffix)" DllEntry="AddGroupMembership" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix6)AddGroupMembershipRollback$(var.Suffix)" DllEntry="AddGroupMembershipRollback" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix6)RemoveGroupMembership$(var.Suffix)" DllEntry="RemoveGroupMembership" Impersonate="no" Execute="deferred" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix6)RemoveGroupMembershipRollback$(var.Suffix)" DllEntry="RemoveGroupMembershipRollback" Impersonate="no" Execute="rollback" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)UtilCA$(var.Suffix)" />
     </Fragment>
 
     <Fragment>

@@ -256,11 +256,11 @@ namespace WixToolsetTest.MsiE2E
             productNestedGroups.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
             // Verify group nested membership
-            UserGroupVerifier.VerifyIsMemberOf(String.Empty, "Administrators", new string[] { "testName1", "testName2" });
-            UserGroupVerifier.VerifyIsMemberOf(String.Empty, "Power Users", new string[] { "testName1" });
+            UserGroupVerifier.VerifyIsMemberOf(String.Empty, "Authenticated Users", new string[] { "testName1", "testName2" });
+            UserGroupVerifier.VerifyIsMemberOf(String.Empty, "Everyone", new string[] { "testName1" });
 
-            UserGroupVerifier.VerifyIsNotMemberOf(String.Empty, "Administrators", new string[] { "testName3" });
-            UserGroupVerifier.VerifyIsNotMemberOf(String.Empty, "Power Users", new string[] { "testName2", "testName3" });
+            UserGroupVerifier.VerifyIsNotMemberOf(String.Empty, "Authenticated Users", new string[] { "testName3" });
+            UserGroupVerifier.VerifyIsNotMemberOf(String.Empty, "Everyone", new string[] { "testName2", "testName3" });
 
             // clean up
             UserGroupVerifier.DeleteLocalGroup("testName1");

@@ -46,6 +46,10 @@ EXPORTS
     CreateGroup
     CreateGroupRollback
     RemoveGroup
+    AddGroupMembership
+    AddGroupMembershipRollback
+    RemoveGroupMembership
+    RemoveGroupMembershipRollback
     CreateUser
     CreateUserRollback
     RemoveUser

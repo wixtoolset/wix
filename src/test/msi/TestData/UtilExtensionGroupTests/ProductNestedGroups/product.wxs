@@ -12,11 +12,11 @@
     </Fragment>
 
     <Fragment>
-        <util:Group Id="ADMIN" Name="Administrators" >
+        <util:Group Id="AUTH_USERS" Name="Authenticated Users" >
             <util:GroupRef Id="TEST_GROUP1" />
             <util:GroupRef Id="TEST_GROUP2" />
         </util:Group>
-        <util:Group Id="POWER_USERS" Name="Power Users" >
+        <util:Group Id="EVERYONE" Name="Everyone" >
             <util:GroupRef Id="TEST_GROUP1" />
         </util:Group>
 
@@ -26,8 +26,6 @@
             <util:Group Id="TEST_GROUP1" Name="testName1" Comment="Group1" CreateGroup="yes" RemoveOnUninstall="yes" />
 
             <util:Group Id="TEST_GROUP2" Name="testName2" Comment="Group2" RemoveOnUninstall="no" UpdateIfExists="yes" />
-
-            <util:Group Id="TEST_GROUP3" Name="testName3" Comment="Group3" />
         </Component>
     </Fragment>
 </Wix>

@@ -17,8 +17,13 @@
     <Fragment>
         <UI Id="ConfigureGroupsErrorText">
             <Error Id="$(var.msierrGRPFailedGroupCreate)" Message="!(loc.msierrGRPFailedGroupCreate)" />
-            <Error Id="$(var.msierrGRPFailedGroupGroupAdd)" Message="!(loc.msierrGRPFailedGroupGroupAdd)" />
             <Error Id="$(var.msierrGRPFailedGroupCreateExists)" Message="!(loc.msierrGRPFailedGroupCreateExists)" />
+        </UI>
+    </Fragment>
+
+    <Fragment>
+        <UI Id="ConfigureGroupGroupsErrorText">
+            <Error Id="$(var.msierrGRPFailedGroupGroupAdd)" Message="!(loc.msierrGRPFailedGroupGroupAdd)" />
         </UI>
     </Fragment>
 

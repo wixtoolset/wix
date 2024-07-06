@@ -1475,7 +1475,7 @@ namespace WixToolset.Util
 
             if (null != componentId)
             {
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4ConfigureGroups", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix6ConfigureGroups", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
             }
 
             foreach (var child in element.Elements())
@@ -1488,7 +1488,7 @@ namespace WixToolset.Util
                             this.ParseGroupRefElement(intermediate, section, child,  id.Id, groupType:true);
                             break;
                         default:
-                            //this.ParseHelper.UnexpectedElement(element, child);
+                            this.ParseHelper.UnexpectedElement(element, child);
                             break;
                     }
                 }
@@ -1561,6 +1561,9 @@ namespace WixToolset.Util
                 }
                 else
                 {
+                    // Add reference to bring in fragment
+                    this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix6AddGroupMembership", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+
                     section.AddSymbol(new GroupGroupSymbol(sourceLineNumbers)
                     {
                         ChildGroupRef = childId,
