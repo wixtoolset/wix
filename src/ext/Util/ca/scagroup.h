@@ -21,10 +21,12 @@ struct SCA_GROUP
     WCHAR wzComment[MAX_DARWIN_COLUMN + 1];
     INT iAttributes;
 
-    SCA_GROUP* psgGroups;
+    SCA_GROUP* psgParents;
+    SCA_GROUP* psgChildren;
 
     SCA_GROUP *psgNext;
 };
+
 
 // prototypes
 HRESULT __stdcall ScaGetGroup(
@@ -42,6 +44,12 @@ void ScaGroupFreeList(
 HRESULT ScaGroupRead(
     __inout SCA_GROUP** ppsgList
     );
+HRESULT ScaGroupMembershipRemoveExecute(
+        __in SCA_GROUP* psgList
+    );
+HRESULT ScaGroupMembershipAddExecute(
+    __in SCA_GROUP* psgList
+);
 HRESULT ScaGroupExecute(
     __in SCA_GROUP*psgList
     );

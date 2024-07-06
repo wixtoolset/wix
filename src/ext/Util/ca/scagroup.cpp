@@ -6,8 +6,11 @@
 LPCWSTR vcsGroupQuery = L"SELECT `Group`, `Component_`, `Name`, `Domain` FROM `Wix4Group` WHERE `Group`=?";
 enum eGroupQuery { vgqGroup = 1, vgqComponent, vgqName, vgqDomain };
 
-LPCWSTR vcsGroupGroupQuery = L"SELECT `Parent_`, `Child_` FROM `Wix6GroupGroup` WHERE `Child_`=?";
-enum eGroupGroupQuery { vggqParent = 1, vggqChild };
+LPCWSTR vcsGroupParentsQuery = L"SELECT `Parent_`,`Component_`,`Name`,`Domain`,`Child_` FROM `Wix6GroupGroup`,`Wix4Group` WHERE `Wix6GroupGroup`.`Parent_`=`Wix4Group`.`Group` AND `Wix6GroupGroup`.`Child_`=?";
+enum eGroupParentsQuery { vgpqParent = 1, vgpqParentComponent, vgpqParentName, vgpqParentDomain, vgpqChild };
+
+LPCWSTR vcsGroupChildrenQuery = L"SELECT `Parent_`,`Child_`,`Component_`,`Name`,`Domain` FROM `Wix6GroupGroup`,`Wix4Group` WHERE `Wix6GroupGroup`.`Child_`=`Wix4Group`.`Group` AND `Wix6GroupGroup`.`Parent_`=?";
+enum eGroupChildrenQuery { vgcqParent = 1, vgcqChild, vgcqChildComponent, vgcqChildName, vgcqChildDomain };
 
 LPCWSTR vActionableGroupQuery = L"SELECT `Group`,`Component_`,`Name`,`Domain`,`Comment`,`Attributes` FROM `Wix4Group`,`Wix6Group` WHERE `Component_` IS NOT NULL AND `Group`=`Group_`";
 enum eActionableGroupQuery { vagqGroup = 1, vagqComponent, vagqName, vagqDomain, vagqComment, vagqAttributes };
@@ -15,7 +18,6 @@ enum eActionableGroupQuery { vagqGroup = 1, vagqComponent, vagqName, vagqDomain,
 static HRESULT AddGroupToList(
     __inout SCA_GROUP** ppsgList
     );
-
 
 HRESULT __stdcall ScaGetGroup(
     __in LPCWSTR wzGroup,
@@ -160,9 +162,147 @@ void ScaGroupFreeList(
     {
         psgDelete = psgList;
         psgList = psgList->psgNext;
+        ScaGroupFreeList(psgDelete->psgParents);
+        ScaGroupFreeList(psgDelete->psgChildren);
 
         MemFree(psgDelete);
     }
+}
+
+HRESULT ScaGroupGetParents(
+    __inout SCA_GROUP* psg
+)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+    SCA_GROUP* psgParent = NULL;
+    PMSIHANDLE hView, hParamRec, hRec;
+    LPWSTR pwzTempStr = NULL;
+
+    if (S_OK != WcaTableExists(L"Wix6GroupGroup"))
+    {
+        WcaLog(LOGMSG_VERBOSE, "Wix6GroupGroup Table does not exist, exiting");
+        ExitFunction1(hr = S_FALSE);
+    }
+
+    // setup the query parameter record
+    hParamRec = ::MsiCreateRecord(1);
+    hr = WcaSetRecordString(hParamRec, 1, psg->wzKey);
+
+    //
+    // loop through all the groups
+    //
+    hr = WcaOpenView(vcsGroupParentsQuery, &hView);
+    ExitOnFailure(hr, "failed to open view on Wix6GroupGroup,Wix4Group table(s)");
+    hr = WcaExecuteView(hView, hParamRec);
+    ExitOnFailure(hr, "failed to open view on Wix4Group,Wix6Group table(s)");
+    while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
+    {
+        hr = AddGroupToList(&psg->psgParents);
+        ExitOnFailure(hr, "failed to add group to list");
+
+        psgParent = psg->psgParents;
+
+        if (::MsiRecordIsNull(hRec, vgcqChildComponent))
+        {
+            psgParent->isInstalled = INSTALLSTATE_NOTUSED;
+            psgParent->isAction = INSTALLSTATE_NOTUSED;
+        }
+        else
+        {
+            hr = WcaGetRecordString(hRec, vgpqParentComponent, &pwzTempStr);
+            ExitOnFailure(hr, "failed to get Wix4Group.Component");
+            wcsncpy_s(psgParent->wzComponent, pwzTempStr, MAX_DARWIN_KEY);
+            ReleaseNullStr(pwzTempStr);
+
+            er = ::MsiGetComponentStateW(WcaGetInstallHandle(), psgParent->wzComponent, &psgParent->isInstalled, &psgParent->isAction);
+            hr = HRESULT_FROM_WIN32(er);
+            ExitOnFailure(hr, "failed to get Component state for Wix4Group");
+        }
+
+        hr = WcaGetRecordString(hRec, vgpqParentName, &pwzTempStr);
+        ExitOnFailure(hr, "failed to get Wix4Group.Name");
+        wcsncpy_s(psgParent->wzName, pwzTempStr, MAX_DARWIN_COLUMN);
+        ReleaseNullStr(pwzTempStr);
+
+
+        hr = WcaGetRecordString(hRec, vgpqParentDomain, &pwzTempStr);
+        ExitOnFailure(hr, "failed to get Wix4Group.Domain");
+        wcsncpy_s(psgParent->wzDomain, pwzTempStr, MAX_DARWIN_COLUMN);
+        ReleaseNullStr(pwzTempStr);
+    }
+
+LExit:
+    ReleaseNullStr(pwzTempStr);
+    return hr;
+}
+
+HRESULT ScaGroupGetChildren(
+    __inout SCA_GROUP* psg
+)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+    SCA_GROUP* psgChild = NULL;
+    PMSIHANDLE hView, hParamRec, hRec;
+    LPWSTR pwzTempStr = NULL;
+
+    if (S_OK != WcaTableExists(L"Wix6GroupGroup"))
+    {
+        WcaLog(LOGMSG_VERBOSE, "Wix6GroupGroup Table does not exist, exiting");
+        ExitFunction1(hr = S_FALSE);
+    }
+
+    // setup the query parameter record
+    hParamRec = ::MsiCreateRecord(1);
+    hr = WcaSetRecordString(hParamRec, 1, psg->wzKey);
+
+    //
+    // loop through all the groups
+    //
+    hr = WcaOpenView(vcsGroupChildrenQuery, &hView);
+    ExitOnFailure(hr, "failed to open view on Wix6GroupGroup,Wix4Group table(s)");
+    hr = WcaExecuteView(hView, hParamRec);
+    ExitOnFailure(hr, "failed to open view on Wix4Group,Wix6Group table(s)");
+    while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
+    {
+        hr = AddGroupToList(&psg->psgChildren);
+        ExitOnFailure(hr, "failed to add group to list");
+
+        psgChild = psg->psgChildren;
+
+        if (::MsiRecordIsNull(hRec, vgcqChildComponent))
+        {
+            psgChild->isInstalled = INSTALLSTATE_NOTUSED;
+            psgChild->isAction = INSTALLSTATE_NOTUSED;
+        }
+        else
+        {
+            hr = WcaGetRecordString(hRec, vgcqChildComponent, &pwzTempStr);
+            ExitOnFailure(hr, "failed to get Wix4Group.Component");
+            wcsncpy_s(psgChild->wzComponent, pwzTempStr, MAX_DARWIN_KEY);
+            ReleaseNullStr(pwzTempStr);
+
+            er = ::MsiGetComponentStateW(WcaGetInstallHandle(), psgChild->wzComponent, &psgChild->isInstalled, &psgChild->isAction);
+            hr = HRESULT_FROM_WIN32(er);
+            ExitOnFailure(hr, "failed to get Component state for Wix4Group");
+        }
+
+        hr = WcaGetRecordString(hRec, vgcqChildName, &pwzTempStr);
+        ExitOnFailure(hr, "failed to get Wix4Group.Name");
+        wcsncpy_s(psgChild->wzName, pwzTempStr, MAX_DARWIN_COLUMN);
+        ReleaseNullStr(pwzTempStr);
+
+
+        hr = WcaGetRecordString(hRec, vgcqChildDomain, &pwzTempStr);
+        ExitOnFailure(hr, "failed to get Wix4Group.Domain");
+        wcsncpy_s(psgChild->wzDomain, pwzTempStr, MAX_DARWIN_COLUMN);
+        ReleaseNullStr(pwzTempStr);
+    }
+
+LExit:
+    ReleaseNullStr(pwzTempStr);
+    return hr;
 }
 
 
@@ -179,7 +319,7 @@ HRESULT ScaGroupRead(
 
     LPWSTR pwzData = NULL;
 
-    BOOL fGroupGroupExists = FALSE;
+    //BOOL fGroupGroupExists = FALSE;
 
     SCA_GROUP *psg = NULL;
 
@@ -194,11 +334,6 @@ HRESULT ScaGroupRead(
     {
         WcaLog(LOGMSG_VERBOSE, "Wix6Group Table does not exist, exiting");
         ExitFunction1(hr = S_FALSE);
-    }
-
-    if (S_OK == WcaTableExists(L"Wix6GroupGroup"))
-    {
-        fGroupGroupExists = TRUE;
     }
 
     //
@@ -230,21 +365,26 @@ HRESULT ScaGroupRead(
             psg->isAction = isAction;
             hr = ::StringCchCopyW(psg->wzComponent, countof(psg->wzComponent), pwzData);
             ExitOnFailure(hr, "failed to copy component name: %ls", pwzData);
+            ReleaseNullStr(pwzData);
 
             hr = WcaGetRecordString(hRec, vagqGroup, &pwzData);
             ExitOnFailure(hr, "failed to get Wix4Group.Group");
             hr = ::StringCchCopyW(psg->wzKey, countof(psg->wzKey), pwzData);
             ExitOnFailure(hr, "failed to copy group key: %ls", pwzData);
+            ReleaseNullStr(pwzData);
 
             hr = WcaGetRecordFormattedString(hRec, vagqName, &pwzData);
             ExitOnFailure(hr, "failed to get Wix4Group.Name");
             hr = ::StringCchCopyW(psg->wzName, countof(psg->wzName), pwzData);
             ExitOnFailure(hr, "failed to copy group name: %ls", pwzData);
+            ReleaseNullStr(pwzData);
 
             hr = WcaGetRecordFormattedString(hRec, vagqDomain, &pwzData);
             ExitOnFailure(hr, "failed to get Wix4Group.Domain");
             hr = ::StringCchCopyW(psg->wzDomain, countof(psg->wzDomain), pwzData);
             ExitOnFailure(hr, "failed to copy group domain: %ls", pwzData);
+            ReleaseNullStr(pwzData);
+
             hr = WcaGetRecordFormattedString(hRec, vagqComment, &pwzData);
             ExitOnFailure(hr, "failed to get Wix6Group.Comment");
             hr = ::StringCchCopyW(psg->wzComment, countof(psg->wzComment), pwzData);
@@ -253,36 +393,9 @@ HRESULT ScaGroupRead(
             hr = WcaGetRecordInteger(hRec, vagqAttributes, &psg->iAttributes);
             ExitOnFailure(hr, "failed to get Wix6Group.Attributes");
 
-            // Check if this group is to be added to any other groups
-            if (fGroupGroupExists)
-            {
-                hGroupRec = ::MsiCreateRecord(1);
-                hr = WcaSetRecordString(hGroupRec, 1, psg->wzKey);
-                ExitOnFailure(hr, "Failed to create group record for querying Wix6GroupGroup table");
+            ScaGroupGetParents(psg);
 
-                hr = WcaOpenExecuteView(vcsGroupGroupQuery, &hGroupGroupView);
-                ExitOnFailure(hr, "Failed to open view on Wix6GroupGroup table for group %ls", psg->wzKey);/*
-                hr = WcaExecuteView(hGroupGroupView, hGroupRec);
-                ExitOnFailure(hr, "Failed to execute view on Wix6GroupGroup table for group: %ls", psg->wzKey);*/
-
-                while (S_OK == (hr = WcaFetchRecord(hGroupGroupView, &hRec)))
-                {
-                    hr = WcaGetRecordString(hRec, vggqParent, &pwzData);
-                    ExitOnFailure(hr, "failed to get Wix6GroupGroup.Parent");
-
-                    hr = AddGroupToList(&(psg->psgGroups));
-                    ExitOnFailure(hr, "failed to add group to list");
-
-                    hr = ScaGetGroup(pwzData, psg->psgGroups);
-                    ExitOnFailure(hr, "failed to get information for group: %ls", pwzData);
-                }
-
-                if (E_NOMOREITEMS == hr)
-                {
-                    hr = S_OK;
-                }
-                ExitOnFailure(hr, "failed to enumerate selected rows from Wix4UserGroup table");
-            }
+            ScaGroupGetChildren(psg);
         }
     }
 
@@ -301,7 +414,6 @@ LExit:
 /* ****************************************************************
 ScaGroupExecute - Schedules group account creation or removal based on
 component state.
-
 ******************************************************************/
 HRESULT ScaGroupExecute(
     __in SCA_GROUP *psgList
@@ -428,7 +540,7 @@ HRESULT ScaGroupExecute(
                 hr = WcaWriteIntegerToCaData(iRollbackUserAttributes, &pwzRollbackData);
                 ExitOnFailure(hr, "failed to add group attributes to rollback custom action data for group: %ls", psg->wzKey);
 
-                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CreateGroupRollback"), pwzRollbackData, COST_GROUP_DELETE);
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"CreateGroupRollback"), pwzRollbackData, COST_GROUP_DELETE);
                 ExitOnFailure(hr, "failed to schedule CreateGroupRollback");
             }
             else
@@ -441,7 +553,7 @@ HRESULT ScaGroupExecute(
             //
             // Schedule the creation now.
             //
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"CreateGroup"), pwzActionData, COST_GROUP_ADD);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"CreateGroup"), pwzActionData, COST_GROUP_ADD);
             ExitOnFailure(hr, "failed to schedule CreateGroup");
         }
         else if (((GROUP_EXISTS_YES == geGroupExists)
@@ -457,7 +569,7 @@ HRESULT ScaGroupExecute(
             //
             // Note: We can't rollback the removal of a group which is why RemoveGroup is a commit
             // CustomAction.
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"RemoveGroup"), pwzActionData, COST_GROUP_DELETE);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroup"), pwzActionData, COST_GROUP_DELETE);
             ExitOnFailure(hr, "failed to schedule RemoveGroup");
         }
 
@@ -497,6 +609,222 @@ static HRESULT AddGroupToList(
 
     psg->psgNext = *ppsgList;
     *ppsgList = psg;
+
+LExit:
+    return hr;
+}
+
+/* ****************************************************************
+ScaGroupMembershipRemoveParentsExecute - Schedules group membership removal
+based on parent/child component state
+******************************************************************/
+HRESULT ScaGroupMembershipRemoveParentsExecute(
+    __in SCA_GROUP* psg
+)
+{
+    HRESULT hr = S_OK;
+    LPWSTR pwzActionData = NULL;
+
+    for (SCA_GROUP* psgp = psg->psgParents; psgp; psgp = psgp->psgNext)
+    {
+        Assert(psgp->wzName);
+        if (WcaIsUninstalling(psg->isInstalled, psg->isAction)
+            || WcaIsUninstalling(psgp->isInstalled, psgp->isAction))
+        {
+            hr = WcaWriteStringToCaData(psgp->wzName, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add parent group name to custom action data: %ls", psgp->wzName);
+            hr = WcaWriteStringToCaData(psgp->wzDomain, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add parent group domain to custom action data: %ls", psgp->wzDomain);
+            hr = WcaWriteStringToCaData(psg->wzName, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add child group name to custom action data: %ls", psg->wzName);
+            hr = WcaWriteStringToCaData(psg->wzDomain, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add child group domain to custom action data: %ls", psg->wzDomain);
+            hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+
+        LExit:
+            ReleaseNullStr(pwzActionData);
+            if (hr != S_OK && !(psg->iAttributes & SCAG_NON_VITAL))
+            {
+                return hr;
+            }
+        }
+    }
+    return S_OK;
+}
+
+/* ****************************************************************
+ScaGroupMembershipRemoveChildrenExecute - 
+******************************************************************/
+HRESULT ScaGroupMembershipRemoveChildrenExecute(
+    __in SCA_GROUP* psg
+)
+{
+    HRESULT hr = S_OK;
+    LPWSTR pwzActionData = NULL;
+
+    for (SCA_GROUP* psgc = psg->psgChildren; psgc; psgc = psgc->psgNext)
+    {
+        Assert(psgc->wzName);
+        if (WcaIsUninstalling(psg->isInstalled, psg->isAction)
+            || WcaIsUninstalling(psgc->isInstalled, psgc->isAction))
+        {
+            hr = WcaWriteStringToCaData(psg->wzName, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add parent group name to custom action data: %ls", psg->wzName);
+            hr = WcaWriteStringToCaData(psg->wzDomain, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add parent group domain to custom action data: %ls", psg->wzDomain);
+            hr = WcaWriteStringToCaData(psgc->wzName, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add child group name to custom action data: %ls", psgc->wzName);
+            hr = WcaWriteStringToCaData(psgc->wzDomain, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add child group domain to custom action data: %ls", psgc->wzDomain);
+            hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+
+        LExit:
+            ReleaseNullStr(pwzActionData);
+
+            if (hr != S_OK && !(psg->iAttributes & SCAG_NON_VITAL))
+            {
+                return hr;
+            }
+        }
+    }
+    return S_OK;
+}
+
+/* ****************************************************************
+ScaGroupMembershipRemoveExecute - Schedules group membership removal
+based on parent/child component state
+******************************************************************/
+HRESULT ScaGroupMembershipRemoveExecute(
+    __in SCA_GROUP* psgList
+)
+{
+    HRESULT hr = S_OK;
+
+    // Loop through all the users to be configured.
+    for (SCA_GROUP* psg = psgList; psg; psg = psg->psgNext)
+    {
+        Assert(psg->wzName);
+        // first we loop through the Parents
+        hr = ScaGroupMembershipRemoveParentsExecute(psg);
+        ExitOnFailure(hr, "Failed to remove parent membership for vital group: %ls", psg->wzKey);
+
+        // then through the Children
+        hr = ScaGroupMembershipRemoveChildrenExecute(psg);
+        ExitOnFailure(hr, "Failed to remove child membership for vital group: %ls", psg->wzKey);
+    }
+
+LExit:
+    return hr;
+}
+
+/* ****************************************************************
+ScaGroupMembershipAddParentsExecute - Schedules group membership removal
+based on parent/child component state
+******************************************************************/
+HRESULT ScaGroupMembershipAddParentsExecute(
+    __in SCA_GROUP* psg
+)
+{
+    HRESULT hr = S_OK;
+    LPWSTR pwzActionData = NULL;
+
+    for (SCA_GROUP* psgp = psg->psgParents; psgp; psgp = psgp->psgNext)
+    {
+        Assert(psgp->wzName);
+        if (WcaIsInstalling(psg->isInstalled, psg->isAction)
+            || WcaIsInstalling(psgp->isInstalled, psgp->isAction))
+        {
+            hr = WcaWriteStringToCaData(psgp->wzName, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add parent group domain to custom action data: %ls", psgp->wzName);
+            hr = WcaWriteStringToCaData(psgp->wzDomain, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add parent group domain to custom action data: %ls", psgp->wzDomain);
+            hr = WcaWriteStringToCaData(psg->wzName, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add child group name to custom action data: %ls", psg->wzName);
+            hr = WcaWriteStringToCaData(psg->wzDomain, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add child group domain to custom action data: %ls", psg->wzDomain);
+            hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+
+        LExit:
+            ReleaseNullStr(pwzActionData);
+
+            if (hr != S_OK && !(psg->iAttributes & SCAG_NON_VITAL))
+            {
+                return hr;
+            }
+        }
+    }
+    return S_OK;
+}
+
+/* ****************************************************************
+ScaGroupMembershipAddChildrenExecute - Schedules group membership removal
+based on parent/child component state
+******************************************************************/
+HRESULT ScaGroupMembershipAddChildrenExecute(
+    __in SCA_GROUP* psg
+)
+{
+    HRESULT hr = S_OK;
+    LPWSTR pwzActionData = NULL;
+
+    // then through the Children
+    for (SCA_GROUP* psgc = psg->psgChildren; psgc; psgc = psgc->psgNext)
+    {
+        Assert(psgc->wzName);
+        if (WcaIsInstalling(psg->isInstalled, psg->isAction)
+            || WcaIsInstalling(psgc->isInstalled, psgc->isAction))
+        {
+            hr = WcaWriteStringToCaData(psg->wzName, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add child group name to custom action data: %ls", psg->wzName);
+            hr = WcaWriteStringToCaData(psg->wzDomain, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add child group domain to custom action data: %ls", psg->wzDomain);
+            hr = WcaWriteStringToCaData(psgc->wzName, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add parent group domain to custom action data: %ls", psgc->wzName);
+            hr = WcaWriteStringToCaData(psgc->wzDomain, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add parent group domain to custom action data: %ls", psgc->wzDomain);
+            hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
+            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+
+        LExit:
+            ReleaseNullStr(pwzActionData);
+            if (hr != S_OK && !(psg->iAttributes & SCAG_NON_VITAL))
+            {
+                return hr;
+            }
+        }
+    }
+    return S_OK;
+}
+
+/* ****************************************************************
+ScaGroupMembershipAddExecute - Schedules group membership addition
+based on parent/child component state
+******************************************************************/
+HRESULT ScaGroupMembershipAddExecute(
+    __in SCA_GROUP* psgList
+)
+{
+    HRESULT hr = S_OK;
+
+    // Loop through all the users to be configured.
+    for (SCA_GROUP* psg = psgList; psg; psg = psg->psgNext)
+    {
+        Assert(psg->wzName);
+        // first we loop through the Parents
+        hr = ScaGroupMembershipAddParentsExecute(psg);
+        ExitOnFailure(hr, "Failed to add parent membership for vital group: %ls", psg->wzKey);
+
+        // then through the Children
+        hr = ScaGroupMembershipAddChildrenExecute(psg);
+        ExitOnFailure(hr, "Failed to add child membership for vital group: %ls", psg->wzKey);
+    }
 
 LExit:
     return hr;

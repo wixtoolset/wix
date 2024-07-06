@@ -153,8 +153,14 @@ extern "C" UINT __stdcall ConfigureGroups(
     hr = ScaGroupRead(&psgList);
     ExitOnFailure(hr, "failed to read Wix4Group,Wix6Group table(s)");
 
+    hr = ScaGroupMembershipRemoveExecute(psgList);
+    ExitOnFailure(hr, "failed to remove Group Memberships")
+
     hr = ScaGroupExecute(psgList);
     ExitOnFailure(hr, "failed to add/remove Group actions");
+
+    hr = ScaGroupMembershipAddExecute(psgList);
+    ExitOnFailure(hr, "failed to add Group Memberships")
 
 LExit:
     if (psgList)
