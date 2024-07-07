@@ -22,28 +22,28 @@
       <HintPath>$(RootPackagesFolder)xunit.abstractions.2.0.3\lib\netstandard2.0\xunit.abstractions.dll</HintPath>
     </Reference>
     <Reference Include="xunit.assert">
-      <HintPath>$(RootPackagesFolder)xunit.assert.2.5.1\lib\netstandard1.1\xunit.assert.dll</HintPath>
+      <HintPath>$(RootPackagesFolder)xunit.assert.2.8.1\lib\netstandard1.1\xunit.assert.dll</HintPath>
     </Reference>
     <Reference Include="xunit.core">
-      <HintPath>$(RootPackagesFolder)xunit.extensibility.core.2.5.1\lib\netstandard1.1\xunit.core.dll</HintPath>
+      <HintPath>$(RootPackagesFolder)xunit.extensibility.core.2.8.1\lib\netstandard1.1\xunit.core.dll</HintPath>
     </Reference>
     <Reference Include="xunit.execution.desktop">
-      <HintPath>$(RootPackagesFolder)xunit.extensibility.execution.2.5.1\lib\net452\xunit.execution.desktop.dll</HintPath>
+      <HintPath>$(RootPackagesFolder)xunit.extensibility.execution.2.8.1\lib\net452\xunit.execution.desktop.dll</HintPath>
     </Reference>
   </ItemGroup>
 
-  <Import Project="$(RootPackagesFolder)xunit.core.2.5.1\build\xunit.core.targets" Condition="Exists('$(RootPackagesFolder)xunit.core.2.5.1\build\xunit.core.targets')" />
+  <Import Project="$(RootPackagesFolder)xunit.core.2.8.1\build\xunit.core.targets" Condition="Exists('$(RootPackagesFolder)xunit.core.2.8.1\build\xunit.core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('$(RootPackagesFolder)xunit.core.2.5.1\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '$(RootPackagesFolder)xunit.core.2.5.1\build\xunit.core.props'))" />
-    <Error Condition="!Exists('$(RootPackagesFolder)xunit.core.2.5.1\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(RootPackagesFolder)xunit.core.2.5.1\build\xunit.core.targets'))" />
-    <Error Condition="!Exists('$(RootPackagesFolder)xunit.runner.visualstudio.2.5.1\build\net462\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '$(RootPackagesFolder)xunit.runner.visualstudio.2.5.1\build\net462\xunit.runner.visualstudio.props'))" />
+    <Error Condition="!Exists('$(RootPackagesFolder)xunit.core.2.8.1\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '$(RootPackagesFolder)xunit.core.2.8.1\build\xunit.core.props'))" />
+    <Error Condition="!Exists('$(RootPackagesFolder)xunit.core.2.8.1\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(RootPackagesFolder)xunit.core.2.8.1\build\xunit.core.targets'))" />
+    <Error Condition="!Exists('$(RootPackagesFolder)xunit.runner.visualstudio.2.8.1\build\net462\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '$(RootPackagesFolder)xunit.runner.visualstudio.2.8.1\build\net462\xunit.runner.visualstudio.props'))" />
   </Target>
 
-  <UsingTask AssemblyFile="$(RootPackagesFolder)xunit.runner.msbuild.2.5.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" Architecture="x86" Condition=" '$(Platform)'!='x64' " />
-  <UsingTask AssemblyFile="$(RootPackagesFolder)xunit.runner.msbuild.2.5.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" Architecture="x64" Condition=" '$(Platform)'=='x64' " />
+  <UsingTask AssemblyFile="$(RootPackagesFolder)xunit.runner.msbuild.2.8.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" Architecture="x86" Condition=" '$(Platform)'!='x64' " />
+  <UsingTask AssemblyFile="$(RootPackagesFolder)xunit.runner.msbuild.2.8.1\build\net452\xunit.runner.msbuild.net452.dll" TaskName="Xunit.Runner.MSBuild.xunit" Architecture="x64" Condition=" '$(Platform)'=='x64' " />
   <Target Name="Test">
     <!-- https://xunit.net/docs/running-tests-in-msbuild -->
     <!-- https://github.com/xunit/xunit/issues/2188 -->
