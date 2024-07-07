@@ -152,7 +152,7 @@ namespace WixToolsetTest.CoreIntegration
                                 WixAssert.StringEqual("http://wixtoolset.org/schemas/v4/2008/Burn", attribute.Value);
                                 break;
                             default:
-                                Assert.False(true, $"Attribute: '{attribute.LocalName}', Value: '{attribute.Value}'");
+                                Assert.Fail($"Attribute: '{attribute.LocalName}', Value: '{attribute.Value}'");
                                 break;
                         }
                     }
@@ -264,7 +264,7 @@ namespace WixToolsetTest.CoreIntegration
                             WixAssert.StringEqual("http://wixtoolset.org/schemas/v4/2008/Burn", attribute.Value);
                             break;
                         default:
-                            Assert.False(true, $"Attribute: '{attribute.LocalName}', Value: '{attribute.Value}'");
+                            Assert.Fail($"Attribute: '{attribute.LocalName}', Value: '{attribute.Value}'");
                             break;
                     }
                 }
@@ -808,7 +808,7 @@ namespace WixToolsetTest.CoreIntegration
                     return;
                 }
 
-                Assert.False(true, "Expected exception not accepted.");
+                Assert.Fail("Expected exception not accepted.");
             }
         }
 

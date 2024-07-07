@@ -31,7 +31,7 @@ namespace WixTestTools
             }
             else
             {
-                Assert.True(false, "Tried to unregister when not registered.");
+                Assert.Fail("Tried to unregister when not registered.");
             }
         }
 
