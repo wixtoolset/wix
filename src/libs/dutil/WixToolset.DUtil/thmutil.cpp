@@ -312,13 +312,14 @@ static HRESULT ShowControl(
     __in BOOL fSaveEditboxes,
     __in THEME_SHOW_PAGE_REASON reason,
     __in DWORD dwPageId,
-    __out_opt HWND* phwndFocus
+    __inout_opt HWND* phwndFocus
     );
 static HRESULT ShowControls(
     __in THEME* pTheme,
     __in_opt const THEME_CONTROL* pParentControl,
     __in int nCmdShow,
     __in BOOL fSaveEditboxes,
+    __in BOOL fSetFocus,
     __in THEME_SHOW_PAGE_REASON reason,
     __in DWORD dwPageId
     );
@@ -1192,8 +1193,9 @@ DAPI_(HRESULT) ThemeShowPageEx(
     BOOL fHide = SW_HIDE == nCmdShow;
     BOOL fSaveEditboxes = FALSE;
     THEME_SAVEDVARIABLE* pSavedVariable = NULL;
-    THEME_PAGE* pPage = ThemeGetPage(pTheme, dwPage);
     SIZE_T cb = 0;
+    BOOL fSetFocus = dwPage != pTheme->dwCurrentPageId;
+    THEME_PAGE* pPage = ThemeGetPage(pTheme, dwPage);
 
     if (pPage)
     {
@@ -1257,7 +1259,7 @@ DAPI_(HRESULT) ThemeShowPageEx(
         }
     }
 
-    hr = ShowControls(pTheme, NULL, nCmdShow, fSaveEditboxes, reason, dwPage);
+    hr = ShowControls(pTheme, NULL, nCmdShow, fSaveEditboxes, fSetFocus, reason, dwPage);
     ThmExitOnFailure(hr, "Failed to show page controls.");
 
 LExit:
@@ -5561,7 +5563,7 @@ static HRESULT ShowControl(
     __in BOOL fSaveEditboxes,
     __in THEME_SHOW_PAGE_REASON reason,
     __in DWORD dwPageId,
-    __out_opt HWND* phwndFocus
+    __inout_opt HWND* phwndFocus
     )
 {
     HRESULT hr = S_OK;
@@ -5810,7 +5812,7 @@ static HRESULT ShowControl(
 
     if (0 < pControl->cControls)
     {
-        ShowControls(pTheme, pControl, nCmdShow, fSaveEditboxes, reason, dwPageId);
+        ShowControls(pTheme, pControl, nCmdShow, fSaveEditboxes, FALSE/*fSetFocus*/, reason, dwPageId);
     }
 
     if (THEME_CONTROL_TYPE_BILLBOARD == pControl->type && pControl->wPageId)
@@ -5842,6 +5844,7 @@ static HRESULT ShowControls(
     __in_opt const THEME_CONTROL* pParentControl,
     __in int nCmdShow,
     __in BOOL fSaveEditboxes,
+    __in BOOL fSetFocus,
     __in THEME_SHOW_PAGE_REASON reason,
     __in DWORD dwPageId
     )
@@ -5865,7 +5868,7 @@ static HRESULT ShowControls(
         }
     }
 
-    if (hwndFocus)
+    if (fSetFocus && hwndFocus)
     {
         ::SendMessage(pTheme->hwndParent, WM_NEXTDLGCTL, (WPARAM)hwndFocus, TRUE);
     }
