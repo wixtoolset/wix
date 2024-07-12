@@ -8,8 +8,6 @@
     <Description>WiX Toolset Firewall Extension</Description>
     <Title>WiX Toolset Firewall Extension</Title>
     <DebugType>embedded</DebugType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>    
   </PropertyGroup>
 
   <Import Project="..\..\WixExt.props" />
