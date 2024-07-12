@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="WixToolset.Sdk">
+  <PropertyGroup>
+    <Platform>x64</Platform>
+    <OutputName>wix-cli-$(Platform)</OutputName>
+    <OutputPath>$(PackageOutputPath)</OutputPath>
+    <SignOutput>true</SignOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <BindPath BindName="Files" Include="$(RootBuildFolder)wix\$(Configuration)\net472\win-$(Platform)" />
+    <BindPath BindName="Heat_x64" Include="$(RootBuildFolder)tools\$(Configuration)\net472\win-x64\" />
+    <BindPath BindName="Heat_x86" Include="$(RootBuildFolder)tools\$(Configuration)\net472\win-x86\" />
+
+    <BindPath Include="$(RootBuildFolder)Bal.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)ComPlus.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)Dependency.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)DirectX.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)Firewall.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)Http.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)Iis.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)Msmq.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)NetFx.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)PowerShell.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)Sql.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)UI.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)Util.wixext\$(Configuration)\netstandard2.0\" />
+    <BindPath Include="$(RootBuildFolder)VisualStudio.wixext\$(Configuration)\netstandard2.0\" />
+  </ItemGroup>
+
+  <UsingTask TaskName="GenerateMetadata" AssemblyFile="$(BaseOutputPath)$(Configuration)\net472\MetadataTask.dll" />
+
+  <Target Name="GenerateMetadata" AfterTargets="AfterBuild">
+    <GenerateMetadata TargetFile="$(TargetPath)" WixpdbFile="$(TargetPdbPath)" />
+  </Target>
+</Project>

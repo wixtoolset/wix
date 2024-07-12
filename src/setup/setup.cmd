@@ -35,7 +35,9 @@ msbuild -Restore setup.sln -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl
 
 :clean
 @rd /s/q "..\..\build\setup" 2> nul
+@del "..\..\build\artifacts\wix-cli-x64.*" 2> nul
 @del "..\..\build\artifacts\WixAdditionalTools.*" 2> nul
+@del "..\..\build\logs\pdbs\%_C%\wix-cli-x64.*" 2> nul
 @del "..\..\build\logs\pdbs\%_C%\WixAdditionalTools.*" 2> nul
 @exit /b
 
