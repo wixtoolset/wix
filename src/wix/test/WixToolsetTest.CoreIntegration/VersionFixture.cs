@@ -41,6 +41,62 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildMsiWithInsignificantZeroesVersion()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, "bin", "test1.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Version", "PackageWithReplaceableVersion.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-d", "Version=0001.002.0003.04",
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var productVersion = GetProductVersionFromMsi(msiPath);
+                Assert.Equal("0001.002.0003.04", productVersion);
+            }
+        }
+
+        [Fact]
+        public void CanBuildMsiWithPrefixedInsignificantZeroesVersion()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, "bin", "test1.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Version", "PackageWithReplaceableVersion.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-d", "Version=v01.002.0003.000004",
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var productVersion = GetProductVersionFromMsi(msiPath);
+                Assert.Equal("01.002.0003.000004", productVersion);
+            }
+        }
+
+        [Fact]
         public void CanBuildMsiWithPrefixedVersionBindVariable()
         {
             var folder = TestData.Get(@"TestData");
