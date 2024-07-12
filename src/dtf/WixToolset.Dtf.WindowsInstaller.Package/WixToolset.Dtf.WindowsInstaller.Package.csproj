@@ -5,7 +5,7 @@
   <PropertyGroup>
     <RootNamespace>WixToolset.Dtf.WindowsInstaller</RootNamespace>
     <AssemblyName>WixToolset.Dtf.WindowsInstaller.Package</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net20</TargetFrameworks>
     <Description>Extended managed libraries for Windows Installer</Description>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
