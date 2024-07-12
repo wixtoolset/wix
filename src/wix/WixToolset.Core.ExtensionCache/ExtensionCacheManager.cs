@@ -83,51 +83,54 @@ namespace WixToolset.Core.ExtensionCache
 
             (var extensionId, var extensionVersion) = ParseExtensionReference(extension);
 
-            var cacheFolder = this.GetCacheFolder(global);
+            var cacheFolders = this.GetCacheFolders(global);
 
-            var searchFolder = Path.Combine(cacheFolder, extensionId, extensionVersion);
+            foreach (var cacheFolder in cacheFolders)
+            {
+                var searchFolder = Path.Combine(cacheFolder, extensionId, extensionVersion);
 
-            if (!Directory.Exists(searchFolder))
-            {
-            }
-            else if (!String.IsNullOrEmpty(extensionVersion)) // looking for an explicit version of an extension.
-            {
-                var present = this.ExtensionFileExists(cacheFolder, extensionId, extensionVersion);
-                found.Add(new CachedExtension(extensionId, extensionVersion, !present));
-            }
-            else // looking for all versions of an extension or all versions of all extensions.
-            {
-                IEnumerable<string> foundExtensionIds;
-
-                if (String.IsNullOrEmpty(extensionId))
+                if (!Directory.Exists(searchFolder))
                 {
-                    // Looking for all versions of all extensions.
-                    foundExtensionIds = Directory.GetDirectories(cacheFolder).Select(folder => Path.GetFileName(folder)).ToList();
                 }
-                else
+                else if (!String.IsNullOrEmpty(extensionVersion)) // looking for an explicit version of an extension.
                 {
-                    // Looking for all versions of a single extension.
-                    var extensionFolder = Path.Combine(cacheFolder, extensionId);
-                    foundExtensionIds = Directory.Exists(extensionFolder) ? new[] { extensionId } : Array.Empty<string>();
+                    var present = this.ExtensionFileExists(cacheFolder, extensionId, extensionVersion);
+                    found.Add(new CachedExtension(extensionId, extensionVersion, !present));
                 }
-
-                foreach (var foundExtensionId in foundExtensionIds)
+                else // looking for all versions of an extension or all versions of all extensions.
                 {
-                    var extensionFolder = Path.Combine(cacheFolder, foundExtensionId);
+                    IEnumerable<string> foundExtensionIds;
 
-                    foreach (var folder in Directory.GetDirectories(extensionFolder))
+                    if (String.IsNullOrEmpty(extensionId))
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
+                        // Looking for all versions of all extensions.
+                        foundExtensionIds = Directory.GetDirectories(cacheFolder).Select(folder => Path.GetFileName(folder)).ToList();
+                    }
+                    else
+                    {
+                        // Looking for all versions of a single extension.
+                        var extensionFolder = Path.Combine(cacheFolder, extensionId);
+                        foundExtensionIds = Directory.Exists(extensionFolder) ? new[] { extensionId } : Array.Empty<string>();
+                    }
 
-                        var foundExtensionVersion = Path.GetFileName(folder);
+                    foreach (var foundExtensionId in foundExtensionIds)
+                    {
+                        var extensionFolder = Path.Combine(cacheFolder, foundExtensionId);
 
-                        if (!NuGetVersion.TryParse(foundExtensionVersion, out _))
+                        foreach (var foundExtensionVersionFolder in Directory.GetDirectories(extensionFolder))
                         {
-                            continue;
-                        }
+                            cancellationToken.ThrowIfCancellationRequested();
 
-                        var present = this.ExtensionFileExists(cacheFolder, foundExtensionId, foundExtensionVersion);
-                        found.Add(new CachedExtension(foundExtensionId, foundExtensionVersion, !present));
+                            var foundExtensionVersion = Path.GetFileName(foundExtensionVersionFolder);
+
+                            if (!NuGetVersion.TryParse(foundExtensionVersion, out _))
+                            {
+                                continue;
+                            }
+
+                            var present = this.ExtensionFileExists(cacheFolder, foundExtensionId, foundExtensionVersion);
+                            found.Add(new CachedExtension(foundExtensionId, foundExtensionVersion, !present));
+                        }
                     }
                 }
             }
@@ -147,6 +150,18 @@ namespace WixToolset.Core.ExtensionCache
             var cacheLocation = this.cacheLocations.First(l => l.Scope == requestedScope);
 
             return cacheLocation.Path;
+        }
+
+        private IEnumerable<string> GetCacheFolders(bool global)
+        {
+            if (this.cacheLocations == null)
+            {
+                this.cacheLocations = this.ExtensionManager.GetCacheLocations();
+            }
+
+            var cacheLocations = this.cacheLocations.Where(l => global || l.Scope == ExtensionCacheLocationScope.Project).OrderBy(l => l.Scope).Select(l => l.Path);
+
+            return cacheLocations;
         }
 
         private async Task<bool> DownloadAndExtractAsync(bool global, string id, string version, CancellationToken cancellationToken)
