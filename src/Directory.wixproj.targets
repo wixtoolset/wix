@@ -10,7 +10,9 @@
       <DefineConstants>
         $(DefineConstants);
         SetupVersion=$(PackageVersion);
+        SetupMajorVersion=$(SomeVerInfoMajor);
         SetupMajorMinorVersion=$(SomeVerInfoMajor).$(SomeVerInfoMinor);
+        SetupMajorMinorPatchVersion=$(SomeVerInfoMajor).$(SomeVerInfoMinor).$(SomeVerInfoPatch);
         SetupDashedMajorMinorVersion=$(SomeVerInfoMajor)-$(SomeVerInfoMinor);
         SetupDashedPrerelease=$(PrereleaseSuffix)
       </DefineConstants>
