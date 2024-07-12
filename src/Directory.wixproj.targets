@@ -11,7 +11,9 @@
       <DefineConstants>
         $(DefineConstants);
         SetupVersion=$(PackageVersion);
+        SetupMajorVersion=$(GitBaseVersionMajor);
         SetupMajorMinorVersion=$(GitBaseVersionMajor).$(GitBaseVersionMinor);
+        SetupMajorMinorPatchVersion=$(GitBaseVersionMajor).$(GitBaseVersionMinor).$(GitBaseVersionPatch);
         SetupDashedMajorMinorVersion=$(GitBaseVersionMajor)-$(GitBaseVersionMinor);
         SetupDashedPrerelease=$(PrereleaseSuffix)
       </DefineConstants>

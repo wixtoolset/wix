@@ -1,0 +1,81 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="WiX Toolset Command-Line Tools" Manufacturer="WiX Toolset" Version="!(bind.fileVersion.WixExe)" UpgradeCode="2e85dc76-769f-46d2-82a7-46cb3a0c9d50">
+    <MediaTemplate EmbedCab="yes" />
+
+    <ComponentGroupRef Id="BinaryFiles" />
+    <ComponentGroupRef Id="ExtensionFiles" />
+
+    <Property Id="ARPURLINFOABOUT" Value="https://wixtoolset.org/" />
+    <Property Id="ARPHELPLINK" Value="https://wixtoolset.org/docs/gethelp/" />
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLFOLDER]" After="CostFinalize" />
+  </Package>
+
+  <Fragment>
+    <ComponentGroup Id="BinaryFiles" Directory="BinFolder">
+      <Component>
+        <File Id="WixExe" Source="!(bindpath.Files)\wix.exe" />
+        <File Source="!(bindpath.Files)\wix.exe.config" />
+
+        <Environment Name="PATH" Value="[BinFolder]" Action="set" Part ="last" System="yes" />
+        <Environment Name="WIX$(SetupMajorVersion)" Value="[BinFolder]" Action="set" System="yes" />
+      </Component>
+
+      <Files Include="!(bindpath.Files)\**">
+        <Exclude Files="!(bindpath.Files)\wix.exe*" />
+        <Exclude Files="!(bindpath.Files)\**\*.xml" />
+        <Exclude Files="!(bindpath.Files)\**\*.targets" />
+      </Files>
+
+      <Files Include="!(bindpath.Heat_x64)\**" Subdirectory="x64" />
+      <Files Include="!(bindpath.Heat_x86)\**" Subdirectory="x86" />
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ExtensionFiles" Directory="ExtensionFolder">
+      <File Subdirectory="WixToolset.BootstrapperApplications.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.BootstrapperApplications.wixext.dll" />
+      <File Subdirectory="WixToolset.ComPlus.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.ComPlus.wixext.dll" />
+      <File Subdirectory="WixToolset.Dependency.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.Dependency.wixext.dll" />
+      <File Subdirectory="WixToolset.DirectX.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.DirectX.wixext.dll" />
+      <File Subdirectory="WixToolset.Firewall.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.Firewall.wixext.dll" />
+      <File Subdirectory="WixToolset.Http.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.Http.wixext.dll" />
+      <File Subdirectory="WixToolset.Iis.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.Iis.wixext.dll" />
+      <File Subdirectory="WixToolset.Msmq.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.Msmq.wixext.dll" />
+      <File Subdirectory="WixToolset.NetFx.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.NetFx.wixext.dll" />
+      <File Subdirectory="WixToolset.PowerShell.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.PowerShell.wixext.dll" />
+      <File Subdirectory="WixToolset.Sql.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.Sql.wixext.dll" />
+      <File Subdirectory="WixToolset.UI.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.UI.wixext.dll" />
+      <File Subdirectory="WixToolset.Util.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.Util.wixext.dll" />
+      <File Subdirectory="WixToolset.VisualStudio.wixext\$(SetupMajorMinorPatchVersion)\wixext$(SetupMajorVersion)"
+            Source="WixToolset.VisualStudio.wixext.dll" />
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="WiX Toolset v$(SetupMajorMinorVersion)">
+        <Directory Id="BinFolder" Name="bin" />
+      </Directory>
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <StandardDirectory Id="CommonFiles64Folder">
+      <Directory Id="ExtensionFolder" Name="WixToolset\extensions" />
+    </StandardDirectory>
+  </Fragment>
+</Wix>

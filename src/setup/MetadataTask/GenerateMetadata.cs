@@ -36,12 +36,21 @@ namespace WixToolset.Tasks
 
             var section = intermediate.Sections.Single();
 
-            if (section.Type != SectionType.Bundle)
+            Metadata metadata;
+            SourceLineNumber sourceLineNumber;
+
+            if (section.Type == SectionType.Bundle)
+            {
+                (metadata, sourceLineNumber) = this.GetBundleMetadata(section, "WixToolset.AdditionalTools");
+            }
+            else if (section.Type == SectionType.Package)
+            {
+                (metadata, sourceLineNumber) = this.GetPackageMetadata(section, "WixToolset.CommandLineTools");
+            }
+            else
             {
                 return false;
             }
-
-            (var metadata, var sourceLineNumber) = this.GetBundleMetadata(section);
 
             if (metadata != null)
             {
@@ -53,13 +62,13 @@ namespace WixToolset.Tasks
             return true;
         }
 
-        private (Metadata, SourceLineNumber) GetBundleMetadata(IntermediateSection section)
+        private (Metadata, SourceLineNumber) GetBundleMetadata(IntermediateSection section, string defaultId)
         {
             var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
 
             var metadata = new Metadata
             {
-                Id = "WixToolset.AdditionalTools",
+                Id = bundleSymbol.Id?.Id ?? defaultId,
                 Type = MetadataType.Burn,
                 Name = bundleSymbol.Name,
                 Version = bundleSymbol.Version,
@@ -74,6 +83,31 @@ namespace WixToolset.Tasks
             };
 
             return (metadata, bundleSymbol.SourceLineNumbers);
+        }
+
+        private (Metadata, SourceLineNumber) GetPackageMetadata(IntermediateSection section, string defaultId)
+        {
+            var packageSymbol = section.Symbols.OfType<WixPackageSymbol>().Single();
+            var propertySymbols = section.Symbols.OfType<PropertySymbol>().ToDictionary(p => p.Id.Id);
+            var platform = GetPlatformFromSummaryInformation(section.Symbols.OfType<SummaryInformationSymbol>());
+
+            var metadata = new Metadata
+            {
+                Id = packageSymbol.Id?.Id ?? defaultId,
+                Type = MetadataType.Msi,
+                Name = packageSymbol.Name,
+                Version = packageSymbol.Version,
+                Publisher = packageSymbol.Manufacturer,
+                Description = "Installation for " + packageSymbol.Name,
+                License = "MS-RL",
+                SupportUrl = propertySymbols["ARPHELPLINK"].Value,
+                ProductCode = propertySymbols["ProductCode"].Value,
+                UpgradeCode = propertySymbols["UpgradeCode"].Value,
+                AboutUrl = propertySymbols["ARPURLINFOABOUT"].Value,
+                Architecture = PlatformToArchitecture(platform),
+            };
+
+            return (metadata, packageSymbol.SourceLineNumbers);
         }
 
         private void PopulateFileInfo(Metadata metadata)
@@ -99,6 +133,34 @@ namespace WixToolset.Tasks
             var json = JsonSerializer.Serialize(metadata, SerializerOptions);
 
             File.WriteAllText(metadataFilePath, json);
+        }
+
+        private static Platform GetPlatformFromSummaryInformation(IEnumerable<SummaryInformationSymbol> symbols)
+        {
+            foreach (var symbol in symbols)
+            {
+                if (symbol.PropertyId == SummaryInformationType.PlatformAndLanguage)
+                {
+                    var value = symbol.Value;
+                    var separatorIndex = value.IndexOf(';');
+                    var platformValue = separatorIndex > 0 ? value.Substring(0, separatorIndex) : value;
+
+                    switch (platformValue)
+                    {
+                        case "x64":
+                            return Platform.X64;
+
+                        case "Arm64":
+                            return Platform.ARM64;
+
+                        case "Intel":
+                        default:
+                            return Platform.X86;
+                    }
+                }
+            }
+
+            return Platform.X86;
         }
 
         private static ArchitectureType PlatformToArchitecture(Platform platform)
