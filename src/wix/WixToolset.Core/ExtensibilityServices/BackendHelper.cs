@@ -120,16 +120,13 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             if (WixVersion.TryParse(version, out var wixVersion) && wixVersion.HasMajor && wixVersion.Major < 256 && wixVersion.Minor < 256 && wixVersion.Patch < 65536 && wixVersion.Labels == null && String.IsNullOrEmpty(wixVersion.Metadata))
             {
-                parsedVersion = $"{wixVersion.Major}.{wixVersion.Minor}";
-
-                if (strict || wixVersion.HasPatch)
+                if (strict)
                 {
-                    parsedVersion += $".{wixVersion.Patch}";
+                    parsedVersion = $"{wixVersion.Major}.{wixVersion.Minor}.{wixVersion.Patch}";
                 }
-
-                if (!strict && wixVersion.HasRevision)
+                else
                 {
-                    parsedVersion += $".{wixVersion.Revision}";
+                    parsedVersion = wixVersion.Prefix.HasValue ? version.Substring(1) : version;
                 }
 
                 return true;
