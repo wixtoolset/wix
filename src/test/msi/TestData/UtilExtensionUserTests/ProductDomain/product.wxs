@@ -1,0 +1,33 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="Component1" />
+        </ComponentGroup>
+
+        <Property Id="TEMPDOMAIN" Secure="yes" />
+        <Property Id="TEMPUSERNAME" Secure="yes" />
+    </Fragment>
+
+    <Fragment>
+        <util:Group Id="ADMIN" Name="Administrators" />
+        <util:Group Id="DOMAIN_GUESTS" Name="Domain Guests" Domain="TESTDOMAIN" />
+
+        <Component Id="Component1" Guid="09624A9A-4BBC-4126-BBF9-0713C5217DB1" Directory="INSTALLFOLDER">
+            <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" />
+
+            <util:User Id="TEST_USER1" Name="testName1" Domain="TESTDOMAIN" Comment="testComment1"
+                       Password="test123!@#"
+                       PasswordNeverExpires="no"
+                       PasswordExpired="yes"
+                       Disabled="yes"
+                       CreateUser="yes"
+                       RemoveOnUninstall="yes">
+                <util:GroupRef Id="ADMIN" />
+                <util:GroupRef Id="DOMAIN_GUESTS" />
+            </util:User>
+        </Component>
+    </Fragment>
+</Wix>
