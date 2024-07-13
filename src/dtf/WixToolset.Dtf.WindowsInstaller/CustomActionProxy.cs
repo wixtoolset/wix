@@ -101,8 +101,13 @@ namespace WixToolset.Dtf.WindowsInstaller
                 return (int) ActionResult.Failure;
             }
 
+            string originalDirectory = null;
+
             try
             {
+                // Remember the original directory so we can restore it later.
+                originalDirectory = Environment.CurrentDirectory;
+
                 // Set the current directory to the location of the extracted files.
                 Environment.CurrentDirectory =
                     AppDomain.CurrentDomain.BaseDirectory;
@@ -141,6 +146,20 @@ namespace WixToolset.Dtf.WindowsInstaller
                 session.Log("Exception thrown by custom action:");
                 session.Log(ex.ToString());
                 return (int) ActionResult.Failure;
+            }
+            finally
+            {
+                try
+                {
+                    if (!String.IsNullOrEmpty(originalDirectory))
+                    {
+                        Environment.CurrentDirectory = originalDirectory;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    session.Log("Failed to restore current directory after running custom action: {0}", ex.Message);
+                }
             }
         }
 
