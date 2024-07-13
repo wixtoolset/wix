@@ -131,9 +131,16 @@ namespace WixToolset.Core.Link
             // Ensure referenced override symbols actually overrode a virtual symbol.
             foreach (var referencedOverrideSymbol in this.OverrideSymbols.Where(s => this.ResolvedSections.Contains(s.Section)))
             {
+                // The easiest check is to see if the symbol overrode a virtual symbol. If not, check to see if there were any possible
+                // virtual symbols that could have been overridden. If not, then we have an error.
                 if (referencedOverrideSymbol.Overrides is null)
                 {
-                    this.Messaging.Write(LinkerErrors.VirtualSymbolNotFoundForOverride(referencedOverrideSymbol.Symbol));
+                    var otherVirtualsCount = referencedOverrideSymbol.PossiblyConflicts.Count(s => s.Access == AccessModifier.Virtual);
+
+                    if (otherVirtualsCount == 0)
+                    {
+                        this.Messaging.Write(LinkerErrors.VirtualSymbolNotFoundForOverride(referencedOverrideSymbol.Symbol));
+                    }
                 }
             }
 
