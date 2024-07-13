@@ -2504,8 +2504,8 @@ namespace WixToolset.Core
                 var exitSequence = CompilerConstants.IntegerNotSet;
                 var sequence = CompilerConstants.IntegerNotSet;
                 var showDialog = "Show" == actionName;
-                var specialAction = "InstallExecute" == actionName || "InstallExecuteAgain" == actionName || "RemoveExistingProducts" == actionName || "DisableRollback" == actionName || "ScheduleReboot" == actionName || "ForceReboot" == actionName || "ResolveSource" == actionName;
-                var specialStandardAction = "AppSearch" == actionName || "CCPSearch" == actionName || "RMCCPSearch" == actionName || "LaunchConditions" == actionName || "FindRelatedProducts" == actionName;
+                var specialAction = "InstallExecute" == actionName || "InstallExecuteAgain" == actionName || "RemoveExistingProducts" == actionName || "DisableRollback" == actionName || "ScheduleReboot" == actionName || "ForceReboot" == actionName || "ResolveSource" == actionName; // these actions do NOT have default sequence numbers and MUST be scheduled.
+                var specialStandardAction = "AppSearch" == actionName || "CCPSearch" == actionName || "RMCCPSearch" == actionName || "LaunchConditions" == actionName || "FindRelatedProducts" == actionName; // these standard actions have default sequence numbers so they do NOT have to be scheduled.
                 var suppress = false;
 
                 foreach (var attrib in child.Attributes())
@@ -2608,6 +2608,8 @@ namespace WixToolset.Core
                     }
                 }
 
+                var standardAction = WindowsInstallerStandard.IsStandardAction(actionName);
+
                 if (customAction && "Custom" == actionName)
                 {
                     this.Core.Write(ErrorMessages.ExpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Action"));
@@ -2653,7 +2655,7 @@ namespace WixToolset.Core
                 }
 
                 // normal standard actions cannot be set overridable by the user (since they are overridable by default)
-                if (overridable && WindowsInstallerStandard.IsStandardAction(actionName) && !specialAction)
+                if (overridable && standardAction && !specialAction)
                 {
                     this.Core.Write(ErrorMessages.UnexpectedAttribute(childSourceLineNumbers, child.Name.LocalName, "Overridable"));
                 }
@@ -2687,6 +2689,10 @@ namespace WixToolset.Core
                         else if (actionIdentifier != null)
                         {
                             access = actionIdentifier.Access;
+                        }
+                        else if (standardAction)
+                        {
+                            access = AccessModifier.Override;
                         }
 
                         var symbol = this.Core.AddSymbol(new WixActionSymbol(childSourceLineNumbers, new Identifier(access, sequenceTable, actionName))
