@@ -5,6 +5,7 @@
     <String Id="msierrUSRFailedUserCreate" Overridable="yes" Value="无法创建用户。  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes" Value="由于密码错误无法创建用户。  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="无法在组中添加用户。  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrUSRFailedGrantLogonAsService" Overridable="yes" Value="无法向用户授予“作为服务登录”权限。 ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="无法创建已经存在的用户。  ([2]   [3]   [4]   [5])" />
 
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="无法创建网络分享。  ([2]   [3]   [4]   [5])" />
