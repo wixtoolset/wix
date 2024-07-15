@@ -711,7 +711,7 @@ DAPI_(HRESULT) ThemeLoadFromFile(
     LPWSTR sczRelativePath = NULL;
 
     hr = XmlLoadDocumentFromFile(wzThemeFile, &pixd);
-    ThmExitOnFailure(hr, "Failed to load theme resource as XML document.");
+    ThmExitOnFailure(hr, "Failed to load theme file as XML document.");
 
     hr = PathGetDirectory(wzThemeFile, &sczRelativePath);
     ThmExitOnFailure(hr, "Failed to get relative path from theme file.");

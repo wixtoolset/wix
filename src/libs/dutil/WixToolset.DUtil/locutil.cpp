@@ -116,15 +116,15 @@ extern "C" HRESULT DAPI LocProbeForFile(
             LocExitOnFailure(hr, "Failed to parse langId.");
 
             langid = MAKEWORD(HIBYTE(langid), LOBYTE(langid));
-            hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName); 
+            hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName);
             LocExitOnFailure(hr, "Failed to format user preferred langid.");
 
-            hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath); 
+            hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath);
             LocExitOnFailure(hr, "Failed to concat user preferred langid file name to base path.");
 
-            if (FileExistsEx(sczProbePath, NULL)) 
-            { 
-                ExitFunction(); 
+            if (FileExistsEx(sczProbePath, NULL))
+            {
+                ExitFunction();
             }
         }
     }
@@ -142,20 +142,20 @@ extern "C" HRESULT DAPI LocProbeForFile(
         ExitFunction();
     }
 
-    if (MAKELANGID(langid & 0x3FF, SUBLANG_DEFAULT) != langid) 
-    { 
-        langid = MAKELANGID(langid & 0x3FF, SUBLANG_DEFAULT); 
-        
-        hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName); 
+    if (MAKELANGID(langid & 0x3FF, SUBLANG_DEFAULT) != langid)
+    {
+        langid = MAKELANGID(langid & 0x3FF, SUBLANG_DEFAULT);
+
+        hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName);
         LocExitOnFailure(hr, "Failed to format user langid (default sublang).");
 
-        hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath); 
+        hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath);
         LocExitOnFailure(hr, "Failed to concat user langid file name to base path (default sublang).");
 
-        if (FileExistsEx(sczProbePath, NULL)) 
-        { 
-            ExitFunction(); 
-        } 
+        if (FileExistsEx(sczProbePath, NULL))
+        {
+            ExitFunction();
+        }
     }
 
     langid = ::GetSystemDefaultUILanguage();
@@ -171,20 +171,20 @@ extern "C" HRESULT DAPI LocProbeForFile(
         ExitFunction();
     }
 
-    if (MAKELANGID(langid & 0x3FF, SUBLANG_DEFAULT) != langid) 
-    { 
-        langid = MAKELANGID(langid & 0x3FF, SUBLANG_DEFAULT); 
-        
-        hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName); 
+    if (MAKELANGID(langid & 0x3FF, SUBLANG_DEFAULT) != langid)
+    {
+        langid = MAKELANGID(langid & 0x3FF, SUBLANG_DEFAULT);
+
+        hr = StrAllocFormatted(&sczLangIdFile, L"%u\\%ls", langid, wzLocFileName);
         LocExitOnFailure(hr, "Failed to format user langid (default sublang).");
 
-        hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath); 
+        hr = PathConcat(wzBasePath, sczLangIdFile, &sczProbePath);
         LocExitOnFailure(hr, "Failed to concat user langid file name to base path (default sublang).");
 
-        if (FileExistsEx(sczProbePath, NULL)) 
-        { 
-            ExitFunction(); 
-        } 
+        if (FileExistsEx(sczProbePath, NULL))
+        {
+            ExitFunction();
+        }
     }
 
     // Finally, look for the loc file in the base path.
@@ -242,13 +242,13 @@ extern "C" HRESULT DAPI LocLoadFromResource(
     IXMLDOMDocument* pixd = NULL;
 
     hr = ResReadData(hModule, szResource, &pvResource, &cbResource);
-    LocExitOnFailure(hr, "Failed to read theme from resource.");
+    LocExitOnFailure(hr, "Failed to read localization from resource.");
 
     hr = StrAllocStringAnsi(&sczXml, reinterpret_cast<LPCSTR>(pvResource), cbResource, CP_UTF8);
-    LocExitOnFailure(hr, "Failed to convert XML document data from UTF-8 to unicode string.");
+    LocExitOnFailure(hr, "Failed to convert XML document data from UTF-8 to Unicode string.");
 
     hr = XmlLoadDocument(sczXml, &pixd);
-    LocExitOnFailure(hr, "Failed to load theme resource as XML document.");
+    LocExitOnFailure(hr, "Failed to load localization resource as XML document.");
 
     hr = ParseWxl(pixd, ppWixLoc);
     LocExitOnFailure(hr, "Failed to parse WXL.");
