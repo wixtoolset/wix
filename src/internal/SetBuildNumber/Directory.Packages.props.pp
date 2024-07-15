@@ -38,6 +38,7 @@
     <PackageVersion Include="WixToolset.UI.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Util.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Firewall.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Msmq.wixext" Version="{packageversion}" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,6 +46,7 @@
     <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="4.7.0" />
     <PackageVersion Include="System.DirectoryServices" Version="4.7.0" />
     <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
+    <PackageVersion Include="System.Management" Version="4.7.0" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
     <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
     <PackageVersion Include="System.Net.NetworkInformation" Version="4.3.0" />
