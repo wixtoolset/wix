@@ -487,7 +487,7 @@ HRESULT ScaUserExecute(
 {
     HRESULT hr = S_OK;
     DWORD er = 0;
-    PDOMAIN_CONTROLLER_INFOW pDomainControllerInfo = NULL;
+    LPWSTR pwzDomainName = NULL;
 
     LPWSTR pwzBaseScriptKey = NULL;
     DWORD cScriptKey = 0;
@@ -518,36 +518,11 @@ HRESULT ScaUserExecute(
         ExitOnFailure(hr, "Failed to add user comment to custom action data: %ls", psu->wzComment);
 
         // Check to see if the user already exists since we have to be very careful when adding
-        // and removing users.  Note: MSDN says that it is safe to call these APIs from any
-        // user, so we should be safe calling it during immediate mode.
-        er = ::NetApiBufferAllocate(sizeof(USER_INFO_0), reinterpret_cast<LPVOID*>(&pUserInfo));
-        hr = HRESULT_FROM_WIN32(er);
-        ExitOnFailure(hr, "Failed to allocate memory to check existence of user: %ls", psu->wzName);
+        // and removing users.
+        hr = GetDomainFromServerName(&pwzDomainName, psu->wzDomain, 0);
+        ExitOnFailure(hr, "Failed to get domain from server name: %ls", psu->wzDomain);
 
-        LPCWSTR wzDomain = psu->wzDomain;
-        if (wzDomain && *wzDomain)
-        {
-            er = ::DsGetDcNameW(NULL, wzDomain, NULL, NULL, NULL, &pDomainControllerInfo);
-            if (RPC_S_SERVER_UNAVAILABLE == er)
-            {
-                // MSDN says, if we get the above error code, try again with the "DS_FORCE_REDISCOVERY" flag
-                er = ::DsGetDcNameW(NULL, wzDomain, NULL, NULL, DS_FORCE_REDISCOVERY, &pDomainControllerInfo);
-            }
-            if (ERROR_SUCCESS == er && pDomainControllerInfo->DomainControllerName)
-            {
-                // If the  \\ prefix on the queried domain was present, skip it.
-                if ('\\' == *pDomainControllerInfo->DomainControllerName && '\\' == *pDomainControllerInfo->DomainControllerName + 1)
-                {
-                    wzDomain = pDomainControllerInfo->DomainControllerName + 2;
-                }
-                else
-                {
-                    wzDomain = pDomainControllerInfo->DomainControllerName;
-                }
-            }
-        }
-
-        er = ::NetUserGetInfo(wzDomain, psu->wzName, 0, reinterpret_cast<LPBYTE*>(pUserInfo));
+        er = ::NetUserGetInfo(pwzDomainName, psu->wzName, 0, reinterpret_cast<LPBYTE*>(&pUserInfo));
         if (NERR_Success == er)
         {
             ueUserExists = USER_EXISTS_YES;
@@ -560,7 +535,7 @@ HRESULT ScaUserExecute(
         {
             ueUserExists = USER_EXISTS_INDETERMINATE;
             hr = HRESULT_FROM_WIN32(er);
-            WcaLog(LOGMSG_VERBOSE, "Failed to check existence of domain: %ls, user: %ls (error code 0x%x) - continuing", wzDomain, psu->wzName, hr);
+            WcaLog(LOGMSG_VERBOSE, "Failed to check existence of domain: %ls, user: %ls (error code 0x%x) - continuing", pwzDomainName, psu->wzName, hr);
             hr = S_OK;
             er = ERROR_SUCCESS;
         }
@@ -685,11 +660,6 @@ HRESULT ScaUserExecute(
             ::NetApiBufferFree(static_cast<LPVOID>(pUserInfo));
             pUserInfo = NULL;
         }
-        if (pDomainControllerInfo)
-        {
-            ::NetApiBufferFree(static_cast<LPVOID>(pDomainControllerInfo));
-            pDomainControllerInfo = NULL;
-        }
     }
 
 LExit:
@@ -697,13 +667,11 @@ LExit:
     ReleaseStr(pwzScriptKey);
     ReleaseStr(pwzActionData);
     ReleaseStr(pwzRollbackData);
+    ReleaseStr(pwzDomainName);
+
     if (pUserInfo)
     {
         ::NetApiBufferFree(static_cast<LPVOID>(pUserInfo));
-    }
-    if (pDomainControllerInfo)
-    {
-        ::NetApiBufferFree(static_cast<LPVOID>(pDomainControllerInfo));
     }
 
     return hr;

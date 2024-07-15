@@ -613,8 +613,7 @@ static HRESULT RemoveUserInternal(
     LPWSTR pwz = NULL;
     LPWSTR pwzGroup = NULL;
     LPWSTR pwzGroupDomain = NULL;
-    LPCWSTR wz = NULL;
-    PDOMAIN_CONTROLLER_INFOW pDomainControllerInfo = NULL;
+    LPWSTR pwzDomainName = NULL;
 
     //
     // Remove the logon as service privilege.
@@ -644,30 +643,10 @@ static HRESULT RemoveUserInternal(
     //
     if (!(SCAU_DONT_CREATE_USER & iAttributes))
     {
-        if (wzDomain && *wzDomain)
-        {
-            er = ::DsGetDcNameW(NULL, (LPCWSTR)wzDomain, NULL, NULL, NULL, &pDomainControllerInfo);
-            if (RPC_S_SERVER_UNAVAILABLE == er)
-            {
-                // MSDN says, if we get the above error code, try again with the "DS_FORCE_REDISCOVERY" flag
-                er = ::DsGetDcNameW(NULL, (LPCWSTR)wzDomain, NULL, NULL, DS_FORCE_REDISCOVERY, &pDomainControllerInfo);
-            }
-            if (ERROR_SUCCESS == er)
-            {
-                if (2 <= wcslen(pDomainControllerInfo->DomainControllerName))
-                {
-                    wz = pDomainControllerInfo->DomainControllerName + 2; // Add 2 so that we don't get the \\ prefix.
-                                                                          // Pass the entire string if it is too short
-                                                                          // to have a \\ prefix.
-                }
-            }
-            else
-            {
-                wz = wzDomain;
-            }
-        }
+        hr = GetDomainFromServerName(&pwzDomainName, wzDomain, 0);
+        ExitOnFailure(hr, "Failed to get domain to remove user from server name: %ls", wzDomain);
 
-        er = ::NetUserDel(wz, wzName);
+        er = ::NetUserDel(pwzDomainName, wzName);
         if (NERR_UserNotFound == er)
         {
             er = NERR_Success;
@@ -707,50 +686,11 @@ static HRESULT RemoveUserInternal(
     }
 
 LExit:
-    if (pDomainControllerInfo)
-    {
-        ::NetApiBufferFree(static_cast<LPVOID>(pDomainControllerInfo));
-    }
+    ReleaseStr(pwzDomainName);
+    ReleaseStr(pwzGroupDomain);
+    ReleaseStr(pwzGroup);
 
     return hr;
-}
-
-static void GetServerName(LPWSTR pwzDomain, LPWSTR* ppwzServerName)
-{
-    DWORD er = ERROR_SUCCESS;
-    PDOMAIN_CONTROLLER_INFOW pDomainControllerInfo = NULL;
-
-    if (pwzDomain && *pwzDomain)
-    {
-        er = ::DsGetDcNameW(NULL, (LPCWSTR)pwzDomain, NULL, NULL, NULL, &pDomainControllerInfo);
-        if (RPC_S_SERVER_UNAVAILABLE == er)
-        {
-            // MSDN says, if we get the above error code, try again with the "DS_FORCE_REDISCOVERY" flag
-            er = ::DsGetDcNameW(NULL, (LPCWSTR)pwzDomain, NULL, NULL, DS_FORCE_REDISCOVERY, &pDomainControllerInfo);
-        }
-
-        if (ERROR_SUCCESS == er && pDomainControllerInfo->DomainControllerName)
-        {
-            // Skip the \\ prefix if present.
-            if ('\\' == *pDomainControllerInfo->DomainControllerName && '\\' == *pDomainControllerInfo->DomainControllerName + 1)
-            {
-                *ppwzServerName = pDomainControllerInfo->DomainControllerName + 2;
-            }
-            else
-            {
-                *ppwzServerName = pDomainControllerInfo->DomainControllerName;
-            }
-        }
-        else
-        {
-            *ppwzServerName = pwzDomain;
-        }
-    }
-
-    if (pDomainControllerInfo)
-    {
-        ::NetApiBufferFree((LPVOID)pDomainControllerInfo);
-    }
 }
 
 /********************************************************************
@@ -776,6 +716,7 @@ extern "C" UINT __stdcall CreateUser(
     LPWSTR pwzPassword = NULL;
     LPWSTR pwzGroup = NULL;
     LPWSTR pwzGroupDomain = NULL;
+    LPWSTR pwzDomainName = NULL;
     int iAttributes = 0;
     BOOL fInitializedCom = FALSE;
 
@@ -786,7 +727,6 @@ extern "C" UINT __stdcall CreateUser(
     USER_INFO_1 userInfo1;
     USER_INFO_1* pUserInfo1 = NULL;
     DWORD dw;
-    LPWSTR pwzServerName = NULL;
 
     hr = WcaInitialize(hInstall, "CreateUser");
     ExitOnFailure(hr, "failed to initialize");
@@ -845,9 +785,10 @@ extern "C" UINT __stdcall CreateUser(
         //
         // Create the User
         //
-        GetServerName(pwzDomain, &pwzServerName);
+        hr = GetDomainFromServerName(&pwzDomainName, pwzDomain, 0);
+        ExitOnFailure(hr, "Failed to get domain from server name: %ls", pwzDomain);
 
-        er = ::NetUserAdd(pwzServerName, 1, reinterpret_cast<LPBYTE>(pUserInfo1), &dw);
+        er = ::NetUserAdd(pwzDomainName, 1, reinterpret_cast<LPBYTE>(pUserInfo1), &dw);
         if (NERR_UserExists == er)
         {
             if (SCAU_FAIL_IF_EXISTS & iAttributes)
@@ -862,7 +803,7 @@ extern "C" UINT __stdcall CreateUser(
             if (SCAU_UPDATE_IF_EXISTS & iAttributes)
             {
                 pUserInfo1 = NULL;
-                er = ::NetUserGetInfo(pwzServerName, pwzName, 1, reinterpret_cast<LPBYTE*>(&pUserInfo1));
+                er = ::NetUserGetInfo(pwzDomainName, pwzName, 1, reinterpret_cast<LPBYTE*>(&pUserInfo1));
                 if (ERROR_SUCCESS == er)
                 {
                     // There is no rollback scheduled if the key is empty.
@@ -922,28 +863,28 @@ extern "C" UINT __stdcall CreateUser(
 
                 if (ERROR_SUCCESS == er)
                 {
-                    hr = SetUserPassword(pwzServerName, pwzName, pwzPassword);
+                    hr = SetUserPassword(pwzDomainName, pwzName, pwzPassword);
                     if (FAILED(hr))
                     {
-                        WcaLogError(hr, "failed to set user password for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                        WcaLogError(hr, "failed to set user password for user %ls\\%ls, continuing anyway.", pwzDomainName, pwzName);
                         hr = S_OK;
                     }
 
                     if (SCAU_REMOVE_COMMENT & iAttributes)
                     {
-                        hr = SetUserComment(pwzServerName, pwzName, L"");
+                        hr = SetUserComment(pwzDomainName, pwzName, L"");
                         if (FAILED(hr))
                         {
-                            WcaLogError(hr, "failed to clear user comment for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                            WcaLogError(hr, "failed to clear user comment for user %ls\\%ls, continuing anyway.", pwzDomainName, pwzName);
                             hr = S_OK;
                         }
                     }
                     else if (pwzComment && *pwzComment)
                     {
-                        hr = SetUserComment(pwzServerName, pwzName, pwzComment);
+                        hr = SetUserComment(pwzDomainName, pwzName, pwzComment);
                         if (FAILED(hr))
                         {
-                            WcaLogError(hr, "failed to set user comment to %ls for user %ls\\%ls, continuing anyway.", pwzComment, pwzServerName, pwzName);
+                            WcaLogError(hr, "failed to set user comment to %ls for user %ls\\%ls, continuing anyway.", pwzComment, pwzDomainName, pwzName);
                             hr = S_OK;
                         }
                     }
@@ -952,10 +893,10 @@ extern "C" UINT __stdcall CreateUser(
 
                     ApplyAttributes(iAttributes, &flags);
 
-                    hr = SetUserFlags(pwzServerName, pwzName, flags);
+                    hr = SetUserFlags(pwzDomainName, pwzName, flags);
                     if (FAILED(hr))
                     {
-                        WcaLogError(hr, "failed to set user flags for user %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                        WcaLogError(hr, "failed to set user flags for user %ls\\%ls, continuing anyway.", pwzDomainName, pwzName);
                         hr = S_OK;
                     }
                 }
@@ -1018,6 +959,7 @@ LExit:
     ReleaseStr(pwzPassword);
     ReleaseStr(pwzGroup);
     ReleaseStr(pwzGroupDomain);
+    ReleaseStr(pwzDomainName)
 
     if (fInitializedCom)
     {
