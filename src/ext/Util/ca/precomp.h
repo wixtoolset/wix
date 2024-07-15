@@ -15,7 +15,7 @@
 
 #include <msxml2.h>
 #include <Iads.h>
-#include <activeds.h> 
+#include <activeds.h>
 #include <lm.h>        // NetApi32.lib
 #include <Ntsecapi.h>
 #include <Dsgetdc.h>
@@ -50,5 +50,6 @@
 #include "scauser.h"
 #include "scasmb.h"
 #include "scasmbexec.h"
+#include "utilca.h"
 
 #include "..\..\caDecor.h"
