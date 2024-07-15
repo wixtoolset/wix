@@ -23,6 +23,7 @@
     <PackageReference Include="Microsoft.Win32.Registry" />
     <PackageReference Include="System.DirectoryServices" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" />
+    <PackageReference Include="System.Management" />
     <PackageReference Include="System.Security.Principal.Windows" />
     <PackageReference Include="WixInternal.TestSupport" />
     <PackageReference Include="WixToolset.Data" />

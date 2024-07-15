@@ -20,3 +20,5 @@
 #include "mqqueuesched.h"
 #include "mqutilexec.h"
 #include "mqqueueexec.h"
+
+#include "..\..\caDecor.h"

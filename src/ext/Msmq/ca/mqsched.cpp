@@ -68,7 +68,7 @@ extern "C" UINT __stdcall MessageQueuingInstall(MSIHANDLE hInstall)
         hr = MqiMessageQueueInstall(&lstMessageQueues, TRUE, &pwzRollbackActionData);
         ExitOnFailure(hr, "Failed to add message queues to rollback action data");
 
-        hr = WcaDoDeferredAction(L"MessageQueuingRollbackInstall", pwzRollbackActionData, 0);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"MessageQueuingRollbackInstall"), pwzRollbackActionData, 0);
         ExitOnFailure(hr, "Failed to schedule MessageQueuingRollbackInstall");
 
         // schedule execute action
@@ -80,7 +80,7 @@ extern "C" UINT __stdcall MessageQueuingInstall(MSIHANDLE hInstall)
         ExitOnFailure(hr, "Failed to add message queue permissions to execute action data");
         iCost += lstMessageQueues.iInstallCount * COST_MESSAGE_QUEUE_PERMISSION_ADD;
 
-        hr = WcaDoDeferredAction(L"MessageQueuingExecuteInstall", pwzExecuteActionData, iCost);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"MessageQueuingExecuteInstall"), pwzExecuteActionData, iCost);
         ExitOnFailure(hr, "Failed to schedule MessageQueuingExecuteInstall");
     }
 
@@ -163,7 +163,7 @@ extern "C" UINT __stdcall MessageQueuingUninstall(MSIHANDLE hInstall)
         hr = MqiMessageQueuePermissionUninstall(&lstMessageQueuePermissions, &pwzRollbackActionData);
         ExitOnFailure(hr, "Failed to add message queue permissions to rollback action data");
 
-        hr = WcaDoDeferredAction(L"MessageQueuingRollbackUninstall", pwzRollbackActionData, 0);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"MessageQueuingRollbackUninstall"), pwzRollbackActionData, 0);
         ExitOnFailure(hr, "Failed to schedule MessageQueuingRollbackUninstall");
 
         // schedule execute action
@@ -174,7 +174,7 @@ extern "C" UINT __stdcall MessageQueuingUninstall(MSIHANDLE hInstall)
         ExitOnFailure(hr, "Failed to add message queues to execute action data");
         iCost += lstMessageQueues.iUninstallCount * COST_MESSAGE_QUEUE_DELETE;
 
-        hr = WcaDoDeferredAction(L"MessageQueuingExecuteUninstall", pwzExecuteActionData, iCost);
+        hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"MessageQueuingExecuteUninstall"), pwzExecuteActionData, iCost);
         ExitOnFailure(hr, "Failed to schedule MessageQueuingExecuteUninstall");
     }
 
