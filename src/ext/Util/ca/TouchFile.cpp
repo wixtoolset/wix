@@ -23,6 +23,7 @@ static HRESULT SetExistingFileModifiedTime(
     )
 {
     HRESULT hr = S_OK;
+#ifndef _WIN64
     BOOL fReenableFileSystemRedirection = FALSE;
 
     if (f64Bit)
@@ -32,14 +33,20 @@ static HRESULT SetExistingFileModifiedTime(
 
         fReenableFileSystemRedirection = TRUE;
     }
+#else
+    UNREFERENCED_PARAMETER(wzId);
+    UNREFERENCED_PARAMETER(f64Bit);
+#endif
 
     hr = FileSetTime(wzPath, NULL, NULL, pftModified);
 
+#ifndef _WIN64
 LExit:
     if (fReenableFileSystemRedirection)
     {
         WcaRevertWow64FSRedirection();
     }
+#endif
 
     return hr;
 }
@@ -83,6 +90,7 @@ static BOOL TryGetExistingFileModifiedTime(
     )
 {
     HRESULT hr = S_OK;
+#ifndef _WIN64
     BOOL fReenableFileSystemRedirection = FALSE;
 
     if (f64Bit)
@@ -92,6 +100,10 @@ static BOOL TryGetExistingFileModifiedTime(
 
         fReenableFileSystemRedirection = TRUE;
     }
+#else
+    UNREFERENCED_PARAMETER(wzId);
+    UNREFERENCED_PARAMETER(f64Bit);
+#endif
 
     hr = FileGetTime(wzPath, NULL, NULL, pftModified);
     if (E_PATHNOTFOUND == hr || E_FILENOTFOUND == hr)
@@ -104,11 +116,13 @@ static BOOL TryGetExistingFileModifiedTime(
         WcaLog(LOGMSG_STANDARD, "Cannot access modified timestamp for file: '%ls' due to error: 0x%x. Continuing with out rollback for: %ls", wzPath, hr, wzId);
     }
 
+#ifndef _WIN64
 LExit:
     if (fReenableFileSystemRedirection)
     {
         WcaRevertWow64FSRedirection();
     }
+#endif
 
     return SUCCEEDED(hr);
 }
@@ -217,9 +231,17 @@ extern "C" UINT WINAPI WixTouchFileDuringInstall(
     hr = WcaInitialize(hInstall, "WixTouchFileDuringInstall");
     ExitOnFailure(hr, "Failed to initialize WixTouchFileDuringInstall.");
 
+#ifndef _WIN64
+    WcaInitializeWow64();
+#endif
+
     hr = ProcessTouchFileTable(TRUE);
 
 LExit:
+#ifndef _WIN64
+    WcaFinalizeWow64();
+#endif
+
     DWORD er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
@@ -236,9 +258,17 @@ extern "C" UINT WINAPI WixTouchFileDuringUninstall(
     hr = WcaInitialize(hInstall, "WixTouchFileDuringUninstall");
     ExitOnFailure(hr, "Failed to initialize WixTouchFileDuringUninstall.");
 
+#ifndef _WIN64
+    WcaInitializeWow64();
+#endif
+
     hr = ProcessTouchFileTable(FALSE);
 
 LExit:
+#ifndef _WIN64
+    WcaFinalizeWow64();
+#endif
+
     DWORD er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
@@ -260,6 +290,10 @@ extern "C" UINT WINAPI WixExecuteTouchFile(
 
     hr = WcaInitialize(hInstall, "WixExecuteTouchFile");
     ExitOnFailure(hr, "Failed to initialize WixExecuteTouchFile.");
+
+#ifndef _WIN64
+    WcaInitializeWow64();
+#endif
 
     hr = WcaGetProperty(L"CustomActionData", &sczData);
     ExitOnFailure(hr, "Failed to get custom action data for WixExecuteTouchFile.");
@@ -299,6 +333,10 @@ extern "C" UINT WINAPI WixExecuteTouchFile(
     }
 
 LExit:
+#ifndef _WIN64
+    WcaFinalizeWow64();
+#endif
+
     ReleaseStr(sczPath);
     ReleaseStr(sczId);
     ReleaseStr(sczData);
