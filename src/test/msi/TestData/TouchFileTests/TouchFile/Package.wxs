@@ -1,0 +1,8 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Package Name="~TouchFile" Version="1.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <Component>
+            <File Source="$(sys.SOURCEFILEPATH)" />
+            <util:TouchFile Path="[LocalAppDataFolder]touch-file-test.txt" />
+        </Component>
+    </Package>
+</Wix>
