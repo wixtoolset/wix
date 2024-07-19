@@ -74,7 +74,7 @@ namespace WixToolsetTest.MsiE2E
         // Verify that command-line parameters aer not blocked by repair switches.
         // Original code signalled repair mode by using "-f ", which silently
         // terminated the command-line parsing, ignoring any parameters that followed.
-        [RuntimeFact()]
+        [RuntimeFact]
         public void CanRepairUsersWithCommandLineParameters()
         {
             var arguments = new string[]
@@ -98,7 +98,7 @@ namespace WixToolsetTest.MsiE2E
 
 
         // Verify that the users specified in the authoring are created as expected on repair.
-        [RuntimeFact()]
+        [RuntimeFact]
         public void CanRepairUsers()
         {
             UserVerifier.CreateLocalUser("testName3", "test123!@#");
@@ -273,6 +273,26 @@ namespace WixToolsetTest.MsiE2E
 
             // clean up
             UserVerifier.DeleteLocalUser("testName1");
+        }
+
+        // Verify that the users specified in the authoring are created as expected.
+        [RuntimeFact(DomainRequired = true)]
+        public void CanInstallAndUninstallDomainUsers()
+        {
+
+            var productDomain = this.CreatePackageInstaller("ProductDomain");
+
+            productDomain.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+
+            // Validate New User Information.
+            UserVerifier.VerifyUserInformation("TESTDOMAIN", "testName1", true, false, true);
+            UserVerifier.VerifyUserIsMemberOf("TESTDOMAIN", "testName1", "Administrators", "TESTDOMAIN\\Domain Guests");
+            UserVerifier.VerifyUserComment("TESTDOMAIN", "testName1", "testComment1");
+
+            productDomain.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+
+            // Verify Users marked as RemoveOnUninstall were removed.
+            Assert.False(UserVerifier.UserExists("TESTDOMAIN", "testName1"), String.Format("User '{0}\\{1}' was not removed on Uninstall", "TESTDOMAIN", "testName1"));
         }
     }
 }
