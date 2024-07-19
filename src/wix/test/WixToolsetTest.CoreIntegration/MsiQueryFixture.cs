@@ -116,6 +116,39 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void PopulatesAppSearchTablesFromDirectorySearchInMergeModule()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msmPath = Path.Combine(baseFolder, @"bin\test.msm");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "AppSearch", "DirectorySearchInModule.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msmPath,
+                    "-sw1079",
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msmPath));
+                var results = Query.QueryDatabase(msmPath, new[] { "AppSearch", "DrLocator", "IniLocator" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "AppSearch:SYSTEM32FOLDER.7361203A_597E_4DA2_9024_27246B8446B2\tWindowsDrLocator.7361203A_597E_4DA2_9024_27246B8446B2",
+                    "DrLocator:WindowsDrLocator.7361203A_597E_4DA2_9024_27246B8446B2\t\t[WindowsFolder.7361203A_597E_4DA2_9024_27246B8446B2]System32\t",
+                }, results);
+            }
+        }
+
+        [Fact]
         public void PopulatesAppSearchTablesFromRegistrySearch()
         {
             var folder = TestData.Get(@"TestData");
