@@ -9,7 +9,7 @@
             <Error Id="$(var.msierrUSRFailedUserCreate)" Message="!(loc.msierrUSRFailedUserCreate)" />
             <Error Id="$(var.msierrUSRFailedUserCreatePswd)" Message="!(loc.msierrUSRFailedUserCreatePswd)" />
             <Error Id="$(var.msierrUSRFailedUserGroupAdd)" Message="!(loc.msierrUSRFailedUserGroupAdd)" />
-            <Error Id="$(var.msierrUSRFailedGrantLogonAsService)" Message="Failed to grant 'logon as service' rights to user.  ([2]   [3]   [4]   [5])" />
+            <Error Id="$(var.msierrUSRFailedGrantLogonAsService)" Message="!(loc.msierrUSRFailedGrantLogonAsService)" />
             <Error Id="$(var.msierrUSRFailedUserCreateExists)" Message="!(loc.msierrUSRFailedUserCreateExists)" />
         </UI>
     </Fragment>

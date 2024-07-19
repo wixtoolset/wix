@@ -5,6 +5,7 @@
     <String Id="msierrUSRFailedUserCreate" Overridable="yes" Value="Konnte den Benutzer nicht anlegen. ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes" Value="Konnte den Benutzer auf Grund eines falschen Passwortes nicht anlegen. ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="Konnte Benutzer nicht zur Gruppe hinzufügen. ([2]   [3]   [4]   [5])" />
+    <String Id="msierrUSRFailedGrantLogonAsService" Overridable="yes" Value="Konnte den Benutzer nicht gewähren 'Anmelden als ein Service' Rechte. ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="Konnte den Benutzer nicht anlegen, da er bereits existierte. ([2]   [3]   [4]   [5])" />
 
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Konnte Netzwerkfreigabe nicht anlegen. ([2]   [3]   [4]   [5])" />

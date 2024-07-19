@@ -5,6 +5,7 @@
     <String Id="msierrUSRFailedUserCreate" Overridable="yes" Value="Не удалось создать пользователя.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreatePswd" Overridable="yes" Value="Не удалось создать пользователя из-за неверного пароля.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="Не удалось добавить пользователя в группу. ([2]   [3]   [4]   [5])" />
+    <String Id="msierrUSRFailedGrantLogonAsService" Overridable="yes" Value="Не удалось предоставить пользователю права входа в систему как службу. ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="Не удалось создать пользователя, поскольку он уже существует.  ([2]   [3]   [4]   [5])" />
 
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Не удалось создать общий сетевой ресурс.  ([2]   [3]   [4]   [5])" />
