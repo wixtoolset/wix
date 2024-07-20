@@ -553,7 +553,14 @@ HRESULT ScaGroupExecute(
             //
             // Schedule the creation now.
             //
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"CreateGroup"), pwzActionData, COST_GROUP_ADD);
+            if (psg->wzDomain && *psg->wzDomain)
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"CreateDomainGroup"), pwzActionData, COST_GROUP_ADD);
+            }
+            else
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"CreateGroup"), pwzActionData, COST_GROUP_ADD);
+            }
             ExitOnFailure(hr, "failed to schedule CreateGroup");
         }
         else if (((GROUP_EXISTS_YES == geGroupExists)
@@ -569,7 +576,14 @@ HRESULT ScaGroupExecute(
             //
             // Note: We can't rollback the removal of a group which is why RemoveGroup is a commit
             // CustomAction.
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroup"), pwzActionData, COST_GROUP_DELETE);
+            if (psg->wzDomain && *psg->wzDomain)
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveDomainGroup"), pwzActionData, COST_GROUP_DELETE);
+            }
+            else
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroup"), pwzActionData, COST_GROUP_DELETE);
+            }
             ExitOnFailure(hr, "failed to schedule RemoveGroup");
         }
 
@@ -641,7 +655,15 @@ HRESULT ScaGroupMembershipRemoveParentsExecute(
             ExitOnFailure(hr, "Failed to add child group domain to custom action data: %ls", psg->wzDomain);
             hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
             ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+
+            if (psgp->wzDomain && *psgp->wzDomain)
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveDomainGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+            }
+            else
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+            }
 
         LExit:
             ReleaseNullStr(pwzActionData);
@@ -680,7 +702,14 @@ HRESULT ScaGroupMembershipRemoveChildrenExecute(
             ExitOnFailure(hr, "Failed to add child group domain to custom action data: %ls", psgc->wzDomain);
             hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
             ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+            if (psg->wzDomain && *psg->wzDomain)
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveDomainGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+            }
+            else
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+            }
 
         LExit:
             ReleaseNullStr(pwzActionData);
@@ -748,7 +777,14 @@ HRESULT ScaGroupMembershipAddParentsExecute(
             ExitOnFailure(hr, "Failed to add child group domain to custom action data: %ls", psg->wzDomain);
             hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
             ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+            if (psgp->wzDomain&&* psgp->wzDomain)
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddDomainGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+            }
+            else
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+            }
 
         LExit:
             ReleaseNullStr(pwzActionData);
@@ -790,7 +826,14 @@ HRESULT ScaGroupMembershipAddChildrenExecute(
             ExitOnFailure(hr, "Failed to add parent group domain to custom action data: %ls", psgc->wzDomain);
             hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
             ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
-            hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+            if (psg->wzDomain && *psg->wzDomain)
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddDomainGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+            }
+            else
+            {
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+            }
 
         LExit:
             ReleaseNullStr(pwzActionData);
