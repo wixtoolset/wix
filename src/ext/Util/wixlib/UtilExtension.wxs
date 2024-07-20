@@ -22,7 +22,7 @@
     </Fragment>
 
     <Fragment>
-        <UI Id="ConfigureGroupGroupsErrorText">
+        <UI Id="ConfigureGroupMembershipErrorText">
             <Error Id="$(var.msierrGRPFailedGroupGroupAdd)" Message="!(loc.msierrGRPFailedGroupGroupAdd)" />
         </UI>
     </Fragment>

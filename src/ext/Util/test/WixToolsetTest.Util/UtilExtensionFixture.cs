@@ -405,8 +405,11 @@ namespace WixToolsetTest.Util
             {
                 "Binary:Wix4UtilCA_X64\t[Binary data]",
                 "CustomAction:Wix6ConfigureGroups_X64\t1\tWix4UtilCA_X64\tConfigureGroups\t",
+                "CustomAction:Wix6CreateDomainGroup_X64\t1025\tWix4UtilCA_X64\tCreateGroup\t",
+                "CustomAction:Wix6CreateDomainGroupRollback_X64\t1281\tWix4UtilCA_X64\tCreateGroupRollback\t",
                 "CustomAction:Wix6CreateGroup_X64\t3073\tWix4UtilCA_X64\tCreateGroup\t",
                 "CustomAction:Wix6CreateGroupRollback_X64\t3329\tWix4UtilCA_X64\tCreateGroupRollback\t",
+                "CustomAction:Wix6RemoveDomainGroup_X64\t1601\tWix4UtilCA_X64\tRemoveGroup\t",
                 "CustomAction:Wix6RemoveGroup_X64\t3649\tWix4UtilCA_X64\tRemoveGroup\t",
                 "Wix4Group:TEST_GROUP00\tComponent1\ttestName00\t",
                 "Wix4Group:TEST_GROUP01\tComponent1\ttestName01\t",

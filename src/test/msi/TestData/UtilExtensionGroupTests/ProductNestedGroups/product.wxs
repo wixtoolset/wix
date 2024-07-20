@@ -7,12 +7,11 @@
             <ComponentRef Id="Component1" />
         </ComponentGroup>
 
-        <Property Id="TEMPDOMAIN" Secure="yes" />
-        <Property Id="TEMPGROUPNAME" Secure="yes" />
+        <Property Id="TEMPDOMAIN" Secure="yes" Value="TESTDOMAIN" />
     </Fragment>
 
     <Fragment>
-        <util:Group Id="AUTH_USERS" Name="Authenticated Users" >
+        <util:Group Id="AUTH_USERS" Name="Authenticated Users" Domain="[TEMPDOMAIN]" >
             <util:GroupRef Id="TEST_GROUP1" />
             <util:GroupRef Id="TEST_GROUP2" />
         </util:Group>
