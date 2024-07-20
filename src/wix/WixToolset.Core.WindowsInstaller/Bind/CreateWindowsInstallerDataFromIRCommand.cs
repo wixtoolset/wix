@@ -1447,6 +1447,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 this.Messaging.Write(WarningMessages.DangerousTableInMergeModule(row.SourceLineNumbers, table.Name));
                             }
                         }
+                        else if (31 < table.Name.Length)
+                        {
+                            foreach (var row in table.Rows)
+                            {
+                                this.Messaging.Write(ErrorMessages.OverlengthTableNameInProductOrMergeModule(row.SourceLineNumbers, table.Name));
+                            }
+                        }
                         break;
 
                     case OutputType.PatchCreation:
@@ -1504,6 +1511,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             foreach (var row in table.Rows)
                             {
                                 this.Messaging.Write(WarningMessages.UnexpectedTableInProduct(row.SourceLineNumbers, table.Name));
+                            }
+                        }
+                        else if (31 < table.Name.Length)
+                        {
+                            foreach (var row in table.Rows)
+                            {
+                                this.Messaging.Write(ErrorMessages.OverlengthTableNameInProductOrMergeModule(row.SourceLineNumbers, table.Name));
                             }
                         }
                         break;
