@@ -2266,6 +2266,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.IllegalAttributeWhenNested, "The File element contains an attribute '{0}' that cannot be used in a File element that is a child of a Component element.", attributeName);
         }
 
+        public static Message OverlengthTableNameInProductOrMergeModule(SourceLineNumber sourceLineNumbers, string tableName)
+        {
+            return Message(sourceLineNumbers, Ids.OverlengthTableNameInProductOrMergeModule, "The table name '{0}' is invalid because the table name exceeds 31 characters in length. For more information, see: https://learn.microsoft.com/en-au/windows/win32/msi/table-names", tableName);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -2667,6 +2672,7 @@ namespace WixToolset.Data
             MsiTransactionInvalidPackage2 = 412,
             ExpectedAttributeOrElementWithOtherAttribute = 413,
             ExpectedAttributeOrElementWithoutOtherAttribute = 414,
+            OverlengthTableNameInProductOrMergeModule = 415
         }
     }
 }
