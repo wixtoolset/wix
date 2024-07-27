@@ -53,31 +53,31 @@ void CpiSchedInitialize()
     // tables
     giTables = 0;
 
-    if (S_OK == WcaTableExists(L"ComPlusPartition"))               giTables |= cptComPlusPartition;
-    if (S_OK == WcaTableExists(L"ComPlusPartitionProperty"))       giTables |= cptComPlusPartitionProperty;
-    if (S_OK == WcaTableExists(L"ComPlusPartitionRole"))           giTables |= cptComPlusPartitionRole;
-    if (S_OK == WcaTableExists(L"ComPlusUserInPartitionRole"))     giTables |= cptComPlusUserInPartitionRole;
-    if (S_OK == WcaTableExists(L"ComPlusGroupInPartitionRole"))    giTables |= cptComPlusGroupInPartitionRole;
-    if (S_OK == WcaTableExists(L"ComPlusPartitionUser"))           giTables |= cptComPlusPartitionUser;
-    if (S_OK == WcaTableExists(L"ComPlusApplication"))             giTables |= cptComPlusApplication;
-    if (S_OK == WcaTableExists(L"ComPlusApplicationProperty"))     giTables |= cptComPlusApplicationProperty;
-    if (S_OK == WcaTableExists(L"ComPlusApplicationRole"))         giTables |= cptComPlusApplicationRole;
-    if (S_OK == WcaTableExists(L"ComPlusApplicationRoleProperty")) giTables |= cptComPlusApplicationRoleProperty;
-    if (S_OK == WcaTableExists(L"ComPlusUserInApplicationRole"))   giTables |= cptComPlusUserInApplicationRole;
-    if (S_OK == WcaTableExists(L"ComPlusGroupInApplicationRole"))  giTables |= cptComPlusGroupInApplicationRole;
-    if (S_OK == WcaTableExists(L"ComPlusAssembly"))                giTables |= cptComPlusAssembly;
-    if (S_OK == WcaTableExists(L"ComPlusAssemblyDependency"))      giTables |= cptComPlusAssemblyDependency;
-    if (S_OK == WcaTableExists(L"ComPlusComponent"))               giTables |= cptComPlusComponent;
-    if (S_OK == WcaTableExists(L"ComPlusComponentProperty"))       giTables |= cptComPlusComponentProperty;
-    if (S_OK == WcaTableExists(L"ComPlusRoleForComponent"))        giTables |= cptComPlusRoleForComponent;
-    if (S_OK == WcaTableExists(L"ComPlusInterface"))               giTables |= cptComPlusInterface;
-    if (S_OK == WcaTableExists(L"ComPlusInterfaceProperty"))       giTables |= cptComPlusInterfaceProperty;
-    if (S_OK == WcaTableExists(L"ComPlusRoleForInterface"))        giTables |= cptComPlusRoleForInterface;
-    if (S_OK == WcaTableExists(L"ComPlusMethod"))                  giTables |= cptComPlusMethod;
-    if (S_OK == WcaTableExists(L"ComPlusMethodProperty"))          giTables |= cptComPlusMethodProperty;
-    if (S_OK == WcaTableExists(L"ComPlusRoleForMethod"))           giTables |= cptComPlusRoleForMethod;
-    if (S_OK == WcaTableExists(L"ComPlusSubscription"))            giTables |= cptComPlusSubscription;
-    if (S_OK == WcaTableExists(L"ComPlusSubscriptionProperty"))    giTables |= cptComPlusSubscriptionProperty;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusPartition"))               giTables |= cptComPlusPartition;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusPartitionProperty"))       giTables |= cptComPlusPartitionProperty;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusPartitionRole"))           giTables |= cptComPlusPartitionRole;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusUserInPartitionRole"))     giTables |= cptComPlusUserInPartitionRole;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusGroupInPartitionRole"))    giTables |= cptComPlusGroupInPartitionRole;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusPartitionUser"))           giTables |= cptComPlusPartitionUser;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusApplication"))             giTables |= cptComPlusApplication;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusApplicationProperty"))     giTables |= cptComPlusApplicationProperty;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusApplicationRole"))         giTables |= cptComPlusApplicationRole;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusAppRoleProperty"))         giTables |= cptComPlusApplicationRoleProperty;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusUserInAppRole"))           giTables |= cptComPlusUserInApplicationRole;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusGroupInAppRole"))          giTables |= cptComPlusGroupInApplicationRole;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusAssembly"))                giTables |= cptComPlusAssembly;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusAssemblyDependency"))      giTables |= cptComPlusAssemblyDependency;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusComponent"))               giTables |= cptComPlusComponent;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusComponentProperty"))       giTables |= cptComPlusComponentProperty;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusRoleForComponent"))        giTables |= cptComPlusRoleForComponent;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusInterface"))               giTables |= cptComPlusInterface;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusInterfaceProperty"))       giTables |= cptComPlusInterfaceProperty;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusRoleForInterface"))        giTables |= cptComPlusRoleForInterface;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusMethod"))                  giTables |= cptComPlusMethod;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusMethodProperty"))          giTables |= cptComPlusMethodProperty;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusRoleForMethod"))           giTables |= cptComPlusRoleForMethod;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusSubscription"))            giTables |= cptComPlusSubscription;
+    if (S_OK == WcaTableExists(L"Wix4ComPlusSubscriptionProperty"))    giTables |= cptComPlusSubscriptionProperty;
 }
 
 void CpiSchedFinalize()
@@ -137,7 +137,7 @@ HRESULT CpiSchedGetCatalogCollection(
     hr = CpiSchedGetAdminCatalog(&piCatalog);
     ExitOnFailure(hr, "Failed to get COM+ admin catalog");
 
-    // get collecton from catalog
+    // get collection from catalog
     hr = piCatalog->GetCollection(bstrName, &piDisp);
     ExitOnFailure(hr, "Failed to get collection");
 

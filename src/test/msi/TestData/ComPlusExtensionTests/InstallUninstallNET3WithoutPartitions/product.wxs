@@ -1,0 +1,24 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util"
+     xmlns:complus="http://wixtoolset.org/schemas/v4/wxs/complus">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="Component1" />
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <Component Id="Component1" Guid="09624A9A-4BBC-4126-BBF9-0713C5217DB1" Directory="INSTALLFOLDER">
+            <File Id="AssemblyFileNET" Source="../Components/TestComponentNET3.dll" KeyPath="yes" />
+            <File Id="TlbFileNET" Source="../Components/TestComponentNET3.tlb" />
+                <complus:ComPlusApplication Id="APPLICATION" Name="ComPlus .NET 3 Application" Description="ComPlus Application" >
+                    <complus:ComPlusAssembly Id="ASSEMBLY_NET" Type=".net" DllPath="[#AssemblyFileNET]" TlbPath="[#TlbFileNET]" >
+                        <complus:ComPlusComponent Id="MyComNET3" CLSID="17F82C39-5433-493A-A396-36072C645B80" />
+                    </complus:ComPlusAssembly>
+                </complus:ComPlusApplication>
+        </Component>
+    </Fragment>
+</Wix>

@@ -10,13 +10,13 @@ LPCWSTR vcsApplicationRoleQuery =
 enum eApplicationRoleQuery { arqApplicationRole = 1, arqApplication, arqComponent, arqName };
 
 LPCWSTR vcsUserInApplicationRoleQuery =
-    L"SELECT `UserInApplicationRole`, `ApplicationRole_`, `ComPlusUserInApplicationRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusUserInApplicationRole`, `Wix4User` WHERE `User_` = `User`";
+    L"SELECT `UserInApplicationRole`, `ApplicationRole_`, `Wix4ComPlusUserInAppRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusUserInAppRole`, `Wix4User` WHERE `User_` = `User`";
 LPCWSTR vcsGroupInApplicationRoleQuery =
-    L"SELECT `GroupInApplicationRole`, `ApplicationRole_`, `ComPlusGroupInApplicationRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusGroupInApplicationRole`, `Wix4Group` WHERE `Group_` = `Group`";
+    L"SELECT `GroupInApplicationRole`, `ApplicationRole_`, `Wix4ComPlusGroupInAppRole`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusGroupInAppRole`, `Wix4Group` WHERE `Group_` = `Group`";
 enum eTrusteeInApplicationRoleQuery { tiarqUserInApplicationRole = 1, tiarqApplicationRole, tiarqComponent, tiarqDomain, tiarqName };
 
 LPCWSTR vcsApplicationRolePropertyQuery =
-    L"SELECT `Name`, `Value` FROM `Wix4ComPlusApplicationRoleProperty` WHERE `ApplicationRole_` = ?";
+    L"SELECT `Name`, `Value` FROM `Wix4ComPlusAppRoleProperty` WHERE `ApplicationRole_` = ?";
 
 
 // property definitions
@@ -95,7 +95,7 @@ HRESULT CpiApplicationRolesRead(
 
     // loop through all application roles
     hr = WcaOpenExecuteView(vcsApplicationRoleQuery, &hView);
-    ExitOnFailure(hr, "Failed to execute view on ComPlusApplicationRole table");
+    ExitOnFailure(hr, "Failed to execute view on Wix4ComPlusApplicationRole table");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
@@ -205,7 +205,7 @@ HRESULT CpiApplicationRolesVerifyInstall(
         if (!pItm->fReferencedForInstall && !(pItm->fHasComponent && WcaIsInstalling(pItm->isInstalled, pItm->isAction)))
             continue;
 
-        // if the role is referensed and is not a locater, it must be installed
+        // if the role is referenced and is not a locater, it must be installed
         if (pItm->fReferencedForInstall && pItm->fHasComponent && !CpiWillBeInstalled(pItm->isInstalled, pItm->isAction))
             MessageExitOnFailure(hr = E_FAIL, msierrComPlusApplicationRoleDependency, "An application role is used by another entity being installed, but is not installed itself, key: %S", pItm->wzKey);
 
@@ -235,7 +235,7 @@ HRESULT CpiApplicationRolesVerifyInstall(
                     switch (er)
                     {
                     case IDABORT:
-                        ExitOnFailure(hr = E_FAIL, "An application with a conflictiong name exists, key: %S", pItm->wzKey);
+                        ExitOnFailure(hr = E_FAIL, "An application with a conflicting name exists, key: %S", pItm->wzKey);
                         break;
                     case IDRETRY:
                         break;
@@ -319,7 +319,7 @@ HRESULT CpiApplicationRolesInstall(
     int iActionType;
 
     // add action text
-    hr = CpiAddActionTextToActionData(L"CreateComPlusApplicationRoles", ppwzActionData);
+    hr = CpiAddActionTextToActionData(CUSTOM_ACTION_DECORATION(L"CreateComPlusApplicationRoles"), ppwzActionData);
     ExitOnFailure(hr, "Failed to add action text to custom action data");
 
     // add count to action data
@@ -371,7 +371,7 @@ HRESULT CpiApplicationRolesUninstall(
     int iActionType;
 
     // add action text
-    hr = CpiAddActionTextToActionData(L"RemoveComPlusApplicationRoles", ppwzActionData);
+    hr = CpiAddActionTextToActionData(CUSTOM_ACTION_DECORATION(L"RemoveComPlusApplicationRoles"), ppwzActionData);
     ExitOnFailure(hr, "Failed to add action text to custom action data");
 
     // add count to action data
@@ -477,7 +477,7 @@ HRESULT CpiUsersInApplicationRolesInstall(
     int iActionType;
 
     // add action text
-    hr = CpiAddActionTextToActionData(L"AddUsersToComPlusApplicationRoles", ppwzActionData);
+    hr = CpiAddActionTextToActionData(CUSTOM_ACTION_DECORATION(L"AddUsersToComPlusApplicationRoles"), ppwzActionData);
     ExitOnFailure(hr, "Failed to add action text to custom action data");
 
     // add count to action data
@@ -529,7 +529,7 @@ HRESULT CpiUsersInApplicationRolesUninstall(
     int iActionType;
 
     // add action text
-    hr = CpiAddActionTextToActionData(L"RemoveUsersFromComPlusAppRoles", ppwzActionData);
+    hr = CpiAddActionTextToActionData(CUSTOM_ACTION_DECORATION(L"RemoveUsersFromComPlusAppRoles"), ppwzActionData);
     ExitOnFailure(hr, "Failed to add action text to custom action data");
 
     // add count to action data

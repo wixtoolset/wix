@@ -180,7 +180,7 @@ LExit:
     if (INVALID_HANDLE_VALUE != hRollbackFile)
         ::CloseHandle(hRollbackFile);
 
-    // unitialize
+    // uninitialize
     CpiExecFinalize();
 
     if (fInitializedCom)
@@ -258,7 +258,7 @@ LExit:
     if (INVALID_HANDLE_VALUE != hRollbackFile)
         ::CloseHandle(hRollbackFile);
 
-    // unitialize
+    // uninitialize
     CpiExecFinalize();
 
     if (fInitializedCom)
@@ -415,7 +415,7 @@ LExit:
     if (prdSubscriptions)
         CpiFreeRollbackDataList(prdSubscriptions);
 
-    // unitialize
+    // uninitialize
     CpiExecFinalize();
 
     if (fInitializedCom)
@@ -521,7 +521,7 @@ LExit:
     if (INVALID_HANDLE_VALUE != hRollbackFile)
         ::CloseHandle(hRollbackFile);
 
-    // unitialize
+    // uninitialize
     CpiExecFinalize();
 
     if (fInitializedCom)
@@ -670,7 +670,7 @@ LExit:
     if (prdSubscriptions)
         CpiFreeRollbackDataList(prdSubscriptions);
 
-    // unitialize
+    // uninitialize
     CpiExecFinalize();
 
     if (fInitializedCom)

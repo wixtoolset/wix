@@ -13,7 +13,7 @@ LPCWSTR vcsPartitionPropertyQuery =
     L"SELECT `Name`, `Value` FROM `Wix4ComPlusPartitionProperty` WHERE `Partition_` = ?";
 
 LPCWSTR vcsPartitionUserQuery =
-    L"SELECT `PartitionUser`, `Partition_`, `ComPlusPartitionUser`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusPartitionUser`, `Wix4User` WHERE `User_` = `User`";
+    L"SELECT `PartitionUser`, `Partition_`, `Wix4ComPlusPartitionUser`.`Component_`, `Domain`, `Name` FROM `Wix4ComPlusPartitionUser`, `Wix4User` WHERE `User_` = `User`";
 enum ePartitionUserQuery { puqPartitionUser = 1, puqPartition, puqComponent, puqDomain, puqName };
 
 
@@ -192,7 +192,7 @@ HRESULT CpiPartitionsVerifyInstall(
         if (!pItm->fReferencedForInstall && !(pItm->fHasComponent && WcaIsInstalling(pItm->isInstalled, pItm->isAction)))
             continue;
 
-        // if the partition is referensed and is not a locater, it must be installed
+        // if the partition is referenced and is not a locater, it must be installed
         if (pItm->fReferencedForInstall && pItm->fHasComponent && !CpiWillBeInstalled(pItm->isInstalled, pItm->isAction))
             MessageExitOnFailure(hr = E_FAIL, msierrComPlusPartitionDependency, "A partition is used by another entity being installed, but is not installed itself, key: %S", pItm->wzKey);
 
@@ -281,7 +281,7 @@ HRESULT CpiPartitionsVerifyInstall(
                 {
                 case IDCANCEL:
                 case IDABORT:
-                    ExitOnFailure(hr = E_FAIL, "A partition with a conflictiong name or id exists, key: %S", pItm->wzKey);
+                    ExitOnFailure(hr = E_FAIL, "A partition with a conflicting name or id exists, key: %S", pItm->wzKey);
                     break;
                 case IDRETRY:
                     break;
@@ -403,7 +403,7 @@ HRESULT CpiPartitionsInstall(
     int iActionType;
 
     // add action text
-    hr = CpiAddActionTextToActionData(L"CreateComPlusPartitions", ppwzActionData);
+    hr = CpiAddActionTextToActionData(CUSTOM_ACTION_DECORATION(L"CreateComPlusPartitions"), ppwzActionData);
     ExitOnFailure(hr, "Failed to add action text to custom action data");
 
     // add partition count to action data
@@ -455,7 +455,7 @@ HRESULT CpiPartitionsUninstall(
     int iActionType;
 
     // add action text
-    hr = CpiAddActionTextToActionData(L"RemoveComPlusPartitions", ppwzActionData);
+    hr = CpiAddActionTextToActionData(CUSTOM_ACTION_DECORATION(L"RemoveComPlusPartitions"), ppwzActionData);
     ExitOnFailure(hr, "Failed to add action text to custom action data");
 
     // add partition count to action data
@@ -735,7 +735,7 @@ HRESULT CpiPartitionUsersInstall(
     int iActionType;
 
     // add action text
-    hr = CpiAddActionTextToActionData(L"AddComPlusPartitionUsers", ppwzActionData);
+    hr = CpiAddActionTextToActionData(CUSTOM_ACTION_DECORATION(L"AddComPlusPartitionUsers"), ppwzActionData);
     ExitOnFailure(hr, "Failed to add action text to custom action data");
 
     // add partition count to action data
@@ -787,7 +787,7 @@ HRESULT CpiPartitionUsersUninstall(
     int iActionType;
 
     // add action text
-    hr = CpiAddActionTextToActionData(L"RemoveComPlusPartitionUsers", ppwzActionData);
+    hr = CpiAddActionTextToActionData(CUSTOM_ACTION_DECORATION(L"RemoveComPlusPartitionUsers"), ppwzActionData);
     ExitOnFailure(hr, "Failed to add action text to custom action data");
 
     // add partition count to action data
