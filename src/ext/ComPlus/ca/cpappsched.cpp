@@ -255,7 +255,7 @@ HRESULT CpiApplicationsVerifyInstall(
         if (!pItm->fReferencedForInstall && !(pItm->fHasComponent && WcaIsInstalling(pItm->isInstalled, pItm->isAction)))
             continue;
 
-        // if the application is referensed and is not a locater, it must be installed
+        // if the application is referenced and is not a locater, it must be installed
         if (pItm->fReferencedForInstall && pItm->fHasComponent && !CpiWillBeInstalled(pItm->isInstalled, pItm->isAction))
             MessageExitOnFailure(hr = E_FAIL, msierrComPlusApplicationDependency, "An application is used by another entity being installed, but is not installed itself, key: %S", pItm->wzKey);
 

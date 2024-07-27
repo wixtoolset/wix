@@ -123,7 +123,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusApplicationRoleProperty = new TableDefinition(
-            "Wix4ComPlusApplicationRoleProperty",
+            "Wix4ComPlusAppRoleProperty",
             ComPlusSymbolDefinitions.ComPlusApplicationRoleProperty,
             new[]
             {
@@ -135,7 +135,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusUserInApplicationRole = new TableDefinition(
-            "Wix4ComPlusUserInApplicationRole",
+            "Wix4ComPlusUserInAppRole",
             ComPlusSymbolDefinitions.ComPlusUserInApplicationRole,
             new[]
             {
@@ -148,7 +148,7 @@ namespace WixToolset.ComPlus
         );
 
         public static readonly TableDefinition ComPlusGroupInApplicationRole = new TableDefinition(
-            "Wix4ComPlusGroupInApplicationRole",
+            "Wix4ComPlusGroupInAppRole",
             ComPlusSymbolDefinitions.ComPlusGroupInApplicationRole,
             new[]
             {

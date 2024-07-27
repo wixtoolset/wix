@@ -33,6 +33,7 @@
 
     <PackageVersion Include="WixToolset.Bal.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.BootstrapperApplications.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.ComPlus.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dependency.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.NetFx.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.UI.wixext" Version="{packageversion}" />
