@@ -3,13 +3,13 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net472</TargetFrameworks>
+    <TargetFrameworks>net8.0;net472</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <Description>WiX Toolset creates installation packages.</Description>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackAsTool>true</PackAsTool>
-    <RuntimeIdentifiers Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='net6.0' ">win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifiers Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='net8.0' ">win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <AppConfig>app.config</AppConfig>
     <ApplicationManifest>wix.exe.manifest</ApplicationManifest>
     <RollForward>Major</RollForward>

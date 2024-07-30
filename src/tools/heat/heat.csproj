@@ -3,13 +3,13 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0-windows;net472</TargetFrameworks>
+    <TargetFrameworks>net8.0-windows;net472</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <Description>Harvester</Description>
     <Title>WiX Toolset Harvester</Title>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <RuntimeIdentifiers Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='net6.0' ">win-x86;win-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers Condition=" '$(RuntimeIdentifier)'=='' and '$(TargetFramework)'!='net8.0' ">win-x86;win-x64</RuntimeIdentifiers>
     <AppConfig>app.config</AppConfig>
     <ApplicationManifest>heat.exe.manifest</ApplicationManifest>
     <RollForward>LatestMajor</RollForward>

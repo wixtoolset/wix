@@ -5,7 +5,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- These properties can be overridden to support non-default installations. -->
   <PropertyGroup>
-    <WixHeatBinDir Condition=" '$(WixHeatBinDir)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)..\tools\net6.0\</WixHeatBinDir>
+    <WixHeatBinDir Condition=" '$(WixHeatBinDir)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)..\tools\net8.0\</WixHeatBinDir>
     <WixHeatBinDir Condition=" '$(WixHeatBinDir)' == '' ">$(MSBuildThisFileDirectory)..\tools\net472\</WixHeatBinDir>
     <WixHeatTasksPath Condition=" '$(WixHeatTasksPath)' == '' ">$(WixHeatBinDir)WixToolset.HeatTasks.dll</WixHeatTasksPath>
 

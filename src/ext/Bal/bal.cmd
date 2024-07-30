@@ -31,7 +31,7 @@ msbuild bal_t.proj -p:Configuration=%_C% -tl -nologo -warnaserror -bl:%_L%\bal_b
 :: Test
 dotnet test ^
   %_B%\x86\WixStdFnUnitTest.dll ^
-  %_B%\net6.0\WixToolsetTest.BootstrapperApplications.dll ^
+  %_B%\net8.0\WixToolsetTest.BootstrapperApplications.dll ^
   --nologo -l "trx;LogFileName=%_L%\TestResults\bal.wixext.trx" || exit /b
 
 @goto :end

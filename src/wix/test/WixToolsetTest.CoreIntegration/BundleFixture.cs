@@ -100,7 +100,7 @@ namespace WixToolsetTest.CoreIntegration
                 });
 
                 result.AssertSuccess();
-                Assert.Empty(result.Messages.Where(m => m.Level == MessageLevel.Warning));
+                Assert.DoesNotContain(result.Messages, m => m.Level == MessageLevel.Warning);
 
                 Assert.True(File.Exists(exePath));
                 Assert.True(File.Exists(pdbPath));
