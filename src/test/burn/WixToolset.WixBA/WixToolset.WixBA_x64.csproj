@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net472;net6.0-windows</TargetFrameworks>
+    <TargetFrameworks>net472;net8.0-windows</TargetFrameworks>
     <OutputType>WinExe</OutputType>
     <AssemblyName>WixToolset.WixBA</AssemblyName>
     <RootNamespace>WixToolset.WixBA</RootNamespace>
