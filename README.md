@@ -23,7 +23,7 @@ This repository contains the WiX Toolset codebase.
 
 | Individual components |
 | :-------------------- |
-| .NET 6.0 Runtime (Long Term Support) |
+| .NET 8.0 Runtime (Long Term Support) |
 | .NET Framework 4.7.2 SDK |
 | .NET Framework 4.7.2 targeting pack |
 | .NET Framework 4.6.2 targeting pack |
