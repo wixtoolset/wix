@@ -17,7 +17,7 @@
   </ItemGroup>
   <!-- We do this dynamically to avoid committing such a large file to source control. -->
   <Target Name="CreateLargeFile" AfterTargets="BeforeBuild" Inputs="$(MSBuildProjectFullPath)" Outputs="$(MSBuildProjectDirectory)\fivegb.file">
-    <Exec Command='"$(BaseOutputPath)$(Configuration)\net6.0\win-x86\testexe.exe" /lf "fivegb.file|5368709120' WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Exec Command='"$(BaseOutputPath)$(Configuration)\net8.0\win-x86\testexe.exe" /lf "fivegb.file|5368709120' WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
   <!-- We do this to avoid copying such a large file to the VM to run the tests. -->
   <Target Name="DeleteLargeFile" AfterTargets="AfterBuild">

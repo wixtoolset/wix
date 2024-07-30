@@ -11,10 +11,10 @@
                 <File Id="net472_x64" Source="!(bindpath.TestExe.net472.win_x64)\e_sqlite3.dll" />
             </Component>
             <Component Subdirectory="net6_x86">
-                <File Id="net6_x86" Source="!(bindpath.TestExe.net6.0.win_x86)\e_sqlite3.dll" />
+                <File Id="net6_x86" Source="!(bindpath.TestExe.net8.0.win_x86)\e_sqlite3.dll" />
             </Component>
             <Component Subdirectory="net6_x64">
-                <File Id="net6_x64" Source="!(bindpath.TestExe.net6.0.win_x64)\e_sqlite3.dll" />
+                <File Id="net6_x64" Source="!(bindpath.TestExe.net8.0.win_x64)\e_sqlite3.dll" />
             </Component>
 
             <!-- This is explicitly not built and causes the build to fail -->

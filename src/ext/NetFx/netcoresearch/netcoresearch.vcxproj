@@ -42,8 +42,8 @@
   <PropertyGroup>
     <NetHostPlatform>$(Platform)</NetHostPlatform>
     <NetHostPlatform Condition=" '$(NetHostPlatform)'=='Win32' ">x86</NetHostPlatform>
-    <NetHostPath>..\..\..\..\packages\runtime.win-$(NetHostPlatform).Microsoft.NETCore.DotNetAppHost.6.0.4\runtimes\win-$(NetHostPlatform)\native\</NetHostPath>
-    <HostfxrPath>..\..\..\..\packages\runtime.win-$(NetHostPlatform).Microsoft.NETCore.DotNetHostResolver.6.0.4\runtimes\win-$(NetHostPlatform)\native\</HostfxrPath>
+    <NetHostPath>..\..\..\..\packages\runtime.win-$(NetHostPlatform).Microsoft.NETCore.DotNetAppHost.8.0.7\runtimes\win-$(NetHostPlatform)\native\</NetHostPath>
+    <HostfxrPath>..\..\..\..\packages\runtime.win-$(NetHostPlatform).Microsoft.NETCore.DotNetHostResolver.8.0.7\runtimes\win-$(NetHostPlatform)\native\</HostfxrPath>
     <ProjectAdditionalIncludeDirectories>$(NetHostPath)</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
 

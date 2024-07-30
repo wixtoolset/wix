@@ -7,6 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CsprojConsoleMultiFramework\CsprojConsoleMultiFramework.csproj"
-                      TargetFrameworks="net472;net6.0" Publish="true" />
+                      TargetFrameworks="net472;net8.0" Publish="true" />
   </ItemGroup>
 </Project>
