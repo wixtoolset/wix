@@ -20,9 +20,9 @@ For example, the following line runs only the specified test:
 > dotnet test --filter WixToolsetTest.BurnE2E.BasicFunctionalityTests.CanInstallAndUninstallSimpleBundle_x86_wixstdba WixToolsetTest.BurnE2E.dll
 
 The VM must have:
-1. x64 .NET Core SDK of 6.0 or later (for the test runner and .NET Core TestBA)
+1. x64 .NET Core SDK of 8.0 or later (for the test runner and .NET Core TestBA)
 1. Any version of .NET Framework (for the .NET Framework TestBA)
-1. x86 .NET Core Desktop Runtime of 6.0 or later (for the .NET Core TestBA)
+1. x86 .NET Core Desktop Runtime of 8.0 or later (for the .NET Core TestBA)
 
 ## Building with local changes
 
