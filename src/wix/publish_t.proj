@@ -2,27 +2,27 @@
   <PropertyGroup>
     <StagePublishX86>$(BaseIntermediateOutputPath)$(Configuration)\net472\x86\</StagePublishX86>
     <StagePublishX64>$(BaseIntermediateOutputPath)$(Configuration)\net472\x64\</StagePublishX64>
-    <StagePublishDnc>$(BaseIntermediateOutputPath)$(Configuration)\net6.0\</StagePublishDnc>
+    <StagePublishDnc>$(BaseIntermediateOutputPath)$(Configuration)\net8.0\</StagePublishDnc>
 
     <PublishBuildFolder>$(PublishRoot)WixToolset.Sdk\build\</PublishBuildFolder>
     <PublishHere>$(PublishRoot)WixToolset.Sdk\tools\net472\</PublishHere>
     <PublishX86>$(PublishRoot)WixToolset.Sdk\tools\net472\x86\</PublishX86>
     <PublishX64>$(PublishRoot)WixToolset.Sdk\tools\net472\x64\</PublishX64>
     <PublishARM64>$(PublishRoot)WixToolset.Sdk\tools\net472\arm64\</PublishARM64>
-    <PublishDnc>$(PublishRoot)WixToolset.Sdk\tools\net6.0\</PublishDnc>
+    <PublishDnc>$(PublishRoot)WixToolset.Sdk\tools\net8.0\</PublishDnc>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="WixToolset.BuildTasks\WixToolset.BuildTasks.csproj" Properties="TargetFramework=net472;PublishDir=$(StagePublishX86)WixToolset.BuildTasks" Targets="Publish" />
-    <ProjectReference Include="WixToolset.BuildTasks\WixToolset.BuildTasks.csproj" Properties="TargetFramework=net6.0;UseAppHost=false;PublishDir=$(StagePublishDnc)WixToolset.BuildTasks" Targets="Publish" />
+    <ProjectReference Include="WixToolset.BuildTasks\WixToolset.BuildTasks.csproj" Properties="TargetFramework=net8.0;UseAppHost=false;PublishDir=$(StagePublishDnc)WixToolset.BuildTasks" Targets="Publish" />
 
-    <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=net6.0;PublishDir=$(BaseOutputPath)$(Configuration)\publish\wix\" Targets="Publish" />
+    <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=net8.0;PublishDir=$(BaseOutputPath)$(Configuration)\publish\wix\" Targets="Publish" />
 
     <!-- wix.exe doesn't need to filter any files so publish it straight into its final location -->
     <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-x86;PublishDir=$(PublishX86)" Targets="Publish" />
     <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-x64;PublishDir=$(PublishX64)" Targets="Publish" />
     <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-arm64;PublishDir=$(PublishARM64)" Targets="Publish" />
-    <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=net6.0;UseAppHost=false;PublishDir=$(PublishDnc)" Targets="Publish" />
+    <ProjectReference Include="wix\wix.csproj" Properties="TargetFramework=net8.0;UseAppHost=false;PublishDir=$(PublishDnc)" Targets="Publish" />
   </ItemGroup>
 
   <Target Name="CopyToFinalPublishFolder" AfterTargets="Build">

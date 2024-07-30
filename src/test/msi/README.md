@@ -10,8 +10,8 @@ They modify machine state so it's strongly recommended *not* to run these tests 
 They should be run on a VM instead, where you can easily roll back.
 
 1. Run build.cmd to build everything (the tests will not automatically run).
-1. Copy the build\IntegrationMsi\Debug\net6.0-windows folder to your VM.
-1. Open an elevated command prompt and navigate to the net6.0-windows folder.
+1. Copy the build\IntegrationMsi\Debug\net8.0-windows folder to your VM.
+1. Open an elevated command prompt and navigate to the net8.0-windows folder.
 1. Run the runtests.cmd file to run the tests.
 
 You can modify the runtests.cmd to run specific tests.

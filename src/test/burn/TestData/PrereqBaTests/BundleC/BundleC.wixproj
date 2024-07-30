@@ -9,7 +9,7 @@
     <Compile Include="..\..\Templates\Bundle.wxs" Link="Bundle.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net6.0-windows\win-x86" BindName="dncx86" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net8.0-windows\win-x86" BindName="dncx86" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PackageA\PackageA.wixproj" />

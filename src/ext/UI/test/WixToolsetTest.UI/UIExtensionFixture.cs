@@ -111,7 +111,7 @@ namespace WixToolsetTest.UI
             var results = build.BuildAndQuery(BuildX64, "Binary", "Dialog", "CustomAction", "ControlEvent", "InstallUISequence");
             Assert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
             Assert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
-            Assert.Empty(results.Where(result => result.StartsWith("Dialog:SetupTypeDlg\t")));
+            Assert.DoesNotContain(results, result => result.StartsWith("Dialog:SetupTypeDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -318,7 +318,7 @@ namespace WixToolsetTest.UI
                 "ControlEvent:InstallDirDlg\tNext\tDoAction\tWixUIValidatePath_X86\t1\t2",
             }, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).OrderBy(s => s).ToArray());
 
-            Assert.Empty(results.Where(result => result.Contains("LicenseAgreementDlg")).ToArray());
+            Assert.DoesNotContain(results, result => result.Contains("LicenseAgreementDlg"));
 
             WixAssert.CompareLineByLine(new[]
             {

@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <Description>WiX Toolset Heat MSBuild integration</Description>
     <PublishDir>$(PublishRoot)WixToolset.Heat\</PublishDir>
     <NuspecFile>$(MSBuildThisFileName).nuspec</NuspecFile>
