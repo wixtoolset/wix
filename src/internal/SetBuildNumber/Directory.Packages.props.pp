@@ -66,14 +66,8 @@
     <PackageVersion Include="NuGet.Versioning" Version="6.10.1" />
   </ItemGroup>
 
-  <!--
-    These MSBuild versions are trapped in antiquity for heat.exe.
-  -->
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="14.3" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.10.4" />
   </ItemGroup>
 
   <!-- Keep the following versions in sync with internal\WixInternal.TestSupport.Native\packages.config -->
