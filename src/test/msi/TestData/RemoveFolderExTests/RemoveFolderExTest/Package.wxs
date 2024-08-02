@@ -1,0 +1,15 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="Component1" />
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <SetProperty Id="REMOVEFOLDEREXTESTDIR" Value="C:\RemoveFolderExTest" Sequence="execute" Before="Wix4RemoveFoldersEx_X86" />
+        <Component Id="Component1" Guid="{2D735A5F-D152-4B2E-B935-E11AD8C3FB25}">
+            <util:RemoveFolderEx Id ="RemoveAllTheFolders" On="both" Property="REMOVEFOLDEREXTESTDIR" />
+        </Component>
+    </Fragment>
+</Wix>
