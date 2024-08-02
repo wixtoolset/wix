@@ -2,6 +2,12 @@
 
 #include "precomp.h"
 
+// Whilst ::GetFileAttributesW might return FILE_ATTRIBUTE_INVALID for an invalid path, it's not a header defined variable.
+// so define it here, but guard it to avoid redefining it if Microsoft change their mind
+#ifndef FILE_ATTRIBUTE_INVALID
+#define FILE_ATTRIBUTE_INVALID           ((DWORD)-1)
+#endif
+
 LPCWSTR vcsRemoveFolderExQuery =
     L"SELECT `RemoveFolderEx`, `Component_`, `Property`, `InstallMode`, `Wix4RemoveFolderEx`.`Condition`, `Component`.`Attributes` "
     L"FROM `Wix4RemoveFolderEx`,`Component` "
@@ -38,8 +44,14 @@ static HRESULT RecursePath(
     }
 #endif
 
-    // Do NOT follow junctions.
     DWORD dwAttributes = ::GetFileAttributesW(wzPath);
+    if (FILE_ATTRIBUTE_INVALID == dwAttributes)
+    {
+        WcaLog(LOGMSG_STANDARD, "Path is invalid: %ls", wzPath);
+        ExitFunction();
+    }
+
+    // Do NOT follow junctions.
     if (dwAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
     {
         WcaLog(LOGMSG_STANDARD, "Path is a junction; skipping: %ls", wzPath);
