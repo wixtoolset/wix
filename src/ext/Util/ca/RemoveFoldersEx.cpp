@@ -232,7 +232,7 @@ extern "C" UINT WINAPI WixRemoveFoldersEx(
     {
         hr = S_OK;
     }
-    ExitOnFailure(hr, "Failure occured while processing Wix4RemoveFolderEx table");
+    ExitOnFailure(hr, "Failure occurred while processing Wix4RemoveFolderEx table");
 
 LExit:
 #ifndef _WIN64
