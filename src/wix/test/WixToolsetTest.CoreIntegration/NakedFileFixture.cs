@@ -115,6 +115,13 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildNakedFilesUnderPackageWithDuplicateNames()
+        {
+            var rows = BuildAndQueryComponentAndFileTables("DuplicateNames.wxs");
+            AssertFileComponentIds(5, rows);
+        }
+
+        [Fact]
         public void CanBuildNakedFilesUnderPackageWithDefaultInstallFolder()
         {
             var rows = BuildAndQueryComponentAndFileTables("PackageWithDefaultInstallFolder.wxs");

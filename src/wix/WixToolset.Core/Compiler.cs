@@ -5348,7 +5348,7 @@ namespace WixToolset.Core
                 }
             }
 
-            if (null == id)
+            if (null == id && !isNakedFile)
             {
                 id = this.Core.CreateIdentifier("fil", directoryId, name);
             }
@@ -5610,8 +5610,6 @@ namespace WixToolset.Core
             string condition = null;
             string subdirectory = null;
 
-            var keyPath = this.ParseFileElementAttributes(node, "@WixTemporaryComponentId", directoryId, diskId: CompilerConstants.IntegerNotSet, sourcePath, out var _, componentGuid: "*", isNakedFile: true, out var fileSymbol, out var assemblySymbol);
-
             if (!this.Core.EncounteredError)
             {
                 // Naked files have additional attributes to handle common component attributes.
@@ -5661,13 +5659,43 @@ namespace WixToolset.Core
 
                 directoryId = this.HandleSubdirectory(sourceLineNumbers, node, directoryId, subdirectory, "Directory", "Subdirectory");
 
-                this.Core.AddSymbol(new ComponentSymbol(sourceLineNumbers, fileSymbol.Id)
+                var keyPath = this.ParseFileElementAttributes(node, "@WixTemporaryComponentId", directoryId, diskId: CompilerConstants.IntegerNotSet, sourcePath, out var _, componentGuid: "*", isNakedFile: true, out var fileSymbol, out var assemblySymbol);
+
+                // Now that we have all the data we need to generate a good id, do
+                // so and create a file and component symbol with the right data.
+                var id = fileSymbol.Id ?? this.Core.CreateIdentifier("nkf", directoryId, fileSymbol.Name, condition, win64.ToString());
+
+                this.Core.AddSymbol(new FileSymbol(sourceLineNumbers, id)
+                {
+                    ComponentRef = id.Id,
+                    Name = fileSymbol.Name,
+                    ShortName = fileSymbol.ShortName,
+                    FileSize = fileSymbol.FileSize,
+                    Version = fileSymbol.Version,
+                    Language = fileSymbol.Language,
+                    Attributes = fileSymbol.Attributes,
+                    DirectoryRef = fileSymbol.DirectoryRef,
+                    DiskId = fileSymbol.DiskId,
+                    Source = fileSymbol.Source,
+                    FontTitle = fileSymbol.FontTitle,
+                    SelfRegCost = fileSymbol.SelfRegCost,
+                    BindPath = fileSymbol.BindPath,
+                    PatchGroup = fileSymbol.PatchGroup,
+                    PatchAttributes = fileSymbol.PatchAttributes,
+                    RetainLengths = fileSymbol.RetainLengths,
+                    IgnoreOffsets = fileSymbol.IgnoreOffsets,
+                    IgnoreLengths = fileSymbol.IgnoreLengths,
+                    RetainOffsets = fileSymbol.RetainOffsets,
+                    SymbolPaths = fileSymbol.SymbolPaths,
+                });
+
+                this.Core.AddSymbol(new ComponentSymbol(sourceLineNumbers, id)
                 {
                     ComponentId = "*",
                     DirectoryRef = directoryId,
                     Location = ComponentLocation.LocalOnly,
                     Condition = condition,
-                    KeyPath = fileSymbol.Id.Id,
+                    KeyPath = id.Id,
                     KeyPathType = ComponentKeyPathType.File,
                     DisableRegistryReflection = false,
                     NeverOverwrite = false,
@@ -5678,9 +5706,6 @@ namespace WixToolset.Core
                     UninstallWhenSuperseded = false,
                     Win64 = win64,
                 });
-
-                fileSymbol.ComponentRef = fileSymbol.Id.Id;
-                this.Core.AddSymbol(fileSymbol);
 
                 if (assemblySymbol != null)
                 {
@@ -5697,7 +5722,7 @@ namespace WixToolset.Core
                 else if (ComplexReferenceParentType.Unknown != parentType && null != parentId) // if parent was provided, add a complex reference to that.
                 {
                     // If the naked file's component is defined directly under a feature, then mark the complex reference primary.
-                    this.Core.CreateComplexReference(sourceLineNumbers, parentType, parentId, null, ComplexReferenceChildType.Component, fileSymbol.Id.Id, ComplexReferenceParentType.Feature == parentType);
+                    this.Core.CreateComplexReference(sourceLineNumbers, parentType, parentId, null, ComplexReferenceChildType.Component, id.Id, ComplexReferenceParentType.Feature == parentType);
                 }
             }
         }

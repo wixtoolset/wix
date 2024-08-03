@@ -1,10 +1,8 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Package Name="MsiPackage" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
-        <MajorUpgrade DowngradeErrorMessage="Downgrade error message." />
-
-        <File Directory="INSTALLFOLDER" Source="test.txt" />
-        <File Directory="INSTALLFOLDER" Source="test.txt" Name="test2.txt" />
-        <File Directory="INSTALLFOLDER" Source="test.txt" Name="test3.txt" />
-        <File Directory="INSTALLFOLDER" Source="test.txt" Name="test4.txt" />
+        <File Directory="INSTALLFOLDER" Subdirectory="X" Source="test.txt" />
+        <File Directory="INSTALLFOLDER" Subdirectory="X" Source="test.txt" Name="test2.txt" />
+        <File Directory="INSTALLFOLDER" Subdirectory="X3" Source="test.txt" Name="test3.txt" />
+        <File Directory="INSTALLFOLDER" Subdirectory="X4" Source="test.txt" Name="test4.txt" />
     </Package>
 </Wix>

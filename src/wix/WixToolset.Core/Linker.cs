@@ -716,7 +716,7 @@ namespace WixToolset.Core
                     var childTypeAndId = this.CombineTypeAndId(wixComplexReferenceRow.ChildType, wixComplexReferenceRow.Child);
                     if (loopDetector.Contains(childTypeAndId))
                     {
-                        // Create a comma delimited list of the references that participate in the
+                        // Create an arrow-delimited list of the references that participate in the
                         // loop for the error message. Start at the bottom of the stack and work the
                         // way up to present the loop as a directed graph.
                         var loop = String.Join(" -> ", loopDetector);

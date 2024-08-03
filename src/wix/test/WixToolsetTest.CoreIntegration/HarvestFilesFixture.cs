@@ -355,6 +355,41 @@ namespace WixToolsetTest.CoreIntegration
             }, additionalCommandLineArguments: "-v");
         }
 
+        [Fact]
+        public void CanHarvestFilesWithDuplicateNames()
+        {
+            var expectedFiles = new[]
+            {
+                "File:fls47G631z.20kTPzBwIPjGuWifsVo\tfls47G631z.20kTPzBwIPjGuWifsVo\tfile.x\t0\t\t\t512\t2",
+                "File:flshOXYGoD0VHcQhrkIILRPNOVbYuM\tflshOXYGoD0VHcQhrkIILRPNOVbYuM\tfile.x\t0\t\t\t512\t1",
+                "File:flsp2QdFvBeSwll1i5tN0jM72w3Hu4\tflsp2QdFvBeSwll1i5tN0jM72w3Hu4\tfile.x\t0\t\t\t512\t3",
+                "File:flsqopW5ihQpwCTF7t_51GkHd4Hf6s\tflsqopW5ihQpwCTF7t_51GkHd4Hf6s\tfile.x\t0\t\t\t512\t4",
+            };
+
+            var expectedFilesAndDirectories = new[]
+            {
+                @"fls47G631z.20kTPzBwIPjGuWifsVo=PFiles\Example Corporation MsiPackage\b\file.x",
+                @"flshOXYGoD0VHcQhrkIILRPNOVbYuM=PFiles\Example Corporation MsiPackage\a\file.x",
+                @"flsp2QdFvBeSwll1i5tN0jM72w3Hu4=PFiles\Example Corporation MsiPackage\c\file.x",
+                @"flsqopW5ihQpwCTF7t_51GkHd4Hf6s=PFiles\Example Corporation MsiPackage\d\file.x",
+            };
+
+            Build("DuplicateNames.wxs", (msiPath, result) => AssertFileAndComponentIdsAndTargetPaths(msiPath, result, expectedFiles, expectedFilesAndDirectories));
+        }
+
+        private static void AssertFileAndComponentIdsAndTargetPaths(string msiPath, WixRunnerResult result, string[] expectedFiles, string[] expectedFilesAndDirectories)
+        {
+            result.AssertSuccess();
+
+            var files = Query.QueryDatabase(msiPath, new[] { "File" })
+                .OrderBy(s => s)
+                .ToArray();
+
+            Assert.Equal(expectedFiles, files);
+
+            AssertFileIdsAndTargetPaths(msiPath, expectedFilesAndDirectories);
+        }
+
         private static void AssertFileIdsAndTargetPaths(string msiPath, string[] expected)
         {
             var pkg = new WixToolset.Dtf.WindowsInstaller.Package.InstallPackage(msiPath,
