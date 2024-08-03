@@ -1,0 +1,9 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="GenManyComponents 5x1" Manufacturer="FireGiant" Version="1.0.0.0" UpgradeCode="b146c9a9-7184-413c-8ab2-b65ed869feb9">
+    <File Subdirectory='0000' Name='0000.x' Source='$(sys.SOURCEFILEPATH)' />
+    <File Subdirectory='0001' Name='0000.x' Source='$(sys.SOURCEFILEPATH)' />
+    <File Subdirectory='0002' Name='0000.x' Source='$(sys.SOURCEFILEPATH)' />
+    <File Subdirectory='0003' Name='0000.x' Source='$(sys.SOURCEFILEPATH)' />
+    <File Subdirectory='0004' Name='0000.x' Source='$(sys.SOURCEFILEPATH)' />
+  </Package>
+</Wix>
