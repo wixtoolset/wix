@@ -4,16 +4,13 @@
     <ComponentGroup Id="ProductComponents">
       <ComponentRef Id="Component1" />
     </ComponentGroup>
+
+      <Property Id="TESTDOMAIN" Secure="yes" />
   </Fragment>
 
   <Fragment>
-      <Component Id="Component1"
-                 Guid="1FDC6C4D-7741-4BF1-A4F0-4231879CEC45"
-                 Directory="INSTALLFOLDER">
-          <util:Group Id="TEST_GROUP1"
-                     Name="[TESTPARAMETER1]"
-                     CreateGroup="yes"
-                     RemoveOnUninstall="yes" />
+      <Component Id="Component1" Guid="1FDC6C4D-7741-4BF1-A4F0-4231879CEC45" Directory="INSTALLFOLDER">
+          <util:Group Id="TEST_GROUP1" Name="[TESTPARAMETER1]" Domain="[TESTDOMAIN]" CreateGroup="yes" RemoveOnUninstall="yes" />
       </Component>
   </Fragment>
 </Wix>

@@ -220,13 +220,13 @@ HRESULT ScaGroupGetParents(
             ExitOnFailure(hr, "failed to get Component state for Wix4Group");
         }
 
-        hr = WcaGetRecordString(hRec, vgpqParentName, &pwzTempStr);
+        hr = WcaGetRecordFormattedString(hRec, vgpqParentName, &pwzTempStr);
         ExitOnFailure(hr, "failed to get Wix4Group.Name");
         wcsncpy_s(psgParent->wzName, pwzTempStr, MAX_DARWIN_COLUMN);
         ReleaseNullStr(pwzTempStr);
 
 
-        hr = WcaGetRecordString(hRec, vgpqParentDomain, &pwzTempStr);
+        hr = WcaGetRecordFormattedString(hRec, vgpqParentDomain, &pwzTempStr);
         ExitOnFailure(hr, "failed to get Wix4Group.Domain");
         wcsncpy_s(psgParent->wzDomain, pwzTempStr, MAX_DARWIN_COLUMN);
         ReleaseNullStr(pwzTempStr);
@@ -288,13 +288,13 @@ HRESULT ScaGroupGetChildren(
             ExitOnFailure(hr, "failed to get Component state for Wix4Group");
         }
 
-        hr = WcaGetRecordString(hRec, vgcqChildName, &pwzTempStr);
+        hr = WcaGetRecordFormattedString(hRec, vgcqChildName, &pwzTempStr);
         ExitOnFailure(hr, "failed to get Wix4Group.Name");
         wcsncpy_s(psgChild->wzName, pwzTempStr, MAX_DARWIN_COLUMN);
         ReleaseNullStr(pwzTempStr);
 
 
-        hr = WcaGetRecordString(hRec, vgcqChildDomain, &pwzTempStr);
+        hr = WcaGetRecordFormattedString(hRec, vgcqChildDomain, &pwzTempStr);
         ExitOnFailure(hr, "failed to get Wix4Group.Domain");
         wcsncpy_s(psgChild->wzDomain, pwzTempStr, MAX_DARWIN_COLUMN);
         ReleaseNullStr(pwzTempStr);
@@ -412,8 +412,11 @@ LExit:
 }
 
 /* ****************************************************************
-ScaGroupExecute - Schedules group account creation or removal based on
-component state.
+ScaGroupExecute - Schedules group account creation or removal based on component state.
+
+  Output:   CustomData for CreateGroup          - Name\tDomain\tComment\tAttributes\tScriptKey
+            CustomData for RollbackCreateGroup  - ScriptKey\tName\tDomain\tComment\tRollbackAttributes
+            CustomData for RemoveGroup          - Name\tDomain\tComment\tAttributes
 ******************************************************************/
 HRESULT ScaGroupExecute(
     __in SCA_GROUP *psgList
@@ -455,8 +458,7 @@ HRESULT ScaGroupExecute(
         // and removing groups.  Note: MSDN says that it is safe to call these APIs from any
         // user, so we should be safe calling it during immediate mode.
 
-        LPCWSTR wzDomain = psg->wzDomain;
-        hr = GetDomainServerName(wzDomain, &pwzServerName);
+        hr = GetDomainServerName(psg->wzDomain, &pwzServerName);
 
         er = ::NetLocalGroupGetInfo(pwzServerName, psg->wzName, 0, reinterpret_cast<LPBYTE*>(&pGroupInfo));
         if (NERR_Success == er)
@@ -471,7 +473,7 @@ HRESULT ScaGroupExecute(
         {
             geGroupExists = GROUP_EXISTS_INDETERMINATE;
             hr = HRESULT_FROM_WIN32(er);
-            WcaLog(LOGMSG_VERBOSE, "Failed to check existence of domain: %ls, group: %ls (error code 0x%x) - continuing", wzDomain, psg->wzName, hr);
+            WcaLog(LOGMSG_VERBOSE, "Failed to check existence of group: %ls\\%ls (error code 0x%x) - continuing", psg->wzDomain, psg->wzName, hr);
             hr = S_OK;
             er = ERROR_SUCCESS;
         }
@@ -498,7 +500,7 @@ HRESULT ScaGroupExecute(
                     && !(SCAG_UPDATE_IF_EXISTS & psg->iAttributes))
                 {
                     hr = HRESULT_FROM_WIN32(NERR_GroupExists);
-                    MessageExitOnFailure(hr, msierrGRPFailedGroupCreateExists, "Failed to create group: %ls because group already exists.", psg->wzName);
+                    MessageExitOnFailure(hr, msierrGRPFailedGroupCreateExists, "Failed to create group: %ls\\%ls because group already exists.", psg->wzDomain, psg->wzName);
                 }
             }
 
@@ -537,10 +539,19 @@ HRESULT ScaGroupExecute(
                 ExitOnFailure(hr, "Failed to add group name to rollback custom action data: %ls", psg->wzName);
                 hr = WcaWriteStringToCaData(psg->wzDomain, &pwzRollbackData);
                 ExitOnFailure(hr, "Failed to add group domain to rollback custom action data: %ls", psg->wzDomain);
+                hr = WcaWriteStringToCaData(psg->wzComment, &pwzRollbackData);
+                ExitOnFailure(hr, "Failed to add group comment to rollback custom action data: %ls", psg->wzComment);
                 hr = WcaWriteIntegerToCaData(iRollbackUserAttributes, &pwzRollbackData);
-                ExitOnFailure(hr, "failed to add group attributes to rollback custom action data for group: %ls", psg->wzKey);
+                ExitOnFailure(hr, "failed to add group rollback attributes to rollback custom action data: %i", iRollbackUserAttributes);
 
-                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"CreateGroupRollback"), pwzRollbackData, COST_GROUP_DELETE);
+                if (*psg->wzDomain)
+                {
+                    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"CreateDomainGroupRollback"), pwzRollbackData, COST_GROUP_DELETE);
+                }
+                else
+                {
+                    hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"CreateGroupRollback"), pwzRollbackData, COST_GROUP_DELETE);
+                }
                 ExitOnFailure(hr, "failed to schedule CreateGroupRollback");
             }
             else
@@ -571,11 +582,10 @@ HRESULT ScaGroupExecute(
             hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
             ExitOnFailure(hr, "failed to add group attributes to custom action data for group: %ls", psg->wzKey);
 
-            // Schedule the removal because the group exists and we don't have any flags set
-            // that say not to remove the group on uninstall.
+            // Schedule the removal because the group exists and we don't have any flags set that say not to remove the group
+            // on uninstall.
             //
-            // Note: We can't rollback the removal of a group which is why RemoveGroup is a commit
-            // CustomAction.
+            // Note: We can't rollback the removal of a group which is why RemoveGroup is a commit CustomAction.
             if (psg->wzDomain && *psg->wzDomain)
             {
                 hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveDomainGroup"), pwzActionData, COST_GROUP_DELETE);
@@ -631,15 +641,31 @@ LExit:
 /* ****************************************************************
 ScaGroupMembershipRemoveParentsExecute - Schedules group membership removal
 based on parent/child component state
+
+ Output:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
+          rollback CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
 ******************************************************************/
 HRESULT ScaGroupMembershipRemoveParentsExecute(
-    __in SCA_GROUP* psg
+    __in SCA_GROUP* psg,
+    __inout DWORD &cScriptIndex
 )
 {
     HRESULT hr = S_OK;
     LPWSTR pwzActionData = NULL;
+    LPWSTR pwzBaseScriptKey = NULL;
+    LPWSTR pwzScriptKey = NULL;
+    SCA_GROUP* psgp = NULL;
 
-    for (SCA_GROUP* psgp = psg->psgParents; psgp; psgp = psgp->psgNext)
+    ++cScriptIndex;
+    // Get the base script key for this CustomAction.
+    hr = WcaCaScriptCreateKey(&pwzBaseScriptKey);
+    ExitOnFailure(hr, "Failed to get encoding key.");
+    hr = StrAllocFormatted(&pwzScriptKey, L"%ls_removemember_%u", pwzBaseScriptKey, cScriptIndex);
+    ExitOnFailure(hr, "Failed to create script key");
+
+    for (psgp = psg->psgParents; psgp; psgp = psgp->psgNext)
     {
         Assert(psgp->wzName);
         if (WcaIsUninstalling(psg->isInstalled, psg->isAction)
@@ -655,18 +681,24 @@ HRESULT ScaGroupMembershipRemoveParentsExecute(
             ExitOnFailure(hr, "Failed to add child group domain to custom action data: %ls", psg->wzDomain);
             hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
             ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
+            hr = WcaWriteStringToCaData(pwzScriptKey, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add script key to custom action data: %i", pwzScriptKey);
 
             if (psgp->wzDomain && *psgp->wzDomain)
             {
                 hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveDomainGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveDomainGroupMembershipRollback"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
             }
             else
             {
                 hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroupMembershipRollback"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
             }
 
         LExit:
             ReleaseNullStr(pwzActionData);
+            ReleaseNullStr(pwzBaseScriptKey);
+            ReleaseNullStr(pwzScriptKey);
             if (hr != S_OK && !(psg->iAttributes & SCAG_NON_VITAL))
             {
                 return hr;
@@ -677,16 +709,32 @@ HRESULT ScaGroupMembershipRemoveParentsExecute(
 }
 
 /* ****************************************************************
-ScaGroupMembershipRemoveChildrenExecute - 
+ScaGroupMembershipRemoveChildrenExecute -
+
+ Output:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
+          rollback CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
 ******************************************************************/
 HRESULT ScaGroupMembershipRemoveChildrenExecute(
-    __in SCA_GROUP* psg
+    __in SCA_GROUP* psg,
+    __inout DWORD &cScriptIndex
 )
 {
     HRESULT hr = S_OK;
     LPWSTR pwzActionData = NULL;
+    LPWSTR pwzBaseScriptKey = NULL;
+    LPWSTR pwzScriptKey = NULL;
+    SCA_GROUP* psgc = NULL;
 
-    for (SCA_GROUP* psgc = psg->psgChildren; psgc; psgc = psgc->psgNext)
+    ++cScriptIndex;
+    // Get the base script key for this CustomAction.
+    hr = WcaCaScriptCreateKey(&pwzBaseScriptKey);
+    ExitOnFailure(hr, "Failed to get encoding key.");
+    hr = StrAllocFormatted(&pwzScriptKey, L"%ls_removemember_%u", pwzBaseScriptKey, cScriptIndex);
+    ExitOnFailure(hr, "Failed to create script key");
+
+    for (psgc = psg->psgChildren; psgc; psgc = psgc->psgNext)
     {
         Assert(psgc->wzName);
         if (WcaIsUninstalling(psg->isInstalled, psg->isAction)
@@ -702,17 +750,23 @@ HRESULT ScaGroupMembershipRemoveChildrenExecute(
             ExitOnFailure(hr, "Failed to add child group domain to custom action data: %ls", psgc->wzDomain);
             hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
             ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
+            hr = WcaWriteStringToCaData(pwzScriptKey, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add script key to custom action data: %i", pwzScriptKey);
             if (psg->wzDomain && *psg->wzDomain)
             {
                 hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveDomainGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveDomainGroupMembershipRollback"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
             }
             else
             {
                 hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_DELETE);
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"RemoveGroupMembershipRollback"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
             }
 
         LExit:
             ReleaseNullStr(pwzActionData);
+            ReleaseNullStr(pwzBaseScriptKey);
+            ReleaseNullStr(pwzScriptKey);
 
             if (hr != S_OK && !(psg->iAttributes & SCAG_NON_VITAL))
             {
@@ -726,23 +780,29 @@ HRESULT ScaGroupMembershipRemoveChildrenExecute(
 /* ****************************************************************
 ScaGroupMembershipRemoveExecute - Schedules group membership removal
 based on parent/child component state
+
+ Output:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
+          rollback CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
 ******************************************************************/
 HRESULT ScaGroupMembershipRemoveExecute(
     __in SCA_GROUP* psgList
 )
 {
     HRESULT hr = S_OK;
+    static DWORD iScriptIndex = 0;
 
     // Loop through all the users to be configured.
     for (SCA_GROUP* psg = psgList; psg; psg = psg->psgNext)
     {
         Assert(psg->wzName);
         // first we loop through the Parents
-        hr = ScaGroupMembershipRemoveParentsExecute(psg);
+        hr = ScaGroupMembershipRemoveParentsExecute(psg, iScriptIndex);
         ExitOnFailure(hr, "Failed to remove parent membership for vital group: %ls", psg->wzKey);
 
         // then through the Children
-        hr = ScaGroupMembershipRemoveChildrenExecute(psg);
+        hr = ScaGroupMembershipRemoveChildrenExecute(psg, iScriptIndex);
         ExitOnFailure(hr, "Failed to remove child membership for vital group: %ls", psg->wzKey);
     }
 
@@ -755,13 +815,24 @@ ScaGroupMembershipAddParentsExecute - Schedules group membership removal
 based on parent/child component state
 ******************************************************************/
 HRESULT ScaGroupMembershipAddParentsExecute(
-    __in SCA_GROUP* psg
+    __in SCA_GROUP* psg,
+    __inout DWORD &cScriptIndex
 )
 {
     HRESULT hr = S_OK;
     LPWSTR pwzActionData = NULL;
+    LPWSTR pwzBaseScriptKey = NULL;
+    LPWSTR pwzScriptKey = NULL;
+    SCA_GROUP* psgp = NULL;
 
-    for (SCA_GROUP* psgp = psg->psgParents; psgp; psgp = psgp->psgNext)
+    ++cScriptIndex;
+    // Get the base script key for this CustomAction.
+    hr = WcaCaScriptCreateKey(&pwzBaseScriptKey);
+    ExitOnFailure(hr, "Failed to get encoding key.");
+    hr = StrAllocFormatted(&pwzScriptKey, L"%ls_addmember_%u", pwzBaseScriptKey, cScriptIndex);
+    ExitOnFailure(hr, "Failed to create script key");
+
+    for (psgp = psg->psgParents; psgp; psgp = psgp->psgNext)
     {
         Assert(psgp->wzName);
         if (WcaIsInstalling(psg->isInstalled, psg->isAction)
@@ -777,17 +848,23 @@ HRESULT ScaGroupMembershipAddParentsExecute(
             ExitOnFailure(hr, "Failed to add child group domain to custom action data: %ls", psg->wzDomain);
             hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
             ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
+            hr = WcaWriteStringToCaData(pwzScriptKey, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add script key to custom action data: %i", pwzScriptKey);
             if (psgp->wzDomain&&* psgp->wzDomain)
             {
                 hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddDomainGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddDomainGroupMembershipRollback"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
             }
             else
             {
                 hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddGroupMembershipRollback"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
             }
 
         LExit:
             ReleaseNullStr(pwzActionData);
+            ReleaseNullStr(pwzBaseScriptKey);
+            ReleaseNullStr(pwzScriptKey);
 
             if (hr != S_OK && !(psg->iAttributes & SCAG_NON_VITAL))
             {
@@ -801,16 +878,32 @@ HRESULT ScaGroupMembershipAddParentsExecute(
 /* ****************************************************************
 ScaGroupMembershipAddChildrenExecute - Schedules group membership removal
 based on parent/child component state
+
+ Output:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
+          rollback CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
 ******************************************************************/
 HRESULT ScaGroupMembershipAddChildrenExecute(
-    __in SCA_GROUP* psg
+    __in SCA_GROUP* psg,
+    __inout DWORD &cScriptIndex
 )
 {
     HRESULT hr = S_OK;
     LPWSTR pwzActionData = NULL;
+    LPWSTR pwzBaseScriptKey = NULL;
+    LPWSTR pwzScriptKey = NULL;
+    SCA_GROUP* psgc = NULL;
+
+    ++cScriptIndex;
+    // Get the base script key for this CustomAction.
+    hr = WcaCaScriptCreateKey(&pwzBaseScriptKey);
+    ExitOnFailure(hr, "Failed to get encoding key.");
+    hr = StrAllocFormatted(&pwzScriptKey, L"%ls_addmember_%u", pwzBaseScriptKey, cScriptIndex);
+    ExitOnFailure(hr, "Failed to create script key");
 
     // then through the Children
-    for (SCA_GROUP* psgc = psg->psgChildren; psgc; psgc = psgc->psgNext)
+    for (psgc = psg->psgChildren; psgc; psgc = psgc->psgNext)
     {
         Assert(psgc->wzName);
         if (WcaIsInstalling(psg->isInstalled, psg->isAction)
@@ -826,17 +919,24 @@ HRESULT ScaGroupMembershipAddChildrenExecute(
             ExitOnFailure(hr, "Failed to add parent group domain to custom action data: %ls", psgc->wzDomain);
             hr = WcaWriteIntegerToCaData(psg->iAttributes, &pwzActionData);
             ExitOnFailure(hr, "Failed to add group attributes to custom action data: %i", psg->iAttributes);
+            hr = WcaWriteStringToCaData(pwzScriptKey, &pwzActionData);
+            ExitOnFailure(hr, "Failed to add script key to custom action data: %i", pwzScriptKey);
             if (psg->wzDomain && *psg->wzDomain)
             {
                 hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddDomainGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddDomainGroupMembershipRollback"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
             }
             else
             {
                 hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddGroupMembership"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
+                hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION6(L"AddGroupMembershipRollback"), pwzActionData, COST_GROUPMEMBERSHIP_ADD);
             }
 
         LExit:
             ReleaseNullStr(pwzActionData);
+            ReleaseNullStr(pwzBaseScriptKey);
+            ReleaseNullStr(pwzScriptKey);
+
             if (hr != S_OK && !(psg->iAttributes & SCAG_NON_VITAL))
             {
                 return hr;
@@ -855,17 +955,18 @@ HRESULT ScaGroupMembershipAddExecute(
 )
 {
     HRESULT hr = S_OK;
+    static DWORD iScriptIndex = 0;
 
     // Loop through all the users to be configured.
     for (SCA_GROUP* psg = psgList; psg; psg = psg->psgNext)
     {
         Assert(psg->wzName);
         // first we loop through the Parents
-        hr = ScaGroupMembershipAddParentsExecute(psg);
+        hr = ScaGroupMembershipAddParentsExecute(psg, iScriptIndex);
         ExitOnFailure(hr, "Failed to add parent membership for vital group: %ls", psg->wzKey);
 
         // then through the Children
-        hr = ScaGroupMembershipAddChildrenExecute(psg);
+        hr = ScaGroupMembershipAddChildrenExecute(psg, iScriptIndex);
         ExitOnFailure(hr, "Failed to add child membership for vital group: %ls", psg->wzKey);
     }
 
