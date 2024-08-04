@@ -134,7 +134,7 @@ extern "C" UINT __stdcall ConfigureGroups(
     __in MSIHANDLE hInstall
 )
 {
-    //AssertSz(0, "Debug ConfigureGroups");
+    AssertSz(0, "Debug ConfigureGroups");
 
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;

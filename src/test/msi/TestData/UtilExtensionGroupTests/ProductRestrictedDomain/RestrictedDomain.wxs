@@ -7,14 +7,14 @@
             <ComponentRef Id="Component1" />
         </ComponentGroup>
 
-        <Property Id="TEMPDOMAIN" Secure="yes" />
+        <Property Id="TESTDOMAIN" Secure="yes" />
     </Fragment>
 
     <Fragment>
         <Component Id="Component1" Guid="00030829-0000-0000-C000-000000000046" Directory="INSTALLFOLDER">
             <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" />
 
-            <util:Group Id="TEST_GROUP_test" Name="testName1" Domain="[TEMPDOMAIN]" />
+            <util:Group Id="TEST_GROUP_test" Name="testName1" Domain="[TESTDOMAIN]" />
         </Component>
     </Fragment>
 </Wix>

@@ -6,6 +6,8 @@
         <ComponentGroup Id="ProductComponents">
             <ComponentRef Id="Component1" />
         </ComponentGroup>
+
+        <Property Id="TESTDOMAIN" Secure="yes" />
     </Fragment>
 
     <Fragment>
