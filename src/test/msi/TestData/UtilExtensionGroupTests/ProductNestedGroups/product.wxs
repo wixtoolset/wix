@@ -7,13 +7,14 @@
             <ComponentRef Id="Component1" />
         </ComponentGroup>
 
-        <Property Id="TEMPDOMAIN" Secure="yes" Value="TESTDOMAIN" />
+        <Property Id="TESTDOMAIN" Secure="yes" />
     </Fragment>
 
     <Fragment>
-        <util:Group Id="AUTH_USERS" Name="Authenticated Users" Domain="[TEMPDOMAIN]" >
+        <util:Group Id="DOMAIN_USERS" Name="Domain Users" Domain="[TESTDOMAIN]" >
             <util:GroupRef Id="TEST_GROUP1" />
             <util:GroupRef Id="TEST_GROUP2" />
+            <util:GroupRef Id="TEST_GROUP3" />
         </util:Group>
         <util:Group Id="EVERYONE" Name="Everyone" >
             <util:GroupRef Id="TEST_GROUP1" />
@@ -25,6 +26,8 @@
             <util:Group Id="TEST_GROUP1" Name="testName1" Comment="Group1" CreateGroup="yes" RemoveOnUninstall="yes" />
 
             <util:Group Id="TEST_GROUP2" Name="testName2" Comment="Group2" RemoveOnUninstall="no" UpdateIfExists="yes" />
+            
+            <util:Group Id="TEST_GROUP3" Name="testName3" Domain="[TESTDOMAIN]" Comment="Group3" RemoveOnUninstall="no" UpdateIfExists="yes" />
         </Component>
     </Fragment>
 </Wix>

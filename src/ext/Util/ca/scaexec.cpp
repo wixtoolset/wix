@@ -716,7 +716,7 @@ static HRESULT RemoveGroupInternal(
     //
     if (!(SCAG_DONT_CREATE_GROUP & iAttributes))
     {
-        GetDomainServerName(wzDomain, &pwzServerName, DS_WRITABLE_REQUIRED);
+        hr = GetDomainFromServerName(&pwzServerName, wzDomain, DS_WRITABLE_REQUIRED);
 
         NET_API_STATUS er = ::NetLocalGroupDel(pwzServerName, wzName);
         hr = HRESULT_FROM_WIN32(er);
@@ -1218,9 +1218,13 @@ LExit:
 
 
 /********************************************************************
- CreateGroup - CUSTOM ACTION ENTRY POINT for creating groups
+  CreateGroup - CUSTOM ACTION ENTRY POINT for creating groups
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
 
-  Input:  deferred CustomActionData - GroupName\tDomain\tComment\tAttributes
+  Input:  deferred CustomActionData - GroupName\tDomain\tComment\tAttributes\tScriptKey(empty for no rollback)
+
+  Output: Script for RollbackCreateGroup - OriginalComment\tRollbackAttributes
  * *****************************************************************/
 extern "C" UINT __stdcall CreateGroup(
     __in MSIHANDLE hInstall
@@ -1281,8 +1285,8 @@ extern "C" UINT __stdcall CreateGroup(
 
     if (!(SCAG_DONT_CREATE_GROUP & iAttributes))
     {
-        hr = GetDomainServerName(pwzDomain, &pwzServerName, DS_WRITABLE_REQUIRED);
-        ExitOnFailure(hr, "failed to find Domain %ls.", pwzDomain);
+        hr = GetDomainFromServerName(&pwzServerName, pwzDomain, DS_WRITABLE_REQUIRED);
+        ExitOnFailure(hr, "failed to find writable server for domain %ls.", pwzDomain);
 
         // Set the group's comment
         if (SCAG_REMOVE_COMMENT & iAttributes)
@@ -1304,7 +1308,7 @@ extern "C" UINT __stdcall CreateGroup(
         {
             if (SCAG_FAIL_IF_EXISTS & iAttributes)
             {
-                MessageExitOnFailure(hr, msierrGRPFailedGroupCreateExists, "Group (%ls) was not supposed to exist, but does", pwzName);
+                MessageExitOnFailure(hr, msierrGRPFailedGroupCreateExists, "Group (%ls\\%ls) was not supposed to exist, but does", pwzDomain, pwzName);
             }
 
             hr = S_OK; // Make sure that we don't report this situation as an error
@@ -1359,7 +1363,7 @@ extern "C" UINT __stdcall CreateGroup(
                         hr = SetGroupComment(pwzServerName, pwzName, L"");
                         if (FAILED(hr))
                         {
-                            WcaLogError(hr, "failed to clear comment for group %ls\\%ls, continuing anyway.", pwzServerName, pwzName);
+                            WcaLogError(hr, "failed to clear comment for group %ls\\%ls, continuing anyway.", pwzDomain, pwzName);
                             hr = S_OK;
                         }
                     }
@@ -1368,14 +1372,14 @@ extern "C" UINT __stdcall CreateGroup(
                         hr = SetGroupComment(pwzServerName, pwzName, pwzComment);
                         if (FAILED(hr))
                         {
-                            WcaLogError(hr, "failed to set comment to %ls for group %ls\\%ls, continuing anyway.", pwzComment, pwzServerName, pwzName);
+                            WcaLogError(hr, "failed to set comment to '%ls' for group %ls\\%ls, continuing anyway.", pwzComment, pwzDomain, pwzName);
                             hr = S_OK;
                         }
                     }
                 }
             }
         }
-        MessageExitOnFailure(hr, msierrGRPFailedGroupCreate, "failed to create group: %ls", pwzName);
+        MessageExitOnFailure(hr, msierrGRPFailedGroupCreate, "failed to create group: %ls\\%ls", pwzDomain, pwzName);
     }
 
 LExit:
@@ -1391,6 +1395,7 @@ LExit:
     ReleaseStr(pwzDomain);
     ReleaseStr(pwzComment);
     ReleaseStr(pwzScriptKey);
+    ReleaseStr(pwzServerName);
 
     if (fInitializedCom)
     {
@@ -1412,6 +1417,11 @@ LExit:
 
 /********************************************************************
  CreateGroupRollback - CUSTOM ACTION ENTRY POINT for CreateGroup rollback
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
+
+ Input:  rollback CustomActionData  - ScriptKey\tGroupName\tDomain\tComment\tRollbackAttributes
+         rollback script            - OriginalComment\tRollbackAttributes
 
  * *****************************************************************/
 extern "C" UINT __stdcall CreateGroupRollback(
@@ -1429,7 +1439,7 @@ extern "C" UINT __stdcall CreateGroupRollback(
     LPWSTR pwzName = NULL;
     LPWSTR pwzDomain = NULL;
     LPWSTR pwzComment = NULL;
-    int iAttributes = 0;
+    int iRollbackAttributes = 0;
     BOOL fInitializedCom = FALSE;
 
     WCA_CASCRIPT_HANDLE hRollbackScript = NULL;
@@ -1454,7 +1464,7 @@ extern "C" UINT __stdcall CreateGroupRollback(
     //
     pwz = pwzData;
     hr = WcaReadStringFromCaData(&pwz, &pwzScriptKey);
-    ExitOnFailure(hr, "failed to read encoding key from custom action data");
+    ExitOnFailure(hr, "failed to read script key from custom action data");
 
     hr = WcaReadStringFromCaData(&pwz, &pwzName);
     ExitOnFailure(hr, "failed to read name from custom action data");
@@ -1465,8 +1475,8 @@ extern "C" UINT __stdcall CreateGroupRollback(
     hr = WcaReadStringFromCaData(&pwz, &pwzComment);
     ExitOnFailure(hr, "failed to read comment from custom action data");
 
-    hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
-    ExitOnFailure(hr, "failed to read attributes from custom action data");
+    hr = WcaReadIntegerFromCaData(&pwz, &iRollbackAttributes);
+    ExitOnFailure(hr, "failed to read rollback attributes from custom action data");
 
     // Best effort to read original configuration from CreateUser.
     hr = WcaCaScriptOpen(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, &hRollbackScript);
@@ -1502,12 +1512,12 @@ extern "C" UINT __stdcall CreateGroupRollback(
             }
             else
             {
-                iAttributes |= iOriginalAttributes;
+                iRollbackAttributes |= iOriginalAttributes;
             }
         }
     }
 
-    hr = RemoveGroupInternal(pwzDomain, pwzName, iAttributes);
+    hr = RemoveGroupInternal(pwzDomain, pwzName, iRollbackAttributes);
 
 LExit:
     WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_DELETE);
@@ -1535,9 +1545,12 @@ LExit:
 
 
 /********************************************************************
- RemoveGroup - CUSTOM ACTION ENTRY POINT for removing groups
+  RemoveGroup - CUSTOM ACTION ENTRY POINT for removing groups
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
+  NOTE: This action can't be rolled back, so should only be performed in commit phase
 
-  Input:  deferred CustomActionData - Name\tDomain
+  Input:  commit CustomActionData - Name\tDomain\tComment\tAttributes
  * *****************************************************************/
 extern "C" UINT __stdcall RemoveGroup(
     MSIHANDLE hInstall
@@ -1605,7 +1618,7 @@ LExit:
     return WcaFinalize(er);
 }
 
-HRESULT AlterGroupMembership(bool remove, bool isRollback = false)
+HRESULT AlterGroupMembership(bool remove, bool isRollback)
 {
     HRESULT hr = S_OK;
     NET_API_STATUS er = ERROR_SUCCESS;
@@ -1617,22 +1630,13 @@ HRESULT AlterGroupMembership(bool remove, bool isRollback = false)
     LPWSTR pwzChildName = NULL;
     LPWSTR pwzChildDomain = NULL;
     int iAttributes = 0;
+    LPWSTR pwzScriptKey = NULL;
     LPWSTR pwzChildFullName = NULL;
     LPWSTR pwzServerName = NULL;
     LOCALGROUP_MEMBERS_INFO_3 memberInfo3 = {};
-    WCA_CASCRIPT_HANDLE phRollbackScript = NULL;
+    WCA_CASCRIPT_HANDLE hRollbackScript = NULL;
 
-    if (isRollback)
-    {
-        // Get a CaScript key
-        hr = WcaCaScriptOpen(WCA_ACTION_NONE, WCA_CASCRIPT_ROLLBACK, FALSE, remove ? L"AddGroupMembershipRollback" : L"RemoveGroupMembershipRollback", &phRollbackScript);
-        hr = WcaCaScriptReadAsCustomActionData(phRollbackScript, &pwzData);
-    }
-    else
-    {
-        hr = WcaCaScriptCreate(WCA_ACTION_NONE, WCA_CASCRIPT_ROLLBACK, FALSE, remove ? L"RemoveGroupMembershipRollback" : L"AddGroupMembershipRollback", TRUE, &phRollbackScript);
-        hr = WcaGetProperty(L"CustomActionData", &pwzData);
-    }
+    hr = WcaGetProperty(L"CustomActionData", &pwzData);
     ExitOnFailure(hr, "failed to get CustomActionData");
 
     WcaLog(LOGMSG_TRACEONLY, "CustomActionData: %ls", pwzData);
@@ -1656,8 +1660,28 @@ HRESULT AlterGroupMembership(bool remove, bool isRollback = false)
     hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
     ExitOnFailure(hr, "failed to read attributes from custom action data");
 
-    hr = GetDomainServerName(pwzParentDomain, &pwzServerName, DS_WRITABLE_REQUIRED);
-    ExitOnFailure(hr, "failed to contact domain server %ls", pwzParentDomain);
+    hr = WcaReadStringFromCaData(&pwz, &pwzScriptKey);
+    ExitOnFailure(hr, "failed to read scriptkey from custom action data");
+
+    if (isRollback)
+    {
+        // if the script file doesn't exist, then we'll abandon this rollback
+        hr = WcaCaScriptOpen(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, &hRollbackScript);
+        if (S_OK == hr)
+        {
+            WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_DELETE);
+        }
+        else
+        {
+            WcaLog(LOGMSG_VERBOSE, "Rollback of parent: %ls\\%ls, child: %ls\\%ls relationship not performed, rollback script not found", pwzParentDomain, pwzParentName, pwzChildDomain, pwzChildName);
+            hr = S_OK;
+            ExitFunction();
+        }
+    }
+
+
+    hr = GetDomainFromServerName(&pwzServerName, pwzParentDomain, DS_WRITABLE_REQUIRED);
+    ExitOnFailure(hr, "failed to obtain writable server for domain %ls", pwzParentDomain);
 
     if (*pwzChildDomain)
     {
@@ -1679,16 +1703,13 @@ HRESULT AlterGroupMembership(bool remove, bool isRollback = false)
     }
     hr = HRESULT_FROM_WIN32(er);
 
+    // if there was no error, the action succeeded, and we should flag that it's something which might need
+    // to be rolled back
     if (S_OK == hr && !isRollback)
     {
-        // we need to log rollback data, we can just use exactly the same data we used to do the initial action though
-        WcaCaScriptWriteString(phRollbackScript, pwzParentName);
-        WcaCaScriptWriteString(phRollbackScript, pwzParentDomain);
-        WcaCaScriptWriteString(phRollbackScript, pwzChildName);
-        WcaCaScriptWriteString(phRollbackScript, pwzChildDomain);
-        WcaCaScriptWriteNumber(phRollbackScript, iAttributes);
-        WcaCaScriptFlush(phRollbackScript);
-        WcaCaScriptClose(phRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
+        // we create a script file, the rollback matching this scriptkey will occur if the file exists
+        hr = WcaCaScriptCreate(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, FALSE, &hRollbackScript);
+        WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
     }
 
     if (remove)
@@ -1716,6 +1737,7 @@ LExit:
     ReleaseStr(pwzChildDomain);
     ReleaseStr(pwzChildFullName);
     ReleaseStr(pwzServerName);
+    ReleaseStr(pwzScriptKey);
 
     if (SCAG_NON_VITAL & iAttributes)
     {
@@ -1725,10 +1747,12 @@ LExit:
 }
 
 /********************************************************************
- AddGroupmembership - CUSTOM ACTION ENTRY POINT for creating groups
+  AddGroupMembership - CUSTOM ACTION ENTRY POINT for adding Group Membership
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
 
   Input:  deferred CustomActionData -
-  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
  * *****************************************************************/
 extern "C" UINT __stdcall AddGroupMembership(
     __in MSIHANDLE hInstall
@@ -1758,10 +1782,13 @@ LExit:
 }
 
 /********************************************************************
- AddGroupmembership - CUSTOM ACTION ENTRY POINT for creating groups
+ AddGroupMembershipRollback - CUSTOM ACTION ENTRY POINT for rolling back
+        adding Group Membership
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
 
   Input:  deferred CustomActionData -
-  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
  * *****************************************************************/
 extern "C" UINT __stdcall AddGroupMembershipRollback(
     __in MSIHANDLE hInstall
@@ -1791,10 +1818,12 @@ LExit:
 }
 
 /********************************************************************
- RemoveGroupMembership - CUSTOM ACTION ENTRY POINT for creating groups
+  RemoveGroupMembership - CUSTOM ACTION ENTRY POINT for removing group memberships
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
 
   Input:  deferred CustomActionData -
-  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
  * *****************************************************************/
 extern "C" UINT __stdcall RemoveGroupMembership(
     __in MSIHANDLE hInstall
@@ -1824,10 +1853,13 @@ LExit:
 }
 
 /********************************************************************
- RemoveGroupMembershipRollback - CUSTOM ACTION ENTRY POINT for creating groups
+  RemoveGroupMembershipRollback - CUSTOM ACTION ENTRY POINT for rolling back
+        removing group memberships
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
 
   Input:  deferred CustomActionData -
-  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
  * *****************************************************************/
 extern "C" UINT __stdcall RemoveGroupMembershipRollback(
     __in MSIHANDLE hInstall

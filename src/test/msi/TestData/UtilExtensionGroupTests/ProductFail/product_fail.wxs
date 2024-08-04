@@ -13,6 +13,8 @@
         <InstallExecuteSequence>
             <Custom Action="CaFail" After="Wix6ConfigureGroups_X86" />
         </InstallExecuteSequence>
+
+        <Property Id="TESTDOMAIN" Secure="yes" />
     </Fragment>
 
     <Fragment>

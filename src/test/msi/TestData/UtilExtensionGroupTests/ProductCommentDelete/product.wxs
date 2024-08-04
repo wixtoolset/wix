@@ -6,13 +6,15 @@
         <ComponentGroup Id="ProductComponents">
             <ComponentRef Id="Component1" />
         </ComponentGroup>
+
+        <Property Id="TESTDOMAIN" Secure="yes" />
     </Fragment>
 
     <Fragment>
         <Component Id="Component1" Guid="00030829-0000-0000-C000-000000000046" Directory="INSTALLFOLDER">
             <File Source="$(sys.SOURCEFILEPATH)" KeyPath="yes" />
 
-            <util:Group Id="TEST_GROUP1" Name="testName1" UpdateIfExists="yes" RemoveOnUninstall="yes" RemoveComment="yes"/>
+            <util:Group Id="TEST_GROUP1" Name="testName1" Domain="[TESTDOMAIN]" UpdateIfExists="yes" RemoveOnUninstall="yes" RemoveComment="yes"/>
         </Component>
     </Fragment>
 </Wix>
