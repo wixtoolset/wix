@@ -2266,6 +2266,16 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.IllegalAttributeWhenNested, "The File element contains an attribute '{0}' that cannot be used in a File element that is a child of a Component element.", attributeName);
         }
 
+        public static Message OverlengthTableNameInMergeModule(SourceLineNumber sourceLineNumbers, string tableName)
+        {
+            return Message(sourceLineNumbers, Ids.OverlengthTableNameInMergeModule, "Merge modules should not contain the '{0}' table because the table name exceeds 31 characters in length. https://learn.microsoft.com/en-au/windows/win32/msi/table-names", tableName);
+        }
+
+        public static Message OverlengthTableNameInProduct(SourceLineNumber sourceLineNumbers, string tableName)
+        {
+            return Message(sourceLineNumbers, Ids.OverlengthTableNameInProduct, "The table name '{0}' is invalid because the table name exceeds 31 characters in length. https://learn.microsoft.com/en-au/windows/win32/msi/table-names", tableName);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -2275,6 +2285,8 @@ namespace WixToolset.Data
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, resourceManager, resourceName, args);
         }
+
+
 
         public enum Ids
         {
@@ -2667,6 +2679,8 @@ namespace WixToolset.Data
             MsiTransactionInvalidPackage2 = 412,
             ExpectedAttributeOrElementWithOtherAttribute = 413,
             ExpectedAttributeOrElementWithoutOtherAttribute = 414,
+            OverlengthTableNameInMergeModule = 415,
+            OverlengthTableNameInProduct = 416
         }
     }
 }
