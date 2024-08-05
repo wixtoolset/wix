@@ -3,31 +3,17 @@
 #include "precomp.h"
 
 
-#ifdef _WIN64
-#define CP_COMPLUSROLLBACKINSTALLPREPARE    L"ComPlusRollbackInstallPrepare_64"
-#define CP_COMPLUSINSTALLPREPARE            L"ComPlusInstallPrepare_64"
-#define CP_COMPLUSROLLBACKINSTALLEXECUTE    L"ComPlusRollbackInstallExecute_64"
-#define CP_COMPLUSINSTALLEXECUTE            L"ComPlusInstallExecute_64"
-#define CP_COMPLUSINSTALLEXECUTECOMMIT      L"ComPlusInstallExecuteCommit_64"
-#define CP_COMPLUSINSTALLCOMMIT             L"ComPlusInstallCommit_64"
-#define CP_COMPLUSROLLBACKINSTALLPREPARE    L"ComPlusRollbackInstallPrepare_64"
-#define CP_COMPLUSINSTALLPREPARE            L"ComPlusInstallPrepare_64"
-#define CP_COMPLUSROLLBACKUNINSTALLEXECUTE  L"ComPlusRollbackUninstallExecute_64"
-#define CP_COMPLUSUNINSTALLEXECUTE          L"ComPlusUninstallExecute_64"
-#define CP_COMPLUSINSTALLCOMMIT             L"ComPlusInstallCommit_64"
-#else
-#define CP_COMPLUSROLLBACKINSTALLPREPARE    L"ComPlusRollbackInstallPrepare"
-#define CP_COMPLUSINSTALLPREPARE            L"ComPlusInstallPrepare"
-#define CP_COMPLUSROLLBACKINSTALLEXECUTE    L"ComPlusRollbackInstallExecute"
-#define CP_COMPLUSINSTALLEXECUTE            L"ComPlusInstallExecute"
-#define CP_COMPLUSINSTALLEXECUTECOMMIT      L"ComPlusInstallExecuteCommit"
-#define CP_COMPLUSINSTALLCOMMIT             L"ComPlusInstallCommit"
-#define CP_COMPLUSROLLBACKINSTALLPREPARE    L"ComPlusRollbackInstallPrepare"
-#define CP_COMPLUSINSTALLPREPARE            L"ComPlusInstallPrepare"
-#define CP_COMPLUSROLLBACKUNINSTALLEXECUTE  L"ComPlusRollbackUninstallExecute"
-#define CP_COMPLUSUNINSTALLEXECUTE          L"ComPlusUninstallExecute"
-#define CP_COMPLUSINSTALLCOMMIT             L"ComPlusInstallCommit"
-#endif
+#define CP_COMPLUSROLLBACKINSTALLPREPARE    CUSTOM_ACTION_DECORATION(L"ComPlusRollbackInstallPrepare")
+#define CP_COMPLUSINSTALLPREPARE            CUSTOM_ACTION_DECORATION(L"ComPlusInstallPrepare")
+#define CP_COMPLUSROLLBACKINSTALLEXECUTE    CUSTOM_ACTION_DECORATION(L"ComPlusRollbackInstallExecute")
+#define CP_COMPLUSINSTALLEXECUTE            CUSTOM_ACTION_DECORATION(L"ComPlusInstallExecute")
+#define CP_COMPLUSINSTALLEXECUTECOMMIT      CUSTOM_ACTION_DECORATION(L"ComPlusInstallExecuteCommit")
+#define CP_COMPLUSINSTALLCOMMIT             CUSTOM_ACTION_DECORATION(L"ComPlusInstallCommit")
+#define CP_COMPLUSROLLBACKINSTALLPREPARE    CUSTOM_ACTION_DECORATION(L"ComPlusRollbackInstallPrepare")
+#define CP_COMPLUSINSTALLPREPARE            CUSTOM_ACTION_DECORATION(L"ComPlusInstallPrepare")
+#define CP_COMPLUSROLLBACKUNINSTALLEXECUTE  CUSTOM_ACTION_DECORATION(L"ComPlusRollbackUninstallExecute")
+#define CP_COMPLUSUNINSTALLEXECUTE          CUSTOM_ACTION_DECORATION(L"ComPlusUninstallExecute")
+#define CP_COMPLUSINSTALLCOMMIT             CUSTOM_ACTION_DECORATION(L"ComPlusInstallCommit")
 
 /********************************************************************
  ConfigureComPlusInstall - CUSTOM ACTION ENTRY POINT for installing COM+ components
@@ -81,7 +67,7 @@ extern "C" UINT __stdcall ConfigureComPlusInstall(MSIHANDLE hInstall)
 
     CpiSchedInitialize();
 
-    // check for the prerequsite tables
+    // check for the prerequisite tables
     if (!CpiTableExists(cptComPlusPartition) && !CpiTableExists(cptComPlusApplication) && !CpiTableExists(cptComPlusAssembly))
     {
         WcaLog(LOGMSG_VERBOSE, "skipping install COM+ CustomAction, no ComPlusPartition, ComPlusApplication or ComPlusAssembly table present");
@@ -117,55 +103,55 @@ extern "C" UINT __stdcall ConfigureComPlusInstall(MSIHANDLE hInstall)
     if (502 <= iVersionNT && CpiTableExists(cptComPlusPartition))
     {
         hr = CpiPartitionsRead(&partList);
-        MessageExitOnFailure(hr, msierrComPlusPartitionReadFailed, "Failed to read ComPlusPartitions table");
+        MessageExitOnFailure(hr, msierrComPlusPartitionReadFailed, "Failed to read Wix4ComPlusPartitions table");
     }
 
     if (502 <= iVersionNT && CpiTableExists(cptComPlusPartitionRole))
     {
         hr = CpiPartitionRolesRead(&partList, &partRoleList);
-        MessageExitOnFailure(hr, msierrComPlusPartitionRoleReadFailed, "Failed to read ComPlusPartitionRole table");
+        MessageExitOnFailure(hr, msierrComPlusPartitionRoleReadFailed, "Failed to read Wix4ComPlusPartitionRole table");
     }
 
     if (502 <= iVersionNT && (CpiTableExists(cptComPlusUserInPartitionRole) || CpiTableExists(cptComPlusGroupInPartitionRole)))
     {
         hr = CpiUsersInPartitionRolesRead(&partRoleList, &usrInPartRoleList);
-        MessageExitOnFailure(hr, msierrComPlusUserInPartitionRoleReadFailed, "Failed to read ComPlusUserInPartitionRole table");
+        MessageExitOnFailure(hr, msierrComPlusUserInPartitionRoleReadFailed, "Failed to read Wix4ComPlusUserInPartitionRole table");
     }
 
     if (502 <= iVersionNT && CpiTableExists(cptComPlusPartitionUser))
     {
         hr = CpiPartitionUsersRead(&partList, &partUsrList);
-        MessageExitOnFailure(hr, msierrComPlusPartitionUserReadFailed, "Failed to read ComPlusPartitionUser table");
+        MessageExitOnFailure(hr, msierrComPlusPartitionUserReadFailed, "Failed to read Wix4ComPlusPartitionUser table");
     }
 
     if (CpiTableExists(cptComPlusApplication))
     {
         hr = CpiApplicationsRead(&partList, &appList);
-        MessageExitOnFailure(hr, msierrComPlusApplicationReadFailed, "Failed to read ComPlusApplication table");
+        MessageExitOnFailure(hr, msierrComPlusApplicationReadFailed, "Failed to read Wix4ComPlusApplication table");
     }
 
     if (CpiTableExists(cptComPlusApplicationRole))
     {
         hr = CpiApplicationRolesRead(&appList, &appRoleList);
-        MessageExitOnFailure(hr, msierrComPlusApplicationRoleReadFailed, "Failed to read ComPlusApplicationRole table");
+        MessageExitOnFailure(hr, msierrComPlusApplicationRoleReadFailed, "Failed to read Wix4ComPlusApplicationRole table");
     }
 
     if (CpiTableExists(cptComPlusUserInApplicationRole) || CpiTableExists(cptComPlusGroupInApplicationRole))
     {
         hr = CpiUsersInApplicationRolesRead(&appRoleList, &usrInAppRoleList);
-        MessageExitOnFailure(hr, msierrComPlusUserInApplicationRoleReadFailed, "Failed to read ComPlusUserInApplicationRole table");
+        MessageExitOnFailure(hr, msierrComPlusUserInApplicationRoleReadFailed, "Failed to read Wix4ComPlusUserInApplicationRole table");
     }
 
     if (CpiTableExists(cptComPlusAssembly))
     {
         hr = CpiAssembliesRead(&appList, &appRoleList, &asmList);
-        MessageExitOnFailure(hr, msierrComPlusAssembliesReadFailed, "Failed to read ComPlusAssembly table");
+        MessageExitOnFailure(hr, msierrComPlusAssembliesReadFailed, "Failed to read Wix4ComPlusAssembly table");
     }
 
     if (CpiTableExists(cptComPlusSubscription))
     {
         hr = CpiSubscriptionsRead(&asmList, &subList);
-        MessageExitOnFailure(hr, msierrComPlusSubscriptionReadFailed, "Failed to read ComPlusSubscription table");
+        MessageExitOnFailure(hr, msierrComPlusSubscriptionReadFailed, "Failed to read Wix4ComPlusSubscription table");
     }
 
     // verify elements
@@ -295,7 +281,7 @@ LExit:
     CpiAssemblyListFree(&asmList);
     CpiSubscriptionListFree(&subList);
 
-    // unitialize
+    // uninitialize
     CpiSchedFinalize();
 
     if (fInitializedCom)
@@ -359,7 +345,7 @@ extern "C" UINT __stdcall ConfigureComPlusUninstall(MSIHANDLE hInstall)
     // check for the prerequsite tables
     if (!CpiTableExists(cptComPlusPartition) && !CpiTableExists(cptComPlusApplication) && !CpiTableExists(cptComPlusAssembly))
     {
-        WcaLog(LOGMSG_VERBOSE, "skipping uninstall COM+ CustomAction, no ComPlusPartition, ComPlusApplication or ComPlusAssembly table present");
+        WcaLog(LOGMSG_VERBOSE, "skipping uninstall COM+ CustomAction, no Wix4ComPlusPartition, Wix4ComPlusApplication or Wix4ComPlusAssembly table present");
         ExitFunction1(hr = S_FALSE);
     }
 
@@ -392,55 +378,55 @@ extern "C" UINT __stdcall ConfigureComPlusUninstall(MSIHANDLE hInstall)
     if (502 <= iVersionNT && CpiTableExists(cptComPlusPartition))
     {
         hr = CpiPartitionsRead(&partList);
-        MessageExitOnFailure(hr, msierrComPlusPartitionReadFailed, "Failed to read ComPlusPartitions table");
+        MessageExitOnFailure(hr, msierrComPlusPartitionReadFailed, "Failed to read Wix4ComPlusPartitions table");
     }
 
     if (502 <= iVersionNT && CpiTableExists(cptComPlusPartitionRole))
     {
         hr = CpiPartitionRolesRead(&partList, &partRoleList);
-        MessageExitOnFailure(hr, msierrComPlusPartitionRoleReadFailed, "Failed to read ComPlusPartitionRole table");
+        MessageExitOnFailure(hr, msierrComPlusPartitionRoleReadFailed, "Failed to read Wix4ComPlusPartitionRole table");
     }
 
     if (502 <= iVersionNT && (CpiTableExists(cptComPlusUserInPartitionRole) || CpiTableExists(cptComPlusGroupInPartitionRole)))
     {
         hr = CpiUsersInPartitionRolesRead(&partRoleList, &usrInPartRoleList);
-        MessageExitOnFailure(hr, msierrComPlusUserInPartitionRoleReadFailed, "Failed to read ComPlusUserInPartitionRole table");
+        MessageExitOnFailure(hr, msierrComPlusUserInPartitionRoleReadFailed, "Failed to read Wix4ComPlusUserInPartitionRole table");
     }
 
     if (502 <= iVersionNT && CpiTableExists(cptComPlusPartitionUser))
     {
         hr = CpiPartitionUsersRead(&partList, &partUsrList);
-        MessageExitOnFailure(hr, msierrComPlusPartitionUserReadFailed, "Failed to read ComPlusPartitionUser table");
+        MessageExitOnFailure(hr, msierrComPlusPartitionUserReadFailed, "Failed to read Wix4ComPlusPartitionUser table");
     }
 
     if (CpiTableExists(cptComPlusApplication))
     {
         hr = CpiApplicationsRead(&partList, &appList);
-        MessageExitOnFailure(hr, msierrComPlusApplicationReadFailed, "Failed to read ComPlusApplication table");
+        MessageExitOnFailure(hr, msierrComPlusApplicationReadFailed, "Failed to read Wix4ComPlusApplication table");
     }
 
     if (CpiTableExists(cptComPlusApplicationRole))
     {
         hr = CpiApplicationRolesRead(&appList, &appRoleList);
-        MessageExitOnFailure(hr, msierrComPlusApplicationRoleReadFailed, "Failed to read ComPlusApplicationRole table");
+        MessageExitOnFailure(hr, msierrComPlusApplicationRoleReadFailed, "Failed to read Wix4ComPlusApplicationRole table");
     }
 
     if (CpiTableExists(cptComPlusUserInApplicationRole) || CpiTableExists(cptComPlusGroupInApplicationRole))
     {
         hr = CpiUsersInApplicationRolesRead(&appRoleList, &usrInAppRoleList);
-        MessageExitOnFailure(hr, msierrComPlusUserInApplicationRoleReadFailed, "Failed to read ComPlusUserInApplicationRole table");
+        MessageExitOnFailure(hr, msierrComPlusUserInApplicationRoleReadFailed, "Failed to read Wix4ComPlusUserInApplicationRole table");
     }
 
     if (CpiTableExists(cptComPlusAssembly))
     {
         hr = CpiAssembliesRead(&appList, &appRoleList, &asmList);
-        MessageExitOnFailure(hr, msierrComPlusAssembliesReadFailed, "Failed to read ComPlusAssembly table");
+        MessageExitOnFailure(hr, msierrComPlusAssembliesReadFailed, "Failed to read Wix4ComPlusAssembly table");
     }
 
     if (CpiTableExists(cptComPlusSubscription))
     {
         hr = CpiSubscriptionsRead(&asmList, &subList);
-        MessageExitOnFailure(hr, msierrComPlusSubscriptionReadFailed, "Failed to read ComPlusSubscription table");
+        MessageExitOnFailure(hr, msierrComPlusSubscriptionReadFailed, "Failed to read Wix4ComPlusSubscription table");
     }
 
     // verify elements
@@ -555,7 +541,7 @@ LExit:
     CpiAssemblyListFree(&asmList);
     CpiSubscriptionListFree(&subList);
 
-    // unitialize
+    // uninitialize
     CpiSchedFinalize();
 
     if (fInitializedCom)

@@ -1,7 +1,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 #include "precomp.h"
-
+#include <mscoree.h>
 
 // GAC related declarations
 
@@ -61,13 +61,11 @@ public:
 
 typedef HRESULT (__stdcall *LoadLibraryShimFunc)(LPCWSTR szDllName, LPCWSTR szVersion, LPVOID pvReserved, HMODULE *phModDll);
 typedef HRESULT (__stdcall *CreateAssemblyCacheFunc)(IAssemblyCache **ppAsmCache, DWORD dwReserved);
+typedef HRESULT (__stdcall *GetFileVersionFnPtr)(LPCWSTR szFilename, _Out_writes_to_opt_(cchBuffer, *dwLength) LPWSTR szBuffer, DWORD cchBuffer, DWORD* dwLength);
+typedef HRESULT (__stdcall *CorBindToRuntimeExFnPtr)(LPCWSTR pwszVersion, LPCWSTR pwszBuildFlavor, DWORD startupFlags, REFCLSID rclsid, REFIID riid, LPVOID FAR* ppv);
 
 
 // RegistrationHelper related declarations
-
-static const GUID CLSID_RegistrationHelper =
-    { 0x89a86e7b, 0xc229, 0x4008, { 0x9b, 0xaa, 0x2f, 0x5c, 0x84, 0x11, 0xd7, 0xe0 } };
-
 enum eInstallationFlags {
     ifConfigureComponentsOnly = 16,
     ifFindOrCreateTargetApplication = 4,
@@ -156,7 +154,8 @@ static HRESULT UnregisterAssembly(
 static void InitAssemblyExec();
 static void UninitAssemblyExec();
 static HRESULT GetRegistrationHelper(
-    IDispatch** ppiRegHlp
+    IDispatch** ppiRegHlp,
+    LPCWSTR pwzAssemblyPath
     );
 static HRESULT GetAssemblyCacheObject(
     IAssemblyCache** ppAssemblyCache
@@ -722,15 +721,44 @@ static void UninitAssemblyExec()
 }
 
 static HRESULT GetRegistrationHelper(
-    IDispatch** ppiRegHlp
+    IDispatch** ppiRegHlp,
+    LPCWSTR pwzAssemblyPath
     )
 {
     HRESULT hr = S_OK;
+    wchar_t pwzVersion[MAX_PATH];
+    DWORD pcchVersionLen = MAX_PATH;
+    ICLRRuntimeHost* runtimeHost = NULL;
+
+    if (!ghMscoree)
+    {
+        ghMscoree = ::LoadLibraryW(L"mscoree.dll");
+        ExitOnNull(ghMscoree, hr, E_FAIL, "Failed to load mscoree.dll");
+    }
+    GetFileVersionFnPtr GetFileVersion = (GetFileVersionFnPtr)::GetProcAddress(ghMscoree, "GetFileVersion");
+    ExitOnNull(GetFileVersion, hr, E_FAIL, "Failed to GetProcAddress for 'GetFileVersion' from 'mscoree.dll'");
+    hr = GetFileVersion(pwzAssemblyPath, pwzVersion, pcchVersionLen, &pcchVersionLen);
 
     if (!gpiRegHlp)
     {
+        CLSID CLSID_RegistrationHelper{};
+        hr = ::CLSIDFromProgID(OLESTR("System.EnterpriseServices.RegistrationHelper"), &CLSID_RegistrationHelper);
+        ExitOnFailure(hr, "Failed to identify CLSID for 'System.EnterpriseServices.RegistrationHelper'");
+
+        // NOTE: The 'CoreBindToRuntimeEx' method is DEPRECATED in .NET v4.
+        // HOWEVER, we might be running in an earlier context at this point so we don't want to rely upon stuff that is particularly v4 dependent.
+        // Even if we are about to try to fire up a v4 runtime.
+        // The .NET v4 runtime with STARTUP_LOADER_SAFEMODE flag (to disable version checking of loaded assemblies) is what lets us launch the
+        // RegistrationHelper.  The v4 RegistrationHelper is able to register both v4 and v3 assemblies however, so if we can get it, we most as well
+        // use it.
+        CorBindToRuntimeExFnPtr CorBindToRuntimeEx = (CorBindToRuntimeExFnPtr)::GetProcAddress(ghMscoree, "CorBindToRuntimeEx");
+        hr = CorBindToRuntimeEx(L"v4.0.30319", L"wks", STARTUP_LOADER_SAFEMODE, CLSID_CLRRuntimeHost, IID_ICLRRuntimeHost, (LPVOID*)&runtimeHost);
+        // we ignore the HRESULT here.  If it worked, great, we'll use it moving forward.  If it didn't work, we'll end up trying to resort to legacy .NET FW
+        // when we just try the COM Create below
+
         // create registration helper object
-        hr = ::CoCreateInstance(CLSID_RegistrationHelper, NULL, CLSCTX_ALL, IID_IDispatch, (void**)&gpiRegHlp); 
+        // This will be created in the .NET FW 4 version if we managed to launch it above, or in the .NET FW <4 version based on the COM dispatch otherwise
+        hr = ::CoCreateInstance(CLSID_RegistrationHelper, NULL, CLSCTX_ALL, IID_IDispatch, (void**)&gpiRegHlp);
         ExitOnFailure(hr, "Failed to create registration helper object");
     }
 
@@ -883,7 +911,7 @@ static HRESULT RegisterDotNetAssembly(
     }
 
     // get registration helper object
-    hr = GetRegistrationHelper(&piRegHlp);
+    hr = GetRegistrationHelper(&piRegHlp, pAttrs->pwzDllPath);
     ExitOnFailure(hr, "Failed to get registration helper object");
 
     // get dispatch id of InstallAssembly() method
@@ -979,7 +1007,7 @@ static HRESULT RegisterNativeAssembly(
     ExitOnNull(bstrTlbPath, hr, E_OUTOFMEMORY, "Failed to allocate BSTR for tlb path");
 
     bstrPSDllPath = ::SysAllocString(pAttrs->pwzPSDllPath ? pAttrs->pwzPSDllPath : L"");
-    ExitOnNull(bstrPSDllPath, hr, E_OUTOFMEMORY, "Failed to allocate BSTR for tlb path");
+    ExitOnNull(bstrPSDllPath, hr, E_OUTOFMEMORY, "Failed to allocate BSTR for proxy/stub dll path");
 
     // get catalog
     hr = CpiExecGetAdminCatalog(&piCatalog);
@@ -1089,7 +1117,7 @@ static HRESULT UnregisterDotNetAssembly(
     ExitOnNull(bstrDllPath, hr, E_OUTOFMEMORY, "Failed to allocate BSTR for dll path");
 
     // get registration helper object
-    hr = GetRegistrationHelper(&piRegHlp);
+    hr = GetRegistrationHelper(&piRegHlp, pAttrs->pwzDllPath);
     ExitOnFailure(hr, "Failed to get registration helper object");
 
     // get dispatch id of UninstallAssembly() method

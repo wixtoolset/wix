@@ -5,6 +5,7 @@ namespace WixTestTools
     using System;
     using System.Security.Principal;
     using WixInternal.TestSupport.XunitExtensions;
+    using System.Runtime.InteropServices;
 
     public class RuntimeFactAttribute : SkippableFactAttribute
     {
@@ -12,6 +13,16 @@ namespace WixTestTools
 
         public static bool RuntimeTestsEnabled { get; }
         public static bool RunningAsAdministrator { get; }
+        public static bool RunningOnWindowsServer { get; }
+
+        [DllImport("shlwapi.dll", SetLastError = true, EntryPoint = "#437")]
+        private static extern bool IsOS(int os);
+        private static bool IsWindowsServer()
+        {
+            const int OS_ANYSERVER = 29;
+            return IsOS(OS_ANYSERVER);
+        }
+
 
         static RuntimeFactAttribute()
         {
@@ -21,6 +32,25 @@ namespace WixTestTools
 
             var testsEnabledString = Environment.GetEnvironmentVariable(RequiredEnvironmentVariableName);
             RuntimeTestsEnabled = Boolean.TryParse(testsEnabledString, out var testsEnabled) && testsEnabled;
+
+            RunningOnWindowsServer = IsWindowsServer();
+        }
+
+        private bool _RequireWindowsServer;
+        public bool RequireWindowsServer
+        {
+            get
+            {
+                return _RequireWindowsServer;
+            }
+            set
+            {
+                _RequireWindowsServer = value;
+                if (_RequireWindowsServer && !RunningOnWindowsServer)
+                {
+                    this.Skip = $"These tests are only run on Windows Server";
+                }
+            }
         }
 
         public RuntimeFactAttribute()

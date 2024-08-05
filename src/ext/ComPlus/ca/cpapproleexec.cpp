@@ -74,7 +74,7 @@ HRESULT CpiConfigureApplicationRoles(
     hr = CpiActionStartMessage(ppwzData, FALSE);
     ExitOnFailure(hr, "Failed to send action start message");
 
-    // ger count
+    // get count
     int iCnt = 0;
     hr = WcaReadIntegerFromCaData(ppwzData, &iCnt);
     ExitOnFailure(hr, "Failed to read count");
@@ -218,7 +218,7 @@ HRESULT CpiConfigureUsersInApplicationRoles(
     hr = CpiActionStartMessage(ppwzData, FALSE);
     ExitOnFailure(hr, "Failed to send action start message");
 
-    // ger count
+    // get count
     int iCnt = 0;
     hr = WcaReadIntegerFromCaData(ppwzData, &iCnt);
     ExitOnFailure(hr, "Failed to read count");

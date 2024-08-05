@@ -34,6 +34,7 @@ static HRESULT ReadPartitionAttributes(
 static void FreePartitionAttributes(
     CPI_PARTITION_ATTRIBUTES* pAttrs
     );
+static HRESULT CpiEnsurePartitionsEnabled();
 static HRESULT CreatePartition(
     CPI_PARTITION_ATTRIBUTES* pAttrs
     );
@@ -71,7 +72,7 @@ HRESULT CpiConfigurePartitions(
     hr = CpiActionStartMessage(ppwzData, FALSE);
     ExitOnFailure(hr, "Failed to send action start message");
 
-    // ger partition count
+    // get partition count
     int iCnt = 0;
     hr = WcaReadIntegerFromCaData(ppwzData, &iCnt);
     ExitOnFailure(hr, "Failed to read count");
@@ -215,7 +216,7 @@ HRESULT CpiConfigurePartitionUsers(
     hr = CpiActionStartMessage(ppwzData, FALSE);
     ExitOnFailure(hr, "Failed to send action start message");
 
-    // ger partition count
+    // get partition count
     int iCnt = 0;
     hr = WcaReadIntegerFromCaData(ppwzData, &iCnt);
     ExitOnFailure(hr, "Failed to read count");
@@ -384,6 +385,69 @@ static void FreePartitionAttributes(
         CpiFreePropertyList(pAttrs->pPropList);
 }
 
+static HRESULT CpiEnsurePartitionsEnabled()
+{
+    HRESULT hr = S_OK;
+
+    ICatalogCollection* piLocalComputerColl = NULL;
+    IDispatch* piDisp = NULL;
+    ICatalogObject* piLocalComputerObj = NULL;
+    VARIANT vtVal;
+    BSTR bsPartitionsEnabledName = ::SysAllocString(L"PartitionsEnabled");
+    long numChanges = 0;
+
+    ::VariantInit(&vtVal);
+
+    // get collection
+    hr = CpiExecGetCatalogCollection(L"LocalComputer", &piLocalComputerColl);
+    ExitOnFailure(hr, "Failed to get catalog collection");
+
+    // find object, there will be only one in the LocalComputer collection
+    hr = piLocalComputerColl->get_Item(0, &piDisp);
+    ExitOnFailure(hr, "Failed to get object from collection");
+
+    hr = piDisp->QueryInterface(IID_ICatalogObject, (void**)&piLocalComputerObj);
+    ExitOnFailure(hr, "Failed to get IID_ICatalogObject interface");
+
+    // and then we get the value of the PartitionsEnabled property
+    hr = piLocalComputerObj->get_Value(bsPartitionsEnabledName, &vtVal);
+    if (!vtVal.boolVal)
+    {
+        vtVal.boolVal = true;
+        hr = piLocalComputerObj->put_Value(bsPartitionsEnabledName, vtVal);
+        ExitOnFailure(hr, "Failed to put value to Enable COM+ PartitionsEnabled property");
+        hr = piLocalComputerColl->SaveChanges(&numChanges);
+        ExitOnFailure(hr, "Failed to save PartitionsEnabled property");
+
+        // we'll read back the hopefully updated values of the PartitionsEnabled property
+        // if it's still False, then we're on a Windows Desktop that doesn't allow Partitions
+        // (as of Windows Server2003 Microsoft limited Partitions to only ServerOS platforms)
+        hr = piLocalComputerObj->get_Value(bsPartitionsEnabledName, &vtVal);
+        ExitOnFailure(hr, "Failed to read PartitionsEnabled property");
+    }
+
+    if (vtVal.boolVal)
+    {
+        // everything went well, we have the Partitioning available
+        hr = S_OK;
+    }
+    else
+    {
+        // we're on a Desktop OS, or couldn't otherwise enable partitioning
+        WcaLog(LOGMSG_STANDARD, "Failed to Enable COM+ PartitionEnabled property. This suggests Partitioning was attempted on a Desktop OS, which is not supported");
+        hr = S_FALSE;
+    }
+
+LExit:
+    // clean up
+    ReleaseObject(piLocalComputerColl);
+    ReleaseObject(piLocalComputerObj);
+    ReleaseBSTR(bsPartitionsEnabledName);
+    ::VariantClear(&vtVal);
+
+    return hr;
+}
+
 static HRESULT CreatePartition(
     CPI_PARTITION_ATTRIBUTES* pAttrs
     )
@@ -408,6 +472,9 @@ static HRESULT CreatePartition(
 
     if (S_FALSE == hr)
     {
+        hr = CpiEnsurePartitionsEnabled();
+        ExitOnFailure(hr, "Failed to enable partitions");
+
         // create partition
         hr = CpiAddCollectionObject(piPartColl, &piPartObj);
         ExitOnFailure(hr, "Failed to add partition to collection");
