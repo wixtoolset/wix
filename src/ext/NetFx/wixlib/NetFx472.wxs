@@ -10,7 +10,7 @@
 
   <?define NetFx472MinRelease = 461808 ?>
   <?define NetFx472WebLink = https://go.microsoft.com/fwlink/?LinkId=863262 ?>
-  <?define NetFx472RedistLink = https://go.microsoft.com/fwlink/?LinkId=863258 ?>
+  <?define NetFx472RedistLink = https://go.microsoft.com/fwlink/?LinkId=863265 ?>
   <?define NetFx472EulaLink = https://referencesource.microsoft.com/license.html ?>
   <?define NetFx472WebId = NetFx472Web ?>
   <?define NetFx472RedistId = NetFx472Redist ?>
@@ -52,7 +52,7 @@
 
     <PackageGroup Id="$(var.NetFx472RedistId)">
       <ExePackage CacheId="$(var.NetFx472RedistId)_ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" InstallArguments="/q /norestart /log &quot;[NetFx472RedistLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx472RedistDetectCondition)" InstallCondition="!(wix.NetFx472RedistInstallCondition)" Id="$(var.NetFx472RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx472RedistLog" Cache="remove">
-        <ExePackagePayload Name="!(wix.NetFx472RedistPackageDirectory)NDP472-KB4054530-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx472RedistLink)" ProductName="Microsoft .NET Framework 4.7.2" Description="Microsoft .NET Framework 4.7.2 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Size="83940592" Version="4.7.3081.0" />
+        <ExePackagePayload Name="!(wix.NetFx472RedistPackageDirectory)NDP472-KB4054530-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx472RedistLink)" ProductName="Microsoft .NET Framework 4.7.2" Description="Microsoft .NET Framework 4.7.2 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="C2048FB509F1C37A8C3E9EC6648118458AA01780" Size="83970736" Version="4.7.3081.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>
