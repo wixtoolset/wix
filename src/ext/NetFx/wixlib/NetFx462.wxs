@@ -10,7 +10,7 @@
 
   <?define NetFx462MinRelease = 394802 ?>
   <?define NetFx462WebLink = https://go.microsoft.com/fwlink/?LinkId=780596 ?>
-  <?define NetFx462RedistLink = https://go.microsoft.com/fwlink/?LinkId=780600 ?>
+  <?define NetFx462RedistLink = https://go.microsoft.com/fwlink/?linkid=2099468 ?>
   <?define NetFx462EulaLink = https://referencesource.microsoft.com/license.html ?>
   <?define NetFx462WebId = NetFx462Web ?>
   <?define NetFx462RedistId = NetFx462Redist ?>
@@ -52,7 +52,7 @@
 
     <PackageGroup Id="$(var.NetFx462RedistId)">
       <ExePackage CacheId="$(var.NetFx462RedistId)_ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" InstallArguments="/q /norestart /log &quot;[NetFx462FullLog].html&quot;" UninstallArguments="/uninstall /q /norestart /log &quot;[NetFx462FullLog].html&quot;" PerMachine="yes" DetectCondition="!(wix.NetFx462RedistDetectCondition)" InstallCondition="!(wix.NetFx462RedistInstallCondition)" Id="$(var.NetFx462RedistId)" Vital="yes" Permanent="yes" Protocol="netfx4" LogPathVariable="NetFx462FullLog">
-        <ExePackagePayload Name="!(wix.NetFx462RedistPackageDirectory)NDP462-KB3151800-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx462RedistLink)" ProductName="Microsoft .NET Framework 4.6.2" Description="Microsoft .NET Framework 4.6.2 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="ABDCA79AF9DD48A0EA702AD45260B3C03093FB4B" Size="62000832" Version="4.6.1590.0" />
+        <ExePackagePayload Name="!(wix.NetFx462RedistPackageDirectory)NDP462-KB3151800-x86-x64-AllOS-ENU.exe" DownloadUrl="$(var.NetFx462RedistLink)" ProductName="Microsoft .NET Framework 4.6.2" Description="Microsoft .NET Framework 4.6.2 Setup" CertificatePublicKey="F49F9B33E25E33CCA0BFB15A62B7C29FFAB3880B" CertificateThumbprint="C2048FB509F1C37A8C3E9EC6648118458AA01780" Size="62024904" Version="4.6.1590.0" />
       </ExePackage>
     </PackageGroup>
   </Fragment>

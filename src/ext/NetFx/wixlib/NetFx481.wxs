@@ -50,9 +50,9 @@
           ProductName="Microsoft .NET Framework 4.8.1"
           Description="Microsoft .NET Framework 4.8.1 Setup"
           CertificatePublicKey="0A7D1EFF01D4EBAD21E85C51499576EBAA40E676"
-          CertificateThumbprint="AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173"
-          Size="1460448"
-          Version="4.8.09037.06"
+          CertificateThumbprint="72105B6D5F370B62FD5C82F1512F7AD7DEE5F2C0"
+          Size="1466664"
+          Version="4.8.09195.10"
         />
       </ExePackage>
     </PackageGroup>
@@ -93,9 +93,9 @@
           ProductName="Microsoft .NET Framework 4.8.1"
           Description="Microsoft .NET Framework 4.8.1 Setup"
           CertificatePublicKey="0A7D1EFF01D4EBAD21E85C51499576EBAA40E676"
-          CertificateThumbprint="AFBF0B8B6A18F7E23CCA1DDCD0AC1A55B4035173"
-          Size="63610344"
-          Version="4.8.09037.06"
+          CertificateThumbprint="72105B6D5F370B62FD5C82F1512F7AD7DEE5F2C0"
+          Size="77688504"
+          Version="4.8.09195.10"
           />
       </ExePackage>
     </PackageGroup>
