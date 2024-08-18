@@ -7,7 +7,7 @@ namespace WixToolset.BootstrapperApplicationApi
     /// <summary>
     /// This is no longer used.
     /// </summary>
-    [Obsolete("Bootstrapper applications now run out of proc and do not use a BootstrapperApplicationFactory. Remove your BootstrapperApplicationFactory class. See https://wixtoolset.org/docs/fiveforfour/ for more details.")]
+    [Obsolete("Bootstrapper applications now run out of proc and do not use a BootstrapperApplicationFactory. Remove your BootstrapperApplicationFactory class. See https://wixtoolset.org/docs/fivefour/ for more details.")]
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = false)]
     public sealed class BootstrapperApplicationFactoryAttribute : Attribute
     {
