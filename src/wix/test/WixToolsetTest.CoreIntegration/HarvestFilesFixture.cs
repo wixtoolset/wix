@@ -3,6 +3,7 @@
 namespace WixToolsetTest.CoreIntegration
 {
     using System;
+    using System.Collections.Generic;
     using System.Data;
     using System.IO;
     using System.Linq;
@@ -291,6 +292,23 @@ namespace WixToolsetTest.CoreIntegration
             Build("PackageFiveLiner.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected));
         }
 
+        [Fact]
+        public void CanGetVerboseHarvestingDetails()
+        {
+            Build("Feature.wxs", (_, result) =>
+            {
+                var messages = result.Messages.Select(m => m.Id).Where(i => i >= 8700 && i < 8800);
+                Assert.Equal(new[]
+                {
+                    8701,
+                    8700,
+                    8701,
+                    8700,
+                    8700,
+                }, messages);
+            }, additionalCommandLineArguments: "-v");
+        }
+
         private static void AssertFileIdsAndTargetPaths(string msiPath, string[] expected)
         {
             var pkg = new WixToolset.Dtf.WindowsInstaller.Package.InstallPackage(msiPath,
@@ -301,7 +319,7 @@ namespace WixToolsetTest.CoreIntegration
             Assert.Equal(sortedExpected, actual);
         }
 
-        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isPackage = true)
+        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isPackage = true, params string[] additionalCommandLineArguments)
         {
             var folder = TestData.Get("TestData", "HarvestFiles");
 
@@ -312,7 +330,7 @@ namespace WixToolsetTest.CoreIntegration
                 var binFolder = Path.Combine(baseFolder, "bin");
                 var msiPath = Path.Combine(binFolder, isPackage ? "test.msi" : "test.msm");
 
-                var arguments = new[]
+                var arguments = new List<string>()
                 {
                     "build",
                     Path.Combine(folder, file),
@@ -323,7 +341,12 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", msiPath,
                 };
 
-                var result = WixRunner.Execute(arguments);
+                if (additionalCommandLineArguments.Length > 0)
+                {
+                    arguments.AddRange(additionalCommandLineArguments);
+                }
+
+                var result = WixRunner.Execute(arguments.ToArray());
 
                 tester(msiPath, result);
             }
