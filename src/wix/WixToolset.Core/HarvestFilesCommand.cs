@@ -57,6 +57,11 @@ namespace WixToolset.Core
                 var included = this.GetWildcardFiles(harvestFile, inclusions);
                 var excluded = this.GetWildcardFiles(harvestFile, exclusions);
 
+                foreach (var excludedFile in excluded)
+                {
+                    this.Messaging.Write(OptimizerVerboses.ExcludedFile(harvestFile.SourceLineNumbers, excludedFile.Path));
+                }
+
                 resolvedFiles = included.Except(excluded, comparer).ToList();
 
                 if (!resolvedFiles.Any())
@@ -89,6 +94,8 @@ namespace WixToolset.Core
                         var name = Path.GetFileName(file);
 
                         var id = this.ParseHelper.CreateIdentifier("fls", directoryId, name);
+
+                        this.Messaging.Write(OptimizerVerboses.HarvestedFile(harvestFile.SourceLineNumbers, file));
 
                         section.AddSymbol(new FileSymbol(harvestFile.SourceLineNumbers, id)
                         {
