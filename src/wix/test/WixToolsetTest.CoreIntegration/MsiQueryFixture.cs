@@ -947,5 +947,38 @@ namespace WixToolsetTest.CoreIntegration
                 }, results);
             }
         }
+
+        [Fact]
+        public void EnsureTableSchedulesAppropriateStandardActions()
+        {
+            var folder = TestData.Get(@"TestData\EnsureTable");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "StandardActions.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var results = Query.QueryDatabase(msiPath, new[] { "InstallExecuteSequence" });
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "InstallExecuteSequence:AppSearch\t\t50",
+                    "InstallExecuteSequence:CCPSearch\tNOT Installed\t500",
+                    "InstallExecuteSequence:FileCost\t\t900",
+                    "InstallExecuteSequence:RemoveFiles\t\t3500",
+                    "InstallExecuteSequence:RMCCPSearch\tNOT Installed\t600",
+                }, results.Where(l => l.Contains("Search") || l.Contains("File")).ToArray());
+            }
+        }
     }
 }
