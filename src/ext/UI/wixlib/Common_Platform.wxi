@@ -5,10 +5,6 @@
     <?include ..\..\caDecor.wxi ?>
 
     <Fragment>
-        <CustomAction Id="WixUIPrintEula$(Suffix)" BinaryRef="WixUiCa$(Suffix)" DllEntry="PrintEula" Return="ignore" Execute="immediate" />
-    </Fragment>
-
-    <Fragment>
         <CustomAction Id="WixUIValidatePath$(Suffix)" BinaryRef="WixUiCa$(Suffix)" DllEntry="ValidatePath" Return="ignore" Execute="immediate" />
     </Fragment>
 
