@@ -22,7 +22,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class UpdateFileFacadesCommand
     {
-        public UpdateFileFacadesCommand(IMessaging messaging, IFileSystem fileSystem, IntermediateSection section, IEnumerable<IFileFacade> allFileFacades, IEnumerable<IFileFacade> updateFileFacades, IDictionary<string, string> variableCache, bool overwriteHash, CancellationToken cancellationToken)
+        public UpdateFileFacadesCommand(IMessaging messaging, IFileSystem fileSystem, IntermediateSection section, IEnumerable<IFileFacade> allFileFacades, IEnumerable<IFileFacade> updateFileFacades, IDictionary<string, string> variableCache, bool overwriteHash, CancellationToken cancellationToken, int threadCount)
         {
             this.Messaging = messaging;
             this.FileSystem = fileSystem;
@@ -32,6 +32,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.VariableCache = variableCache;
             this.OverwriteHash = overwriteHash;
             this.CancellationToken = cancellationToken;
+            this.ThreadCount = threadCount;
         }
 
         private IMessaging Messaging { get; }
@@ -49,6 +50,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IDictionary<string, string> VariableCache { get; }
 
         private CancellationToken CancellationToken { get; }
+
+        private int ThreadCount { get; }
 
         public void Execute()
         {
@@ -74,7 +77,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             Parallel.ForEach(facades,
                 new ParallelOptions{
-                    CancellationToken = this.CancellationToken
+                    CancellationToken = this.CancellationToken,
+                    MaxDegreeOfParallelism = this.ThreadCount
                 },
                 () =>
                 {

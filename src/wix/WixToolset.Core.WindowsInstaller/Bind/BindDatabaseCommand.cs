@@ -105,6 +105,29 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private CancellationToken CancellationToken { get; }
 
+        private int CalculateCabbingThreadCount()
+        {
+            var processorCount = Environment.ProcessorCount;
+
+            // If the number of processors is invalid, default to a single processor.
+            if (processorCount == 0)
+            {
+                processorCount = 1;
+
+                this.Messaging.Write(WarningMessages.InvalidEnvironmentVariable("NUMBER_OF_PROCESSORS", Environment.ProcessorCount.ToString(), processorCount.ToString()));
+            }
+
+            // If the cabbing thread count was provided, and it isn't more than double the number of processors, use it.
+            if (0 < this.CabbingThreadCount && this.CabbingThreadCount < processorCount * 2)
+            {
+                processorCount = this.CabbingThreadCount;
+            }
+
+            this.Messaging.Write(VerboseMessages.SetCabbingThreadCount(processorCount.ToString()));
+
+            return processorCount;
+        }
+
         public IBindResult Execute()
         {
             if (!this.Intermediate.HasLevel(Data.IntermediateLevels.Linked) || !this.Intermediate.HasLevel(Data.IntermediateLevels.Resolved))
@@ -122,6 +145,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var trackedFiles = new List<ITrackedFile>();
 
             var containsMergeModules = false;
+
+            int calculatedCabbingThreadCount = this.CalculateCabbingThreadCount();
 
             // Load standard tables, authored custom tables, and extension custom tables.
             TableDefinitionCollection tableDefinitions;
@@ -280,7 +305,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Gather information about files that do not come from merge modules.
             {
-                var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, section, allFileFacades, fileFacadesFromIntermediate, variableCache, overwriteHash: true, this.CancellationToken);
+                var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, section, allFileFacades, fileFacadesFromIntermediate, variableCache, overwriteHash: true, this.CancellationToken, calculatedCabbingThreadCount);
                 command.Execute();
             }
 
@@ -324,7 +349,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         var updatedFacades = reresolvedFiles.Select(f => allFileFacades.First(ff => ff.Id == f.Id?.Id));
 
-                        var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, section, allFileFacades, updatedFacades, variableCache, overwriteHash: false, this.CancellationToken);
+                        var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, section, allFileFacades, updatedFacades, variableCache, overwriteHash: false, this.CancellationToken, calculatedCabbingThreadCount);
                         command.Execute();
                     }
                 }
@@ -442,7 +467,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 this.Messaging.Write(VerboseMessages.CreatingCabinetFiles());
 
-                var command = new CreateCabinetsCommand(this.ServiceProvider, this.Messaging, this.WindowsInstallerBackendHelper, this.BackendExtensions, section, this.CabCachePath, this.CabbingThreadCount, this.OutputPath, this.IntermediateFolder, this.DefaultCompressionLevel, compressed, modularizationSuffix, filesByCabinetMedia, data, tableDefinitions, this.ResolveMedia);
+                var command = new CreateCabinetsCommand(this.ServiceProvider, this.Messaging, this.WindowsInstallerBackendHelper, this.BackendExtensions, section, this.CabCachePath, calculatedCabbingThreadCount, this.OutputPath, this.IntermediateFolder, this.DefaultCompressionLevel, compressed, modularizationSuffix, filesByCabinetMedia, data, tableDefinitions, this.ResolveMedia);
                 command.Execute();
 
                 fileTransfers.AddRange(command.FileTransfers);
