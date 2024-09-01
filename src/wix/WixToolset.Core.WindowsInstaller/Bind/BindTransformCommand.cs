@@ -268,7 +268,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                 {
                                     if (ColumnType.Number == field.Column.Type && !field.Column.IsLocalizable)
                                     {
-                                        field.Data = field.Column.MinValue;
+                                        field.Data = field.Column.MinValue ?? 0;
                                     }
                                     else if (ColumnType.Object == field.Column.Type)
                                     {

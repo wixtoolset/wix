@@ -310,6 +310,27 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildPatchFromProductWithAddedRemoveFileRows()
+        {
+            var sourceFolder = TestData.Get(@"TestData", "PatchWithRemovedRemoveFileRows");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var tempFolderBaseline = Path.Combine(baseFolder, "baseline");
+                var tempFolderUpdate = Path.Combine(baseFolder, "update");
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
+
+                var baselinePath = BuildMsi("Baseline.msi", sourceFolder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0");
+                var updatePath = BuildMsi("Update.msi", sourceFolder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1");
+                var patchPath = BuildMsp("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(baselinePath), Path.GetDirectoryName(updatePath) }, hasNoFiles: true);
+
+                var doc = GetExtractPatchXml(patchPath);
+                WixAssert.StringEqual("{6CB58995-A174-4A21-823E-3A114A81AB66}", doc.Root.Element(TargetProductCodeName).Value);
+            }
+        }
+
+        [Fact]
         public void CanBuildBundleWithNonSpecificPatches()
         {
             var folder = TestData.Get(@"TestData", "PatchNonSpecific");
