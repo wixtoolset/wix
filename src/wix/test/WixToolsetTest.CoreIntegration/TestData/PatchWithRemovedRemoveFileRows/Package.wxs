@@ -1,0 +1,18 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="~Test Package" Version="$(V)" Manufacturer="Example Corporation" Language="1033" UpgradeCode="{81CB1126-5796-4012-AB4D-97360EB817F1}" Scope="perMachine" ProductCode="{6CB58995-A174-4A21-823E-3A114A81AB66}">
+
+        <Component Directory="INSTALLFOLDER">
+            <RegistryValue Root="HKLM" Key="SOFTWARE\WiX Toolset\PatchTests" Name="GonnaRemoveRemoveFileRow" Value="1" KeyPath="yes" />
+
+            <?if $(V) = "1.0.0" ?>
+            <RemoveFile Name="bar.dat" On="uninstall" />
+            <?endif?>
+        </Component>
+
+        <Component Directory="INSTALLFOLDER">
+            <RegistryValue Root="HKLM" Key="SOFTWARE\WiX Toolset\PatchTests" Name="ButNotInThisComponent" Value="1" KeyPath="yes" />
+
+            <RemoveFile Name="foo.dat" On="uninstall" />
+        </Component>
+    </Package>
+</Wix>
