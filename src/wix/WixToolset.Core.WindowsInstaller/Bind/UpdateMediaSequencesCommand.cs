@@ -60,7 +60,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (facade.PatchGroup.HasValue)
                     {
-                        if (patchGroups.TryGetValue(facade.PatchGroup.Value, out var patchGroup))
+                        if (!patchGroups.TryGetValue(facade.PatchGroup.Value, out var patchGroup))
                         {
                             patchGroup = new List<IFileFacade>();
                             patchGroups.Add(facade.PatchGroup.Value, patchGroup);
