@@ -17,7 +17,7 @@
   <Fragment>
     <ComponentGroup Id="Components" Directory="INSTALLFOLDER">
       <Component>
-        <File Source="$(sys.SOURCEFILEPATH)" />
+        <File PatchGroup="22" Source="$(sys.SOURCEFILEPATH)" />
       </Component>
 
       <Component>
