@@ -90,7 +90,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     if (-1 != closeParen)
                     {
                         bindName = source.Substring(BindPathOpenString.Length, closeParen - BindPathOpenString.Length);
-                        path = source.Substring(BindPathOpenString.Length + bindName.Length + 1); // +1 for the closing brace.
+                        path = source.Substring(BindPathOpenString.Length + bindName.Length + 1); // +1 for the closing paren.
                         path = path.TrimStart('\\'); // remove starting '\\' char so the path doesn't look rooted.
                     }
                 }
