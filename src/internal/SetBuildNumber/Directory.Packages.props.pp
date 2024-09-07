@@ -55,26 +55,26 @@
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     <PackageVersion Include="System.Text.Json" Version="8.0.4" />
 
-    <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="8.0.7" />
-    <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="3.10.2154" />
+    <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="8.0.8" />
+    <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="3.11.2177" />
     <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="NuGet.Credentials" Version="6.10.1" />
-    <PackageVersion Include="NuGet.Protocol" Version="6.10.1" />
-    <PackageVersion Include="NuGet.Versioning" Version="6.10.1" />
+    <PackageVersion Include="NuGet.Credentials" Version="6.11.0" />
+    <PackageVersion Include="NuGet.Protocol" Version="6.11.0" />
+    <PackageVersion Include="NuGet.Versioning" Version="6.11.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.10.4" />
+    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.11.4" />
   </ItemGroup>
 
   <!-- Keep the following versions in sync with internal\WixInternal.TestSupport.Native\packages.config -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
 
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageVersion Include="xunit" Version="2.9.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageVersion Include="xunit.assert" Version="2.9.0" />
