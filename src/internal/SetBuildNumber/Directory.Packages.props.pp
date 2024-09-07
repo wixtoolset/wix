@@ -52,21 +52,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
-    <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="8.0.1" />
+    <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="8.0.1" />
     <PackageVersion Include="System.DirectoryServices" Version="8.0.0" />
-    <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="8.0.0" />
+    <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="8.0.1" />
     <PackageVersion Include="System.Management" Version="8.0.0" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
     <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
     <PackageVersion Include="System.Net.NetworkInformation" Version="4.3.0" />
-    <PackageVersion Include="System.Reflection.Metadata" Version="8.0.0" />
+    <PackageVersion Include="System.Reflection.Metadata" Version="8.0.1" />
     <PackageVersion Include="System.Security.Principal.Windows" Version="5.0.0" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-    <PackageVersion Include="System.Text.Json" Version="8.0.4" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.5" />
 
-    <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="8.0.7" />
-    <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="3.10.2154" />
+    <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="8.0.12" />
+    <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="3.11.2177" />
     <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>
 
@@ -77,17 +77,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.10.4" />
+    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.12.6" />
   </ItemGroup>
 
   <!-- Keep the following versions in sync with internal\WixInternal.TestSupport.Native\packages.config -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
 
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-    <PackageVersion Include="xunit" Version="2.9.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
-    <PackageVersion Include="xunit.assert" Version="2.9.0" />
+    <PackageVersion Include="xunit.assert" Version="2.9.3" />
   </ItemGroup>
 
   <ItemGroup>
