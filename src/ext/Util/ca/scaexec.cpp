@@ -291,7 +291,6 @@ LExit:
     return hr;
 }
 
-
 static HRESULT GetUserHasRight(
     __in LSA_HANDLE hPolicy,
     __in PSID pUserSid,
@@ -590,6 +589,15 @@ static HRESULT SetUserComment(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __
     return HRESULT_FROM_WIN32(er);
 }
 
+static HRESULT SetGroupComment(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __in LPWSTR pwzComment)
+{
+    _LOCALGROUP_INFO_1002  groupInfo1002 {};
+
+    groupInfo1002.lgrpi1002_comment = pwzComment;
+    NET_API_STATUS er = ::NetLocalGroupSetInfo(pwzServerName, pwzName, 1002, reinterpret_cast<LPBYTE>(&groupInfo1002), NULL);
+    return HRESULT_FROM_WIN32(er);
+}
+
 static HRESULT SetUserFlags(__in LPWSTR pwzServerName, __in LPWSTR pwzName, __in DWORD flags)
 {
     NET_API_STATUS er = NERR_Success;
@@ -692,6 +700,40 @@ LExit:
 
     return hr;
 }
+
+static HRESULT RemoveGroupInternal(
+    LPWSTR wzDomain,
+    LPWSTR wzName,
+    int iAttributes
+)
+{
+    HRESULT hr = S_OK;
+
+    LPWSTR pwzServerName = NULL;
+
+    //
+    // Remove the Group if the group was created by us.
+    //
+    if (!(SCAG_DONT_CREATE_GROUP & iAttributes))
+    {
+        hr = GetDomainFromServerName(&pwzServerName, wzDomain, DS_WRITABLE_REQUIRED);
+
+        NET_API_STATUS er = ::NetLocalGroupDel(pwzServerName, wzName);
+        hr = HRESULT_FROM_WIN32(er);
+        if (HRESULT_FROM_WIN32(ERROR_NO_SUCH_ALIAS) == hr
+            || HRESULT_FROM_WIN32(NERR_GroupNotFound) == hr) // we wanted to delete it.. and the group doesn't exist.. solved.
+        {
+            hr = S_OK;
+        }
+        ExitOnFailure(hr, "failed to delete group: %ls", wzName);
+    }
+
+LExit:
+    ReleaseStr(pwzServerName);
+
+    return hr;
+}
+
 
 /********************************************************************
  CreateUser - CUSTOM ACTION ENTRY POINT for creating users
@@ -1172,4 +1214,676 @@ LExit:
     }
 
     return WcaFinalize(er);
+}
+
+
+/********************************************************************
+  CreateGroup - CUSTOM ACTION ENTRY POINT for creating groups
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
+
+  Input:  deferred CustomActionData - GroupName\tDomain\tComment\tAttributes\tScriptKey(empty for no rollback)
+
+  Output: Script for RollbackCreateGroup - OriginalComment\tRollbackAttributes
+ * *****************************************************************/
+extern "C" UINT __stdcall CreateGroup(
+    __in MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug CreateGroup");
+
+    HRESULT hr = S_OK;
+    NET_API_STATUS er = ERROR_SUCCESS;
+
+    LPWSTR pwzData = NULL;
+    LPWSTR pwz = NULL;
+    LPWSTR pwzName = NULL;
+    LPWSTR pwzDomain = NULL;
+    LPWSTR pwzComment = NULL;
+    LPWSTR pwzScriptKey = NULL;
+    int iAttributes = 0;
+    BOOL fInitializedCom = FALSE;
+
+    LOCALGROUP_INFO_1* pGroupInfo1 = NULL;
+
+    WCA_CASCRIPT_HANDLE hRollbackScript = NULL;
+    int iRollbackAttributes = 0;
+
+    DWORD dw;
+    LPWSTR pwzServerName = NULL;
+
+    hr = WcaInitialize(hInstall, "CreateGroup");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = WcaGetProperty(L"CustomActionData", &pwzData);
+    ExitOnFailure(hr, "failed to get CustomActionData");
+
+    WcaLog(LOGMSG_TRACEONLY, "CustomActionData: %ls", pwzData);
+
+    //
+    // Read in the CustomActionData
+    //
+    pwz = pwzData;
+    hr = WcaReadStringFromCaData(&pwz, &pwzName);
+    ExitOnFailure(hr, "failed to read group name from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzDomain);
+    ExitOnFailure(hr, "failed to read domain from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzComment);
+    ExitOnFailure(hr, "failed to read group comment from custom action data");
+
+    hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
+    ExitOnFailure(hr, "failed to read attributes from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzScriptKey);
+    ExitOnFailure(hr, "failed to read encoding key from custom action data");
+
+    if (!(SCAG_DONT_CREATE_GROUP & iAttributes))
+    {
+        hr = GetDomainFromServerName(&pwzServerName, pwzDomain, DS_WRITABLE_REQUIRED);
+        ExitOnFailure(hr, "failed to find writable server for domain %ls.", pwzDomain);
+
+        // Set the group's comment
+        if (SCAG_REMOVE_COMMENT & iAttributes)
+        {
+            StrAllocString(&pwzComment, L"", 0);
+        }
+
+        //
+        // Create the Group
+        //
+        LOCALGROUP_INFO_1 groupInfo1;
+        groupInfo1.lgrpi1_name = pwzName;
+        groupInfo1.lgrpi1_comment = pwzComment;
+        er = ::NetLocalGroupAdd(pwzServerName, 1, reinterpret_cast<LPBYTE>(&groupInfo1), &dw);
+        hr = HRESULT_FROM_WIN32(er);
+
+        if (HRESULT_FROM_WIN32(ERROR_ALIAS_EXISTS) == hr
+            || HRESULT_FROM_WIN32(NERR_GroupExists) == hr)
+        {
+            if (SCAG_FAIL_IF_EXISTS & iAttributes)
+            {
+                MessageExitOnFailure(hr, msierrGRPFailedGroupCreateExists, "Group (%ls\\%ls) was not supposed to exist, but does", pwzDomain, pwzName);
+            }
+
+            hr = S_OK; // Make sure that we don't report this situation as an error
+            // if we fall through the tests that follow.
+
+            if (SCAG_UPDATE_IF_EXISTS & iAttributes)
+            {
+                er = ::NetLocalGroupGetInfo(pwzServerName, pwzName, 1, reinterpret_cast<LPBYTE*>(&pGroupInfo1));
+                hr = HRESULT_FROM_WIN32(er);
+                if (S_OK == hr)
+                {
+                    // There is no rollback scheduled if the key is empty.
+                    // Best effort to get original configuration and save it in the script so rollback can restore it.
+                    if (*pwzScriptKey)
+                    {
+                        // Try to open the rollback script
+                        hr = WcaCaScriptOpen(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, &hRollbackScript);
+
+                        if (hRollbackScript && INVALID_HANDLE_VALUE != hRollbackScript->hScriptFile)
+                        {
+                            WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
+                        }
+                        else
+                        {
+                            hRollbackScript = NULL;
+                            hr = WcaCaScriptCreate(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, FALSE, &hRollbackScript);
+                            ExitOnFailure(hr, "Failed to open rollback CustomAction script.");
+
+                            iRollbackAttributes = 0;
+
+                            hr = WcaCaScriptWriteString(hRollbackScript, pGroupInfo1->lgrpi1_comment);
+                            ExitOnFailure(hr, "Failed to add rollback comment to rollback script.");
+
+                            if (!pGroupInfo1->lgrpi1_comment || !*pGroupInfo1->lgrpi1_comment)
+                            {
+                                iRollbackAttributes |= SCAG_REMOVE_COMMENT;
+                            }
+
+                            hr = WcaCaScriptWriteNumber(hRollbackScript, iRollbackAttributes);
+                            ExitOnFailure(hr, "Failed to add rollback attributes to rollback script.");
+
+                            // Nudge the system to get all our rollback data written to disk.
+                            WcaCaScriptFlush(hRollbackScript);
+                        }
+                    }
+                }
+
+                if (S_OK == hr)
+                {
+                    if (SCAG_REMOVE_COMMENT & iAttributes)
+                    {
+                        hr = SetGroupComment(pwzServerName, pwzName, L"");
+                        if (FAILED(hr))
+                        {
+                            WcaLogError(hr, "failed to clear comment for group %ls\\%ls, continuing anyway.", pwzDomain, pwzName);
+                            hr = S_OK;
+                        }
+                    }
+                    else if (pwzComment && *pwzComment)
+                    {
+                        hr = SetGroupComment(pwzServerName, pwzName, pwzComment);
+                        if (FAILED(hr))
+                        {
+                            WcaLogError(hr, "failed to set comment to '%ls' for group %ls\\%ls, continuing anyway.", pwzComment, pwzDomain, pwzName);
+                            hr = S_OK;
+                        }
+                    }
+                }
+            }
+        }
+        MessageExitOnFailure(hr, msierrGRPFailedGroupCreate, "failed to create group: %ls\\%ls", pwzDomain, pwzName);
+    }
+
+LExit:
+    WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
+
+    if (pGroupInfo1)
+    {
+        ::NetApiBufferFree((LPVOID)pGroupInfo1);
+    }
+
+    ReleaseStr(pwzData);
+    ReleaseStr(pwzName);
+    ReleaseStr(pwzDomain);
+    ReleaseStr(pwzComment);
+    ReleaseStr(pwzScriptKey);
+    ReleaseStr(pwzServerName);
+
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+
+    if (SCAG_NON_VITAL & iAttributes)
+    {
+        er = ERROR_SUCCESS;
+    }
+    else if (FAILED(hr))
+    {
+        er = ERROR_INSTALL_FAILURE;
+    }
+
+    return WcaFinalize(er);
+}
+
+
+/********************************************************************
+ CreateGroupRollback - CUSTOM ACTION ENTRY POINT for CreateGroup rollback
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
+
+ Input:  rollback CustomActionData  - ScriptKey\tGroupName\tDomain\tComment\tRollbackAttributes
+         rollback script            - OriginalComment\tRollbackAttributes
+
+ * *****************************************************************/
+extern "C" UINT __stdcall CreateGroupRollback(
+    MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug CreateGroupRollback");
+
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    LPWSTR pwzData = NULL;
+    LPWSTR pwz = NULL;
+    LPWSTR pwzScriptKey = NULL;
+    LPWSTR pwzName = NULL;
+    LPWSTR pwzDomain = NULL;
+    LPWSTR pwzComment = NULL;
+    int iRollbackAttributes = 0;
+    BOOL fInitializedCom = FALSE;
+
+    WCA_CASCRIPT_HANDLE hRollbackScript = NULL;
+    LPWSTR pwzRollbackData = NULL;
+    int iOriginalAttributes = 0;
+    LPWSTR pwzOriginalComment = NULL;
+
+    hr = WcaInitialize(hInstall, "CreateGroupRollback");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = WcaGetProperty(L"CustomActionData", &pwzData);
+    ExitOnFailure(hr, "failed to get CustomActionData");
+
+    WcaLog(LOGMSG_TRACEONLY, "CustomActionData: %ls", pwzData);
+
+    //
+    // Read in the CustomActionData
+    //
+    pwz = pwzData;
+    hr = WcaReadStringFromCaData(&pwz, &pwzScriptKey);
+    ExitOnFailure(hr, "failed to read script key from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzName);
+    ExitOnFailure(hr, "failed to read name from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzDomain);
+    ExitOnFailure(hr, "failed to read domain from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzComment);
+    ExitOnFailure(hr, "failed to read comment from custom action data");
+
+    hr = WcaReadIntegerFromCaData(&pwz, &iRollbackAttributes);
+    ExitOnFailure(hr, "failed to read rollback attributes from custom action data");
+
+    // Best effort to read original configuration from CreateUser.
+    hr = WcaCaScriptOpen(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, &hRollbackScript);
+    if (FAILED(hr))
+    {
+        WcaLogError(hr, "Failed to open rollback CustomAction script, continuing anyway.");
+    }
+    else
+    {
+        hr = WcaCaScriptReadAsCustomActionData(hRollbackScript, &pwzRollbackData);
+        if (FAILED(hr))
+        {
+            WcaLogError(hr, "Failed to read rollback script into CustomAction data, continuing anyway.");
+        }
+        else
+        {
+            WcaLog(LOGMSG_TRACEONLY, "Rollback Data: %ls", pwzRollbackData);
+
+            pwz = pwzRollbackData;
+            hr = WcaReadStringFromCaData(&pwz, &pwzOriginalComment);
+            if (FAILED(hr))
+            {
+                WcaLogError(hr, "failed to read comment from rollback data, continuing anyway");
+            }
+            else
+            {
+                pwzComment = pwzOriginalComment;
+            }
+            hr = WcaReadIntegerFromCaData(&pwz, &iOriginalAttributes);
+            if (FAILED(hr))
+            {
+                WcaLogError(hr, "failed to read attributes from rollback data, continuing anyway");
+            }
+            else
+            {
+                iRollbackAttributes |= iOriginalAttributes;
+            }
+        }
+    }
+
+    hr = RemoveGroupInternal(pwzDomain, pwzName, iRollbackAttributes);
+
+LExit:
+    WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_DELETE);
+
+    ReleaseStr(pwzData);
+    ReleaseStr(pwzName);
+    ReleaseStr(pwzDomain);
+    ReleaseStr(pwzComment);
+    ReleaseStr(pwzScriptKey);
+    ReleaseStr(pwzRollbackData);
+    ReleaseStr(pwzOriginalComment);
+
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+
+    if (FAILED(hr))
+    {
+        er = ERROR_INSTALL_FAILURE;
+    }
+
+    return WcaFinalize(er);
+}
+
+
+/********************************************************************
+  RemoveGroup - CUSTOM ACTION ENTRY POINT for removing groups
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
+  NOTE: This action can't be rolled back, so should only be performed in commit phase
+
+  Input:  commit CustomActionData - Name\tDomain\tComment\tAttributes
+ * *****************************************************************/
+extern "C" UINT __stdcall RemoveGroup(
+    MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug RemoveGroup");
+
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    LPWSTR pwzData = NULL;
+    LPWSTR pwz = NULL;
+    LPWSTR pwzName = NULL;
+    LPWSTR pwzDomain = NULL;
+    LPWSTR pwzComment = NULL;
+    int iAttributes = 0;
+    BOOL fInitializedCom = FALSE;
+
+    hr = WcaInitialize(hInstall, "RemoveGroup");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = WcaGetProperty(L"CustomActionData", &pwzData);
+    ExitOnFailure(hr, "failed to get CustomActionData");
+
+    WcaLog(LOGMSG_TRACEONLY, "CustomActionData: %ls", pwzData);
+
+    //
+    // Read in the CustomActionData
+    //
+    pwz = pwzData;
+    hr = WcaReadStringFromCaData(&pwz, &pwzName);
+    ExitOnFailure(hr, "failed to read name from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzDomain);
+    ExitOnFailure(hr, "failed to read domain from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzComment);
+    ExitOnFailure(hr, "failed to read comment from custom action data");
+
+    hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
+    ExitOnFailure(hr, "failed to read attributes from custom action data");
+
+    hr = RemoveGroupInternal(pwzDomain, pwzName, iAttributes);
+
+LExit:
+    ReleaseStr(pwzData);
+    ReleaseStr(pwzName);
+    ReleaseStr(pwzDomain);
+    ReleaseStr(pwzComment);
+
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+
+    if (FAILED(hr))
+    {
+        er = ERROR_INSTALL_FAILURE;
+    }
+
+    return WcaFinalize(er);
+}
+
+HRESULT AlterGroupMembership(bool remove, bool isRollback)
+{
+    HRESULT hr = S_OK;
+    NET_API_STATUS er = ERROR_SUCCESS;
+
+    LPWSTR pwzData = NULL;
+    LPWSTR pwz = NULL;
+    LPWSTR pwzParentName = NULL;
+    LPWSTR pwzParentDomain = NULL;
+    LPWSTR pwzChildName = NULL;
+    LPWSTR pwzChildDomain = NULL;
+    int iAttributes = 0;
+    LPWSTR pwzScriptKey = NULL;
+    LPWSTR pwzChildFullName = NULL;
+    LPWSTR pwzServerName = NULL;
+    LOCALGROUP_MEMBERS_INFO_3 memberInfo3 = {};
+    WCA_CASCRIPT_HANDLE hRollbackScript = NULL;
+
+    hr = WcaGetProperty(L"CustomActionData", &pwzData);
+    ExitOnFailure(hr, "failed to get CustomActionData");
+
+    WcaLog(LOGMSG_TRACEONLY, "CustomActionData: %ls", pwzData);
+
+    //
+    // Read in the CustomActionData
+    //
+    pwz = pwzData;
+    hr = WcaReadStringFromCaData(&pwz, &pwzParentName);
+    ExitOnFailure(hr, "failed to read group name from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzParentDomain);
+    ExitOnFailure(hr, "failed to read domain from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzChildName);
+    ExitOnFailure(hr, "failed to read group comment from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzChildDomain);
+    ExitOnFailure(hr, "failed to read group comment from custom action data");
+
+    hr = WcaReadIntegerFromCaData(&pwz, &iAttributes);
+    ExitOnFailure(hr, "failed to read attributes from custom action data");
+
+    hr = WcaReadStringFromCaData(&pwz, &pwzScriptKey);
+    ExitOnFailure(hr, "failed to read scriptkey from custom action data");
+
+    if (isRollback)
+    {
+        // if the script file doesn't exist, then we'll abandon this rollback
+        hr = WcaCaScriptOpen(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, &hRollbackScript);
+        if (S_OK == hr)
+        {
+            WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_DELETE);
+        }
+        else
+        {
+            WcaLog(LOGMSG_VERBOSE, "Rollback of parent: %ls\\%ls, child: %ls\\%ls relationship not performed, rollback script not found", pwzParentDomain, pwzParentName, pwzChildDomain, pwzChildName);
+            hr = S_OK;
+            ExitFunction();
+        }
+    }
+
+
+    hr = GetDomainFromServerName(&pwzServerName, pwzParentDomain, DS_WRITABLE_REQUIRED);
+    ExitOnFailure(hr, "failed to obtain writable server for domain %ls", pwzParentDomain);
+
+    if (*pwzChildDomain)
+    {
+        StrAllocFormatted(&pwzChildFullName, L"%ls\\%ls", pwzChildDomain, pwzChildName);
+    }
+    else
+    {
+        StrAllocFormatted(&pwzChildFullName, L"%ls", pwzChildName);
+    }
+    memberInfo3.lgrmi3_domainandname = pwzChildFullName;
+
+    if (remove)
+    {
+        er = ::NetLocalGroupDelMembers(pwzServerName, pwzParentName, 3, (LPBYTE)&memberInfo3, 1);
+    }
+    else
+    {
+        er = ::NetLocalGroupAddMembers(pwzServerName, pwzParentName, 3, (LPBYTE)&memberInfo3, 1);
+    }
+    hr = HRESULT_FROM_WIN32(er);
+
+    // if there was no error, the action succeeded, and we should flag that it's something which might need
+    // to be rolled back
+    if (S_OK == hr && !isRollback)
+    {
+        // we create a script file, the rollback matching this scriptkey will occur if the file exists
+        hr = WcaCaScriptCreate(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, FALSE, &hRollbackScript);
+        WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
+    }
+
+    if (remove)
+    {
+        if (HRESULT_FROM_WIN32(NERR_GroupNotFound) == hr
+            || HRESULT_FROM_WIN32(ERROR_NO_SUCH_MEMBER) == hr
+            || HRESULT_FROM_WIN32(ERROR_MEMBER_NOT_IN_ALIAS) == hr)
+        {
+            hr = S_OK;
+        }
+    }
+    else
+    {
+        if (HRESULT_FROM_WIN32(ERROR_MEMBER_IN_ALIAS) == hr)
+        {
+            hr = S_OK;
+        }
+    }
+
+LExit:
+    ReleaseStr(pwzData);
+    ReleaseStr(pwzParentName);
+    ReleaseStr(pwzParentDomain);
+    ReleaseStr(pwzChildName);
+    ReleaseStr(pwzChildDomain);
+    ReleaseStr(pwzChildFullName);
+    ReleaseStr(pwzServerName);
+    ReleaseStr(pwzScriptKey);
+
+    if (SCAG_NON_VITAL & iAttributes)
+    {
+        return S_OK;
+    }
+    return hr;
+}
+
+/********************************************************************
+  AddGroupMembership - CUSTOM ACTION ENTRY POINT for adding Group Membership
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
+
+  Input:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
+ * *****************************************************************/
+extern "C" UINT __stdcall AddGroupMembership(
+    __in MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug AddGroupMembership");
+
+    HRESULT hr = S_OK;
+
+    BOOL fInitializedCom = FALSE;
+
+    hr = WcaInitialize(hInstall, "AddGroupMembership");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = AlterGroupMembership(false, false);
+
+LExit:
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+    return WcaFinalize(FAILED(hr) ? ERROR_INSTALL_FAILED : ERROR_SUCCESS);
+}
+
+/********************************************************************
+ AddGroupMembershipRollback - CUSTOM ACTION ENTRY POINT for rolling back
+        adding Group Membership
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
+
+  Input:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
+ * *****************************************************************/
+extern "C" UINT __stdcall AddGroupMembershipRollback(
+    __in MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug AddGroupMembershipRollback");
+
+    HRESULT hr = S_OK;
+
+    BOOL fInitializedCom = FALSE;
+
+    hr = WcaInitialize(hInstall, "AddGroupMembershipRollback");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = AlterGroupMembership(true, true);
+
+LExit:
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+    return WcaFinalize(FAILED(hr) ? ERROR_INSTALL_FAILED : ERROR_SUCCESS);
+}
+
+/********************************************************************
+  RemoveGroupMembership - CUSTOM ACTION ENTRY POINT for removing group memberships
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
+
+  Input:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
+ * *****************************************************************/
+extern "C" UINT __stdcall RemoveGroupMembership(
+    __in MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug RemoveGroupMembership");
+
+    HRESULT hr = S_OK;
+
+    BOOL fInitializedCom = FALSE;
+
+    hr = WcaInitialize(hInstall, "RemoveGroupMembership");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = AlterGroupMembership(true, false);
+
+LExit:
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+    return WcaFinalize(FAILED(hr) ? ERROR_INSTALL_FAILED : ERROR_SUCCESS);
+}
+
+/********************************************************************
+  RemoveGroupMembershipRollback - CUSTOM ACTION ENTRY POINT for rolling back
+        removing group memberships
+  For domain parent group, must be run as Impersonated=true
+  For non-domain parent group, must be run as Impersonated=false (for elevation)
+
+  Input:  deferred CustomActionData -
+  ParentGroupName\tParentGroupDomain\tChildGroupName\tChildGroupDomain\tAttributes\tScriptkey
+ * *****************************************************************/
+extern "C" UINT __stdcall RemoveGroupMembershipRollback(
+    __in MSIHANDLE hInstall
+)
+{
+    //AssertSz(0, "Debug RemoveGroupMembershipRollback");
+
+    HRESULT hr = S_OK;
+
+    BOOL fInitializedCom = FALSE;
+
+    hr = WcaInitialize(hInstall, "RemoveGroupMembershipRollback");
+    ExitOnFailure(hr, "failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = AlterGroupMembership(false, true);
+
+LExit:
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+    return WcaFinalize(FAILED(hr) ? ERROR_INSTALL_FAILED : ERROR_SUCCESS);
 }

@@ -125,3 +125,54 @@ LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
+
+/********************************************************************
+ConfigureGroups - CUSTOM ACTION ENTRY POINT for installing groups
+
+********************************************************************/
+extern "C" UINT __stdcall ConfigureGroups(
+    __in MSIHANDLE hInstall
+)
+{
+    AssertSz(0, "Debug ConfigureGroups");
+
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    BOOL fInitializedCom = FALSE;
+    SCA_GROUP* psgList = NULL;
+
+    // initialize
+    hr = WcaInitialize(hInstall, "ConfigureGroups");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    hr = ::CoInitialize(NULL);
+    ExitOnFailure(hr, "failed to initialize COM");
+    fInitializedCom = TRUE;
+
+    hr = ScaGroupRead(&psgList);
+    ExitOnFailure(hr, "failed to read Wix4Group,Wix6Group table(s)");
+
+    hr = ScaGroupMembershipRemoveExecute(psgList);
+    ExitOnFailure(hr, "failed to remove Group Memberships")
+
+    hr = ScaGroupExecute(psgList);
+    ExitOnFailure(hr, "failed to add/remove Group actions");
+
+    hr = ScaGroupMembershipAddExecute(psgList);
+    ExitOnFailure(hr, "failed to add Group Memberships")
+
+LExit:
+    if (psgList)
+    {
+        ScaGroupFreeList(psgList);
+    }
+
+    if (fInitializedCom)
+    {
+        ::CoUninitialize();
+    }
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}

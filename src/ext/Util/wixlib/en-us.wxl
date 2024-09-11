@@ -7,6 +7,10 @@
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="Failed to add user to group.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="Failed to create user because it already exists.  ([2]   [3]   [4]   [5])" />
 
+    <String Id="msierrGRPFailedGroupCreate" Overridable="yes" Value="Failed to create group.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupGroupAdd" Overridable="yes" Value="Failed to add group to group.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupCreateExists" Overridable="yes" Value="Failed to create group because it already exists.  ([2]   [3]   [4]   [5])" />
+
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Failed to create network share.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrSMBFailedDrop" Overridable="yes" Value="Failed to drop network share.  ([2]   [3]   [4]   [5])" />
 

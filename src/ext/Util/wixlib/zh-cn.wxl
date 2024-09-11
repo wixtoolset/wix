@@ -7,6 +7,10 @@
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="无法在组中添加用户。  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="无法创建已经存在的用户。  ([2]   [3]   [4]   [5])" />
 
+    <String Id="msierrGRPFailedGroupCreate" Overridable="yes" Value="无法创建组。 ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupGroupAdd" Overridable="yes" Value="无法将群组添加到群组。 ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupCreateExists" Overridable="yes" Value="无法创建组，因为该组已存在。 ([2]   [3]   [4]   [5])" />
+
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="无法创建网络分享。  ([2]   [3]   [4]   [5])" />
     <String Id="msierrSMBFailedDrop" Overridable="yes" Value="无法关闭网络分享。  ([2]   [3]   [4]   [5])" />
 

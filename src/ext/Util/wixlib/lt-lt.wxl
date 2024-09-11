@@ -7,6 +7,10 @@
     <String Id="msierrUSRFailedUserGroupAdd" Overridable="yes" Value="Nepavyko pridėti vartotojo prie grupės.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrUSRFailedUserCreateExists" Overridable="yes" Value="Vartotojo sukurti nepavyko, nes toks vartotojas jau egzistuoja.  ([2]   [3]   [4]   [5])" />
 
+    <String Id="msierrGRPFailedGroupCreate" Overridable="yes" Value="Nepavyko sukurti grupės.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupGroupAdd" Overridable="yes" Value="Nepavyko pridėti grupės prie grupės.  ([2]   [3]   [4]   [5])" />
+    <String Id="msierrGRPFailedGroupCreateExists" Overridable="yes" Value="Nepavyko sukurti grupės, nes ji jau egzistuoja.  ([2]   [3]   [4]   [5])" />
+
     <String Id="msierrSMBFailedCreate" Overridable="yes" Value="Nepavyko sukurti tinklo prieigos resurso.  ([2]   [3]   [4]   [5])" />
     <String Id="msierrSMBFailedDrop" Overridable="yes" Value="Nepavyko ištrinti tinklo prieigos resurso.  ([2]   [3]   [4]   [5])" />
 
