@@ -199,6 +199,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 overridableActionSymbols.Add(standardAction.Id.Id, standardAction);
             }
 
+            // Get the Standard Actions associated with EnsureTable symbols.
+            foreach (var table in this.Section.Symbols.OfType<WixEnsureTableSymbol>())
+            {
+                if (WindowsInstallerStandard.TryGetTableAssociatedStandardActions(table.Table, out var standardActions))
+                {
+                    foreach(var standardAction in standardActions)
+                    {
+                        if (!overridableActionSymbols.ContainsKey(standardAction.Id.Id))
+                        {
+                            overridableActionSymbols.Add(standardAction.Id.Id, standardAction);
+                        }
+                    }
+                }
+            }
+
             return overridableActionSymbols;
         }
 

@@ -11,6 +11,7 @@ namespace WixToolset.Data.WindowsInstaller
     {
         private static readonly Dictionary<string, WixActionSymbol> standardActionsById;
         private static readonly HashSet<string> standardActionNames;
+        private static readonly Dictionary<string, WixActionSymbol[]> standardActionsByTableName = new Dictionary<string, WixActionSymbol[]>();
 
         /// <summary>
         /// References:
@@ -368,6 +369,26 @@ namespace WixToolset.Data.WindowsInstaller
 
             standardActionNames = new HashSet<string>(standardActions.Select(a => a.Action));
             standardActionsById = standardActions.ToDictionary(a => a.Id.Id);
+
+            // Populate standard actions based on standard table names
+            standardActionsByTableName.Add("AppId", new[]
+            {
+                standardActionsById["AdvertiseExecuteSequence/RegisterClassInfo"],
+                standardActionsById["InstallExecuteSequence/UnregisterClassInfo"],
+                standardActionsById["InstallExecuteSequence/RegisterClassInfo"],
+            });
+            standardActionsByTableName.Add("AppSearch", new[]
+            {
+                standardActionsById["InstallUISequence/AppSearch"],
+                standardActionsById["InstallExecuteSequence/AppSearch"],
+            });
+            standardActionsByTableName.Add("BindImage", new[] { standardActionsById["InstallExecuteSequence/BindImage"] });
+            standardActionsByTableName.Add("RemoveFile", new[] { standardActionsById["InstallExecuteSequence/RemoveFiles"] });
+            standardActionsByTableName.Add("Registry", new[]
+            {
+                standardActionsById["InstallExecuteSequence/WriteRegistryValues"],
+                standardActionsById["InstallExecuteSequence/RemoveRegistryValues"],
+            });
         }
 
         /// <summary>
@@ -455,6 +476,14 @@ namespace WixToolset.Data.WindowsInstaller
         public static bool TryGetStandardAction(string sequenceName, string actioname, out WixActionSymbol standardAction)
         {
             return standardActionsById.TryGetValue(String.Concat(sequenceName, "/", actioname), out standardAction);
+        }
+
+        /// <summary>
+        /// Try to get standard actions associated with a table definition.
+        /// </summary>
+        public static bool TryGetTableAssociatedStandardActions(string tableName, out WixActionSymbol[] standardActions)
+        {
+            return standardActionsByTableName.TryGetValue(tableName, out standardActions);
         }
 
         /// <summary>
