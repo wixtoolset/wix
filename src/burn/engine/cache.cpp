@@ -16,42 +16,42 @@ static HRESULT CacheVerifyPayloadSignature(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-);
+    );
 static HRESULT CalculatePotentialBaseWorkingFolders(
     __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in LPCWSTR wzAcquisitionFolder
-);
+    );
 static HRESULT CalculateWorkingFolders(
     __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand
-);
+    );
 static HRESULT GetLastUsedSourceFolder(
     __in BURN_VARIABLES* pVariables,
     __out_z LPWSTR* psczLastSource
-);
+    );
 static HRESULT SecurePerMachineCacheRoot(
     __in BURN_CACHE* pCache
-);
+    );
 static HRESULT CreateCompletedPath(
     __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in LPCWSTR wzCacheId,
     __in LPCWSTR wzFilePath,
     __out_z LPWSTR* psczCachePath
-);
+    );
 static HRESULT CreateUnverifiedPath(
     __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzPayloadId,
     __out_z LPWSTR* psczUnverifiedPayloadPath
-);
+    );
 static HRESULT GetRootPath(
     __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in BOOL fAllowRedirect,
     __deref_out_z LPWSTR* psczRootPath
-);
+    );
 static HRESULT VerifyThenTransferContainer(
     __in BURN_CONTAINER* pContainer,
     __in_z LPCWSTR wzCachedPath,
@@ -60,7 +60,7 @@ static HRESULT VerifyThenTransferContainer(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-);
+    );
 static HRESULT VerifyThenTransferPayload(
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzCachedPath,
@@ -69,7 +69,7 @@ static HRESULT VerifyThenTransferPayload(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-);
+    );
 static HRESULT CacheTransferFileWithRetry(
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzDestinationPath,
@@ -79,7 +79,7 @@ static HRESULT CacheTransferFileWithRetry(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-);
+    );
 static HRESULT VerifyFileAgainstContainer(
     __in BURN_CONTAINER* pContainer,
     __in_z LPCWSTR wzVerifyPath,
@@ -88,7 +88,7 @@ static HRESULT VerifyFileAgainstContainer(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-);
+    );
 static HRESULT VerifyFileAgainstPayload(
     __in BURN_PAYLOAD* pPayload,
     __in_z LPCWSTR wzVerifyPath,
@@ -97,14 +97,14 @@ static HRESULT VerifyFileAgainstPayload(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-);
+    );
 static HRESULT ResetPathPermissions(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzPath
-);
+    );
 static HRESULT SecurePath(
     __in LPCWSTR wzPath
-);
+    );
 static HRESULT CopyEngineToWorkingFolder(
     __in BOOL fElevated,
     __in BURN_CACHE* pCache,
@@ -113,25 +113,25 @@ static HRESULT CopyEngineToWorkingFolder(
     __in_z LPCWSTR wzExecutableName,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczEngineWorkingPath
-);
+    );
 static HRESULT CopyEngineWithSignatureFixup(
     __in HANDLE hEngineFile,
     __in_z LPCWSTR wzEnginePath,
     __in_z LPCWSTR wzTargetPath,
     __in BURN_SECTION* pSection
-);
+    );
 static HRESULT RemoveBundleOrPackage(
     __in BURN_CACHE* pCache,
     __in BOOL fBundle,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzBundleOrPackageId,
     __in_z LPCWSTR wzCacheId
-);
+    );
 static HRESULT VerifyFileSize(
     __in HANDLE hFile,
     __in DWORD64 qwFileSize,
     __in_z LPCWSTR wzUnverifiedPayloadPath
-);
+    );
 static HRESULT VerifyHash(
     __in BYTE* pbHash,
     __in DWORD cbHash,
@@ -143,36 +143,36 @@ static HRESULT VerifyHash(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-);
+    );
 static HRESULT VerifyPayloadAgainstCertChain(
     __in BURN_PAYLOAD* pPayload,
     __in PCCERT_CHAIN_CONTEXT pChainContext
-);
+    );
 static HRESULT SendCacheBeginMessage(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPVOID pContext,
     __in BURN_CACHE_STEP cacheStep
-);
+    );
 static HRESULT SendCacheSuccessMessage(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPVOID pContext,
     __in DWORD64 qwFileSize
-);
+    );
 static HRESULT SendCacheCompleteMessage(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPVOID pContext,
     __in HRESULT hrStatus
-);
+    );
 static HRESULT SendCacheFailureMessage(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPVOID pContext,
     __in BURN_CACHE_STEP cacheStep
-);
+    );
 
 extern "C" HRESULT CacheInitialize(
     __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand
-)
+    )
 {
     Assert(!pCache->fInitializedCache);
 
@@ -225,7 +225,7 @@ extern "C" HRESULT CacheInitialize(
         // Fallback to per-machine adddata directory
         hr = ShelGetFolder(&sczAppData, CSIDL_COMMON_APPDATA);
         ExitOnFailure(hr, "Failed to find local %hs appdata directory.", "per-machine");
-    }    
+    }
 
     hr = PathConcat(sczAppData, PACKAGE_CACHE_FOLDER_NAME, &pCache->sczDefaultUserPackageCache);
     ExitOnFailure(hr, "Failed to construct %hs package cache directory name.", "per-user");
@@ -249,7 +249,7 @@ extern "C" HRESULT CacheInitializeSources(
     __in BURN_CACHE* pCache,
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables
-)
+    )
 {
     Assert(!pCache->fInitializedCacheSources);
 
@@ -320,7 +320,7 @@ LExit:
 
 extern "C" HRESULT CacheEnsureAcquisitionFolder(
     __in BURN_CACHE* pCache
-)
+    )
 {
     Assert(pCache->fInitializedCache);
 
@@ -340,7 +340,7 @@ extern "C" HRESULT CacheEnsureBaseWorkingFolder(
     __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __deref_out_z_opt LPWSTR* psczBaseWorkingFolder
-)
+    )
 {
     Assert(pCache->fInitializedCache);
 
@@ -412,7 +412,7 @@ extern "C" HRESULT CacheCalculateBundleWorkingPath(
     __in BURN_CACHE* pCache,
     __in LPCWSTR wzExecutableName,
     __deref_out_z LPWSTR* psczWorkingPath
-)
+    )
 {
     Assert(pCache->fInitializedCache);
     Assert(pCache->fInitializedBaseWorkingFolder);
@@ -440,7 +440,7 @@ extern "C" HRESULT CacheCalculateBundleLayoutWorkingPath(
     __in BURN_CACHE* pCache,
     __in_z LPCWSTR wzBundleId,
     __deref_out_z LPWSTR* psczWorkingPath
-)
+    )
 {
     Assert(pCache->fInitializedCache);
 
@@ -457,7 +457,7 @@ extern "C" HRESULT CacheCalculatePayloadWorkingPath(
     __in BURN_CACHE* pCache,
     __in BURN_PAYLOAD* pPayload,
     __deref_out_z LPWSTR* psczWorkingPath
-)
+    )
 {
     Assert(pCache->fInitializedCache);
 
@@ -474,7 +474,7 @@ extern "C" HRESULT CacheCalculateContainerWorkingPath(
     __in BURN_CACHE* pCache,
     __in BURN_CONTAINER* pContainer,
     __deref_out_z LPWSTR* psczWorkingPath
-)
+    )
 {
     Assert(pCache->fInitializedCache);
 
@@ -491,7 +491,7 @@ extern "C" HRESULT CacheGetPerMachineRootCompletedPath(
     __in BURN_CACHE* pCache,
     __out_z LPWSTR* psczCurrentRootCompletedPath,
     __out_z LPWSTR* psczDefaultRootCompletedPath
-)
+    )
 {
     HRESULT hr = S_OK;
 
@@ -521,7 +521,7 @@ extern "C" HRESULT CacheGetCompletedPath(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzCacheId,
     __deref_out_z LPWSTR* psczCompletedPath
-)
+    )
 {
     HRESULT hr = S_OK;
     BOOL fRedirected = FALSE;
@@ -577,7 +577,7 @@ LExit:
 extern "C" HRESULT CacheGetResumePath(
     __in_z LPCWSTR wzPayloadWorkingPath,
     __deref_out_z LPWSTR* psczResumePath
-)
+    )
 {
     HRESULT hr = S_OK;
 
@@ -599,7 +599,7 @@ extern "C" HRESULT CacheGetLocalSourcePaths(
     __out DWORD* pcSearchPaths,
     __out DWORD* pdwLikelySearchPath,
     __out DWORD* pdwDestinationSearchPath
-)
+    )
 {
     AssertSz(pCache->fInitializedCacheSources, "Cache sources weren't initialized");
 
@@ -770,7 +770,7 @@ extern "C" HRESULT CacheSetLastUsedSource(
     __in BURN_VARIABLES* pVariables,
     __in_z LPCWSTR wzSourcePath,
     __in_z LPCWSTR wzRelativePath
-)
+    )
 {
     HRESULT hr = S_OK;
     size_t cchSourcePath = 0;
@@ -830,7 +830,7 @@ extern "C" HRESULT CacheSendProgressCallback(
     __in DWORD64 dw64Progress,
     __in DWORD64 dw64Total,
     __in HANDLE hDestinationFile
-)
+    )
 {
     static LARGE_INTEGER LARGE_INTEGER_ZERO = { };
 
@@ -876,7 +876,7 @@ extern "C" void CacheSendErrorCallback(
     __in HRESULT hrError,
     __in_z_opt LPCWSTR wzError,
     __out_opt BOOL* pfRetry
-)
+    )
 {
     if (pfRetry)
     {
@@ -895,7 +895,7 @@ extern "C" void CacheSendErrorCallback(
 
 extern "C" BOOL CacheBundleRunningFromCache(
     __in BURN_CACHE* pCache
-)
+    )
 {
     AssertSz(pCache->fInitializedCacheSources, "Cache sources weren't initialized");
 
@@ -905,7 +905,7 @@ extern "C" BOOL CacheBundleRunningFromCache(
 extern "C" HRESULT CachePreparePackage(
     __in BURN_CACHE* pCache,
     __in BURN_PACKAGE* pPackage
-)
+    )
 {
     HRESULT hr = S_OK;
 
@@ -923,7 +923,7 @@ extern "C" HRESULT CacheBundleToWorkingDirectory(
     __in_z LPCWSTR wzExecutableName,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczEngineWorkingPath
-)
+    )
 {
     Assert(pCache->fInitializedCache);
 
@@ -961,7 +961,7 @@ extern "C" HRESULT CacheLayoutBundle(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczTargetPath = NULL;
@@ -989,7 +989,7 @@ extern "C" HRESULT CacheCompleteBundle(
 #ifdef DEBUG
     , __in_z LPCWSTR wzExecutablePath
 #endif
-)
+    )
 {
     HRESULT hr = S_OK;
     BOOL fPathEqual = FALSE;
@@ -1047,7 +1047,7 @@ extern "C" HRESULT CacheLayoutContainer(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczCachedPath = NULL;
@@ -1072,7 +1072,7 @@ extern "C" HRESULT CacheLayoutPayload(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczCachedPath = NULL;
@@ -1099,7 +1099,7 @@ extern "C" HRESULT CacheCompletePayload(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczCachedPath = NULL;
@@ -1166,7 +1166,7 @@ extern "C" HRESULT CacheVerifyContainer(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczCachedPath = NULL;
@@ -1188,7 +1188,7 @@ extern "C" HRESULT CacheVerifyPayload(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczCachedPath = NULL;
@@ -1206,7 +1206,7 @@ LExit:
 
 extern "C" HRESULT CacheRemoveBaseWorkingFolder(
     __in BURN_CACHE* pCache
-)
+    )
 {
     HRESULT hr = S_OK;
 
@@ -1224,7 +1224,7 @@ extern "C" HRESULT CacheRemoveBundle(
     __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzBundleId
-)
+    )
 {
     HRESULT hr = S_OK;
 
@@ -1240,7 +1240,7 @@ extern "C" HRESULT CacheRemovePackage(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzPackageId,
     __in_z LPCWSTR wzCacheId
-)
+    )
 {
     HRESULT hr = S_OK;
 
@@ -1259,7 +1259,7 @@ static HRESULT CacheVerifyPayloadSignature(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE /*pfnProgress*/,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     LONG er = ERROR_SUCCESS;
@@ -1326,7 +1326,7 @@ LExit:
 extern "C" void CacheCleanup(
     __in BOOL fPerMachine,
     __in BURN_CACHE* pCache
-)
+    )
 {
     Assert(pCache->fInitializedCache);
 
@@ -1393,7 +1393,7 @@ extern "C" void CacheCleanup(
 
 extern "C" void CacheUninitialize(
     __in BURN_CACHE* pCache
-)
+    )
 {
     ReleaseStrArray(pCache->rgsczPotentialBaseWorkingFolders, pCache->cPotentialBaseWorkingFolders);
     ReleaseStr(pCache->sczCurrentMachinePackageCache);
@@ -1412,7 +1412,7 @@ static HRESULT CalculatePotentialBaseWorkingFolders(
     __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand,
     __in LPCWSTR wzAcquisitionFolder
-)
+    )
 {
     Assert(!pCache->rgsczPotentialBaseWorkingFolders && !pCache->cPotentialBaseWorkingFolders);
     HRESULT hr = S_OK;
@@ -1486,7 +1486,7 @@ LExit:
 static HRESULT CalculateWorkingFolders(
     __in BURN_CACHE* pCache,
     __in BURN_ENGINE_COMMAND* pInternalCommand
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczBaseAcquisitionPath = NULL;
@@ -1520,7 +1520,7 @@ static HRESULT GetRootPath(
     __in BOOL fPerMachine,
     __in BOOL fAllowRedirect,
     __deref_out_z LPWSTR* psczRootPath
-)
+    )
 {
     Assert(pCache->fInitializedCache);
 
@@ -1549,7 +1549,7 @@ LExit:
 static HRESULT GetLastUsedSourceFolder(
     __in BURN_VARIABLES* pVariables,
     __out_z LPWSTR* psczLastSource
-)
+    )
 {
     HRESULT hr = S_OK;
 
@@ -1565,7 +1565,7 @@ static HRESULT GetLastUsedSourceFolder(
 
 static HRESULT SecurePerMachineCacheRoot(
     __in BURN_CACHE* pCache
-)
+    )
 {
     HRESULT hr = S_OK;
     BOOL fRedirected = FALSE;
@@ -1622,7 +1622,7 @@ static HRESULT CreateCompletedPath(
     __in LPCWSTR wzId,
     __in LPCWSTR wzFilePath,
     __out_z LPWSTR* psczCachePath
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczCacheDirectory = NULL;
@@ -1674,7 +1674,7 @@ static HRESULT CreateUnverifiedPath(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzPayloadId,
     __out_z LPWSTR* psczUnverifiedPayloadPath
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczUnverifiedCacheFolder = NULL;
@@ -1709,7 +1709,7 @@ static HRESULT VerifyThenTransferContainer(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     HANDLE hFile = INVALID_HANDLE_VALUE;
@@ -1751,7 +1751,7 @@ static HRESULT VerifyThenTransferPayload(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     HANDLE hFile = INVALID_HANDLE_VALUE;
@@ -1798,7 +1798,7 @@ static HRESULT CacheTransferFileWithRetry(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE /*pfnProgress*/,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
 
@@ -1833,7 +1833,7 @@ static HRESULT VerifyFileAgainstContainer(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     HANDLE hFile = INVALID_HANDLE_VALUE;
@@ -1891,7 +1891,7 @@ static HRESULT VerifyFileAgainstPayload(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE pfnProgress,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     HANDLE hFile = INVALID_HANDLE_VALUE;
@@ -1967,7 +1967,7 @@ LExit:
 static HRESULT AllocateSid(
     __in WELL_KNOWN_SID_TYPE type,
     __out PSID* ppSid
-)
+    )
 {
     HRESULT hr = S_OK;
     PSID pAllocSid = NULL;
@@ -1993,7 +1993,7 @@ LExit:
 static HRESULT ResetPathPermissions(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzPath
-)
+    )
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
@@ -2030,7 +2030,7 @@ static HRESULT GrantAccessAndAllocateSid(
     __in WELL_KNOWN_SID_TYPE type,
     __in DWORD dwGrantAccess,
     __in EXPLICIT_ACCESS* pAccess
-)
+    )
 {
     HRESULT hr = S_OK;
 
@@ -2050,7 +2050,7 @@ LExit:
 
 static HRESULT SecurePath(
     __in LPCWSTR wzPath
-)
+    )
 {
     HRESULT hr = S_OK;
     DWORD er = ERROR_SUCCESS;
@@ -2075,7 +2075,7 @@ static HRESULT SecurePath(
 
     // Set the ACL and ensure the Administrators group ends up the owner
     hr = AclSetSecurityWithRetry(wzPath, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION | PROTECTED_DACL_SECURITY_INFORMATION,
-        reinterpret_cast<PSID>(access[0].Trustee.ptstrName), NULL, pAcl, NULL, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
+                                 reinterpret_cast<PSID>(access[0].Trustee.ptstrName), NULL, pAcl, NULL, FILE_OPERATION_RETRY_COUNT, FILE_OPERATION_RETRY_WAIT);
     ExitOnFailure(hr, "Failed to secure cache path: %ls", wzPath);
 
 LExit:
@@ -2101,7 +2101,7 @@ static HRESULT CopyEngineToWorkingFolder(
     __in_z LPCWSTR wzExecutableName,
     __in BURN_SECTION* pSection,
     __deref_out_z_opt LPWSTR* psczEngineWorkingPath
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczWorkingFolder = NULL;
@@ -2150,7 +2150,7 @@ static HRESULT CopyEngineWithSignatureFixup(
     __in_z LPCWSTR wzEnginePath,
     __in_z LPCWSTR wzTargetPath,
     __in BURN_SECTION* pSection
-)
+    )
 {
     HRESULT hr = S_OK;
     HANDLE hTarget = INVALID_HANDLE_VALUE;
@@ -2219,7 +2219,7 @@ static HRESULT RemoveBundleOrPackage(
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzBundleOrPackageId,
     __in_z LPCWSTR wzCacheId
-)
+    )
 {
     HRESULT hr = S_OK;
     LPWSTR sczRootCacheDirectory = NULL;
@@ -2278,7 +2278,7 @@ static HRESULT VerifyFileSize(
     __in HANDLE hFile,
     __in DWORD64 qwFileSize,
     __in_z LPCWSTR wzUnverifiedPayloadPath
-)
+    )
 {
     HRESULT hr = S_OK;
     LONGLONG llSize = 0;
@@ -2306,7 +2306,7 @@ static HRESULT VerifyHash(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPPROGRESS_ROUTINE /*pfnProgress*/,
     __in LPVOID pContext
-)
+    )
 {
     HRESULT hr = S_OK;
     BYTE rgbActualHash[SHA512_HASH_LEN] = { };
@@ -2369,7 +2369,7 @@ LExit:
 static HRESULT VerifyPayloadAgainstCertChain(
     __in BURN_PAYLOAD* pPayload,
     __in PCCERT_CHAIN_CONTEXT pChainContext
-)
+    )
 {
     HRESULT hr = S_OK;
     PCCERT_CONTEXT pChainElementCertContext = NULL;
@@ -2434,7 +2434,7 @@ static HRESULT SendCacheBeginMessage(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPVOID pContext,
     __in BURN_CACHE_STEP cacheStep
-)
+    )
 {
     HRESULT hr = S_OK;
     BURN_CACHE_MESSAGE message = { };
@@ -2451,7 +2451,7 @@ static HRESULT SendCacheSuccessMessage(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPVOID pContext,
     __in DWORD64 qwFileSize
-)
+    )
 {
     HRESULT hr = S_OK;
     BURN_CACHE_MESSAGE message = { };
@@ -2468,7 +2468,7 @@ static HRESULT SendCacheCompleteMessage(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPVOID pContext,
     __in HRESULT hrStatus
-)
+    )
 {
     HRESULT hr = S_OK;
     BURN_CACHE_MESSAGE message = { };
@@ -2485,7 +2485,7 @@ static HRESULT SendCacheFailureMessage(
     __in PFN_BURNCACHEMESSAGEHANDLER pfnCacheMessageHandler,
     __in LPVOID pContext,
     __in BURN_CACHE_STEP cacheStep
-)
+    )
 {
     HRESULT hr = S_OK;
     BURN_CACHE_MESSAGE message = { };
