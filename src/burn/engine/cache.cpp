@@ -223,7 +223,7 @@ extern "C" HRESULT CacheInitialize(
     {
         LogErrorString(hr, "Failed to find local per-user appdata directory.  Falling back to per-machine appdata.");
 
-        // Fallback to per-machine adddata directory
+        // Fallback to per-machine appdata directory
         hr = ShelGetFolder(&sczAppData, CSIDL_COMMON_APPDATA);
         ExitOnFailure(hr, "Failed to find local %hs appdata directory.", "per-machine");
     }
