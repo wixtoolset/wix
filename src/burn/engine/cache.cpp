@@ -217,6 +217,7 @@ extern "C" HRESULT CacheInitialize(
 
     pCache->fCustomMachinePackageCache = !fPathEqual;
 
+
     hr = ShelGetFolder(&sczAppData, CSIDL_LOCAL_APPDATA);
     if (FAILED(hr))
     {
