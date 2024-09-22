@@ -48,7 +48,9 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Equal(new[]
                 {
                     8601,
+                    8600,
                     8601,
+                    8600,
                 }, messages);
             });
         }
@@ -272,7 +274,11 @@ namespace WixToolsetTest.CoreIntegration
                 @"flsCgt3Noa1VJHlHG5HOVjD5vdJm5Q=PFiles\MsiPackage\files2_sub3\FileName.Extension",
             };
 
-            Build("StandardDirectory.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected));
+            Build("StandardDirectory.wxs", (msiPath, result) =>
+            {
+                result.AssertSuccess();
+                AssertFileIdsAndTargetPaths(msiPath, expected);
+            }, warningsAsErrors: false);
         }
 
         [Fact]
@@ -319,7 +325,7 @@ namespace WixToolsetTest.CoreIntegration
             Assert.Equal(sortedExpected, actual);
         }
 
-        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isPackage = true, params string[] additionalCommandLineArguments)
+        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isPackage = true, bool warningsAsErrors = true, params string[] additionalCommandLineArguments)
         {
             var folder = TestData.Get("TestData", "HarvestFiles");
 
@@ -346,7 +352,7 @@ namespace WixToolsetTest.CoreIntegration
                     arguments.AddRange(additionalCommandLineArguments);
                 }
 
-                var result = WixRunner.Execute(arguments.ToArray());
+                var result = WixRunner.Execute(warningsAsErrors, arguments.ToArray());
 
                 tester(msiPath, result);
             }
