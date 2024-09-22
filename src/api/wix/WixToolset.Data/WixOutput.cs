@@ -25,7 +25,7 @@ namespace WixToolset.Data
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public Uri Uri { get; }
 
@@ -189,7 +189,10 @@ namespace WixToolset.Data
         /// <returns>Stream to the data of the file.</returns>
         public Stream CreateDataStream(string name)
         {
-            this.DeleteExistingEntry(name);
+            if (this.archive.Mode == ZipArchiveMode.Update)
+            {
+                this.DeleteExistingEntry(name);
+            }
 
             var entry = this.archive.CreateEntry(name);
 
@@ -203,7 +206,10 @@ namespace WixToolset.Data
         /// <param name="path">Path to file on disk to include in the output.</param>
         public void ImportDataStream(string name, string path)
         {
-            this.DeleteExistingEntry(name);
+            if (this.archive.Mode == ZipArchiveMode.Update)
+            {
+                this.DeleteExistingEntry(name);
+            }
 
             this.archive.CreateEntryFromFile(path, name, System.IO.Compression.CompressionLevel.Optimal);
         }
@@ -238,6 +244,26 @@ namespace WixToolset.Data
             {
                 return streamReader.ReadToEnd();
             }
+        }
+
+        /// <summary>
+        /// Creates a new file structure on disk that can only be written to.
+        /// </summary>
+        /// <param name="path">Path to write file structure to.</param>
+        /// <returns>Newly created <c>WixOutput</c>.</returns>
+        internal static WixOutput CreateNew(string path)
+        {
+            var fullPath = Path.GetFullPath(path);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
+
+            var uri = new Uri(fullPath);
+
+            var stream = File.Create(path);
+
+            var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true);
+
+            return new WixOutput(uri, archive, stream);
         }
 
         /// <summary>
