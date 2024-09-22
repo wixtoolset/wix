@@ -248,7 +248,7 @@ namespace WixToolset.Core.CommandLine
 
                 if (!this.Messaging.EncounteredError)
                 {
-                    result.Library.Save(outputPath);
+                    result.Library.SaveNew(outputPath);
 
                     this.LayoutFiles(result.TrackedFiles, null, cancellationToken);
                 }
