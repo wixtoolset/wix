@@ -245,6 +245,20 @@ namespace WixToolset.Data
         }
 
         /// <summary>
+        /// Saves an intermediate that can only be written to to a path on disk.
+        /// </summary>
+        /// <param name="path">Path to save intermediate file to disk.</param>
+        public void SaveNew(string path)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path)));
+
+            using (var wixout = WixOutput.CreateNew(path))
+            {
+                this.Save(wixout);
+            }
+        }
+
+        /// <summary>
         /// Saves an intermediate to a WixOutput.
         /// </summary>
         /// <param name="wixout">Destination to save.</param>
