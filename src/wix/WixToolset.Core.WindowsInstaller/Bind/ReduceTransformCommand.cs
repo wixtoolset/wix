@@ -101,11 +101,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     continue;
                 }
 
-                // Differ.sectionDelimiter
                 if (this.PatchFilterMap.TryGetPatchFiltersForRow(row, out var targetFilterId, out var updatedFilterId))
                 {
-                    targetFilterIdsToKeep[targetFilterId] = row;
-                    updatedFilterIdsToKeep[updatedFilterId] = row;
+                    targetFilterIdsToKeep[targetFilterId ?? String.Empty] = row;
+                    updatedFilterIdsToKeep[updatedFilterId ?? String.Empty] = row;
                 }
             }
 
@@ -251,7 +250,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            keptRows += ReduceTransformSequenceTable(sequenceList, targetFilterIdsToKeep, updatedFilterIdsToKeep, customActionTable);
+            keptRows += this.ReduceTransformSequenceTable(sequenceList, targetFilterIdsToKeep, updatedFilterIdsToKeep, customActionTable);
 
             if (null != directoryTable)
             {
@@ -333,7 +332,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            keptRows += ReduceTransformSequenceTable(sequenceList, targetFilterIdsToKeep, updatedFilterIdsToKeep, customActionTable);
+            keptRows += this.ReduceTransformSequenceTable(sequenceList, targetFilterIdsToKeep, updatedFilterIdsToKeep, customActionTable);
 
             // Delete tables that are empty.
             var tablesToDelete = transform.Tables.Where(t => t.Rows.Count == 0).Select(t => t.Name).ToList();

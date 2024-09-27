@@ -1,0 +1,18 @@
+<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>
+    <Patch
+    AllowRemoval="yes"
+    DisplayName="~Test Patch v$(var.V)"
+    Description="~Test Small Update Patch v$(var.V)"
+    MoreInfoURL="http://www.example.com/"
+    Manufacturer="Example Corporation"
+    Classification="Update">
+
+    <Media Id="1" Cabinet="foo.cab">
+      <PatchBaseline Id="RTM" BaselineFile="Baseline.wixpdb" UpdateFile="Update.wixpdb" />
+    </Media>
+
+    <PatchFamily Id='SequenceFamily' Version='$(var.V)'>
+      <ComponentRef Id="CC" />
+    </PatchFamily>
+  </Patch>
+</Wix>
