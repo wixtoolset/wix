@@ -1,0 +1,21 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="~Test Package" Version="$(var.V)" Manufacturer="Example Corporation" Language="1033" UpgradeCode="7d326855-e790-4a94-8611-5351f8321fca" Compressed="yes" Scope="perMachine" ProductCode="7d326855-e790-4a94-8611-5351f8321fca">
+    <MediaTemplate EmbedCab="yes" />
+
+    <ComponentGroup Id="Components" Directory="INSTALLFOLDER">
+      <Component Id="CA">
+        <File Id="a.txt" Name="a.txt" Source="Av$(var.A).txt" />
+      </Component>
+      
+      <Component Id="CB">
+        <File Id="b.txt" Name="b.txt" Source="Bv$(var.B).txt" />
+      </Component>
+      
+      <?if $(C) == "TRUE" ?>
+        <Component Id="CC">
+          <File Id="c.txt" Name="c.txt" Source="C.txt" />
+        </Component>
+      <?endif?>
+    </ComponentGroup>
+  </Package>
+</Wix>

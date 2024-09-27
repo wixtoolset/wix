@@ -44,9 +44,9 @@ namespace WixToolsetTest.CoreIntegration
             var tempFolderUpdate = Path.Combine(this.tempBaseFolder, "PatchTemplatePackage", "update");
             var tempFolderUpdateNoFileChanges = Path.Combine(this.tempBaseFolder, "PatchTemplatePackage", "updatewithoutfilechanges");
 
-            this.templateBaselinePdb = BuildMsi("Baseline.msi", this.templateSourceFolder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0", new[] { Path.Combine(this.templateSourceFolder, ".baseline-data") });
-            this.templateUpdatePdb = BuildMsi("Update.msi", this.templateSourceFolder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1", new[] { Path.Combine(this.templateSourceFolder, ".update-data") });
-            this.templateUpdateNoFilesChangedPdb = BuildMsi("Update.msi", this.templateSourceFolder, tempFolderUpdateNoFileChanges, "1.0.1", "1.0.1", "1.0.1", new[] { Path.Combine(this.templateSourceFolder, ".baseline-data") });
+            this.templateBaselinePdb = BuildMsi("Baseline.msi", this.templateSourceFolder, tempFolderBaseline, "1.0.0", "1.0.0", "1.0.0", bindpaths: new[] { Path.Combine(this.templateSourceFolder, ".baseline-data") });
+            this.templateUpdatePdb = BuildMsi("Update.msi", this.templateSourceFolder, tempFolderUpdate, "1.0.1", "1.0.1", "1.0.1", bindpaths: new[] { Path.Combine(this.templateSourceFolder, ".update-data") });
+            this.templateUpdateNoFilesChangedPdb = BuildMsi("Update.msi", this.templateSourceFolder, tempFolderUpdateNoFileChanges, "1.0.1", "1.0.1", "1.0.1", bindpaths: new[] { Path.Combine(this.templateSourceFolder, ".baseline-data") });
         }
 
         public void Dispose()
@@ -78,6 +78,33 @@ namespace WixToolsetTest.CoreIntegration
 
                 var files = Query.GetCabinetFiles(cab);
                 WixAssert.CompareLineByLine(new[] { "a.txt", "b.txt" }, files.Select(f => f.Name).ToArray());
+            }
+        }
+
+        [Fact]
+        public void CanBuildSimplePatchWithNewFileAndFilteringUsingWixpdbs()
+        {
+            var folder = TestData.Get(@"TestData", "PatchWithAddedFile");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var tempFolder = fs.GetFolder();
+
+                var baselinePath = BuildMsi("Baseline.msi", folder, tempFolder, "1.0.0", "1.0.0", "1.0.0");
+                var update1Path = BuildMsi("Update.msi", folder, tempFolder, "1.0.1", "1.0.1", "1.0.1", "TRUE");
+                var patchPath = BuildMsp("Patch1.msp", folder, tempFolder, "1.0.1", warningsAsErrors: false);
+
+                var doc = GetExtractPatchXml(patchPath);
+                WixAssert.StringEqual("{7D326855-E790-4A94-8611-5351F8321FCA}", doc.Root.Element(TargetProductCodeName).Value);
+
+                var names = Query.GetSubStorageNames(patchPath);
+                WixAssert.CompareLineByLine(new[] { "#RTM.1", "RTM.1" }, names);
+
+                var cab = Path.Combine(tempFolder, "foo.cab");
+                Query.ExtractStream(patchPath, "foo.cab", cab);
+
+                var files = Query.GetCabinetFiles(cab);
+                WixAssert.CompareLineByLine(new[] { "c.txt" }, files.Select(f => f.Name).ToArray());
             }
         }
 
@@ -452,7 +479,7 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        private static string BuildMsi(string outputName, string sourceFolder, string baseFolder, string defineV, string defineA, string defineB, IEnumerable<string> bindpaths = null)
+        private static string BuildMsi(string outputName, string sourceFolder, string baseFolder, string defineV, string defineA, string defineB, string defineC = null, IEnumerable<string> bindpaths = null)
         {
             var outputPath = Path.Combine(baseFolder, Path.Combine("bin", outputName));
 
@@ -463,6 +490,7 @@ namespace WixToolsetTest.CoreIntegration
                 "-d", "V=" + defineV,
                 "-d", "A=" + defineA,
                 "-d", "B=" + defineB,
+                "-d", "C=" + defineC ?? String.Empty,
                 "-bindpath", Path.Combine(sourceFolder, ".data"),
                 "-intermediateFolder", Path.Combine(baseFolder, "obj"),
                 "-o", outputPath,
