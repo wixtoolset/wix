@@ -23,8 +23,25 @@ Todo:
     <?foreach WIXUIARCH in X86;X64;A64 ?>
     <Fragment>
         <UI Id="WixUI_Advanced_$(WIXUIARCH)">
-            <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath_$(WIXUIARCH)" Order="1" Condition="NOT WIXUI_DONTVALIDATEPATH" />
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath_$(WIXUIARCH)" Order="2" Condition="NOT WIXUI_DONTVALIDATEPATH" />
+            <Publish Dialog="BrowseDlg" Control="OK" Event="CheckTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1" />
+
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="CheckTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1" />
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="FeaturesDlg" Order="4" />
+        </UI>
+
+        <UIRef Id="WixUI_Advanced" />
+    </Fragment>
+    <?endforeach?>
+
+    <?foreach WIXUIARCH in X86;X64;A64 ?>
+    <Fragment>
+        <UI Id="WixUI_Advanced_ExtendedPathValidation_$(WIXUIARCH)">
+            <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath_$(WIXUIARCH)" Order="1" />
+            <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="2" Condition="WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
+
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath_$(WIXUIARCH)" Order="1" />
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="2" Condition="WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="FeaturesDlg" Order="4" Condition="WIXUI_INSTALLDIR_VALID=&quot;1&quot;" />
         </UI>
 
         <UIRef Id="WixUI_Advanced" />
@@ -76,7 +93,6 @@ Todo:
             <DialogRef Id="WelcomeDlg" />
 
             <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999" />
-            <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="2" Condition="WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
 
             <Publish Dialog="AdvancedWelcomeEulaDlg" Control="Advanced" Event="NewDialog" Value="InstallScopeDlg" Order="1" Condition="!(wix.WixUISupportPerMachine) AND !(wix.WixUISupportPerUser)" />
             <Publish Dialog="AdvancedWelcomeEulaDlg" Control="Advanced" Event="NewDialog" Value="FeaturesDlg" Order="2" Condition="NOT !(wix.WixUISupportPerMachine)" />
@@ -94,11 +110,12 @@ Todo:
 
             <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="InstallScopeDlg" Condition="!(wix.WixUISupportPerUser)" />
             <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="AdvancedWelcomeEulaDlg" Condition="NOT !(wix.WixUISupportPerUser)" />
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1" />
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3" Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="FeaturesDlg" Order="4" Condition="WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID=&quot;1&quot;" />
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="3" />
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1" />
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2" />
+
+            <Publish Dialog="BrowseDlg" Control="OK" Event="SetTargetPath" Value="[_BrowseProperty]" Order="3" />
+            <Publish Dialog="BrowseDlg" Control="OK" Event="EndDialog" Value="Return" Order="4" />
 
             <Publish Dialog="FeaturesDlg" Control="Back" Event="NewDialog" Value="InstallScopeDlg" Condition="NOT Installed AND WixAppFolder = &quot;WixPerUserFolder&quot;" />
             <Publish Dialog="FeaturesDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Condition="NOT Installed AND WixAppFolder = &quot;WixPerMachineFolder&quot;" />
