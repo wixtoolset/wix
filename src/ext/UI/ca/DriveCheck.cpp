@@ -12,21 +12,21 @@ static HRESULT PathIsRemovable(__in LPCWSTR pTargetFolder, __inout BOOL* fPathRe
 UINT __stdcall ValidatePath(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
-    
+
     LPWSTR pwszWixUIDir = NULL;
     LPWSTR pwszInstallPath = NULL;
     BOOL fInstallPathIsRemote = TRUE;
     BOOL fInstallPathIsRemoveable = TRUE;
-    
+
     hr = WcaInitialize(hInstall, "ValidatePath");
     ExitOnFailure(hr, "failed to initialize");
 
     hr = WcaGetProperty(L"WIXUI_INSTALLDIR", &pwszWixUIDir);
     ExitOnFailure(hr, "failed to get WixUI Installation Directory");
-    
+
     hr = WcaGetProperty(pwszWixUIDir, &pwszInstallPath);
     ExitOnFailure(hr, "failed to get Installation Directory");
-    
+
     hr = PathIsRemote(pwszInstallPath, &fInstallPathIsRemote);
     if (FAILED(hr))
     {
@@ -34,7 +34,7 @@ UINT __stdcall ValidatePath(MSIHANDLE hInstall)
         //reset HR, as we need to continue and find out if is a UNC path
         hr = S_OK;
     }
-    
+
     hr = PathIsRemovable(pwszInstallPath, &fInstallPathIsRemoveable);
     if (FAILED(hr))
     {
@@ -45,7 +45,7 @@ UINT __stdcall ValidatePath(MSIHANDLE hInstall)
 
     // If the path does not point to a network drive, mapped drive, or removable drive,
     // then set WIXUI_INSTALLDIR_VALID to "1" otherwise set it to 0
-    BOOL fInstallPathIsUnc = PathIsUNCW(pwszInstallPath);
+    BOOL fInstallPathIsUnc = ::PathIsUNCW(pwszInstallPath);
     if (!fInstallPathIsUnc && !fInstallPathIsRemote && !fInstallPathIsRemoveable)
     {
         // path is valid
@@ -61,7 +61,7 @@ UINT __stdcall ValidatePath(MSIHANDLE hInstall)
         hr = WcaSetProperty(L"WIXUI_INSTALLDIR_VALID",  L"0");
         ExitOnFailure(hr, "failed to set WIXUI_INSTALLDIR_VALID");
     }
-    
+
 LExit:
     ReleaseStr(pwszInstallPath);
     ReleaseStr(pwszWixUIDir);
@@ -79,22 +79,22 @@ static HRESULT PathIsRemote(__in LPCWSTR pTargetFolder, __inout BOOL* fPathRemot
     LPWSTR pStrippedTargetFolder = NULL;
 
     hr = StrAllocString(&pStrippedTargetFolder, pTargetFolder, 0);
-    
+
     // Terminate the path at the root
-    if(!::PathStripToRootW(pStrippedTargetFolder))
+    if (!::PathStripToRootW(pStrippedTargetFolder))
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DRIVE);
-        ExitOnFailure(hr, "failed to parse target folder");    
+        ExitOnFailure(hr, "failed to parse target folder");
     }
-    
-    UINT uResult = GetDriveTypeW(pStrippedTargetFolder);
-    
-    *fPathRemote = (DRIVE_REMOTE == uResult) ;
+
+    UINT uResult = ::GetDriveTypeW(pStrippedTargetFolder);
+
+    *fPathRemote = (DRIVE_REMOTE == uResult);
 
 LExit:
     ReleaseStr(pStrippedTargetFolder);
 
-    return hr;        
+    return hr;
 }
 
 /********************************************************************
@@ -107,16 +107,16 @@ static HRESULT PathIsRemovable(__in LPCWSTR pTargetFolder, __inout BOOL* fPathRe
     LPWSTR pStrippedTargetFolder = NULL;
 
     hr = StrAllocString(&pStrippedTargetFolder, pTargetFolder, 0);
-    
+
     // Terminate the path at the root
-    if(!::PathStripToRootW(pStrippedTargetFolder))
+    if (!::PathStripToRootW(pStrippedTargetFolder))
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DRIVE);
-        ExitOnFailure(hr, "failed to parse target folder");    
+        ExitOnFailure(hr, "failed to parse target folder");
     }
-    
-    UINT uResult = GetDriveTypeW(pStrippedTargetFolder);
-    
+
+    UINT uResult = ::GetDriveTypeW(pStrippedTargetFolder);
+
     *fPathRemovable = ((DRIVE_CDROM == uResult) || (DRIVE_REMOVABLE == uResult) || (DRIVE_RAMDISK == uResult) || (DRIVE_UNKNOWN == uResult));
 
 LExit:
