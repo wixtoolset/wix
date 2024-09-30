@@ -299,7 +299,7 @@ namespace WixToolset.Core
         /// <summary>
         /// Return an identifier based on provided file or directory name
         /// </summary>
-        /// <param name="name">File/directory name to generate identifer from</param>
+        /// <param name="name">File/directory name to generate identifier from</param>
         /// <returns>A version of the name that is a legal identifier.</returns>
         internal static string GetIdentifierFromName(string name)
         {
@@ -767,7 +767,7 @@ namespace WixToolset.Core
             var end = equalsDefaultValue == -1 ? closeParen : equalsDefaultValue;
             var secondDot = value.IndexOf('.', firstDot + 1, end - firstDot);
 
-            if (secondDot == -1)
+            if ( (secondDot == -1) || (ns != "bind") )
             {
                 name = value.Substring(firstDot + 1, end - firstDot - 1);
             }
