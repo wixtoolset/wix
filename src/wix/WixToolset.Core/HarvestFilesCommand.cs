@@ -199,14 +199,16 @@ namespace WixToolset.Core
                 if (-1 != closeParen)
                 {
                     bindName = source.Substring(BindPathOpenString.Length, closeParen - BindPathOpenString.Length);
-                    path = source.Substring(BindPathOpenString.Length + bindName.Length + 1); // +1 for the closing brace.
+                    path = source.Substring(BindPathOpenString.Length + bindName.Length + 1); // +1 for the closing paren.
                     path = path.TrimStart('\\'); // remove starting '\\' char so the path doesn't look rooted.
                 }
             }
 
             if (String.IsNullOrEmpty(bindName))
             {
-                resultingDirectories.Add(path);
+                var unnamedBindPath = this.Context.BindPaths.SingleOrDefault(bp => bp.Name == null)?.Path;
+
+                resultingDirectories.Add(unnamedBindPath is null ? path : Path.Combine(unnamedBindPath, path));
             }
             else
             {

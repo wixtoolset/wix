@@ -1,0 +1,19 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="HarvestedFiles" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+        <MajorUpgrade DowngradeErrorMessage="Downgrade error message." />
+
+        <Feature Id="ProductFeature">
+            <ComponentGroupRef Id="Files" />
+        </Feature>
+
+        <ComponentGroup Id="Files" Directory="ProgramFilesFolder" Subdirectory="HarvestedFiles">
+            <Files Include="!(bindpath.ToBeHarvested)\**">
+                <Exclude Files="!(bindpath.ToBeHarvested)\notatest.txt" />
+                <Exclude Files="!(bindpath.ToBeHarvested)\**\pleasedontincludeme.dat" />
+            </Files>
+
+            <!-- Include everything from the unnamed bindpath too. -->
+            <Files Include="**" />
+        </ComponentGroup>
+    </Package>
+</Wix>
