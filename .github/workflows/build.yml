@@ -67,7 +67,10 @@ jobs:
         run: ./src/build_official.cmd
         env:
           RuntimeTestsEnabled: true
-          SigningVaultUri:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_VAULTURI || '' }}
+          SigningKeyVaultUri:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_VAULTURI || '' }}
+          SigningTenantId:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_TENANTID || '' }}
+          SigningClientId:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_CLIENTID || '' }}
+          SigningClientSecret:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_SECRET || '' }}
           SigningCertName:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_CERTNAME || '' }}
 
       - name: Validate test results

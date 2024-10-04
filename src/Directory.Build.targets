@@ -5,7 +5,7 @@
   <PropertyGroup>
     <SigningToolExe>$(ToolsFolder)\sign.exe</SigningToolExe>
     <SigningCommand>code azure-key-vault</SigningCommand>
-    <SigningConfiguration>--description "WiX Toolset" --description-url "https://wixtoolset.org/" --timestamp-url "http://timestamp.digicert.com" --file-list "$(MSBuildThisFileDirectory)signing-empty-file-list.txt" --azure-key-vault-managed-identity true --azure-key-vault-url "$(SigningVaultUri)" --azure-key-vault-certificate "$(SigningCertName)"</SigningConfiguration>
+    <SigningConfiguration>--description "WiX Toolset" --description-url "https://wixtoolset.org/" --file-list "$(MSBuildThisFileDirectory)signing-empty-file-list.txt"  --azure-key-vault-url $(SigningKeyVaultUri) --azure-key-vault-tenant-id $(SigningTenantId) --azure-key-vault-client-id $(SigningClientId) --azure-key-vault-client-secret $(SigningClientSecret) --azure-key-vault-certificate $(SigningCertName) --timestamp-url "http://timestamp.digicert.com"</SigningConfiguration>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(IsWixTestSupportProject)'=='true' ">
