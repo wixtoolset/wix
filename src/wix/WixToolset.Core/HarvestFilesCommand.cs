@@ -52,28 +52,19 @@ namespace WixToolset.Core
 
             var resolvedFiles = Enumerable.Empty<WildcardFile>();
 
-            try
+            var included = this.GetWildcardFiles(harvestFile, inclusions);
+            var excluded = this.GetWildcardFiles(harvestFile, exclusions);
+
+            foreach (var excludedFile in excluded)
             {
-                var included = this.GetWildcardFiles(harvestFile, inclusions);
-                var excluded = this.GetWildcardFiles(harvestFile, exclusions);
-
-                foreach (var excludedFile in excluded)
-                {
-                    this.Messaging.Write(OptimizerVerboses.ExcludedFile(harvestFile.SourceLineNumbers, excludedFile.Path));
-                }
-
-                resolvedFiles = included.Except(excluded, comparer).ToList();
-
-                if (!resolvedFiles.Any())
-                {
-                    this.Messaging.Write(OptimizerWarnings.ZeroFilesHarvested(harvestFile.SourceLineNumbers));
-                }
+                this.Messaging.Write(OptimizerVerboses.ExcludedFile(harvestFile.SourceLineNumbers, excludedFile.Path));
             }
-            catch (DirectoryNotFoundException e)
-            {
-                this.Messaging.Write(OptimizerWarnings.ExpectedDirectory(harvestFile.SourceLineNumbers, e.Message));
 
-                return;
+            resolvedFiles = included.Except(excluded, comparer).ToList();
+
+            if (!resolvedFiles.Any())
+            {
+                this.Messaging.Write(OptimizerWarnings.ZeroFilesHarvested(harvestFile.SourceLineNumbers));
             }
 
             foreach (var fileByRecursiveDir in resolvedFiles.GroupBy(resolvedFile => resolvedFile.RecursiveDir, resolvedFile => resolvedFile.Path))
@@ -139,47 +130,52 @@ namespace WixToolset.Core
 
             var files = new List<WildcardFile>();
 
-            foreach (var pattern in patterns)
+            try
             {
-                // Resolve bind paths, if any, which might result in multiple directories.
-                foreach (var path in this.ResolveBindPaths(sourceLineNumbers, pattern))
+                foreach (var pattern in patterns)
                 {
-                    var sourceDirectory = String.IsNullOrEmpty(sourcePath) ? Path.GetDirectoryName(sourceLineNumbers.FileName) : sourcePath;
-                    var recursive = path.IndexOf("**") >= 0;
-                    var filePortion = Path.GetFileName(path);
-                    var directoryPortion = Path.GetDirectoryName(path);
-
-                    if (directoryPortion?.EndsWith(@"\**") == true)
+                    // Resolve bind paths, if any, which might result in multiple directories.
+                    foreach (var path in this.ResolveBindPaths(sourceLineNumbers, pattern))
                     {
-                        directoryPortion = directoryPortion.Substring(0, directoryPortion.Length - 3);
-                    }
+                        var sourceDirectory = String.IsNullOrEmpty(sourcePath) ? Path.GetDirectoryName(sourceLineNumbers.FileName) : sourcePath;
+                        var recursive = path.IndexOf("**") >= 0;
+                        var filePortion = Path.GetFileName(path);
+                        var directoryPortion = Path.GetDirectoryName(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
-                    var recursiveDirOffset = directoryPortion.Length + 1;
-
-                    if (directoryPortion is null || directoryPortion.Length == 0 || directoryPortion == "**")
-                    {
-                        directoryPortion = sourceDirectory;
-                        recursiveDirOffset = sourceDirectory.Length + 1;
-
-                    }
-                    else if (!Path.IsPathRooted(directoryPortion))
-                    {
-                        directoryPortion = Path.Combine(sourceDirectory, directoryPortion);
-                        recursiveDirOffset = directoryPortion.Length + 1;
-                    }
-
-                    var foundFiles = Directory.EnumerateFiles(directoryPortion, filePortion, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-
-                    foreach (var foundFile in foundFiles)
-                    {
-                        var recursiveDir = Path.GetDirectoryName(foundFile.Substring(recursiveDirOffset));
-                        files.Add(new WildcardFile()
+                        if (directoryPortion?.EndsWith(@"\**") == true)
                         {
-                            RecursiveDir = recursiveDir,
-                            Path = foundFile,
-                        });
+                            directoryPortion = directoryPortion.Substring(0, directoryPortion.Length - 3);
+                        }
+
+                        if (directoryPortion is null || directoryPortion.Length == 0 || directoryPortion == "**")
+                        {
+                            directoryPortion = sourceDirectory;
+
+                        }
+                        else if (!Path.IsPathRooted(directoryPortion))
+                        {
+                            directoryPortion = Path.Combine(sourceDirectory, directoryPortion);
+                        }
+
+                        var recursiveDirOffset = directoryPortion.Length + 1;
+
+                        var foundFiles = Directory.EnumerateFiles(directoryPortion, filePortion, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+
+                        foreach (var foundFile in foundFiles)
+                        {
+                            var recursiveDir = Path.GetDirectoryName(foundFile.Substring(recursiveDirOffset));
+                            files.Add(new WildcardFile()
+                            {
+                                RecursiveDir = recursiveDir,
+                                Path = foundFile,
+                            });
+                        }
                     }
                 }
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                this.Messaging.Write(OptimizerWarnings.ExpectedDirectory(harvestFile.SourceLineNumbers, e.Message));
             }
 
             return files;

@@ -5,7 +5,9 @@
         <StandardDirectory Id="ProgramFiles6432Folder">
             <!-- Relies on default-feature feature to include naked files in package. -->
             <Files Subdirectory="MsiPackage" Include="files1\**" />
-            <Files Subdirectory="MsiPackage" Include="files2\**" />
+            <Files Subdirectory="MsiPackage" Include="files2\**">
+                <Exclude Files="notfound\**" />
+            </Files>
         </StandardDirectory>
     </Package>
 </Wix>
