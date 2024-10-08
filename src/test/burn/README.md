@@ -10,8 +10,8 @@ They modify machine state so it's strongly recommended *not* to run these tests 
 They should be run on a VM instead, where you can easily roll back.
 
 1. Run build.cmd to build everything (the tests will not automatically run).
-1. Copy the build\IntegrationBurn\Debug\net6.0-windows folder to your VM.
-1. Open an elevated command prompt and navigate to the net6.0-windows folder.
+1. Copy the build\IntegrationBurn\Debug\net8.0-windows folder to your VM.
+1. Open an elevated command prompt and navigate to the net8.0-windows folder.
 1. Run the runtests.cmd file to run the tests.
 
 You can modify the runtests.cmd to run specific tests.
@@ -20,9 +20,9 @@ For example, the following line runs only the specified test:
 > dotnet test --filter WixToolsetTest.BurnE2E.BasicFunctionalityTests.CanInstallAndUninstallSimpleBundle_x86_wixstdba WixToolsetTest.BurnE2E.dll
 
 The VM must have:
-1. x64 .NET Core SDK of 6.0 or later (for the test runner and .NET Core TestBA)
+1. x64 .NET Core SDK of 8.0 or later (for the test runner and .NET Core TestBA)
 1. Any version of .NET Framework (for the .NET Framework TestBA)
-1. x86 .NET Core Desktop Runtime of 6.0 or later (for the .NET Core TestBA)
+1. x86 .NET Core Desktop Runtime of 8.0 or later (for the .NET Core TestBA)
 
 ## Building with local changes
 

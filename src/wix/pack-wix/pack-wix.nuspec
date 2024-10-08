@@ -18,8 +18,8 @@
   </metadata>
 
   <files>
-    <file src="$projectFolder$\DotnetToolSettings.xml" target="tools\net6.0\any" />
+    <file src="$projectFolder$\DotnetToolSettings.xml" target="tools\net8.0\any" />
     <file src="$projectFolder$\..\..\internal\images\wix.png" />
-    <file src="**" target="tools\net6.0\any" exclude="**\*.xml;**\WixToolset.Core.Native.targets" />
+    <file src="**" target="tools\net8.0\any" exclude="**\*.xml;**\WixToolset.Core.Native.targets" />
   </files>
 </package>
