@@ -1,0 +1,30 @@
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util"
+     xmlns:complus="http://wixtoolset.org/schemas/v4/wxs/complus">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents">
+            <ComponentRef Id="Component1" />
+        </ComponentGroup>
+    </Fragment>
+
+    <Fragment>
+        <util:User Id="TEST_USER" Name="[LogonUser]" />
+
+        <Component Id="Component1" Guid="09624A9A-4BBC-4126-BBF9-0713C5217DB1" Directory="INSTALLFOLDER">
+            <File Id="AssemblyFileNative" Source="../Components/TestComponentNative.dll" />
+
+            <!-- Partition testing only works on Server OS -->
+            <complus:ComPlusPartition Id="PARTITION" Name="Complus Partition1" Description="ComPlus Partition" >
+            <complus:ComPlusPartitionUser Id="PARTITION_USER" User ="TEST_USER"/>
+                <complus:ComPlusApplication Id="APPLICATION" Name="ComPlus Application" Description="ComPlus Application" >
+                    <complus:ComPlusAssembly Id="ASSEMBLY_Native" Type="native" DllPath="[#AssemblyFileNative]" >
+                        <complus:ComPlusComponent Id="MyComNative" CLSID="8b4c3a90-762c-465b-abc5-81cb3cc5e464" />
+                    </complus:ComPlusAssembly>
+                </complus:ComPlusApplication>
+            </complus:ComPlusPartition>
+        </Component>
+    </Fragment>
+</Wix>

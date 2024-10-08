@@ -31,3 +31,5 @@
 #include "cpapprolesched.h"
 #include "cpasmsched.h"
 #include "cpsubssched.h"
+
+#include "..\..\caDecor.h"

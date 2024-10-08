@@ -408,7 +408,7 @@ HRESULT CpiAssembliesVerifyInstall(
         if (!pItm->fReferencedForInstall && !pItm->iRoleAssignmentsInstallCount && !WcaIsInstalling(pItm->isInstalled, pItm->isAction))
             continue;
 
-        // if the assembly is referensed, it must be installed
+        // if the assembly is referenced, it must be installed
         if ((pItm->fReferencedForInstall || pItm->iRoleAssignmentsInstallCount) && !CpiWillBeInstalled(pItm->isInstalled, pItm->isAction))
             MessageExitOnFailure(hr = E_FAIL, msierrComPlusAssemblyDependency, "An assembly is used by another entity being installed, but is not installed itself, key: %S", pItm->wzKey);
     }
