@@ -50,7 +50,6 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="DriveCheck.cpp" />
-    <ClCompile Include="PrintEula.cpp" />
   </ItemGroup>
 
   <ItemGroup>

@@ -11,7 +11,9 @@
                 <Control Id="DescriptionPerMachine" Type="Text" X="20" Y="202" Width="330" Height="31" Transparent="yes" NoPrefix="yes" Hidden="yes" Text="!(loc.AdvancedWelcomeEulaDlgDescriptionPerMachine)" ShowCondition="ALLUSERS" />
                 <Control Id="DescriptionPerUser" Type="Text" X="20" Y="202" Width="330" Height="31" Transparent="yes" NoPrefix="yes" Hidden="yes" Text="!(loc.AdvancedWelcomeEulaDlgDescriptionPerUser)" ShowCondition="NOT ALLUSERS" />
                 <Control Id="LicenseAcceptedCheckBox" Type="CheckBox" X="20" Y="180" Width="226" Height="18" CheckBoxValue="1" Property="LicenseAccepted" Text="!(loc.WelcomeEulaDlgLicenseAcceptedCheckBox)" />
-                <Control Id="Print" Type="PushButton" X="88" Y="243" Width="56" Height="17" Text="!(loc.WixUIPrint)" />
+                <Control Id="Print" Type="PushButton" X="88" Y="243" Width="56" Height="17" Text="!(loc.WixUIPrint)">
+                    <Publish Event="MsiPrint" Value="1" />
+                </Control>
                 <Control Id="Advanced" Type="PushButton" X="156" Y="243" Width="56" Height="17" Text="!(loc.AdvancedWelcomeEulaDlgAdvanced)" DisableCondition="LicenseAccepted &lt;&gt; &quot;1&quot;" EnableCondition="LicenseAccepted = &quot;1&quot;" />
                 <Control Id="Install" Type="PushButton" ElevationShield="yes" X="212" Y="243" Width="80" Height="17" Default="yes" Text="!(loc.AdvancedWelcomeEulaDlgInstall)" Hidden="yes" DisableCondition="LicenseAccepted &lt;&gt; &quot;1&quot;" EnableCondition="LicenseAccepted = &quot;1&quot;" ShowCondition="ALLUSERS">
                     <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg" Condition="!(wix.WixUICostingPopupOptOut) OR CostingComplete = 1" />

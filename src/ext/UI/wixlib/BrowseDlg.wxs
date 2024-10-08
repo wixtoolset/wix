@@ -6,10 +6,7 @@
         <UI>
             <Dialog Id="BrowseDlg" Width="370" Height="270" Title="!(loc.BrowseDlg_Title)">
                 <Control Id="PathEdit" Type="PathEdit" X="25" Y="202" Width="320" Height="18" Property="_BrowseProperty" Indirect="yes" />
-                <Control Id="OK" Type="PushButton" X="240" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUIOK)">
-                    <Publish Event="SetTargetPath" Value="[_BrowseProperty]" />
-                    <Publish Event="EndDialog" Value="Return" />
-                </Control>
+                <Control Id="OK" Type="PushButton" X="240" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUIOK)" />
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
                     <Publish Event="Reset" Value="0" />
                     <Publish Event="EndDialog" Value="Return" />

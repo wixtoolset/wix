@@ -56,6 +56,7 @@ namespace WixToolset.UI
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string id = null;
             string installDirectory = null;
+            YesNoType extendedPathValidation = YesNoType.No;
 
             foreach (var attrib in element.Attributes())
             {
@@ -68,6 +69,9 @@ namespace WixToolset.UI
                             break;
                         case "InstallDirectory":
                             installDirectory = this.ParseHelper.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ExtendedPathValidation":
+                            extendedPathValidation = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -87,7 +91,15 @@ namespace WixToolset.UI
             else
             {
                 var platform = this.Context.Platform == Platform.ARM64 ? "A64" : this.Context.Platform.ToString();
-                this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixUI, $"{id}_{platform}");
+
+                if (extendedPathValidation == YesNoType.No)
+                {
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixUI, $"{id}_{platform}");
+                }
+                else
+                {
+                    this.ParseHelper.CreateSimpleReference(section, sourceLineNumbers, SymbolDefinitions.WixUI, $"{id}_ExtendedPathValidation_{platform}");
+                }
 
                 if (installDirectory != null)
                 {
