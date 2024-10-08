@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="EnsureTable_StandardActions" Manufacturer="WiX Toolset Worldwide" Version="1.0" UpgradeCode="{EB227D6E-1559-47E4-BE0A-B5E921D68B9C}">
+        <EnsureTable Id="CCPSearch" />
+        <EnsureTable Id="RemoveFile" />
+    </Package>
+</Wix>

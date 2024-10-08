@@ -4,7 +4,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
@@ -29,6 +28,42 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IntermediateSection Section { get; }
 
         private Dictionary<string, RelativeActions> RelativeActionsForActions { get; }
+
+        public Dictionary<string, SymbolDefinitionType> SymbolTypeForTable { get; } = new Dictionary<string, SymbolDefinitionType>
+        {
+            { "AppSearch", SymbolDefinitionType.AppSearch },
+            { "CCPSearch", SymbolDefinitionType.CCPSearch },
+            { "Class", SymbolDefinitionType.Class },
+            { "Complus", SymbolDefinitionType.Complus},
+            { "CreateFolder", SymbolDefinitionType.CreateFolder },
+            { "DuplicateFile", SymbolDefinitionType.DuplicateFile },
+            { "Environment", SymbolDefinitionType.Environment },
+            { "Extension", SymbolDefinitionType.Extension },
+            { "File", SymbolDefinitionType.File },
+            { "IniFile", SymbolDefinitionType.IniFile },
+            { "IsolatedComponent", SymbolDefinitionType.IsolatedComponent },
+            { "LaunchCondition", SymbolDefinitionType.LaunchCondition },
+            { "MIME", SymbolDefinitionType.MIME },
+            { "MoveFile", SymbolDefinitionType.MoveFile },
+            { "MsiAssembly", SymbolDefinitionType.Assembly },
+            { "MsiAssemblyName", SymbolDefinitionType.Assembly },
+            { "MsiServiceConfig", SymbolDefinitionType.LaunchCondition },
+            { "MsiServiceConfigFailureActions", SymbolDefinitionType.MsiServiceConfigFailureActions },
+            { "ODBCAttribute", SymbolDefinitionType.ODBCAttribute },
+            { "ODBCDataSource", SymbolDefinitionType.ODBCDataSource },
+            { "ODBCDriver", SymbolDefinitionType.ODBCDriver },
+            { "ODBCTranslator", SymbolDefinitionType.ODBCTranslator },
+            { "ODBCSourceAttribute", SymbolDefinitionType.ODBCSourceAttribute },
+            { "PublishComponent", SymbolDefinitionType.PublishComponent },
+            { "Registry", SymbolDefinitionType.Registry },
+            { "RemoveRegistry", SymbolDefinitionType.RemoveRegistry },
+            { "RemoveFile", SymbolDefinitionType.RemoveFile },
+            { "ServiceControl", SymbolDefinitionType.ServiceControl },
+            { "ServiceInstall", SymbolDefinitionType.ServiceInstall },
+            { "Shortcut", SymbolDefinitionType.Shortcut },
+            { "TypeLib", SymbolDefinitionType.TypeLib },
+            { "Upgrade", SymbolDefinitionType.Upgrade },
+        };
 
         public void Execute()
         {
@@ -131,7 +166,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // A dictionary used for detecting cyclic references among action symbols.
             var firstReference = new Dictionary<WixActionSymbol, WixActionSymbol>();
-            
+
             // Build up dependency trees of the relatively scheduled actions.
             // Use ToList() to create a copy of the required action symbols so that new symbols can
             // be added while enumerating.
@@ -396,165 +431,179 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // Gather the required actions for each symbol type.
             foreach (var symbolType in this.Section.Symbols.Select(t => t.Definition.Type).Distinct())
             {
-                switch (symbolType)
+                this.GetActionsForSymbolType(symbolType, set);
+            }
+
+            // Gather the required actions for each ensured table.
+            foreach (var ensureTable in this.Section.Symbols.OfType<WixEnsureTableSymbol>())
+            {
+                if (this.SymbolTypeForTable.TryGetValue(ensureTable.Table, out var symbolType))
                 {
-                    case SymbolDefinitionType.AppSearch:
-                        set.Add("InstallExecuteSequence/AppSearch");
-                        set.Add("InstallUISequence/AppSearch");
-                        break;
-                    case SymbolDefinitionType.CCPSearch:
-                        set.Add("InstallExecuteSequence/AppSearch");
-                        set.Add("InstallExecuteSequence/CCPSearch");
-                        set.Add("InstallExecuteSequence/RMCCPSearch");
-                        set.Add("InstallUISequence/AppSearch");
-                        set.Add("InstallUISequence/CCPSearch");
-                        set.Add("InstallUISequence/RMCCPSearch");
-                        break;
-                    case SymbolDefinitionType.Class:
-                        set.Add("AdvertiseExecuteSequence/RegisterClassInfo");
-                        set.Add("InstallExecuteSequence/RegisterClassInfo");
-                        set.Add("InstallExecuteSequence/UnregisterClassInfo");
-                        break;
-                    case SymbolDefinitionType.Complus:
-                        set.Add("InstallExecuteSequence/RegisterComPlus");
-                        set.Add("InstallExecuteSequence/UnregisterComPlus");
-                        break;
-                    case SymbolDefinitionType.Component:
-                    case SymbolDefinitionType.CreateFolder:
-                        set.Add("InstallExecuteSequence/CreateFolders");
-                        set.Add("InstallExecuteSequence/RemoveFolders");
-                        break;
-                    case SymbolDefinitionType.DuplicateFile:
-                        set.Add("InstallExecuteSequence/DuplicateFiles");
-                        set.Add("InstallExecuteSequence/RemoveDuplicateFiles");
-                        break;
-                    case SymbolDefinitionType.Environment:
-                        set.Add("InstallExecuteSequence/WriteEnvironmentStrings");
-                        set.Add("InstallExecuteSequence/RemoveEnvironmentStrings");
-                        break;
-                    case SymbolDefinitionType.Extension:
-                        set.Add("AdvertiseExecuteSequence/RegisterExtensionInfo");
-                        set.Add("InstallExecuteSequence/RegisterExtensionInfo");
-                        set.Add("InstallExecuteSequence/UnregisterExtensionInfo");
-                        break;
-                    case SymbolDefinitionType.File:
-                        set.Add("InstallExecuteSequence/InstallFiles");
-                        set.Add("InstallExecuteSequence/RemoveFiles");
-
-                        var foundFont = false;
-                        var foundSelfReg = false;
-                        var foundBindPath = false;
-                        foreach (var file in this.Section.Symbols.OfType<FileSymbol>())
-                        {
-                            // Note that TrueType fonts are denoted by the empty string in the FontTitle
-                            // field. So, non-null means a font is present.
-                            if (!foundFont && file.FontTitle != null)
-                            {
-                                set.Add("InstallExecuteSequence/RegisterFonts");
-                                set.Add("InstallExecuteSequence/UnregisterFonts");
-                                foundFont = true;
-                            }
-
-                            if (!foundSelfReg && file.SelfRegCost.HasValue)
-                            {
-                                set.Add("InstallExecuteSequence/SelfRegModules");
-                                set.Add("InstallExecuteSequence/SelfUnregModules");
-                                foundSelfReg = true;
-                            }
-
-                            if (!foundBindPath && !String.IsNullOrEmpty(file.BindPath))
-                            {
-                                set.Add("InstallExecuteSequence/BindImage");
-                                foundBindPath = true;
-                            }
-                        }
-                        break;
-                    case SymbolDefinitionType.IniFile:
-                        set.Add("InstallExecuteSequence/WriteIniValues");
-                        set.Add("InstallExecuteSequence/RemoveIniValues");
-                        break;
-                    case SymbolDefinitionType.IsolatedComponent:
-                        set.Add("InstallExecuteSequence/IsolateComponents");
-                        break;
-                    case SymbolDefinitionType.LaunchCondition:
-                        set.Add("InstallExecuteSequence/LaunchConditions");
-                        set.Add("InstallUISequence/LaunchConditions");
-                        break;
-                    case SymbolDefinitionType.MIME:
-                        set.Add("AdvertiseExecuteSequence/RegisterMIMEInfo");
-                        set.Add("InstallExecuteSequence/RegisterMIMEInfo");
-                        set.Add("InstallExecuteSequence/UnregisterMIMEInfo");
-                        break;
-                    case SymbolDefinitionType.MoveFile:
-                        set.Add("InstallExecuteSequence/MoveFiles");
-                        break;
-                    case SymbolDefinitionType.Assembly:
-                        set.Add("AdvertiseExecuteSequence/MsiPublishAssemblies");
-                        set.Add("InstallExecuteSequence/MsiPublishAssemblies");
-                        set.Add("InstallExecuteSequence/MsiUnpublishAssemblies");
-                        break;
-                    case SymbolDefinitionType.MsiServiceConfig:
-                    case SymbolDefinitionType.MsiServiceConfigFailureActions:
-                        set.Add("InstallExecuteSequence/MsiConfigureServices");
-                        break;
-                    case SymbolDefinitionType.ODBCDataSource:
-                    case SymbolDefinitionType.ODBCTranslator:
-                    case SymbolDefinitionType.ODBCDriver:
-                        set.Add("InstallExecuteSequence/SetODBCFolders");
-                        set.Add("InstallExecuteSequence/InstallODBC");
-                        set.Add("InstallExecuteSequence/RemoveODBC");
-                        break;
-                    case SymbolDefinitionType.ProgId:
-                        set.Add("AdvertiseExecuteSequence/RegisterProgIdInfo");
-                        set.Add("InstallExecuteSequence/RegisterProgIdInfo");
-                        set.Add("InstallExecuteSequence/UnregisterProgIdInfo");
-                        break;
-                    case SymbolDefinitionType.PublishComponent:
-                        set.Add("AdvertiseExecuteSequence/PublishComponents");
-                        set.Add("InstallExecuteSequence/PublishComponents");
-                        set.Add("InstallExecuteSequence/UnpublishComponents");
-                        break;
-                    case SymbolDefinitionType.Registry:
-                    case SymbolDefinitionType.RemoveRegistry:
-                        set.Add("InstallExecuteSequence/WriteRegistryValues");
-                        set.Add("InstallExecuteSequence/RemoveRegistryValues");
-                        break;
-                    case SymbolDefinitionType.RemoveFile:
-                        set.Add("InstallExecuteSequence/RemoveFiles");
-                        break;
-                    case SymbolDefinitionType.ServiceControl:
-                        set.Add("InstallExecuteSequence/StartServices");
-                        set.Add("InstallExecuteSequence/StopServices");
-                        set.Add("InstallExecuteSequence/DeleteServices");
-                        break;
-                    case SymbolDefinitionType.ServiceInstall:
-                        set.Add("InstallExecuteSequence/InstallServices");
-                        break;
-                    case SymbolDefinitionType.Shortcut:
-                        set.Add("AdvertiseExecuteSequence/CreateShortcuts");
-                        set.Add("InstallExecuteSequence/CreateShortcuts");
-                        set.Add("InstallExecuteSequence/RemoveShortcuts");
-                        break;
-                    case SymbolDefinitionType.TypeLib:
-                        set.Add("InstallExecuteSequence/RegisterTypeLibraries");
-                        set.Add("InstallExecuteSequence/UnregisterTypeLibraries");
-                        break;
-                    case SymbolDefinitionType.Upgrade:
-                        set.Add("InstallExecuteSequence/FindRelatedProducts");
-                        set.Add("InstallUISequence/FindRelatedProducts");
-
-                        // Only add the MigrateFeatureStates action if MigrateFeature attribute is set on
-                        // at least one UpgradeVersion element.
-                        if (this.Section.Symbols.OfType<UpgradeSymbol>().Any(t => t.MigrateFeatures))
-                        {
-                            set.Add("InstallExecuteSequence/MigrateFeatureStates");
-                            set.Add("InstallUISequence/MigrateFeatureStates");
-                        }
-                        break;
+                    this.GetActionsForSymbolType(symbolType, set);
                 }
             }
 
             return set;
+        }
+
+        private void GetActionsForSymbolType(SymbolDefinitionType symbolType, HashSet<string> set)
+        {
+            switch (symbolType)
+            {
+                case SymbolDefinitionType.AppSearch:
+                    set.Add("InstallExecuteSequence/AppSearch");
+                    set.Add("InstallUISequence/AppSearch");
+                    break;
+                case SymbolDefinitionType.CCPSearch:
+                    set.Add("InstallExecuteSequence/AppSearch");
+                    set.Add("InstallExecuteSequence/CCPSearch");
+                    set.Add("InstallExecuteSequence/RMCCPSearch");
+                    set.Add("InstallUISequence/AppSearch");
+                    set.Add("InstallUISequence/CCPSearch");
+                    set.Add("InstallUISequence/RMCCPSearch");
+                    break;
+                case SymbolDefinitionType.Class:
+                    set.Add("AdvertiseExecuteSequence/RegisterClassInfo");
+                    set.Add("InstallExecuteSequence/RegisterClassInfo");
+                    set.Add("InstallExecuteSequence/UnregisterClassInfo");
+                    break;
+                case SymbolDefinitionType.Complus:
+                    set.Add("InstallExecuteSequence/RegisterComPlus");
+                    set.Add("InstallExecuteSequence/UnregisterComPlus");
+                    break;
+                case SymbolDefinitionType.Component:
+                case SymbolDefinitionType.CreateFolder:
+                    set.Add("InstallExecuteSequence/CreateFolders");
+                    set.Add("InstallExecuteSequence/RemoveFolders");
+                    break;
+                case SymbolDefinitionType.DuplicateFile:
+                    set.Add("InstallExecuteSequence/DuplicateFiles");
+                    set.Add("InstallExecuteSequence/RemoveDuplicateFiles");
+                    break;
+                case SymbolDefinitionType.Environment:
+                    set.Add("InstallExecuteSequence/WriteEnvironmentStrings");
+                    set.Add("InstallExecuteSequence/RemoveEnvironmentStrings");
+                    break;
+                case SymbolDefinitionType.Extension:
+                    set.Add("AdvertiseExecuteSequence/RegisterExtensionInfo");
+                    set.Add("InstallExecuteSequence/RegisterExtensionInfo");
+                    set.Add("InstallExecuteSequence/UnregisterExtensionInfo");
+                    break;
+                case SymbolDefinitionType.File:
+                    set.Add("InstallExecuteSequence/InstallFiles");
+                    set.Add("InstallExecuteSequence/RemoveFiles");
+
+                    var foundFont = false;
+                    var foundSelfReg = false;
+                    var foundBindPath = false;
+                    foreach (var file in this.Section.Symbols.OfType<FileSymbol>())
+                    {
+                        // Note that TrueType fonts are denoted by the empty string in the FontTitle
+                        // field. So, non-null means a font is present.
+                        if (!foundFont && file.FontTitle != null)
+                        {
+                            set.Add("InstallExecuteSequence/RegisterFonts");
+                            set.Add("InstallExecuteSequence/UnregisterFonts");
+                            foundFont = true;
+                        }
+
+                        if (!foundSelfReg && file.SelfRegCost.HasValue)
+                        {
+                            set.Add("InstallExecuteSequence/SelfRegModules");
+                            set.Add("InstallExecuteSequence/SelfUnregModules");
+                            foundSelfReg = true;
+                        }
+
+                        if (!foundBindPath && !String.IsNullOrEmpty(file.BindPath))
+                        {
+                            set.Add("InstallExecuteSequence/BindImage");
+                            foundBindPath = true;
+                        }
+                    }
+                    break;
+                case SymbolDefinitionType.IniFile:
+                    set.Add("InstallExecuteSequence/WriteIniValues");
+                    set.Add("InstallExecuteSequence/RemoveIniValues");
+                    break;
+                case SymbolDefinitionType.IsolatedComponent:
+                    set.Add("InstallExecuteSequence/IsolateComponents");
+                    break;
+                case SymbolDefinitionType.LaunchCondition:
+                    set.Add("InstallExecuteSequence/LaunchConditions");
+                    set.Add("InstallUISequence/LaunchConditions");
+                    break;
+                case SymbolDefinitionType.MIME:
+                    set.Add("AdvertiseExecuteSequence/RegisterMIMEInfo");
+                    set.Add("InstallExecuteSequence/RegisterMIMEInfo");
+                    set.Add("InstallExecuteSequence/UnregisterMIMEInfo");
+                    break;
+                case SymbolDefinitionType.MoveFile:
+                    set.Add("InstallExecuteSequence/MoveFiles");
+                    break;
+                case SymbolDefinitionType.Assembly:
+                    set.Add("AdvertiseExecuteSequence/MsiPublishAssemblies");
+                    set.Add("InstallExecuteSequence/MsiPublishAssemblies");
+                    set.Add("InstallExecuteSequence/MsiUnpublishAssemblies");
+                    break;
+                case SymbolDefinitionType.MsiServiceConfig:
+                case SymbolDefinitionType.MsiServiceConfigFailureActions:
+                    set.Add("InstallExecuteSequence/MsiConfigureServices");
+                    break;
+                case SymbolDefinitionType.ODBCDataSource:
+                case SymbolDefinitionType.ODBCTranslator:
+                case SymbolDefinitionType.ODBCDriver:
+                    set.Add("InstallExecuteSequence/SetODBCFolders");
+                    set.Add("InstallExecuteSequence/InstallODBC");
+                    set.Add("InstallExecuteSequence/RemoveODBC");
+                    break;
+                case SymbolDefinitionType.ProgId:
+                    set.Add("AdvertiseExecuteSequence/RegisterProgIdInfo");
+                    set.Add("InstallExecuteSequence/RegisterProgIdInfo");
+                    set.Add("InstallExecuteSequence/UnregisterProgIdInfo");
+                    break;
+                case SymbolDefinitionType.PublishComponent:
+                    set.Add("AdvertiseExecuteSequence/PublishComponents");
+                    set.Add("InstallExecuteSequence/PublishComponents");
+                    set.Add("InstallExecuteSequence/UnpublishComponents");
+                    break;
+                case SymbolDefinitionType.Registry:
+                case SymbolDefinitionType.RemoveRegistry:
+                    set.Add("InstallExecuteSequence/WriteRegistryValues");
+                    set.Add("InstallExecuteSequence/RemoveRegistryValues");
+                    break;
+                case SymbolDefinitionType.RemoveFile:
+                    set.Add("InstallExecuteSequence/RemoveFiles");
+                    break;
+                case SymbolDefinitionType.ServiceControl:
+                    set.Add("InstallExecuteSequence/StartServices");
+                    set.Add("InstallExecuteSequence/StopServices");
+                    set.Add("InstallExecuteSequence/DeleteServices");
+                    break;
+                case SymbolDefinitionType.ServiceInstall:
+                    set.Add("InstallExecuteSequence/InstallServices");
+                    break;
+                case SymbolDefinitionType.Shortcut:
+                    set.Add("AdvertiseExecuteSequence/CreateShortcuts");
+                    set.Add("InstallExecuteSequence/CreateShortcuts");
+                    set.Add("InstallExecuteSequence/RemoveShortcuts");
+                    break;
+                case SymbolDefinitionType.TypeLib:
+                    set.Add("InstallExecuteSequence/RegisterTypeLibraries");
+                    set.Add("InstallExecuteSequence/UnregisterTypeLibraries");
+                    break;
+                case SymbolDefinitionType.Upgrade:
+                    set.Add("InstallExecuteSequence/FindRelatedProducts");
+                    set.Add("InstallUISequence/FindRelatedProducts");
+
+                    // Only add the MigrateFeatureStates action if MigrateFeature attribute is set on
+                    // at least one UpgradeVersion element.
+                    if (this.Section.Symbols.OfType<UpgradeSymbol>().Any(t => t.MigrateFeatures))
+                    {
+                        set.Add("InstallExecuteSequence/MigrateFeatureStates");
+                        set.Add("InstallUISequence/MigrateFeatureStates");
+                    }
+                    break;
+            }
         }
 
         /// <summary>
@@ -661,8 +710,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             return parentActionSymbol;
         }
-    
-        
+
         private RelativeActions GetRelativeActions(WixActionSymbol action)
         {
             if (!this.RelativeActionsForActions.TryGetValue(action.Id.Id, out var relativeActions))
