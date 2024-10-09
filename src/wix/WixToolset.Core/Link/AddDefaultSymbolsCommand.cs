@@ -56,8 +56,7 @@ namespace WixToolset.Core.Link
             // conjure a default major upgrade with the stdlib localization string for the
             // downgrade error message.
             var symbols = this.Sections.SelectMany(section => section.Symbols);
-            var upgradeSymbols = symbols.OfType<UpgradeSymbol>();
-            if (!upgradeSymbols.Any())
+            if (!symbols.OfType<UpgradeSymbol>().Any(us => !us.OnlyDetect))
             {
                 var packageSymbol = this.Find.EntrySection.Symbols.OfType<WixPackageSymbol>().FirstOrDefault();
 
