@@ -4,5 +4,4 @@
 LIBRARY      "uica"
 
 EXPORTS
-	PrintEula
 	ValidatePath
