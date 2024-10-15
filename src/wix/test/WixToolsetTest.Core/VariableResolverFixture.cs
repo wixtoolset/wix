@@ -23,6 +23,8 @@ namespace WixToolsetTest.Core
                 { "ProductName", new BindVariable() { Id = "ProductName", Value = "Localized Product Name" } },
                 { "ProductNameEdition", new BindVariable() { Id = "ProductNameEdition", Value = "!(loc.ProductName) Enterprise Edition" } },
                 { "ProductNameEditionVersion", new BindVariable() { Id = "ProductNameEditionVersion", Value = "!(loc.ProductNameEdition) v1.2.3" } },
+                { "ProductNameEditionVersion.WithDot", new BindVariable() { Id = "ProductNameEditionVersion.WithDot", Value = "Test of localization variable with dot" } },
+                { "ProductNameEditionVersion.WithDotTest", new BindVariable() { Id = "ProductNameEditionVersion.WithDotTest", Value = "!(loc.ProductNameEditionVersion.WithDot) v1.2.3" } },
             };
 
             var localization = new Localization(0, null, "x-none", variables, new Dictionary<string, LocalizedControl>());
@@ -43,6 +45,10 @@ namespace WixToolsetTest.Core
 
             result = variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductNameEditionVersion)");
             WixAssert.StringEqual("Welcome to Localized Product Name Enterprise Edition v1.2.3", result.Value);
+            Assert.True(result.UpdatedValue);
+
+            result = variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductNameEditionVersion.WithDotTest)");
+            WixAssert.StringEqual("Welcome to Test of localization variable with dot v1.2.3", result.Value);
             Assert.True(result.UpdatedValue);
 
             result = variableResolver.ResolveVariables(null, "Welcome to !(bind.property.ProductVersion)");
