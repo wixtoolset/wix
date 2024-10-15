@@ -236,7 +236,7 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanHarvestFilesWithBindPaths()
+        public void CanHarvestFilesWithNamedBindPaths()
         {
             var expected = new[]
             {
@@ -252,6 +252,27 @@ namespace WixToolsetTest.CoreIntegration
             };
 
             Build("BindPaths.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected));
+        }
+
+        [Fact]
+        public void CanHarvestFilesWithUnnamedBindPaths()
+        {
+            var expected = new[]
+            {
+                @"flsNNsTNrgmjASmTBbP.45J1F50dEc=PFiles\HarvestedFiles\test1.txt",
+                @"flsASLR5pHQzLmWRE.Snra7ndH7sIA=PFiles\HarvestedFiles\test2.txt",
+                @"flsTZFPiMHb.qfUxdGKQYrnXOhZ.8M=PFiles\HarvestedFiles\files1_sub1\test10.txt",
+                @"flsLGcTTZPIU3ELiWybqnm.PQ0Ih_g=PFiles\HarvestedFiles\files1_sub1\files1_sub2\test120.txt",
+                @"fls1Jx2Y9Vea_.WZBH_h2e79arvDRU=PFiles\HarvestedFiles\test3.txt",
+                @"flsJ9gNxWaau2X3ufphQuCV9WwAgcw=PFiles\HarvestedFiles\test4.txt",
+                @"flswcmX9dpMQytmD_5QA5aJ5szoQVA=PFiles\HarvestedFiles\files2_sub2\test20.txt",
+                @"flskKeCKFUtCYMuvw564rgPLJmyBx0=PFiles\HarvestedFiles\files2_sub2\test21.txt",
+                @"fls2agLZFnQwjoijShwT9Z0RwHyGrI=PFiles\HarvestedFiles\files2_sub3\FileName.Extension",
+                @"fls9UMOE.TOv61JuYF8IhvCKb8eous=PFiles\HarvestedFiles\namedfile.txt",
+                @"flsu53T_9CcaBegDflAImGHTajDbJ0=PFiles\HarvestedFiles\unnamedfile.txt",
+            };
+
+            Build("BindPathsUnnamed.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected), addUnnamedBindPath: true);
         }
 
         [Fact]
@@ -319,7 +340,7 @@ namespace WixToolsetTest.CoreIntegration
             Assert.Equal(sortedExpected, actual);
         }
 
-        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isPackage = true, params string[] additionalCommandLineArguments)
+        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isPackage = true, bool addUnnamedBindPath = false, params string[] additionalCommandLineArguments)
         {
             var folder = TestData.Get("TestData", "HarvestFiles");
 
@@ -335,11 +356,16 @@ namespace WixToolsetTest.CoreIntegration
                     "build",
                     Path.Combine(folder, file),
                     "-intermediateFolder", intermediateFolder,
-                    "-bindpath", folder,
                     "-bindpath", @$"ToBeHarvested={folder}\files1",
                     "-bindpath", @$"ToBeHarvested={folder}\files2",
                     "-o", msiPath,
                 };
+
+                if (addUnnamedBindPath)
+                {
+                    arguments.Add("-bindpath");
+                    arguments.Add(Path.Combine(folder, "unnamedbindpath"));
+                }
 
                 if (additionalCommandLineArguments.Length > 0)
                 {
