@@ -6,7 +6,7 @@
             <bal:WixInternalUIBootstrapperApplication />
         </BootstrapperApplication>
         <Chain>
-            <MsiPackage SourceFile="test.msi" InstallCondition="INSTALLTEST" bal:DisplayInternalUICondition="DISPLAYTEST" />
+            <MsiPackage SourceFile="test.msi" InstallCondition="INSTALLTEST" bal:DisplayInternalUICondition="DISPLAYTEST" bal:DisplayFilesInUseDialogCondition="DISPLAYTEST" />
             <ExePackage Permanent="yes" DetectCondition="none" SourceFile="runtimes\win-x86\native\wixnative.exe" Cache="force" />
         </Chain>
     </Bundle>

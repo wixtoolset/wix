@@ -14,6 +14,7 @@ namespace WixToolset.BootstrapperApplications
                 new IntermediateFieldDefinition(nameof(WixBalPackageInfoSymbolFields.PackageId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBalPackageInfoSymbolFields.DisplayInternalUICondition), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBalPackageInfoSymbolFields.PrimaryPackageType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBalPackageInfoSymbolFields.DisplayFilesInUseDialogCondition), IntermediateFieldType.String),
             },
             typeof(WixBalPackageInfoSymbol));
     }
@@ -28,6 +29,7 @@ namespace WixToolset.BootstrapperApplications.Symbols
         PackageId,
         DisplayInternalUICondition,
         PrimaryPackageType,
+        DisplayFilesInUseDialogCondition,
     }
 
     public enum BalPrimaryPackageType
@@ -67,6 +69,12 @@ namespace WixToolset.BootstrapperApplications.Symbols
         {
             get => (BalPrimaryPackageType)this.Fields[(int)WixBalPackageInfoSymbolFields.PrimaryPackageType].AsNumber();
             set => this.Set((int)WixBalPackageInfoSymbolFields.PrimaryPackageType, (int)value);
+        }
+
+        public string DisplayFilesInUseDialogCondition
+        {
+            get => this.Fields[(int)WixBalPackageInfoSymbolFields.DisplayFilesInUseDialogCondition].AsString();
+            set => this.Set((int)WixBalPackageInfoSymbolFields.DisplayFilesInUseDialogCondition, value);
         }
     }
 }

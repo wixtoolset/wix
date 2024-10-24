@@ -56,6 +56,44 @@ namespace WixToolsetTest.BootstrapperApplications
         }
 
         [TestMethod]
+        public void CanBuildUsingDisplayFilesInUseDialogCondition()
+        {
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
+                var bundleSourceFolder = TestData.Get(@"TestData\WixStdBa");
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var baFolderPath = Path.Combine(baseFolder, "ba");
+                var extractFolderPath = Path.Combine(baseFolder, "extract");
+
+                var compileResult = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(bundleSourceFolder, "DisplayFilesInUseDialogConditionBundle.wxs"),
+                    "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindpath", Path.Combine(bundleSourceFolder, "data"),
+                    "-o", bundleFile,
+                });
+                compileResult.AssertSuccess();
+
+                Assert.IsTrue(File.Exists(bundleFile));
+
+                var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
+                extractResult.AssertSuccess();
+
+                var balPackageInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixBalPackageInfo");
+                WixAssert.CompareLineByLine(new string[]
+                {
+                    "<WixBalPackageInfo PackageId='test.msi' DisplayFilesInUseDialogCondition='1' />",
+                }, balPackageInfos);
+
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "thm.wxl")));
+            }
+        }
+
+        [TestMethod]
         public void CanBuildUsingBootstrapperApplicationId()
         {
             using (var fs = new DisposableFileSystem())
@@ -298,6 +336,7 @@ namespace WixToolsetTest.BootstrapperApplications
                 {
                     "bal:Condition/@Condition contains the built-in Variable 'WixBundleAction', which is not available when it is evaluated. (Unavailable Variables are: 'WixBundleAction'.). Rewrite the condition to avoid Variables that are never valid during its evaluation.",
                     "Overridable variable 'TEST1' collides with 'Test1' with Bundle/@CommandLineVariables value 'caseInsensitive'.",
+                    "The *Package/@bal:DisplayFilesInUseDialogCondition attribute's value '=' is not a valid bundle condition.",
                     "The *Package/@bal:DisplayInternalUICondition attribute's value '=' is not a valid bundle condition.",
                     "The location of the Variable related to the previous error.",
                 }, messages.ToArray());

@@ -51,6 +51,11 @@ namespace WixToolset.BootstrapperApplications
                         writer.WriteAttributeString("DisplayInternalUICondition", balPackageInfoSymbol.DisplayInternalUICondition);
                     }
 
+                    if (balPackageInfoSymbol.DisplayFilesInUseDialogCondition != null)
+                    {
+                        writer.WriteAttributeString("DisplayFilesInUseDialogCondition", balPackageInfoSymbol.DisplayFilesInUseDialogCondition);
+                    }
+
                     if (balPackageInfoSymbol.PrimaryPackageType != BalPrimaryPackageType.None)
                     {
                         writer.WriteAttributeString("PrimaryPackageType", balPackageInfoSymbol.PrimaryPackageType.ToString().ToLower());
@@ -104,6 +109,7 @@ namespace WixToolset.BootstrapperApplications
 
             this.VerifyBalConditions(section);
             this.VerifyDisplayInternalUICondition(section);
+            this.VerifyDisplayFilesInUseDialogCondition(section);
             this.VerifyOverridableVariables(section);
 
             var balBaSymbol = section.Symbols.OfType<WixBalBootstrapperApplicationSymbol>().SingleOrDefault();
@@ -191,6 +197,17 @@ namespace WixToolset.BootstrapperApplications
                 if (balPackageInfoSymbol.DisplayInternalUICondition != null)
                 {
                     this.BackendHelper.ValidateBundleCondition(balPackageInfoSymbol.SourceLineNumbers, "*Package", "bal:DisplayInternalUICondition", balPackageInfoSymbol.DisplayInternalUICondition, BundleConditionPhase.Plan);
+                }
+            }
+        }
+
+        private void VerifyDisplayFilesInUseDialogCondition(IntermediateSection section)
+        {
+            foreach (var balPackageInfoSymbol in section.Symbols.OfType<WixBalPackageInfoSymbol>().ToList())
+            {
+                if (balPackageInfoSymbol.DisplayFilesInUseDialogCondition != null)
+                {
+                    this.BackendHelper.ValidateBundleCondition(balPackageInfoSymbol.SourceLineNumbers, "*Package", "bal:DisplayFilesInUseDialogCondition", balPackageInfoSymbol.DisplayFilesInUseDialogCondition, BundleConditionPhase.Plan);
                 }
             }
         }
@@ -419,6 +436,11 @@ namespace WixToolset.BootstrapperApplications
             if (balPackageInfoSymbol.DisplayInternalUICondition != null)
             {
                 this.Messaging.Write(BalWarnings.IuibaPrimaryPackageDisplayInternalUICondition(packageSymbol.SourceLineNumbers));
+            }
+
+            if (balPackageInfoSymbol.DisplayFilesInUseDialogCondition != null)
+            {
+                this.Messaging.Write(BalWarnings.IuibaPrimaryPackageDisplayFilesInUseDialogCondition(packageSymbol.SourceLineNumbers));
             }
         }
 
