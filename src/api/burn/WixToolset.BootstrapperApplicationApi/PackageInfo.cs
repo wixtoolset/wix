@@ -121,6 +121,9 @@ namespace WixToolset.BootstrapperApplicationApi
         public string DisplayInternalUICondition { get; internal set; }
 
         /// <inheritdoc/>
+        public string DisplayFilesInUseDialogCondition { get; internal set; }
+
+        /// <inheritdoc/>
         public string ProductCode { get; internal set; }
 
         /// <inheritdoc/>
@@ -363,6 +366,7 @@ namespace WixToolset.BootstrapperApplicationApi
                 var package = (PackageInfo)ipackage;
 
                 package.DisplayInternalUICondition = BootstrapperApplicationData.GetAttribute(node, "DisplayInternalUICondition");
+                package.DisplayFilesInUseDialogCondition = BootstrapperApplicationData.GetAttribute(node, "DisplayFilesInUseDialogCondition");
             }
 
             nodes = root.Select("/p:BootstrapperApplicationData/p:WixPrereqInformation", namespaceManager);

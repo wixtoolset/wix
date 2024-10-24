@@ -291,6 +291,7 @@ DAPI_(void) BalInfoUninitialize(
         ReleaseStr(pBundle->packages.rgPackages[i].sczDescription);
         ReleaseStr(pBundle->packages.rgPackages[i].sczId);
         ReleaseStr(pBundle->packages.rgPackages[i].sczDisplayInternalUICondition);
+        ReleaseStr(pBundle->packages.rgPackages[i].sczDisplayFilesInUseDialogCondition);
         ReleaseStr(pBundle->packages.rgPackages[i].sczProductCode);
         ReleaseStr(pBundle->packages.rgPackages[i].sczUpgradeCode);
         ReleaseStr(pBundle->packages.rgPackages[i].sczVersion);
@@ -516,6 +517,9 @@ static HRESULT ParseBalPackageInfoFromXml(
 
         hr = XmlGetAttributeEx(pNode, L"DisplayInternalUICondition", &pPackage->sczDisplayInternalUICondition);
         ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get DisplayInternalUICondition setting for package.");
+
+        hr = XmlGetAttributeEx(pNode, L"DisplayFilesInUseDialogCondition", &pPackage->sczDisplayFilesInUseDialogCondition);
+        ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get DisplayFilesInUseDialogCondition setting for package.");
 
         hr = XmlGetAttributeEx(pNode, L"PrimaryPackageType", &scz);
         ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get PrimaryPackageType setting for package.");
