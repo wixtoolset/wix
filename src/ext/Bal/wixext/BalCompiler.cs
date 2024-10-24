@@ -200,6 +200,20 @@ namespace WixToolset.BootstrapperApplications
                                         break;
                                 }
                                 break;
+                            case "DisplayFilesInUseDialogCondition":
+                                switch (parentElement.Name.LocalName)
+                                {
+                                    case "MsiPackage":
+                                    case "MspPackage":
+                                        var displayFilesInUseDialogCondition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attribute);
+                                        var packageInfo = this.GetBalPackageInfoSymbol(section, sourceLineNumbers, packageId);
+                                        packageInfo.DisplayFilesInUseDialogCondition = displayFilesInUseDialogCondition;
+                                        break;
+                                    default:
+                                        this.ParseHelper.UnexpectedAttribute(parentElement, attribute);
+                                        break;
+                                }
+                                break;
                             case "PrimaryPackageType":
                             {
                                 var primaryPackageType = BalPrimaryPackageType.None;

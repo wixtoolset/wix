@@ -9,7 +9,7 @@
         <Variable Name="TEST1" bal:Overridable="yes" />
         <Chain>
             <ExePackage Permanent="yes" DetectCondition="none" SourceFile="runtimes\win-x86\native\wixnative.exe" />
-            <MsiPackage SourceFile="test.msi" bal:DisplayInternalUICondition="!(loc.NonsensePlanCondition)" />
+            <MsiPackage SourceFile="test.msi" bal:DisplayInternalUICondition="!(loc.NonsensePlanCondition)" bal:DisplayFilesInUseDialogCondition="!(loc.NonsensePlanCondition)" />
         </Chain>
         <bal:Condition Condition="!(loc.NonsenseDetectCondition)" Message="Unsupported" />
     </Bundle>

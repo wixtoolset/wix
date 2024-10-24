@@ -23,6 +23,11 @@ namespace WixToolset.BootstrapperApplications
             return Message(sourceLineNumbers, Ids.IuibaPrimaryPackageDisplayInternalUICondition, "WixInternalUIBootstrapperApplication ignores DisplayInternalUICondition for the primary package so that the MSI UI is always shown.");
         }
 
+        public static Message IuibaPrimaryPackageDisplayFilesInUseDialogCondition(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.IuibaPrimaryPackageDisplayFilesInUseDialogCondition, "WixInternalUIBootstrapperApplication ignores DisplayFilesInUseDialogCondition for the primary package so that the MSI UI is always shown.");
+        }
+
         public static Message IuibaPrimaryPackageInstallCondition(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.IuibaPrimaryPackageInstallCondition, "WixInternalUIBootstrapperApplication ignores InstallCondition for the primary package so that the MSI UI is always shown.");
@@ -56,6 +61,7 @@ namespace WixToolset.BootstrapperApplications
             IuibaPrimaryPackageDisplayInternalUICondition = 6504,
             IuibaPrereqPackageAfterPrimaryPackage = 6505,
             DeprecatedBAFactoryAssemblyAttribute = 6506,
+            IuibaPrimaryPackageDisplayFilesInUseDialogCondition = 6507,
         }
     }
 }

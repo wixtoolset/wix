@@ -54,6 +54,7 @@ typedef struct _BAL_INFO_PACKAGE
     BOOL fPermanent;
     BOOL fVital;
     LPWSTR sczDisplayInternalUICondition;
+    LPWSTR sczDisplayFilesInUseDialogCondition;
     LPWSTR sczProductCode;
     LPWSTR sczUpgradeCode;
     LPWSTR sczVersion;
