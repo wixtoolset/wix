@@ -42,7 +42,7 @@ namespace WixToolset.BootstrapperApplicationApi
             }
             else
             {
-                string variablesValue = BootstrapperApplicationData.GetAttribute(commandLineNode, "Variables");
+                string variablesValue = BootstrapperApplicationData.GetAttribute(commandLineNode, "VariableType");
 
                 if (variablesValue == null)
                 {
