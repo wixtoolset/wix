@@ -616,7 +616,7 @@ extern "C" HRESULT RegistrationSessionBegin(
 
     AssertSz(BOOTSTRAPPER_REGISTRATION_TYPE_NONE != registrationType, "Registration type can't be NONE");
 
-    LogId(REPORT_VERBOSE, MSG_SESSION_BEGIN, pRegistration->sczRegistrationKey, dwRegistrationOptions, LoggingBoolToString(pRegistration->fDisableResume));
+    LogId(REPORT_VERBOSE, MSG_SESSION_BEGIN, pRegistration->sczRegistrationKey, LoggingInstallScopeToString(pRegistration->fPerMachine), dwRegistrationOptions, LoggingBoolToString(pRegistration->fDisableResume));
 
     // Cache bundle executable.
     if (dwRegistrationOptions & BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE)
@@ -1259,7 +1259,7 @@ static HRESULT UpdateResumeMode(
     LPWSTR sczRunOnceCommandLine = NULL;
     LPCWSTR sczResumeKey = REGISTRY_RUN_ONCE_KEY;
 
-    LogId(REPORT_STANDARD, MSG_SESSION_UPDATE, pRegistration->sczRegistrationKey, LoggingResumeModeToString(resumeMode), LoggingBoolToString(fRestartInitiated), LoggingBoolToString(pRegistration->fDisableResume));
+    LogId(REPORT_STANDARD, MSG_SESSION_UPDATE, pRegistration->sczRegistrationKey, LoggingInstallScopeToString(pRegistration->fPerMachine), LoggingResumeModeToString(resumeMode), LoggingBoolToString(fRestartInitiated), LoggingBoolToString(pRegistration->fDisableResume));
 
     // write resume information
     if (hkRegistration)

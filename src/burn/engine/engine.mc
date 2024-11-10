@@ -1027,21 +1027,21 @@ MessageId=370
 Severity=Success
 SymbolicName=MSG_SESSION_BEGIN
 Language=English
-Session begin, registration key: %1!ls!, options: 0x%2!x!, disable resume: %3!hs!
+Session begin, registration key: %1!ls!, scope: %2!hs!, options: 0x%3!x!, disable resume: %4!hs!
 .
 
 MessageId=371
 Severity=Success
 SymbolicName=MSG_SESSION_UPDATE
 Language=English
-Updating session, registration key: %1!ls!, resume: %2!hs!, restart initiated: %3!hs!, disable resume: %4!hs!
+Updating session, registration key: %1!ls!, scope: %2!hs!, resume: %3!hs!, restart initiated: %4!hs!, disable resume: %5!hs!
 .
 
 MessageId=372
 Severity=Success
 SymbolicName=MSG_SESSION_END
 Language=English
-Session end, registration key: %1!ls!, resume: %2!hs!, restart: %3!hs!, disable resume: %4!hs!, default registration: %5!hs!, ba requested registration: %6!hs!
+Session end, registration key: %1!ls!, scope: %2!hs!, resume: %3!hs!, restart: %4!hs!, disable resume: %5!hs!, default registration: %6!hs!, ba requested registration: %7!hs!
 .
 
 MessageId=373
