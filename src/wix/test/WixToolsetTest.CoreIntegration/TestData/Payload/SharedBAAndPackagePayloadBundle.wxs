@@ -7,7 +7,7 @@
             </ExePackage>
         </PackageGroup>
 
-        <PayloadGroup Id="override ExtraBoostrapperApplicationPayloads">
+        <PayloadGroup Id="override ExtraBootstrapperApplicationPayloads">
             <PayloadGroupRef Id="Shared" />
         </PayloadGroup>
 

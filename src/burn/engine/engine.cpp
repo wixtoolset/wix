@@ -782,7 +782,7 @@ LExit:
     {
         // If the BA requested a reload but we do not have a secondary EXE,
         // then log a message and do not reload.
-        LogId(REPORT_STANDARD, MSG_BA_NO_SECONDARY_BOOSTRAPPER_SO_RELOAD_NOT_SUPPORTED);
+        LogId(REPORT_STANDARD, MSG_BA_NO_SECONDARY_BOOTSTRAPPER_SO_RELOAD_NOT_SUPPORTED);
         *pfReloadApp = FALSE;
     }
 

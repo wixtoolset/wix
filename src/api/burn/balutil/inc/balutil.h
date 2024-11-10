@@ -44,7 +44,7 @@ static const HRESULT E_PREREQBA_INFINITE_LOOP = MAKE_HRESULT(SEVERITY_ERROR, FAC
 
 /*******************************************************************
  BalDebuggerCheck - allows bootstrapper application to explicitly check
-        whether a debugger should be attached to the boostrapper application.
+        whether a debugger should be attached to the bootstrapper application.
 
  Note: Automatically called in BootstrapperApplicationRun().
 ********************************************************************/
