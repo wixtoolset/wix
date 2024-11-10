@@ -53,7 +53,7 @@
     <PackageVersion Include="System.Reflection.Metadata" Version="1.8.1" />
     <PackageVersion Include="System.Security.Principal.Windows" Version="4.7.0" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="4.7.1" />
-    <PackageVersion Include="System.Text.Json" Version="6.0.9" />
+    <PackageVersion Include="System.Text.Json" Version="6.0.10" />
 
     <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="3.1.13" />
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="3.10.2154" />
