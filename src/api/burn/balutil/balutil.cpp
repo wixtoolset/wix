@@ -162,7 +162,7 @@ DAPI_(VOID) BalDebuggerCheck()
 
             if (fDebug)
             {
-                hr = ::StringCchPrintfW(wzMessage, countof(wzMessage), L"To debug the boostrapper application process %ls\n\nSet breakpoints and attach a debugger to process id: %d (0x%x)", wzModuleFilename, ::GetCurrentProcessId(), ::GetCurrentProcessId());
+                hr = ::StringCchPrintfW(wzMessage, countof(wzMessage), L"To debug the bootstrapper application process %ls\n\nSet breakpoints and attach a debugger to process id: %d (0x%x)", wzModuleFilename, ::GetCurrentProcessId(), ::GetCurrentProcessId());
 
                 if (SUCCEEDED(hr))
                 {

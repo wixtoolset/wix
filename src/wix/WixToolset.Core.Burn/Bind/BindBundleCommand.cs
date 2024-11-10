@@ -108,7 +108,7 @@ namespace WixToolset.Core.Burn
                 command.Execute();
             }
 
-            // Find the primary boostrapper application and optional secondary.
+            // Find the primary bootstrapper application and optional secondary.
             WixBootstrapperApplicationSymbol primaryBootstrapperApplicationSymbol = null;
             WixBootstrapperApplicationSymbol secondaryBootstrapperApplicationSymbol = null;
             {

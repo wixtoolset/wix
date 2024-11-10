@@ -115,7 +115,7 @@ namespace WixToolset.Core.Burn
 
         public static Message BundleMissingBootstrapperApplicationContainer(SourceLineNumber sourceLineNumbers, string path)
         {
-            return Message(sourceLineNumbers, Ids.BundleMissingBootstrapperApplicationContainer, "Bundle is invalid. The BoostrapperApplication attached container is missing from the file: {0}", path);
+            return Message(sourceLineNumbers, Ids.BundleMissingBootstrapperApplicationContainer, "Bundle is invalid. The BootstrapperApplication attached container is missing from the file: {0}", path);
         }
 
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)

@@ -255,7 +255,7 @@ Bootstrapper application already requested to quit, ignoring request: '%1!hs!'.
 
 MessageId=59
 Severity=Warning
-SymbolicName=MSG_BA_NO_SECONDARY_BOOSTRAPPER_SO_RELOAD_NOT_SUPPORTED
+SymbolicName=MSG_BA_NO_SECONDARY_BOOTSTRAPPER_SO_RELOAD_NOT_SUPPORTED
 Language=English
 Bootstrapper application requested reload but there is no secondary bootstrapper application, ignoring the request to reload.
 .
