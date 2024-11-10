@@ -198,6 +198,10 @@ LPWSTR LoggingStringOrUnknownIfNull(
     __in LPCWSTR wz
     );
 
+LPCSTR LoggingInstallScopeToString(
+    __in BOOL fPerMachine
+    );
+
 
 #if defined(__cplusplus)
 }

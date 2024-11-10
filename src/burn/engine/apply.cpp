@@ -536,7 +536,7 @@ extern "C" HRESULT ApplyUnregister(
         IgnoreRollbackError(hrRegistrationRollback, "Dependent registration actions failed");
     }
 
-    LogId(REPORT_STANDARD, MSG_SESSION_END, pEngineState->registration.sczRegistrationKey, LoggingResumeModeToString(resumeMode), LoggingRestartToString(restart), LoggingBoolToString(pEngineState->registration.fDisableResume), LoggingRegistrationTypeToString(defaultRegistrationType), LoggingRegistrationTypeToString(registrationType));
+    LogId(REPORT_STANDARD, MSG_SESSION_END, pEngineState->registration.sczRegistrationKey, LoggingInstallScopeToString(pEngineState->registration.fPerMachine), LoggingResumeModeToString(resumeMode), LoggingRestartToString(restart), LoggingBoolToString(pEngineState->registration.fDisableResume), LoggingRegistrationTypeToString(defaultRegistrationType), LoggingRegistrationTypeToString(registrationType));
 
     if (BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pEngineState->plan.action)
     {

@@ -959,6 +959,13 @@ extern "C" LPWSTR LoggingStringOrUnknownIfNull(
     return wz ? wz : L"Unknown";
 }
 
+extern "C" LPCSTR LoggingInstallScopeToString(
+    __in BOOL fPerMachine
+    )
+{
+    return fPerMachine ? "PerMachine" : "PerUser";
+}
+
 
 // internal function declarations
 
