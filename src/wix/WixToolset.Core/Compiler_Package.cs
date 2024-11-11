@@ -99,7 +99,7 @@ namespace WixToolset.Core
                                 isPerUserOrMachine = true;
                                 break;
                             default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser", "perUserOrMachine"));
                                 break;
                             }
                         break;

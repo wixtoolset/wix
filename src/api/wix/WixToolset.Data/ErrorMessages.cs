@@ -737,7 +737,7 @@ namespace WixToolset.Data
 
         public static Message IllegalAttributeValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, params string[] legalValues)
         {
-            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}'.", elementName, attributeName, value, String.Join(",", legalValues));
+            return Message(sourceLineNumbers, Ids.IllegalAttributeValue, "The {0}/@{1} attribute's value, '{2}', is not one of the legal options: '{3}'.", elementName, attributeName, value, String.Join(", ", legalValues));
         }
 
         public static Message IllegalAttributeValueWhenNested(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string attrivuteValue, string parentElementName)
