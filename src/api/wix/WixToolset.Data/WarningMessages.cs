@@ -229,7 +229,7 @@ namespace WixToolset.Data
 
         public static Message DiscouragedAllUsersValue(SourceLineNumber sourceLineNumbers, string path, string machineOrUser)
         {
-            return Message(sourceLineNumbers, Ids.DiscouragedAllUsersValue, "Bundles require a package to be either per-machine or per-user. The MSI '{0}' ALLUSERS Property is set to '2' which may change from per-user to per-machine at install time. The Bundle will assume the package is per-{1} and will not work correctly if that changes. If possible, remove the Property with Id='ALLUSERS' and use Package/@InstallScope attribute instead.", path, machineOrUser);
+            return Message(sourceLineNumbers, Ids.DiscouragedAllUsersValue, "Bundles require a package to be either per-machine or per-user. The MSI '{0}' ALLUSERS Property is set to '2' which may change from per-user to per-machine at install time. The Bundle will assume the package is per-{1} and will not work correctly if that changes. If possible, use the Package/@Scope attribute values 'perUser' or 'perMachine' instead.", path, machineOrUser);
         }
 
         public static Message DetectConditionRecommended(SourceLineNumber sourceLineNumbers, string elementName)
