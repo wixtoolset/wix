@@ -1231,34 +1231,52 @@ public: // IBootstrapperApplication
         __inout int* pResult
         )
     {
+        HRESULT hr = S_OK;
+        BAL_INFO_PACKAGE* pPackage = NULL;
+        BOOL fShowFilesInUseDialog = TRUE;
 
         if (!m_fShowingInternalUiThisPackage && wzPackageId && *wzPackageId)
         {
             BalLog(BOOTSTRAPPER_LOG_LEVEL_VERBOSE, "Package %ls has %d applications holding files in use.", wzPackageId, cFiles);
 
-            switch (source)
+            hr = BalInfoFindPackageById(&m_Bundle.packages, wzPackageId, &pPackage);
+            if (SUCCEEDED(hr) && pPackage->sczDisplayFilesInUseDialogCondition)
             {
-            case BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI:
-                if (m_fShowStandardFilesInUse)
+                hr = BalEvaluateCondition(pPackage->sczDisplayFilesInUseDialogCondition, &fShowFilesInUseDialog);
+                BalExitOnFailure(hr, "Failed to evaluate condition for package '%ls': %ls", wzPackageId, pPackage->sczDisplayFilesInUseDialogCondition);
+            }
+
+            if (fShowFilesInUseDialog)
+            {
+                switch (source)
                 {
-                    return ShowMsiFilesInUse(cFiles, rgwzFiles, source, pResult);
+                case BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI:
+                    if (m_fShowStandardFilesInUse)
+                    {
+                        return ShowMsiFilesInUse(cFiles, rgwzFiles, source, pResult);
+                    }
+                    break;
+                case BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI_RM:
+                    if (m_fShowRMFilesInUse)
+                    {
+                        return ShowMsiFilesInUse(cFiles, rgwzFiles, source, pResult);
+                    }
+                    break;
+                case BOOTSTRAPPER_FILES_IN_USE_TYPE_NETFX:
+                    if (m_fShowNetfxFilesInUse)
+                    {
+                        return ShowNetfxFilesInUse(cFiles, rgwzFiles, pResult);
+                    }
+                    break;
                 }
-                break;
-            case BOOTSTRAPPER_FILES_IN_USE_TYPE_MSI_RM:
-                if (m_fShowRMFilesInUse)
-                {
-                    return ShowMsiFilesInUse(cFiles, rgwzFiles, source, pResult);
-                }
-                break;
-            case BOOTSTRAPPER_FILES_IN_USE_TYPE_NETFX:
-                if (m_fShowNetfxFilesInUse)
-                {
-                    return ShowNetfxFilesInUse(cFiles, rgwzFiles, pResult);
-                }
-                break;
+            }
+            else
+            {
+                *pResult = IDIGNORE;
             }
         }
 
+    LExit:
         return __super::OnExecuteFilesInUse(wzPackageId, cFiles, rgwzFiles, nRecommendation, source, pResult);
     }
 

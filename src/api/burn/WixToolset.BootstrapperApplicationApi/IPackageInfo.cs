@@ -28,6 +28,11 @@ namespace WixToolset.BootstrapperApplicationApi
         string DisplayInternalUICondition { get; }
 
         /// <summary>
+        /// The authored bal:DisplayFilesInUseDialogCondition.
+        /// </summary>
+        string DisplayFilesInUseDialogCondition { get; }
+
+        /// <summary>
         /// The package's display name.
         /// </summary>
         string DisplayName { get; }
