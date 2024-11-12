@@ -11,7 +11,9 @@
                 <Control Id="Description" Type="Text" X="25" Y="23" Width="340" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.LicenseAgreementDlgDescription)" />
                 <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.LicenseAgreementDlgTitle)" />
                 <Control Id="LicenseAcceptedCheckBox" Type="CheckBox" X="20" Y="207" Width="330" Height="18" CheckBoxValue="1" Property="LicenseAccepted" Text="!(loc.LicenseAgreementDlgLicenseAcceptedCheckBox)" />
-                <Control Id="Print" Type="PushButton" X="112" Y="243" Width="56" Height="17" Text="!(loc.WixUIPrint)" />
+                <Control Id="Print" Type="PushButton" X="112" Y="243" Width="56" Height="17" Text="!(loc.WixUIPrint)">
+                    <Publish Event="MsiPrint" Value="1" />
+                </Control>
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
                 <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" DisableCondition="LicenseAccepted &lt;&gt; &quot;1&quot;" EnableCondition="LicenseAccepted = &quot;1&quot;">
                     <Publish Event="SpawnWaitDialog" Value="WaitForCostingDlg" Condition="!(wix.WixUICostingPopupOptOut) OR CostingComplete = 1" />

@@ -22,10 +22,7 @@ Patch dialog sequence:
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <?foreach WIXUIARCH in X86;X64;A64 ?>
     <Fragment>
-        <UI Id="WixUI_FeatureTree_$(WIXUIARCH)">
-            <Publish Dialog="LicenseAgreementDlg" Control="Print" Event="DoAction" Value="WixUIPrintEula_$(WIXUIARCH)" />
-        </UI>
-
+        <UI Id="WixUI_FeatureTree_$(WIXUIARCH)" />
         <UIRef Id="WixUI_FeatureTree" />
     </Fragment>
     <?endforeach?>

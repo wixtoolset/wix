@@ -1705,11 +1705,20 @@ namespace WixToolset.Converters
             var eventName = element.Attribute("Event")?.Value;
             var eventValue = element.Attribute("Value")?.Value;
 
-            if (eventName?.Equals("DoAction", StringComparison.OrdinalIgnoreCase) == true
-                && eventValue?.StartsWith("WixUI", StringComparison.OrdinalIgnoreCase) == true
-                && this.OnInformation(ConverterTestType.CustomActionIdsIncludePlatformSuffix, element, "Custom action ids have changed in WiX v4 extensions to support platform-specific custom actions. For more information, see https://wixtoolset.org/docs/fourthree/#converting-custom-wixui-dialog-sets."))
+            if (eventName?.Equals("DoAction", StringComparison.OrdinalIgnoreCase) == true)
             {
-                element.Attribute("Value").Value = eventValue + "_$(sys.BUILDARCHSHORT)";
+                if (eventValue?.StartsWith("WixUIPrintEula", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    if (this.OnInformation(ConverterTestType.WixUIPrintEulaCustomAction, element, "The WixUIPrintEula custom action has been replaced with the MSI native MsiPrint control event in WiX v5 and no longer needs to be authored in a custom dialog set."))
+                    {
+                        element.Remove();
+                    }
+                }
+                else if (eventValue?.StartsWith("WixUI", StringComparison.OrdinalIgnoreCase) == true
+                    && this.OnInformation(ConverterTestType.CustomActionIdsIncludePlatformSuffix, element, "Custom action ids have changed in WiX v4 extensions to support platform-specific custom actions. For more information, see https://wixtoolset.org/docs/fourthree/faqs/#converting-custom-wixui-dialog-sets."))
+                {
+                    element.Attribute("Value").Value = eventValue + "_$(sys.BUILDARCHSHORT)";
+                }
             }
         }
 
@@ -3546,6 +3555,11 @@ namespace WixToolset.Converters
             /// The RelatedBundle element's Action attribute value must now be all lowercase. The Action='{0}' will be converted to '{1}'
             /// </summary>
             RelatedBundleActionLowercase,
+
+            /// <summary>
+            /// The WixUIPrintEula custom action has been replaced with the MSI native MsiPrint control event in WiX v5 and no longer needs to be authored in a custom dialog set.
+            /// </summary>
+            WixUIPrintEulaCustomAction,
         }
     }
 }
