@@ -720,15 +720,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddIniLocatorSymbol(IniLocatorSymbol symbol)
         {
-            var name = symbol.FileName;
-            if (null == symbol.ShortFileName && null != name && !this.BackendHelper.IsValidShortFilename(name, false))
-            {
-                symbol.ShortFileName = this.CreateShortName(name, true, "IniFileSearch");
-            }
-
             var row = this.CreateRow(symbol, "IniLocator");
             row[0] = symbol.Id.Id;
-            row[1] = CreateMsiFilename(symbol.ShortFileName, name);
+            row[1] = CreateMsiFilename(symbol.ShortFileName, symbol.FileName);
             row[2] = symbol.Section;
             row[3] = symbol.Key;
             row[4] = symbol.Field;
@@ -843,12 +837,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddRemoveFileSymbol(RemoveFileSymbol symbol)
         {
-            var name = symbol.FileName;
-            if (null == symbol.ShortFileName && null != name && !this.BackendHelper.IsValidShortFilename(name, false))
-            {
-                symbol.ShortFileName = this.CreateShortName(name, true, "RemoveFile", symbol.ComponentRef);
-            }
-
             var installMode = symbol.OnInstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnInstall : 0;
             installMode |= symbol.OnUninstall == true ? WindowsInstallerConstants.MsidbRemoveFileInstallModeOnRemove : 0;
 

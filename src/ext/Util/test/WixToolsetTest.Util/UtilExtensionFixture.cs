@@ -109,8 +109,8 @@ namespace WixToolsetTest.Util
                 "CustomAction:Wix4CreateInternetShortcuts_X64\t3073\tWix4UtilCA_X64\tWixCreateInternetShortcuts\t",
                 "CustomAction:Wix4RollbackInternetShortcuts_X64\t3329\tWix4UtilCA_X64\tWixRollbackInternetShortcuts\t",
                 "CustomAction:Wix4SchedInternetShortcuts_X64\t1\tWix4UtilCA_X64\tWixSchedInternetShortcuts\t",
-                "RemoveFile:uisdCsU32.1i4Hebrg1N7E194zJQ8Y\tPackage.ico\thoiptxrr.url|WiX Toolset (url).url\tINSTALLFOLDER\t2",
-                "RemoveFile:uisjV.q0ROZZYR3h_lkpbkZtLtPH0A\tPackage.ico\tjcxd1dwf.lnk|WiX Toolset (link).lnk\tINSTALLFOLDER\t2",
+                "RemoveFile:uisdCsU32.1i4Hebrg1N7E194zJQ8Y\tPackage.ico\tWiX Toolset (url).url\tINSTALLFOLDER\t2",
+                "RemoveFile:uisjV.q0ROZZYR3h_lkpbkZtLtPH0A\tPackage.ico\tWiX Toolset (link).lnk\tINSTALLFOLDER\t2",
                 "Wix4InternetShortcut:uisdCsU32.1i4Hebrg1N7E194zJQ8Y\tPackage.ico\tINSTALLFOLDER\tWiX Toolset (url).url\thttps://wixtoolset.org\t1\t[#Package.ico]\t0",
                 "Wix4InternetShortcut:uisjV.q0ROZZYR3h_lkpbkZtLtPH0A\tPackage.ico\tINSTALLFOLDER\tWiX Toolset (link).lnk\thttps://wixtoolset.org\t0\t[#Package.ico]\t0",
             }, results.OrderBy(s => s).ToArray());
@@ -129,8 +129,8 @@ namespace WixToolsetTest.Util
                 "CustomAction:Wix4CreateInternetShortcuts_X64\t3073\tWix4UtilCA_X64.047730A5_30FE_4A62_A520_DA9381B8226A\tWixCreateInternetShortcuts\t",
                 "CustomAction:Wix4RollbackInternetShortcuts_X64\t3329\tWix4UtilCA_X64.047730A5_30FE_4A62_A520_DA9381B8226A\tWixRollbackInternetShortcuts\t",
                 "CustomAction:Wix4SchedInternetShortcuts_X64\t1\tWix4UtilCA_X64.047730A5_30FE_4A62_A520_DA9381B8226A\tWixSchedInternetShortcuts\t",
-                "RemoveFile:uisdCsU32.1i4Hebrg1N7E194zJQ8Y.047730A5_30FE_4A62_A520_DA9381B8226A\tPackage.ico.047730A5_30FE_4A62_A520_DA9381B8226A\thoiptxrr.url|WiX Toolset (url).url\tINSTALLFOLDER.047730A5_30FE_4A62_A520_DA9381B8226A\t2",
-                "RemoveFile:uisjV.q0ROZZYR3h_lkpbkZtLtPH0A.047730A5_30FE_4A62_A520_DA9381B8226A\tPackage.ico.047730A5_30FE_4A62_A520_DA9381B8226A\tjcxd1dwf.lnk|WiX Toolset (link).lnk\tINSTALLFOLDER.047730A5_30FE_4A62_A520_DA9381B8226A\t2",
+                "RemoveFile:uisdCsU32.1i4Hebrg1N7E194zJQ8Y.047730A5_30FE_4A62_A520_DA9381B8226A\tPackage.ico.047730A5_30FE_4A62_A520_DA9381B8226A\tWiX Toolset (url).url\tINSTALLFOLDER.047730A5_30FE_4A62_A520_DA9381B8226A\t2",
+                "RemoveFile:uisjV.q0ROZZYR3h_lkpbkZtLtPH0A.047730A5_30FE_4A62_A520_DA9381B8226A\tPackage.ico.047730A5_30FE_4A62_A520_DA9381B8226A\tWiX Toolset (link).lnk\tINSTALLFOLDER.047730A5_30FE_4A62_A520_DA9381B8226A\t2",
                 "Wix4InternetShortcut:uisdCsU32.1i4Hebrg1N7E194zJQ8Y.047730A5_30FE_4A62_A520_DA9381B8226A\tPackage.ico.047730A5_30FE_4A62_A520_DA9381B8226A\tINSTALLFOLDER.047730A5_30FE_4A62_A520_DA9381B8226A\tWiX Toolset (url).url\thttps://wixtoolset.org\t1\t[#Package.ico.047730A5_30FE_4A62_A520_DA9381B8226A]\t0",
                 "Wix4InternetShortcut:uisjV.q0ROZZYR3h_lkpbkZtLtPH0A.047730A5_30FE_4A62_A520_DA9381B8226A\tPackage.ico.047730A5_30FE_4A62_A520_DA9381B8226A\tINSTALLFOLDER.047730A5_30FE_4A62_A520_DA9381B8226A\tWiX Toolset (link).lnk\thttps://wixtoolset.org\t0\t[#Package.ico.047730A5_30FE_4A62_A520_DA9381B8226A]\t0",
             }, results.OrderBy(s => s).ToArray());
