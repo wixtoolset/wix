@@ -856,7 +856,7 @@ namespace WixToolset.Harvesters
                                         processed = true;
                                     }
                                 }
-                                else if (5 == parts.Length && String.Equals("win32", parts[4], StringComparison.OrdinalIgnoreCase))
+                                else if (5 == parts.Length && (String.Equals("win32", parts[4], StringComparison.OrdinalIgnoreCase) || String.Equals("win64", parts[4], StringComparison.OrdinalIgnoreCase)))
                                 {
                                     typeLib.Language = Convert.ToInt32(parts[3], CultureInfo.InvariantCulture);
 
