@@ -9,6 +9,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.Linq;
     using WixInternal.Core.TestPackage;
     using WixInternal.TestSupport;
+    using WixToolset.Data.WindowsInstaller;
     using Xunit;
 
     public class HarvestFilesFixture
@@ -225,16 +226,34 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanHarvestFilesInModules()
         {
-            var expected = new[]
+            var expectedFilesAndTargetPaths = new[]
             {
-                @"flsgrgAVAsCQ8tCCxfnbBNis66623c.E535B765_1019_4A4F_B3EA_AE28870E6D73=PFiles\MergeModule\test1.txt",
+                @"flsBvxG729t7hKBa4KOmfvNMPptZkM.E535B765_1019_4A4F_B3EA_AE28870E6D73=PFiles\MergeModule\test4.txt",
                 @"flsDBWSWjpVSU3Zs33bREsJa2ygSQM.E535B765_1019_4A4F_B3EA_AE28870E6D73=PFiles\MergeModule\test2.txt",
                 @"flsehdwEdXusUijRShuTszSxwf8joA.E535B765_1019_4A4F_B3EA_AE28870E6D73=PFiles\MergeModule\test3.txt",
-                @"flsBvxG729t7hKBa4KOmfvNMPptZkM.E535B765_1019_4A4F_B3EA_AE28870E6D73=PFiles\MergeModule\test4.txt",
+                @"flsgrgAVAsCQ8tCCxfnbBNis66623c.E535B765_1019_4A4F_B3EA_AE28870E6D73=PFiles\MergeModule\test1.txt",
                 @"flskqOUVMfAE13k2h.ZkPhurwO4Y1c.E535B765_1019_4A4F_B3EA_AE28870E6D73=PFiles\MergeModule\notatest.txt",
             };
 
-            Build("Module.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected), isPackage: false);
+            var expectedModuleComponents = new[]
+            {
+                "ModuleComponents:flsBvxG729t7hKBa4KOmfvNMPptZkM.E535B765_1019_4A4F_B3EA_AE28870E6D73\tMergeModule.E535B765_1019_4A4F_B3EA_AE28870E6D73\t1033",
+                "ModuleComponents:flsDBWSWjpVSU3Zs33bREsJa2ygSQM.E535B765_1019_4A4F_B3EA_AE28870E6D73\tMergeModule.E535B765_1019_4A4F_B3EA_AE28870E6D73\t1033",
+                "ModuleComponents:flsehdwEdXusUijRShuTszSxwf8joA.E535B765_1019_4A4F_B3EA_AE28870E6D73\tMergeModule.E535B765_1019_4A4F_B3EA_AE28870E6D73\t1033",
+                "ModuleComponents:flsgrgAVAsCQ8tCCxfnbBNis66623c.E535B765_1019_4A4F_B3EA_AE28870E6D73\tMergeModule.E535B765_1019_4A4F_B3EA_AE28870E6D73\t1033",
+                "ModuleComponents:flskqOUVMfAE13k2h.ZkPhurwO4Y1c.E535B765_1019_4A4F_B3EA_AE28870E6D73\tMergeModule.E535B765_1019_4A4F_B3EA_AE28870E6D73\t1033",
+            };
+
+            Build("Module.wxs", (msiPath, _) => AssertModuleComponentsFileIdsAndTargetPaths(msiPath, expectedFilesAndTargetPaths, expectedModuleComponents), isMsi: false);
+
+            static void AssertModuleComponentsFileIdsAndTargetPaths(string msiPath, string[] expectedFilesAndTargetPaths, string[] expectedModuleComponents)
+            {
+                AssertFileIdsAndTargetPaths(msiPath, expectedFilesAndTargetPaths);
+
+                var query = Query.QueryDatabase(msiPath, new[] { "ModuleComponents" });
+
+                Assert.Equal(expectedModuleComponents, query);
+            }
         }
 
         [Fact]
@@ -346,7 +365,7 @@ namespace WixToolsetTest.CoreIntegration
             Assert.Equal(sortedExpected, actual);
         }
 
-        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isPackage = true, bool warningsAsErrors = true, bool addUnnamedBindPath = false, params string[] additionalCommandLineArguments)
+        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPath = false, params string[] additionalCommandLineArguments)
         {
             var folder = TestData.Get("TestData", "HarvestFiles");
 
@@ -355,7 +374,7 @@ namespace WixToolsetTest.CoreIntegration
                 var baseFolder = fs.GetFolder();
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var binFolder = Path.Combine(baseFolder, "bin");
-                var msiPath = Path.Combine(binFolder, isPackage ? "test.msi" : "test.msm");
+                var msiPath = Path.Combine(binFolder, isMsi ? "test.msi" : "test.msm");
 
                 var arguments = new List<string>()
                 {

@@ -16,6 +16,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(HarvestFilesSymbolFields.ComplexReferenceParentType), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(HarvestFilesSymbolFields.ParentId), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(HarvestFilesSymbolFields.SourcePath), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HarvestFilesSymbolFields.ModuleLanguage), IntermediateFieldType.String),
             },
             typeof(HarvestFilesSymbol));
     }
@@ -31,6 +32,7 @@ namespace WixToolset.Data.Symbols
         ComplexReferenceParentType,
         ParentId,
         SourcePath,
+        ModuleLanguage,
     }
 
     public class HarvestFilesSymbol : IntermediateSymbol
@@ -79,6 +81,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (string)this.Fields[(int)HarvestFilesSymbolFields.SourcePath];
             set => this.Set((int)HarvestFilesSymbolFields.SourcePath, value);
+        }
+
+        public string ModuleLanguage
+        {
+            get => (string)this.Fields[(int)HarvestFilesSymbolFields.ModuleLanguage];
+            set => this.Set((int)HarvestFilesSymbolFields.ModuleLanguage, value);
         }
     }
 }

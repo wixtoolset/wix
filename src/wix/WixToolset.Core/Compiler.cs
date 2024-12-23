@@ -5689,7 +5689,12 @@ namespace WixToolset.Core
 
                 this.ParseFileElementChildren(node, fileSymbol, keyPath, win64);
 
-                if (ComplexReferenceParentType.Unknown != parentType && null != parentId) // if parent was provided, add a complex reference to that.
+                // if this is a module, automatically add this component to the references to ensure it gets in the ModuleComponents table
+                if (this.compilingModule)
+                {
+                    this.Core.CreateComplexReference(sourceLineNumbers, ComplexReferenceParentType.Module, this.activeName, this.activeLanguage, ComplexReferenceChildType.Component, fileSymbol.Id.Id, false);
+                }
+                else if (ComplexReferenceParentType.Unknown != parentType && null != parentId) // if parent was provided, add a complex reference to that.
                 {
                     // If the naked file's component is defined directly under a feature, then mark the complex reference primary.
                     this.Core.CreateComplexReference(sourceLineNumbers, parentType, parentId, null, ComplexReferenceChildType.Component, fileSymbol.Id.Id, ComplexReferenceParentType.Feature == parentType);
@@ -5790,6 +5795,7 @@ namespace WixToolset.Core
                 ComplexReferenceParentType = parentType.ToString(),
                 ParentId = parentId,
                 SourcePath = sourcePath,
+                ModuleLanguage = this.compilingModule ? this.activeLanguage : null,
             });
         }
 

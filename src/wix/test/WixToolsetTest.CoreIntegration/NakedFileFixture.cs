@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System.Collections.Generic;
     using System.Data;
     using System.IO;
     using System.Linq;
@@ -82,6 +83,14 @@ namespace WixToolsetTest.CoreIntegration
             var rows = BuildAndQueryComponentAndFileTables("Module.wxs", isPackage: false);
 
             AssertFileComponentIds(2, rows);
+
+            var expectedModuleComponents = new[]
+            {
+                "ModuleComponents:FILE1.E535B765_1019_4A4F_B3EA_AE28870E6D73\tMergeModule.E535B765_1019_4A4F_B3EA_AE28870E6D73\t1033",
+                "ModuleComponents:FILE2.E535B765_1019_4A4F_B3EA_AE28870E6D73\tMergeModule.E535B765_1019_4A4F_B3EA_AE28870E6D73\t1033",
+            };
+
+            Assert.Equal(expectedModuleComponents, rows.Where(row => row.StartsWith("ModuleComponents:")));
         }
 
         [Fact]
@@ -215,7 +224,14 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     result.AssertSuccess();
 
-                    return Query.QueryDatabase(msiPath, new[] { "Component", "File" })
+                    var tables = new List<string> { "Component", "File" };
+
+                    if (!isPackage)
+                    {
+                        tables.Add("ModuleComponents");
+                    }
+
+                    return Query.QueryDatabase(msiPath, tables.ToArray())
                         .OrderBy(s => s)
                         .ToArray();
                 }
