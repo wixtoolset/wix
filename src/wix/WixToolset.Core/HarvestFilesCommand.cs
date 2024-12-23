@@ -107,10 +107,15 @@ namespace WixToolset.Core
                             Win64 = this.Context.Platform == Platform.ARM64 || this.Context.Platform == Platform.X64,
                         });
 
-                        if (Enum.TryParse<ComplexReferenceParentType>(harvestFile.ComplexReferenceParentType, out var parentType)
+                        // if this is a module, automatically add this component to the references to ensure it gets in the ModuleComponents table
+                        if (!String.IsNullOrEmpty(harvestFile.ModuleLanguage))
+                        {
+                            this.ParseHelper.CreateComplexReference(section, harvestFile.SourceLineNumbers, ComplexReferenceParentType.Module, harvestFile.ParentId, harvestFile.ModuleLanguage, ComplexReferenceChildType.Component, id.Id, false);
+                        }
+                        else if (Enum.TryParse<ComplexReferenceParentType>(harvestFile.ComplexReferenceParentType, out var parentType)
                             && ComplexReferenceParentType.Unknown != parentType && null != harvestFile.ParentId)
                         {
-                            // If the parent was provided, add a complex reference to that, and, if 
+                            // If the parent was provided, add a complex reference to that, and, if
                             // the Files is under a feature, then mark the complex reference primary.
                             this.ParseHelper.CreateComplexReference(section, harvestFile.SourceLineNumbers, parentType, harvestFile.ParentId, null, ComplexReferenceChildType.Component, id.Id, ComplexReferenceParentType.Feature == parentType);
                         }
