@@ -1485,7 +1485,7 @@ namespace WixToolset.Util
                     switch (child.Name.LocalName)
                     {
                         case "GroupRef":
-                            this.ParseGroupRefElement(intermediate, section, child,  id.Id, groupType:true);
+                            this.ParseGroupRefElement(intermediate, section, child, id.Id, groupType: true);
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(element, child);
@@ -1521,7 +1521,7 @@ namespace WixToolset.Util
         /// <param name="element">Element to parse.</param>
         /// <param name="childId">Required child id to be joined to the group.</param>
         /// <param name="groupType">whether the child is a group (true) or a user (false)</param>
-        private void ParseGroupRefElement(Intermediate intermediate, IntermediateSection section, XElement element, string childId, bool groupType=false)
+        private void ParseGroupRefElement(Intermediate intermediate, IntermediateSection section, XElement element, string childId, bool groupType)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string groupId = null;
@@ -3588,7 +3588,7 @@ namespace WixToolset.Util
                                 this.Messaging.Write(UtilErrors.IllegalElementWithoutComponent(childSourceLineNumbers, child.Name.LocalName));
                             }
 
-                            this.ParseGroupRefElement(intermediate, section, child, id.Id, groupType:false);
+                            this.ParseGroupRefElement(intermediate, section, child, id.Id, groupType: false);
                             break;
                         default:
                             this.ParseHelper.UnexpectedElement(element, child);

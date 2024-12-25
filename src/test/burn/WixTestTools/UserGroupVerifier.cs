@@ -29,7 +29,7 @@ namespace WixTestTools
         }
 
         /// <summary>
-        /// Deletes a local gorup from the machine
+        /// Deletes a local group from the machine
         /// </summary>
         /// <param name="groupName">group name to delete</param>
         /// <remarks>Has to be run as an Admin</remarks>
