@@ -720,8 +720,7 @@ static HRESULT RemoveGroupInternal(
 
         NET_API_STATUS er = ::NetLocalGroupDel(pwzServerName, wzName);
         hr = HRESULT_FROM_WIN32(er);
-        if (HRESULT_FROM_WIN32(ERROR_NO_SUCH_ALIAS) == hr
-            || HRESULT_FROM_WIN32(NERR_GroupNotFound) == hr) // we wanted to delete it.. and the group doesn't exist.. solved.
+        if (HRESULT_FROM_WIN32(ERROR_NO_SUCH_ALIAS) == hr || HRESULT_FROM_WIN32(NERR_GroupNotFound) == hr) // we wanted to delete it.. and the group doesn't exist.. solved.
         {
             hr = S_OK;
         }
@@ -1303,16 +1302,16 @@ extern "C" UINT __stdcall CreateGroup(
         er = ::NetLocalGroupAdd(pwzServerName, 1, reinterpret_cast<LPBYTE>(&groupInfo1), &dw);
         hr = HRESULT_FROM_WIN32(er);
 
-        if (HRESULT_FROM_WIN32(ERROR_ALIAS_EXISTS) == hr
-            || HRESULT_FROM_WIN32(NERR_GroupExists) == hr)
+        if (HRESULT_FROM_WIN32(ERROR_ALIAS_EXISTS) == hr || HRESULT_FROM_WIN32(NERR_GroupExists) == hr)
         {
             if (SCAG_FAIL_IF_EXISTS & iAttributes)
             {
                 MessageExitOnFailure(hr, msierrGRPFailedGroupCreateExists, "Group (%ls\\%ls) was not supposed to exist, but does", pwzDomain, pwzName);
             }
 
-            hr = S_OK; // Make sure that we don't report this situation as an error
+            // Make sure that we don't report this situation as an error
             // if we fall through the tests that follow.
+            hr = S_OK;
 
             if (SCAG_UPDATE_IF_EXISTS & iAttributes)
             {
@@ -1505,6 +1504,7 @@ extern "C" UINT __stdcall CreateGroupRollback(
             {
                 pwzComment = pwzOriginalComment;
             }
+
             hr = WcaReadIntegerFromCaData(&pwz, &iOriginalAttributes);
             if (FAILED(hr))
             {
@@ -1618,7 +1618,7 @@ LExit:
     return WcaFinalize(er);
 }
 
-HRESULT AlterGroupMembership(bool remove, bool isRollback)
+HRESULT AlterGroupMembership(BOOL fRemove, BOOL fIsRollback)
 {
     HRESULT hr = S_OK;
     NET_API_STATUS er = ERROR_SUCCESS;
@@ -1663,7 +1663,7 @@ HRESULT AlterGroupMembership(bool remove, bool isRollback)
     hr = WcaReadStringFromCaData(&pwz, &pwzScriptKey);
     ExitOnFailure(hr, "failed to read scriptkey from custom action data");
 
-    if (isRollback)
+    if (fIsRollback)
     {
         // if the script file doesn't exist, then we'll abandon this rollback
         hr = WcaCaScriptOpen(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, &hRollbackScript);
@@ -1693,7 +1693,7 @@ HRESULT AlterGroupMembership(bool remove, bool isRollback)
     }
     memberInfo3.lgrmi3_domainandname = pwzChildFullName;
 
-    if (remove)
+    if (fRemove)
     {
         er = ::NetLocalGroupDelMembers(pwzServerName, pwzParentName, 3, (LPBYTE)&memberInfo3, 1);
     }
@@ -1705,18 +1705,16 @@ HRESULT AlterGroupMembership(bool remove, bool isRollback)
 
     // if there was no error, the action succeeded, and we should flag that it's something which might need
     // to be rolled back
-    if (S_OK == hr && !isRollback)
+    if (S_OK == hr && !fIsRollback)
     {
         // we create a script file, the rollback matching this scriptkey will occur if the file exists
         hr = WcaCaScriptCreate(WCA_ACTION_INSTALL, WCA_CASCRIPT_ROLLBACK, FALSE, pwzScriptKey, FALSE, &hRollbackScript);
         WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_PRESERVE);
     }
 
-    if (remove)
+    if (fRemove)
     {
-        if (HRESULT_FROM_WIN32(NERR_GroupNotFound) == hr
-            || HRESULT_FROM_WIN32(ERROR_NO_SUCH_MEMBER) == hr
-            || HRESULT_FROM_WIN32(ERROR_MEMBER_NOT_IN_ALIAS) == hr)
+        if (HRESULT_FROM_WIN32(NERR_GroupNotFound) == hr || HRESULT_FROM_WIN32(ERROR_NO_SUCH_MEMBER) == hr || HRESULT_FROM_WIN32(ERROR_MEMBER_NOT_IN_ALIAS) == hr)
         {
             hr = S_OK;
         }
@@ -1771,7 +1769,7 @@ extern "C" UINT __stdcall AddGroupMembership(
     ExitOnFailure(hr, "failed to initialize COM");
     fInitializedCom = TRUE;
 
-    hr = AlterGroupMembership(false, false);
+    hr = AlterGroupMembership(FALSE, FALSE);
 
 LExit:
     if (fInitializedCom)
@@ -1807,7 +1805,7 @@ extern "C" UINT __stdcall AddGroupMembershipRollback(
     ExitOnFailure(hr, "failed to initialize COM");
     fInitializedCom = TRUE;
 
-    hr = AlterGroupMembership(true, true);
+    hr = AlterGroupMembership(TRUE, TRUE);
 
 LExit:
     if (fInitializedCom)
@@ -1842,13 +1840,14 @@ extern "C" UINT __stdcall RemoveGroupMembership(
     ExitOnFailure(hr, "failed to initialize COM");
     fInitializedCom = TRUE;
 
-    hr = AlterGroupMembership(true, false);
+    hr = AlterGroupMembership(TRUE, FALSE);
 
 LExit:
     if (fInitializedCom)
     {
         ::CoUninitialize();
     }
+
     return WcaFinalize(FAILED(hr) ? ERROR_INSTALL_FAILED : ERROR_SUCCESS);
 }
 
@@ -1878,7 +1877,7 @@ extern "C" UINT __stdcall RemoveGroupMembershipRollback(
     ExitOnFailure(hr, "failed to initialize COM");
     fInitializedCom = TRUE;
 
-    hr = AlterGroupMembership(false, true);
+    hr = AlterGroupMembership(FALSE, TRUE);
 
 LExit:
     if (fInitializedCom)

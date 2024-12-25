@@ -10,6 +10,8 @@ namespace WixTestTools
 
     public class RuntimeFactAttribute : SkippableFactAttribute
     {
+        private bool domainRequired;
+
         const string RequiredEnvironmentVariableName = "RuntimeTestsEnabled";
         const string RequiredDomainEnvironmentVariableName = "RuntimeDomainTestsEnabled";
 
@@ -47,17 +49,16 @@ namespace WixTestTools
             RuntimeDomainTestsEnabled = Boolean.TryParse(domainTestsEnabledString, out var domainTestsEnabled) && domainTestsEnabled;
         }
 
-        private bool _domainRequired;
         public bool DomainRequired
         {
             get
             {
-                return _domainRequired;
+                return this.domainRequired;
             }
             set
             {
-                _domainRequired = value;
-                if (_domainRequired && String.IsNullOrEmpty(this.Skip) && (!RunningInDomain || !RuntimeDomainTestsEnabled))
+                this.domainRequired = value;
+                if (this.domainRequired && String.IsNullOrEmpty(this.Skip) && (!RunningInDomain || !RuntimeDomainTestsEnabled))
                 {
                     this.Skip = $"These tests require the test host to be running as a domain member ({(RunningInDomain ? "passed" : "failed")}). These tests affect both MACHINE AND DOMAIN state. To accept the consequences, set the {RequiredDomainEnvironmentVariableName} environment variable to true ({(RuntimeDomainTestsEnabled ? "passed" : "failed")}).";
                 }
