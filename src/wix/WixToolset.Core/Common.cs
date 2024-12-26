@@ -765,7 +765,8 @@ namespace WixToolset.Core
 
             var equalsDefaultValue = value.IndexOf('=', firstDot + 1, closeParen - firstDot);
             var end = equalsDefaultValue == -1 ? closeParen : equalsDefaultValue;
-            var secondDot = value.IndexOf('.', firstDot + 1, end - firstDot);
+            // bind variables may have a second dot to define their scope, other variables do not have scope and ignore additional dots.
+            var secondDot = ns == "bind" ? value.IndexOf('.', firstDot + 1, end - firstDot) : -1;
 
             if (secondDot == -1)
             {

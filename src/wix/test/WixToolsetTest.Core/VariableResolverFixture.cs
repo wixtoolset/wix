@@ -3,6 +3,7 @@
 namespace WixToolsetTest.Core
 {
     using System.Collections.Generic;
+    using System.Linq;
     using WixInternal.TestSupport;
     using WixToolset.Core;
     using WixToolset.Data;
@@ -18,12 +19,14 @@ namespace WixToolsetTest.Core
             var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
             var variableResolver = serviceProvider.GetService<IVariableResolver>();
 
-            var variables = new Dictionary<string, BindVariable>()
+            var variables = new BindVariable[]
             {
-                { "ProductName", new BindVariable() { Id = "ProductName", Value = "Localized Product Name" } },
-                { "ProductNameEdition", new BindVariable() { Id = "ProductNameEdition", Value = "!(loc.ProductName) Enterprise Edition" } },
-                { "ProductNameEditionVersion", new BindVariable() { Id = "ProductNameEditionVersion", Value = "!(loc.ProductNameEdition) v1.2.3" } },
-            };
+                new() { Id = "ProductName", Value = "Localized Product Name" },
+                new() { Id = "ProductNameEdition", Value = "!(loc.ProductName) Enterprise Edition" },
+                new() { Id = "ProductNameEditionVersion", Value = "!(loc.ProductNameEdition) v1.2.3" },
+                new() { Id = "Dotted.Loc.Variable", Value = "Dotted.Loc.Variable = !(loc.ProductNameEditionVersion)" },
+                new() { Id = "NestedDotted.Loc.Variable", Value = "!(loc.Dotted.Loc.Variable) worked" },
+            }.ToDictionary(b => b.Id);
 
             var localization = new Localization(0, null, "x-none", variables, new Dictionary<string, LocalizedControl>());
 
@@ -43,6 +46,10 @@ namespace WixToolsetTest.Core
 
             result = variableResolver.ResolveVariables(null, "Welcome to !(loc.ProductNameEditionVersion)");
             WixAssert.StringEqual("Welcome to Localized Product Name Enterprise Edition v1.2.3", result.Value);
+            Assert.True(result.UpdatedValue);
+
+            result = variableResolver.ResolveVariables(null, "start !(loc.NestedDotted.Loc.Variable) end");
+            WixAssert.StringEqual("start Dotted.Loc.Variable = Localized Product Name Enterprise Edition v1.2.3 worked end", result.Value);
             Assert.True(result.UpdatedValue);
 
             result = variableResolver.ResolveVariables(null, "Welcome to !(bind.property.ProductVersion)");
