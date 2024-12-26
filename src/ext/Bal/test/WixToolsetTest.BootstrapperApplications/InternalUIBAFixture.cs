@@ -167,6 +167,7 @@ namespace WixToolsetTest.BootstrapperApplications
                     "WixInternalUIBootstrapperApplication does not support the value of 'force' for Cache on prereq packages. Prereq packages are only cached when they need to be installed.",
                     "WixInternalUIBootstrapperApplication ignores InstallCondition for the primary package so that the MSI UI is always shown.",
                     "WixInternalUIBootstrapperApplication ignores DisplayInternalUICondition for the primary package so that the MSI UI is always shown.",
+                    "WixInternalUIBootstrapperApplication ignores DisplayFilesInUseDialogCondition for the primary package so that the MSI UI is always shown.",
                     "When using WixInternalUIBootstrapperApplication, all prereq packages should be before the primary package in the chain. The prereq packages are always installed before the primary package.",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
@@ -180,7 +181,7 @@ namespace WixToolsetTest.BootstrapperApplications
                 var balPackageInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixBalPackageInfo");
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<WixBalPackageInfo PackageId='test.msi' DisplayInternalUICondition='DISPLAYTEST' PrimaryPackageType='default' />",
+                    "<WixBalPackageInfo PackageId='test.msi' DisplayInternalUICondition='DISPLAYTEST' DisplayFilesInUseDialogCondition='DISPLAYTEST' PrimaryPackageType='default' />",
                 }, balPackageInfos);
 
                 var mbaPrereqInfos = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPrereqInformation");
