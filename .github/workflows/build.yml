@@ -77,7 +77,7 @@ jobs:
         run: 7z a build\testresults.zip @src\testresultfilelist.txt
 
       - name: Save build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: build/artifacts/
@@ -100,7 +100,7 @@ jobs:
       # Do NOT publish logs on `master` branch as they may contain secrets in them.
       - name: Save logs
         if: github.ref != 'refs/heads/master' && always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: logs_${{ github.run_id }}
           path: build/logs/
