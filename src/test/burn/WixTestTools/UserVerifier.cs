@@ -171,12 +171,12 @@ namespace WixTestTools
 
             Assert.False(null == user, String.Format("User '{0}' was not found under domain '{1}'.", userName, domainName));
 
-            Assert.True(passwordNeverExpires == user.PasswordNeverExpires, String.Format("Password Never Expires for user '{0}/{1}' is: '{2}', expected: '{3}'.", domainName, userName, user.PasswordNeverExpires, passwordNeverExpires));
-            Assert.True(disabled != user.Enabled, String.Format("Disappled for user '{0}/{1}' is: '{2}', expected: '{3}'.", domainName, userName, !user.Enabled, disabled));
+            Assert.True(passwordNeverExpires == user.PasswordNeverExpires, String.Format("Password Never Expires for user '{0}\\{1}' is: '{2}', expected: '{3}'.", domainName, userName, user.PasswordNeverExpires, passwordNeverExpires));
+            Assert.True(disabled != user.Enabled, String.Format("Account disabled for user '{0}\\{1}' is: '{2}', expected: '{3}'.", domainName, userName, !user.Enabled, disabled));
 
             DateTime expirationDate = user.AccountExpirationDate.GetValueOrDefault();
             bool accountExpired = expirationDate.ToLocalTime().CompareTo(DateTime.Now) <= 0;
-            Assert.True(passwordExpired == accountExpired, String.Format("Password Expired for user '{0}/{1}' is: '{2}', expected: '{3}'.", domainName, userName, accountExpired, passwordExpired));
+            Assert.True(passwordExpired == accountExpired, String.Format("Password Expired for user '{0}\\{1}' is: '{2}', expected: '{3}'.", domainName, userName, accountExpired, passwordExpired));
         }
 
         /// <summary>
@@ -349,7 +349,7 @@ namespace WixTestTools
                     if (found != shouldBeMember)
                     {
                         missedAGroup = true;
-                        message += String.Format("User '{0}/{1}' is {2} a member of local group '{3}'. \r\n", domainName, userName, found ? String.Empty : "NOT", groupName);
+                        message += String.Format("User '{0}\\{1}' is {2} a member of local group '{3}'. \r\n", domainName, userName, found ? String.Empty : "NOT", groupName);
                     }
                 }
                 catch (System.DirectoryServices.AccountManagement.PrincipalOperationException)
