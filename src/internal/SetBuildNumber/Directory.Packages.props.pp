@@ -1,4 +1,13 @@
 <Project>
+  <PropertyGroup>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <!-- Pinned versions to address security vulnerabilities in transitive dependencies. Review as dependencies update. -->
+  <ItemGroup>
+    <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageVersion Include="WixToolset.Dtf.Compression" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dtf.Compression.Cab" Version="{packageversion}" />
@@ -43,35 +52,36 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="6.0.1" />
-    <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="4.7.0" />
-    <PackageVersion Include="System.DirectoryServices" Version="4.7.0" />
-    <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
-    <PackageVersion Include="System.Management" Version="4.7.0" />
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="6.0.2" />
+    <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="6.0.2" />
+    <PackageVersion Include="System.DirectoryServices" Version="6.0.2" />
+    <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="6.0.1" />
+    <PackageVersion Include="System.Management" Version="6.0.2" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
-    <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
+    <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
     <PackageVersion Include="System.Net.NetworkInformation" Version="4.3.0" />
-    <PackageVersion Include="System.Reflection.Metadata" Version="1.8.1" />
-    <PackageVersion Include="System.Security.Principal.Windows" Version="4.7.0" />
-    <PackageVersion Include="System.Text.Encoding.CodePages" Version="4.7.1" />
-    <PackageVersion Include="System.Text.Json" Version="6.0.10" />
+    <PackageVersion Include="System.Reflection.Metadata" Version="6.0.2" />
+    <PackageVersion Include="System.Security.Principal.Windows" Version="5.0.0" />
+    <PackageVersion Include="System.Text.Encoding.CodePages" Version="6.0.1" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.5" />
+    <PackageVersion Include="System.Memory" Version="4.5.5" />
 
     <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="3.1.13" />
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="3.10.2154" />
-    <PackageVersion Include="Microsoft.Win32.Registry" Version="4.7.0" />
+    <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="NuGet.Credentials" Version="6.10.1" />
-    <PackageVersion Include="NuGet.Protocol" Version="6.10.1" />
-    <PackageVersion Include="NuGet.Versioning" Version="6.10.1" />
+    <PackageVersion Include="NuGet.Credentials" Version="6.12.1" />
+    <PackageVersion Include="NuGet.Protocol" Version="6.12.1" />
+    <PackageVersion Include="NuGet.Versioning" Version="6.12.1" />
   </ItemGroup>
 
   <!--
     These MSBuild versions are trapped in antiquity for heat.exe.
   -->
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="14.3" />
+    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="14.3.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
     <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />

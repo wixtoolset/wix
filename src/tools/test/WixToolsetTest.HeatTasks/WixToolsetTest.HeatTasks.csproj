@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixInternal.TestSupport" /> 
-    <PackageReference Include="WixInternal.Core.TestPackage" /> 
+    <PackageReference Include="WixInternal.TestSupport" />
+    <PackageReference Include="WixInternal.Core.TestPackage" />
   </ItemGroup>
 </Project>

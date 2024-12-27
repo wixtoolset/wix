@@ -39,5 +39,6 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" />
     <PackageReference Include="System.DirectoryServices" />
+    <PackageReference Include="System.Memory" />
   </ItemGroup>
 </Project>

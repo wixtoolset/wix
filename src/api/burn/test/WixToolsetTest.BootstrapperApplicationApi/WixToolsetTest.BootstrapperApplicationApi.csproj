@@ -12,8 +12,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\WixToolset.BootstrapperApplicationApi\WixToolset.BootstrapperApplicationApi.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="WixInternal.TestSupport" />
-  </ItemGroup>
 </Project>

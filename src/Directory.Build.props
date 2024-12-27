@@ -32,7 +32,9 @@
     <ProjectUrl>https://wixtoolset.org/</ProjectUrl>
     <PackageIcon>wix.png</PackageIcon>
 
-    <GitVersionFile>version.txt</GitVersionFile>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>low</NuGetAuditLevel>
   </PropertyGroup>
 
   <Import Project="Directory$(MSBuildProjectExtension).props" Condition=" Exists('Directory$(MSBuildProjectExtension).props') " />

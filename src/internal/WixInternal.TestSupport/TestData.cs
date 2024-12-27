@@ -44,13 +44,13 @@ namespace WixInternal.TestSupport
 
         public static string Get(params string[] paths)
         {
-            var localPath = Path.GetDirectoryName(new Uri(Assembly.GetCallingAssembly().CodeBase).LocalPath);
+            var localPath = AppDomain.CurrentDomain.BaseDirectory;
             return Path.Combine(localPath, Path.Combine(paths));
         }
 
         public static string GetUnitTestLogsFolder([CallerFilePath] string path = "", [CallerMemberName] string method = "")
         {
-            var startingPath = Path.GetDirectoryName(new Uri(Assembly.GetCallingAssembly().CodeBase).LocalPath);
+            var startingPath = AppDomain.CurrentDomain.BaseDirectory;
             var buildPath = startingPath;
 
             while (!String.IsNullOrEmpty(buildPath))
