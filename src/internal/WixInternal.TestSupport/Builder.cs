@@ -64,7 +64,7 @@ namespace WixInternal.TestSupport
                 foreach (var ext in this.ExtensionTypes)
                 {
                     args.Add("-ext");
-                    args.Add(Path.GetFullPath(new Uri(ext.Assembly.CodeBase).LocalPath));
+                    args.Add(Path.GetFullPath(ext.Assembly.Location));
                 }
 
                 args.AddRange(sourceFiles);
@@ -126,7 +126,7 @@ namespace WixInternal.TestSupport
                 foreach (var ext in this.ExtensionTypes)
                 {
                     firstBuildArgs.Add("-ext");
-                    firstBuildArgs.Add(Path.GetFullPath(new Uri(ext.Assembly.CodeBase).LocalPath));
+                    firstBuildArgs.Add(Path.GetFullPath(ext.Assembly.Location));
                 }
 
                 firstBuildArgs.AddRange(sourceFiles);
@@ -171,7 +171,7 @@ namespace WixInternal.TestSupport
                 foreach (var ext in this.ExtensionTypes)
                 {
                     decompileArgs.Add("-ext");
-                    decompileArgs.Add(Path.GetFullPath(new Uri(ext.Assembly.CodeBase).LocalPath));
+                    decompileArgs.Add(Path.GetFullPath(ext.Assembly.Location));
                 }
 
                 decompileFunc(decompileArgs.ToArray());
@@ -188,7 +188,7 @@ namespace WixInternal.TestSupport
                 foreach (var ext in this.ExtensionTypes)
                 {
                     secondBuildArgs.Add("-ext");
-                    secondBuildArgs.Add(Path.GetFullPath(new Uri(ext.Assembly.CodeBase).LocalPath));
+                    secondBuildArgs.Add(Path.GetFullPath(ext.Assembly.Location));
                 }
 
                 secondBuildArgs.Add("-bindpath");
