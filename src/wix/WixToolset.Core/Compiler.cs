@@ -5070,6 +5070,75 @@ namespace WixToolset.Core
             }
         }
 
+        private void ParseFileNamingAttributes(XElement node, string sourcePath, string directoryId, bool isNakedFile, out Identifier id, out string name, out string shortName, out string source)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            name = null;
+            id = null;
+            shortName = null;
+            source = sourcePath;   // assume we'll use the parents as the source for this file
+            var sourceSet = false;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Name":
+                            name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
+                            break;
+                        case "ShortName":
+                            shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Source":
+                            source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            sourceSet = true;
+                            break;
+                    }
+                }
+            }
+
+            if (sourceSet && !source.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) && null == name)
+            {
+                name = Path.GetFileName(source);
+                if (!this.Core.IsValidLongFilename(name, false))
+                {
+                    this.Core.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Source", name));
+                }
+            }
+
+            if (name == null)
+            {
+                if (shortName == null)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
+                }
+                else
+                {
+                    name = shortName;
+                    shortName = null;
+                }
+            }
+
+            if (String.IsNullOrEmpty(source))
+            {
+                source = name;
+            }
+            else if (source.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)) // if source relies on parent directories, append the file name
+            {
+                source = Path.Combine(source, name);
+            }
+
+            if (null == id && !isNakedFile)
+            {
+                id = this.Core.CreateIdentifier("fil", directoryId, name);
+            }
+        }
+
         /// <summary>
         /// Parses a File element's attributes.
         /// </summary>
@@ -5077,6 +5146,9 @@ namespace WixToolset.Core
         /// <param name="componentId">Parent's component id.</param>
         /// <param name="directoryId">Ancestor's directory id.</param>
         /// <param name="diskId">Disk id inherited from parent component.</param>
+        /// <param name="id">Already-parsed or defaulted id.</param>
+        /// <param name="name">Already-parsed or defaulted name.</param>
+        /// <param name="shortName">Already-parsed short name.</param>
         /// <param name="sourcePath">Default source path of parent directory.</param>
         /// <param name="possibleKeyPath">This will be set with the possible keyPath for the parent component.</param>
         /// <param name="componentGuid">Component GUID (including `*`).</param>
@@ -5084,16 +5156,14 @@ namespace WixToolset.Core
         /// <param name="fileSymbol">Outgoing file symbol containing parsed attributes.</param>
         /// <param name="assemblySymbol">Outgoing assembly symbol containing parsed attributes.</param>
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
-        private YesNoType ParseFileElementAttributes(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out Identifier possibleKeyPath, string componentGuid, bool isNakedFile, out FileSymbol fileSymbol, out AssemblySymbol assemblySymbol)
+        private YesNoType ParseFileElementOtherAttributes(XElement node, string componentId, string directoryId, int diskId, Identifier id, string name, string shortName, string sourcePath, out Identifier possibleKeyPath, string componentGuid, bool isNakedFile, out FileSymbol fileSymbol, out AssemblySymbol assemblySymbol)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            Identifier id = null;
             var assemblyType = AssemblyType.NotAnAssembly;
             string assemblyApplication = null;
             string assemblyManifest = null;
             string bindPath = null;
 
-            //int bits = MsiInterop.MsidbFileAttributesVital;
             var readOnly = false;
             var checksum = false;
             bool? compressed = null;
@@ -5107,7 +5177,6 @@ namespace WixToolset.Core
             string defaultVersion = null;
             string fontTitle = null;
             var keyPath = YesNoType.NotSet;
-            string name = null;
             var patchGroup = CompilerConstants.IntegerNotSet;
             var patchIgnore = false;
             var patchIncludeWholeFile = false;
@@ -5121,9 +5190,6 @@ namespace WixToolset.Core
 
             string procArch = null;
             int? selfRegCost = null;
-            string shortName = null;
-            var source = sourcePath;   // assume we'll use the parents as the source for this file
-            var sourceSet = false;
 
             fileSymbol = null;
             assemblySymbol = null;
@@ -5134,6 +5200,13 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
+                    case "Id":
+                    case "Name":
+                    case "ShortName":
+                    case "Source":
+                            // Handled in ParseFileNamingAttributes
+                            break;
+
                     case "Bitness":
                     case "Condition":
                     case "Directory":
@@ -5143,9 +5216,6 @@ namespace WixToolset.Core
                         {
                             this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, attrib.Name.LocalName));
                         }
-                        break;
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
                     case "Assembly":
                         var assemblyValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -5225,9 +5295,6 @@ namespace WixToolset.Core
                     case "KeyPath":
                         keyPath = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                         break;
-                    case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
-                        break;
                     case "PatchGroup":
                         patchGroup = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int32.MaxValue);
                         break;
@@ -5273,13 +5340,6 @@ namespace WixToolset.Core
                     case "SelfRegCost":
                         selfRegCost = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
                         break;
-                    case "ShortName":
-                        shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Source":
-                        source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        sourceSet = true;
-                        break;
                     case "System":
                         if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                         {
@@ -5324,33 +5384,6 @@ namespace WixToolset.Core
                 {
                     this.Core.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, node.Name.LocalName, "CompanionFile", "KeyPath", "yes"));
                 }
-            }
-
-            if (sourceSet && !source.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal) && null == name)
-            {
-                name = Path.GetFileName(source);
-                if (!this.Core.IsValidLongFilename(name, false))
-                {
-                    this.Core.Write(ErrorMessages.IllegalLongFilename(sourceLineNumbers, node.Name.LocalName, "Source", name));
-                }
-            }
-
-            if (name == null)
-            {
-                if (shortName == null)
-                {
-                    this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Name"));
-                }
-                else
-                {
-                    name = shortName;
-                    shortName = null;
-                }
-            }
-
-            if (null == id && !isNakedFile)
-            {
-                id = this.Core.CreateIdentifier("fil", directoryId, name);
             }
 
             if (null != defaultVersion && null != companionFile)
@@ -5400,15 +5433,6 @@ namespace WixToolset.Core
                     patchAttributes |= PatchAttributeType.AllowIgnoreOnError;
                 }
 
-                if (String.IsNullOrEmpty(source))
-                {
-                    source = name;
-                }
-                else if (source.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)) // if source relies on parent directories, append the file name
-                {
-                    source = Path.Combine(source, name);
-                }
-
                 var attributes = FileSymbolAttributes.None;
                 attributes |= readOnly ? FileSymbolAttributes.ReadOnly : 0;
                 attributes |= hidden ? FileSymbolAttributes.Hidden : 0;
@@ -5430,7 +5454,7 @@ namespace WixToolset.Core
 
                     DirectoryRef = directoryId,
                     DiskId = (CompilerConstants.IntegerNotSet == diskId) ? null : (int?)diskId,
-                    Source = new IntermediateFieldPathValue { Path = source },
+                    Source = new IntermediateFieldPathValue { Path = sourcePath },
 
                     FontTitle = fontTitle,
                     SelfRegCost = selfRegCost,
@@ -5577,7 +5601,9 @@ namespace WixToolset.Core
         /// <returns>Yes if this element was marked as the parent component's key path, No if explicitly marked as not being a key path, or NotSet otherwise.</returns>
         private YesNoType ParseFileElement(XElement node, string componentId, string directoryId, int diskId, string sourcePath, out Identifier possibleKeyPath, bool win64Component, string componentGuid)
         {
-            var keyPath = this.ParseFileElementAttributes(node, componentId, directoryId, diskId, sourcePath, out possibleKeyPath, componentGuid, isNakedFile: false, out var fileSymbol, out var assemblySymbol);
+            this.ParseFileNamingAttributes(node, sourcePath, directoryId, isNakedFile: false, out var id, out var name, out var shortName, out var source);
+
+            var keyPath = this.ParseFileElementOtherAttributes(node, componentId, directoryId, diskId, id, name, shortName, source, out possibleKeyPath, componentGuid, isNakedFile: false, out var fileSymbol, out var assemblySymbol);
 
             if (!this.Core.EncounteredError)
             {
@@ -5659,35 +5685,15 @@ namespace WixToolset.Core
 
                 directoryId = this.HandleSubdirectory(sourceLineNumbers, node, directoryId, subdirectory, "Directory", "Subdirectory");
 
-                var keyPath = this.ParseFileElementAttributes(node, "@WixTemporaryComponentId", directoryId, diskId: CompilerConstants.IntegerNotSet, sourcePath, out var _, componentGuid: "*", isNakedFile: true, out var fileSymbol, out var assemblySymbol);
+                this.ParseFileNamingAttributes(node, sourcePath, directoryId, isNakedFile: true, out var id, out var name, out var shortName, out var source);
 
                 // Now that we have all the data we need to generate a good id, do
                 // so and create a file and component symbol with the right data.
-                var id = fileSymbol.Id ?? this.Core.CreateIdentifier("nkf", directoryId, fileSymbol.Name, condition, win64.ToString());
+                id = id ?? this.Core.CreateIdentifier("nkf", directoryId, name, condition, win64.ToString());
 
-                this.Core.AddSymbol(new FileSymbol(sourceLineNumbers, id)
-                {
-                    ComponentRef = id.Id,
-                    Name = fileSymbol.Name,
-                    ShortName = fileSymbol.ShortName,
-                    FileSize = fileSymbol.FileSize,
-                    Version = fileSymbol.Version,
-                    Language = fileSymbol.Language,
-                    Attributes = fileSymbol.Attributes,
-                    DirectoryRef = fileSymbol.DirectoryRef,
-                    DiskId = fileSymbol.DiskId,
-                    Source = fileSymbol.Source,
-                    FontTitle = fileSymbol.FontTitle,
-                    SelfRegCost = fileSymbol.SelfRegCost,
-                    BindPath = fileSymbol.BindPath,
-                    PatchGroup = fileSymbol.PatchGroup,
-                    PatchAttributes = fileSymbol.PatchAttributes,
-                    RetainLengths = fileSymbol.RetainLengths,
-                    IgnoreOffsets = fileSymbol.IgnoreOffsets,
-                    IgnoreLengths = fileSymbol.IgnoreLengths,
-                    RetainOffsets = fileSymbol.RetainOffsets,
-                    SymbolPaths = fileSymbol.SymbolPaths,
-                });
+                var keyPath = this.ParseFileElementOtherAttributes(node, id.Id, directoryId, diskId: CompilerConstants.IntegerNotSet, id, name, shortName, source, out var _, componentGuid: "*", isNakedFile: true, fileSymbol: out var fileSymbol, assemblySymbol: out var assemblySymbol);
+
+                this.Core.AddSymbol(fileSymbol);
 
                 this.Core.AddSymbol(new ComponentSymbol(sourceLineNumbers, id)
                 {
