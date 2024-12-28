@@ -55,6 +55,14 @@ static INT_PTR CloseFileInfoCallback(
     __in BURN_CONTAINER_CONTEXT* pContext,
     __inout FDINOTIFICATION *pFDINotify
     );
+static HRESULT PrepareTargetFile(
+    __in long cb,
+    __in HANDLE hFile
+    );
+static void BestEffortSetFileTime(
+    __in FDINOTIFICATION* pFDINotify,
+    __in HANDLE hFile
+    );
 static LPVOID DIAMONDAPI CabAlloc(
     __in DWORD dwSize
     );
@@ -221,6 +229,28 @@ extern "C" HRESULT CabExtractStreamToBuffer(
     pContext->Cabinet.pbTargetBuffer = NULL;
     pContext->Cabinet.cbTargetBuffer = 0;
     pContext->Cabinet.iTargetBuffer = 0;
+
+LExit:
+    return hr;
+}
+
+extern "C" HRESULT CabExtractStreamToHandle(
+    __in BURN_CONTAINER_CONTEXT* pContext,
+    __in HANDLE hFile
+    )
+{
+    HRESULT hr = S_OK;
+
+    // set operation to move to next stream
+    pContext->Cabinet.operation = BURN_CAB_OPERATION_STREAM_TO_HANDLE;
+    pContext->Cabinet.hTargetFile = hFile;
+
+    // begin operation and wait
+    hr = BeginAndWaitForOperation(pContext);
+    ExitOnFailure(hr, "Failed to begin and wait for operation.");
+
+    // clear file handle
+    pContext->Cabinet.hTargetFile = INVALID_HANDLE_VALUE;
 
 LExit:
     return hr;
@@ -505,8 +535,6 @@ static INT_PTR CopyFileCallback(
 {
     HRESULT hr = S_OK;
     INT_PTR ipResult = 1; // result to return on success
-    LPWSTR pwzPath = NULL;
-    LARGE_INTEGER li = { };
 
     // set operation complete event
     if (!::SetEvent(pContext->Cabinet.hOperationCompleteEvent))
@@ -567,23 +595,14 @@ static INT_PTR CopyFileCallback(
             ExitWithLastError(hr, "Failed to create file: %ls", pContext->Cabinet.wzTargetFile);
         }
 
-        // set file size
-        li.QuadPart = pFDINotify->cb;
-        if (!::SetFilePointerEx(pContext->Cabinet.hTargetFile, li, NULL, FILE_BEGIN))
-        {
-            ExitWithLastError(hr, "Failed to set file pointer to end of file.");
-        }
+        hr = PrepareTargetFile(pFDINotify->cb, pContext->Cabinet.hTargetFile);
+        ExitOnFailure(hr, "Failed to prepare target file.");
 
-        if (!::SetEndOfFile(pContext->Cabinet.hTargetFile))
-        {
-            ExitWithLastError(hr, "Failed to set end of file.");
-        }
+        break;
 
-        li.QuadPart = 0;
-        if (!::SetFilePointerEx(pContext->Cabinet.hTargetFile, li, NULL, FILE_BEGIN))
-        {
-            ExitWithLastError(hr, "Failed to set file pointer to beginning of file.");
-        }
+    case BURN_CAB_OPERATION_STREAM_TO_HANDLE:
+        hr = PrepareTargetFile(pFDINotify->cb, pContext->Cabinet.hTargetFile);
+        ExitOnFailure(hr, "Failed to prepare target file.");
 
         break;
 
@@ -611,8 +630,6 @@ static INT_PTR CopyFileCallback(
     }
 
 LExit:
-    ReleaseStr(pwzPath);
-
     pContext->Cabinet.hrError = hr;
     return SUCCEEDED(hr) ? ipResult : -1;
 }
@@ -624,25 +641,22 @@ static INT_PTR CloseFileInfoCallback(
 {
     HRESULT hr = S_OK;
     INT_PTR ipResult = 1; // result to return on success
-    FILETIME ftLocal = { };
-    FILETIME ft = { };
 
     // read operation
     switch (pContext->Cabinet.operation)
     {
     case BURN_CAB_OPERATION_STREAM_TO_FILE:
-        // Make a best effort to set the time on the new file before
-        // we close it.
-        if (::DosDateTimeToFileTime(pFDINotify->date, pFDINotify->time, &ftLocal))
-        {
-            if (::LocalFileTimeToFileTime(&ftLocal, &ft))
-            {
-                ::SetFileTime(pContext->Cabinet.hTargetFile, &ft, &ft, &ft);
-            }
-        }
+        BestEffortSetFileTime(pFDINotify, pContext->Cabinet.hTargetFile);
 
         // close file
         ReleaseFile(pContext->Cabinet.hTargetFile);
+        break;
+
+    case BURN_CAB_OPERATION_STREAM_TO_HANDLE:
+        BestEffortSetFileTime(pFDINotify, pContext->Cabinet.hTargetFile);
+
+        // Do NOT close file.
+        pContext->Cabinet.hTargetFile = INVALID_HANDLE_VALUE;
         break;
 
     case BURN_CAB_OPERATION_STREAM_TO_BUFFER:
@@ -674,6 +688,55 @@ static INT_PTR CloseFileInfoCallback(
 LExit:
     pContext->Cabinet.hrError = hr;
     return SUCCEEDED(hr) ? ipResult : -1;
+}
+
+static HRESULT PrepareTargetFile(
+    __in long cb,
+    __in HANDLE hFile
+    )
+{
+    HRESULT hr = S_OK;
+    LARGE_INTEGER li = { };
+
+    // set file size
+    li.QuadPart = cb;
+    if (!::SetFilePointerEx(hFile, li, NULL, FILE_BEGIN))
+    {
+        ExitWithLastError(hr, "Failed to set file pointer to end of file.");
+    }
+
+    if (!::SetEndOfFile(hFile))
+    {
+        ExitWithLastError(hr, "Failed to set end of file.");
+    }
+
+    li.QuadPart = 0;
+    if (!::SetFilePointerEx(hFile, li, NULL, FILE_BEGIN))
+    {
+        ExitWithLastError(hr, "Failed to set file pointer to beginning of file.");
+    }
+
+LExit:
+    return hr;
+}
+
+static void BestEffortSetFileTime(
+    __in FDINOTIFICATION* pFDINotify,
+    __in HANDLE hFile
+    )
+{
+    FILETIME ftLocal = { };
+    FILETIME ft = { };
+
+    // Make a best effort to set the time on the new file before
+    // we close it.
+    if (::DosDateTimeToFileTime(pFDINotify->date, pFDINotify->time, &ftLocal))
+    {
+        if (::LocalFileTimeToFileTime(&ftLocal, &ft))
+        {
+            ::SetFileTime(hFile, &ft, &ft, &ft);
+        }
+    }
 }
 
 static LPVOID DIAMONDAPI CabAlloc(
@@ -759,7 +822,8 @@ static UINT FAR DIAMONDAPI CabWrite(
 
     switch (pContext->Cabinet.operation)
     {
-    case BURN_CAB_OPERATION_STREAM_TO_FILE:
+    case BURN_CAB_OPERATION_STREAM_TO_FILE: __fallthrough;
+    case BURN_CAB_OPERATION_STREAM_TO_HANDLE:
         // write file
         if (!::WriteFile(pContext->Cabinet.hTargetFile, pv, cb, &cbWrite, NULL))
         {

@@ -27,6 +27,10 @@ HRESULT CabExtractStreamToBuffer(
     __out BYTE** ppbBuffer,
     __out SIZE_T* pcbBuffer
     );
+HRESULT CabExtractStreamToHandle(
+    __in BURN_CONTAINER_CONTEXT* pContext,
+    __in HANDLE hFile
+    );
 HRESULT CabExtractSkipStream(
     __in BURN_CONTAINER_CONTEXT* pContext
     );
