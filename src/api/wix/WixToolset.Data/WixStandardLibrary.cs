@@ -162,6 +162,9 @@ namespace WixToolset.Data
                 case "CommonFiles6432Folder":
                     return platform == Platform.X86 ? "CommonFilesFolder" : "CommonFiles64Folder";
 
+                case "PerUserProgramFilesFolder":
+                    return "LocalAppDataFolder";
+
                 case "ProgramFiles6432Folder":
                     return platform == Platform.X86 ? "ProgramFilesFolder" : "ProgramFiles64Folder";
 

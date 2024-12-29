@@ -223,6 +223,7 @@ namespace WixToolset.Data.WindowsInstaller
             ["MyPicturesFolder"] = "Pictures",
             ["NetHoodFolder"] = "NetHood",
             ["PersonalFolder"] = "Personal",
+            ["PerUserProgramFilesFolder"] = "Programs",
             ["PrintHoodFolder"] = "Printers",
             ["ProgramFilesFolder"] = "PFiles",
             ["ProgramFiles64Folder"] = "PFiles64",
@@ -264,7 +265,7 @@ namespace WixToolset.Data.WindowsInstaller
                 new WixActionSymbol(null, new Identifier(AccessModifier.Virtual, "AdminUISequence/FileCost"))         { Action="FileCost",         Sequence=900, SequenceTable=SequenceTable.AdminUISequence },
                 new WixActionSymbol(null, new Identifier(AccessModifier.Virtual, "AdminUISequence/CostFinalize"))     { Action="CostFinalize",     Sequence=1000, SequenceTable=SequenceTable.AdminUISequence },
                 new WixActionSymbol(null, new Identifier(AccessModifier.Virtual, "AdminUISequence/ExecuteAction"))    { Action="ExecuteAction",    Sequence=1300, SequenceTable=SequenceTable.AdminUISequence },
-                
+
                 // AdvertiseExecuteSequence
                 new WixActionSymbol(null, new Identifier(AccessModifier.Virtual, "AdvertiseExecuteSequence/CostInitialize"))        { Action="CostInitialize",        Sequence=800, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
                 new WixActionSymbol(null, new Identifier(AccessModifier.Virtual, "AdvertiseExecuteSequence/CostFinalize"))          { Action="CostFinalize",          Sequence=1000, SequenceTable=SequenceTable.AdvertiseExecuteSequence },
