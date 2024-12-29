@@ -2,12 +2,10 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
-    using System;
     using System.IO;
     using System.Linq;
-    using Example.Extension;
-    using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
     using Xunit;
 
     public class MsiQueryFixture
@@ -929,16 +927,20 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(msiPath));
-                var results = Query.QueryDatabase(msiPath, new[] { "Upgrade" });
+                var results = Query.QueryDatabase(msiPath, new[] { "Property", "Upgrade" });
+                var upgradeRows = results.Where(r => r.StartsWith("Upgrade:")).OrderBy(s => s).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "Upgrade:{12E4699F-E774-4D05-8A01-5BDD41BBA127}\t\t1.0.0.0\t1033\t1\t\tWIX_UPGRADE_DETECTED",
-                    "Upgrade:{12E4699F-E774-4D05-8A01-5BDD41BBA127}\t1.0.0.0\t\t1033\t2\t\tWIX_DOWNGRADE_DETECTED",
                     "Upgrade:{B05772EA-82B8-4DE0-B7EB-45B5F0CCFE6D}\t1.0.0\t\t\t256\t\tRELPRODFOUND",
-                }, results);
+                    "Upgrade:{C00D7E9A-1276-51ED-B782-A20AB34D4070}\t\t1.0.0.0\t1033\t1\t\tWIX_UPGRADE_DETECTED",
+                    "Upgrade:{C00D7E9A-1276-51ED-B782-A20AB34D4070}\t1.0.0.0\t\t1033\t2\t\tWIX_DOWNGRADE_DETECTED",
+                }, upgradeRows);
+
+                var packageId = results.Where(r => r.StartsWith("Property:PackageId\t")).Single();
+                Assert.Equal("Property:PackageId\tWixToolsetTest.TestPackage", packageId);
 
                 var prefix = "Property:SecureCustomProperties\t";
-                var secureProperties = Query.QueryDatabase(msiPath, new[] { "Property" }).Where(p => p.StartsWith(prefix)).Single();
+                var secureProperties = results.Where(p => p.StartsWith(prefix)).Single();
                 WixAssert.CompareLineByLine(new[]
                 {
                     "RELPRODFOUND",

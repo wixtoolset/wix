@@ -69,8 +69,8 @@ namespace WixToolsetTest.CoreIntegration
             {
                 "LaunchCondition:NOT WIX_DOWNGRADE_DETECTED\tA newer version of [ProductName] is already installed.",
                 "Upgrade:{46649344-6CDF-4531-B91C-DCC088CBF6D3}\t1.0\t\t\t258\t\tPRODUCT",
-                "Upgrade:{7AB24276-C628-43DB-9E65-A184D052909B}\t\t2.0.0\t1033\t1\t\tWIX_UPGRADE_DETECTED",
-                "Upgrade:{7AB24276-C628-43DB-9E65-A184D052909B}\t2.0.0\t\t1033\t2\t\tWIX_DOWNGRADE_DETECTED",
+                "Upgrade:{C00D7E9A-1276-51ED-B782-A20AB34D4070}\t\t2.0.0\t1033\t1\t\tWIX_UPGRADE_DETECTED",
+                "Upgrade:{C00D7E9A-1276-51ED-B782-A20AB34D4070}\t2.0.0\t\t1033\t2\t\tWIX_DOWNGRADE_DETECTED",
             }, results);
         }
 

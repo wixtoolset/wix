@@ -2,7 +2,7 @@
     <?ifndef ProductCode?>
     <?define ProductCode = *?>
     <?endif?>
-    <Package Name="MsiPackage" Codepage="1252" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="12E4699F-E774-4D05-8A01-5BDD41BBA127" Compressed="no" Scope="perMachine" ProductCode="$(var.ProductCode)">
+    <Package Id="WixToolsetTest.TestPackage" Name="MsiPackage" Codepage="1252" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" Compressed="no" Scope="perMachine" ProductCode="$(var.ProductCode)">
 
         <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 

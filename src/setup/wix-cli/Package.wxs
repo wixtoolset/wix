@@ -1,6 +1,6 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="WiX Toolset Command-Line Tools" Manufacturer="WiX Toolset" Version="!(bind.fileVersion.WixExe)" UpgradeCode="2e85dc76-769f-46d2-82a7-46cb3a0c9d50">
+  <Package Id="WixToolset.CommandLineTools.Package" Name="WiX Toolset Command-Line Tools" Manufacturer="WiX Toolset" Version="!(bind.fileVersion.WixExe)">
     <MediaTemplate EmbedCab="yes" />
 
     <ComponentGroupRef Id="BinaryFiles" />

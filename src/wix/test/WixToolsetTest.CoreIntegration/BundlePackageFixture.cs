@@ -386,7 +386,7 @@ namespace WixToolsetTest.CoreIntegration
                 var packageElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixPackageProperties", ignoreAttributesByElementName);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<WixPackageProperties Package='test.msi' Vital='yes' DisplayName='All Users Package' DownloadSize='*' PackageSize='*' InstalledSize='28' PackageType='Msi' Permanent='no' LogPathVariable='WixBundleLog_test.msi' RollbackLogPathVariable='WixBundleRollbackLog_test.msi' Compressed='no' ProductCode='{33333333-3333-3333-3333-333333333333}' UpgradeCode='{4BE34BEE-CA23-488E-96A0-B15878E3654B}' Version='1.0' Cache='keep' />",
+                    "<WixPackageProperties Package='test.msi' Vital='yes' DisplayName='All Users Package' DownloadSize='*' PackageSize='*' InstalledSize='28' PackageType='Msi' Permanent='no' LogPathVariable='WixBundleLog_test.msi' RollbackLogPathVariable='WixBundleRollbackLog_test.msi' Compressed='no' ProductCode='{33333333-3333-3333-3333-333333333333}' UpgradeCode='{C00D7E9A-1276-51ED-B782-A20AB34D4070}' Version='1.0' Cache='keep' />",
                 }, packageElements);
             }
         }

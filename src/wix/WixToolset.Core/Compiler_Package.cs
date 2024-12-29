@@ -25,6 +25,7 @@ namespace WixToolset.Core
         private void ParsePackageElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
             var compressed = YesNoDefaultType.Default;
             var sourceBits = 0;
             string codepage = null;
@@ -53,6 +54,9 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                        break;
                     case "Codepage":
                         codepage = this.Core.GetAttributeLocalizableCodePageValue(sourceLineNumbers, attrib);
                         break;
@@ -156,7 +160,14 @@ namespace WixToolset.Core
 
             if (null == upgradeCode)
             {
-                this.Core.Write(WarningMessages.MissingUpgradeCode(sourceLineNumbers));
+                if (id is null)
+                {
+                    this.Core.Write(WarningMessages.MissingUpgradeCode(sourceLineNumbers));
+                }
+                else
+                {
+                    upgradeCode = this.Core.CreateGuid(Compiler.UpgradeCodeGuidNamespace, id.Id);
+                }
             }
 
             if (null == version)
@@ -178,6 +189,11 @@ namespace WixToolset.Core
             {
                 this.compilingProduct = true;
                 this.Core.CreateActiveSection(productCode, SectionType.Package, this.Context.CompilationId);
+
+                if (null != id)
+                {
+                    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "PackageId"), id.Id, false, false, false, true);
+                }
 
                 this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "Manufacturer"), manufacturer, false, false, false, true);
                 this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ProductCode"), productCode, false, false, false, true);
@@ -392,7 +408,7 @@ namespace WixToolset.Core
 
                 if (!this.Core.EncounteredError)
                 {
-                    this.Core.AddSymbol(new WixPackageSymbol(sourceLineNumbers)
+                    this.Core.AddSymbol(new WixPackageSymbol(sourceLineNumbers, id)
                     {
                         PackageId = productCode,
                         UpgradeCode = upgradeCode,

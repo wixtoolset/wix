@@ -6216,6 +6216,9 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         case "Manufacturer":
                             this.DecompilerHelper.RootElement.SetAttributeValue("Manufacturer", value);
                             continue;
+                        case "PackageId":
+                            this.DecompilerHelper.RootElement.SetAttributeValue("Id", value);
+                            continue;
                         case "ProductCode":
                             this.DecompilerHelper.RootElement.SetAttributeValue("ProductCode", value.ToUpper(CultureInfo.InvariantCulture));
                             continue;

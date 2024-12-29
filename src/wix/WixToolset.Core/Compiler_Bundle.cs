@@ -115,6 +115,7 @@ namespace WixToolset.Core
         private void ParseBundleElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            Identifier id = null;
             string copyright = null;
             string aboutUrl = null;
             var modifyType = WixBundleModifyType.Allowed;
@@ -144,6 +145,9 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
                         case "AboutUrl":
                             aboutUrl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
@@ -233,7 +237,14 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(upgradeCode))
             {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "UpgradeCode"));
+                if (id is null)
+                {
+                    this.Core.Write(ErrorMessages.ExpectedAttributes(sourceLineNumbers, node.Name.LocalName, "Id", "UpgradeCode"));
+                }
+                else
+                {
+                    upgradeCode = this.Core.CreateGuid(Compiler.UpgradeCodeGuidNamespace, id.Id);
+                }
             }
 
             if (String.IsNullOrEmpty(copyright))
@@ -265,7 +276,7 @@ namespace WixToolset.Core
                 logVariablePrefixAndExtension = String.Concat("WixBundleLog:", fileSystemSafeBundleName, ":log");
             }
 
-            this.activeName = String.IsNullOrEmpty(name) ? Common.GenerateGuid() : name;
+            this.activeName = String.IsNullOrEmpty(name) ? String.IsNullOrEmpty(id?.Id) ? Common.GenerateGuid() : id.Id : name;
             this.Core.CreateActiveSection(this.activeName, SectionType.Bundle, this.Context.CompilationId);
 
             // Now that the active section is initialized, process only extension attributes and the special ProviderKey attribute.
@@ -401,7 +412,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
-                var symbol = this.Core.AddSymbol(new WixBundleSymbol(sourceLineNumbers)
+                var symbol = this.Core.AddSymbol(new WixBundleSymbol(sourceLineNumbers, id)
                 {
                     UpgradeCode = upgradeCode,
                     Version = version,
