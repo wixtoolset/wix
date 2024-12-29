@@ -2,7 +2,7 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
      xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
-  <Bundle Name="!(loc.Name)" Manufacturer="WiX Toolset" Version="$(SetupVersion)" UpgradeCode="fc48131d-214a-439b-9a31-ef2ea5c69ea5"
+  <Bundle Id="WixToolset.WixAdditionalTools" Name="!(loc.Name)" Manufacturer="WiX Toolset" Version="$(SetupVersion)"
           AboutUrl="!(loc.AboutUrl)" HelpUrl="!(loc.SupportUrl)" UpdateUrl="!(loc.UpdateUrl)">
     <BootstrapperApplication>
       <bal:WixStandardBootstrapperApplication

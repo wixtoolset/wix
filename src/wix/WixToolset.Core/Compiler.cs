@@ -29,6 +29,9 @@ namespace WixToolset.Core
         private const char ComponentIdPlaceholderEnd = (char)167;
         private Dictionary<string, string> componentIdPlaceholders;
 
+        // As outlined in RFC 4122, this is our namespace for generating name-based (version 3) UUIDs for upgrade codes.
+        private static readonly Guid UpgradeCodeGuidNamespace = new Guid("{D9C5E8D9-0F97-4D24-A235-91BD2FA169A6}");
+
         // If these are true you know you are building a module or product
         // but if they are false you cannot not be sure they will not end
         // up a product or module.  Use these flags carefully.
