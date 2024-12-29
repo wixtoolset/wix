@@ -11,7 +11,8 @@ namespace WixToolset.Core.Link
     internal class AddDefaultSymbolsCommand
     {
         public static readonly string WixStandardInstallFolder = "INSTALLFOLDER";
-        public static readonly string WixStandardInstallFolderParent = "ProgramFiles6432Folder";
+        public static readonly string WixStandardPerMachineInstallFolderParent = "ProgramFiles6432Folder";
+        public static readonly string WixStandardPerUserInstallFolderParent = "PerUserProgramFilesFolder";
         public static readonly string WixStandardInstallFolderReference = "Directory:INSTALLFOLDER";
 
         public AddDefaultSymbolsCommand(FindEntrySectionAndLoadSymbolsCommand find, IList<IntermediateSection> sections)
@@ -26,28 +27,31 @@ namespace WixToolset.Core.Link
 
         public void Execute()
         {
-            if (this.Find.EntrySection.Type != SectionType.Package)
+            if (this.Find.EntrySection.Type != SectionType.Package || this.Find.EntrySection.Symbols.Count == 0)
             {
                 // Only packages...for now.
                 return;
             }
 
+            var packageSymbol = this.Find.EntrySection.Symbols.OfType<WixPackageSymbol>().First();
+
             // If a directory with id INSTALLFOLDER hasn't been authored, provide a default one.
             if (!this.Find.SymbolsByName.ContainsKey(WixStandardInstallFolderReference))
             {
                 var sourceLineNumber = new SourceLineNumber("DefaultInstallFolder");
+                var parentDirectoryRef = (packageSymbol.Scope == WixPackageScope.PerUser) ? WixStandardPerUserInstallFolderParent : WixStandardPerMachineInstallFolderParent;
 
                 this.AddSymbolsToNewSection(WixStandardInstallFolder,
                     new DirectorySymbol(sourceLineNumber, new Identifier(AccessModifier.Global, WixStandardInstallFolder))
                     {
-                        ParentDirectoryRef = WixStandardInstallFolderParent,
+                        ParentDirectoryRef = parentDirectoryRef,
                         Name = "!(bind.Property.Manufacturer) !(bind.Property.ProductName)",
                         SourceName = ".",
                     },
                     new WixSimpleReferenceSymbol(sourceLineNumber, new Identifier(AccessModifier.Global, WixStandardInstallFolder))
                     {
                         Table = "Directory",
-                        PrimaryKeys = WixStandardInstallFolderParent,
+                        PrimaryKeys = parentDirectoryRef,
                     }
                 );
             }
@@ -58,10 +62,7 @@ namespace WixToolset.Core.Link
             var symbols = this.Sections.SelectMany(section => section.Symbols);
             if (!symbols.OfType<UpgradeSymbol>().Any(us => !us.OnlyDetect))
             {
-                var packageSymbol = this.Find.EntrySection.Symbols.OfType<WixPackageSymbol>().FirstOrDefault();
-
-                if (packageSymbol?.UpgradeStrategy == WixPackageUpgradeStrategy.MajorUpgrade
-                    && !String.IsNullOrEmpty(packageSymbol?.UpgradeCode))
+                if (packageSymbol.UpgradeStrategy == WixPackageUpgradeStrategy.MajorUpgrade && !String.IsNullOrEmpty(packageSymbol?.UpgradeCode))
                 {
                     this.AddDefaultMajorUpgrade(packageSymbol);
                 }

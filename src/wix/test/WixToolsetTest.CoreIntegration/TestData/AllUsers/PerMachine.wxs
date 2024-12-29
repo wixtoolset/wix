@@ -7,7 +7,7 @@
     <MajorUpgrade DowngradeErrorMessage="Downgrade not allowed" />
 
     <Feature Id="ProductFeature" Title="Feature title">
-        <Component Directory="DesktopFolder">
+        <Component>
             <File Source="PerUser.wxs" />
         </Component>
     </Feature>
