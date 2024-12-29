@@ -30,8 +30,7 @@ namespace WixToolset.Core
             string codepage = null;
             var productCode = "*";
             string productLanguage = null;
-            var isPerMachine = true;
-            var isPerUserOrMachine = false;
+            var scope = WixPackageScope.PerMachine;
             string upgradeCode = null;
             string manufacturer = null;
             string version = null;
@@ -91,12 +90,11 @@ namespace WixToolset.Core
                                 // handled below after we create the section.
                                 break;
                             case "perUser":
-                                isPerMachine = false;
+                                scope = WixPackageScope.PerUser;
                                 sourceBits |= 8;
                                 break;
                             case "perUserOrMachine":
-                                isPerMachine = false;
-                                isPerUserOrMachine = true;
+                                scope = WixPackageScope.PerUserOrMachine;
                                 break;
                             default:
                                 this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser", "perUserOrMachine"));
@@ -191,12 +189,12 @@ namespace WixToolset.Core
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "UpgradeCode"), upgradeCode, false, false, false, true);
                 }
 
-                if (isPerUserOrMachine)
+                if (scope == WixPackageScope.PerUserOrMachine)
                 {
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ALLUSERS"), "2", false, false, false, false);
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "MSIINSTALLPERUSER"), "1", false, false, false, false);
                 }
-                else if (isPerMachine)
+                else if (scope == WixPackageScope.PerMachine)
                 {
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ALLUSERS"), "1", false, false, false, false);
                 }
@@ -402,8 +400,8 @@ namespace WixToolset.Core
                         Language = productLanguage,
                         Version = version,
                         Manufacturer = manufacturer,
-                        Attributes = isPerMachine ? WixPackageAttributes.PerMachine : WixPackageAttributes.None,
                         Codepage = codepage,
+                        Scope = scope,
                         UpgradeStrategy = upgradeStrategy,
                     });
 

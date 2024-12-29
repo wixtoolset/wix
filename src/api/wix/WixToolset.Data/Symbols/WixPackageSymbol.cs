@@ -18,6 +18,8 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixPackageSymbolFields.Manufacturer), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixPackageSymbolFields.Attributes), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixPackageSymbolFields.Codepage), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixPackageSymbolFields.Scope), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixPackageSymbolFields.UpgradeStrategy), IntermediateFieldType.Number),
             },
             typeof(WixPackageSymbol));
     }
@@ -37,19 +39,27 @@ namespace WixToolset.Data.Symbols
         Manufacturer,
         Attributes,
         Codepage,
+        Scope,
+        UpgradeStrategy,
     }
 
     [Flags]
     public enum WixPackageAttributes
     {
         None = 0x0,
-        PerMachine = 0x1,
+    }
+
+    public enum WixPackageScope
+    {
+        PerMachine,
+        PerUser,
+        PerUserOrMachine,
     }
 
     public enum WixPackageUpgradeStrategy
     {
-        None = 0x0,
-        MajorUpgrade = 0x1,
+        None,
+        MajorUpgrade,
     }
 
     public class WixPackageSymbol : IntermediateSymbol
@@ -112,12 +122,16 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixPackageSymbolFields.Codepage, value);
         }
 
-        public WixPackageUpgradeStrategy UpgradeStrategy
+        public WixPackageScope Scope
         {
-            get => (WixPackageUpgradeStrategy)this.Fields[(int)WixPackageSymbolFields.Attributes].AsNumber();
-            set => this.Set((int)WixPackageSymbolFields.Attributes, (int)value);
+            get => (WixPackageScope)this.Fields[(int)WixPackageSymbolFields.Scope].AsNumber();
+            set => this.Set((int)WixPackageSymbolFields.Scope, (int)value);
         }
 
-        public bool PerMachine => (this.Attributes & WixPackageAttributes.PerMachine) == WixPackageAttributes.PerMachine;
+        public WixPackageUpgradeStrategy UpgradeStrategy
+        {
+            get => (WixPackageUpgradeStrategy)this.Fields[(int)WixPackageSymbolFields.UpgradeStrategy].AsNumber();
+            set => this.Set((int)WixPackageSymbolFields.UpgradeStrategy, (int)value);
+        }
     }
 }
