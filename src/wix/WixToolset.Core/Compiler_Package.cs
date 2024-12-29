@@ -5033,6 +5033,11 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError)
             {
+                if (overridable)
+                {
+                    id = new Identifier(AccessModifier.Virtual, id.Id);
+                }
+
                 this.Core.AddSymbol(new WixVariableSymbol(sourceLineNumbers, id)
                 {
                     Value = value,

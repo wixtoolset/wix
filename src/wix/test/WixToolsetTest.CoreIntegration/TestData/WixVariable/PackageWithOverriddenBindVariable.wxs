@@ -1,0 +1,13 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Version="1.0.0" Name="MsiPackage" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+    <PropertyRef Id="Test" />
+
+    <WixVariable Id="override TestWixVariable" Value="0"/>
+  </Package>
+
+  <Fragment>
+    <Property Id="Test" Value="!(wix.TestWixVariable)" />
+
+    <WixVariable Id="TestWixVariable" Value="1" Overridable="true"/>
+  </Fragment>
+</Wix>
