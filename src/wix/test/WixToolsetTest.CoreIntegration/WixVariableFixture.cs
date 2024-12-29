@@ -35,7 +35,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var productVersion = GetProductVersionFromMsi(msiPath);
+                var productVersion = GetPropertyFromMsi(msiPath, "ProductVersion");
                 Assert.Equal("4.3.2.1", productVersion);
             }
         }
@@ -62,7 +62,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var productVersion = GetProductVersionFromMsi(msiPath);
+                var productVersion = GetPropertyFromMsi(msiPath, "ProductVersion");
                 Assert.Equal("1.1.1.1", productVersion);
 
                 var directoryTable = Query.QueryDatabase(msiPath, new[] { "Directory" }).OrderBy(s => s).ToArray();
@@ -98,7 +98,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var productVersion = GetProductVersionFromMsi(msiPath);
+                var productVersion = GetPropertyFromMsi(msiPath, "ProductVersion");
                 Assert.Equal("9.8.7.6", productVersion);
 
                 var directoryTable = Query.QueryDatabase(msiPath, new[] { "Directory" }).OrderBy(s => s).ToArray();
@@ -108,6 +108,33 @@ namespace WixToolsetTest.CoreIntegration
                     "Directory:INSTALLFOLDER\tDesktopFolder\tpja2bznq|MsiPackage v9.8.7.6 and 9.8.7.6",
                     "Directory:TARGETDIR\t\tSourceDir"
                 }, directoryTable);
+            }
+        }
+
+        [Fact]
+        public void CanBuildMsiWithOverridableBindVariable()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, "bin", "test1.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "WixVariable", "PackageWithOverriddenBindVariable.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var testValue = GetPropertyFromMsi(msiPath, "Test");
+                Assert.Equal("0", testValue);
             }
         }
 
@@ -150,7 +177,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result3.AssertSuccess();
 
-                var productVersion = GetProductVersionFromMsi(msiPath);
+                var productVersion = GetPropertyFromMsi(msiPath, "ProductVersion");
                 WixAssert.StringEqual("255.255.65535", productVersion);
 
                 var extractResult = BundleExtractor.ExtractAllContainers(null, bundlePath, Path.Combine(baseFolder, "ba"), Path.Combine(baseFolder, "attached"), Path.Combine(baseFolder, "extract"));
@@ -163,10 +190,10 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        private static string GetProductVersionFromMsi(string msiPath)
+        private static string GetPropertyFromMsi(string msiPath, string propertyId)
         {
             var propertyTable = Query.QueryDatabase(msiPath, new[] { "Property" }).Select(r => r.Split('\t')).ToDictionary(r => r[0].Substring("Property:".Length), r => r[1]);
-            Assert.True(propertyTable.TryGetValue("ProductVersion", out var productVersion));
+            Assert.True(propertyTable.TryGetValue(propertyId, out var productVersion), $"Failed to find requested property: '{propertyId}'");
 
             return productVersion;
         }
