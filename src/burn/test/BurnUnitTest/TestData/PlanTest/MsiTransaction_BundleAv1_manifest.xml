@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BurnManifest xmlns="http://wixtoolset.org/schemas/v4/2008/Burn">
     <Log PathVariable="WixBundleLog" Prefix="~MsiTransactionTests_BundleAv1" Extension=".log" />
-    <RelatedBundle Id="{90ED10D5-B187-4470-B498-05D80DAB729A}" Action="Upgrade" />
+    <RelatedBundle Code="{90ED10D5-B187-4470-B498-05D80DAB729A}" Action="Upgrade" />
     <Variable Id="TestGroupName" Value="MsiTransactionTests" Type="string" Hidden="no" Persisted="no" />
     <UX PrimaryPayloadId="WixStandardBootstrapperApplication">
         <Payload Id="WixStandardBootstrapperApplication" FilePath="wixstdba.exe" FileSize="245760" Hash="23F0568ADACD69D72B259F876B437707A0D41069" Packaging="embedded" SourcePath="u3" />
@@ -20,7 +20,7 @@
     <Payload Id="cab3wekki1le1R8RPDV2B8_g8jcjZc" FilePath="1cv1.cab" FileSize="975" Hash="11DE5863C4B2A8762D0EE23FE25B7774CA07676B" Packaging="embedded" SourcePath="a5" Container="WixAttachedContainer" />
     <RollbackBoundary Id="WixDefaultBoundary" Vital="yes" Transaction="no" />
     <RollbackBoundary Id="rbaOCA08D8ky7uBOK71_6FWz1K3TuQ" Vital="yes" Transaction="yes" />
-    <Registration Id="{E6469F05-BDC8-4EB8-B218-67412543EFAA}" ExecutableName="BundleAv1.exe" PerMachine="yes" Tag="" Version="1.0.0.0" ProviderKey="{E6469F05-BDC8-4EB8-B218-67412543EFAA}">
+    <Registration Code="{E6469F05-BDC8-4EB8-B218-67412543EFAA}" ExecutableName="BundleAv1.exe" PerMachine="yes" Tag="" Version="1.0.0.0" ProviderKey="{E6469F05-BDC8-4EB8-B218-67412543EFAA}">
         <Arp Register="yes" DisplayName="~MsiTransactionTests - BundleAv1" DisplayVersion="1.0.0.0" />
     </Registration>
     <Chain>

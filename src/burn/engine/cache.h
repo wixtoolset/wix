@@ -107,7 +107,7 @@ HRESULT CacheCalculateBundleWorkingPath(
     );
 HRESULT CacheCalculateBundleLayoutWorkingPath(
     __in BURN_CACHE* pCache,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __deref_out_z LPWSTR* psczWorkingPath
     );
 HRESULT CacheCalculatePayloadWorkingPath(
@@ -191,7 +191,7 @@ HRESULT CacheCompleteBundle(
     __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzExecutableName,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzSourceBundlePath
 #ifdef DEBUG
     , __in_z LPCWSTR wzExecutablePath

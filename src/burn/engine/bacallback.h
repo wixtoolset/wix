@@ -193,7 +193,7 @@ HRESULT BACallbackOnDetectComplete(
     );
 HRESULT BACallbackOnDetectForwardCompatibleBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
@@ -219,7 +219,7 @@ HRESULT BACallbackOnDetectPackageComplete(
     );
 HRESULT BACallbackOnDetectRelatedBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
@@ -229,7 +229,7 @@ HRESULT BACallbackOnDetectRelatedBundle(
 HRESULT BACallbackOnDetectRelatedBundlePackage(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPerMachine,
     __in VERUTIL_VERSION* pVersion
@@ -388,7 +388,7 @@ HRESULT BACallbackOnPlanComplete(
     );
 HRESULT BACallbackOnPlanForwardCompatibleBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
@@ -443,17 +443,17 @@ HRESULT BACallbackOnPlanPackageComplete(
     );
 HRESULT BACallbackOnPlanRelatedBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
     );
 HRESULT BACallbackOnPlanRelatedBundleType(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* pRequestedType
     );
 HRESULT BACallbackOnPlanRestoreRelatedBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
     );
 HRESULT BACallbackOnPlanRollbackBoundary(

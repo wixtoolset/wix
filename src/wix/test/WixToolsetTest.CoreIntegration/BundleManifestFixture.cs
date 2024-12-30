@@ -176,17 +176,17 @@ namespace WixToolsetTest.CoreIntegration
                 var manifestRelatedBundlesElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:RelatedBundle");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<RelatedBundle Id='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' Action='Upgrade' />",
+                    "<RelatedBundle Code='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' Action='Upgrade' />",
                 }, manifestRelatedBundlesElements);
 
                 var ignoreAttributesByElementName = new Dictionary<string, List<string>>
                 {
-                    { "WixBundleProperties", new List<string> { "DisplayName", "Id" } },
+                    { "WixBundleProperties", new List<string> { "Code", "DisplayName" } },
                 };
                 var dataRelatedBundlesElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixBundleProperties", ignoreAttributesByElementName);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<WixBundleProperties DisplayName='*' LogPathVariable='WixBundleLog' Compressed='no' Id='*' UpgradeCode='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' PerMachine='yes' />",
+                    "<WixBundleProperties BundleId='WixToolsetTest.BundleWithInvalidUpgradeCode' Code='*' DisplayName='*' LogPathVariable='WixBundleLog' Compressed='no' UpgradeCode='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' PerMachine='yes' />",
                 }, dataRelatedBundlesElements);
             }
         }

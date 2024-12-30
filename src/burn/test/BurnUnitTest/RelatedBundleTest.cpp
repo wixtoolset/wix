@@ -48,8 +48,8 @@ namespace Bootstrapper
                     L"    <UX>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' />"
                     L"    </UX>"
-                    L"    <RelatedBundle Id='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Action='Upgrade' />"
-                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='yes'>"
+                    L"    <RelatedBundle Code='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Action='Upgrade' />"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='yes'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -100,8 +100,8 @@ namespace Bootstrapper
                     L"    <UX>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' />"
                     L"    </UX>"
-                    L"    <RelatedBundle Id='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Action='Upgrade' />"
-                    L"    <Registration Id='{3DB49D3D-1FB8-4147-A465-BBE8BFD0DAD0}' Tag='foo' ProviderKey='foo' Version='4.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <RelatedBundle Code='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Action='Upgrade' />"
+                    L"    <Registration Code='{3DB49D3D-1FB8-4147-A465-BBE8BFD0DAD0}' Tag='foo' ProviderKey='foo' Version='4.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='4.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -142,7 +142,7 @@ namespace Bootstrapper
             this->RegisterFakeBundle(L"{3DB49D3D-1FB8-4147-A465-BBE8BFD0DAD0}", L"{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}", NULL, L"4.0.0.0", FALSE);
         }
 
-        void RegisterFakeBundle(LPCWSTR wzBundleId, LPCWSTR wzUpgradeCodes, LPCWSTR wzCachePath, LPCWSTR wzVersion, BOOL fPerMachine)
+        void RegisterFakeBundle(LPCWSTR wzBundleCode, LPCWSTR wzUpgradeCodes, LPCWSTR wzCachePath, LPCWSTR wzVersion, BOOL fPerMachine)
         {
             HRESULT hr = S_OK;
             LPWSTR* rgsczUpgradeCodes = NULL;
@@ -157,12 +157,12 @@ namespace Bootstrapper
                 hr = StrSplitAllocArray(&rgsczUpgradeCodes, reinterpret_cast<UINT*>(&cUpgradeCodes), wzUpgradeCodes, L";");
                 NativeAssert::Succeeded(hr, "Failed to split upgrade codes.");
 
-                hr = StrAllocFormatted(&sczRegistrationKey, L"%s\\%s", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, wzBundleId);
+                hr = StrAllocFormatted(&sczRegistrationKey, L"%s\\%s", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, wzBundleCode);
                 NativeAssert::Succeeded(hr, "Failed to build uninstall registry key path.");
 
                 if (!wzCachePath)
                 {
-                    hr = StrAllocFormatted(&sczCachePath, L"%ls.exe", wzBundleId);
+                    hr = StrAllocFormatted(&sczCachePath, L"%ls.exe", wzBundleCode);
                     NativeAssert::Succeeded(hr, "Failed to build cache path.");
 
                     wzCachePath = sczCachePath;

@@ -74,7 +74,7 @@ static HRESULT AddRegistrationAction(
     __in BURN_PLAN* pPlan,
     __in BURN_DEPENDENT_REGISTRATION_ACTION_TYPE type,
     __in_z LPCWSTR wzDependentProviderKey,
-    __in_z LPCWSTR wzOwnerBundleId
+    __in_z LPCWSTR wzOwnerBundleCode
     );
 static HRESULT AddCachePackage(
     __in BURN_PLAN* pPlan,
@@ -467,7 +467,7 @@ extern "C" HRESULT PlanLayoutBundle(
     hr = StrAllocString(&pCacheAction->bundleLayout.sczExecutableName, wzExecutableName, 0);
     ExitOnFailure(hr, "Failed to to copy executable name for bundle.");
 
-    hr = CacheCalculateBundleLayoutWorkingPath(pPlan->pCache, pPlan->wzBundleId, &pCacheAction->bundleLayout.sczUnverifiedPath);
+    hr = CacheCalculateBundleLayoutWorkingPath(pPlan->pCache, pPlan->wzBundleCode, &pCacheAction->bundleLayout.sczUnverifiedPath);
     ExitOnFailure(hr, "Failed to calculate bundle layout working path.");
 
     pCacheAction->bundleLayout.qwBundleSize = qwBundleSize;
@@ -599,7 +599,7 @@ extern "C" HRESULT PlanRegistration(
         // If our provider key was not owned by a different bundle,
         // then plan to write our provider key registration to "fix it" if broken
         // in case the bundle isn't successfully uninstalled.
-        if (!pRegistration->fDetectedForeignProviderKeyBundleId)
+        if (!pRegistration->fDetectedForeignProviderKeyBundleCode)
         {
             pPlan->dwRegistrationOperations |= BURN_REGISTRATION_ACTION_OPERATIONS_WRITE_PROVIDER_KEY;
         }
@@ -612,7 +612,7 @@ extern "C" HRESULT PlanRegistration(
         // would prevent self-removal.
         if (pRegistration->fSelfRegisteredAsDependent)
         {
-            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_UNREGISTER, pDependencies->wzSelfDependent, pRegistration->sczId);
+            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_UNREGISTER, pDependencies->wzSelfDependent, pRegistration->sczCode);
             ExitOnFailure(hr, "Failed to allocate registration action.");
 
             hr = DependencyAddIgnoreDependencies(sdIgnoreDependents, pDependencies->wzSelfDependent);
@@ -758,7 +758,7 @@ extern "C" HRESULT PlanRegistration(
         // as our own dependent.
         if (pDependencies->wzSelfDependent && !pRegistration->fSelfRegisteredAsDependent && (pDependencies->wzActiveParent || !fAddonOrPatchBundle))
         {
-            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_REGISTER, pDependencies->wzSelfDependent, pRegistration->sczId);
+            hr = AddRegistrationAction(pPlan, BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_REGISTER, pDependencies->wzSelfDependent, pRegistration->sczCode);
             ExitOnFailure(hr, "Failed to add registration action for self dependent.");
         }
     }
@@ -1439,7 +1439,7 @@ extern "C" HRESULT PlanRelatedBundlesBegin(
             }
             else if (E_NOTFOUND != hr)
             {
-                ExitOnFailure(hr, "Failed to lookup the bundle ID in the ancestors dictionary.");
+                ExitOnFailure(hr, "Failed to lookup the bundle code in the ancestors dictionary.");
             }
         }
         else if (fDependent && BOOTSTRAPPER_RELATION_NONE != relationType)
@@ -2076,7 +2076,7 @@ static void UninitializeRegistrationAction(
     )
 {
     ReleaseStr(pAction->sczDependentProviderKey);
-    ReleaseStr(pAction->sczBundleId);
+    ReleaseStr(pAction->sczBundleCode);
     memset(pAction, 0, sizeof(BURN_DEPENDENT_REGISTRATION_ACTION));
 }
 
@@ -2271,7 +2271,7 @@ static HRESULT AddRegistrationAction(
     __in BURN_PLAN* pPlan,
     __in BURN_DEPENDENT_REGISTRATION_ACTION_TYPE type,
     __in_z LPCWSTR wzDependentProviderKey,
-    __in_z LPCWSTR wzOwnerBundleId
+    __in_z LPCWSTR wzOwnerBundleCode
     )
 {
     HRESULT hr = S_OK;
@@ -2287,7 +2287,7 @@ static HRESULT AddRegistrationAction(
 
     pAction->type = type;
 
-    hr = StrAllocString(&pAction->sczBundleId, wzOwnerBundleId, 0);
+    hr = StrAllocString(&pAction->sczBundleCode, wzOwnerBundleCode, 0);
     ExitOnFailure(hr, "Failed to copy owner bundle to registration action.");
 
     hr = StrAllocString(&pAction->sczDependentProviderKey, wzDependentProviderKey, 0);
@@ -2302,7 +2302,7 @@ static HRESULT AddRegistrationAction(
 
     pAction->type = rollbackType;
 
-    hr = StrAllocString(&pAction->sczBundleId, wzOwnerBundleId, 0);
+    hr = StrAllocString(&pAction->sczBundleCode, wzOwnerBundleCode, 0);
     ExitOnFailure(hr, "Failed to copy owner bundle to registration action.");
 
     hr = StrAllocString(&pAction->sczDependentProviderKey, wzDependentProviderKey, 0);
@@ -2880,7 +2880,7 @@ static void DependentRegistrationActionLog(
 
     if (wzType)
     {
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: %ls bundle id: %ls, provider key: %ls", wzBase, iAction, wzType, pAction->sczBundleId, pAction->sczDependentProviderKey);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: %ls bundle code: %ls, provider key: %ls", wzBase, iAction, wzType, pAction->sczBundleCode, pAction->sczDependentProviderKey);
     }
 }
 
@@ -3076,7 +3076,7 @@ extern "C" void PlanDump(
     LogStringLine(PlanDumpLevel, "--- Begin plan dump ---");
 
     LogStringLine(PlanDumpLevel, "Plan action: %hs", LoggingBurnActionToString(pPlan->action));
-    LogStringLine(PlanDumpLevel, "     bundle id: %ls", pPlan->wzBundleId);
+    LogStringLine(PlanDumpLevel, "     bundle code: %ls", pPlan->wzBundleCode);
     LogStringLine(PlanDumpLevel, "     bundle provider key: %ls", pPlan->wzBundleProviderKey);
     LogStringLine(PlanDumpLevel, "     use-forward-compatible: %hs", LoggingTrueFalseToString(pPlan->fEnabledForwardCompatibleBundle));
     LogStringLine(PlanDumpLevel, "     per-machine: %hs", LoggingTrueFalseToString(pPlan->fPerMachine));

@@ -1449,9 +1449,9 @@ namespace WixToolset.BootstrapperApplicationApi
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnDetectForwardCompatibleBundle(string wzBundleId, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, bool fMissingFromCache, ref bool fCancel)
+        int IBootstrapperApplication.OnDetectForwardCompatibleBundle(string wzBundleCode, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, bool fMissingFromCache, ref bool fCancel)
         {
-            DetectForwardCompatibleBundleEventArgs args = new DetectForwardCompatibleBundleEventArgs(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, fCancel);
+            DetectForwardCompatibleBundleEventArgs args = new DetectForwardCompatibleBundleEventArgs(wzBundleCode, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, fCancel);
             this.OnDetectForwardCompatibleBundle(args);
 
             fCancel = args.Cancel;
@@ -1566,9 +1566,9 @@ namespace WixToolset.BootstrapperApplicationApi
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanRelatedBundle(string wzBundleId, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
+        int IBootstrapperApplication.OnPlanRelatedBundle(string wzBundleCode, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
         {
-            PlanRelatedBundleEventArgs args = new PlanRelatedBundleEventArgs(wzBundleId, recommendedState, pRequestedState, fCancel);
+            PlanRelatedBundleEventArgs args = new PlanRelatedBundleEventArgs(wzBundleCode, recommendedState, pRequestedState, fCancel);
             this.OnPlanRelatedBundle(args);
 
             pRequestedState = args.State;
@@ -1576,9 +1576,9 @@ namespace WixToolset.BootstrapperApplicationApi
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanRelatedBundleType(string wzBundleId, RelatedBundlePlanType recommendedType, ref RelatedBundlePlanType pRequestedType, ref bool fCancel)
+        int IBootstrapperApplication.OnPlanRelatedBundleType(string wzBundleCode, RelatedBundlePlanType recommendedType, ref RelatedBundlePlanType pRequestedType, ref bool fCancel)
         {
-            PlanRelatedBundleTypeEventArgs args = new PlanRelatedBundleTypeEventArgs(wzBundleId, recommendedType, pRequestedType, fCancel);
+            PlanRelatedBundleTypeEventArgs args = new PlanRelatedBundleTypeEventArgs(wzBundleCode, recommendedType, pRequestedType, fCancel);
             this.OnPlanRelatedBundleType(args);
 
             pRequestedType = args.Type;
@@ -2060,9 +2060,9 @@ namespace WixToolset.BootstrapperApplicationApi
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanForwardCompatibleBundle(string wzBundleId, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, bool fRecommendedIgnoreBundle, ref bool fCancel, ref bool fIgnoreBundle)
+        int IBootstrapperApplication.OnPlanForwardCompatibleBundle(string wzBundleCode, RelationType relationType, string wzBundleTag, bool fPerMachine, string wzVersion, bool fRecommendedIgnoreBundle, ref bool fCancel, ref bool fIgnoreBundle)
         {
-            PlanForwardCompatibleBundleEventArgs args = new PlanForwardCompatibleBundleEventArgs(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fRecommendedIgnoreBundle, fCancel, fIgnoreBundle);
+            PlanForwardCompatibleBundleEventArgs args = new PlanForwardCompatibleBundleEventArgs(wzBundleCode, relationType, wzBundleTag, fPerMachine, wzVersion, fRecommendedIgnoreBundle, fCancel, fIgnoreBundle);
             this.OnPlanForwardCompatibleBundle(args);
 
             fCancel = args.Cancel;
@@ -2122,9 +2122,9 @@ namespace WixToolset.BootstrapperApplicationApi
             return args.HResult;
         }
 
-        int IBootstrapperApplication.OnPlanRestoreRelatedBundle(string wzBundleId, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
+        int IBootstrapperApplication.OnPlanRestoreRelatedBundle(string wzBundleCode, RequestState recommendedState, ref RequestState pRequestedState, ref bool fCancel)
         {
-            PlanRestoreRelatedBundleEventArgs args = new PlanRestoreRelatedBundleEventArgs(wzBundleId, recommendedState, pRequestedState, fCancel);
+            PlanRestoreRelatedBundleEventArgs args = new PlanRestoreRelatedBundleEventArgs(wzBundleCode, recommendedState, pRequestedState, fCancel);
             this.OnPlanRestoreRelatedBundle(args);
 
             pRequestedState = args.State;

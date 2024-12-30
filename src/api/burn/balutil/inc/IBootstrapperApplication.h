@@ -56,7 +56,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
 
     // OnDetectForwardCompatibleBundle - called when the engine detects a forward compatible bundle.
     STDMETHOD(OnDetectForwardCompatibleBundle)(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in BOOTSTRAPPER_RELATION_TYPE relationType,
         __in_z LPCWSTR wzBundleTag,
         __in BOOL fPerMachine,
@@ -95,7 +95,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
 
     // OnDetectRelatedBundle - called when the engine detects a related bundle.
     STDMETHOD(OnDetectRelatedBundle)(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in BOOTSTRAPPER_RELATION_TYPE relationType,
         __in_z LPCWSTR wzBundleTag,
         __in BOOL fPerMachine,
@@ -170,7 +170,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
 
     // OnPlanRelatedBundle - called when the engine begins planning a related bundle.
     STDMETHOD(OnPlanRelatedBundle)(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
         __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
         __inout BOOL* pfCancel
@@ -649,7 +649,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
         ) = 0;
 
     STDMETHOD(OnPlanForwardCompatibleBundle)(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in BOOTSTRAPPER_RELATION_TYPE relationType,
         __in_z LPCWSTR wzBundleTag,
         __in BOOL fPerMachine,
@@ -703,7 +703,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
 
     // OnPlanRestoreRelatedBundle - called when the engine begins planning an upgrade related bundle for restoring in case of failure.
     STDMETHOD(OnPlanRestoreRelatedBundle)(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in BOOTSTRAPPER_REQUEST_STATE recommendedState,
         __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState,
         __inout BOOL* pfCancel
@@ -711,7 +711,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
 
     // OnPlanRelatedBundleType - called when the engine begins planning the related bundle relation type.
     STDMETHOD(OnPlanRelatedBundleType)(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE recommendedType,
         __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* pRequestedType,
         __inout BOOL* pfCancel
@@ -736,7 +736,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperApplication, IUnknown, "53C31D56-49C0-426B-A
     // OnDetectRelatedBundlePackage - called when the engine detects a related bundle for a BundlePackage.
     STDMETHOD(OnDetectRelatedBundlePackage)(
         __in_z LPCWSTR wzPackageId,
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in BOOTSTRAPPER_RELATION_TYPE relationType,
         __in BOOL fPerMachine,
         __in_z LPCWSTR wzVersion,

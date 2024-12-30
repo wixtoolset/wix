@@ -2120,7 +2120,7 @@ LExit:
 
 EXTERN_C HRESULT BACallbackOnDetectForwardCompatibleBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
@@ -2138,7 +2138,7 @@ EXTERN_C HRESULT BACallbackOnDetectForwardCompatibleBundle(
 
     // Init structs.
     args.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
-    args.wzBundleId = wzBundleId;
+    args.wzBundleCode = wzBundleCode;
     args.relationType = relationType;
     args.wzBundleTag = wzBundleTag;
     args.fPerMachine = fPerMachine;
@@ -2151,8 +2151,8 @@ EXTERN_C HRESULT BACallbackOnDetectForwardCompatibleBundle(
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.dwApiVersion);
     ExitOnFailure(hr, "Failed to write API version of OnDetectForwardCompatibleBundle args.");
 
-    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleId);
-    ExitOnFailure(hr, "Failed to write bundle id of OnDetectForwardCompatibleBundle args.");
+    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleCode);
+    ExitOnFailure(hr, "Failed to write bundle code of OnDetectForwardCompatibleBundle args.");
 
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.relationType);
     ExitOnFailure(hr, "Failed to write relation type of OnDetectForwardCompatibleBundle args.");
@@ -2393,7 +2393,7 @@ LExit:
 
 EXTERN_C HRESULT BACallbackOnDetectRelatedBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
@@ -2411,7 +2411,7 @@ EXTERN_C HRESULT BACallbackOnDetectRelatedBundle(
 
     // Init structs.
     args.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
-    args.wzBundleId = wzBundleId;
+    args.wzBundleCode = wzBundleCode;
     args.relationType = relationType;
     args.wzBundleTag = wzBundleTag;
     args.fPerMachine = fPerMachine;
@@ -2424,8 +2424,8 @@ EXTERN_C HRESULT BACallbackOnDetectRelatedBundle(
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.dwApiVersion);
     ExitOnFailure(hr, "Failed to write API version of OnDetectRelatedBundle args.");
 
-    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleId);
-    ExitOnFailure(hr, "Failed to write bundle id of OnDetectRelatedBundle args.");
+    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleCode);
+    ExitOnFailure(hr, "Failed to write bundle code of OnDetectRelatedBundle args.");
 
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.relationType);
     ExitOnFailure(hr, "Failed to write relation type of OnDetectRelatedBundle args.");
@@ -2478,7 +2478,7 @@ LExit:
 EXTERN_C HRESULT BACallbackOnDetectRelatedBundlePackage(
     __in BURN_USER_EXPERIENCE* pUserExperience,
     __in_z LPCWSTR wzPackageId,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BOOL fPerMachine,
     __in VERUTIL_VERSION* pVersion
@@ -2495,7 +2495,7 @@ EXTERN_C HRESULT BACallbackOnDetectRelatedBundlePackage(
     // Init structs.
     args.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
     args.wzPackageId = wzPackageId;
-    args.wzBundleId = wzBundleId;
+    args.wzBundleCode = wzBundleCode;
     args.relationType = relationType;
     args.fPerMachine = fPerMachine;
     args.wzVersion = pVersion->sczVersion;
@@ -2509,8 +2509,8 @@ EXTERN_C HRESULT BACallbackOnDetectRelatedBundlePackage(
     hr = BuffWriteStringToBuffer(&bufferArgs, args.wzPackageId);
     ExitOnFailure(hr, "Failed to write package id of OnDetectRelatedBundlePackage args.");
 
-    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleId);
-    ExitOnFailure(hr, "Failed to write bundle id of OnDetectRelatedBundlePackage args.");
+    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleCode);
+    ExitOnFailure(hr, "Failed to write bundle code of OnDetectRelatedBundlePackage args.");
 
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.relationType);
     ExitOnFailure(hr, "Failed to write relation type of OnDetectRelatedBundlePackage args.");
@@ -4315,7 +4315,7 @@ LExit:
 
 EXTERN_C HRESULT BACallbackOnPlanForwardCompatibleBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in_z LPCWSTR wzBundleTag,
     __in BOOL fPerMachine,
@@ -4333,7 +4333,7 @@ EXTERN_C HRESULT BACallbackOnPlanForwardCompatibleBundle(
 
     // Init structs.
     args.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
-    args.wzBundleId = wzBundleId;
+    args.wzBundleCode = wzBundleCode;
     args.relationType = relationType;
     args.wzBundleTag = wzBundleTag;
     args.fPerMachine = fPerMachine;
@@ -4347,8 +4347,8 @@ EXTERN_C HRESULT BACallbackOnPlanForwardCompatibleBundle(
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.dwApiVersion);
     ExitOnFailure(hr, "Failed to write API version of OnPlanForwardCompatibleBundle args.");
 
-    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleId);
-    ExitOnFailure(hr, "Failed to write bundle id of OnPlanForwardCompatibleBundle args.");
+    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleCode);
+    ExitOnFailure(hr, "Failed to write bundle code of OnPlanForwardCompatibleBundle args.");
 
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.relationType);
     ExitOnFailure(hr, "Failed to write relation type of OnPlanForwardCompatibleBundle args.");
@@ -4806,7 +4806,7 @@ LExit:
 
 EXTERN_C HRESULT BACallbackOnPlanRelatedBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
     )
 {
@@ -4820,7 +4820,7 @@ EXTERN_C HRESULT BACallbackOnPlanRelatedBundle(
 
     // Init structs.
     args.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
-    args.wzBundleId = wzBundleId;
+    args.wzBundleCode = wzBundleCode;
     args.recommendedState = *pRequestedState;
 
     results.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
@@ -4830,8 +4830,8 @@ EXTERN_C HRESULT BACallbackOnPlanRelatedBundle(
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.dwApiVersion);
     ExitOnFailure(hr, "Failed to write API version of OnPlanRelatedBundle args.");
 
-    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleId);
-    ExitOnFailure(hr, "Failed to write bundle id of OnPlanRelatedBundle args.");
+    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleCode);
+    ExitOnFailure(hr, "Failed to write bundle code of OnPlanRelatedBundle args.");
 
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.recommendedState);
     ExitOnFailure(hr, "Failed to write recommended state of OnPlanRelatedBundle args.");
@@ -4879,7 +4879,7 @@ LExit:
 
 EXTERN_C HRESULT BACallbackOnPlanRelatedBundleType(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* pRequestedType
     )
 {
@@ -4893,7 +4893,7 @@ EXTERN_C HRESULT BACallbackOnPlanRelatedBundleType(
 
     // Init structs.
     args.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
-    args.wzBundleId = wzBundleId;
+    args.wzBundleCode = wzBundleCode;
     args.recommendedType = *pRequestedType;
 
     results.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
@@ -4903,8 +4903,8 @@ EXTERN_C HRESULT BACallbackOnPlanRelatedBundleType(
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.dwApiVersion);
     ExitOnFailure(hr, "Failed to write API version of OnPlanRelatedBundleType args.");
 
-    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleId);
-    ExitOnFailure(hr, "Failed to write bundle id of OnPlanRelatedBundleType args.");
+    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleCode);
+    ExitOnFailure(hr, "Failed to write bundle code of OnPlanRelatedBundleType args.");
 
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.recommendedType);
     ExitOnFailure(hr, "Failed to write recommended type of OnPlanRelatedBundleType args.");
@@ -4952,7 +4952,7 @@ LExit:
 
 EXTERN_C HRESULT BACallbackOnPlanRestoreRelatedBundle(
     __in BURN_USER_EXPERIENCE* pUserExperience,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __inout BOOTSTRAPPER_REQUEST_STATE* pRequestedState
     )
 {
@@ -4966,7 +4966,7 @@ EXTERN_C HRESULT BACallbackOnPlanRestoreRelatedBundle(
 
     // Init structs.
     args.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
-    args.wzBundleId = wzBundleId;
+    args.wzBundleCode = wzBundleCode;
     args.recommendedState = *pRequestedState;
 
     results.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
@@ -4976,8 +4976,8 @@ EXTERN_C HRESULT BACallbackOnPlanRestoreRelatedBundle(
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.dwApiVersion);
     ExitOnFailure(hr, "Failed to write API version of OnPlanRestoreRelatedBundle args.");
 
-    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleId);
-    ExitOnFailure(hr, "Failed to write bundle id of OnPlanRestoreRelatedBundle args.");
+    hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleCode);
+    ExitOnFailure(hr, "Failed to write bundle code of OnPlanRestoreRelatedBundle args.");
 
     hr = BuffWriteNumberToBuffer(&bufferArgs, args.recommendedState);
     ExitOnFailure(hr, "Failed to write recommended state of OnPlanRestoreRelatedBundle args.");

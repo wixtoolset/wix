@@ -67,7 +67,7 @@ DECLARE_INTERFACE_IID_(IBootstrapperExtensionEngine, IUnknown, "9D027A39-F6B6-42
         ) = 0;
 
     STDMETHOD(GetRelatedBundleVariable)(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in_z LPCWSTR wzVariable,
         __out_ecount_opt(*pcchValue) LPWSTR wzValue,
         __inout SIZE_T * pcchValue

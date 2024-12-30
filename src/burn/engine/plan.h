@@ -71,7 +71,7 @@ enum BURN_CLEAN_ACTION_TYPE
 typedef struct _BURN_DEPENDENT_REGISTRATION_ACTION
 {
     BURN_DEPENDENT_REGISTRATION_ACTION_TYPE type;
-    LPWSTR sczBundleId;
+    LPWSTR sczBundleCode;
     LPWSTR sczDependentProviderKey;
 } BURN_DEPENDENT_REGISTRATION_ACTION;
 
@@ -253,7 +253,7 @@ typedef struct _BURN_PLAN
     BOOTSTRAPPER_COMMAND* pCommand;
     BURN_ENGINE_COMMAND* pInternalCommand;
     BURN_PAYLOADS* pPayloads;
-    LPWSTR wzBundleId;          // points directly into parent the ENGINE_STATE.
+    LPWSTR wzBundleCode;          // points directly into parent the ENGINE_STATE.
     LPWSTR wzBundleProviderKey; // points directly into parent the ENGINE_STATE.
     BOOL fPerMachine;
     BOOL fCanAffectMachineState;

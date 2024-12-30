@@ -73,7 +73,7 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -173,7 +173,7 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='Product1' InProgressDisplayName='Product1 Installation' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -294,7 +294,7 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='bar' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='bar' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='Product1' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -415,7 +415,7 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' DisplayName='DisplayName1' DisplayVersion='1.2.3.4' Publisher='Publisher1' HelpLink='http://www.microsoft.com/help'"
                     L"             HelpTelephone='555-555-5555' AboutUrl='http://www.microsoft.com/about' UpdateUrl='http://www.microsoft.com/update'"
                     L"             Comments='Comments1' Contact='Contact1' DisableModify='yes' DisableRemove='yes' />"
@@ -525,7 +525,7 @@ namespace Bootstrapper
             IXMLDOMElement* pixeBundle = NULL;
             LPWSTR sczCurrentProcess = NULL;
             LPWSTR sczValue = NULL;
-            LPWSTR sczRelatedBundleId = NULL;
+            LPWSTR sczRelatedBundleCode = NULL;
             DWORD dwRelatedBundleIndex = 0;
             BURN_VARIABLES variables = { };
             BURN_USER_EXPERIENCE userExperience = { };
@@ -553,8 +553,8 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <RelatedBundle Id='" TEST_BUNDLE_UPGRADE_CODE L"' Action='Upgrade' />"
-                    L"    <Registration Id='" TEST_BUNDLE_ID L"' Tag='foo' ProviderKey='" TEST_BUNDLE_ID L"' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <RelatedBundle Code='" TEST_BUNDLE_UPGRADE_CODE L"' Action='Upgrade' />"
+                    L"    <Registration Code='" TEST_BUNDLE_ID L"' Tag='foo' ProviderKey='" TEST_BUNDLE_ID L"' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"    <Variable Id='MyBurnVariable1' Type='numeric' Value='0' Hidden='no' Persisted='yes' />"
@@ -622,14 +622,14 @@ namespace Bootstrapper
                 this->ValidateVariableKey(L"MyBurnVariable5", gcnew String(L"vvv"));
                 this->ValidateVariableKeyEmpty(L"WixBundleForcedRestartPackage");
 
-                hr = StrAlloc(&sczRelatedBundleId, MAX_GUID_CHARS + 1);
-                NativeAssert::Succeeded(hr, "Failed to allocate buffer for related bundle id.");
+                hr = StrAlloc(&sczRelatedBundleCode, MAX_GUID_CHARS + 1);
+                NativeAssert::Succeeded(hr, "Failed to allocate buffer for related bundle code.");
 
                 // Verify we can find ourself via the UpgradeCode
-                hr = BundleEnumRelatedBundleFixed(TEST_BUNDLE_UPGRADE_CODE, BUNDLE_INSTALL_CONTEXT_USER, REG_KEY_DEFAULT, &dwRelatedBundleIndex, sczRelatedBundleId);
+                hr = BundleEnumRelatedBundleFixed(TEST_BUNDLE_UPGRADE_CODE, BUNDLE_INSTALL_CONTEXT_USER, REG_KEY_DEFAULT, &dwRelatedBundleIndex, sczRelatedBundleCode);
                 TestThrowOnFailure(hr, L"Failed to enumerate related bundle.");
 
-                NativeAssert::StringEqual(TEST_BUNDLE_ID, sczRelatedBundleId);
+                NativeAssert::StringEqual(TEST_BUNDLE_ID, sczRelatedBundleCode);
 
                 // Verify we can read the bundle variables via the API
                 hr = BundleGetBundleVariable(TEST_BUNDLE_ID, L"MyBurnVariable1", &sczValue);
@@ -643,7 +643,7 @@ namespace Bootstrapper
             }
             finally
             {
-                ReleaseStr(sczRelatedBundleId);
+                ReleaseStr(sczRelatedBundleCode);
                 ReleaseStr(sczCurrentProcess);
                 ReleaseObject(pixeBundle);
                 BootstrapperApplicationUninitialize(&userExperience);
@@ -694,7 +694,7 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Id='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"    <Variable Id='MyBurnVariable1' Type='numeric' Value='0' Hidden='no' Persisted='yes' />"

@@ -28,32 +28,32 @@ namespace WixToolset.Core.Burn.Bind
             foreach (var relatedBundleSymbol in this.Section.Symbols.OfType<WixRelatedBundleSymbol>())
             {
                 var elementName = "RelatedBundle";
-                var attributeName = "Id";
+                var attributeName = "Code";
 
-                if (this.BundleSymbol.UpgradeCode == relatedBundleSymbol.BundleId)
+                if (this.BundleSymbol.UpgradeCode == relatedBundleSymbol.BundleCode)
                 {
                     elementName = "Bundle";
                     attributeName = "UpgradeCode";
                 }
 
-                relatedBundleSymbol.BundleId = this.NormalizeBundleRelatedBundleId(relatedBundleSymbol.SourceLineNumbers, relatedBundleSymbol.BundleId, elementName, attributeName);
+                relatedBundleSymbol.BundleCode = this.NormalizeBundleRelatedBundleCode(relatedBundleSymbol.SourceLineNumbers, relatedBundleSymbol.BundleCode, elementName, attributeName);
             }
 
-            this.BundleSymbol.UpgradeCode = this.NormalizeBundleRelatedBundleId(this.BundleSymbol.SourceLineNumbers, this.BundleSymbol.UpgradeCode, null, null);
+            this.BundleSymbol.UpgradeCode = this.NormalizeBundleRelatedBundleCode(this.BundleSymbol.SourceLineNumbers, this.BundleSymbol.UpgradeCode, null, null);
         }
 
-        private string NormalizeBundleRelatedBundleId(SourceLineNumber sourceLineNumber, string relatedBundleId, string elementName, string attributeName)
+        private string NormalizeBundleRelatedBundleCode(SourceLineNumber sourceLineNumber, string relatedBundleCode, string elementName, string attributeName)
         {
-            if (Guid.TryParse(relatedBundleId, out var guid))
+            if (Guid.TryParse(relatedBundleCode, out var guid))
             {
                 return guid.ToString("B").ToUpperInvariant();
             }
             else if (!String.IsNullOrEmpty(elementName))
             {
-                this.Messaging.Write(ErrorMessages.IllegalGuidValue(sourceLineNumber, elementName, attributeName, relatedBundleId));
+                this.Messaging.Write(ErrorMessages.IllegalGuidValue(sourceLineNumber, elementName, attributeName, relatedBundleCode));
             }
 
-            return relatedBundleId;
+            return relatedBundleCode;
         }
     }
 }

@@ -92,10 +92,15 @@ namespace WixToolset.Core.Burn.Bundles
         {
             writer.WriteStartElement("WixBundleProperties");
 
+            if (this.BundleSymbol.Id != null)
+            {
+                writer.WriteAttributeString("BundleId", this.BundleSymbol.Id.Id);
+            }
+
+            writer.WriteAttributeString("Code", this.BundleSymbol.BundleCode.ToUpperInvariant());
             writer.WriteAttributeString("DisplayName", this.BundleSymbol.Name);
             writer.WriteAttributeString("LogPathVariable", this.BundleSymbol.LogPathVariable);
             writer.WriteAttributeString("Compressed", this.BundleSymbol.Compressed == true ? "yes" : "no");
-            writer.WriteAttributeString("Id", this.BundleSymbol.BundleId.ToUpperInvariant());
             writer.WriteAttributeString("UpgradeCode", this.BundleSymbol.UpgradeCode);
             writer.WriteAttributeString("PerMachine", this.BundleSymbol.PerMachine ? "yes" : "no");
 

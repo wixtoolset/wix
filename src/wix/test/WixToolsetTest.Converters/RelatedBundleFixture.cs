@@ -18,10 +18,10 @@ namespace WixToolsetTest.Converters
             var parse = String.Join(Environment.NewLine,
                 "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
                 "  <Fragment>",
-                "    <RelatedBundle Id='D' Action='Detect' />",
-                "    <RelatedBundle Id='U' Action='Upgrade' />",
-                "    <RelatedBundle Id='A' Action='Addon' />",
-                "    <RelatedBundle Id='P' Action='Patch' />",
+                "    <RelatedBundle Code='D' Action='Detect' />",
+                "    <RelatedBundle Code='U' Action='Upgrade' />",
+                "    <RelatedBundle Code='A' Action='Addon' />",
+                "    <RelatedBundle Code='P' Action='Patch' />",
                 "  </Fragment>",
                 "</Wix>");
 
@@ -29,10 +29,10 @@ namespace WixToolsetTest.Converters
             {
                 "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
                 "  <Fragment>",
-                "    <RelatedBundle Id=\"D\" Action=\"detect\" />",
-                "    <RelatedBundle Id=\"U\" Action=\"upgrade\" />",
-                "    <RelatedBundle Id=\"A\" Action=\"addon\" />",
-                "    <RelatedBundle Id=\"P\" Action=\"patch\" />",
+                "    <RelatedBundle Code=\"D\" Action=\"detect\" />",
+                "    <RelatedBundle Code=\"U\" Action=\"upgrade\" />",
+                "    <RelatedBundle Code=\"A\" Action=\"addon\" />",
+                "    <RelatedBundle Code=\"P\" Action=\"patch\" />",
                 "  </Fragment>",
                 "</Wix>"
             };
@@ -53,6 +53,52 @@ namespace WixToolsetTest.Converters
                 "[Converted] The RelatedBundle element's Action attribute value must now be all lowercase. The Action='Upgrade' will be converted to 'upgrade' (RelatedBundleActionLowercase)",
                 "[Converted] The RelatedBundle element's Action attribute value must now be all lowercase. The Action='Addon' will be converted to 'addon' (RelatedBundleActionLowercase)",
                 "[Converted] The RelatedBundle element's Action attribute value must now be all lowercase. The Action='Patch' will be converted to 'patch' (RelatedBundleActionLowercase)",
+            }, messaging.Messages.Select(m => m.ToString()).ToArray());
+
+            Assert.Equal(4, errors);
+        }
+    
+        [Fact]
+        public void CanConvertIdToCode()
+        {
+            var parse = String.Join(Environment.NewLine,
+                "<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                "  <Fragment>",
+                "    <RelatedBundle Id='D' Action='detect' />",
+                "    <RelatedBundle Id='U' Action='upgrade' />",
+                "    <RelatedBundle Id='A' Action='addon' />",
+                "    <RelatedBundle Id='P' Action='patch' />",
+                "  </Fragment>",
+                "</Wix>");
+
+            var expected = new[]
+            {
+                "<Wix xmlns=\"http://wixtoolset.org/schemas/v4/wxs\">",
+                "  <Fragment>",
+                "    <RelatedBundle Action=\"detect\" Code=\"D\" />",
+                "    <RelatedBundle Action=\"upgrade\" Code=\"U\" />",
+                "    <RelatedBundle Action=\"addon\" Code=\"A\" />",
+                "    <RelatedBundle Action=\"patch\" Code=\"P\" />",
+                "  </Fragment>",
+                "</Wix>"
+            };
+
+            var document = XDocument.Parse(parse, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
+
+            var messaging = new MockMessaging();
+            var converter = new WixConverter(messaging, 2, null, null);
+
+            var errors = converter.ConvertDocument(document);
+
+            var actualLines = UnformattedDocumentLines(document);
+            WixAssert.CompareLineByLine(expected, actualLines);
+
+            WixAssert.CompareLineByLine(new[]
+            {
+                "[Converted] The RelatedBundle element's Id attribute has been renamed. Use the Code attribute instead. (RelatedBundleIdAttributeRenamed)",
+                "[Converted] The RelatedBundle element's Id attribute has been renamed. Use the Code attribute instead. (RelatedBundleIdAttributeRenamed)",
+                "[Converted] The RelatedBundle element's Id attribute has been renamed. Use the Code attribute instead. (RelatedBundleIdAttributeRenamed)",
+                "[Converted] The RelatedBundle element's Id attribute has been renamed. Use the Code attribute instead. (RelatedBundleIdAttributeRenamed)",
             }, messaging.Messages.Select(m => m.ToString()).ToArray());
 
             Assert.Equal(4, errors);

@@ -551,7 +551,7 @@ LExit:
 }
 
 DAPI_(HRESULT) BalGetRelatedBundleVariable(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzVariable,
     __inout LPWSTR* psczValue
 )
@@ -564,7 +564,7 @@ DAPI_(HRESULT) BalGetRelatedBundleVariable(
         ExitOnRootFailure(hr, "BalInitialize() must be called first.");
     }
 
-    hr = BalGetRelatedBundleVariableFromEngine(vpEngine, wzBundleId, wzVariable, psczValue);
+    hr = BalGetRelatedBundleVariableFromEngine(vpEngine, wzBundleCode, wzVariable, psczValue);
 
 LExit:
     return hr;
@@ -572,7 +572,7 @@ LExit:
 
 DAPI_(HRESULT) BalGetRelatedBundleVariableFromEngine(
     __in IBootstrapperEngine* pEngine,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzVariable,
     __inout LPWSTR* psczValue
 )
@@ -586,7 +586,7 @@ DAPI_(HRESULT) BalGetRelatedBundleVariableFromEngine(
         ExitOnFailure(hr, "Failed to determine length of value.");
     }
 
-    hr = pEngine->GetRelatedBundleVariable(wzBundleId, wzVariable, *psczValue, &cch);
+    hr = pEngine->GetRelatedBundleVariable(wzBundleCode, wzVariable, *psczValue, &cch);
     if (E_MOREDATA == hr)
     {
         ++cch;
@@ -594,7 +594,7 @@ DAPI_(HRESULT) BalGetRelatedBundleVariableFromEngine(
         hr = StrAllocSecure(psczValue, cch);
         ExitOnFailure(hr, "Failed to allocate value.");
 
-        hr = pEngine->GetRelatedBundleVariable(wzBundleId, wzVariable, *psczValue, &cch);
+        hr = pEngine->GetRelatedBundleVariable(wzBundleCode, wzVariable, *psczValue, &cch);
     }
 
 LExit:

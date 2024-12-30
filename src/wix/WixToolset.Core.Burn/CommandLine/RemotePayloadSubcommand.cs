@@ -407,7 +407,7 @@ namespace WixToolset.Core.Burn.CommandLine
                 }
             }
 
-            return Path.GetFileName(path); 
+            return Path.GetFileName(path);
         }
 
         private void HarvestBundlePackage(HarvestedFile harvestedFile)
@@ -424,7 +424,7 @@ namespace WixToolset.Core.Burn.CommandLine
             {
                 var bundleElement = new XElement(RemoteBundleName);
 
-                bundleElement.Add(new XAttribute("BundleId", command.HarvestedBundlePackage.BundleId));
+                bundleElement.Add(new XAttribute("BundleCode", command.HarvestedBundlePackage.BundleCode));
 
                 if (!String.IsNullOrEmpty(command.HarvestedBundlePackage.DisplayName))
                 {
@@ -455,13 +455,13 @@ namespace WixToolset.Core.Burn.CommandLine
                     if (!setUpgradeCode && relatedBundle.Action == RelatedBundleActionType.Upgrade)
                     {
                         setUpgradeCode = true;
-                        bundleElement.Add(new XAttribute("UpgradeCode", relatedBundle.BundleId));
+                        bundleElement.Add(new XAttribute("UpgradeCode", relatedBundle.BundleCode));
                         continue;
                     }
 
                     var relatedBundleElement = new XElement(RemoteRelatedBundleName);
 
-                    relatedBundleElement.Add(new XAttribute("Id", relatedBundle.BundleId));
+                    relatedBundleElement.Add(new XAttribute("Code", relatedBundle.BundleCode));
                     relatedBundleElement.Add(new XAttribute("Action", relatedBundle.Action.ToString()));
 
                     bundleElement.Add(relatedBundleElement);

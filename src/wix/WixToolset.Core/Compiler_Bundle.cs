@@ -447,7 +447,7 @@ namespace WixToolset.Core
                 {
                     this.Core.AddSymbol(new WixRelatedBundleSymbol(sourceLineNumbers)
                     {
-                        BundleId = upgradeCode,
+                        BundleCode = upgradeCode,
                         Action = RelatedBundleActionType.Upgrade,
                     });
                 }
@@ -2765,7 +2765,7 @@ namespace WixToolset.Core
         private void ParseRemoteBundleElement(XElement node, string packagePayloadId)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string bundleId = null;
+            string bundleCode = null;
             string displayName = null;
             string engineVersion = null;
             long? installSize = null;
@@ -2784,7 +2784,10 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                         case "BundleId":
-                            bundleId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib);
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BundleCode"));
+                            goto case "BundleCode";
+                        case "BundleCode":
+                            bundleCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib);
                             break;
                         case "DisplayName":
                             displayName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2827,9 +2830,9 @@ namespace WixToolset.Core
                 }
             }
 
-            if (String.IsNullOrEmpty(bundleId))
+            if (String.IsNullOrEmpty(bundleCode))
             {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "BundleId"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "BundleCode"));
             }
 
             if (String.IsNullOrEmpty(manifestNamespace))
@@ -2876,7 +2879,7 @@ namespace WixToolset.Core
                 var symbol = this.Core.AddSymbol(new WixBundleHarvestedBundlePackageSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, packagePayloadId))
                 {
                     Attributes = bundleAttributes,
-                    BundleId = bundleId,
+                    BundleCode = bundleCode,
                     DisplayName = displayName,
                     EngineVersion = engineVersion,
                     ManifestNamespace = manifestNamespace,
@@ -2892,7 +2895,7 @@ namespace WixToolset.Core
                 this.Core.AddSymbol(new WixBundlePackageRelatedBundleSymbol(sourceLineNumbers)
                 {
                     PackagePayloadRef = packagePayloadId,
-                    BundleId = upgradeCode,
+                    BundleCode = upgradeCode,
                     Action = RelatedBundleActionType.Upgrade,
                 });
 
@@ -3006,7 +3009,7 @@ namespace WixToolset.Core
                 this.Core.AddSymbol(new WixBundlePackageRelatedBundleSymbol(sourceLineNumbers)
                 {
                     PackagePayloadRef = payloadId,
-                    BundleId = id,
+                    BundleCode = id,
                     Action = actionType.Value,
                 });
             }
@@ -3489,7 +3492,7 @@ namespace WixToolset.Core
         private void ParseRelatedBundleElement(XElement node)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
-            string id = null;
+            string code = null;
             var actionType = RelatedBundleActionType.Detect;
 
             foreach (var attrib in node.Attributes())
@@ -3499,7 +3502,10 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            this.Core.Write(WarningMessages.DeprecatedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "Code"));
+                            goto case "Code";
+                        case "Code":
+                            code = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
                             break;
                         case "Action":
                             var action = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3539,9 +3545,9 @@ namespace WixToolset.Core
                 }
             }
 
-            if (null == id)
+            if (null == code)
             {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Code"));
             }
 
             this.Core.ParseForExtensionElements(node);
@@ -3550,7 +3556,7 @@ namespace WixToolset.Core
             {
                 this.Core.AddSymbol(new WixRelatedBundleSymbol(sourceLineNumbers)
                 {
-                    BundleId = id,
+                    BundleCode = code,
                     Action = actionType,
                 });
             }

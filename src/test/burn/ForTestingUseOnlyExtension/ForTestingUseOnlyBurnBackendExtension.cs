@@ -37,7 +37,7 @@ namespace ForTestingUseOnly
             }
 
             var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
-            bundleSymbol.ProviderKey = bundleSymbol.BundleId = forTestingUseOnlyBundleSymbol.BundleId;
+            bundleSymbol.ProviderKey = bundleSymbol.BundleCode = forTestingUseOnlyBundleSymbol.BundleCode;
         }
     }
 }

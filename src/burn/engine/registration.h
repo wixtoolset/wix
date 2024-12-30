@@ -99,7 +99,7 @@ typedef struct _BURN_REGISTRATION
     BOOL fDisableResume;
     BOOL fCached;
     BOOTSTRAPPER_REGISTRATION_TYPE detectedRegistrationType;
-    LPWSTR sczId;
+    LPWSTR sczCode;
     LPWSTR sczTag;
 
     LPWSTR *rgsczDetectCodes;
@@ -155,8 +155,8 @@ typedef struct _BURN_REGISTRATION
     BOOL fForwardCompatibleBundleExists; // Only valid after detect.
     BOOL fEligibleForCleanup;            // Only valid after detect.
 
-    BOOL fDetectedForeignProviderKeyBundleId;
-    LPWSTR sczDetectedProviderKeyBundleId;
+    BOOL fDetectedForeignProviderKeyBundleCode;
+    LPWSTR sczDetectedProviderKeyBundleCode;
     LPWSTR sczBundlePackageAncestors;
 } BURN_REGISTRATION;
 

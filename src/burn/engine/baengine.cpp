@@ -330,7 +330,7 @@ static HRESULT BAEngineGetRelatedBundleVariable(
     HRESULT hr = S_OK;
     BAENGINE_GETRELATEDBUNDLEVARIABLE_ARGS args = { };
     BAENGINE_GETRELATEDBUNDLEVARIABLE_RESULTS results = { };
-    LPWSTR sczBundleId = NULL;
+    LPWSTR sczBundleCode = NULL;
     LPWSTR sczVariable = NULL;
     LPWSTR sczValue = NULL;
 
@@ -338,13 +338,13 @@ static HRESULT BAEngineGetRelatedBundleVariable(
     hr = BuffReaderReadNumber(pReaderArgs, &args.dwApiVersion);
     ExitOnFailure(hr, "Failed to read API version of BAEngineGetRelatedBundleVariable args.");
 
-    hr = BuffReaderReadString(pReaderArgs, &sczBundleId);
-    ExitOnFailure(hr, "Failed to read bundle id of BAEngineGetRelatedBundleVariable args.");
+    hr = BuffReaderReadString(pReaderArgs, &sczBundleCode);
+    ExitOnFailure(hr, "Failed to read bundle code of BAEngineGetRelatedBundleVariable args.");
 
     hr = BuffReaderReadString(pReaderArgs, &sczVariable);
     ExitOnFailure(hr, "Failed to read variable name of BAEngineGetRelatedBundleVariable args.");
 
-    args.wzBundleId = sczBundleId;
+    args.wzBundleCode = sczBundleCode;
     args.wzVariable = sczVariable;
 
     // Read results.
@@ -355,7 +355,7 @@ static HRESULT BAEngineGetRelatedBundleVariable(
     ExitOnFailure(hr, "Failed to read API version of BAEngineGetRelatedBundleVariable results.");
 
     // Execute.
-    hr = BundleGetBundleVariable(args.wzBundleId, args.wzVariable, &sczValue);
+    hr = BundleGetBundleVariable(args.wzBundleCode, args.wzVariable, &sczValue);
     ExitOnFailure(hr, "Failed to get related bundle variable: %ls", sczVariable);
 
     results.cchValue = lstrlenW(sczValue);
@@ -374,7 +374,7 @@ static HRESULT BAEngineGetRelatedBundleVariable(
 LExit:
     ReleaseStr(sczValue);
     ReleaseStr(sczVariable);
-    ReleaseStr(sczBundleId);
+    ReleaseStr(sczBundleCode);
 
     return hr;
 }

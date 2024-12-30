@@ -9,7 +9,7 @@ typedef struct _BURN_SECTION_HEADER
     DWORD dwMagic;
     DWORD dwVersion;
 
-    GUID guidBundleId;
+    GUID guidBundleCode;
 
     DWORD dwStubSize;
     DWORD dwOriginalChecksum;
@@ -235,7 +235,7 @@ extern "C" HRESULT SectionInitialize(
     memcpy(pSection->rgcbContainers, pBurnSectionHeader->rgcbContainers, sizeof(DWORD) * pSection->cContainers);
 
     // TODO: verify more than just the GUID.
-    hr = VerifySectionMatchesMemoryPEHeader(pBurnSectionHeader->guidBundleId);
+    hr = VerifySectionMatchesMemoryPEHeader(pBurnSectionHeader->guidBundleCode);
     ExitOnRootFailure(hr, "PE Header from file didn't match PE Header in memory.");
 
 LExit:
@@ -299,7 +299,7 @@ LExit:
 }
 
 HRESULT VerifySectionMatchesMemoryPEHeader(
-    __in REFGUID pBundleId
+    __in REFGUID pBundleCode
     )
 {
     HRESULT hr = S_OK;
@@ -382,7 +382,7 @@ HRESULT VerifySectionMatchesMemoryPEHeader(
         ExitOnRootFailure(hr, "Failed to read section info, unsupported version: %08x", pBurnSectionHeader->dwVersion);
     }
 
-    if (!::IsEqualGUID(pBundleId, pBurnSectionHeader->guidBundleId))
+    if (!::IsEqualGUID(pBundleCode, pBurnSectionHeader->guidBundleCode))
     {
         hr = E_INVALIDDATA;
         ExitOnRootFailure(hr, "Bundle guid didn't match the guid in the PE Header in memory.");

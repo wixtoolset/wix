@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BurnManifest xmlns="http://wixtoolset.org/schemas/v4/2008/Burn">
     <Log PathVariable="WixBundleLog" Prefix="~SlipstreamTests_BundleA" Extension=".log" />
-    <RelatedBundle Id="{62C28DAF-A13E-4F55-ACA1-FB843630789C}" Action="Upgrade" />
+    <RelatedBundle Code="{62C28DAF-A13E-4F55-ACA1-FB843630789C}" Action="Upgrade" />
     <Variable Id="TestGroupName" Value="SlipstreamTests" Type="string" Hidden="no" Persisted="no" />
     <RegistrySearch Id="NETFRAMEWORK45" Variable="NETFRAMEWORK45" Root="HKLM" Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" Value="Release" Type="value" VariableType="string" />
     <UX PrimaryPayloadId="WixManagedBootstrapperApplicationHost">
@@ -45,7 +45,7 @@
     <Payload Id="PackageA" FilePath="PackageAv1.msi" FileSize="32768" Hash="2369B16B7219B3C834DFBC5D2AF8B2EF8803D43D" Packaging="external" SourcePath="PackageAv1.msi" />
     <Payload Id="PatchA" FilePath="PatchA.msp" FileSize="20480" Hash="FABC6C18E4A778E127E84CDF67F93A291CAEC8BB" Packaging="external" SourcePath="PatchA.msp" />
     <RollbackBoundary Id="WixDefaultBoundary" Vital="yes" Transaction="no" />
-    <Registration Id="{22D1DDBA-284D-40A7-BD14-95EA07906F21}" ExecutableName="BundleA.exe" PerMachine="yes" Tag="" Version="1.0.0.0" ProviderKey="{22D1DDBA-284D-40A7-BD14-95EA07906F21}">
+    <Registration Code="{22D1DDBA-284D-40A7-BD14-95EA07906F21}" ExecutableName="BundleA.exe" PerMachine="yes" Tag="" Version="1.0.0.0" ProviderKey="{22D1DDBA-284D-40A7-BD14-95EA07906F21}">
         <Arp Register="yes" DisplayName="~SlipstreamTests - BundleA" DisplayVersion="1.0.0.0" />
     </Registration>
     <Chain>

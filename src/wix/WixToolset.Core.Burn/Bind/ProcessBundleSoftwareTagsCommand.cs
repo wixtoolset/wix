@@ -27,10 +27,10 @@ namespace WixToolset.Core.Burn.Bind
         public void Execute()
         {
             var bundleInfo = this.Section.Symbols.OfType<WixBundleSymbol>().FirstOrDefault();
-            var bundleId = NormalizeGuid(bundleInfo.BundleId);
+            var bundleCode = NormalizeGuid(bundleInfo.BundleCode);
             var upgradeCode = NormalizeGuid(bundleInfo.UpgradeCode);
 
-            var uniqueId = String.Concat("wix:bundle/", bundleId);
+            var uniqueId = String.Concat("wix:bundle/", bundleCode);
             var persistentId = String.Concat("wix:bundle.upgrade/", upgradeCode);
 
             // Try to collect all the software id tags from all the child packages.

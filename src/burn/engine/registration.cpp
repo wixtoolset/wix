@@ -132,9 +132,9 @@ extern "C" HRESULT RegistrationParseFromXml(
     hr = XmlSelectSingleNode(pixnBundle, L"Registration", &pixnRegistrationNode);
     ExitOnRequiredXmlQueryFailure(hr, "Failed to select registration node.");
 
-    // @Id
-    hr = XmlGetAttributeEx(pixnRegistrationNode, L"Id", &pRegistration->sczId);
-    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
+    // @Code
+    hr = XmlGetAttributeEx(pixnRegistrationNode, L"Code", &pRegistration->sczCode);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Code.");
 
     // @Tag
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"Tag", &pRegistration->sczTag);
@@ -305,7 +305,7 @@ extern "C" void RegistrationUninitialize(
     __in BURN_REGISTRATION* pRegistration
     )
 {
-    ReleaseStr(pRegistration->sczId);
+    ReleaseStr(pRegistration->sczCode);
     ReleaseStr(pRegistration->sczTag);
 
     for (DWORD i = 0; i < pRegistration->cDetectCodes; ++i)
@@ -371,7 +371,7 @@ extern "C" void RegistrationUninitialize(
         MemFree(pRegistration->softwareTags.rgSoftwareTags);
     }
 
-    ReleaseStr(pRegistration->sczDetectedProviderKeyBundleId);
+    ReleaseStr(pRegistration->sczDetectedProviderKeyBundleCode);
     ReleaseStr(pRegistration->sczBundlePackageAncestors);
     RelatedBundlesUninitialize(&pRegistration->relatedBundles);
 
@@ -620,7 +620,7 @@ extern "C" HRESULT RegistrationSessionBegin(
     // Cache bundle executable.
     if (dwRegistrationOptions & BURN_REGISTRATION_ACTION_OPERATIONS_CACHE_BUNDLE)
     {
-        hr = CacheCompleteBundle(pCache, pRegistration->fPerMachine, pRegistration->sczExecutableName, pRegistration->sczId, wzEngineWorkingPath
+        hr = CacheCompleteBundle(pCache, pRegistration->fPerMachine, pRegistration->sczExecutableName, pRegistration->sczCode, wzEngineWorkingPath
 #ifdef DEBUG
                         , pRegistration->sczCacheExecutablePath
 #endif
@@ -888,7 +888,7 @@ extern "C" HRESULT RegistrationSessionEnd(
         hr = RegDelete(pRegistration->hkRoot, pRegistration->sczRegistrationKey, REG_KEY_DEFAULT, TRUE);
         ExitOnPathFailure(hr, fDeleted, "Failed to delete registration key: %ls", pRegistration->sczRegistrationKey);
 
-        CacheRemoveBundle(pCache, pRegistration->fPerMachine, pRegistration->sczId);
+        CacheRemoveBundle(pCache, pRegistration->fPerMachine, pRegistration->sczCode);
     }
     else // the mode needs to be updated so open the registration key.
     {
@@ -1153,11 +1153,11 @@ static HRESULT SetPaths(
     pRegistration->hkRoot = pRegistration->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
 
     // build uninstall registry key path
-    hr = StrAllocFormatted(&pRegistration->sczRegistrationKey, L"%ls\\%ls", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pRegistration->sczId);
+    hr = StrAllocFormatted(&pRegistration->sczRegistrationKey, L"%ls\\%ls", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pRegistration->sczCode);
     ExitOnFailure(hr, "Failed to build uninstall registry key path.");
 
     // build cache directory
-    hr = CacheGetCompletedPath(pCache, pRegistration->fPerMachine, pRegistration->sczId, &sczCacheDirectory);
+    hr = CacheGetCompletedPath(pCache, pRegistration->fPerMachine, pRegistration->sczCode, &sczCacheDirectory);
     ExitOnFailure(hr, "Failed to build cache directory.");
 
     // build cached executable path
@@ -1287,7 +1287,7 @@ static HRESULT UpdateResumeMode(
         hr = RegCreate(pRegistration->hkRoot, sczResumeKey, KEY_WRITE, &hkRun);
         ExitOnFailure(hr, "Failed to create run key.");
 
-        hr = RegWriteString(hkRun, pRegistration->sczId, sczRunOnceCommandLine);
+        hr = RegWriteString(hkRun, pRegistration->sczCode, sczRunOnceCommandLine);
         ExitOnFailure(hr, "Failed to write run key value.");
 
         hr = RegWriteString(hkRegistration, REGISTRY_BUNDLE_RESUME_COMMAND_LINE, pRegistration->sczResumeCommandLine);
@@ -1304,7 +1304,7 @@ static HRESULT UpdateResumeMode(
         {
             ExitOnFailure(hr, "Failed to open run key.");
 
-            er = ::RegDeleteValueW(hkRun, pRegistration->sczId);
+            er = ::RegDeleteValueW(hkRun, pRegistration->sczCode);
             if (ERROR_FILE_NOT_FOUND == er)
             {
                 er = ERROR_SUCCESS;

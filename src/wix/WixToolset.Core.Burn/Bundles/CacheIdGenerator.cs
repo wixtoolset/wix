@@ -59,7 +59,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (harvestedPackageSymbol is WixBundleHarvestedBundlePackageSymbol harvestedBundlePackageSymbol)
             {
-                cacheId = GenerateCacheIdFromGuidAndVersion(harvestedBundlePackageSymbol.BundleId, harvestedBundlePackageSymbol.Version);
+                cacheId = GenerateCacheIdFromGuidAndVersion(harvestedBundlePackageSymbol.BundleCode, harvestedBundlePackageSymbol.Version);
             }
             else if (harvestedPackageSymbol is WixBundleHarvestedMsiPackageSymbol harvestedMsiPackageSymbol)
             {

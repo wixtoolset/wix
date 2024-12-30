@@ -236,7 +236,7 @@ namespace WixToolset.BootstrapperApplicationApi
         /// </summary>
         [PreserveSig]
         int GetRelatedBundleVariable(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleCode,
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
                                               IntPtr wzValue,
                                           ref IntPtr pcchValue

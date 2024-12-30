@@ -33,7 +33,7 @@ HRESULT DetectReportRelatedBundles(
     );
 
 HRESULT DetectUpdate(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_UPDATE* pUpdate
     );

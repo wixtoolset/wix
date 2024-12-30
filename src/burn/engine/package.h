@@ -323,7 +323,7 @@ typedef struct _BURN_PACKAGE
     {
         struct
         {
-            LPWSTR sczBundleId;
+            LPWSTR sczBundleCode;
             LPWSTR sczArpKeyPath;
             VERUTIL_VERSION* pVersion;
             LPWSTR sczRegistrationKey;

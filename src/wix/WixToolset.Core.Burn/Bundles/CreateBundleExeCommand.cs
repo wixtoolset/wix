@@ -78,7 +78,7 @@ namespace WixToolset.Core.Burn.Bundles
             using (var writer = BurnWriter.Open(this.Messaging, this.FileSystem, bundleTempPath))
             {
                 var burnStubFile = new FileInfo(bundleTempPath);
-                writer.InitializeBundleSectionData(burnStubFile.Length, this.BundleSymbol.BundleId);
+                writer.InitializeBundleSectionData(burnStubFile.Length, this.BundleSymbol.BundleCode);
 
                 // Always attach the UX container first
                 writer.AppendContainer(this.UXContainer.SourceLineNumbers, this.UXContainer.WorkingPath, BurnWriter.Container.UX);

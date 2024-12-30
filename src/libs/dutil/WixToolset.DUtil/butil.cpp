@@ -61,12 +61,12 @@ static HRESULT QueryRelatedBundlesForScopeAndBitness(
 static HRESULT QueryPotentialRelatedBundle(
     __in BUNDLE_QUERY_CONTEXT* pQueryContext,
     __in HKEY hkUninstallKey,
-    __in_z LPCWSTR wzRelatedBundleId,
+    __in_z LPCWSTR wzRelatedBundleCode,
     __inout BUNDLE_QUERY_CALLBACK_RESULT* pResult
     );
 static HRESULT DetermineRelationType(
     __in BUNDLE_QUERY_CONTEXT* pQueryContext,
-    __in HKEY hkBundleId,
+    __in HKEY hkBundleCode,
     __out BUNDLE_RELATION_TYPE* pRelationType
     );
 /********************************************************************
@@ -76,7 +76,7 @@ LocateAndQueryBundleValue - Locates the requested key for the bundle,
 NOTE: caller is responsible for closing key
 ********************************************************************/
 static HRESULT LocateAndQueryBundleValue(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_opt LPCWSTR wzSubKey,
     __in LPCWSTR wzValueName,
     __inout HKEY* phKey,
@@ -91,7 +91,7 @@ static HRESULT CopyStringToBuffer(
 
 
 DAPI_(HRESULT) BundleGetBundleInfo(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzAttribute,
     __deref_out_z LPWSTR* psczValue
     )
@@ -102,12 +102,12 @@ DAPI_(HRESULT) BundleGetBundleInfo(
     DWORD dwType = 0;
     DWORD dwValue = 0;
 
-    if (!wzBundleId || !wzAttribute || !psczValue)
+    if (!wzBundleCode || !wzAttribute || !psczValue)
     {
         ButilExitWithRootFailure(hr, E_INVALIDARG, "An invalid parameter was passed to the function.");
     }
 
-    hr = LocateAndQueryBundleValue(wzBundleId, NULL, wzAttribute, &hkBundle, &dwType, &status);
+    hr = LocateAndQueryBundleValue(wzBundleCode, NULL, wzAttribute, &hkBundle, &dwType, &status);
     ButilExitOnFailure(hr, "Failed to locate and query bundle attribute.");
 
     switch (status)
@@ -144,7 +144,7 @@ LExit:
 
 
 DAPI_(HRESULT) BundleGetBundleInfoFixed(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzAttribute,
     __out_ecount_opt(*pcchValue) LPWSTR wzValue,
     __inout SIZE_T* pcchValue
@@ -158,7 +158,7 @@ DAPI_(HRESULT) BundleGetBundleInfoFixed(
         ButilExitWithRootFailure(hr, E_INVALIDARG, "An invalid parameter was passed to the function.");
     }
 
-    hr = BundleGetBundleInfo(wzBundleId, wzAttribute, &sczValue);
+    hr = BundleGetBundleInfo(wzBundleCode, wzAttribute, &sczValue);
     if (SUCCEEDED(hr))
     {
         hr = CopyStringToBuffer(sczValue, wzValue, pcchValue);
@@ -176,7 +176,7 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
     __in BUNDLE_INSTALL_CONTEXT context,
     __in REG_KEY_BITNESS kbKeyBitness,
     __inout PDWORD pdwStartIndex,
-    __deref_out_z LPWSTR* psczBundleId
+    __deref_out_z LPWSTR* psczBundleCode
     )
 {
     HRESULT hr = S_OK;
@@ -218,9 +218,9 @@ DAPI_(HRESULT) BundleEnumRelatedBundle(
             fUpgradeCodeFound = TRUE;
             *pdwStartIndex = dwIndex;
 
-            if (psczBundleId)
+            if (psczBundleCode)
             {
-                *psczBundleId = sczUninstallSubKey;
+                *psczBundleCode = sczUninstallSubKey;
                 sczUninstallSubKey = NULL;
             }
 
@@ -246,7 +246,7 @@ DAPI_(HRESULT) BundleEnumRelatedBundleFixed(
     __in BUNDLE_INSTALL_CONTEXT context,
     __in REG_KEY_BITNESS kbKeyBitness,
     __inout PDWORD pdwStartIndex,
-    __out_ecount(MAX_GUID_CHARS+1) LPWSTR wzBundleId
+    __out_ecount(MAX_GUID_CHARS+1) LPWSTR wzBundleCode
     )
 {
     HRESULT hr = S_OK;
@@ -254,12 +254,12 @@ DAPI_(HRESULT) BundleEnumRelatedBundleFixed(
     size_t cchValue = 0;
 
     hr = BundleEnumRelatedBundle(wzUpgradeCode, context, kbKeyBitness, pdwStartIndex, &sczValue);
-    if (S_OK == hr && wzBundleId)
+    if (S_OK == hr && wzBundleCode)
     {
         hr = ::StringCchLengthW(sczValue, STRSAFE_MAX_CCH, &cchValue);
         ButilExitOnRootFailure(hr, "Failed to calculate length of string.");
 
-        hr = ::StringCchCopyNExW(wzBundleId, MAX_GUID_CHARS + 1, sczValue, cchValue, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
+        hr = ::StringCchCopyNExW(wzBundleCode, MAX_GUID_CHARS + 1, sczValue, cchValue, NULL, NULL, STRSAFE_FILL_BEHIND_NULL);
         ButilExitOnRootFailure(hr, "Failed to copy the property value to the output buffer.");
     }
 
@@ -271,7 +271,7 @@ LExit:
 
 
 DAPI_(HRESULT) BundleGetBundleVariable(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzVariable,
     __deref_out_z LPWSTR* psczValue
     )
@@ -281,12 +281,12 @@ DAPI_(HRESULT) BundleGetBundleVariable(
     INTERNAL_BUNDLE_STATUS status = INTERNAL_BUNDLE_STATUS_SUCCESS;
     DWORD dwType = 0;
 
-    if (!wzBundleId || !wzVariable || !psczValue)
+    if (!wzBundleCode || !wzVariable || !psczValue)
     {
         ButilExitWithRootFailure(hr, E_INVALIDARG, "An invalid parameter was passed to the function.");
     }
 
-    hr = LocateAndQueryBundleValue(wzBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_VARIABLE_KEY, wzVariable, &hkBundle, &dwType, &status);
+    hr = LocateAndQueryBundleValue(wzBundleCode, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_VARIABLE_KEY, wzVariable, &hkBundle, &dwType, &status);
     ButilExitOnFailure(hr, "Failed to locate and query bundle variable.");
 
     switch (status)
@@ -319,7 +319,7 @@ LExit:
 
 
 DAPI_(HRESULT) BundleGetBundleVariableFixed(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzVariable,
     __out_ecount_opt(*pcchValue) LPWSTR wzValue,
     __inout SIZE_T* pcchValue
@@ -333,7 +333,7 @@ DAPI_(HRESULT) BundleGetBundleVariableFixed(
         ButilExitWithRootFailure(hr, E_INVALIDARG, "An invalid parameter was passed to the function.");
     }
 
-    hr = BundleGetBundleVariable(wzBundleId, wzVariable, &sczValue);
+    hr = BundleGetBundleVariable(wzBundleCode, wzVariable, &sczValue);
     if (SUCCEEDED(hr))
     {
         hr = CopyStringToBuffer(sczValue, wzValue, pcchValue);
@@ -405,7 +405,7 @@ static HRESULT QueryRelatedBundlesForScopeAndBitness(
     HKEY hkRoot = BUNDLE_INSTALL_CONTEXT_USER == pQueryContext->installContext ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE;
     HKEY hkUninstallKey = NULL;
     BOOL fExists = FALSE;
-    LPWSTR sczRelatedBundleId = NULL;
+    LPWSTR sczRelatedBundleCode = NULL;
     BUNDLE_QUERY_CALLBACK_RESULT result = BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE;
 
     hr = RegOpenEx(hkRoot, BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, KEY_READ, pQueryContext->regBitness, &hkUninstallKey);
@@ -418,7 +418,7 @@ static HRESULT QueryRelatedBundlesForScopeAndBitness(
 
     for (DWORD dwIndex = 0; /* exit via break below */; ++dwIndex)
     {
-        hr = RegKeyEnum(hkUninstallKey, dwIndex, &sczRelatedBundleId);
+        hr = RegKeyEnum(hkUninstallKey, dwIndex, &sczRelatedBundleCode);
         if (E_NOMOREITEMS == hr)
         {
             hr = S_OK;
@@ -428,7 +428,7 @@ static HRESULT QueryRelatedBundlesForScopeAndBitness(
 
         // Ignore failures here since we'll often find products that aren't actually
         // related bundles (or even bundles at all).
-        HRESULT hrRelatedBundle = QueryPotentialRelatedBundle(pQueryContext, hkUninstallKey, sczRelatedBundleId, &result);
+        HRESULT hrRelatedBundle = QueryPotentialRelatedBundle(pQueryContext, hkUninstallKey, sczRelatedBundleCode, &result);
         if (SUCCEEDED(hrRelatedBundle) && BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE != result)
         {
             ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_REQUEST_ABORTED));
@@ -436,7 +436,7 @@ static HRESULT QueryRelatedBundlesForScopeAndBitness(
     }
 
 LExit:
-    ReleaseStr(sczRelatedBundleId);
+    ReleaseStr(sczRelatedBundleCode);
     ReleaseRegKey(hkUninstallKey);
 
     return hr;
@@ -445,19 +445,19 @@ LExit:
 static HRESULT QueryPotentialRelatedBundle(
     __in BUNDLE_QUERY_CONTEXT* pQueryContext,
     __in HKEY hkUninstallKey,
-    __in_z LPCWSTR wzRelatedBundleId,
+    __in_z LPCWSTR wzRelatedBundleCode,
     __inout BUNDLE_QUERY_CALLBACK_RESULT* pResult
     )
 {
     HRESULT hr = S_OK;
-    HKEY hkBundleId = NULL;
+    HKEY hkBundleCode = NULL;
     BUNDLE_RELATION_TYPE relationType = BUNDLE_RELATION_NONE;
     BUNDLE_QUERY_RELATED_BUNDLE_RESULT bundle = { };
 
-    hr = RegOpenEx(hkUninstallKey, wzRelatedBundleId, KEY_READ, pQueryContext->regBitness, &hkBundleId);
-    ButilExitOnFailure(hr, "Failed to open uninstall key for potential related bundle: %ls", wzRelatedBundleId);
+    hr = RegOpenEx(hkUninstallKey, wzRelatedBundleCode, KEY_READ, pQueryContext->regBitness, &hkBundleCode);
+    ButilExitOnFailure(hr, "Failed to open uninstall key for potential related bundle: %ls", wzRelatedBundleCode);
 
-    hr = DetermineRelationType(pQueryContext, hkBundleId, &relationType);
+    hr = DetermineRelationType(pQueryContext, hkBundleCode, &relationType);
     if (FAILED(hr))
     {
         ExitFunction();
@@ -465,21 +465,21 @@ static HRESULT QueryPotentialRelatedBundle(
 
     bundle.installContext = pQueryContext->installContext;
     bundle.regBitness = pQueryContext->regBitness;
-    bundle.wzBundleId = wzRelatedBundleId;
+    bundle.wzBundleCode = wzRelatedBundleCode;
     bundle.relationType = relationType;
-    bundle.hkBundle = hkBundleId;
+    bundle.hkBundle = hkBundleCode;
 
     *pResult = pQueryContext->pfnCallback(&bundle, pQueryContext->pvContext);
 
 LExit:
-    ReleaseRegKey(hkBundleId);
+    ReleaseRegKey(hkBundleCode);
 
     return hr;
 }
 
 static HRESULT DetermineRelationType(
     __in BUNDLE_QUERY_CONTEXT* pQueryContext,
-    __in HKEY hkBundleId,
+    __in HKEY hkBundleCode,
     __out BUNDLE_RELATION_TYPE* pRelationType
     )
 {
@@ -499,7 +499,7 @@ static HRESULT DetermineRelationType(
 
     *pRelationType = BUNDLE_RELATION_NONE;
 
-    hr = RegReadStringArray(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczUpgradeCodes, &cUpgradeCodes);
+    hr = RegReadStringArray(hkBundleCode, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczUpgradeCodes, &cUpgradeCodes);
     if (HRESULT_FROM_WIN32(ERROR_INVALID_DATATYPE) == hr)
     {
         TraceError(hr, "Failed to read upgrade codes as REG_MULTI_SZ. Trying again as REG_SZ in case of older bundles.");
@@ -507,7 +507,7 @@ static HRESULT DetermineRelationType(
         rgsczUpgradeCodes = reinterpret_cast<LPWSTR*>(MemAlloc(sizeof(LPWSTR), TRUE));
         ButilExitOnNull(rgsczUpgradeCodes, hr, E_OUTOFMEMORY, "Failed to allocate list for a single upgrade code from older bundle.");
 
-        hr = RegReadString(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczUpgradeCodes[0]);
+        hr = RegReadString(hkBundleCode, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &rgsczUpgradeCodes[0]);
         if (SUCCEEDED(hr))
         {
             cUpgradeCodes = 1;
@@ -581,7 +581,7 @@ static HRESULT DetermineRelationType(
     }
 
     // Compare addon codes.
-    hr = RegReadStringArray(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_ADDON_CODE, &rgsczAddonCodes, &cAddonCodes);
+    hr = RegReadStringArray(hkBundleCode, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_ADDON_CODE, &rgsczAddonCodes, &cAddonCodes);
     if (SUCCEEDED(hr))
     {
         hr = DictCreateStringListFromArray(&sdAddonCodes, rgsczAddonCodes, cAddonCodes, DICT_FLAG_CASEINSENSITIVE);
@@ -620,7 +620,7 @@ static HRESULT DetermineRelationType(
     }
 
     // Compare patch codes.
-    hr = RegReadStringArray(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_PATCH_CODE, &rgsczPatchCodes, &cPatchCodes);
+    hr = RegReadStringArray(hkBundleCode, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_PATCH_CODE, &rgsczPatchCodes, &cPatchCodes);
     if (SUCCEEDED(hr))
     {
         hr = DictCreateStringListFromArray(&sdPatchCodes, rgsczPatchCodes, cPatchCodes, DICT_FLAG_CASEINSENSITIVE);
@@ -659,7 +659,7 @@ static HRESULT DetermineRelationType(
     }
 
     // Compare detect codes.
-    hr = RegReadStringArray(hkBundleId, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_DETECT_CODE, &rgsczDetectCodes, &cDetectCodes);
+    hr = RegReadStringArray(hkBundleCode, BUNDLE_REGISTRATION_REGISTRY_BUNDLE_DETECT_CODE, &rgsczDetectCodes, &cDetectCodes);
     if (SUCCEEDED(hr))
     {
         hr = DictCreateStringListFromArray(&sdDetectCodes, rgsczDetectCodes, cDetectCodes, DICT_FLAG_CASEINSENSITIVE);
@@ -730,7 +730,7 @@ LExit:
 }
 
 static HRESULT LocateAndQueryBundleValue(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_opt LPCWSTR wzSubKey,
     __in LPCWSTR wzValueName,
     __inout HKEY* phKey,
@@ -746,11 +746,11 @@ static HRESULT LocateAndQueryBundleValue(
 
     if (wzSubKey)
     {
-        hr = StrAllocFormatted(&sczKeypath, L"%ls\\%ls\\%ls", BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, wzBundleId, wzSubKey);
+        hr = StrAllocFormatted(&sczKeypath, L"%ls\\%ls\\%ls", BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, wzBundleCode, wzSubKey);
     }
     else
     {
-        hr = StrAllocFormatted(&sczKeypath, L"%ls\\%ls", BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, wzBundleId);
+        hr = StrAllocFormatted(&sczKeypath, L"%ls\\%ls", BUNDLE_REGISTRATION_REGISTRY_UNINSTALL_KEY, wzBundleCode);
     }
     ButilExitOnFailure(hr, "Failed to allocate bundle uninstall key path.");
 

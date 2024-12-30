@@ -556,7 +556,7 @@ extern "C" HRESULT ElevationSessionBegin(
     __in BOOL fDisableResume,
     __in BURN_VARIABLES* pVariables,
     __in DWORD dwRegistrationOperations,
-    __in BOOL fDetectedForeignProviderKeyBundleId,
+    __in BOOL fDetectedForeignProviderKeyBundleCode,
     __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
@@ -579,7 +579,7 @@ extern "C" HRESULT ElevationSessionBegin(
     hr = BuffWriteNumber(&pbData, &cbData, dwRegistrationOperations);
     ExitOnFailure(hr, "Failed to write registration operations to message buffer.");
 
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fDetectedForeignProviderKeyBundleId);
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fDetectedForeignProviderKeyBundleCode);
     ExitOnFailure(hr, "Failed to write dependency registration action to message buffer.");
 
     hr = BuffWriteNumber64(&pbData, &cbData, qwEstimatedSize);
@@ -611,7 +611,7 @@ extern "C" HRESULT ElevationSessionEnd(
     __in HANDLE hPipe,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
-    __in BOOL fDetectedForeignProviderKeyBundleId,
+    __in BOOL fDetectedForeignProviderKeyBundleCode,
     __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     )
@@ -628,7 +628,7 @@ extern "C" HRESULT ElevationSessionEnd(
     hr = BuffWriteNumber(&pbData, &cbData, (DWORD)restart);
     ExitOnFailure(hr, "Failed to write restart enum to message buffer.");
 
-    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fDetectedForeignProviderKeyBundleId);
+    hr = BuffWriteNumber(&pbData, &cbData, (DWORD)fDetectedForeignProviderKeyBundleCode);
     ExitOnFailure(hr, "Failed to write dependency registration action to message buffer.");
 
     hr = BuffWriteNumber64(&pbData, &cbData, qwEstimatedSize);
@@ -821,8 +821,8 @@ extern "C" HRESULT ElevationProcessDependentRegistration(
     hr = BuffWriteNumber(&pbData, &cbData, pAction->type);
     ExitOnFailure(hr, "Failed to write action type to message buffer.");
 
-    hr = BuffWriteString(&pbData, &cbData, pAction->sczBundleId);
-    ExitOnFailure(hr, "Failed to write bundle id to message buffer.");
+    hr = BuffWriteString(&pbData, &cbData, pAction->sczBundleCode);
+    ExitOnFailure(hr, "Failed to write bundle code to message buffer.");
 
     hr = BuffWriteString(&pbData, &cbData, pAction->sczDependentProviderKey);
     ExitOnFailure(hr, "Failed to write dependent provider key to message buffer.");
@@ -2559,7 +2559,7 @@ static HRESULT OnSessionBegin(
     hr = BuffReadNumber(pbData, cbData, &iData, &dwRegistrationOperations);
     ExitOnFailure(hr, "Failed to read registration operations.");
 
-    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&pRegistration->fDetectedForeignProviderKeyBundleId);
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&pRegistration->fDetectedForeignProviderKeyBundleCode);
     ExitOnFailure(hr, "Failed to read dependency registration action.");
 
     hr = BuffReadNumber64(pbData, cbData, &iData, &qwEstimatedSize);
@@ -2604,7 +2604,7 @@ static HRESULT OnSessionEnd(
     hr = BuffReadNumber(pbData, cbData, &iData, &dwRestart);
     ExitOnFailure(hr, "Failed to read restart enum.");
 
-    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&pRegistration->fDetectedForeignProviderKeyBundleId);
+    hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&pRegistration->fDetectedForeignProviderKeyBundleCode);
     ExitOnFailure(hr, "Failed to read dependency registration action.");
 
     hr = BuffReadNumber64(pbData, cbData, &iData, &qwEstimatedSize);
@@ -2810,8 +2810,8 @@ static HRESULT OnProcessDependentRegistration(
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&action.type);
     ExitOnFailure(hr, "Failed to read action type.");
 
-    hr = BuffReadString(pbData, cbData, &iData, &action.sczBundleId);
-    ExitOnFailure(hr, "Failed to read bundle id.");
+    hr = BuffReadString(pbData, cbData, &iData, &action.sczBundleCode);
+    ExitOnFailure(hr, "Failed to read bundle code.");
 
     hr = BuffReadString(pbData, cbData, &iData, &action.sczDependentProviderKey);
     ExitOnFailure(hr, "Failed to read dependent provider key.");
@@ -2824,7 +2824,7 @@ LExit:
     // TODO: do the right thing here.
     //DependencyUninitializeRegistrationAction(&action);
     ReleaseStr(action.sczDependentProviderKey);
-    ReleaseStr(action.sczBundleId)
+    ReleaseStr(action.sczBundleCode)
 
     return hr;
 }
@@ -2854,7 +2854,7 @@ static HRESULT OnExecuteRelatedBundle(
 
     // Deserialize message data.
     hr = BuffReadString(pbData, cbData, &iData, &sczPackage);
-    ExitOnFailure(hr, "Failed to read related bundle id.");
+    ExitOnFailure(hr, "Failed to read related bundle code.");
 
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&executeAction.relatedBundle.action);
     ExitOnFailure(hr, "Failed to read action.");

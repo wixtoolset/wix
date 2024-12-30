@@ -118,10 +118,10 @@ namespace WixToolset.Core.Burn.Bundles
 
                 foreach (var relatedBundle in relatedBundles)
                 {
-                    if (distinctRelatedBundles.Add(relatedBundle.BundleId))
+                    if (distinctRelatedBundles.Add(relatedBundle.BundleCode))
                     {
                         writer.WriteStartElement("RelatedBundle");
-                        writer.WriteAttributeString("Id", relatedBundle.BundleId);
+                        writer.WriteAttributeString("Code", relatedBundle.BundleCode);
                         writer.WriteAttributeString("Action", relatedBundle.Action.ToString());
                         writer.WriteEndElement();
                     }
@@ -216,7 +216,12 @@ namespace WixToolset.Core.Burn.Bundles
                 // Write the registration information...
                 writer.WriteStartElement("Registration");
 
-                writer.WriteAttributeString("Id", this.BundleSymbol.BundleId);
+                if (this.BundleSymbol.Id != null)
+                {
+                    writer.WriteAttributeString("BundleId", this.BundleSymbol.Id.Id);
+                }
+
+                writer.WriteAttributeString("Code", this.BundleSymbol.BundleCode);
                 writer.WriteAttributeString("ExecutableName", this.ExecutableName);
                 writer.WriteAttributeString("PerMachine", this.BundleSymbol.PerMachine ? "yes" : "no");
                 writer.WriteAttributeString("Tag", this.BundleSymbol.Tag);
@@ -407,7 +412,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                     if (package.SpecificPackageSymbol is WixBundleBundlePackageSymbol bundlePackage) // BUNDLE
                     {
-                        writer.WriteAttributeString("BundleId", bundlePackage.BundleId);
+                        writer.WriteAttributeString("BundleCode", bundlePackage.BundleCode);
                         writer.WriteAttributeString("Version", bundlePackage.Version);
                         writer.WriteAttributeString("InstallArguments", bundlePackage.InstallCommand);
                         writer.WriteAttributeString("UninstallArguments", bundlePackage.UninstallCommand);
@@ -608,7 +613,7 @@ namespace WixToolset.Core.Burn.Bundles
                     foreach (var relatedBundle in packageRelatedBundles)
                     {
                         writer.WriteStartElement("RelatedBundle");
-                        writer.WriteAttributeString("Id", relatedBundle.BundleId);
+                        writer.WriteAttributeString("Code", relatedBundle.BundleCode);
                         writer.WriteAttributeString("Action", relatedBundle.Action.ToString());
                         writer.WriteEndElement();
                     }

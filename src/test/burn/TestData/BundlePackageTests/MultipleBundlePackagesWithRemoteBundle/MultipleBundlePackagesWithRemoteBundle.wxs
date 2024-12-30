@@ -6,13 +6,13 @@
     <PackageGroup Id="BundlePackages">
       <BundlePackage Id="ASP.Net_Core_6.0" Permanent="yes">
         <BundlePackagePayload Id="ASP.Net_Core_6.0" Name="aspnetcore-runtime-6.0.10-win-x64.exe" ProductName="Microsoft ASP.NET Core 6.0.10 - Shared Framework (x64)" Description="Microsoft ASP.NET Core 6.0.10 - Shared Framework (x64)" DownloadUrl="https://download.visualstudio.microsoft.com/download/pr/2370bcad-45b1-4ccb-bc61-21ffd7116d63/1aa8efcabfb60ee778b913a5eb237a56/aspnetcore-runtime-6.0.10-win-x64.exe" Hash="4AF8DA7DE85BCB1D079A85CD3F4AAFDFC4E4D441B87DFCDFFC27C820D9F69513341BE5ACC987C47CACDC597CBC0CC89C7D746050E6D40AE02DB7391E8214352D" Size="8997144" Version="6.0.10.22476">
-          <RemoteBundle BundleId="{5D69246A-5874-401D-9879-ECC18D5A1BAB}" DisplayName="Microsoft ASP.NET Core 6.0.10 - Shared Framework (x64)" InstallSize="22958021" ManifestNamespace="http://schemas.microsoft.com/wix/2008/Burn" PerMachine="yes" ProviderKey="{5d69246a-5874-401d-9879-ecc18d5a1bab}" ProtocolVersion="1" Version="6.0.10.22476" Win64="no" UpgradeCode="{B7C4CC53-CE40-39E9-9F43-81CE9F5CD47C}" />
+          <RemoteBundle BundleCode="{5D69246A-5874-401D-9879-ECC18D5A1BAB}" DisplayName="Microsoft ASP.NET Core 6.0.10 - Shared Framework (x64)" InstallSize="22958021" ManifestNamespace="http://schemas.microsoft.com/wix/2008/Burn" PerMachine="yes" ProviderKey="{5d69246a-5874-401d-9879-ecc18d5a1bab}" ProtocolVersion="1" Version="6.0.10.22476" Win64="no" UpgradeCode="{B7C4CC53-CE40-39E9-9F43-81CE9F5CD47C}" />
         </BundlePackagePayload>
       </BundlePackage>
 
       <BundlePackage Id="Dotnet_Runtime_6.0" Permanent="yes">
         <BundlePackagePayload Id="Dotnet_Runtime_6.0" Name="dotnet-runtime-6.0.10-win-x64.exe" ProductName="Microsoft .NET Runtime - 6.0.10 (x64)" Description="Microsoft .NET Runtime - 6.0.10 (x64)" DownloadUrl="https://download.visualstudio.microsoft.com/download/pr/50336bc7-7fd1-4a12-b5a2-81ce0219edf9/8d862413975808de0d835888e41e49a7/dotnet-runtime-6.0.10-win-x64.exe" Hash="23E4C862AFEF34A2C0D6476A93274CE0158D28F1609E0404737663E4BE17263E61E5A8760382FB125D288A0965394E3D04B9E1C77F99DE80A2C590DD295B8732" Size="27912752" Version="6.0.10.31726">
-          <RemoteBundle BundleId="{9A89127E-80A4-45FB-AD62-58F72634274A}" DisplayName="Microsoft .NET Runtime - 6.0.10 (x64)" InstallSize="71462036" ManifestNamespace="http://schemas.microsoft.com/wix/2008/Burn" PerMachine="yes" ProviderKey="{9a89127e-80a4-45fb-ad62-58f72634274a}" ProtocolVersion="1" Version="6.0.10.31726" Win64="no" UpgradeCode="{B19A028F-5C89-7AF4-5102-0F8ED67CCACA}" />
+          <RemoteBundle BundleCode="{9A89127E-80A4-45FB-AD62-58F72634274A}" DisplayName="Microsoft .NET Runtime - 6.0.10 (x64)" InstallSize="71462036" ManifestNamespace="http://schemas.microsoft.com/wix/2008/Burn" PerMachine="yes" ProviderKey="{9a89127e-80a4-45fb-ad62-58f72634274a}" ProtocolVersion="1" Version="6.0.10.31726" Win64="no" UpgradeCode="{B19A028F-5C89-7AF4-5102-0F8ED67CCACA}" />
         </BundlePackagePayload>
       </BundlePackage>
     </PackageGroup>

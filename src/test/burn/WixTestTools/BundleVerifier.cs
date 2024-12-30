@@ -62,7 +62,7 @@ namespace WixTestTools
         public string GetExpectedCachedBundlePath()
         {
             var bundleSymbol = this.GetBundleSymbol();
-            var cachePath = this.GetPackageCachePathForCacheId(bundleSymbol.BundleId, bundleSymbol.PerMachine);
+            var cachePath = this.GetPackageCachePathForCacheId(bundleSymbol.BundleCode, bundleSymbol.PerMachine);
             return Path.Combine(cachePath, Path.GetFileName(this.Bundle));
         }
 
@@ -107,14 +107,14 @@ namespace WixTestTools
         {
             var bundleSymbol = this.GetBundleSymbol();
             var x64 = bundleSymbol.Platform != Platform.X86;
-            var bundleId = bundleSymbol.BundleId;
+            var bundleCode = bundleSymbol.BundleCode;
             if (bundleSymbol.PerMachine)
             {
-                return BundleRegistration.TryGetPerMachineBundleRegistrationById(bundleId, x64, out registration);
+                return BundleRegistration.TryGetPerMachineBundleRegistrationById(bundleCode, x64, out registration);
             }
             else
             {
-                return BundleRegistration.TryGetPerUserBundleRegistrationById(bundleId, out registration);
+                return BundleRegistration.TryGetPerUserBundleRegistrationById(bundleCode, out registration);
             }
         }
 
@@ -141,8 +141,8 @@ namespace WixTestTools
 
         public void VerifyUnregisteredAndRemovedFromPackageCache(string cachedBundlePath)
         {
-            Assert.False(this.TryGetRegistration(out _));
-            Assert.False(File.Exists(cachedBundlePath));
+            Assert.False(this.TryGetRegistration(out _), $"Bundle cached at '{cachedBundlePath}' should not still be registered.");
+            Assert.False(File.Exists(cachedBundlePath), $"Cached bundle should have been removed from package cache at '{cachedBundlePath}'.");
         }
 
         public void RemovePackageFromCache(string packageId)

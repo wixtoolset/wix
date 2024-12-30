@@ -1,5 +1,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <Bundle Name="BundleWithInvalidUpgradeCode"
+    <Bundle Id="WixToolsetTest.BundleWithInvalidUpgradeCode"
+            Name="BundleWithInvalidUpgradeCode"
             Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="!(loc.UpgradeCode)">
         <BootstrapperApplication SourceFile="fakeba.dll" />
 

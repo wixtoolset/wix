@@ -200,10 +200,10 @@ extern "C" HRESULT DependencyInitialize(
 
     HRESULT hr = S_OK;
 
-    // If no parent was specified at all, use the bundle id as the self dependent.
+    // If no parent was specified at all, use the bundle code as the self dependent.
     if (!pInternalCommand->sczActiveParent)
     {
-        pDependencies->wzSelfDependent = pRegistration->sczId;
+        pDependencies->wzSelfDependent = pRegistration->sczCode;
     }
     else if (*pInternalCommand->sczActiveParent) // if parent was specified use that as the self dependent.
     {
@@ -243,30 +243,30 @@ extern "C" void DependencyUninitialize(
     memset(pDependencies, 0, sizeof(BURN_DEPENDENCIES));
 }
 
-extern "C" HRESULT DependencyDetectProviderKeyBundleId(
+extern "C" HRESULT DependencyDetectProviderKeyBundleCode(
     __in BURN_REGISTRATION* pRegistration
     )
 {
     HRESULT hr = S_OK;
 
-    hr = DepGetProviderInformation(pRegistration->hkRoot, pRegistration->sczProviderKey, &pRegistration->sczDetectedProviderKeyBundleId, NULL, NULL);
+    hr = DepGetProviderInformation(pRegistration->hkRoot, pRegistration->sczProviderKey, &pRegistration->sczDetectedProviderKeyBundleCode, NULL, NULL);
     if (E_NOTFOUND == hr)
     {
-        ReleaseNullStr(pRegistration->sczDetectedProviderKeyBundleId);
+        ReleaseNullStr(pRegistration->sczDetectedProviderKeyBundleCode);
         ExitFunction1(hr = S_OK);
     }
-    ExitOnFailure(hr, "Failed to get provider key bundle id.");
+    ExitOnFailure(hr, "Failed to get provider key bundle code.");
 
-    // If a bundle id was not explicitly set, default the provider key bundle id to this bundle's provider key.
-    if (!pRegistration->sczDetectedProviderKeyBundleId || !*pRegistration->sczDetectedProviderKeyBundleId)
+    // If a bundle code was not explicitly set, default the provider key bundle code to this bundle's provider key.
+    if (!pRegistration->sczDetectedProviderKeyBundleCode || !*pRegistration->sczDetectedProviderKeyBundleCode)
     {
-        hr = StrAllocString(&pRegistration->sczDetectedProviderKeyBundleId, pRegistration->sczProviderKey, 0);
-        ExitOnFailure(hr, "Failed to initialize provider key bundle id.");
+        hr = StrAllocString(&pRegistration->sczDetectedProviderKeyBundleCode, pRegistration->sczProviderKey, 0);
+        ExitOnFailure(hr, "Failed to initialize provider key bundle code.");
     }
-    else if (CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczId, -1, pRegistration->sczDetectedProviderKeyBundleId, -1))
+    else if (CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczCode, -1, pRegistration->sczDetectedProviderKeyBundleCode, -1))
     {
-        pRegistration->fDetectedForeignProviderKeyBundleId = TRUE;
-        LogId(REPORT_STANDARD, MSG_DETECTED_FOREIGN_BUNDLE_PROVIDER_REGISTRATION, pRegistration->sczProviderKey, pRegistration->sczDetectedProviderKeyBundleId);
+        pRegistration->fDetectedForeignProviderKeyBundleCode = TRUE;
+        LogId(REPORT_STANDARD, MSG_DETECTED_FOREIGN_BUNDLE_PROVIDER_REGISTRATION, pRegistration->sczProviderKey, pRegistration->sczDetectedProviderKeyBundleCode);
     }
 
 LExit:
@@ -281,8 +281,8 @@ extern "C" HRESULT DependencyDetectBundle(
     HRESULT hr = S_OK;
     BOOL fExists = FALSE;
 
-    hr = DependencyDetectProviderKeyBundleId(pRegistration);
-    ExitOnFailure(hr, "Failed to detect provider key bundle id.");
+    hr = DependencyDetectProviderKeyBundleCode(pRegistration);
+    ExitOnFailure(hr, "Failed to detect provider key bundle code.");
 
     hr = DepCheckDependents(pRegistration->hkRoot, pRegistration->sczProviderKey, 0, NULL, &pRegistration->rgDependents, &pRegistration->cDependents);
     ExitOnPathFailure(hr, fExists, "Failed dependents check on bundle.");
@@ -794,7 +794,7 @@ extern "C" HRESULT DependencyRegisterBundle(
     LogId(REPORT_VERBOSE, MSG_DEPENDENCY_BUNDLE_REGISTER, pRegistration->sczProviderKey, pRegistration->pVersion->sczVersion);
 
     // Register the bundle provider key.
-    hr = DepRegisterDependency(pRegistration->hkRoot, pRegistration->sczProviderKey, pRegistration->pVersion->sczVersion, pRegistration->sczDisplayName, pRegistration->sczId, 0);
+    hr = DepRegisterDependency(pRegistration->hkRoot, pRegistration->sczProviderKey, pRegistration->pVersion->sczVersion, pRegistration->sczDisplayName, pRegistration->sczCode, 0);
     ExitOnFailure(hr, "Failed to register the bundle dependency provider.");
 
 LExit:
@@ -835,10 +835,10 @@ extern "C" void DependencyUnregisterBundle(
     )
 {
     HRESULT hr = S_OK;
-    LPCWSTR wzDependentProviderKey = pRegistration->sczId;
+    LPCWSTR wzDependentProviderKey = pRegistration->sczCode;
 
     // If we own the bundle dependency then remove it.
-    if (!pRegistration->fDetectedForeignProviderKeyBundleId)
+    if (!pRegistration->fDetectedForeignProviderKeyBundleCode)
     {
         // Remove the bundle provider key.
         hr = DepUnregisterDependency(pRegistration->hkRoot, pRegistration->sczProviderKey);
@@ -969,7 +969,7 @@ static HRESULT DetectPackageDependents(
         {
             DEPENDENCY* pDependent = pProvider->rgDependents + iDependent;
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczId, -1, pDependent->sczKey, -1))
+            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczCode, -1, pDependent->sczKey, -1))
             {
                 pProvider->fBundleRegisteredAsDependent = TRUE;
                 fBundleRegisteredAsDependent = TRUE;

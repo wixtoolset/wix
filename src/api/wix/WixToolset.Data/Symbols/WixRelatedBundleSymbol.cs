@@ -10,7 +10,7 @@ namespace WixToolset.Data
             SymbolDefinitionType.WixRelatedBundle,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(WixRelatedBundleSymbolFields.BundleId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixRelatedBundleSymbolFields.BundleCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixRelatedBundleSymbolFields.Action), IntermediateFieldType.Number),
             },
             typeof(WixRelatedBundleSymbol));
@@ -19,9 +19,13 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
     public enum WixRelatedBundleSymbolFields
     {
-        BundleId,
+        BundleCode,
+        [Obsolete("Use BundleCode instead.")]
+        BundleId = BundleCode,
         Action,
     }
 
@@ -45,10 +49,17 @@ namespace WixToolset.Data.Symbols
 
         public IntermediateField this[WixRelatedBundleSymbolFields index] => this.Fields[(int)index];
 
+        public string BundleCode
+        {
+            get => (string)this.Fields[(int)WixRelatedBundleSymbolFields.BundleCode];
+            set => this.Set((int)WixRelatedBundleSymbolFields.BundleCode, value);
+        }
+
+        [Obsolete("Use BundleCode instead.")]
         public string BundleId
         {
-            get => (string)this.Fields[(int)WixRelatedBundleSymbolFields.BundleId];
-            set => this.Set((int)WixRelatedBundleSymbolFields.BundleId, value);
+            get => (string)this.Fields[(int)WixRelatedBundleSymbolFields.BundleCode];
+            set => this.Set((int)WixRelatedBundleSymbolFields.BundleCode, value);
         }
 
         public RelatedBundleActionType Action

@@ -80,7 +80,7 @@ namespace WixToolset.BootstrapperApplicationApi
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectForwardCompatibleBundle(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleCode,
             [MarshalAs(UnmanagedType.U4)] RelationType relationType,
             [MarshalAs(UnmanagedType.LPWStr)] string wzBundleTag,
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
@@ -135,7 +135,7 @@ namespace WixToolset.BootstrapperApplicationApi
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectRelatedBundle(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleCode,
             [MarshalAs(UnmanagedType.U4)] RelationType relationType,
             [MarshalAs(UnmanagedType.LPWStr)] string wzBundleTag,
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
@@ -243,7 +243,7 @@ namespace WixToolset.BootstrapperApplicationApi
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanRelatedBundle(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleCode,
             [MarshalAs(UnmanagedType.U4)] RequestState recommendedState,
             [MarshalAs(UnmanagedType.U4)] ref RequestState pRequestedState,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
@@ -869,7 +869,7 @@ namespace WixToolset.BootstrapperApplicationApi
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanForwardCompatibleBundle(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleCode,
             [MarshalAs(UnmanagedType.U4)] RelationType relationType,
             [MarshalAs(UnmanagedType.LPWStr)] string wzBundleTag,
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
@@ -957,7 +957,7 @@ namespace WixToolset.BootstrapperApplicationApi
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanRestoreRelatedBundle(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleCode,
             [MarshalAs(UnmanagedType.U4)] RequestState recommendedState,
             [MarshalAs(UnmanagedType.U4)] ref RequestState pRequestedState,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
@@ -969,7 +969,7 @@ namespace WixToolset.BootstrapperApplicationApi
         [PreserveSig]
         [return: MarshalAs(UnmanagedType.I4)]
         int OnPlanRelatedBundleType(
-            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleCode,
             [MarshalAs(UnmanagedType.U4)] RelatedBundlePlanType recommendedType,
             [MarshalAs(UnmanagedType.U4)] ref RelatedBundlePlanType pRequestedType,
             [MarshalAs(UnmanagedType.Bool)] ref bool fCancel
@@ -1004,7 +1004,7 @@ namespace WixToolset.BootstrapperApplicationApi
         [return: MarshalAs(UnmanagedType.I4)]
         int OnDetectRelatedBundlePackage(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageId,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleCode,
             [MarshalAs(UnmanagedType.U4)] RelationType relationType,
             [MarshalAs(UnmanagedType.Bool)] bool fPerMachine,
             [MarshalAs(UnmanagedType.LPWStr)] string wzVersion,

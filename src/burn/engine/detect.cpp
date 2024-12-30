@@ -18,13 +18,13 @@ static HRESULT WINAPI AuthenticationRequired(
     );
 
 static HRESULT DetectAtomFeedUpdate(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_UPDATE* pUpdate
     );
 
 static HRESULT DownloadUpdateFeed(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_UPDATE* pUpdate,
     __deref_inout_z LPWSTR* psczTempFile
@@ -38,8 +38,8 @@ extern "C" void DetectReset(
     )
 {
     RelatedBundlesUninitialize(&pRegistration->relatedBundles);
-    ReleaseNullStr(pRegistration->sczDetectedProviderKeyBundleId);
-    pRegistration->fDetectedForeignProviderKeyBundleId = FALSE;
+    ReleaseNullStr(pRegistration->sczDetectedProviderKeyBundleCode);
+    pRegistration->fDetectedForeignProviderKeyBundleCode = FALSE;
     pRegistration->fSelfRegisteredAsDependent = FALSE;
     pRegistration->fParentRegisteredAsDependent = FALSE;
     pRegistration->fForwardCompatibleBundleExists = FALSE;
@@ -123,14 +123,14 @@ extern "C" HRESULT DetectForwardCompatibleBundles(
     HRESULT hr = S_OK;
     int nCompareResult = 0;
 
-    if (pRegistration->fDetectedForeignProviderKeyBundleId)
+    if (pRegistration->fDetectedForeignProviderKeyBundleCode)
     {
         for (DWORD iRelatedBundle = 0; iRelatedBundle < pRegistration->relatedBundles.cRelatedBundles; ++iRelatedBundle)
         {
             BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + iRelatedBundle;
 
             if (BOOTSTRAPPER_RELATION_UPGRADE == pRelatedBundle->detectRelationType &&
-                CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczDetectedProviderKeyBundleId, -1, pRelatedBundle->package.sczId, -1))
+                CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczDetectedProviderKeyBundleCode, -1, pRelatedBundle->package.sczId, -1))
             {
                 hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
                 ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion->sczVersion, pRelatedBundle->pVersion->sczVersion);
@@ -201,7 +201,7 @@ LExit:
 }
 
 extern "C" HRESULT DetectUpdate(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_UPDATE* pUpdate
     )
@@ -228,7 +228,7 @@ extern "C" HRESULT DetectUpdate(
 
     if (!fSkip)
     {
-        hr = DetectAtomFeedUpdate(wzBundleId, pUX, pUpdate);
+        hr = DetectAtomFeedUpdate(wzBundleCode, pUX, pUpdate);
         ExitOnFailure(hr, "Failed to detect atom feed update.");
     }
 
@@ -306,7 +306,7 @@ LExit:
 }
 
 static HRESULT DownloadUpdateFeed(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_UPDATE* pUpdate,
     __deref_inout_z LPWSTR* psczTempFile
@@ -334,7 +334,7 @@ static HRESULT DownloadUpdateFeed(
     cacheCallback.pv = NULL; //pProgress;
 
     authenticationData.pUX = pUX;
-    authenticationData.wzPackageOrContainerId = wzBundleId;
+    authenticationData.wzPackageOrContainerId = wzBundleCode;
 
     authenticationCallback.pv =  static_cast<LPVOID>(&authenticationData);
     authenticationCallback.pfnAuthenticate = &AuthenticationRequired;
@@ -364,7 +364,7 @@ LExit:
 
 
 static HRESULT DetectAtomFeedUpdate(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in BURN_USER_EXPERIENCE* pUX,
     __in BURN_UPDATE* pUpdate
     )
@@ -385,7 +385,7 @@ static HRESULT DetectAtomFeedUpdate(
     hr = AtomInitialize();
     ExitOnFailure(hr, "Failed to initialize Atom.");
 
-    hr = DownloadUpdateFeed(wzBundleId, pUX, pUpdate, &sczUpdateFeedTempFile);
+    hr = DownloadUpdateFeed(wzBundleCode, pUX, pUpdate, &sczUpdateFeedTempFile);
     ExitOnFailure(hr, "Failed to download update feed.");
 
     hr = AtomParseFromFile(sczUpdateFeedTempFile, &pAtomFeed);

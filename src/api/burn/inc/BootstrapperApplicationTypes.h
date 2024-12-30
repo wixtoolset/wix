@@ -790,7 +790,7 @@ struct BA_ONDETECTCOMPLETE_RESULTS
 struct BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_ARGS
 {
     DWORD dwApiVersion;
-    LPCWSTR wzBundleId;
+    LPCWSTR wzBundleCode;
     BOOTSTRAPPER_RELATION_TYPE relationType;
     LPCWSTR wzBundleTag;
     BOOL fPerMachine;
@@ -847,7 +847,7 @@ struct BA_ONDETECTPACKAGECOMPLETE_RESULTS
 struct BA_ONDETECTRELATEDBUNDLE_ARGS
 {
     DWORD dwApiVersion;
-    LPCWSTR wzBundleId;
+    LPCWSTR wzBundleCode;
     BOOTSTRAPPER_RELATION_TYPE relationType;
     LPCWSTR wzBundleTag;
     BOOL fPerMachine;
@@ -865,7 +865,7 @@ struct BA_ONDETECTRELATEDBUNDLEPACKAGE_ARGS
 {
     DWORD dwApiVersion;
     LPCWSTR wzPackageId;
-    LPCWSTR wzBundleId;
+    LPCWSTR wzBundleCode;
     BOOTSTRAPPER_RELATION_TYPE relationType;
     BOOL fPerMachine;
     LPCWSTR wzVersion;
@@ -1226,7 +1226,7 @@ struct BA_ONPLANCOMPLETE_RESULTS
 struct BA_ONPLANFORWARDCOMPATIBLEBUNDLE_ARGS
 {
     DWORD dwApiVersion;
-    LPCWSTR wzBundleId;
+    LPCWSTR wzBundleCode;
     BOOTSTRAPPER_RELATION_TYPE relationType;
     LPCWSTR wzBundleTag;
     BOOL fPerMachine;
@@ -1339,7 +1339,7 @@ struct BA_ONPLANPACKAGECOMPLETE_RESULTS
 struct BA_ONPLANRELATEDBUNDLE_ARGS
 {
     DWORD dwApiVersion;
-    LPCWSTR wzBundleId;
+    LPCWSTR wzBundleCode;
     BOOTSTRAPPER_REQUEST_STATE recommendedState;
 };
 
@@ -1353,7 +1353,7 @@ struct BA_ONPLANRELATEDBUNDLE_RESULTS
 struct BA_ONPLANRELATEDBUNDLETYPE_ARGS
 {
     DWORD dwApiVersion;
-    LPCWSTR wzBundleId;
+    LPCWSTR wzBundleCode;
     BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE recommendedType;
 };
 
@@ -1367,7 +1367,7 @@ struct BA_ONPLANRELATEDBUNDLETYPE_RESULTS
 struct BA_ONPLANRESTORERELATEDBUNDLE_ARGS
 {
     DWORD dwApiVersion;
-    LPCWSTR wzBundleId;
+    LPCWSTR wzBundleCode;
     BOOTSTRAPPER_REQUEST_STATE recommendedState;
 };
 

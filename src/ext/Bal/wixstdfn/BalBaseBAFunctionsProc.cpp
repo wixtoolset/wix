@@ -71,7 +71,7 @@ static HRESULT BalBaseBAFunctionsProcOnDetectForwardCompatibleBundle(
     __inout BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_RESULTS* pResults
     )
 {
-    return pBAFunctions->OnDetectForwardCompatibleBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->fMissingFromCache, &pResults->fCancel);
+    return pBAFunctions->OnDetectForwardCompatibleBundle(pArgs->wzBundleCode, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->fMissingFromCache, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAFunctionsProcOnDetectUpdateBegin(
@@ -107,7 +107,7 @@ static HRESULT BalBaseBAFunctionsProcOnDetectRelatedBundle(
     __inout BA_ONDETECTRELATEDBUNDLE_RESULTS* pResults
     )
 {
-    return pBAFunctions->OnDetectRelatedBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->fMissingFromCache, &pResults->fCancel);
+    return pBAFunctions->OnDetectRelatedBundle(pArgs->wzBundleCode, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->fMissingFromCache, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAFunctionsProcOnDetectPackageBegin(
@@ -170,7 +170,7 @@ static HRESULT BalBaseBAFunctionsProcOnPlanRelatedBundle(
     __inout BA_ONPLANRELATEDBUNDLE_RESULTS* pResults
     )
 {
-    return pBAFunctions->OnPlanRelatedBundle(pArgs->wzBundleId, pArgs->recommendedState, &pResults->requestedState, &pResults->fCancel);
+    return pBAFunctions->OnPlanRelatedBundle(pArgs->wzBundleCode, pArgs->recommendedState, &pResults->requestedState, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAFunctionsProcOnPlanRollbackBoundary(
@@ -647,7 +647,7 @@ static HRESULT BalBaseBAFunctionsProcOnPlanForwardCompatibleBundle(
     __inout BA_ONPLANFORWARDCOMPATIBLEBUNDLE_RESULTS* pResults
     )
 {
-    return pBAFunctions->OnPlanForwardCompatibleBundle(pArgs->wzBundleId, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->fRecommendedIgnoreBundle, &pResults->fCancel, &pResults->fIgnoreBundle);
+    return pBAFunctions->OnPlanForwardCompatibleBundle(pArgs->wzBundleCode, pArgs->relationType, pArgs->wzBundleTag, pArgs->fPerMachine, pArgs->wzVersion, pArgs->fRecommendedIgnoreBundle, &pResults->fCancel, &pResults->fIgnoreBundle);
 }
 
 static HRESULT BalBaseBAFunctionsProcOnCacheContainerOrPayloadVerifyBegin(
@@ -710,7 +710,7 @@ static HRESULT BalBaseBAFunctionsProcOnPlanRestoreRelatedBundle(
     __inout BA_ONPLANRESTORERELATEDBUNDLE_RESULTS* pResults
     )
 {
-    return pBAFunctions->OnPlanRestoreRelatedBundle(pArgs->wzBundleId, pArgs->recommendedState, &pResults->requestedState, &pResults->fCancel);
+    return pBAFunctions->OnPlanRestoreRelatedBundle(pArgs->wzBundleCode, pArgs->recommendedState, &pResults->requestedState, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAFunctionsProcOnPlanRelatedBundleType(
@@ -719,7 +719,7 @@ static HRESULT BalBaseBAFunctionsProcOnPlanRelatedBundleType(
     __inout BA_ONPLANRELATEDBUNDLETYPE_RESULTS* pResults
     )
 {
-    return pBAFunctions->OnPlanRelatedBundleType(pArgs->wzBundleId, pArgs->recommendedType, &pResults->requestedType, &pResults->fCancel);
+    return pBAFunctions->OnPlanRelatedBundleType(pArgs->wzBundleCode, pArgs->recommendedType, &pResults->requestedType, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAFunctionsProcOnApplyDowngrade(
@@ -737,7 +737,7 @@ static HRESULT BalBaseBAFunctionsProcOnDetectRelatedBundlePackage(
     __inout BA_ONDETECTRELATEDBUNDLEPACKAGE_RESULTS* pResults
     )
 {
-    return pBAFunctions->OnDetectRelatedBundlePackage(pArgs->wzPackageId, pArgs->wzBundleId, pArgs->relationType, pArgs->fPerMachine, pArgs->wzVersion, &pResults->fCancel);
+    return pBAFunctions->OnDetectRelatedBundlePackage(pArgs->wzPackageId, pArgs->wzBundleCode, pArgs->relationType, pArgs->fPerMachine, pArgs->wzVersion, &pResults->fCancel);
 }
 
 static HRESULT BalBaseBAFunctionsProcOnCachePackageNonVitalValidationFailure(

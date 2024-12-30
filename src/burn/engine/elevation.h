@@ -29,7 +29,7 @@ HRESULT ElevationSessionBegin(
     __in BOOL fDisableResume,
     __in BURN_VARIABLES* pVariables,
     __in DWORD dwRegistrationOperations,
-    __in BOOL fDetectedForeignProviderKeyBundleId,
+    __in BOOL fDetectedForeignProviderKeyBundleCode,
     __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
@@ -37,7 +37,7 @@ HRESULT ElevationSessionEnd(
     __in HANDLE hPipe,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_APPLY_RESTART restart,
-    __in BOOL fDetectedForeignProviderKeyBundleId,
+    __in BOOL fDetectedForeignProviderKeyBundleCode,
     __in DWORD64 qwEstimatedSize,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType
     );
