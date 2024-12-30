@@ -11,7 +11,7 @@ namespace ForTestingUseOnly
             ForTestingUseOnlySymbolDefinitionType.ForTestingUseOnlyBundle.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(ForTestingUseOnlyBundleSymbolFields.BundleId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ForTestingUseOnlyBundleSymbolFields.BundleCode), IntermediateFieldType.String),
             },
             typeof(ForTestingUseOnlyBundleSymbol));
     }
@@ -23,7 +23,7 @@ namespace ForTestingUseOnly.Symbols
 
     public enum ForTestingUseOnlyBundleSymbolFields
     {
-        BundleId,
+        BundleCode,
     }
 
     public class ForTestingUseOnlyBundleSymbol : IntermediateSymbol
@@ -38,10 +38,10 @@ namespace ForTestingUseOnly.Symbols
 
         public IntermediateField this[ForTestingUseOnlyBundleSymbolFields index] => this.Fields[(int)index];
 
-        public string BundleId
+        public string BundleCode
         {
-            get => this.Fields[(int)ForTestingUseOnlyBundleSymbolFields.BundleId].AsString();
-            set => this.Set((int)ForTestingUseOnlyBundleSymbolFields.BundleId, value);
+            get => this.Fields[(int)ForTestingUseOnlyBundleSymbolFields.BundleCode].AsString();
+            set => this.Set((int)ForTestingUseOnlyBundleSymbolFields.BundleCode, value);
         }
     }
 }

@@ -1,5 +1,5 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Bundle Name="PermanentBundlePackageBundle" Version="1.0.2.0" Manufacturer="Example Corporation" UpgradeCode="{1752611C-3D8C-461E-A0A0-B0F07CBBD6FC}">
+  <Bundle Id="WixToolsetTest.TestBundle" Name="PermanentBundlePackageBundle" Version="1.0.2.0" Manufacturer="Example Corporation">
     <BootstrapperApplication SourceFile="fakeba.dll" />
 
     <Chain>

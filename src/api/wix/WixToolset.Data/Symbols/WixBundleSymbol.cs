@@ -30,7 +30,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Tag), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Platform), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.ParentName), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.BundleId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.BundleCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.ProviderKey), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.InProgressName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.DisableModify), IntermediateFieldType.String),
@@ -65,7 +65,9 @@ namespace WixToolset.Data.Symbols
         Tag,
         Platform,
         ParentName,
-        BundleId,
+        BundleCode,
+        [Obsolete("Use BundleCode instead.")]
+        BundleId = BundleCode,
         ProviderKey,
         InProgressName,
         DisableModify,
@@ -218,10 +220,17 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleSymbolFields.ParentName, value);
         }
 
+        public string BundleCode
+        {
+            get => (string)this.Fields[(int)WixBundleSymbolFields.BundleCode];
+            set => this.Set((int)WixBundleSymbolFields.BundleCode, value);
+        }
+
+        [Obsolete("Use BundleCode instead.")]
         public string BundleId
         {
-            get => (string)this.Fields[(int)WixBundleSymbolFields.BundleId];
-            set => this.Set((int)WixBundleSymbolFields.BundleId, value);
+            get => (string)this.Fields[(int)WixBundleSymbolFields.BundleCode];
+            set => this.Set((int)WixBundleSymbolFields.BundleCode, value);
         }
 
         public string ProviderKey

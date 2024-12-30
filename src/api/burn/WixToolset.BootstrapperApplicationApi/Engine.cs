@@ -209,12 +209,12 @@ namespace WixToolset.BootstrapperApplicationApi
         }
 
         /// <inheritdoc/>
-        public string GetRelatedBundleVariable(string bundleId, string name)
+        public string GetRelatedBundleVariable(string bundleCode, string name)
         {
             StrUtil.StrHandle handle = new StrUtil.StrHandle();
             try
             {
-                int ret = BalUtil.BalGetRelatedBundleVariableFromEngine(this.engine, bundleId, name, ref handle);
+                int ret = BalUtil.BalGetRelatedBundleVariableFromEngine(this.engine, bundleCode, name, ref handle);
                 if (ret != NativeMethods.S_OK)
                 {
                     throw new Win32Exception(ret);

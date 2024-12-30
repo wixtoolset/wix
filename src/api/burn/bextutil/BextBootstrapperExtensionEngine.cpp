@@ -307,7 +307,7 @@ public: // IBootstrapperExtensionEngine
     }
 
     virtual STDMETHODIMP GetRelatedBundleVariable(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in_z LPCWSTR wzVariable,
         __out_ecount_opt(*pcchValue) LPWSTR wzValue,
         __inout SIZE_T* pcchValue
@@ -320,7 +320,7 @@ public: // IBootstrapperExtensionEngine
         ExitOnNull(pcchValue, hr, E_INVALIDARG, "pcchValue is required");
 
         args.cbSize = sizeof(args);
-        args.wzBundleId = wzBundleId;
+        args.wzBundleCode = wzBundleCode;
         args.wzVariable = wzVariable;
 
         results.cbSize = sizeof(results);

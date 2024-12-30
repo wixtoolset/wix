@@ -75,7 +75,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             this.ChainPackage.Win64 = harvestedBundlePackage.Win64;
-            this.BundlePackage.BundleId = Guid.Parse(harvestedBundlePackage.BundleId).ToString("B").ToUpperInvariant();
+            this.BundlePackage.BundleCode = Guid.Parse(harvestedBundlePackage.BundleCode).ToString("B").ToUpperInvariant();
             this.BundlePackage.EngineVersion = harvestedBundlePackage.EngineVersion;
             this.BundlePackage.SupportsBurnProtocol = harvestedBundlePackage.ProtocolVersion == BurnCommon.BURN_PROTOCOL_VERSION;
 

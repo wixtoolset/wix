@@ -1,5 +1,5 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Bundle Name="RemoteBundlePackageBundle" Version="1.0.1.0" Manufacturer="Example Corporation" UpgradeCode="{9BE68A41-FD0E-4E25-B607-D636E42AFEF6}">
+  <Bundle Id="WixToolsetTest.TestBundle" Name="RemoteBundlePackageBundle" Version="1.0.1.0" Manufacturer="Example Corporation">
     <BootstrapperApplication SourceFile="fakeba.dll" />
 
     <Chain>
@@ -9,7 +9,7 @@
                               Description="BurnBundleDescription"
                               Size="123456789"
                               Hash="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
-            <RemoteBundle BundleId="{216BDA7F-74BD-45E8-957B-500552F05629}"
+            <RemoteBundle BundleCode="{216BDA7F-74BD-45E8-957B-500552F05629}"
                           DisplayName="BurnBundle"
                           InstallSize="34"
                           ManifestNamespace="http://wixtoolset.org/schemas/v4/2008/Burn"

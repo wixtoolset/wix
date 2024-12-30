@@ -452,7 +452,7 @@ extern "C" HRESULT ApplyRegister(
 
     if (pEngineState->registration.fPerMachine)
     {
-        hr = ElevationSessionBegin(pEngineState->companionConnection.hPipe, sczEngineWorkingPath, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->registration.fDetectedForeignProviderKeyBundleId, qwEstimatedSize, registrationType);
+        hr = ElevationSessionBegin(pEngineState->companionConnection.hPipe, sczEngineWorkingPath, pEngineState->registration.sczResumeCommandLine, pEngineState->registration.fDisableResume, &pEngineState->variables, pEngineState->plan.dwRegistrationOperations, pEngineState->registration.fDetectedForeignProviderKeyBundleCode, qwEstimatedSize, registrationType);
         ExitOnFailure(hr, "Failed to begin registration session in per-machine process.");
     }
     else
@@ -548,7 +548,7 @@ extern "C" HRESULT ApplyUnregister(
 
     if (pEngineState->registration.fPerMachine)
     {
-        hr = ElevationSessionEnd(pEngineState->companionConnection.hPipe, resumeMode, restart, pEngineState->registration.fDetectedForeignProviderKeyBundleId, qwEstimatedSize, registrationType);
+        hr = ElevationSessionEnd(pEngineState->companionConnection.hPipe, resumeMode, restart, pEngineState->registration.fDetectedForeignProviderKeyBundleCode, qwEstimatedSize, registrationType);
         ExitOnFailure(hr, "Failed to end session in per-machine process.");
     }
     else

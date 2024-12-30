@@ -837,7 +837,7 @@ LExit:
 
 HRESULT ExternalEngineGetRelatedBundleVariable(
     __in BURN_ENGINE_STATE* /*pEngineState*/,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzVariable,
     __out_ecount_opt(*pcchValue) LPWSTR wzValue,
     __inout SIZE_T* pcchValue
@@ -848,7 +848,7 @@ HRESULT ExternalEngineGetRelatedBundleVariable(
 
     if (wzVariable && *wzVariable && pcchValue)
     {
-        hr = BundleGetBundleVariable(wzBundleId, wzVariable, &sczValue);
+        hr = BundleGetBundleVariable(wzBundleCode, wzVariable, &sczValue);
         if (SUCCEEDED(hr))
         {
             hr = CopyStringToExternal(sczValue, wzValue, pcchValue);

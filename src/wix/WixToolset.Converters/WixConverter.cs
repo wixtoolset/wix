@@ -1751,6 +1751,14 @@ namespace WixToolset.Converters
 
         private void ConvertRelatedBundleElement(XElement element)
         {
+            var xId = element.Attribute("Id");
+            if (xId != null &&
+                this.OnInformation(ConverterTestType.RelatedBundleIdAttributeRenamed, element, "The {0} element's Id attribute has been renamed. Use the Code attribute instead.", element.Name.LocalName))
+            {
+                element.Add(new XAttribute("Code", xId.Value));
+                xId.Remove();
+            }
+
             var xAction = element.Attribute("Action");
             var value = xAction?.Value;
             var lowercaseValue = value?.ToLowerInvariant();
@@ -3139,7 +3147,6 @@ namespace WixToolset.Converters
 
             public bool CollectInnerTextWithTrailingWhitespaceAndCommentsForScriptFile(XElement element, out string collectedText)
             {
-                var value = String.Empty;
                 char[] whitespaceChars = { ' ', '\t', '\r', '\n' };
                 var nodes = element.Nodes().ToList();
                 var cDataFound = false;
@@ -3560,6 +3567,11 @@ namespace WixToolset.Converters
             /// The WixUIPrintEula custom action has been replaced with the MSI native MsiPrint control event in WiX v5 and no longer needs to be authored in a custom dialog set.
             /// </summary>
             WixUIPrintEulaCustomAction,
+
+            /// <summary>
+            /// The RelatedBundle element's Id attribute has been renamed. Use the Code attribute instead."
+            /// </summary>
+            RelatedBundleIdAttributeRenamed,
         }
     }
 }

@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.BundleId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.BundleCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.EngineVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.ManifestNamespace), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.ProtocolVersion), IntermediateFieldType.Number),
@@ -30,7 +30,9 @@ namespace WixToolset.Data.Symbols
     public enum WixBundleHarvestedBundlePackageSymbolFields
     {
         Attributes,
-        BundleId,
+        BundleCode,
+        [Obsolete("Use BundleCode instead.")]
+        BundleId = BundleCode,
         EngineVersion,
         ManifestNamespace,
         ProtocolVersion,
@@ -65,10 +67,17 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleHarvestedBundlePackageSymbolFields.Attributes, (int)value);
         }
 
+        public string BundleCode
+        {
+            get => this.Fields[(int)WixBundleHarvestedBundlePackageSymbolFields.BundleCode].AsString();
+            set => this.Set((int)WixBundleHarvestedBundlePackageSymbolFields.BundleCode, value);
+        }
+
+        [Obsolete("Use BundleCode instead.")]
         public string BundleId
         {
-            get => this.Fields[(int)WixBundleHarvestedBundlePackageSymbolFields.BundleId].AsString();
-            set => this.Set((int)WixBundleHarvestedBundlePackageSymbolFields.BundleId, value);
+            get => this.Fields[(int)WixBundleHarvestedBundlePackageSymbolFields.BundleCode].AsString();
+            set => this.Set((int)WixBundleHarvestedBundlePackageSymbolFields.BundleCode, value);
         }
 
         public string EngineVersion

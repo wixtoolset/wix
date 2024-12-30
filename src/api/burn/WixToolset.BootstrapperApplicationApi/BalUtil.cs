@@ -38,7 +38,7 @@ namespace WixToolset.BootstrapperApplicationApi
         [DllImport("mbanative.dll", ExactSpelling = true)]
         internal static extern int BalGetRelatedBundleVariableFromEngine(
             [MarshalAs(UnmanagedType.Interface)] IBootstrapperEngine pEngine,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleId,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzBundleCode,
             [MarshalAs(UnmanagedType.LPWStr)] string wzVariable,
             ref StrUtil.StrHandle psczOut
             );

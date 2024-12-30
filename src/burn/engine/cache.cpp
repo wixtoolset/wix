@@ -259,7 +259,7 @@ extern "C" HRESULT CacheInitializeSources(
     ExitOnFailure(hr, "Failed to get current process path.");
 
     // Determine if we are running from the package cache or not.
-    hr = CacheGetCompletedPath(pCache, pRegistration->fPerMachine, pRegistration->sczId, &sczCompletedFolder);
+    hr = CacheGetCompletedPath(pCache, pRegistration->fPerMachine, pRegistration->sczCode, &sczCompletedFolder);
     ExitOnFailure(hr, "Failed to get completed path for bundle.");
 
     hr = PathConcatRelativeToFullyQualifiedBase(sczCompletedFolder, pRegistration->sczExecutableName, &sczCompletedPath);
@@ -432,7 +432,7 @@ LExit:
 
 extern "C" HRESULT CacheCalculateBundleLayoutWorkingPath(
     __in BURN_CACHE* pCache,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __deref_out_z LPWSTR* psczWorkingPath
     )
 {
@@ -440,8 +440,8 @@ extern "C" HRESULT CacheCalculateBundleLayoutWorkingPath(
 
     HRESULT hr = S_OK;
 
-    hr = PathConcatRelativeToFullyQualifiedBase(pCache->sczAcquisitionFolder, wzBundleId, psczWorkingPath);
-    ExitOnFailure(hr, "Failed to append bundle id for bundle layout working path.");
+    hr = PathConcatRelativeToFullyQualifiedBase(pCache->sczAcquisitionFolder, wzBundleCode, psczWorkingPath);
+    ExitOnFailure(hr, "Failed to append bundle code for bundle layout working path.");
 
 LExit:
     return hr;
@@ -978,7 +978,7 @@ extern "C" HRESULT CacheCompleteBundle(
     __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
     __in_z LPCWSTR wzExecutableName,
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzSourceBundlePath
 #ifdef DEBUG
     , __in_z LPCWSTR wzExecutablePath
@@ -990,7 +990,7 @@ extern "C" HRESULT CacheCompleteBundle(
     LPWSTR sczTargetDirectory = NULL;
     LPWSTR sczTargetPath = NULL;
 
-    hr = CreateCompletedPath(pCache, fPerMachine, wzBundleId, NULL, &sczTargetDirectory);
+    hr = CreateCompletedPath(pCache, fPerMachine, wzBundleCode, NULL, &sczTargetDirectory);
     ExitOnFailure(hr, "Failed to create completed cache path for bundle.");
 
     hr = PathConcatRelativeToFullyQualifiedBase(sczTargetDirectory, wzExecutableName, &sczTargetPath);
@@ -1217,13 +1217,13 @@ extern "C" HRESULT CacheRemoveBaseWorkingFolder(
 extern "C" HRESULT CacheRemoveBundle(
     __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
-    __in_z LPCWSTR wzBundleId
+    __in_z LPCWSTR wzBundleCode
     )
 {
     HRESULT hr = S_OK;
 
-    hr = RemoveBundleOrPackage(pCache, TRUE, fPerMachine, wzBundleId, wzBundleId);
-    ExitOnFailure(hr, "Failed to remove bundle id: %ls.", wzBundleId);
+    hr = RemoveBundleOrPackage(pCache, TRUE, fPerMachine, wzBundleCode, wzBundleCode);
+    ExitOnFailure(hr, "Failed to remove bundle code: %ls.", wzBundleCode);
 
 LExit:
     return hr;

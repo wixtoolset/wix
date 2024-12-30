@@ -52,8 +52,8 @@ extern "C" HRESULT BundlePackageEngineParsePackageFromXml(
     LPWSTR scz = NULL;
 
     // @DetectCondition
-    hr = XmlGetAttributeEx(pixnBundlePackage, L"BundleId", &pPackage->Bundle.sczBundleId);
-    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @BundleId.");
+    hr = XmlGetAttributeEx(pixnBundlePackage, L"BundleCode", &pPackage->Bundle.sczBundleCode);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @BundleCode.");
 
     // @Version
     hr = XmlGetAttributeEx(pixnBundlePackage, L"Version", &scz);
@@ -100,7 +100,7 @@ extern "C" HRESULT BundlePackageEngineParsePackageFromXml(
     hr = ExeEngineParseCommandLineArgumentsFromXml(pixnBundlePackage, &pPackage->Bundle.rgCommandLineArguments, &pPackage->Bundle.cCommandLineArguments);
     ExitOnFailure(hr, "Failed to parse command lines.");
 
-    hr = StrAllocFormatted(&pPackage->Bundle.sczRegistrationKey, L"%ls\\%ls", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pPackage->Bundle.sczBundleId);
+    hr = StrAllocFormatted(&pPackage->Bundle.sczRegistrationKey, L"%ls\\%ls", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pPackage->Bundle.sczBundleCode);
     ExitOnFailure(hr, "Failed to build uninstall registry key path.");
 
 LExit:
@@ -126,7 +126,7 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
     IXMLDOMNodeList* pixnNodes = NULL;
     IXMLDOMNode* pixnElement = NULL;
     LPWSTR sczAction = NULL;
-    LPWSTR sczId = NULL;
+    LPWSTR sczCode = NULL;
     DWORD cElements = 0;
 
     hr = XmlSelectNodes(pixnBundle, L"RelatedBundle", &pixnNodes);
@@ -143,16 +143,16 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
         hr = XmlGetAttributeEx(pixnElement, L"Action", &sczAction);
         ExitOnFailure(hr, "Failed to get @Action.");
 
-        hr = XmlGetAttributeEx(pixnElement, L"Id", &sczId);
-        ExitOnFailure(hr, "Failed to get @Id.");
+        hr = XmlGetAttributeEx(pixnElement, L"Code", &sczCode);
+        ExitOnFailure(hr, "Failed to get @Code.");
 
         if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Detect", -1))
         {
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczDetectCodes), *pcDetectCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Detect code array");
 
-            (*prgsczDetectCodes)[*pcDetectCodes] = sczId;
-            sczId = NULL;
+            (*prgsczDetectCodes)[*pcDetectCodes] = sczCode;
+            sczCode = NULL;
             *pcDetectCodes += 1;
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Upgrade", -1))
@@ -160,8 +160,8 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczUpgradeCodes), *pcUpgradeCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Upgrade code array");
 
-            (*prgsczUpgradeCodes)[*pcUpgradeCodes] = sczId;
-            sczId = NULL;
+            (*prgsczUpgradeCodes)[*pcUpgradeCodes] = sczCode;
+            sczCode = NULL;
             *pcUpgradeCodes += 1;
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Addon", -1))
@@ -169,8 +169,8 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczAddonCodes), *pcAddonCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Addon code array");
 
-            (*prgsczAddonCodes)[*pcAddonCodes] = sczId;
-            sczId = NULL;
+            (*prgsczAddonCodes)[*pcAddonCodes] = sczCode;
+            sczCode = NULL;
             *pcAddonCodes += 1;
         }
         else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Patch", -1))
@@ -178,8 +178,8 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczPatchCodes), *pcPatchCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Patch code array");
 
-            (*prgsczPatchCodes)[*pcPatchCodes] = sczId;
-            sczId = NULL;
+            (*prgsczPatchCodes)[*pcPatchCodes] = sczCode;
+            sczCode = NULL;
             *pcPatchCodes += 1;
         }
         else
@@ -193,7 +193,7 @@ LExit:
     ReleaseObject(pixnNodes);
     ReleaseObject(pixnElement);
     ReleaseStr(sczAction);
-    ReleaseStr(sczId);
+    ReleaseStr(sczCode);
 
     return hr;
 }
@@ -202,7 +202,7 @@ extern "C" void BundlePackageEnginePackageUninitialize(
     __in BURN_PACKAGE* pPackage
     )
 {
-    ReleaseStr(pPackage->Bundle.sczBundleId);
+    ReleaseStr(pPackage->Bundle.sczBundleCode);
     ReleaseStr(pPackage->Bundle.sczArpKeyPath);
     ReleaseVerutilVersion(pPackage->Bundle.pVersion);
     ReleaseStr(pPackage->Bundle.sczRegistrationKey);
@@ -457,7 +457,7 @@ extern "C" HRESULT BundlePackageEnginePlanAddPackage(
         pAction->bundlePackage.pPackage = pPackage;
         pAction->bundlePackage.action = pPackage->rollback;
 
-        hr = StrAllocString(&pAction->bundlePackage.sczParent, pPlan->wzBundleId, 0);
+        hr = StrAllocString(&pAction->bundlePackage.sczParent, pPlan->wzBundleCode, 0);
         ExitOnFailure(hr, "Failed to allocate the parent.");
 
         if (pPackage->Bundle.wzAncestors)
@@ -488,7 +488,7 @@ extern "C" HRESULT BundlePackageEnginePlanAddPackage(
         pAction->bundlePackage.pPackage = pPackage;
         pAction->bundlePackage.action = pPackage->execute;
 
-        hr = StrAllocString(&pAction->bundlePackage.sczParent, pPlan->wzBundleId, 0);
+        hr = StrAllocString(&pAction->bundlePackage.sczParent, pPlan->wzBundleCode, 0);
         ExitOnFailure(hr, "Failed to allocate the parent.");
 
         if (pPackage->Bundle.wzAncestors)
@@ -686,7 +686,7 @@ static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
     BOOTSTRAPPER_RELATION_TYPE relationType = RelatedBundleConvertRelationType(pBundle->relationType);
     BOOL fPerMachine = BUNDLE_INSTALL_CONTEXT_MACHINE == pBundle->installContext;
 
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pBundle->wzBundleId, -1, pPackage->Bundle.sczBundleId, -1) &&
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pBundle->wzBundleCode, -1, pPackage->Bundle.sczBundleCode, -1) &&
         pPackage->Bundle.fWin64 == (REG_KEY_64BIT == pBundle->regBitness))
     {
         Assert(BOOTSTRAPPER_RELATION_UPGRADE == relationType);
@@ -695,14 +695,14 @@ static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
     }
 
     hr = RegReadString(pBundle->hkBundle, BURN_REGISTRATION_REGISTRY_BUNDLE_VERSION, &sczBundleVersion);
-    ExitOnFailure(hr, "Failed to read version from registry for related bundle package: %ls", pBundle->wzBundleId);
+    ExitOnFailure(hr, "Failed to read version from registry for related bundle package: %ls", pBundle->wzBundleCode);
 
     hr = VerParseVersion(sczBundleVersion, 0, FALSE, &pVersion);
     ExitOnFailure(hr, "Failed to parse related bundle package version: %ls", sczBundleVersion);
 
     if (pVersion->fInvalid)
     {
-        LogId(REPORT_WARNING, MSG_RELATED_PACKAGE_INVALID_VERSION, pBundle->wzBundleId, sczBundleVersion);
+        LogId(REPORT_WARNING, MSG_RELATED_PACKAGE_INVALID_VERSION, pBundle->wzBundleCode, sczBundleVersion);
     }
 
     if (BOOTSTRAPPER_RELATION_UPGRADE == relationType)
@@ -719,7 +719,7 @@ static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
     result = BUNDLE_QUERY_CALLBACK_RESULT_CANCEL;
 
     // Pass to BA.
-    hr = BACallbackOnDetectRelatedBundlePackage(pContext->pUserExperience, pPackage->sczId, pBundle->wzBundleId, relationType, fPerMachine, pVersion);
+    hr = BACallbackOnDetectRelatedBundlePackage(pContext->pUserExperience, pPackage->sczId, pBundle->wzBundleCode, relationType, fPerMachine, pVersion);
     ExitOnRootFailure(hr, "BA aborted detect related BUNDLE package.");
 
     result = BUNDLE_QUERY_CALLBACK_RESULT_CONTINUE;
@@ -1064,7 +1064,7 @@ static HRESULT DetectArpEntry(
 
     if (!pPackage->Bundle.sczArpKeyPath)
     {
-        hr = PathConcatRelativeToBase(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\", pPackage->Bundle.sczBundleId, &pPackage->Bundle.sczArpKeyPath);
+        hr = PathConcatRelativeToBase(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\", pPackage->Bundle.sczBundleCode, &pPackage->Bundle.sczArpKeyPath);
         ExitOnFailure(hr, "Failed to build full key path.");
     }
 

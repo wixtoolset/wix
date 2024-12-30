@@ -325,10 +325,10 @@ namespace WixToolset.BootstrapperApplicationApi
         /// This class is for events raised by the engine.
         /// It is not intended to be instantiated by user code.
         /// </summary>
-        public DetectForwardCompatibleBundleEventArgs(string bundleId, RelationType relationType, string bundleTag, bool perMachine, string version, bool missingFromCache, bool cancelRecommendation)
+        public DetectForwardCompatibleBundleEventArgs(string bundleCode, RelationType relationType, string bundleTag, bool perMachine, string version, bool missingFromCache, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
-            this.BundleId = bundleId;
+            this.BundleCode = bundleCode;
             this.RelationType = relationType;
             this.BundleTag = bundleTag;
             this.PerMachine = perMachine;
@@ -339,7 +339,11 @@ namespace WixToolset.BootstrapperApplicationApi
         /// <summary>
         /// Gets the identity of the forward compatible bundle detected.
         /// </summary>
-        public string BundleId { get; private set; }
+        public string BundleCode { get; private set; }
+
+        /// <inheritdoc cref="BundleCode" />
+        [Obsolete("Use BundleCode instead.")]
+        public string BundleId => this.BundleCode;
 
         /// <summary>
         /// Gets the relationship type of the forward compatible bundle.
@@ -807,10 +811,10 @@ namespace WixToolset.BootstrapperApplicationApi
         /// This class is for events raised by the engine.
         /// It is not intended to be instantiated by user code.
         /// </summary>
-        public PlanRelatedBundleEventArgs(string bundleId, RequestState recommendedState, RequestState state, bool cancelRecommendation)
+        public PlanRelatedBundleEventArgs(string bundleCode, RequestState recommendedState, RequestState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
-            this.BundleId = bundleId;
+            this.BundleCode = bundleCode;
             this.RecommendedState = recommendedState;
             this.State = state;
         }
@@ -818,7 +822,11 @@ namespace WixToolset.BootstrapperApplicationApi
         /// <summary>
         /// Gets the identity of the bundle to plan for.
         /// </summary>
-        public string BundleId { get; private set; }
+        public string BundleCode { get; private set; }
+
+        /// <inheritdoc cref="BundleCode" />
+        [Obsolete("Use BundleCode instead.")]
+        public string BundleId => this.BundleCode;
 
         /// <summary>
         /// Gets the recommended requested state for the bundle.
@@ -841,10 +849,10 @@ namespace WixToolset.BootstrapperApplicationApi
         /// This class is for events raised by the engine.
         /// It is not intended to be instantiated by user code.
         /// </summary>
-        public PlanRelatedBundleTypeEventArgs(string bundleId, RelatedBundlePlanType recommendedType, RelatedBundlePlanType type, bool cancelRecommendation)
+        public PlanRelatedBundleTypeEventArgs(string bundleCode, RelatedBundlePlanType recommendedType, RelatedBundlePlanType type, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
-            this.BundleId = bundleId;
+            this.BundleCode = bundleCode;
             this.RecommendedType = recommendedType;
             this.Type = type;
         }
@@ -852,7 +860,11 @@ namespace WixToolset.BootstrapperApplicationApi
         /// <summary>
         /// Gets the identity of the bundle to plan for.
         /// </summary>
-        public string BundleId { get; private set; }
+        public string BundleCode { get; private set; }
+
+        /// <inheritdoc cref="BundleCode" />
+        [Obsolete("Use BundleCode instead.")]
+        public string BundleId => this.BundleCode;
 
         /// <summary>
         /// Gets the recommended plan type for the bundle.
@@ -1327,10 +1339,10 @@ namespace WixToolset.BootstrapperApplicationApi
         /// This class is for events raised by the engine.
         /// It is not intended to be instantiated by user code.
         /// </summary>
-        public PlanForwardCompatibleBundleEventArgs(string bundleId, RelationType relationType, string bundleTag, bool perMachine, string version, bool recommendedIgnoreBundle, bool cancelRecommendation, bool ignoreBundle)
+        public PlanForwardCompatibleBundleEventArgs(string bundleCode, RelationType relationType, string bundleTag, bool perMachine, string version, bool recommendedIgnoreBundle, bool cancelRecommendation, bool ignoreBundle)
             : base(cancelRecommendation)
         {
-            this.BundleId = bundleId;
+            this.BundleCode = bundleCode;
             this.RelationType = relationType;
             this.BundleTag = bundleTag;
             this.PerMachine = perMachine;
@@ -1342,7 +1354,11 @@ namespace WixToolset.BootstrapperApplicationApi
         /// <summary>
         /// Gets the identity of the forward compatible bundle detected.
         /// </summary>
-        public string BundleId { get; private set; }
+        public string BundleCode { get; private set; }
+
+        /// <inheritdoc cref="BundleCode" />
+        [Obsolete("Use BundleCode instead.")]
+        public string BundleId => this.BundleCode;
 
         /// <summary>
         /// Gets the relationship type of the forward compatible bundle.
@@ -2624,10 +2640,10 @@ namespace WixToolset.BootstrapperApplicationApi
         /// This class is for events raised by the engine.
         /// It is not intended to be instantiated by user code.
         /// </summary>
-        public PlanRestoreRelatedBundleEventArgs(string bundleId, RequestState recommendedState, RequestState state, bool cancelRecommendation)
+        public PlanRestoreRelatedBundleEventArgs(string bundleCode, RequestState recommendedState, RequestState state, bool cancelRecommendation)
             : base(cancelRecommendation)
         {
-            this.BundleId = bundleId;
+            this.BundleCode = bundleCode;
             this.RecommendedState = recommendedState;
             this.State = state;
         }
@@ -2635,7 +2651,11 @@ namespace WixToolset.BootstrapperApplicationApi
         /// <summary>
         /// Gets the identity of the bundle to plan for.
         /// </summary>
-        public string BundleId { get; private set; }
+        public string BundleCode { get; private set; }
+
+        /// <inheritdoc cref="BundleCode" />
+        [Obsolete("Use BundleCode instead.")]
+        public string BundleId => this.BundleCode;
 
         /// <summary>
         /// Gets the recommended requested state for the bundle.

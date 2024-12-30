@@ -355,7 +355,7 @@ public: // IBootstrapperApplication
     }
 
     virtual STDMETHODIMP OnDetectRelatedBundle(
-        __in LPCWSTR wzBundleId,
+        __in LPCWSTR wzBundleCode,
         __in BOOTSTRAPPER_RELATION_TYPE relationType,
         __in LPCWSTR wzBundleTag,
         __in BOOL fPerMachine,
@@ -368,7 +368,7 @@ public: // IBootstrapperApplication
 
         if (!fMissingFromCache)
         {
-            BalInfoAddRelatedBundleAsPackage(&m_Bundle.packages, wzBundleId, relationType, fPerMachine, &pPackage);
+            BalInfoAddRelatedBundleAsPackage(&m_Bundle.packages, wzBundleCode, relationType, fPerMachine, &pPackage);
             // Best effort
         }
 
@@ -387,7 +387,7 @@ public: // IBootstrapperApplication
         }
 
     LExit:
-        return CBootstrapperApplicationBase::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
+        return CBootstrapperApplicationBase::OnDetectRelatedBundle(wzBundleCode, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
     }
 
 
@@ -550,7 +550,7 @@ public: // IBootstrapperApplication
 
 
     virtual STDMETHODIMP OnPlanRelatedBundleType(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE recommendedType,
         __inout BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE* pRequestedType,
         __inout BOOL* pfCancel
@@ -562,7 +562,7 @@ public: // IBootstrapperApplication
             *pRequestedType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_NONE;
         }
 
-        return CBootstrapperApplicationBase::OnPlanRelatedBundleType(wzBundleId, recommendedType, pRequestedType, pfCancel);
+        return CBootstrapperApplicationBase::OnPlanRelatedBundleType(wzBundleCode, recommendedType, pRequestedType, pfCancel);
     }
 
 
@@ -1853,7 +1853,7 @@ private: // privates
     {
         BOOTSTRAPPER_REQUEST_STATE requestedState = pResults->requestedState;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANRELATEDBUNDLE, pArgs, pResults, m_pvBAFunctionsProcContext);
-        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_RELATED_BUNDLE, m_hModule, pArgs->wzBundleId, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
+        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_RELATED_BUNDLE, m_hModule, pArgs->wzBundleCode, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
     }
 
     void OnPlanRelatedBundleTypeFallback(
@@ -1863,7 +1863,7 @@ private: // privates
     {
         BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE requestedType = pResults->requestedType;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANRELATEDBUNDLETYPE, pArgs, pResults, m_pvBAFunctionsProcContext);
-        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_RELATED_BUNDLE_TYPE, m_hModule, pArgs->wzBundleId, LoggingPlanRelationTypeToString(requestedType), LoggingPlanRelationTypeToString(pResults->requestedType));
+        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_RELATED_BUNDLE_TYPE, m_hModule, pArgs->wzBundleCode, LoggingPlanRelationTypeToString(requestedType), LoggingPlanRelationTypeToString(pResults->requestedType));
     }
 
     void OnPlanPackageBeginFallback(
@@ -2259,7 +2259,7 @@ private: // privates
     {
         BOOL fIgnoreBundle = pResults->fIgnoreBundle;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANFORWARDCOMPATIBLEBUNDLE, pArgs, pResults, m_pvBAFunctionsProcContext);
-        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_FORWARD_COMPATIBLE_BUNDLE, m_hModule, pArgs->wzBundleId, fIgnoreBundle ? "ignore" : "enable", pResults->fIgnoreBundle ? "ignore" : "enable");
+        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_FORWARD_COMPATIBLE_BUNDLE, m_hModule, pArgs->wzBundleCode, fIgnoreBundle ? "ignore" : "enable", pResults->fIgnoreBundle ? "ignore" : "enable");
     }
 
     void OnCacheVerifyProgressFallback(
@@ -2361,7 +2361,7 @@ private: // privates
     {
         BOOTSTRAPPER_REQUEST_STATE requestedState = pResults->requestedState;
         m_pfnBAFunctionsProc(BA_FUNCTIONS_MESSAGE_ONPLANRESTORERELATEDBUNDLE, pArgs, pResults, m_pvBAFunctionsProcContext);
-        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_RESTORE_RELATED_BUNDLE, m_hModule, pArgs->wzBundleId, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
+        BalLogId(BOOTSTRAPPER_LOG_LEVEL_STANDARD, MSG_WIXSTDBA_PLANNED_RESTORE_RELATED_BUNDLE, m_hModule, pArgs->wzBundleCode, LoggingRequestStateToString(requestedState), LoggingRequestStateToString(pResults->requestedState));
     }
 
     void OnApplyDowngradeFallback(

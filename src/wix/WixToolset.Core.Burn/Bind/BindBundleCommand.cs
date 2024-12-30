@@ -99,7 +99,7 @@ namespace WixToolset.Core.Burn
             // Ensure there is one and only one WixBundleSymbol.
             var bundleSymbol = this.GetSingleSymbol<WixBundleSymbol>("bundle");
 
-            bundleSymbol.ProviderKey = bundleSymbol.BundleId = Guid.NewGuid().ToString("B").ToUpperInvariant();
+            bundleSymbol.ProviderKey = bundleSymbol.BundleCode = Guid.NewGuid().ToString("B").ToUpperInvariant();
 
             bundleSymbol.PerMachine = true; // default to per-machine but the first-per user package wil flip the bundle per-user.
 

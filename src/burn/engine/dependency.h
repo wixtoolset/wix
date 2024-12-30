@@ -55,12 +55,12 @@ void DependencyUninitialize(
     );
 
 /********************************************************************
- DependencyDetectProviderKeyBundleId - Detect if the provider key is
+ DependencyDetectProviderKeyBundleCode - Detect if the provider key is
   registered and if so what bundle is registered.
 
  Note: Returns E_NOTFOUND if the provider key is not registered.
 *********************************************************************/
-HRESULT DependencyDetectProviderKeyBundleId(
+HRESULT DependencyDetectProviderKeyBundleCode(
     __in BURN_REGISTRATION* pRegistration
     );
 

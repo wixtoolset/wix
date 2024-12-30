@@ -154,7 +154,7 @@ namespace WixToolset.Core.Burn.Bundles
         public uint SignatureOffset { get; protected set; }
         public uint SignatureSize { get; protected set; }
         public uint Version { get; protected set; }
-        public Guid BundleId { get; protected set; }
+        public Guid BundleCode { get; protected set; }
         public uint StubSize { get; protected set; }
         public uint OriginalChecksum { get; protected set; }
         public uint OriginalSignatureOffset { get; protected set; }
@@ -238,7 +238,7 @@ namespace WixToolset.Core.Burn.Bundles
                 return false;
             }
 
-            this.BundleId = BurnCommon.ReadGuid(bytes, BURN_SECTION_OFFSET_BUNDLEGUID);
+            this.BundleCode = BurnCommon.ReadGuid(bytes, BURN_SECTION_OFFSET_BUNDLEGUID);
             this.StubSize = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_STUBSIZE);
             this.OriginalChecksum = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_ORIGINALCHECKSUM);
             this.OriginalSignatureOffset = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_ORIGINALSIGNATUREOFFSET);

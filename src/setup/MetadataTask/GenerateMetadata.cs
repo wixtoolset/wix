@@ -76,7 +76,7 @@ namespace WixToolset.Tasks
                 Description = "Installation for " + bundleSymbol.Name,
                 License = "MS-RL",
                 SupportUrl = bundleSymbol.HelpUrl,
-                BundleCode = bundleSymbol.BundleId,
+                BundleCode = bundleSymbol.BundleCode,
                 UpgradeCode = bundleSymbol.UpgradeCode,
                 AboutUrl = bundleSymbol.AboutUrl,
                 Architecture = PlatformToArchitecture(bundleSymbol.Platform),

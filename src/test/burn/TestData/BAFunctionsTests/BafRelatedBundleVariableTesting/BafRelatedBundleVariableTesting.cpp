@@ -14,7 +14,7 @@ public: // IBAFunctions
 
 public: //IBootstrapperApplication
     virtual STDMETHODIMP OnDetectRelatedBundle(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in BOOTSTRAPPER_RELATION_TYPE relationType,
         __in_z LPCWSTR wzBundleTag,
         __in BOOL fPerMachine,
@@ -27,15 +27,15 @@ public: //IBootstrapperApplication
         HRESULT hr = S_OK;
         LPWSTR wzValue = NULL;
 
-        hr = BalGetRelatedBundleVariable(wzBundleId, STRING_VARIABLE, &wzValue);
+        hr = BalGetRelatedBundleVariable(wzBundleCode, STRING_VARIABLE, &wzValue);
 
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Retrieved related bundle variable with BAFunctions: AString = %ws, Error: 0x%x", wzValue, hr);
 
-        hr = BalGetRelatedBundleVariable(wzBundleId, NUMBER_VARIABLE, &wzValue);
+        hr = BalGetRelatedBundleVariable(wzBundleCode, NUMBER_VARIABLE, &wzValue);
 
         BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Retrieved related bundle variable with BAFunctions: ANumber = %ws, Error: 0x%x", wzValue, hr);
 
-        hr = __super::OnDetectRelatedBundle(wzBundleId, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
+        hr = __super::OnDetectRelatedBundle(wzBundleCode, relationType, wzBundleTag, fPerMachine, wzVersion, fMissingFromCache, pfCancel);
 
         ReleaseStr(wzValue);
         return hr;

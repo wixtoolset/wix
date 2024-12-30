@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BurnManifest EngineVersion="4.0.0.409" ProtocolVersion="1" Win64="no" xmlns="http://wixtoolset.org/schemas/v4/2008/Burn">
     <Log PathVariable="WixBundleLog" Prefix="~ExePackageTests_PerUserArpEntryExePackage" Extension=".log" />
-    <RelatedBundle Id="{E4683E88-AF03-40D0-B308-5C084B0E1FA0}" Action="Upgrade" />
+    <RelatedBundle Code="{E4683E88-AF03-40D0-B308-5C084B0E1FA0}" Action="Upgrade" />
     <Variable Id="TestGroupName" Value="ExePackageTests" Type="string" Hidden="no" Persisted="no" />
     <RegistrySearch Id="NETFRAMEWORK45" Variable="NETFRAMEWORK45" Root="HKLM" Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" Value="Release" Type="value" VariableType="string" />
     <UX PrimaryPayloadId="WixManagedBootstrapperApplicationHost">
@@ -46,7 +46,7 @@
     <Payload Id="TestExe.exe" FilePath="TestExe.exe" FileSize="23552" Hash="8A3CAD62E7C15EE88B3B78A5F61EFA6D4C9AED67049075688A641EE65E1526589797B0C52398DEB520A7911E41F2A6F73C178D19C9FFBC03ECF964A822E6438E" Packaging="embedded" SourcePath="a0" Container="WixAttachedContainer" />
     <Payload Id="paygJp32KbpyjbVEQFNbl5_izmhdZw" FilePath="TestExe.exe.config" FileSize="387" Hash="8C819A9E835F3921FA80C5C783AB0C42DDAADF0C0F2BEF8630EA122ABCB9DC8EAF0B14E061C46B37C92F55114BB09A8D5B1B613947A76A648953F2C63C0ACA63" Packaging="embedded" SourcePath="a1" Container="WixAttachedContainer" />
     <RollbackBoundary Id="WixDefaultBoundary" Vital="yes" Transaction="no" />
-    <Registration Id="{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}" ExecutableName="PerUserArpEntryExePackage.exe" PerMachine="no" Tag="" Version="1.0.0.0" ProviderKey="{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}">
+    <Registration Code="{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}" ExecutableName="PerUserArpEntryExePackage.exe" PerMachine="no" Tag="" Version="1.0.0.0" ProviderKey="{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}">
         <Arp DisplayName="~ExePackageTests - PerUserArpEntryExePackage" DisplayVersion="1.0.0.0" />
     </Registration>
     <Chain>

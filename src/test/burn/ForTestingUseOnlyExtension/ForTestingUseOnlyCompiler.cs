@@ -32,7 +32,7 @@ namespace ForTestingUseOnly
         private void ParseForTestingUseOnlyBundleElement(Intermediate intermediate, IntermediateSection section, XElement element)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
-            string bundleId = null;
+            string bundleCode = null;
 
             foreach (var attrib in element.Attributes())
             {
@@ -41,7 +41,7 @@ namespace ForTestingUseOnly
                     switch (attrib.Name.LocalName)
                     {
                         case "Id":
-                            bundleId = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            bundleCode = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
                             this.ParseHelper.UnexpectedAttribute(element, attrib);
@@ -54,13 +54,13 @@ namespace ForTestingUseOnly
                 }
             }
 
-            if (null == bundleId)
+            if (null == bundleCode)
             {
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Id"));
             }
             else
             {
-                bundleId = Guid.Parse(bundleId).ToString("B").ToUpperInvariant();
+                bundleCode = Guid.Parse(bundleCode).ToString("B").ToUpperInvariant();
             }
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
@@ -69,7 +69,7 @@ namespace ForTestingUseOnly
             {
                 section.AddSymbol(new ForTestingUseOnlyBundleSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, "ForTestingUseOnlyBundle"))
                 {
-                    BundleId = bundleId,
+                    BundleCode = bundleCode,
                 });
             }
         }

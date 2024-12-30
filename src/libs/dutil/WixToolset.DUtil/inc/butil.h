@@ -31,7 +31,7 @@ typedef enum _BUNDLE_RELATION_TYPE
 
 typedef struct _BUNDLE_QUERY_RELATED_BUNDLE_RESULT
 {
-    LPCWSTR wzBundleId;
+    LPCWSTR wzBundleCode;
     BUNDLE_INSTALL_CONTEXT installContext;
     REG_KEY_BITNESS regBitness;
     HKEY hkBundle;
@@ -61,7 +61,7 @@ RETURNS:
     All other returns are unexpected returns from other dutil methods.
 ********************************************************************/
 HRESULT DAPI BundleGetBundleInfo(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzAttribute,
     __deref_out_z LPWSTR* psczValue
     );
@@ -84,7 +84,7 @@ RETURNS:
     All other returns are unexpected returns from other dutil methods.
 ********************************************************************/
 HRESULT DAPI BundleGetBundleInfoFixed(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzAttribute,
     __out_ecount_opt(*pcchValue) LPWSTR wzValue,
     __inout SIZE_T* pcchValue
@@ -109,15 +109,16 @@ HRESULT DAPI BundleEnumRelatedBundle(
     __in BUNDLE_INSTALL_CONTEXT context,
     __in REG_KEY_BITNESS kbKeyBitness,
     __inout PDWORD pdwStartIndex,
-    __deref_out_z LPWSTR* psczBundleId
+    __deref_out_z LPWSTR* psczBundleCode
     );
 
 /********************************************************************
 BundleEnumRelatedBundleFixed - Queries the bundle installation metadata for installs with the given upgrade code
 Enumerate 32-bit and 64-bit in two passes.
 
-NOTE: lpBundleIdBuff is a buffer to receive the bundle GUID. This buffer must be 39 characters long.
-        The first 38 characters are for the GUID, and the last character is for the terminating null character.
+NOTE: wzBundleCode is a buffer to receive the bundle GUID. This buffer must be 39 characters long.
+      The first 38 characters are for the GUID, and the last character is for the terminating null character.
+
 RETURNS:
     E_INVALIDARG
         An invalid parameter was passed to the function.
@@ -133,7 +134,7 @@ HRESULT DAPI BundleEnumRelatedBundleFixed(
     __in BUNDLE_INSTALL_CONTEXT context,
     __in REG_KEY_BITNESS kbKeyBitness,
     __inout PDWORD pdwStartIndex,
-    __out_ecount(MAX_GUID_CHARS+1) LPWSTR wzBundleId
+    __out_ecount(MAX_GUID_CHARS+1) LPWSTR wzBundleCode
     );
 
 /********************************************************************
@@ -155,7 +156,7 @@ RETURNS:
     All other returns are unexpected returns from other dutil methods.
 ********************************************************************/
 HRESULT DAPI BundleGetBundleVariable(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzVariable,
     __deref_out_z LPWSTR* psczValue
     );
@@ -180,7 +181,7 @@ RETURNS:
     All other returns are unexpected returns from other dutil methods.
 ********************************************************************/
 HRESULT DAPI BundleGetBundleVariableFixed(
-    __in_z LPCWSTR wzBundleId,
+    __in_z LPCWSTR wzBundleCode,
     __in_z LPCWSTR wzVariable,
     __out_ecount_opt(*pcchValue) LPWSTR wzValue,
     __inout SIZE_T* pcchValue

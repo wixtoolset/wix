@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <BurnManifest xmlns="http://wixtoolset.org/schemas/v4/2008/Burn">
     <Log PathVariable="WixBundleLog" Prefix="~FailureTests_BundleD" Extension=".log" />
-    <RelatedBundle Id="{3C1A4842-81AC-4C90-8B35-A5E18F034C8D}" Action="Upgrade" />
+    <RelatedBundle Code="{3C1A4842-81AC-4C90-8B35-A5E18F034C8D}" Action="Upgrade" />
     <Variable Id="TestGroupName" Value="FailureTests" Type="string" Hidden="no" Persisted="no" />
     <RegistrySearch Id="NETFRAMEWORK45" Variable="NETFRAMEWORK45" Root="HKLM" Key="SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" Value="Release" Type="value" VariableType="string" />
     <RegistrySearch Id="wrsQ7JTGqvaQuDYjfHJoyjxtkLlR6c" Variable="ExeA_Version" Root="HKLM" Key="Software\WiX\Tests\FailureTests\ExeA" Value="Version" Type="value" VariableType="string" />
@@ -47,7 +47,7 @@
     <Payload Id="TestExe.exe" FilePath="TestExe.exe" FileSize="23552" Hash="4344604ECBA4DFE5DE7C680CB1AA5BD6FAA29BF95CE07740F02878C2BB1EF6DE6432944A0DB79B034D1C6F68CF80842EEE442EA8A551816E52D3F68901C50AB9" Packaging="embedded" SourcePath="a0" Container="WixAttachedContainer" />
     <Payload Id="paygJp32KbpyjbVEQFNbl5_izmhdZw" FilePath="TestExe.exe.config" FileSize="387" Hash="8C819A9E835F3921FA80C5C783AB0C42DDAADF0C0F2BEF8630EA122ABCB9DC8EAF0B14E061C46B37C92F55114BB09A8D5B1B613947A76A648953F2C63C0ACA63" Packaging="embedded" SourcePath="a1" Container="WixAttachedContainer" />
     <RollbackBoundary Id="WixDefaultBoundary" Vital="yes" Transaction="no" />
-    <Registration Id="{9C184683-04FB-49AD-9D79-65101BDC3EE3}" ExecutableName="BundleD.exe" PerMachine="yes" Tag="" Version="1.0.0.0" ProviderKey="{9C184683-04FB-49AD-9D79-65101BDC3EE3}">
+    <Registration Code="{9C184683-04FB-49AD-9D79-65101BDC3EE3}" ExecutableName="BundleD.exe" PerMachine="yes" Tag="" Version="1.0.0.0" ProviderKey="{9C184683-04FB-49AD-9D79-65101BDC3EE3}">
         <Arp Register="yes" DisplayName="~FailureTests - BundleD" DisplayVersion="1.0.0.0" />
     </Registration>
     <Chain>

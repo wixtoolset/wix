@@ -8,7 +8,7 @@
 static DWORD dwMagic = BURN_SECTION_MAGIC;
 static DWORD dwVersion = BURN_SECTION_VERSION;
 
-static GUID guidBundleId = { };
+static GUID guidBundleCode = { };
 
 static DWORD dwStubSize = 0;
 static DWORD dwOriginalChecksum = 0;

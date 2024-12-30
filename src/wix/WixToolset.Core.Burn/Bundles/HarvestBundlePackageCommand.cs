@@ -57,7 +57,7 @@ namespace WixToolset.Core.Burn.Bundles
         public void Execute()
         {
             bool win64;
-            string bundleId;
+            string bundleCode;
             string engineVersion;
             int protocolVersion;
             string manifestNamespace;
@@ -76,7 +76,7 @@ namespace WixToolset.Core.Burn.Bundles
                     return;
                 }
 
-                var baFolderPath = Path.Combine(this.IntermediateFolder, burnReader.BundleId.ToString());
+                var baFolderPath = Path.Combine(this.IntermediateFolder, burnReader.BundleCode.ToString());
 
                 if (!burnReader.ExtractUXContainer(baFolderPath, baFolderPath))
                 {
@@ -89,7 +89,7 @@ namespace WixToolset.Core.Burn.Bundles
                     this.TrackedFiles.Add(this.BackendHelper.TrackFile(filePath, TrackedFileType.Temporary, sourceLineNumbers));
                 }
 
-                bundleId = burnReader.BundleId.ToString("B").ToUpperInvariant();
+                bundleCode = burnReader.BundleCode.ToString("B").ToUpperInvariant();
 
                 try
                 {
@@ -144,7 +144,7 @@ namespace WixToolset.Core.Burn.Bundles
             this.HarvestedBundlePackage = new WixBundleHarvestedBundlePackageSymbol(this.PackagePayload.SourceLineNumbers, this.PackagePayload.Id)
             {
                 Win64 = win64,
-                BundleId = bundleId,
+                BundleCode = bundleCode,
                 EngineVersion = engineVersion,
                 ManifestNamespace = manifestNamespace,
                 ProtocolVersion = protocolVersion,
@@ -395,7 +395,12 @@ namespace WixToolset.Core.Burn.Bundles
 
             foreach (XmlElement relatedBundleElement in document.SelectNodes("/burn:BurnManifest/burn:RelatedBundle", namespaceManager))
             {
-                var id = relatedBundleElement.GetAttribute("Id");
+                var code = relatedBundleElement.GetAttribute("Code");
+                if (String.IsNullOrEmpty(code))
+                {
+                    code = relatedBundleElement.GetAttribute("Id");
+                }
+
                 var actionValue = relatedBundleElement.GetAttribute("Action");
 
                 if (!Enum.TryParse(actionValue, out RelatedBundleActionType action))
@@ -407,7 +412,7 @@ namespace WixToolset.Core.Burn.Bundles
                 this.RelatedBundles.Add(new WixBundlePackageRelatedBundleSymbol(sourceLineNumbers)
                 {
                     PackagePayloadRef = this.PackagePayload.Id.Id,
-                    BundleId = id,
+                    BundleCode = code,
                     Action = action,
                 });
             }

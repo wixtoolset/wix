@@ -107,9 +107,9 @@ namespace WixToolset.BootstrapperApplicationApi
         /// <summary>
         /// Gets persisted variables from a related bundle.
         /// </summary>
-        /// <param name="bundleId">The BundleId of the related bundle.</param>
+        /// <param name="bundleCode">The bundle code of the related bundle.</param>
         /// <param name="name">The name of the variable.</param>
-        string GetRelatedBundleVariable(string bundleId, string name);
+        string GetRelatedBundleVariable(string bundleCode, string name);
 
         /// <summary>
         /// Launches a preapproved executable elevated.  As long as the engine already elevated, there will be no UAC prompt.

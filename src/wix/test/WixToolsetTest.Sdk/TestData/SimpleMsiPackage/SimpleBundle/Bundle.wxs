@@ -1,5 +1,5 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-    <Bundle Name="SimpleBundle" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="6670d5c9-bbec-4828-ab60-4a1c0ffeb97d">
+    <Bundle Id="WixToolsetTest.TestBundle" Name="SimpleBundle" Version="1.0.0.0" Manufacturer="Example Corporation">
         <BootstrapperApplication SourceFile="test.txt" />
 
         <Chain>

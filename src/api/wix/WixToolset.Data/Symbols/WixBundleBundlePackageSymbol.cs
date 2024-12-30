@@ -11,7 +11,7 @@ namespace WixToolset.Data
             new[]
             {
                 new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.Attributes), IntermediateFieldType.Number),
-                new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.BundleId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.BundleCode), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.EngineVersion), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleBundlePackageSymbolFields.InstallCommand), IntermediateFieldType.String),
@@ -29,7 +29,9 @@ namespace WixToolset.Data.Symbols
     public enum WixBundleBundlePackageSymbolFields
     {
         Attributes,
-        BundleId,
+        BundleCode,
+        [Obsolete("Use BundleCode instead.")]
+        BundleId = BundleCode,
         EngineVersion,
         Version,
         InstallCommand,
@@ -62,10 +64,17 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleBundlePackageSymbolFields.Attributes, (int)value);
         }
 
+        public string BundleCode
+        {
+            get => (string)this.Fields[(int)WixBundleBundlePackageSymbolFields.BundleCode];
+            set => this.Set((int)WixBundleBundlePackageSymbolFields.BundleCode, value);
+        }
+
+        [Obsolete("Use BundleCode instead.")]
         public string BundleId
         {
-            get => (string)this.Fields[(int)WixBundleBundlePackageSymbolFields.BundleId];
-            set => this.Set((int)WixBundleBundlePackageSymbolFields.BundleId, value);
+            get => (string)this.Fields[(int)WixBundleBundlePackageSymbolFields.BundleCode];
+            set => this.Set((int)WixBundleBundlePackageSymbolFields.BundleCode, value);
         }
 
         public string EngineVersion

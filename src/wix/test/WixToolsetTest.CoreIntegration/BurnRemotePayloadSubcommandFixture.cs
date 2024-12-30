@@ -55,13 +55,13 @@ namespace WixToolsetTest.CoreIntegration
                 var ignoreAttributesByElementName = new Dictionary<string, List<string>>
                 {
                     { "BundlePackagePayload", new List<string> { "Size", "Hash" } },
-                    { "RemoteBundle", new List<string> { "BundleId", "EngineVersion", "ProviderKey" } },
+                    { "RemoteBundle", new List<string> { "BundleCode", "EngineVersion", "ProviderKey" } },
                     { "Payload", new List<string> { "Size", "Hash" } },
                 };
                 WixAssert.StringEqual(
                     "<BundlePackage>" +
                     "<BundlePackagePayload Name='test.exe' ProductName='DiversePayloadsBundle' Description='DiversePayloadsBundle' Hash='*' Size='*' Version='1.0.0.0'>" +
-                    "<RemoteBundle BundleId='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
+                    "<RemoteBundle BundleCode='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
                     "</BundlePackagePayload>" +
                     "</BundlePackage>", xml.GetTestXml(ignoreAttributesByElementName));
 
@@ -83,7 +83,7 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.StringEqual(
                     "<BundlePackage>" +
                     "<BundlePackagePayload Name='test.exe' ProductName='DiversePayloadsBundle' Description='DiversePayloadsBundle' Hash='*' Size='*' Version='1.0.0.0'>" +
-                    "<RemoteBundle BundleId='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
+                    "<RemoteBundle BundleCode='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
                     "</BundlePackagePayload>" +
                     "<Payload Name='External.cab' Hash='*' Size='*' />" +
                     "<Payload Name='test.msi' Hash='*' Size='*' />" +
@@ -109,7 +109,7 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.StringEqual(
                     "<BundlePackage>" +
                     "<BundlePackagePayload Name='test.exe' ProductName='DiversePayloadsBundle' Description='DiversePayloadsBundle' Hash='*' Size='*' Version='1.0.0.0'>" +
-                    "<RemoteBundle BundleId='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
+                    "<RemoteBundle BundleCode='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
                     "</BundlePackagePayload>" +
                     "<Payload Name='External.cab' Hash='*' Size='*' />" +
                     "<Payload Name='Windows8.1-KB2937592-x86.msu' Hash='*' Size='*' />" +
@@ -136,7 +136,7 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.StringEqual(
                     "<BundlePackage>" +
                     "<BundlePackagePayload Name='test.exe' ProductName='DiversePayloadsBundle' Description='DiversePayloadsBundle' Hash='*' Size='*' Version='1.0.0.0'>" +
-                    "<RemoteBundle BundleId='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
+                    "<RemoteBundle BundleCode='*' DisplayName='DiversePayloadsBundle' EngineVersion='*' InstallSize='3790116' ManifestNamespace='http://wixtoolset.org/schemas/v4/2008/Burn' PerMachine='yes' ProviderKey='*' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{FEF1D2B8-4737-4A2A-9F91-77F7294FB55B}' />" +
                     "</BundlePackagePayload>" +
                     "<Payload Name='External.cab' Hash='*' Size='*' />" +
                     "<Payload Name='signed_bundle_engine.exe' ProductName='~TestBundle' Description='~TestBundle' Hash='*' Size='*' Version='1.0.0.0' />" +
@@ -182,7 +182,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     @"<BundlePackage Visible='yes' CacheId='{C0BA713B-9CFE-42DF-B92C-883F6846B4BA}v3.14.0.4118C95FC39334E667F3DD3D'>",
                     @"  <BundlePackagePayload Name='signed_wix314_4118_engine.exe' ProductName='WiX Toolset v3.14.0.4118' Description='WiX Toolset v3.14.0.4118' DownloadUrl='http://wixtoolset.org/{0}' CertificatePublicKey='03169B5A32E602D436FC14EC14C435D7309945D4' CertificateThumbprint='C95FC39334E667F3DD3D82AF382E05719B88F7C1' Size='1088640' Version='3.14.0.4118'>",
-                    @"    <RemoteBundle BundleId='{C0BA713B-9CFE-42DF-B92C-883F6846B4BA}' DisplayName='WiX Toolset v3.14.0.4118' InstallSize='188426175' ManifestNamespace='http://schemas.microsoft.com/wix/2008/Burn' PerMachine='yes' ProviderKey='{c0ba713b-9cfe-42df-b92c-883f6846b4ba}' ProtocolVersion='1' Version='3.14.0.4118' Win64='no' UpgradeCode='{65E893AD-EDD5-4E7D-80CA-F0F50F383532}' />",
+                    @"    <RemoteBundle BundleCode='{C0BA713B-9CFE-42DF-B92C-883F6846B4BA}' DisplayName='WiX Toolset v3.14.0.4118' InstallSize='188426175' ManifestNamespace='http://schemas.microsoft.com/wix/2008/Burn' PerMachine='yes' ProviderKey='{c0ba713b-9cfe-42df-b92c-883f6846b4ba}' ProtocolVersion='1' Version='3.14.0.4118' Win64='no' UpgradeCode='{65E893AD-EDD5-4E7D-80CA-F0F50F383532}' />",
                     @"  </BundlePackagePayload>",
                     @"</BundlePackage>",
                 }, elements);
@@ -216,9 +216,9 @@ namespace WixToolsetTest.CoreIntegration
                 var msuPackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:BundlePackage");
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<BundlePackage Id='signed_wix314_4118_engine.exe' Cache='keep' CacheId='{C0BA713B-9CFE-42DF-B92C-883F6846B4BA}v3.14.0.4118C95FC39334E667F3DD3D' InstallSize='188426175' Size='1088640' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_signed_wix314_4118_engine.exe' RollbackLogPathVariable='WixBundleRollbackLog_signed_wix314_4118_engine.exe' BundleId='{C0BA713B-9CFE-42DF-B92C-883F6846B4BA}' Version='3.14.0.4118' InstallArguments='' UninstallArguments='' RepairArguments='' SupportsBurnProtocol='yes' Win64='no'>" +
+                    "<BundlePackage Id='signed_wix314_4118_engine.exe' Cache='keep' CacheId='{C0BA713B-9CFE-42DF-B92C-883F6846B4BA}v3.14.0.4118C95FC39334E667F3DD3D' InstallSize='188426175' Size='1088640' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_signed_wix314_4118_engine.exe' RollbackLogPathVariable='WixBundleRollbackLog_signed_wix314_4118_engine.exe' BundleCode='{C0BA713B-9CFE-42DF-B92C-883F6846B4BA}' Version='3.14.0.4118' InstallArguments='' UninstallArguments='' RepairArguments='' SupportsBurnProtocol='yes' Win64='no'>" +
                     "<Provides Key='{c0ba713b-9cfe-42df-b92c-883f6846b4ba}' Version='3.14.0.4118' DisplayName='WiX Toolset v3.14.0.4118' Imported='yes' />" +
-                    "<RelatedBundle Id='{65E893AD-EDD5-4E7D-80CA-F0F50F383532}' Action='Upgrade' />" +
+                    "<RelatedBundle Code='{65E893AD-EDD5-4E7D-80CA-F0F50F383532}' Action='Upgrade' />" +
                     "<PayloadRef Id='signed_wix314_4118_engine.exe' />" +
                     "</BundlePackage>",
                 }, msuPackages);
@@ -253,7 +253,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "<BundlePackage Visible='yes'>",
                     "  <BundlePackagePayload Name='v3bundle.exe' ProductName='CustomV3Theme' Description='CustomV3Theme' DownloadUrl='https://www.example.com/files/{0}' Hash='80739E7B8C31D75B4CDC48D60D74F5E481CB904212A3AE3FB0920365A163FBF32B0C5C175AB516D4124F107923E96200605DE1D560D362FEB47350FA727823B4' Size='648397' Version='1.0.0.0'>",
-                    "    <RemoteBundle BundleId='{215A70DB-AB35-48C7-BE51-D66EAAC87177}' DisplayName='CustomV3Theme' InstallSize='1135' ManifestNamespace='http://schemas.microsoft.com/wix/2008/Burn' PerMachine='yes' ProviderKey='{215a70db-ab35-48c7-be51-d66eaac87177}' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{2BF4C01F-C132-4E70-97AB-2BC68C7CCD10}' />",
+                    "    <RemoteBundle BundleCode='{215A70DB-AB35-48C7-BE51-D66EAAC87177}' DisplayName='CustomV3Theme' InstallSize='1135' ManifestNamespace='http://schemas.microsoft.com/wix/2008/Burn' PerMachine='yes' ProviderKey='{215a70db-ab35-48c7-be51-d66eaac87177}' ProtocolVersion='1' Version='1.0.0.0' Win64='no' UpgradeCode='{2BF4C01F-C132-4E70-97AB-2BC68C7CCD10}' />",
                     "  </BundlePackagePayload>",
                     "</BundlePackage>",
                 }, elements);

@@ -139,12 +139,12 @@ namespace WixToolsetTest.CoreIntegration
 
                 var ignoreAttributesByElementName = new Dictionary<string, List<string>>
                 {
-                    { "Registration", new List<string> { "Id" } },
+                    { "Registration", new List<string> { "Id", "Code" } },
                 };
                 var registration = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration", ignoreAttributesByElementName);
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<Registration Id='*' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='MyProviderKey,v1.0'><Arp DisplayName='BurnBundle' DisplayVersion='1.0.0.0' Publisher='Example Corporation' /></Registration>",
+                    "<Registration BundleId='WixToolsetTest.TestBundle' Code='*' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='MyProviderKey,v1.0'><Arp DisplayName='BurnBundle' DisplayVersion='1.0.0.0' Publisher='Example Corporation' /></Registration>",
                 }, registration);
             }
         }

@@ -60,25 +60,25 @@ namespace WixToolset.Core.Burn.Bundles
         /// Update the ".wixburn" section data.
         /// </summary>
         /// <param name="stubSize">Size of the stub engine "burn.exe".</param>
-        /// <param name="bundleId">Unique identifier for this bundle.</param>
+        /// <param name="bundleCode">Unique identifier for this bundle.</param>
         /// <returns></returns>
-        public bool InitializeBundleSectionData(long stubSize, string bundleId)
+        public bool InitializeBundleSectionData(long stubSize, string bundleCode)
         {
             if (this.Invalid)
             {
                 return false;
             }
 
-            var bundleGuid = Guid.Parse(bundleId);
+            var bundleGuid = Guid.Parse(bundleCode);
 
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_MAGIC, BURN_SECTION_MAGIC);
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_VERSION, BURN_SECTION_VERSION);
 
-            this.Messaging.Write(VerboseMessages.BundleGuid(bundleId));
+            this.Messaging.Write(VerboseMessages.BundleGuid(bundleCode));
             this.binaryWriter.BaseStream.Seek(this.wixburnDataOffset + BURN_SECTION_OFFSET_BUNDLEGUID, SeekOrigin.Begin);
             this.binaryWriter.Write(bundleGuid.ToByteArray());
 
-            this.BundleId = bundleGuid;
+            this.BundleCode = bundleGuid;
             this.StubSize = (uint)stubSize;
 
             this.WriteToBurnSectionOffset(BURN_SECTION_OFFSET_STUBSIZE, this.StubSize);

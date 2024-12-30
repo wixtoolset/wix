@@ -1768,7 +1768,7 @@ static HRESULT OnDetectForwardCompatibleBundle(
     HRESULT hr = S_OK;
     BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_ARGS args = { };
     BA_ONDETECTFORWARDCOMPATIBLEBUNDLE_RESULTS results = { };
-    LPWSTR sczBundleId = NULL;
+    LPWSTR sczBundleCode = NULL;
     LPWSTR sczBundleTag = NULL;
     LPWSTR sczVersion = NULL;
 
@@ -1776,10 +1776,10 @@ static HRESULT OnDetectForwardCompatibleBundle(
     hr = BuffReaderReadNumber(pReaderArgs, &args.dwApiVersion);
     ExitOnFailure(hr, "Failed to read API version of OnDetectForwardCompatibleBundle args.");
 
-    hr = BuffReaderReadString(pReaderArgs, &sczBundleId);
-    ExitOnFailure(hr, "Failed to read bundle id of OnDetectForwardCompatibleBundle args.");
+    hr = BuffReaderReadString(pReaderArgs, &sczBundleCode);
+    ExitOnFailure(hr, "Failed to read bundle code of OnDetectForwardCompatibleBundle args.");
 
-    args.wzBundleId = sczBundleId;
+    args.wzBundleCode = sczBundleCode;
 
     hr = BuffReaderReadNumber(pReaderArgs, reinterpret_cast<DWORD*>(&args.relationType));
     ExitOnFailure(hr, "Failed to read relation type of OnDetectForwardCompatibleBundle args.");
@@ -1809,7 +1809,7 @@ static HRESULT OnDetectForwardCompatibleBundle(
 
     if (E_NOTIMPL == hr)
     {
-        hr = pApplication->OnDetectForwardCompatibleBundle(args.wzBundleId, args.relationType, args.wzBundleTag, args.fPerMachine, args.wzVersion, args.fMissingFromCache, &results.fCancel);
+        hr = pApplication->OnDetectForwardCompatibleBundle(args.wzBundleCode, args.relationType, args.wzBundleTag, args.fPerMachine, args.wzVersion, args.fMissingFromCache, &results.fCancel);
     }
 
     pApplication->BAProcFallback(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTFORWARDCOMPATIBLEBUNDLE, &args, &results, &hr);
@@ -1825,7 +1825,7 @@ static HRESULT OnDetectForwardCompatibleBundle(
 LExit:
     ReleaseStr(sczVersion);
     ReleaseStr(sczBundleTag);
-    ReleaseStr(sczBundleId);
+    ReleaseStr(sczBundleCode);
     return hr;
 }
 
@@ -1999,7 +1999,7 @@ static HRESULT OnDetectRelatedBundle(
     HRESULT hr = S_OK;
     BA_ONDETECTRELATEDBUNDLE_ARGS args = { };
     BA_ONDETECTRELATEDBUNDLE_RESULTS results = { };
-    LPWSTR sczBundleId = NULL;
+    LPWSTR sczBundleCode = NULL;
     LPWSTR sczBundleTag = NULL;
     LPWSTR sczVersion = NULL;
 
@@ -2007,10 +2007,10 @@ static HRESULT OnDetectRelatedBundle(
     hr = BuffReaderReadNumber(pReaderArgs, &args.dwApiVersion);
     ExitOnFailure(hr, "Failed to read API version of OnDetectRelatedBundle args.");
 
-    hr = BuffReaderReadString(pReaderArgs, &sczBundleId);
-    ExitOnFailure(hr, "Failed to read bundle id of OnDetectRelatedBundle args.");
+    hr = BuffReaderReadString(pReaderArgs, &sczBundleCode);
+    ExitOnFailure(hr, "Failed to read bundle code of OnDetectRelatedBundle args.");
 
-    args.wzBundleId = sczBundleId;
+    args.wzBundleCode = sczBundleCode;
 
     hr = BuffReaderReadNumber(pReaderArgs, reinterpret_cast<DWORD*>(&args.relationType));
     ExitOnFailure(hr, "Failed to read relation type of OnDetectRelatedBundle args.");
@@ -2040,7 +2040,7 @@ static HRESULT OnDetectRelatedBundle(
 
     if (E_NOTIMPL == hr)
     {
-        hr = pApplication->OnDetectRelatedBundle(args.wzBundleId, args.relationType, args.wzBundleTag, args.fPerMachine, args.wzVersion, args.fMissingFromCache, &results.fCancel);
+        hr = pApplication->OnDetectRelatedBundle(args.wzBundleCode, args.relationType, args.wzBundleTag, args.fPerMachine, args.wzVersion, args.fMissingFromCache, &results.fCancel);
     }
 
     pApplication->BAProcFallback(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDBUNDLE, &args, &results, &hr);
@@ -2056,7 +2056,7 @@ static HRESULT OnDetectRelatedBundle(
 LExit:
     ReleaseStr(sczVersion);
     ReleaseStr(sczBundleTag);
-    ReleaseStr(sczBundleId);
+    ReleaseStr(sczBundleCode);
     return hr;
 }
 
@@ -2071,7 +2071,7 @@ static HRESULT OnDetectRelatedBundlePackage(
     BA_ONDETECTRELATEDBUNDLEPACKAGE_ARGS args = { };
     BA_ONDETECTRELATEDBUNDLEPACKAGE_RESULTS results = { };
     LPWSTR sczPackageId = NULL;
-    LPWSTR sczBundleId = NULL;
+    LPWSTR sczBundleCode = NULL;
     LPWSTR sczVersion = NULL;
 
     // Read args.
@@ -2083,10 +2083,10 @@ static HRESULT OnDetectRelatedBundlePackage(
 
     args.wzPackageId = sczPackageId;
 
-    hr = BuffReaderReadString(pReaderArgs, &sczBundleId);
-    ExitOnFailure(hr, "Failed to read bundle id of OnDetectRelatedBundlePackage args.");
+    hr = BuffReaderReadString(pReaderArgs, &sczBundleCode);
+    ExitOnFailure(hr, "Failed to read bundle code of OnDetectRelatedBundlePackage args.");
 
-    args.wzBundleId = sczBundleId;
+    args.wzBundleCode = sczBundleCode;
 
     hr = BuffReaderReadNumber(pReaderArgs, reinterpret_cast<DWORD*>(&args.relationType));
     ExitOnFailure(hr, "Failed to read relation type of OnDetectRelatedBundlePackage args.");
@@ -2108,7 +2108,7 @@ static HRESULT OnDetectRelatedBundlePackage(
 
     if (E_NOTIMPL == hr)
     {
-        hr = pApplication->OnDetectRelatedBundlePackage(args.wzPackageId, args.wzBundleId, args.relationType, args.fPerMachine, args.wzVersion, &results.fCancel);
+        hr = pApplication->OnDetectRelatedBundlePackage(args.wzPackageId, args.wzBundleCode, args.relationType, args.fPerMachine, args.wzVersion, &results.fCancel);
     }
 
     pApplication->BAProcFallback(BOOTSTRAPPER_APPLICATION_MESSAGE_ONDETECTRELATEDBUNDLEPACKAGE, &args, &results, &hr);
@@ -2123,7 +2123,7 @@ static HRESULT OnDetectRelatedBundlePackage(
 
 LExit:
     ReleaseStr(sczVersion);
-    ReleaseStr(sczBundleId);
+    ReleaseStr(sczBundleCode);
     ReleaseStr(sczPackageId);
     return hr;
 }
@@ -3650,7 +3650,7 @@ static HRESULT OnPlanForwardCompatibleBundle(
     HRESULT hr = S_OK;
     BA_ONPLANFORWARDCOMPATIBLEBUNDLE_ARGS args = { };
     BA_ONPLANFORWARDCOMPATIBLEBUNDLE_RESULTS results = { };
-    LPWSTR sczBundleId = NULL;
+    LPWSTR sczBundleCode = NULL;
     LPWSTR sczBundleTag = NULL;
     LPWSTR sczVersion = NULL;
 
@@ -3658,10 +3658,10 @@ static HRESULT OnPlanForwardCompatibleBundle(
     hr = BuffReaderReadNumber(pReaderArgs, &args.dwApiVersion);
     ExitOnFailure(hr, "Failed to read API version of OnPlanForwardCompatibleBundle args.");
 
-    hr = BuffReaderReadString(pReaderArgs, &sczBundleId);
-    ExitOnFailure(hr, "Failed to read bundle id of OnPlanForwardCompatibleBundle args.");
+    hr = BuffReaderReadString(pReaderArgs, &sczBundleCode);
+    ExitOnFailure(hr, "Failed to read bundle code of OnPlanForwardCompatibleBundle args.");
 
-    args.wzBundleId = sczBundleId;
+    args.wzBundleCode = sczBundleCode;
 
     hr = BuffReaderReadNumber(pReaderArgs, reinterpret_cast<DWORD*>(&args.relationType));
     ExitOnFailure(hr, "Failed to read relation type of OnPlanForwardCompatibleBundle args.");
@@ -3694,7 +3694,7 @@ static HRESULT OnPlanForwardCompatibleBundle(
 
     if (E_NOTIMPL == hr)
     {
-        hr = pApplication->OnPlanForwardCompatibleBundle(args.wzBundleId, args.relationType, args.wzBundleTag, args.fPerMachine, args.wzVersion, args.fRecommendedIgnoreBundle, &results.fCancel, &results.fIgnoreBundle);
+        hr = pApplication->OnPlanForwardCompatibleBundle(args.wzBundleCode, args.relationType, args.wzBundleTag, args.fPerMachine, args.wzVersion, args.fRecommendedIgnoreBundle, &results.fCancel, &results.fIgnoreBundle);
     }
 
     pApplication->BAProcFallback(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANFORWARDCOMPATIBLEBUNDLE, &args, &results, &hr);
@@ -3713,7 +3713,7 @@ static HRESULT OnPlanForwardCompatibleBundle(
 LExit:
     ReleaseStr(sczVersion);
     ReleaseStr(sczBundleTag);
-    ReleaseStr(sczBundleId);
+    ReleaseStr(sczBundleCode);
     return hr;
 }
 
@@ -4049,16 +4049,16 @@ static HRESULT OnPlanRelatedBundle(
     HRESULT hr = S_OK;
     BA_ONPLANRELATEDBUNDLE_ARGS args = { };
     BA_ONPLANRELATEDBUNDLE_RESULTS results = { };
-    LPWSTR sczBundleId = NULL;
+    LPWSTR sczBundleCode = NULL;
 
     // Read args.
     hr = BuffReaderReadNumber(pReaderArgs, &args.dwApiVersion);
     ExitOnFailure(hr, "Failed to read API version of OnPlanRelatedBundle args.");
 
-    hr = BuffReaderReadString(pReaderArgs, &sczBundleId);
+    hr = BuffReaderReadString(pReaderArgs, &sczBundleCode);
     ExitOnFailure(hr, "Failed to read package id of OnPlanRelatedBundle args.");
 
-    args.wzBundleId = sczBundleId;
+    args.wzBundleCode = sczBundleCode;
 
     hr = BuffReaderReadNumber(pReaderArgs, reinterpret_cast<DWORD*>(&args.recommendedState));
     ExitOnFailure(hr, "Failed to read recommended state of OnPlanRelatedBundle args.");
@@ -4075,7 +4075,7 @@ static HRESULT OnPlanRelatedBundle(
 
     if (E_NOTIMPL == hr)
     {
-        hr = pApplication->OnPlanRelatedBundle(args.wzBundleId, args.recommendedState, &results.requestedState, &results.fCancel);
+        hr = pApplication->OnPlanRelatedBundle(args.wzBundleCode, args.recommendedState, &results.requestedState, &results.fCancel);
     }
 
     pApplication->BAProcFallback(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLE, &args, &results, &hr);
@@ -4092,7 +4092,7 @@ static HRESULT OnPlanRelatedBundle(
     ExitOnFailure(hr, "Failed to write requested state of OnPlanRelatedBundle struct.");
 
 LExit:
-    ReleaseStr(sczBundleId);
+    ReleaseStr(sczBundleCode);
     return hr;
 }
 
@@ -4106,16 +4106,16 @@ static HRESULT OnPlanRelatedBundleType(
     HRESULT hr = S_OK;
     BA_ONPLANRELATEDBUNDLETYPE_ARGS args = { };
     BA_ONPLANRELATEDBUNDLETYPE_RESULTS results = { };
-    LPWSTR sczBundleId = NULL;
+    LPWSTR sczBundleCode = NULL;
 
     // Read args.
     hr = BuffReaderReadNumber(pReaderArgs, &args.dwApiVersion);
     ExitOnFailure(hr, "Failed to read API version of OnPlanRelatedBundleType args.");
 
-    hr = BuffReaderReadString(pReaderArgs, &sczBundleId);
+    hr = BuffReaderReadString(pReaderArgs, &sczBundleCode);
     ExitOnFailure(hr, "Failed to read package id of OnPlanRelatedBundleType args.");
 
-    args.wzBundleId = sczBundleId;
+    args.wzBundleCode = sczBundleCode;
 
     hr = BuffReaderReadNumber(pReaderArgs, reinterpret_cast<DWORD*>(&args.recommendedType));
     ExitOnFailure(hr, "Failed to read recommended type of OnPlanRelatedBundleType args.");
@@ -4132,7 +4132,7 @@ static HRESULT OnPlanRelatedBundleType(
 
     if (E_NOTIMPL == hr)
     {
-        hr = pApplication->OnPlanRelatedBundleType(args.wzBundleId, args.recommendedType, &results.requestedType, &results.fCancel);
+        hr = pApplication->OnPlanRelatedBundleType(args.wzBundleCode, args.recommendedType, &results.requestedType, &results.fCancel);
     }
 
     pApplication->BAProcFallback(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRELATEDBUNDLETYPE, &args, &results, &hr);
@@ -4149,7 +4149,7 @@ static HRESULT OnPlanRelatedBundleType(
     ExitOnFailure(hr, "Failed to write requested type of OnPlanRelatedBundleType struct.");
 
 LExit:
-    ReleaseStr(sczBundleId);
+    ReleaseStr(sczBundleCode);
     return hr;
 }
 
@@ -4163,16 +4163,16 @@ static HRESULT OnPlanRestoreRelatedBundle(
     HRESULT hr = S_OK;
     BA_ONPLANRESTORERELATEDBUNDLE_ARGS args = { };
     BA_ONPLANRESTORERELATEDBUNDLE_RESULTS results = { };
-    LPWSTR sczBundleId = NULL;
+    LPWSTR sczBundleCode = NULL;
 
     // Read args.
     hr = BuffReaderReadNumber(pReaderArgs, &args.dwApiVersion);
     ExitOnFailure(hr, "Failed to read API version of OnPlanRestoreRelatedBundle args.");
 
-    hr = BuffReaderReadString(pReaderArgs, &sczBundleId);
+    hr = BuffReaderReadString(pReaderArgs, &sczBundleCode);
     ExitOnFailure(hr, "Failed to read package id of OnPlanRestoreRelatedBundle args.");
 
-    args.wzBundleId = sczBundleId;
+    args.wzBundleCode = sczBundleCode;
 
     hr = BuffReaderReadNumber(pReaderArgs, reinterpret_cast<DWORD*>(&args.recommendedState));
     ExitOnFailure(hr, "Failed to read recommended state of OnPlanRestoreRelatedBundle args.");
@@ -4189,7 +4189,7 @@ static HRESULT OnPlanRestoreRelatedBundle(
 
     if (E_NOTIMPL == hr)
     {
-        hr = pApplication->OnPlanRestoreRelatedBundle(args.wzBundleId, args.recommendedState, &results.requestedState, &results.fCancel);
+        hr = pApplication->OnPlanRestoreRelatedBundle(args.wzBundleCode, args.recommendedState, &results.requestedState, &results.fCancel);
     }
 
     pApplication->BAProcFallback(BOOTSTRAPPER_APPLICATION_MESSAGE_ONPLANRESTORERELATEDBUNDLE, &args, &results, &hr);
@@ -4206,7 +4206,7 @@ static HRESULT OnPlanRestoreRelatedBundle(
     ExitOnFailure(hr, "Failed to write requested state of OnPlanRestoreRelatedBundle struct.");
 
 LExit:
-    ReleaseStr(sczBundleId);
+    ReleaseStr(sczBundleCode);
     return hr;
 }
 

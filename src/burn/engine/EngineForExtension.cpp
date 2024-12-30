@@ -213,7 +213,7 @@ static HRESULT BEEngineGetRelatedBundleVariable(
     ValidateMessageArgs(hr, pvArgs, BOOTSTRAPPER_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_ARGS, pArgs);
     ValidateMessageResults(hr, pvResults, BOOTSTRAPPER_EXTENSION_ENGINE_GETRELATEDBUNDLEVARIABLE_RESULTS, pResults);
 
-    hr = ExternalEngineGetRelatedBundleVariable(pContext->pEngineState, pArgs->wzBundleId, pArgs->wzVariable, pResults->wzValue, &pResults->cchValue);
+    hr = ExternalEngineGetRelatedBundleVariable(pContext->pEngineState, pArgs->wzBundleCode, pArgs->wzVariable, pResults->wzValue, &pResults->cchValue);
 
 LExit:
     return hr;

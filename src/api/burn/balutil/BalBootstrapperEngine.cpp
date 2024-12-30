@@ -319,7 +319,7 @@ public: // IBootstrapperEngine
     }
 
     virtual STDMETHODIMP GetRelatedBundleVariable(
-        __in_z LPCWSTR wzBundleId,
+        __in_z LPCWSTR wzBundleCode,
         __in_z LPCWSTR wzVariable,
         __out_ecount_opt(*pcchValue) LPWSTR wzValue,
         __inout SIZE_T* pcchValue
@@ -338,7 +338,7 @@ public: // IBootstrapperEngine
 
         // Init send structs.
         args.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
-        args.wzBundleId = wzBundleId;
+        args.wzBundleCode = wzBundleCode;
         args.wzVariable = wzVariable;
 
         results.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
@@ -349,8 +349,8 @@ public: // IBootstrapperEngine
         hr = BuffWriteNumberToBuffer(&bufferArgs, args.dwApiVersion);
         ExitOnFailure(hr, "Failed to write API version of GetRelatedBundleVariable args.");
 
-        hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleId);
-        ExitOnFailure(hr, "Failed to write bundle id of GetRelatedBundleVariable args.");
+        hr = BuffWriteStringToBuffer(&bufferArgs, args.wzBundleCode);
+        ExitOnFailure(hr, "Failed to write bundle code of GetRelatedBundleVariable args.");
 
         hr = BuffWriteStringToBuffer(&bufferArgs, args.wzVariable);
         ExitOnFailure(hr, "Failed to write variable name of GetRelatedBundleVariable args.");

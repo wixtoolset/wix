@@ -7,7 +7,6 @@ namespace WixToolset.Core.Burn.Bind
     using System.Linq;
     using System.Text;
     using System.Xml;
-    using WixToolset.Core.Burn.Bundles;
     using WixToolset.Core.Burn.ExtensibilityServices;
     using WixToolset.Data;
     using WixToolset.Data.Burn;

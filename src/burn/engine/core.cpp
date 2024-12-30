@@ -202,12 +202,12 @@ extern "C" HRESULT CoreInitializeConstants(
     // Support passing Ancestors to embedded burn bundles.
     if (pInternalCommand->sczAncestors && *pInternalCommand->sczAncestors)
     {
-        hr = StrAllocFormatted(&pRegistration->sczBundlePackageAncestors, L"%ls;%ls", pInternalCommand->sczAncestors, pRegistration->sczId);
+        hr = StrAllocFormatted(&pRegistration->sczBundlePackageAncestors, L"%ls;%ls", pInternalCommand->sczAncestors, pRegistration->sczCode);
         ExitOnFailure(hr, "Failed to copy ancestors and self to bundle package ancestors.");
     }
     else
     {
-        hr = StrAllocString(&pRegistration->sczBundlePackageAncestors, pRegistration->sczId, 0);
+        hr = StrAllocString(&pRegistration->sczBundlePackageAncestors, pRegistration->sczCode, 0);
         ExitOnFailure(hr, "Failed to copy self to bundle package ancestors.");
     }
 
@@ -330,7 +330,7 @@ extern "C" HRESULT CoreDetect(
     ExitOnFailure(hr, "Failed to report detected related bundles.");
 
     // Do update detection.
-    hr = DetectUpdate(pEngineState->registration.sczId, &pEngineState->userExperience, &pEngineState->update);
+    hr = DetectUpdate(pEngineState->registration.sczCode, &pEngineState->userExperience, &pEngineState->update);
     ExitOnFailure(hr, "Failed to detect update.");
 
     // Detecting MSPs requires special initialization before processing each package but
@@ -462,8 +462,8 @@ extern "C" HRESULT CorePlan(
     pEngineState->plan.pCommand = &pEngineState->command;
     pEngineState->plan.pInternalCommand = &pEngineState->internalCommand;
     pEngineState->plan.pPayloads = &pEngineState->payloads;
-    pEngineState->plan.wzBundleId = pEngineState->registration.sczId;
-    pEngineState->plan.wzBundleProviderKey = pEngineState->registration.sczId;
+    pEngineState->plan.wzBundleCode = pEngineState->registration.sczCode;
+    pEngineState->plan.wzBundleProviderKey = pEngineState->registration.sczCode;
     pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pEngineState->plan.action;
     pEngineState->plan.fPlanPackageCacheRollback = BOOTSTRAPPER_REGISTRATION_TYPE_NONE == pEngineState->registration.detectedRegistrationType;
 

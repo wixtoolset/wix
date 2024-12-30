@@ -64,7 +64,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(FALSE, pPlan->fPerMachine);
@@ -158,7 +158,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(FALSE, pPlan->fPerMachine);
@@ -237,7 +237,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(FALSE, pPlan->fPerMachine);
@@ -330,7 +330,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -490,7 +490,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -631,7 +631,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -746,7 +746,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_REPAIR, pPlan->action);
-            NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -840,7 +840,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{35192ED0-C70A-49B2-9D12-3B1FA39B5E6F}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -959,7 +959,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -1059,7 +1059,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -1178,7 +1178,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -1280,7 +1280,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -1373,7 +1373,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_LAYOUT, pPlan->action);
-            NativeAssert::StringEqual(L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{9C184683-04FB-49AD-9D79-65101BDC3EE3}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(FALSE, pPlan->fPerMachine);
@@ -1456,7 +1456,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_CACHE, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -1545,7 +1545,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -1620,7 +1620,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -1709,7 +1709,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -1802,7 +1802,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -1908,7 +1908,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_MODIFY, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -1987,7 +1987,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -2088,7 +2088,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -2158,7 +2158,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -2244,7 +2244,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -2332,7 +2332,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{A6F0CBF7-1578-450C-B9D7-9CF2EEC40002}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -2437,7 +2437,7 @@ namespace Bootstrapper
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
             Assert::Equal<LONGLONG>(BOOTSTRAPPER_ACTION_INSTALL, llPlannedAction);
-            NativeAssert::StringEqual(L"{06077C60-DC46-4F4A-8D3C-05F869187191}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{06077C60-DC46-4F4A-8D3C-05F869187191}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{06077C60-DC46-4F4A-8D3C-05F869187191}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -2527,7 +2527,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -2658,7 +2658,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -2788,7 +2788,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -2889,7 +2889,7 @@ namespace Bootstrapper
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
-            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleId);
+            NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", pPlan->wzBundleProviderKey);
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(TRUE, pPlan->fPerMachine);
@@ -3114,7 +3114,7 @@ namespace Bootstrapper
             hr = StrAllocString(&pCompatiblePackage->compatibleEntry.sczProviderKey, pProvider->sczKey, 0);
             NativeAssert::Succeeded(hr, "Failed to copy provider key");
 
-            DetectPackageDependent(pPackage, pEngineState->registration.sczId);
+            DetectPackageDependent(pPackage, pEngineState->registration.sczCode);
         }
 
         void DetectPackageAsAbsent(BURN_PACKAGE* pPackage)
@@ -3203,7 +3203,7 @@ namespace Bootstrapper
             {
                 BURN_PACKAGE* pPackage = pEngineState->packages.rgPackages + i;
                 DetectPackageAsPresentAndCached(pPackage);
-                DetectPackageDependent(pPackage, pEngineState->registration.sczId);
+                DetectPackageDependent(pPackage, pEngineState->registration.sczCode);
 
                 if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
                 {
@@ -3236,7 +3236,7 @@ namespace Bootstrapper
                 else
                 {
                     DetectPackageAsPresentAndCached(pPackage);
-                    DetectPackageDependent(pPackage, pEngineState->registration.sczId);
+                    DetectPackageDependent(pPackage, pEngineState->registration.sczCode);
                 }
             }
         }
@@ -3296,7 +3296,7 @@ namespace Bootstrapper
             HRESULT hr = StrAllocString(&pEngineState->internalCommand.sczAncestors, wzId, 0);
             NativeAssert::Succeeded(hr, "Failed to set registration's ancestors");
 
-            hr = StrAllocFormatted(&pEngineState->registration.sczBundlePackageAncestors, L"%ls;%ls", wzId, pEngineState->registration.sczId);
+            hr = StrAllocFormatted(&pEngineState->registration.sczBundlePackageAncestors, L"%ls;%ls", wzId, pEngineState->registration.sczCode);
             NativeAssert::Succeeded(hr, "Failed to set registration's package ancestors");
 
             pEngineState->command.relationType = BOOTSTRAPPER_RELATION_UPGRADE;
@@ -3435,13 +3435,13 @@ namespace Bootstrapper
             __in BOOL fRollback,
             __in DWORD dwIndex,
             __in BOOL fRegister,
-            __in LPCWSTR wzBundleId,
+            __in LPCWSTR wzBundleCode,
             __in LPCWSTR wzProviderKey
             )
         {
             BURN_DEPENDENT_REGISTRATION_ACTION* pAction = ValidateDependentRegistrationActionExists(pPlan, fRollback, dwIndex);
             Assert::Equal<DWORD>(fRegister ? BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_REGISTER : BURN_DEPENDENT_REGISTRATION_ACTION_TYPE_UNREGISTER, pAction->type);
-            NativeAssert::StringEqual(wzBundleId, pAction->sczBundleId);
+            NativeAssert::StringEqual(wzBundleCode, pAction->sczBundleCode);
             NativeAssert::StringEqual(wzProviderKey, pAction->sczDependentProviderKey);
         }
 
