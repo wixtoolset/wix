@@ -9,9 +9,6 @@ on:
     branches:
       - main
   workflow_dispatch:
-    inputs:
-      tags:
-        manual: true
 
 env:
   DOTNET_NOLOGO: true
@@ -39,7 +36,7 @@ jobs:
       - name: Install sign tool
         if: (github.ref == 'refs/heads/master')
         shell: cmd
-        run: dotnet tool install --tool-path build\.tools sign --version 0.9.1-beta.24170.3
+        run: dotnet tool install --tool-path build\.tools sign --version 0.9.1-beta.24529.1
 
       - name: Configure automated logging and crash dumps
         shell: cmd

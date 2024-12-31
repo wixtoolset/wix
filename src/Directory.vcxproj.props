@@ -39,7 +39,7 @@
       <ExceptionHandling>false</ExceptionHandling>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <AdditionalOptions>/Zc:threadSafeInit- -YlprecompDefine /w44263</AdditionalOptions>
-      <MultiProcessorCompilation Condition=" $(NUMBER_OF_PROCESSORS) &gt; 4 ">true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>$(ArmPreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>

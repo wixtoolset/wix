@@ -99,7 +99,7 @@
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
 
-  <!-- 
+  <!--
   This will override some targets that get defined in Microsoft.Common just like Microsoft.NET.DisableStandardFrameworkResolution.targets
   so this needs to be imported after
   -->
@@ -287,7 +287,8 @@
       Projects="@(_MSBuildProjectReferenceExistent)"
       Targets="GetNativeTargetPath"
       Properties="%(_MSBuildProjectReferenceExistent.SetConfiguration);%(_MSBuildProjectReferenceExistent.SetPlatform)"
-      Condition=" '@(ProjectReferenceWithConfiguration)' != '' and '%(_MSBuildProjectReferenceExistent.Extension)' == '.vcxproj' ">
+      Condition=" '@(ProjectReferenceWithConfiguration)' != '' and '%(_MSBuildProjectReferenceExistent.Extension)' == '.vcxproj' "
+      BuildInParallel="true">
 
       <Output TaskParameter="TargetOutputs" ItemName="_WixResolvedProjectReference" />
     </MSBuild>
@@ -570,7 +571,7 @@
       @(_ResolvedWixExtensionPaths);
       @(_BindInputs)"
       Outputs="$(IntermediateOutputPath)$(BindTrackingFilePrefix)%(CultureGroup.OutputSuffix)$(BindTrackingFileExtension);@(_BindBuiltOutputs)"
-      DependsOnTargets="$(CoreCompileDependsOn)" 
+      DependsOnTargets="$(CoreCompileDependsOn)"
       Condition=" '@(Compile)' != '' ">
 
     <PropertyGroup>
@@ -578,7 +579,7 @@
       <_WixBuildCabinetCachePath Condition=" '$(CabinetCachePath)'!='' ">$([MSBuild]::NormalizeDirectory($(CabinetCachePath), %(CultureGroup.OutputFolder)))</_WixBuildCabinetCachePath>
     </PropertyGroup>
 
-    <Warning Text="@(UnsupportedWixExtension->'%(Identity)') does not have support for WiX Toolset v$(WixToolsetVersion)." 
+    <Warning Text="@(UnsupportedWixExtension->'%(Identity)') does not have support for WiX Toolset v$(WixToolsetVersion)."
         Condition=" '@(UnsupportedWixExtension)' != '' "/>
 
     <WixBuild
@@ -632,7 +633,7 @@
 
   <Target
       Name="WindowsInstallerValidation"
-      DependsOnTargets="CoreCompile" 
+      DependsOnTargets="CoreCompile"
       Condition=" '$(_WixBuildExitCode)' != '' and '$(SuppressValidation)' != 'true' and ('$(OutputType)' == 'Package' or '$(OutputType)' == 'Module') ">
       <WindowsInstallerValidation
           DatabaseFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)"
