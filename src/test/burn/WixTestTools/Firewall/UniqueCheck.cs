@@ -23,6 +23,7 @@ namespace WixTestTools.Firewall
             this.ApplicationName = details.ApplicationName;
             this.LocalUserOwner = details.LocalUserOwner;
             this.RemoteAddresses = details.RemoteAddresses;
+            this.Grouping = details.Grouping;
         }
 
 
@@ -39,6 +40,8 @@ namespace WixTestTools.Firewall
         public string LocalUserOwner { get; set; }
 
         public string RemoteAddresses { get; set; }
+
+        public string Grouping { get; set; }
 
         public bool FirewallRuleIsUnique(INetFwRule3 rule)
         {
@@ -73,6 +76,11 @@ namespace WixTestTools.Firewall
             }
 
             if (this.RemoteAddresses != null && rule.RemoteAddresses != this.RemoteAddresses)
+            {
+                return false;
+            }
+
+            if (this.Grouping != null && rule.Grouping != this.Grouping)
             {
                 return false;
             }
