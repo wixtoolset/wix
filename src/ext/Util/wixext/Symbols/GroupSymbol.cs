@@ -78,12 +78,12 @@ namespace WixToolset.Util.Symbols
         public enum SymbolAttributes
         {
             None = 0x00000000,
-            FailIfExists = 0x00000001,
-            UpdateIfExists = 0x00000002,
-            DontRemoveOnUninstall = 0x00000004,
-            DontCreateGroup = 0x00000008,
-            NonVital = 0x00000010,
-            RemoveComment = 0x00000020,
+            FailIfExists = 0x00000010,
+            UpdateIfExists = 0x00000020,
+            DontRemoveOnUninstall = 0x00000100,
+            DontCreateGroup = 0x00000200,
+            NonVital = 0x00000400,
+            RemoveComment = 0x00000800,
         }
 
         public enum SymbolFields
