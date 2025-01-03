@@ -176,6 +176,14 @@ namespace WixToolset.Util
                 case "Wix4Group":
                     this.DecompileGroupTable(table);
                     break;
+                case "Group6":
+                case "Wix6Group":
+                    this.DecompileGroup6Table(table);
+                    break;
+                case "GroupGroup":
+                case "Wix6GroupGroup":
+                    this.DecompileGroupGroup6Table(table);
+                    break;
                 case "Perfmon":
                 case "Wix4Perfmon":
                     this.DecompilePerfmonTable(table);
@@ -427,16 +435,70 @@ namespace WixToolset.Util
         {
             foreach (var row in table.Rows)
             {
-                if (null != row[1])
-                {
-                    this.Messaging.Write(WarningMessages.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "Component_", (string)row[1]));
-                }
-
                 this.DecompilerHelper.AddElementToRoot(UtilConstants.GroupName,
                     new XAttribute("Id", row.FieldAsString(0)),
-                    new XAttribute("Name", row.FieldAsString(1)),
+                    new XAttribute("Name", row.FieldAsString(2)),
                     AttributeIfNotNull("Domain", row, 3)
                     );
+            }
+        }
+        /// <summary>
+        /// Decompile the Group6 table.
+        /// </summary>
+        /// <param name="table">The table to decompile.</param>
+        private void DecompileGroup6Table(Table table)
+        {
+            foreach (var row in table.Rows)
+            {
+                var groupId = row.FieldAsString(0);
+                if (this.DecompilerHelper.TryGetIndexedElement("Group", groupId, out var group))
+                {
+                    var attributes = (Group6Symbol.SymbolAttributes)(row.FieldAsNullableInteger(2) ?? 0);
+                    group.Add(AttributeIfNotNull("Comment", row, 1));
+                    group.Add(AttributeIfTrue("FailIfExists", ((attributes & Group6Symbol.SymbolAttributes.FailIfExists) != 0)));
+                    group.Add(AttributeIfTrue("UpdateIfExists", ((attributes & Group6Symbol.SymbolAttributes.UpdateIfExists) != 0)));
+                    group.Add(AttributeIfTrue("DontRemoveOnUninstall", ((attributes & Group6Symbol.SymbolAttributes.DontRemoveOnUninstall) != 0)));
+                    group.Add(AttributeIfTrue("DontCreateGroup", ((attributes & Group6Symbol.SymbolAttributes.DontCreateGroup) != 0)));
+                    group.Add(AttributeIfTrue("NonVital", ((attributes & Group6Symbol.SymbolAttributes.NonVital) != 0)));
+                    group.Add(AttributeIfTrue("RemoveComment", ((attributes & Group6Symbol.SymbolAttributes.RemoveComment) != 0)));
+                }
+                else
+                {
+                    this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Group_", groupId, "Group"));
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Decompile the GroupGroup6 table.
+        /// </summary>
+        /// <param name="table">The table to decompile.</param>
+        private void DecompileGroupGroup6Table(Table table)
+        {
+            foreach (var row in table.Rows)
+            {
+                var parentId = row.FieldAsString(0);
+                var parentExists = this.DecompilerHelper.TryGetIndexedElement("Group", parentId, out var parentGroup);
+
+                var childId = row.FieldAsString(1);
+                var childExists = this.DecompilerHelper.TryGetIndexedElement("Group", childId, out var childGroup);
+
+                if (parentExists && childExists)
+                {
+                    childGroup.Add(new XElement(UtilConstants.GroupRefName, new XAttribute("Id", parentId)));
+                }
+                else
+                {
+                    if(!parentExists)
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Parent_", parentId, "Group"));
+                    }
+                    if (!childExists)
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(), "Child_", childId, "Group"));
+                    }
+                }
             }
         }
 
