@@ -151,12 +151,14 @@ namespace WixToolsetTest.MsiE2E
         [RuntimeFact]
         public void FailsIfRestrictedDomain()
         {
+            var testDomain = "DOESNOTEXIST";
+            var testGroup = "testName1";
             var productRestrictedDomain = this.CreatePackageInstaller("ProductRestrictedDomain");
 
-            string logFile = productRestrictedDomain.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE, "TESTDOMAIN=DOESNOTEXIST");
+            string logFile = productRestrictedDomain.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE, $"TESTDOMAIN={testDomain}");
 
             // Verify expected error message in the log file
-            Assert.True(LogVerifier.MessageInLogFile(logFile, "CreateGroup:  Error 0x8007054b: failed to find Domain DOESNOTEXIST."));
+            Assert.True(LogVerifier.MessageInLogFile(logFile, $"ConfigureGroups:  Error 0x8007054b: Domain does not exist for vital group: {testDomain}\\{testGroup} - aborting"));
         }
 
         // Verify that a group can be created with a group comment

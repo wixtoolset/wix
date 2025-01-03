@@ -8,8 +8,13 @@ HRESULT GetDomainServerName(LPCWSTR pwzDomain, LPWSTR* ppwzServerName, ULONG fla
     DWORD er = ERROR_SUCCESS;
     PDOMAIN_CONTROLLER_INFOW pDomainControllerInfo = NULL;
     HRESULT hr = S_OK;
+    WCHAR pwzComputerName[MAX_COMPUTERNAME_LENGTH + 1];
+    DWORD cchComputerName = countof(pwzComputerName);
 
-    if (pwzDomain && *pwzDomain)
+    hr = ::GetComputerNameW(pwzComputerName, &cchComputerName);
+    ExitOnFailure(hr, "failed to obtain computer name");
+
+    if (pwzDomain && *pwzDomain && 0!=lstrcmpiW(pwzComputerName, pwzDomain) && 0!=lstrcmpiW(L".", pwzDomain))
     {
         er = ::DsGetDcNameW(NULL, pwzDomain, NULL, NULL, flags, &pDomainControllerInfo);
         if (RPC_S_SERVER_UNAVAILABLE == er)
@@ -21,7 +26,7 @@ HRESULT GetDomainServerName(LPCWSTR pwzDomain, LPWSTR* ppwzServerName, ULONG fla
         if (ERROR_SUCCESS == er && pDomainControllerInfo->DomainControllerName)
         {
             // Skip the \\ prefix if present.
-            if ('\\' == *pDomainControllerInfo->DomainControllerName && '\\' == *pDomainControllerInfo->DomainControllerName + 1)
+            if ('\\' == *pDomainControllerInfo->DomainControllerName && '\\' == *(pDomainControllerInfo->DomainControllerName + 1) )
             {
                 hr = StrAllocString(ppwzServerName, pDomainControllerInfo->DomainControllerName + 2, 0);
             }
