@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Templates\Product.wxs" Link="Product.wxs" />
+    <ProjectReference Include="..\Components\TestComponentNET3\TestComponentNET3.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.Util.wixext" />

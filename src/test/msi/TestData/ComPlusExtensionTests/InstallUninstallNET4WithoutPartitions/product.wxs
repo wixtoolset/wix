@@ -12,8 +12,8 @@
 
     <Fragment>
         <Component Id="Component1" Guid="09624A9A-4BBC-4126-BBF9-0713C5217DB1" Directory="INSTALLFOLDER">
-            <File Id="AssemblyFileNET" Source="../Components/TestComponentNET4.dll" KeyPath="yes" />
-            <File Id="TlbFileNET" Source="../Components/TestComponentNET4.tlb" />
+            <File Id="AssemblyFileNET" Source="$(var.TestComponentNET4.TargetDir)TestComponentNET4.dll" KeyPath="yes" />
+            <File Id="TlbFileNET" Source="$(var.TestComponentNET4.TargetDir)TestComponentNET4.tlb" />
                 <complus:ComPlusApplication Id="APPLICATION" Name="ComPlus .NET 4 Application" Description="ComPlus Application" >
                     <complus:ComPlusAssembly Id="ASSEMBLY_NET" Type=".net" DllPath="[#AssemblyFileNET]" TlbPath="[#TlbFileNET]" >
                         <complus:ComPlusComponent Id="MyComNET4" CLSID="146AB3A2-4472-4DB9-94D5-311536E799BD" />
