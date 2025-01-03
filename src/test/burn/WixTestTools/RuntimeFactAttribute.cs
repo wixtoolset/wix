@@ -47,6 +47,8 @@ namespace WixTestTools
 
             var domainTestsEnabledString = Environment.GetEnvironmentVariable(RequiredDomainEnvironmentVariableName);
             RuntimeDomainTestsEnabled = Boolean.TryParse(domainTestsEnabledString, out var domainTestsEnabled) && domainTestsEnabled;
+
+            RunningOnWindowsServer = IsWindowsServer();
         }
 
         public bool DomainRequired
@@ -63,8 +65,6 @@ namespace WixTestTools
                     this.Skip = $"These tests require the test host to be running as a domain member ({(RunningInDomain ? "passed" : "failed")}). These tests affect both MACHINE AND DOMAIN state. To accept the consequences, set the {RequiredDomainEnvironmentVariableName} environment variable to true ({(RuntimeDomainTestsEnabled ? "passed" : "failed")}).";
                 }
             }
-
-            RunningOnWindowsServer = IsWindowsServer();
         }
 
         private bool _RequireWindowsServer;

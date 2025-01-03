@@ -716,7 +716,7 @@ static HRESULT RemoveGroupInternal(
     //
     if (!(SCAG_DONT_CREATE_GROUP & iAttributes))
     {
-        hr = GetDomainFromServerName(&pwzServerName, wzDomain, DS_WRITABLE_REQUIRED);
+        hr = GetDomainServerName(wzDomain, &pwzServerName, DS_WRITABLE_REQUIRED);
 
         NET_API_STATUS er = ::NetLocalGroupDel(pwzServerName, wzName);
         hr = HRESULT_FROM_WIN32(er);
@@ -1284,7 +1284,7 @@ extern "C" UINT __stdcall CreateGroup(
 
     if (!(SCAG_DONT_CREATE_GROUP & iAttributes))
     {
-        hr = GetDomainFromServerName(&pwzServerName, pwzDomain, DS_WRITABLE_REQUIRED);
+        hr = GetDomainServerName(pwzDomain, &pwzServerName, DS_WRITABLE_REQUIRED);
         ExitOnFailure(hr, "failed to find writable server for domain %ls.", pwzDomain);
 
         // Set the group's comment
@@ -1680,7 +1680,7 @@ HRESULT AlterGroupMembership(BOOL fRemove, BOOL fIsRollback)
     }
 
 
-    hr = GetDomainFromServerName(&pwzServerName, pwzParentDomain, DS_WRITABLE_REQUIRED);
+    hr = GetDomainServerName(pwzParentDomain, &pwzServerName, DS_WRITABLE_REQUIRED);
     ExitOnFailure(hr, "failed to obtain writable server for domain %ls", pwzParentDomain);
 
     if (*pwzChildDomain)
