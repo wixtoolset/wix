@@ -1,0 +1,37 @@
+// TestComponentNative.idl : IDL source for TestComponentNative
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (TestComponentNative.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(b734850b-d5c9-4903-bea3-4c46ee544ed8),
+	dual,
+	nonextensible,
+	pointer_default(unique)
+]
+interface IMessage : IDispatch
+{
+	[id(1), helpstring("hello")] HRESULT SayHello();
+};
+[
+	uuid(8aaadab2-ac31-4618-ad2b-6b71d2a318eb),
+	version(1.0),
+]
+library TestComponentNativeLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(8b4c3a90-762c-465b-abc5-81cb3cc5e464)
+	]
+	coclass Message
+	{
+		[default] interface IMessage;
+	};
+};
+
+import "shobjidl.idl";

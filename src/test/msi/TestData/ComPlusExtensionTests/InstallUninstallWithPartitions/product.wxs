@@ -14,7 +14,7 @@
         <util:User Id="TEST_USER" Name="[LogonUser]" />
 
         <Component Id="Component1" Guid="09624A9A-4BBC-4126-BBF9-0713C5217DB1" Directory="INSTALLFOLDER">
-            <File Id="AssemblyFileNative" Source="../Components/TestComponentNative.dll" />
+            <File Id="AssemblyFileNative" Source="$(var.TestComponentNative.TargetDir)TestComponentNative.dll" />
 
             <!-- Partition testing only works on Server OS -->
             <complus:ComPlusPartition Id="PARTITION" Name="Complus Partition1" Description="ComPlus Partition" >
