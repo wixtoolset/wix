@@ -1,7 +1,6 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 #include "precomp.h"
-#include "scanet.h"
 
 LPCWSTR vcsGroupQuery = L"SELECT `Group`, `Component_`, `Name`, `Domain` FROM `Wix4Group` WHERE `Group`=?";
 enum eGroupQuery { vgqGroup = 1, vgqComponent, vgqName, vgqDomain };
@@ -458,7 +457,20 @@ HRESULT ScaGroupExecute(
         // and removing groups.  Note: MSDN says that it is safe to call these APIs from any
         // user, so we should be safe calling it during immediate mode.
 
-        hr = GetDomainServerName(psg->wzDomain, &pwzServerName);
+        hr = GetDomainServerName(psg->wzDomain, &pwzServerName, 0);
+        if (HRESULT_FROM_WIN32(ERROR_NO_SUCH_DOMAIN) == hr)
+        {
+            if (SCAG_NON_VITAL & psg->iAttributes)
+            {
+                WcaLog(LOGMSG_VERBOSE, "Domain does not exist for non-vital group: %ls\\%ls - continuing", psg->wzDomain, psg->wzName);
+                hr = S_OK;
+                goto ExitCurrentGroup;
+            }
+            else
+            {
+                ExitOnFailure(hr, "Domain does not exist for vital group: %ls\\%ls - aborting", psg->wzDomain, psg->wzName);
+            }
+        }
 
         er = ::NetLocalGroupGetInfo(pwzServerName, psg->wzName, 0, reinterpret_cast<LPBYTE*>(&pGroupInfo));
         if (NERR_Success == er)
@@ -597,6 +609,7 @@ HRESULT ScaGroupExecute(
             ExitOnFailure(hr, "failed to schedule RemoveGroup");
         }
 
+    ExitCurrentGroup:
         ReleaseNullStr(pwzScriptKey);
         ReleaseNullStr(pwzActionData);
         ReleaseNullStr(pwzRollbackData);

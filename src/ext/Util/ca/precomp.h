@@ -51,5 +51,6 @@
 #include "scasmb.h"
 #include "scasmbexec.h"
 #include "utilca.h"
+#include "scanet.h"
 
 #include "..\..\caDecor.h"
