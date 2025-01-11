@@ -4,6 +4,8 @@
     <?include ..\..\caDecor.wxi ?>
 
     <Fragment>
+        <UIRef Id="WixSqlErrors" />
+
         <UI>
             <ProgressText Action="$(var.Prefix)InstallSqlData$(var.Suffix)" Message="!(loc.ConfigureSql)" />
             <ProgressText Action="$(var.Prefix)UninstallSqlData$(var.Suffix)" Message="!(loc.ConfigureSql)" />
