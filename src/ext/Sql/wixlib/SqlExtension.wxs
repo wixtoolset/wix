@@ -4,7 +4,7 @@
     <?include ..\..\caerr.wxi ?>
 
     <Fragment>
-        <UI>
+        <UI Id="WixSqlErrors">
             <Error Id="$(var.msierrSQLFailedCreateDatabase)" Message="!(loc.msierrSQLFailedCreateDatabase)" />
             <Error Id="$(var.msierrSQLFailedDropDatabase)" Message="!(loc.msierrSQLFailedDropDatabase)" />
             <Error Id="$(var.msierrSQLFailedConnectDatabase)" Message="!(loc.msierrSQLFailedConnectDatabase)" />
