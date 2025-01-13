@@ -99,6 +99,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     var bitness = componentSymbol.Win64 ? "64" : String.Empty;
                     var regkey = String.Concat(bitness, registrySymbol.Root, "\\", registrySymbol.Key, "\\", registrySymbol.Name);
+                    if (componentSymbol.WiX3CompatibleGuid)
+                    {
+                        regkey = String.Concat(bitness, (int)registrySymbol.Root, "\\", registrySymbol.Key, "\\", registrySymbol.Name);
+                    }
                     componentSymbol.ComponentId = this.BackendHelper.CreateGuid(BindDatabaseCommand.WixComponentGuidNamespace, regkey.ToLowerInvariant());
                 }
             }

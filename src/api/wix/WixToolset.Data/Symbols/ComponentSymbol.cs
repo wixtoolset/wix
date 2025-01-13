@@ -24,6 +24,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(ComponentSymbolFields.Condition), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComponentSymbolFields.KeyPath), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ComponentSymbolFields.KeyPathType), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(ComponentSymbolFields.WiX3CompatibleGuid), IntermediateFieldType.Bool),
             },
             typeof(ComponentSymbol));
     }
@@ -47,6 +48,7 @@ namespace WixToolset.Data.Symbols
         Condition,
         KeyPath,
         KeyPathType,
+        WiX3CompatibleGuid,
     }
 
     public enum ComponentLocation
@@ -150,6 +152,12 @@ namespace WixToolset.Data.Symbols
         {
             get => (ComponentKeyPathType)this.Fields[(int)ComponentSymbolFields.KeyPathType].AsNumber();
             set => this.Set((int)ComponentSymbolFields.KeyPathType, (int)value);
+        }
+
+        public bool WiX3CompatibleGuid
+        {
+            get => this.Fields[(int)ComponentSymbolFields.WiX3CompatibleGuid].AsBool();
+            set => this.Set((int)ComponentSymbolFields.WiX3CompatibleGuid, value);
         }
     }
 }

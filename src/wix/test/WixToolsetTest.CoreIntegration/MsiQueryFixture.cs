@@ -2,6 +2,7 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.IO;
     using System.Linq;
     using WixInternal.Core.TestPackage;
@@ -211,6 +212,71 @@ namespace WixToolsetTest.CoreIntegration
                     "AppSearch:SAMPLEREGFOUND\tSampleRegSearch",
                     "RegLocator:SampleRegSearch\t2\tSampleReg\t\t18",
                 }, results);
+            }
+        }
+
+        [Fact]
+        public void WiX3CompatibleGuid()
+        {
+            var folder = TestData.Get(@"TestData\WiX3CompatibleGuid");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "WiX3CompatibleGuid.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "Component" });
+
+                Assert.Equal(2, results.Length);
+                Assert.Contains(results, component => component.Contains("WiX3CompatibleGuid") && component.Contains("8BAF5399-2FD2-50B6-ABDA-98FB3A5BB148", StringComparison.InvariantCultureIgnoreCase));
+                Assert.Contains(results, component => component.Contains("WiX4CompatibleGuid") && !component.Contains("8BAF5399-2FD2-50B6-ABDA-98FB3A5BB148", StringComparison.InvariantCultureIgnoreCase));
+            }
+        }
+
+        [Fact]
+        public void WiX4CompatibleGuid()
+        {
+            var folder = TestData.Get(@"TestData\WiX4CompatibleGuid");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    Path.Combine(folder, "WiX4CompatibleGuid.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(msiPath));
+                var results = Query.QueryDatabase(msiPath, new[] { "Component" });
+
+                Assert.Equal(5, results.Length);
+                Assert.Contains(results, component => component.Contains("hklm") && component.Contains("8A4C3648-26AF-5E7E-B64B-D97961856FA4", StringComparison.InvariantCultureIgnoreCase));
+                Assert.Contains(results, component => component.Contains("hkcr") && component.Contains("B40FBCDB-D01C-575F-9030-7B95813A419C", StringComparison.InvariantCultureIgnoreCase));
+                Assert.Contains(results, component => component.Contains("hkcu") && component.Contains("04EB5AB4-FFF7-53D5-A913-1C146FC61EF2", StringComparison.InvariantCultureIgnoreCase));
+                Assert.Contains(results, component => component.Contains("hku") && component.Contains("CC64CDBB-077E-532B-9F95-A1E1EB162875", StringComparison.InvariantCultureIgnoreCase));
+                Assert.Contains(results, component => component.Contains("file") && component.Contains("C207E21E-B6F4-537A-A8AB-620DD88646D6", StringComparison.InvariantCultureIgnoreCase));
             }
         }
 

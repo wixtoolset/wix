@@ -719,6 +719,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.VBScriptIsDeprecated, "VBScript is a deprecated Windows component: https://learn.microsoft.com/en-us/windows/whats-new/deprecated-features. VBScript custom actions might fail on some Windows systems. Rewrite or eliminate VBScript custom actions for best compatibility.");
         }
 
+        public static Message AlreadyWiX3CompatibleGuid(SourceLineNumber sourceLineNumbers, ComponentKeyPathType keyPathType)
+        {
+            return Message(sourceLineNumbers, Ids.AlreadyWiX3CompatibleGuid, "Components with KeyPath type {0} have WiX3-compatible GUID by default. Attribute WiX3CompatibleGuid is redundant.", keyPathType);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -861,6 +866,7 @@ namespace WixToolset.Data
             ExePackageDetectInformationRecommended = 1161,
             InvalidWixVersion = 1162,
             VBScriptIsDeprecated = 1163,
+            AlreadyWiX3CompatibleGuid = 1164,
         }
     }
 }

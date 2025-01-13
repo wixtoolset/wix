@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="TARGETDIR">
+
+            <!-- Expecting {8A4C3648-26AF-5E7E-B64B-D97961856FA4} -->
+            <Component Directory='TARGETDIR' Bitness="always32" Id="hklm">
+                <RegistryValue Root="HKLM" Key="SOFTWARE\WiX3CompatiblityCheck" Name="Test" Value="test value" Type="string"/>
+            </Component>
+
+            <!-- Expecting {B40FBCDB-D01C-575F-9030-7B95813A419C} -->
+            <Component Directory='TARGETDIR' Bitness="always32" Id="hkcr">
+                <RegistryValue Root="HKCR" Key="SOFTWARE\WiX3CompatiblityCheck" Name="Test" Value="test value" Type="string"/>
+            </Component>
+
+            <!-- Expecting {04EB5AB4-FFF7-53D5-A913-1C146FC61EF2} -->
+            <Component Directory='TARGETDIR' Bitness="always32" Id="hkcu">
+                <RegistryValue Root="HKCU" Key="SOFTWARE\WiX3CompatiblityCheck" Name="Test" Value="test value" Type="string"/>
+            </Component>
+
+            <!-- Expecting {CC64CDBB-077E-532B-9F95-A1E1EB162875} -->
+            <Component Directory='TARGETDIR' Bitness="always32" Id="hku">
+                <RegistryValue Root="HKU" Key="SOFTWARE\WiX3CompatiblityCheck" Name="Test" Value="test value" Type="string"/>
+            </Component>
+
+            <!-- Expecting {C207E21E-B6F4-537A-A8AB-620DD88646D6} -->
+            <Component Directory='INSTALLFOLDER' Bitness="always32" Id="file">
+                <File Source='$(sys.SOURCEFILEPATH)' Name='test.wxs'/>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

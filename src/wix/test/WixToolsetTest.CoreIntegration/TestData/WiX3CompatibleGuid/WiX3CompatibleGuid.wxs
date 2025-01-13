@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="TARGETDIR">
+            <!-- Expecting {8BAF5399-2FD2-50B6-ABDA-98FB3A5BB148} -->
+            <Component Id="WiX3CompatibleGuid" WiX3CompatibleGuid="yes" Bitness="always32" Condition="x=y">
+                <RegistryValue Root="HKLM" Key="SOFTWARE\WiX3CompatiblityCheck" Name="Test" Value="test value" />
+            </Component>
+
+            <!-- Expecting *not* {8BAF5399-2FD2-50B6-ABDA-98FB3A5BB148} -->
+            <Component Id="WiX4CompatibleGuid" Bitness="always32" Condition="x=z">
+                <RegistryValue Root="HKLM" Key="SOFTWARE\WiX3CompatiblityCheck" Name="Test" Value="test value" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
