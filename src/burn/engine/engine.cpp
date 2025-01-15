@@ -239,11 +239,6 @@ LExit:
         LoggingOpenFailed();
     }
 
-    BootstrapperApplicationRemove(&engineState.userExperience);
-
-    CacheRemoveBaseWorkingFolder(&engineState.cache);
-    CacheUninitialize(&engineState.cache);
-
     // If this is a related bundle (but not an update) suppress restart and return the standard restart error code.
     if (engineState.fRestart && BOOTSTRAPPER_RELATION_NONE != engineState.command.relationType && BOOTSTRAPPER_RELATION_UPDATE != engineState.command.relationType)
     {
@@ -284,6 +279,11 @@ LExit:
             LogErrorId(hrRestart, MSG_RESTART_FAILED);
         }
     }
+
+    BootstrapperApplicationRemove(&engineState.userExperience);
+
+    CacheRemoveBaseWorkingFolder(&engineState.cache);
+    CacheUninitialize(&engineState.cache);
 
     // If the message window is still around, close it.
     UiCloseMessageWindow(&engineState);
