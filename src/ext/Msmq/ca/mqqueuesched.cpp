@@ -10,9 +10,9 @@ LPCWSTR vcsMessageQueueQuery =
 enum eMessageQueueQuery { mqqMessageQueue = 1, mqqComponent,  mqqBasePriority, mqqJournalQuota, mqqLabel, mqqMulticastAddress, mqqPathName, mqqPrivLevel, mqqQuota, mqqServiceTypeGuid, mqqAttributes };
 
 LPCWSTR vcsMessageQueueUserPermissionQuery =
-    L"SELECT `MessageQueueUserPermission`, `MessageQueue_`, `MessageQueueUserPermission`.`Component_`, `Domain`, `Name`, `Permissions` FROM `Wix4MessageQueueUserPermission`, `Wix4User` WHERE `User_` = `User`";
+    L"SELECT `MessageQueueUserPermission`, `MessageQueue_`, `Wix4MessageQueueUserPermission`.`Component_`, `Domain`, `Name`, `Permissions` FROM `Wix4MessageQueueUserPermission`, `Wix4User` WHERE `User_` = `User`";
 LPCWSTR vcsMessageQueueGroupPermissionQuery =
-    L"SELECT `MessageQueueGroupPermission`, `MessageQueue_`, `MessageQueueGroupPermission`.`Component_`, `Domain`, `Name`, `Permissions` FROM `Wix4MessageQueueGroupPermission`, `Wix4Group` WHERE `Group_` = `Group`";
+    L"SELECT `MessageQueueGroupPermission`, `MessageQueue_`, `Wix4MessageQueueGroupPermission`.`Component_`, `Domain`, `Name`, `Permissions` FROM `Wix4MessageQueueGroupPermission`, `Wix4Group` WHERE `Group_` = `Group`";
 enum eMessageQueuePermissionQuery { mqpqMessageQueuePermission = 1, mqpqMessageQueue, mqpqComponent, mqpqDomain, mqpqName, mqpqPermissions };
 
 
@@ -94,7 +94,7 @@ HRESULT MqiMessageQueueRead(
 
     // loop through all partitions
     hr = WcaOpenExecuteView(vcsMessageQueueQuery, &hView);
-    ExitOnFailure(hr, "Failed to execute view on MessageQueue table");
+    ExitOnFailure(hr, "Failed to execute view on Wix4MessageQueue table");
 
     while (S_OK == (hr = WcaFetchRecord(hView, &hRec)))
     {
@@ -324,14 +324,14 @@ HRESULT MqiMessageQueuePermissionRead(
     HRESULT hr = S_OK;
 
     // read message queue user permissions
-    if (S_OK == WcaTableExists(L"MessageQueueUserPermission"))
+    if (S_OK == WcaTableExists(L"Wix4MessageQueueUserPermission"))
     {
         hr = MessageQueueTrusteePermissionsRead(vcsMessageQueueUserPermissionQuery, pMessageQueueList, pList);
         ExitOnFailure(hr, "Failed to read message queue user permissions");
     }
 
     // read message queue group permissions
-    if (S_OK == WcaTableExists(L"MessageQueueGroupPermission"))
+    if (S_OK == WcaTableExists(L"Wix4MessageQueueGroupPermission"))
     {
         hr = MessageQueueTrusteePermissionsRead(vcsMessageQueueGroupPermissionQuery, pMessageQueueList, pList);
         ExitOnFailure(hr, "Failed to read message queue group permissions");

@@ -2,59 +2,79 @@
 
 namespace WixToolset.Msmq
 {
-#if TODO_CONSIDER_DECOMPILER
     using System;
-    using System.Collections;
-    using System.Globalization;
+    using System.Collections.Generic;
+    using System.Reflection;
+    using System.Security;
+    using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
-    using Msmq = WixToolset.Extensions.Serialize.Msmq;
-    using Wix = WixToolset.Data.Serialize;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// The decompiler for the WiX Toolset MSMQ Extension.
     /// </summary>
-    public sealed class MsmqDecompiler : DecompilerExtension
+    public sealed class MsmqDecompiler : BaseWindowsInstallerDecompilerExtension
     {
-        /// <summary>
-        /// Creates a decompiler for MSMQ Extension.
-        /// </summary>
-        public MsmqDecompiler()
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => MsmqTableDefinitions.All;
+
+        private IParseHelper ParseHelper { get; set; }
+
+        internal static XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/msmq";
+        internal static XName MessageQueueName => Namespace + "MessageQueue";
+        internal static XName MessageQueuePermissionName => Namespace + "MessageQueuePermission";
+
+        public override void PreDecompile(IWindowsInstallerDecompileContext context, IWindowsInstallerDecompilerHelper helper)
         {
-            this.TableDefinitions = MsmqExtensionData.GetExtensionTableDefinitions();
+            base.PreDecompile(context, helper);
+            this.ParseHelper = context.ServiceProvider.GetService<IParseHelper>();
         }
 
         /// <summary>
-        /// Get the extensions library to be removed.
+        /// Called at the beginning of the decompilation of a database.
         /// </summary>
-        /// <param name="tableDefinitions">Table definitions for library.</param>
-        /// <returns>Library to remove from decompiled output.</returns>
-        public override Library GetLibraryToRemove(TableDefinitionCollection tableDefinitions)
+        /// <param name="tables">The collection of all tables.</param>
+        public override void PreDecompileTables(TableIndexedCollection tables)
         {
-            return MsmqExtensionData.GetExtensionLibrary(tableDefinitions);
         }
 
         /// <summary>
         /// Decompiles an extension table.
         /// </summary>
         /// <param name="table">The table to decompile.</param>
-        public override void DecompileTable(Table table)
+        public override bool TryDecompileTable(Table table)
         {
             switch (table.Name)
             {
                 case "MessageQueue":
+                case "Wix4MessageQueue":
                     this.DecompileMessageQueueTable(table);
                     break;
                 case "MessageQueueUserPermission":
+                case "Wix4MessageQueueUserPermission":
                     this.DecompileMessageQueueUserPermissionTable(table);
                     break;
                 case "MessageQueueGroupPermission":
+                case "Wix4MessageQueueGroupPermission":
                     this.DecompileMessageQueueGroupPermissionTable(table);
                     break;
                 default:
-                    base.DecompileTable(table);
-                    break;
+                    return false;
             }
+            return true;
+        }
+
+        /// <summary>
+        /// Finalize decompilation.
+        /// </summary>
+        /// <param name="tables">The collection of all tables.</param>
+        public override void PostDecompileTables(TableIndexedCollection tables)
+        {
+            this.FinalizeMessageQueueTable(tables);
+            this.FinalizeMessageQueueUserPermissionTable(tables);
+            this.FinalizeMessageQueueGroupPermissionTable(tables);
         }
 
         /// <summary>
@@ -65,82 +85,106 @@ namespace WixToolset.Msmq
         {
             foreach (Row row in table.Rows)
             {
-                Msmq.MessageQueue queue = new Msmq.MessageQueue();
+                var messageQueue = new XElement(MessageQueueName,
+                    new XAttribute("Id", row.FieldAsString(0))
+                    );
 
-                queue.Id = (string)row[0];
+                // Column(1) Component_ resolved in FinalizeMessageQueueTable
 
-                if (null != row[2])
+                if (!row.IsColumnEmpty(2))
                 {
-                    queue.BasePriority = (int)row[2];
+                    messageQueue.Add(new XAttribute("BasePriority", row.FieldAsString(2)));
                 }
 
-                if (null != row[3])
+                if (!row.IsColumnEmpty(3))
                 {
-                    queue.JournalQuota = (int)row[3];
+                    messageQueue.Add(new XAttribute("JournalQuota", row.FieldAsString(3)));
                 }
 
-                queue.Label = (string)row[4];
+                messageQueue.Add(new XAttribute("Label", row.FieldAsString(4)));
 
-                if (null != row[5])
+                if (!row.IsColumnEmpty(5))
                 {
-                    queue.MulticastAddress = (string)row[5];
+                    messageQueue.Add(new XAttribute("MulticastAddress", row.FieldAsString(5)));
                 }
 
-                queue.PathName = (string)row[6];
+                messageQueue.Add(new XAttribute("PathName", row.FieldAsString(6)));
 
-                if (null != row[7])
+                
+                if (!row.IsColumnEmpty(7))
                 {
-                    switch ((MsmqCompiler.MqiMessageQueuePrivacyLevel)row[7])
+                    int privLevel = row.FieldAsInteger(7);
+                    switch ((MsmqCompiler.MqiMessageQueuePrivacyLevel)privLevel)
                     {
                         case MsmqCompiler.MqiMessageQueuePrivacyLevel.None:
-                            queue.PrivLevel = Msmq.MessageQueue.PrivLevelType.none;
+                            messageQueue.Add(new XAttribute("PrivLevel", "none"));
                             break;
                         case MsmqCompiler.MqiMessageQueuePrivacyLevel.Optional:
-                            queue.PrivLevel = Msmq.MessageQueue.PrivLevelType.optional;
+                            messageQueue.Add(new XAttribute("PrivLevel", "optional"));
                             break;
                         case MsmqCompiler.MqiMessageQueuePrivacyLevel.Body:
-                            queue.PrivLevel = Msmq.MessageQueue.PrivLevelType.body;
+                            messageQueue.Add(new XAttribute("PrivLevel", "body"));
                             break;
                         default:
                             break;
                     }
                 }
 
-                if (null != row[8])
+                if (!row.IsColumnEmpty(8))
                 {
-                    queue.Quota = (int)row[8];
+                    messageQueue.Add(new XAttribute("Quota", row.FieldAsString(8)));
                 }
 
-                if (null != row[9])
+                if (!row.IsColumnEmpty(9))
                 {
-                    queue.ServiceTypeGuid = (string)row[9];
+                    messageQueue.Add(new XAttribute("ServiceTypeGuid", row.FieldAsString(9)));
                 }
 
-                int attributes = (int)row[10];
+                int attributes = row.FieldAsInteger(10);
 
                 if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueueAttributes.Authenticate))
                 {
-                    queue.Authenticate = Msmq.YesNoType.yes;
+                    messageQueue.Add(new XAttribute("Authenticate", YesNoType.Yes));
                 }
 
                 if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueueAttributes.Journal))
                 {
-                    queue.Journal = Msmq.YesNoType.yes;
+                    messageQueue.Add(new XAttribute("Journal", YesNoType.Yes));
                 }
 
                 if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueueAttributes.Transactional))
                 {
-                    queue.Transactional = Msmq.YesNoType.yes;
+                    messageQueue.Add(new XAttribute("Transactional", YesNoType.Yes));
                 }
 
-                Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
-                if (null != component)
+                this.DecompilerHelper.IndexElement(row, messageQueue);
+            }
+
+        }
+
+        /// <summary>
+        /// Finalize the MessageQueue table.
+        /// </summary>
+        /// <param name="tables">Collection of all tables.</param>
+        private void FinalizeMessageQueueTable(TableIndexedCollection tables)
+        {
+            Table messageQueueTable;
+            if (tables.TryGetTable("MessageQueue", out messageQueueTable)
+                || tables.TryGetTable("Wix4MessageQueue", out messageQueueTable))
+            {
+                foreach (var row in messageQueueTable.Rows)
                 {
-                    component.AddChild(queue);
-                }
-                else
-                {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
+                    var xmlConfig = this.DecompilerHelper.GetIndexedElement(row);
+
+                    var componentId = row.FieldAsString(1);
+                    if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
+                    {
+                        component.Add(xmlConfig);
+                    }
+                    else
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, messageQueueTable.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
+                    }
                 }
             }
         }
@@ -153,27 +197,63 @@ namespace WixToolset.Msmq
         {
             foreach (Row row in table.Rows)
             {
-                Msmq.MessageQueuePermission queuePermission = new Msmq.MessageQueuePermission();
-
-                queuePermission.Id = (string)row[0];
-
-                if (null != row[2])
-                {
-                    queuePermission.MessageQueue = (string)row[2];
-                }
-
-                queuePermission.User = (string)row[3];
+                var queuePermission = new XElement(MessageQueuePermissionName,
+                    new XAttribute("Id", row.FieldAsString(0))
+                    );
 
                 DecompileMessageQueuePermissionAttributes(row, queuePermission);
+                this.DecompilerHelper.IndexElement(row, queuePermission);
+            }
 
-                Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
-                if (null != component)
+        }
+
+        /// <summary>
+        /// Finalize the MessageQueueUserPermissionTable table.
+        /// </summary>
+        /// <param name="tables">Collection of all tables.</param>
+        private void FinalizeMessageQueueUserPermissionTable(TableIndexedCollection tables)
+        {
+            Table messageQueueUserPermissionTable;
+            if (tables.TryGetTable("MessageQueueUserPermission", out messageQueueUserPermissionTable)
+                || tables.TryGetTable("Wix4MessageQueueUserPermission", out messageQueueUserPermissionTable))
+            {
+                foreach (var row in messageQueueUserPermissionTable.Rows)
                 {
-                    component.AddChild(queuePermission);
-                }
-                else
-                {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
+                    var xmlConfig = this.DecompilerHelper.GetIndexedElement(row);
+
+                    var componentId = row.FieldAsString(1);
+                    if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
+                    {
+                        component.Add(xmlConfig);
+                    }
+                    else
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, messageQueueUserPermissionTable.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
+                    }
+
+                    var messageQueueId = row.FieldAsString(2);
+                    XElement messageQueue;
+                    if (this.DecompilerHelper.TryGetIndexedElement("MessageQueue", messageQueueId, out messageQueue)
+                        || this.DecompilerHelper.TryGetIndexedElement("Wix4MessageQueue", messageQueueId, out messageQueue))
+                    {
+                        xmlConfig.Add(new XAttribute("MessageQueue", messageQueueId));
+                    }
+                    else
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, messageQueueUserPermissionTable.Name, row.GetPrimaryKey(), "MessageQueue_", messageQueueId, "Wix4MessageQueue"));
+                    }
+
+                    var userId = row.FieldAsString(3);
+                    XElement user;
+                    if (this.DecompilerHelper.TryGetIndexedElement("User", userId, out user)
+                        || this.DecompilerHelper.TryGetIndexedElement("Wix4User", userId, out user))
+                    {
+                        xmlConfig.Add(new XAttribute("User", userId));
+                    }
+                    else
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, messageQueueUserPermissionTable.Name, row.GetPrimaryKey(), "User_", userId, "Wix4User"));
+                    }
                 }
             }
         }
@@ -186,27 +266,62 @@ namespace WixToolset.Msmq
         {
             foreach (Row row in table.Rows)
             {
-                Msmq.MessageQueuePermission queuePermission = new Msmq.MessageQueuePermission();
-
-                queuePermission.Id = (string)row[0];
-
-                if (null != row[2])
-                {
-                    queuePermission.MessageQueue = (string)row[2];
-                }
-
-                queuePermission.Group = (string)row[3];
+                var queuePermission = new XElement(MessageQueuePermissionName,
+                    new XAttribute("Id", row.FieldAsString(0))
+                    );
 
                 DecompileMessageQueuePermissionAttributes(row, queuePermission);
+                this.DecompilerHelper.IndexElement(row, queuePermission);
+            }
+        }
 
-                Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
-                if (null != component)
+        /// <summary>
+        /// Finalize the MessageQueueGroupPermissionTable table.
+        /// </summary>
+        /// <param name="tables">Collection of all tables.</param>
+        private void FinalizeMessageQueueGroupPermissionTable(TableIndexedCollection tables)
+        {
+            Table messageQueueGroupPermissionTable;
+            if (tables.TryGetTable("MessageQueueGroupPermission", out messageQueueGroupPermissionTable)
+                || tables.TryGetTable("Wix4MessageQueueGroupPermission", out messageQueueGroupPermissionTable))
+            {
+                foreach (var row in messageQueueGroupPermissionTable.Rows)
                 {
-                    component.AddChild(queuePermission);
-                }
-                else
-                {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
+                    var xmlConfig = this.DecompilerHelper.GetIndexedElement(row);
+
+                    var componentId = row.FieldAsString(1);
+                    if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
+                    {
+                        component.Add(xmlConfig);
+                    }
+                    else
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, messageQueueGroupPermissionTable.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
+                    }
+
+                    var messageQueueId = row.FieldAsString(2);
+                    XElement messageQueue;
+                    if (this.DecompilerHelper.TryGetIndexedElement("MessageQueue", messageQueueId, out messageQueue)
+                        || this.DecompilerHelper.TryGetIndexedElement("Wix4MessageQueue", messageQueueId, out messageQueue))
+                    {
+                        xmlConfig.Add(new XAttribute("MessageQueue", messageQueueId));
+                    }
+                    else
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, messageQueueGroupPermissionTable.Name, row.GetPrimaryKey(), "MessageQueue_", messageQueueId, "Wix4MessageQueue"));
+                    }
+
+                    var groupId = row.FieldAsString(3);
+                    XElement group;
+                    if (this.DecompilerHelper.TryGetIndexedElement("Group", groupId, out group)
+                        || this.DecompilerHelper.TryGetIndexedElement("Wix4Group", groupId, out group))
+                    {
+                        xmlConfig.Add(new XAttribute("Group", groupId));
+                    }
+                    else
+                    {
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, messageQueueGroupPermissionTable.Name, row.GetPrimaryKey(), "Group_", groupId, "Wix4Group"));
+                    }
                 }
             }
         }
@@ -216,90 +331,89 @@ namespace WixToolset.Msmq
         /// </summary>
         /// <param name="row">The row to decompile.</param>
         /// <param name="table">Target element.</param>
-        private void DecompileMessageQueuePermissionAttributes(Row row, Msmq.MessageQueuePermission queuePermission)
+        private void DecompileMessageQueuePermissionAttributes(Row row, XElement element)
         {
-            int attributes = (int)row[4];
+            int attributes = row.FieldAsInteger(4);
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.DeleteMessage))
             {
-                queuePermission.DeleteMessage = Msmq.YesNoType.yes;
+                element.Add("DeleteMessage", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.PeekMessage))
             {
-                queuePermission.PeekMessage = Msmq.YesNoType.yes;
+                element.Add("PeekMessage", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.WriteMessage))
             {
-                queuePermission.WriteMessage = Msmq.YesNoType.yes;
+                element.Add("WriteMessage", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.DeleteJournalMessage))
             {
-                queuePermission.DeleteJournalMessage = Msmq.YesNoType.yes;
+                element.Add("DeleteJournalMessage", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.SetQueueProperties))
             {
-                queuePermission.SetQueueProperties = Msmq.YesNoType.yes;
+                element.Add("SetQueueProperties", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.GetQueueProperties))
             {
-                queuePermission.GetQueueProperties = Msmq.YesNoType.yes;
+                element.Add("GetQueueProperties", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.DeleteQueue))
             {
-                queuePermission.DeleteQueue = Msmq.YesNoType.yes;
+                element.Add("DeleteQueue", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.GetQueuePermissions))
             {
-                queuePermission.GetQueuePermissions = Msmq.YesNoType.yes;
+                element.Add("GetQueuePermissions", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.ChangeQueuePermissions))
             {
-                queuePermission.ChangeQueuePermissions = Msmq.YesNoType.yes;
+                element.Add("ChangeQueuePermissions", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.TakeQueueOwnership))
             {
-                queuePermission.TakeQueueOwnership = Msmq.YesNoType.yes;
+                element.Add("TakeQueueOwnership", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.ReceiveMessage))
             {
-                queuePermission.ReceiveMessage = Msmq.YesNoType.yes;
+                element.Add("ReceiveMessage", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.ReceiveJournalMessage))
             {
-                queuePermission.ReceiveJournalMessage = Msmq.YesNoType.yes;
+                element.Add("ReceiveJournalMessage", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.QueueGenericRead))
             {
-                queuePermission.QueueGenericRead = Msmq.YesNoType.yes;
+                element.Add("QueueGenericRead", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.QueueGenericWrite))
             {
-                queuePermission.QueueGenericWrite = Msmq.YesNoType.yes;
+                element.Add("QueueGenericWrite", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.QueueGenericExecute))
             {
-                queuePermission.QueueGenericExecute = Msmq.YesNoType.yes;
+                element.Add("QueueGenericExecute", YesNoType.Yes);
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.QueueGenericAll))
             {
-                queuePermission.QueueGenericAll = Msmq.YesNoType.yes;
+                element.Add("QueueGenericAll", YesNoType.Yes);
             }
         }
     }
-#endif
 }
