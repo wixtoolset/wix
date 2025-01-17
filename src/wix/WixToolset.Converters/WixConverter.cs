@@ -211,7 +211,7 @@ namespace WixToolset.Converters
             { "WixSchedHttpUrlReservationsInstall", "Wix4SchedHttpUrlReservationsInstall_<PlatformSuffix>" },
             { "ConfigureIIs", "Wix4ConfigureIIs_<PlatformSuffix>" },
             { "UninstallCertificates", "Wix4UninstallCertificates_<PlatformSuffix>" },
-            { "InstallCertificates", "Wix4_<PlatformSuffix>" },
+            { "InstallCertificates", "Wix4InstallCertificates_<PlatformSuffix>" },
             { "MessageQueuingUninstall", "Wix4MessageQueuingUninstall_<PlatformSuffix>" },
             { "MessageQueuingInstall", "Wix4_MessageQueuingInstall<PlatformSuffix>" },
             { "NetFxScheduleNativeImage", "Wix4NetFxScheduleNativeImage_<PlatformSuffix>" },
@@ -914,13 +914,18 @@ namespace WixToolset.Converters
 
         private void ConvertCustomElement(XElement element)
         {
-            var actionId = element.Attribute("Action")?.Value;
+            var attributes = new string[] { "Action", "After", "Before" };
 
-            if (actionId != null
-                && CustomActionIdsWithPlatformSuffix.TryGetValue(actionId, out var replacementId))
+            foreach (var attribute in attributes)
             {
-                this.OnError(ConverterTestType.CustomActionIdsIncludePlatformSuffix, element,
-                    $"Custom action ids have changed in WiX v4 extensions to support platform-specific custom actions. The platform is applied as a suffix: _X86, _X64, _A64 (Arm64). When manually rescheduling custom action '{actionId}', you must use the new custom action id '{replacementId}'. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages");
+                var attributeValue = element.Attribute(attribute)?.Value;
+
+                if (attributeValue != null
+                    && CustomActionIdsWithPlatformSuffix.TryGetValue(attributeValue, out var replacementId))
+                {
+                    this.OnError(ConverterTestType.CustomActionIdsIncludePlatformSuffix, element,
+                        $"Custom action ids have changed in WiX v4 extensions to support platform-specific custom actions. The platform is applied as a suffix: _X86, _X64, _A64 (Arm64). When manually rescheduling custom action '{attributeValue}', you must use the new custom action id '{replacementId}'. See the conversion FAQ for more information: https://wixtoolset.org/docs/fourthree/faqs/#converting-packages");
+                }
             }
         }
 
@@ -1830,6 +1835,7 @@ namespace WixToolset.Converters
         {
             foreach (var child in element.Elements())
             {
+                this.ConvertCustomActionElement(child);
                 this.ConvertInnerTextToAttribute(child, "Condition");
             }
         }
@@ -1846,6 +1852,7 @@ namespace WixToolset.Converters
 
         private void ConvertSetPropertyElement(XElement element)
         {
+            this.ConvertCustomElement(element);
             this.ConvertInnerTextToAttribute(element, "Condition");
         }
 
