@@ -146,6 +146,27 @@ HRESULT ScaWriteWebDirProperties7(
         hr = ScaWriteConfigString(wz);
         ExitOnFailure(hr, "Failed to write AuthenticationProviders for Web");
     }
+
+    if (MSI_NULL_INTEGER != pswp->iDirBrowseFlags)
+    {
+        DWORD dwDirBrowseFlags = 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbDirBrowseShowDate) ? MD_DIRBROW_SHOW_DATE : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbDirBrowseShowExtension) ? MD_DIRBROW_SHOW_EXTENSION : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbDirBrowseShowLongDate) ? MD_DIRBROW_LONG_DATE : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbDirBrowseShowSize) ? MD_DIRBROW_SHOW_SIZE : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbDirBrowseShowTime) ? MD_DIRBROW_SHOW_TIME : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbEnableDefaultDoc) ? MD_DIRBROW_LOADDEFAULT : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbEnableDirBrowsing) ? MD_DIRBROW_ENABLED : 0;
+
+        // we XOR the flags, we only update things if they should be non-default
+        dwDirBrowseFlags ^= MD_DIRBROW_SHOW_DATE | MD_DIRBROW_SHOW_TIME | MD_DIRBROW_SHOW_SIZE | MD_DIRBROW_SHOW_EXTENSION | MD_DIRBROW_LONG_DATE | MD_DIRBROW_LOADDEFAULT;
+
+        hr = ScaWriteConfigID(IIS_DIRPROP_BROWSEFLAGS);
+        ExitOnFailure(hr, "Failed to write DirProp BrowseFlags id");
+        hr = ScaWriteConfigInteger(dwDirBrowseFlags);
+        ExitOnFailure(hr, "Failed to write DirBrowseFlags for Web");
+    }
+
     //End of Dir Properties
     hr = ScaWriteConfigID(IIS_DIRPROP_END);
     ExitOnFailure(hr, "Failed to write DirProp end id");
