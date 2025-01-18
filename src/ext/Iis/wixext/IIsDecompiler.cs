@@ -2,106 +2,157 @@
 
 namespace WixToolset.Iis
 {
-#if TODO_CONSIDER_DECOMPILER
     using System;
     using System.Collections;
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.Reflection;
+    using System.Security;
+    using System.Xml.Linq;
     using WixToolset.Data;
+    using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility;
-    using IIs = WixToolset.Extensions.Serialize.IIs;
-    using Wix = WixToolset.Data.Serialize;
+    using WixToolset.Extensibility.Data;
+    using WixToolset.Extensibility.Services;
 
     /// <summary>
     /// The decompiler for the WiX Toolset Internet Information Services Extension.
     /// </summary>
-    public sealed class IIsDecompiler : DecompilerExtension
+    public sealed class IIsDecompiler : BaseWindowsInstallerDecompilerExtension
     {
+        public override IReadOnlyCollection<TableDefinition> TableDefinitions => IisTableDefinitions.All;
+
+        private IParseHelper ParseHelper { get; set; }
+
+        internal static XNamespace Namespace => "http://wixtoolset.org/schemas/v4/wxs/iis";
+        internal static XName CertificateName => Namespace + "Certificate";
+        internal static XName IIsWebSiteCertificates => Namespace + "IIsWebSiteCertificates";
+        internal static XName IIsAppPool => Namespace + "IIsAppPool";
+        internal static XName IIsAppPoolRecycleTime => Namespace + "RecycleTime";
+        internal static XName IIsMimeMap => Namespace + "IIsMimeMap";
+        internal static XName IIsProperty => Namespace + "IIsProperty";
+        internal static XName IIsWebDirProperties => Namespace + "IIsWebDirProperties";
+        internal static XName IIsWebAddress => Namespace + "IIsWebAddress";
+        internal static XName IIsFilter => Namespace + "IIsFilter";
+        internal static XName IIsHttpHeader => Namespace + "IIsHttpHeader";
+        internal static XName IIsWebApplication => Namespace + "IIsWebApplication";
+        internal static XName IIsWebApplicationExtension => Namespace + "IIsWebApplicationExtension";
+        internal static XName IIsWebDir => Namespace + "IIsWebDir";
+        internal static XName IIsWebError => Namespace + "IIsWebError";
+        internal static XName IIsWebLog => Namespace + "IIsWebLog";
+        internal static XName IIsWebServiceExtension => Namespace + "IIsWebServiceExtension";
+        internal static XName IIsWebSite => Namespace + "IIsWebSite";
+        internal static XName IIsWebVirtualDir => Namespace + "IIsWebVirtualDir";
+
         /// <summary>
-        /// Creates a decompiler for IIs Extension.
+        /// Called at the beginning of the decompilation of a database.
         /// </summary>
-        public IIsDecompiler()
+        /// <param name="context">The context for the decompilation.</param>
+        /// <param name="helper">The decompiler helper reference.</param>
+        public override void PreDecompile(IWindowsInstallerDecompileContext context, IWindowsInstallerDecompilerHelper helper)
         {
-            this.TableDefinitions = IIsExtensionData.GetExtensionTableDefinitions();
+            base.PreDecompile(context, helper);
+            this.ParseHelper = context.ServiceProvider.GetService<IParseHelper>();
         }
 
         /// <summary>
-        /// Get the extensions library to be removed.
+        /// Called at the beginning of the decompilation of a database.
         /// </summary>
-        /// <param name="tableDefinitions">Table definitions for library.</param>
-        /// <returns>Library to remove from decompiled output.</returns>
-        public override Library GetLibraryToRemove(TableDefinitionCollection tableDefinitions)
+        /// <param name="tables">The collection of all tables.</param>
+        public override void PreDecompileTables(TableIndexedCollection tables)
         {
-            return IIsExtensionData.GetExtensionLibrary(tableDefinitions);
         }
 
         /// <summary>
         /// Decompiles an extension table.
         /// </summary>
         /// <param name="table">The table to decompile.</param>
-        public override void DecompileTable(Table table)
+        public override bool TryDecompileTable(Table table)
         {
             switch (table.Name)
             {
                 case "Certificate":
+                case "Wix4Certificate":
                     this.DecompileCertificateTable(table);
                     break;
                 case "CertificateHash":
+                case "Wix4CertificateHash":
                     // There is nothing to do for this table, it contains no authored data
                     // to be decompiled.
                     break;
+                case "IIsWebSiteCertificates":
+                case "Wix4IIsWebSiteCertificates":
+                    this.DecompileIIsWebSiteCertificatesTable(table);
+                    break;
                 case "IIsAppPool":
+                case "Wix4IIsAppPool":
                     this.DecompileIIsAppPoolTable(table);
                     break;
-                case "IIsFilter":
-                    this.DecompileIIsFilterTable(table);
-                    break;
-                case "IIsProperty":
-                    this.DecompileIIsPropertyTable(table);
-                    break;
-                case "IIsHttpHeader":
-                    this.DecompileIIsHttpHeaderTable(table);
-                    break;
                 case "IIsMimeMap":
+                case "Wix4IIsMimeMap":
                     this.DecompileIIsMimeMapTable(table);
                     break;
-                case "IIsWebAddress":
-                    this.DecompileIIsWebAddressTable(table);
-                    break;
-                case "IIsWebApplication":
-                    this.DecompileIIsWebApplicationTable(table);
+                case "IIsProperty":
+                case "Wix4IIsProperty":
+                    this.DecompileIIsPropertyTable(table);
                     break;
                 case "IIsWebDirProperties":
+                case "Wix4IIsWebDirProperties":
                     this.DecompileIIsWebDirPropertiesTable(table);
                     break;
+                case "IIsWebAddress":
+                case "Wix4IIsWebAddress":
+                    this.DecompileIIsWebAddressTable(table);
+                    break;
+                case "IIsFilter":
+                case "Wix4IIsFilter":
+                    this.DecompileIIsFilterTable(table);
+                    break;
+                case "IIsHttpHeader":
+                case "Wix4IIsHttpHeader":
+                    this.DecompileIIsHttpHeaderTable(table);
+                    break;
+                case "IIsWebApplication":
+                case "Wix4IIsWebApplication":
+                    this.DecompileIIsWebApplicationTable(table);
+                    break;
+                case "IIsWebApplicationExtension":
+                case "Wix4IIsWebApplicationExtension":
+                    throw new NotImplementedException("Decompiling Wix4IIsWebApplicationExtension table is not implemented.");
+                case "IIsWebDir":
+                case "Wix4IIsWebDir":
+                    throw new NotImplementedException("Decompiling Wix4IIsWebDir table is not implemented.");
                 case "IIsWebError":
+                case "Wix4IIsWebError":
                     this.DecompileIIsWebErrorTable(table);
                     break;
                 case "IIsWebLog":
+                case "Wix4IIsWebLog":
                     this.DecompileIIsWebLogTable(table);
                     break;
                 case "IIsWebServiceExtension":
+                case "Wix4IIsWebServiceExtension":
                     this.DecompileIIsWebServiceExtensionTable(table);
                     break;
                 case "IIsWebSite":
+                case "Wix4IIsWebSite":
                     this.DecompileIIsWebSiteTable(table);
                     break;
                 case "IIsWebVirtualDir":
+                case "Wix4IIsWebVirtualDir":
                     this.DecompileIIsWebVirtualDirTable(table);
                     break;
-                case "IIsWebSiteCertificates":
-                    this.DecompileIIsWebSiteCertificatesTable(table);
-                    break;
                 default:
-                    base.DecompileTable(table);
-                    break;
+                    return false;
             }
+            return true;
         }
 
         /// <summary>
         /// Finalize decompilation.
         /// </summary>
         /// <param name="tables">The collection of all tables.</param>
-        public override void Finish(TableIndexedCollection tables)
+        public override void PostDecompileTables(TableIndexedCollection tables)
         {
             this.FinalizeIIsMimeMapTable(tables);
             this.FinalizeIIsHttpHeaderTable(tables);
@@ -120,18 +171,18 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.Certificate certificate = new IIs.Certificate();
-
-                certificate.Id = (string)row[0];
-                certificate.Name = (string)row[2];
+                var certificate = new XElement(CertificateName,
+                    new XAttribute("Id", row.FieldAsString(0)),
+                    new XAttribute("Name", row.FieldAsString(2))
+                    );
 
                 switch ((int)row[3])
                 {
                     case 1:
-                        certificate.StoreLocation = IIs.Certificate.StoreLocationType.currentUser;
+                        certificate.Add(new XAttribute("StoreLocation", "currentUser"));
                         break;
                     case 2:
-                        certificate.StoreLocation = IIs.Certificate.StoreLocationType.localMachine;
+                        certificate.Add(new XAttribute("StoreLocation", "localMachine"));
                         break;
                     default:
                         // TODO: warn
@@ -141,25 +192,25 @@ namespace WixToolset.Iis
                 switch ((string)row[4])
                 {
                     case "CA":
-                        certificate.StoreName = IIs.Certificate.StoreNameType.ca;
+                        certificate.Add(new XAttribute("StoreName", "ca"));
                         break;
                     case "MY":
-                        certificate.StoreName = IIs.Certificate.StoreNameType.my;
+                        certificate.Add(new XAttribute("StoreName", "my"));
                         break;
                     case "REQUEST":
-                        certificate.StoreName = IIs.Certificate.StoreNameType.request;
+                        certificate.Add(new XAttribute("StoreName", "request"));
                         break;
                     case "Root":
-                        certificate.StoreName = IIs.Certificate.StoreNameType.root;
+                        certificate.Add(new XAttribute("StoreName", "root"));
                         break;
                     case "AddressBook":
-                        certificate.StoreName = IIs.Certificate.StoreNameType.otherPeople;
+                        certificate.Add(new XAttribute("StoreName", "otherPeople"));
                         break;
                     case "TrustedPeople":
-                        certificate.StoreName = IIs.Certificate.StoreNameType.trustedPeople;
+                        certificate.Add(new XAttribute("StoreName", "trustedPeople"));
                         break;
                     case "TrustedPublisher":
-                        certificate.StoreName = IIs.Certificate.StoreNameType.trustedPublisher;
+                        certificate.Add(new XAttribute("StoreName", "trustedPublisher"));
                         break;
                     default:
                         // TODO: warn
@@ -170,44 +221,37 @@ namespace WixToolset.Iis
 
                 if (0x1 == (attribute & 0x1))
                 {
-                    certificate.Request = IIs.YesNoType.yes;
+                    certificate.Add(new XAttribute("Request", "yes"));
                 }
 
                 if (0x2 == (attribute & 0x2))
                 {
                     if (null != row[6])
                     {
-                        certificate.BinaryKey = (string)row[6];
+                        // we'll validate this in the Finalizer
+                        certificate.Add(new XAttribute("BinaryRef", (string)row[6]));
                     }
                     else
                     {
-                        // TODO: warn about expected value in row 5
+                        // TODO: warn about expected value in row 5/6
                     }
                 }
                 else if (null != row[7])
                 {
-                    certificate.CertificatePath = (string)row[7];
+                    certificate.Add(new XAttribute("CertificatePath", (string)row[7]));
                 }
 
                 if (0x4 == (attribute & 0x4))
                 {
-                    certificate.Overwrite = IIs.YesNoType.yes;
+                    certificate.Add(new XAttribute("Overwrite", "yes"));
                 }
 
                 if (null != row[8])
                 {
-                    certificate.PFXPassword = (string)row[8];
+                    certificate.Add(new XAttribute("PFXPassword", (string)row[8]));
                 }
 
-                Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
-                if (null != component)
-                {
-                    component.AddChild(certificate);
-                }
-                else
-                {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
-                }
+                // component link to be done in FinalizeCertificateTable
             }
         }
 
@@ -219,28 +263,27 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebAppPool webAppPool = new IIs.WebAppPool();
-
-                webAppPool.Id = (string)row[0];
-
-                webAppPool.Name = (string)row[1];
+                var webAppPool = new XElement(IIsAppPool,
+                    new XAttribute("Id", row.FieldAsString(0)),
+                    new XAttribute("Name", row.FieldAsString(1))
+                    );
 
                 switch ((int)row[3] & 0x1F)
                 {
                     case 1:
-                        webAppPool.Identity = IIs.WebAppPool.IdentityType.networkService;
+                        webAppPool.Add(new XAttribute("Identity", "networkService"));
                         break;
                     case 2:
-                        webAppPool.Identity = IIs.WebAppPool.IdentityType.localService;
+                        webAppPool.Add(new XAttribute("Identity", "localService"));
                         break;
                     case 4:
-                        webAppPool.Identity = IIs.WebAppPool.IdentityType.localSystem;
+                        webAppPool.Add(new XAttribute("Identity", "localSystem"));
                         break;
                     case 8:
-                        webAppPool.Identity = IIs.WebAppPool.IdentityType.other;
+                        webAppPool.Add(new XAttribute("Identity", "other"));
                         break;
                     case 0x10:
-                        webAppPool.Identity = IIs.WebAppPool.IdentityType.applicationPoolIdentity;
+                        webAppPool.Add(new XAttribute("Identity", "applicationPoolIdentity"));
                         break;
                     default:
                         // TODO: warn
@@ -249,17 +292,17 @@ namespace WixToolset.Iis
 
                 if (null != row[4])
                 {
-                    webAppPool.User = (string)row[4];
+                    webAppPool.Add(new XAttribute("User", (string)row[4]));
                 }
 
                 if (null != row[5])
                 {
-                    webAppPool.RecycleMinutes = (int)row[5];
+                    webAppPool.Add(new XAttribute("RecycleMinutes", (int)row[5]));
                 }
 
                 if (null != row[6])
                 {
-                    webAppPool.RecycleRequests = (int)row[6];
+                    webAppPool.Add(new XAttribute("RecycleRequests", (int)row[6]));
                 }
 
                 if (null != row[7])
@@ -268,22 +311,20 @@ namespace WixToolset.Iis
 
                     foreach (string recycleTimeValue in recycleTimeValues)
                     {
-                        IIs.RecycleTime recycleTime = new IIs.RecycleTime();
-
-                        recycleTime.Value = recycleTimeValue;
-
-                        webAppPool.AddChild(recycleTime);
+                        var recycleTime = new XElement(IIsAppPoolRecycleTime);
+                        recycleTime.Add(new XAttribute("Value", recycleTimeValue));
+                        webAppPool.Add(recycleTime);
                     }
                 }
 
                 if (null != row[8])
                 {
-                    webAppPool.IdleTimeout = (int)row[8];
+                    webAppPool.Add(new XAttribute("IdleTimeout", (int)row[8]));
                 }
 
                 if (null != row[9])
                 {
-                    webAppPool.QueueLimit = (int)row[9];
+                    webAppPool.Add(new XAttribute("QueueLimit", (int)row[9]));
                 }
 
                 if (null != row[10])
@@ -292,12 +333,12 @@ namespace WixToolset.Iis
 
                     if (0 < cpuMon.Length && "0" != cpuMon[0])
                     {
-                        webAppPool.MaxCpuUsage = Convert.ToInt32(cpuMon[0], CultureInfo.InvariantCulture);
+                        webAppPool.Add(new XAttribute("MaxCpuUsage", Convert.ToInt32(cpuMon[0], CultureInfo.InvariantCulture)));
                     }
 
                     if (1 < cpuMon.Length)
                     {
-                        webAppPool.RefreshCpu = Convert.ToInt32(cpuMon[1], CultureInfo.InvariantCulture);
+                        webAppPool.Add(new XAttribute("RefreshCpu", Convert.ToInt32(cpuMon[1], CultureInfo.InvariantCulture)));
                     }
 
                     if (2 < cpuMon.Length)
@@ -305,10 +346,10 @@ namespace WixToolset.Iis
                         switch (Convert.ToInt32(cpuMon[2], CultureInfo.InvariantCulture))
                         {
                             case 0:
-                                webAppPool.CpuAction = IIs.WebAppPool.CpuActionType.none;
+                                webAppPool.Add(new XAttribute("CpuAction", "none"));
                                 break;
                             case 1:
-                                webAppPool.CpuAction = IIs.WebAppPool.CpuActionType.shutdown;
+                                webAppPool.Add(new XAttribute("CpuAction", "shutdown"));
                                 break;
                             default:
                                 // TODO: warn
@@ -324,45 +365,45 @@ namespace WixToolset.Iis
 
                 if (null != row[11])
                 {
-                    webAppPool.MaxWorkerProcesses = (int)row[11];
+                    webAppPool.Add(new XAttribute("MaxWorkerProcesses", (int)row[11]));
                 }
 
                 if (null != row[12])
                 {
-                    webAppPool.VirtualMemory = (int)row[12];
+                    webAppPool.Add(new XAttribute("VirtualMemory", (int)row[12]));
                 }
 
                 if (null != row[13])
                 {
-                    webAppPool.PrivateMemory = (int)row[13];
+                    webAppPool.Add(new XAttribute("PrivateMemory", (int)row[13]));
                 }
 
                 if (null != row[14])
                 {
-                    webAppPool.ManagedRuntimeVersion = (string)row[14];
+                    webAppPool.Add(new XAttribute("ManagedRuntimeVersion", (string)row[14]));
                 }
 
                 if (null != row[15])
                 {
-                    webAppPool.ManagedPipelineMode = (string)row[15];
+                    webAppPool.Add(new XAttribute("ManagedPipelineMode", (string)row[15]));
                 }
 
                 if (null != row[2])
                 {
-                    Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[2]);
+                    var component = this.DecompilerHelper.GetIndexedElement("Component", (string)row[2]);
 
                     if (null != component)
                     {
-                        component.AddChild(webAppPool);
+                        component.Add(webAppPool);
                     }
                     else
                     {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[2], "Component"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[2], "Component"));
                     }
                 }
                 else
                 {
-                    this.Core.RootElement.AddChild(webAppPool);
+                    this.DecompilerHelper.AddElementToRoot(webAppPool);
                 }
             }
         }
@@ -375,21 +416,24 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebProperty webProperty = new IIs.WebProperty();
+                var webProperty = new XElement(IIsProperty,
+                    new XAttribute("Id", row.FieldAsString(0)),
+                    new XAttribute("Name", row.FieldAsString(1))
+                    );
 
                 switch ((string)row[0])
                 {
                     case "ETagChangeNumber":
-                        webProperty.Id = IIs.WebProperty.IdType.ETagChangeNumber;
+                        webProperty.Add(new XAttribute("Id", "ETagChangeNumber"));
                         break;
                     case "IIs5IsolationMode":
-                        webProperty.Id = IIs.WebProperty.IdType.IIs5IsolationMode;
+                        webProperty.Add(new XAttribute("Id", "IIs5IsolationMode"));
                         break;
                     case "LogInUTF8":
-                        webProperty.Id = IIs.WebProperty.IdType.LogInUTF8;
+                        webProperty.Add(new XAttribute("Id", "LogInUTF8"));
                         break;
                     case "MaxGlobalBandwidth":
-                        webProperty.Id = IIs.WebProperty.IdType.MaxGlobalBandwidth;
+                        webProperty.Add(new XAttribute("Id", "MaxGlobalBandwidth"));
                         break;
                 }
 
@@ -400,17 +444,17 @@ namespace WixToolset.Iis
 
                 if (null != row[3])
                 {
-                    webProperty.Value = (string)row[3];
+                    webProperty.Add(new XAttribute("Value", (string)row[3]));
                 }
 
-                Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
+                var component = this.DecompilerHelper.GetIndexedElement("Component", (string)row[1]);
                 if (null != component)
                 {
-                    component.AddChild(webProperty);
+                    component.Add(webProperty);
                 }
                 else
                 {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
+                    this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
                 }
             }
         }
@@ -423,15 +467,13 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.HttpHeader httpHeader = new IIs.HttpHeader();
-
-                httpHeader.Name = (string)row[3];
-
+                var httpHeader = new XElement(IIsHttpHeader,
+                    new XAttribute("Name", (string)row[3]),
+                    new XAttribute("Value", (string)row[4])
+                    );
                 // the ParentType and Parent columns are handled in FinalizeIIsHttpHeaderTable
 
-                httpHeader.Value = (string)row[4];
-
-                this.Core.IndexElement(row, httpHeader);
+                this.DecompilerHelper.IndexElement(row, httpHeader);
             }
         }
 
@@ -443,17 +485,15 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.MimeMap mimeMap = new IIs.MimeMap();
-
-                mimeMap.Id = (string)row[0];
+                var mimeMap = new XElement(IIsMimeMap,
+                    new XAttribute("Id", (string)row[0]),
+                    new XAttribute("Type", (string)row[3]),
+                    new XAttribute("Extension", (string)row[4])
+                    );
 
                 // the ParentType and ParentValue columns are handled in FinalizeIIsMimeMapTable
 
-                mimeMap.Type = (string)row[3];
-
-                mimeMap.Extension = (string)row[4];
-
-                this.Core.IndexElement(row, mimeMap);
+                this.DecompilerHelper.IndexElement(row, mimeMap);
             }
         }
 
@@ -465,28 +505,28 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebAddress webAddress = new IIs.WebAddress();
-
-                webAddress.Id = (string)row[0];
+                var webAddress = new XElement(IIsWebAddress,
+                    new XAttribute("Id", (string)row[0])
+                    );
 
                 if (null != row[2])
                 {
-                    webAddress.IP = (string)row[2];
+                    webAddress.Add(new XAttribute("IP", (string)row[2]));
                 }
 
-                webAddress.Port = (string)row[3];
+                webAddress.Add(new XAttribute("Port", (string)row[3]));
 
                 if (null != row[4])
                 {
-                    webAddress.Header = (string)row[4];
+                    webAddress.Add(new XAttribute("Header", (string)row[4]));
                 }
 
                 if (null != row[5] && 1 == (int)row[5])
                 {
-                    webAddress.Secure = IIs.YesNoType.yes;
+                    webAddress.Add(new XAttribute("Secure", "yes"));
                 }
 
-                this.Core.IndexElement(row, webAddress);
+                this.DecompilerHelper.IndexElement(row, webAddress);
             }
         }
 
@@ -498,23 +538,22 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebApplication webApplication = new IIs.WebApplication();
-
-                webApplication.Id = (string)row[0];
-
-                webApplication.Name = (string)row[1];
+                var webApplication = new XElement(IIsWebApplication,
+                    new XAttribute("Id", (string)row[0]),
+                    new XAttribute("Name", (string)row[1])
+                    );
 
                 // these are not listed incorrectly - the order is low, high, medium
                 switch ((int)row[2])
                 {
                     case 0:
-                        webApplication.Isolation = IIs.WebApplication.IsolationType.low;
+                        webApplication.Add(new XAttribute("Isolation", "low"));
                         break;
                     case 1:
-                        webApplication.Isolation = IIs.WebApplication.IsolationType.high;
+                        webApplication.Add(new XAttribute("Isolation", "high"));
                         break;
                     case 2:
-                        webApplication.Isolation = IIs.WebApplication.IsolationType.medium;
+                        webApplication.Add(new XAttribute("Isolation", "medium"));
                         break;
                     default:
                         // TODO: warn
@@ -526,10 +565,10 @@ namespace WixToolset.Iis
                     switch ((int)row[3])
                     {
                         case 0:
-                            webApplication.AllowSessions = IIs.YesNoDefaultType.no;
+                            webApplication.Add(new XAttribute("AllowSessions", "no"));
                             break;
                         case 1:
-                            webApplication.AllowSessions = IIs.YesNoDefaultType.yes;
+                            webApplication.Add(new XAttribute("AllowSessions", "yes"));
                             break;
                         default:
                             // TODO: warn
@@ -539,7 +578,7 @@ namespace WixToolset.Iis
 
                 if (null != row[4])
                 {
-                    webApplication.SessionTimeout = (int)row[4];
+                    webApplication.Add(new XAttribute("SessionTimeout", (int)row[4]));
                 }
 
                 if (null != row[5])
@@ -547,10 +586,10 @@ namespace WixToolset.Iis
                     switch ((int)row[5])
                     {
                         case 0:
-                            webApplication.Buffer = IIs.YesNoDefaultType.no;
+                            webApplication.Add(new XAttribute("Buffer", "no"));
                             break;
                         case 1:
-                            webApplication.Buffer = IIs.YesNoDefaultType.yes;
+                            webApplication.Add(new XAttribute("Buffer", "yes"));
                             break;
                         default:
                             // TODO: warn
@@ -563,10 +602,10 @@ namespace WixToolset.Iis
                     switch ((int)row[6])
                     {
                         case 0:
-                            webApplication.ParentPaths = IIs.YesNoDefaultType.no;
+                            webApplication.Add(new XAttribute("ParentPaths", "no"));
                             break;
                         case 1:
-                            webApplication.ParentPaths = IIs.YesNoDefaultType.yes;
+                            webApplication.Add(new XAttribute("ParentPaths", "yes"));
                             break;
                         default:
                             // TODO: warn
@@ -579,10 +618,10 @@ namespace WixToolset.Iis
                     switch ((string)row[7])
                     {
                         case "JScript":
-                            webApplication.DefaultScript = IIs.WebApplication.DefaultScriptType.JScript;
+                            webApplication.Add(new XAttribute("DefaultScript", "JScript"));
                             break;
                         case "VBScript":
-                            webApplication.DefaultScript = IIs.WebApplication.DefaultScriptType.VBScript;
+                            webApplication.Add(new XAttribute("DefaultScript", "VBScript"));
                             break;
                         default:
                             // TODO: warn
@@ -592,7 +631,7 @@ namespace WixToolset.Iis
 
                 if (null != row[8])
                 {
-                    webApplication.ScriptTimeout = (int)row[8];
+                    webApplication.Add(new XAttribute("ScriptTimeout", (int)row[8]));
                 }
 
                 if (null != row[9])
@@ -600,10 +639,10 @@ namespace WixToolset.Iis
                     switch ((int)row[9])
                     {
                         case 0:
-                            webApplication.ServerDebugging = IIs.YesNoDefaultType.no;
+                            webApplication.Add(new XAttribute("ServerDebugging", "no"));
                             break;
                         case 1:
-                            webApplication.ServerDebugging = IIs.YesNoDefaultType.yes;
+                            webApplication.Add(new XAttribute("ServerDebugging", "yes"));
                             break;
                         default:
                             // TODO: warn
@@ -616,10 +655,10 @@ namespace WixToolset.Iis
                     switch ((int)row[10])
                     {
                         case 0:
-                            webApplication.ClientDebugging = IIs.YesNoDefaultType.no;
+                            webApplication.Add(new XAttribute("ClientDebugging", "no"));
                             break;
                         case 1:
-                            webApplication.ClientDebugging = IIs.YesNoDefaultType.yes;
+                            webApplication.Add(new XAttribute("ClientDebugging", "yes"));
                             break;
                         default:
                             // TODO: warn
@@ -629,10 +668,10 @@ namespace WixToolset.Iis
 
                 if (null != row[11])
                 {
-                    webApplication.WebAppPool = (string)row[11];
+                    webApplication.Add(new XAttribute("WebAppPool", (string)row[11]));
                 }
 
-                this.Core.IndexElement(row, webApplication);
+                this.DecompilerHelper.IndexElement(row, webApplication);
             }
         }
 
@@ -644,9 +683,9 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebDirProperties webDirProperties = new IIs.WebDirProperties();
-
-                webDirProperties.Id = (string)row[0];
+                var webDirProperties = new XElement(IIsWebDirProperties,
+                    new XAttribute("Id", (string)row[0])
+                    );
 
                 if (null != row[1])
                 {
@@ -654,22 +693,22 @@ namespace WixToolset.Iis
 
                     if (0x1 == (access & 0x1))
                     {
-                        webDirProperties.Read = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("Read", "yes"));
                     }
 
                     if (0x2 == (access & 0x2))
                     {
-                        webDirProperties.Write = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("Write", "yes"));
                     }
 
                     if (0x4 == (access & 0x4))
                     {
-                        webDirProperties.Execute = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("Execute", "yes"));
                     }
 
                     if (0x200 == (access & 0x200))
                     {
-                        webDirProperties.Script = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("Script", "yes"));
                     }
                 }
 
@@ -679,42 +718,42 @@ namespace WixToolset.Iis
 
                     if (0x1 == (authorization & 0x1))
                     {
-                        webDirProperties.AnonymousAccess = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("AnonymousAccess", "yes"));
                     }
                     else // set one of the properties to 'no' to force the output value to be '0' if not other attributes are set
                     {
-                        webDirProperties.AnonymousAccess = IIs.YesNoType.no;
+                        webDirProperties.Add(new XAttribute("AnonymousAccess", "no"));
                     }
 
                     if (0x2 == (authorization & 0x2))
                     {
-                        webDirProperties.BasicAuthentication = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("BasicAuthentication", "yes"));
                     }
 
                     if (0x4 == (authorization & 0x4))
                     {
-                        webDirProperties.WindowsAuthentication = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("WindowsAuthentication", "yes"));
                     }
 
                     if (0x10 == (authorization & 0x10))
                     {
-                        webDirProperties.DigestAuthentication = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("DigestAuthentication", "yes"));
                     }
 
                     if (0x40 == (authorization & 0x40))
                     {
-                        webDirProperties.PassportAuthentication = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("PassportAuthentication", "yes"));
                     }
                 }
 
                 if (null != row[3])
                 {
-                    webDirProperties.AnonymousUser = (string)row[3];
+                    webDirProperties.Add(new XAttribute("AnonymousUser", (string)row[3]));
                 }
 
                 if (null != row[4] && 1 == (int)row[4])
                 {
-                    webDirProperties.IIsControlledPassword = IIs.YesNoType.yes;
+                    webDirProperties.Add(new XAttribute("IIsControlledPassword", "yes"));
                 }
 
                 if (null != row[5])
@@ -722,10 +761,10 @@ namespace WixToolset.Iis
                     switch ((int)row[5])
                     {
                         case 0:
-                            webDirProperties.LogVisits = IIs.YesNoType.no;
+                            webDirProperties.Add(new XAttribute("LogVisits", "no"));
                             break;
                         case 1:
-                            webDirProperties.LogVisits = IIs.YesNoType.yes;
+                            webDirProperties.Add(new XAttribute("LogVisits", "yes"));
                             break;
                         default:
                             // TODO: warn
@@ -738,10 +777,10 @@ namespace WixToolset.Iis
                     switch ((int)row[6])
                     {
                         case 0:
-                            webDirProperties.Index = IIs.YesNoType.no;
+                            webDirProperties.Add(new XAttribute("Index", "no"));
                             break;
                         case 1:
-                            webDirProperties.Index = IIs.YesNoType.yes;
+                            webDirProperties.Add(new XAttribute("Index", "yes"));
                             break;
                         default:
                             // TODO: warn
@@ -751,7 +790,7 @@ namespace WixToolset.Iis
 
                 if (null != row[7])
                 {
-                    webDirProperties.DefaultDocuments = (string)row[7];
+                    webDirProperties.Add(new XAttribute("DefaultDocuments", (string)row[7]));
                 }
 
                 if (null != row[8])
@@ -759,10 +798,10 @@ namespace WixToolset.Iis
                     switch ((int)row[8])
                     {
                         case 0:
-                            webDirProperties.AspDetailedError = IIs.YesNoType.no;
+                            webDirProperties.Add(new XAttribute("AspDetailedError", "no"));
                             break;
                         case 1:
-                            webDirProperties.AspDetailedError = IIs.YesNoType.yes;
+                            webDirProperties.Add(new XAttribute("AspDetailedError", "yes"));
                             break;
                         default:
                             // TODO: warn
@@ -772,18 +811,18 @@ namespace WixToolset.Iis
 
                 if (null != row[9])
                 {
-                    webDirProperties.HttpExpires = (string)row[9];
+                    webDirProperties.Add(new XAttribute("HttpExpires", (string)row[9]));
                 }
 
                 if (null != row[10])
                 {
                     // force the value to be a positive number
-                    webDirProperties.CacheControlMaxAge = unchecked((uint)(int)row[10]);
+                    webDirProperties.Add(new XAttribute("CacheControlMaxAge", unchecked((uint)(int)row[10])));
                 }
 
                 if (null != row[11])
                 {
-                    webDirProperties.CacheControlCustom = (string)row[11];
+                    webDirProperties.Add(new XAttribute("CacheControlCustom", (string)row[11]));
                 }
 
                 if (null != row[12])
@@ -791,10 +830,10 @@ namespace WixToolset.Iis
                     switch ((int)row[8])
                     {
                         case 0:
-                            webDirProperties.ClearCustomError = IIs.YesNoType.no;
+                            webDirProperties.Add(new XAttribute("ClearCustomError", "no"));
                             break;
                         case 1:
-                            webDirProperties.ClearCustomError = IIs.YesNoType.yes;
+                            webDirProperties.Add(new XAttribute("ClearCustomError", "yes"));
                             break;
                         default:
                             // TODO: warn
@@ -808,36 +847,36 @@ namespace WixToolset.Iis
 
                     if (0x8 == (accessSSLFlags & 0x8))
                     {
-                        webDirProperties.AccessSSL = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("AccessSSL", "yes"));
                     }
 
                     if (0x20 == (accessSSLFlags & 0x20))
                     {
-                        webDirProperties.AccessSSLNegotiateCert = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("AccessSSLNegotiateCert", "yes"));
                     }
 
                     if (0x40 == (accessSSLFlags & 0x40))
                     {
-                        webDirProperties.AccessSSLRequireCert = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("AccessSSLRequireCert", "yes"));
                     }
 
                     if (0x80 == (accessSSLFlags & 0x80))
                     {
-                        webDirProperties.AccessSSLMapCert = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("AccessSSLMapCert", "yes"));
                     }
 
                     if (0x100 == (accessSSLFlags & 0x100))
                     {
-                        webDirProperties.AccessSSL128 = IIs.YesNoType.yes;
+                        webDirProperties.Add(new XAttribute("AccessSSL128", "yes"));
                     }
                 }
 
                 if (null != row[14])
                 {
-                    webDirProperties.AuthenticationProviders = (string)row[14];
+                    webDirProperties.Add(new XAttribute("AuthenticationProviders", (string)row[14]));
                 }
 
-                this.Core.RootElement.AddChild(webDirProperties);
+                this.DecompilerHelper.AddElementToRoot(webDirProperties);
             }
         }
 
@@ -849,25 +888,24 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebError webError = new IIs.WebError();
-
-                webError.ErrorCode = (int)row[0];
-
-                webError.SubCode = (int)row[1];
+                var webError = new XElement(IIsWebError,
+                    new XAttribute("ErrorCode", (string)row[0]),
+                    new XAttribute("SubCode", (string)row[1])
+                    );
 
                 // the ParentType and ParentValue columns are handled in FinalizeIIsWebErrorTable
 
                 if (null != row[4])
                 {
-                    webError.File = (string)row[4];
+                    webError.Add(new XAttribute("File", (string)row[4]));
                 }
 
                 if (null != row[5])
                 {
-                    webError.URL = (string)row[5];
+                    webError.Add(new XAttribute("URL", (string)row[5]));
                 }
 
-                this.Core.IndexElement(row, webError);
+                this.DecompilerHelper.IndexElement(row, webError);
             }
         }
 
@@ -879,64 +917,63 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebFilter webFilter = new IIs.WebFilter();
-
-                webFilter.Id = (string)row[0];
-
-                webFilter.Name = (string)row[1];
+                var webFilter = new XElement(IIsFilter,
+                    new XAttribute("Id", (string)row[0]),
+                    new XAttribute("Name", (string)row[1])
+                    );
 
                 if (null != row[3])
                 {
-                    webFilter.Path = (string)row[3];
+                    webFilter.Add(new XAttribute("Path", (string)row[3]));
                 }
 
                 if (null != row[5])
                 {
-                    webFilter.Description = (string)row[5];
+                    webFilter.Add(new XAttribute("Description", (string)row[5]));
                 }
 
-                webFilter.Flags = (int)row[6];
+                webFilter.Add(new XAttribute("Flags", (int)row[6]));
 
                 if (null != row[7])
                 {
                     switch ((int)row[7])
                     {
                         case (-1):
-                            webFilter.LoadOrder = "last";
+                            webFilter.Add(new XAttribute("LoadOrder", "last"));
                             break;
                         case 0:
-                            webFilter.LoadOrder = "first";
+                            webFilter.Add(new XAttribute("LoadOrder", "first"));
                             break;
                         default:
-                            webFilter.LoadOrder = Convert.ToString((int)row[7], CultureInfo.InvariantCulture);
+                            webFilter.Add(new XAttribute("LoadOrder", Convert.ToString((int)row[7], CultureInfo.InvariantCulture)));
                             break;
                     }
                 }
 
                 if (null != row[4])
                 {
-                    IIs.WebSite webSite = (IIs.WebSite)this.Core.GetIndexedElement("IIsWebSite", (string)row[4]);
+                    var webSite = this.DecompilerHelper.GetIndexedElement("IIsWebSite", (string)row[4]);
 
                     if (null != webSite)
                     {
-                        webSite.AddChild(webFilter);
+                        webSite.Add(webFilter);
                     }
                     else
                     {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Web_", (string)row[4], "IIsWebSite"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Web_", (string)row[4], "IIsWebSite"));
                     }
                 }
                 else // Component parent
                 {
-                    Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[2]);
+                    var component = this.DecompilerHelper.GetIndexedElement("Component", (string)row[2]);
 
                     if (null != component)
                     {
-                        component.AddChild(webFilter);
+                        component.Add(webFilter);
                     }
                     else
                     {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[2], "Component"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[2], "Component"));
                     }
                 }
             }
@@ -950,33 +987,33 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebLog webLog = new IIs.WebLog();
-
-                webLog.Id = (string)row[0];
+                var webLog = new XElement(IIsWebLog,
+                    new XAttribute("Id", (string)row[0])
+                    );
 
                 switch ((string)row[1])
                 {
                     case "Microsoft IIS Log File Format":
-                        webLog.Type = IIs.WebLog.TypeType.IIS;
+                        webLog.Add(new XAttribute("Type", "IIS"));
                         break;
                     case "NCSA Common Log File Format":
-                        webLog.Type = IIs.WebLog.TypeType.NCSA;
+                        webLog.Add(new XAttribute("Type", "NCSA"));
                         break;
                     case "none":
-                        webLog.Type = IIs.WebLog.TypeType.none;
+                        webLog.Add(new XAttribute("Type", "none"));
                         break;
                     case "ODBC Logging":
-                        webLog.Type = IIs.WebLog.TypeType.ODBC;
+                        webLog.Add(new XAttribute("Type", "ODBC"));
                         break;
                     case "W3C Extended Log File Format":
-                        webLog.Type = IIs.WebLog.TypeType.W3C;
+                        webLog.Add(new XAttribute("Type", "W3C"));
                         break;
                     default:
                         // TODO: warn
                         break;
                 }
 
-                this.Core.RootElement.AddChild(webLog);
+                this.DecompilerHelper.AddElementToRoot(webLog);
             }
         }
 
@@ -988,46 +1025,46 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebServiceExtension webServiceExtension = new IIs.WebServiceExtension();
-
-                webServiceExtension.Id = (string)row[0];
-
-                webServiceExtension.File = (string)row[2];
+                var webServiceExtension = new XElement(IIsWebServiceExtension,
+                    new XAttribute("Id", (string)row[0]),
+                    new XAttribute("File", (string)row[2])
+                    );
 
                 if (null != row[3])
                 {
-                    webServiceExtension.Description = (string)row[3];
+                    webServiceExtension.Add(new XAttribute("Description", (string)row[3]));
                 }
 
                 if (null != row[4])
                 {
-                    webServiceExtension.Group = (string)row[4];
+                    webServiceExtension.Add(new XAttribute("Group", (string)row[4]));
                 }
 
+                webServiceExtension.Add(new XAttribute("Group", (string)row[4]));
                 int attributes = (int)row[5];
 
                 if (0x1 == (attributes & 0x1))
                 {
-                    webServiceExtension.Allow = IIs.YesNoType.yes;
+                    webServiceExtension.Add(new XAttribute("Allow", "yes"));
                 }
                 else
                 {
-                    webServiceExtension.Allow = IIs.YesNoType.no;
+                    webServiceExtension.Add(new XAttribute("Allow", "no"));
                 }
 
                 if (0x2 == (attributes & 0x2))
                 {
-                    webServiceExtension.UIDeletable = IIs.YesNoType.yes;
+                    webServiceExtension.Add(new XAttribute("UIDeletable", "yes"));
                 }
 
-                Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
+                var component = this.DecompilerHelper.GetIndexedElement("Component", (string)row[1]);
                 if (null != component)
                 {
-                    component.AddChild(webServiceExtension);
+                    component.Add(webServiceExtension);
                 }
                 else
                 {
-                    this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
+                    this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
                 }
             }
         }
@@ -1040,23 +1077,23 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebSite webSite = new IIs.WebSite();
-
-                webSite.Id = (string)row[0];
+                var webSite = new XElement(IIsWebSite,
+                    new XAttribute("Id", (string)row[0])
+                    );
 
                 if (null != row[2])
                 {
-                    webSite.Description = (string)row[2];
+                    webSite.Add(new XAttribute("Description", (string)row[2]));
                 }
 
                 if (null != row[3])
                 {
-                    webSite.ConnectionTimeout = (int)row[3];
+                    webSite.Add(new XAttribute("ConnectionTimeout", (int)row[3]));
                 }
 
                 if (null != row[4])
                 {
-                    webSite.Directory = (string)row[4];
+                    webSite.Add(new XAttribute("Directory", (string)row[4]));
                 }
 
                 if (null != row[5])
@@ -1067,10 +1104,10 @@ namespace WixToolset.Iis
                             // this is the default
                             break;
                         case 1:
-                            webSite.StartOnInstall = IIs.YesNoType.yes;
+                            webSite.Add(new XAttribute("StartOnInstall", "yes"));
                             break;
                         case 2:
-                            webSite.AutoStart = IIs.YesNoType.yes;
+                            webSite.Add(new XAttribute("AutoStart", "yes"));
                             break;
                         default:
                             // TODO: warn
@@ -1084,7 +1121,7 @@ namespace WixToolset.Iis
 
                     if (0x2 == (attributes & 0x2))
                     {
-                        webSite.ConfigureIfExists = IIs.YesNoType.no;
+                        webSite.Add(new XAttribute("ConfigureIfExists", "no"));
                     }
                 }
 
@@ -1092,7 +1129,7 @@ namespace WixToolset.Iis
 
                 if (null != row[8])
                 {
-                    webSite.DirProperties = (string)row[8];
+                    webSite.Add(new XAttribute("DirProperties", (string)row[8]));
                 }
 
                 // the Application_ column is handled in FinalizeIIsWebApplicationTable
@@ -1101,38 +1138,38 @@ namespace WixToolset.Iis
                 {
                     if (-1 != (int)row[10])
                     {
-                        webSite.Sequence = (int)row[10];
+                        webSite.Add(new XAttribute("Sequence", (int)row[10]));
                     }
                 }
 
                 if (null != row[11])
                 {
-                    webSite.WebLog = (string)row[11];
+                    webSite.Add(new XAttribute("WebLog", (string)row[11]));
                 }
 
                 if (null != row[12])
                 {
-                    webSite.SiteId = (string)row[12];
+                    webSite.Add(new XAttribute("SiteId", (string)row[12]));
                 }
 
                 if (null != row[1])
                 {
-                    Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
+                    var component = this.DecompilerHelper.GetIndexedElement("Component", (string)row[1]);
 
                     if (null != component)
                     {
-                        component.AddChild(webSite);
+                        component.Add(webSite);
                     }
                     else
                     {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
                     }
                 }
                 else
                 {
-                    this.Core.RootElement.AddChild(webSite);
+                    this.DecompilerHelper.AddElementToRoot(webSite);
                 }
-                this.Core.IndexElement(row, webSite);
+                this.DecompilerHelper.IndexElement(row, webSite);
             }
         }
 
@@ -1144,24 +1181,24 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.WebVirtualDir webVirtualDir = new IIs.WebVirtualDir();
-
-                webVirtualDir.Id = (string)row[0];
+                var webVirtualDir = new XElement(IIsWebVirtualDir,
+                    new XAttribute("Id", (string)row[0])
+                    );
 
                 // the Component_ and Web_ columns are handled in FinalizeIIsWebVirtualDirTable
 
-                webVirtualDir.Alias = (string)row[3];
+                webVirtualDir.Add(new XAttribute("Alias", (string)row[3]));
 
-                webVirtualDir.Directory = (string)row[4];
+                webVirtualDir.Add(new XAttribute("Directory", (string)row[4]));
 
                 if (null != row[5])
                 {
-                    webVirtualDir.DirProperties = (string)row[5];
+                    webVirtualDir.Add(new XAttribute("DirProperties", (string)row[5]));
                 }
 
                 // the Application_ column is handled in FinalizeIIsWebApplicationTable
 
-                this.Core.IndexElement(row, webVirtualDir);
+                this.DecompilerHelper.IndexElement(row, webVirtualDir);
             }
         }
 
@@ -1173,11 +1210,11 @@ namespace WixToolset.Iis
         {
             foreach (Row row in table.Rows)
             {
-                IIs.CertificateRef certificateRef = new IIs.CertificateRef();
+                var certificateRef = new XElement(IIsWebSiteCertificates,
+                    new XAttribute("Id", (string)row[1])
+                    );
 
-                certificateRef.Id = (string)row[1];
-
-                this.Core.IndexElement(row, certificateRef);
+                this.DecompilerHelper.IndexElement(row, certificateRef);
             }
         }
 
@@ -1191,36 +1228,36 @@ namespace WixToolset.Iis
         /// </remarks>
         private void FinalizeIIsHttpHeaderTable(TableIndexedCollection tables)
         {
-            Table iisHttpHeaderTable = tables["IIsHttpHeader"];
-
-            if (null != iisHttpHeaderTable)
+            Table iisHttpHeaderTable;
+            if (tables.TryGetTable("IIsHttpHeader", out iisHttpHeaderTable)
+                || tables.TryGetTable("Wix4IIsHttpHeader", out iisHttpHeaderTable))
             {
                 foreach (Row row in iisHttpHeaderTable.Rows)
                 {
-                    IIs.HttpHeader httpHeader = (IIs.HttpHeader)this.Core.GetIndexedElement(row);
+                    var httpHeader = this.DecompilerHelper.GetIndexedElement(row);
 
                     if (1 == (int)row[1])
                     {
-                        IIs.WebVirtualDir webVirtualDir = (IIs.WebVirtualDir)this.Core.GetIndexedElement("IIsWebVirtualDir", (string)row[2]);
+                        var webVirtualDir = this.DecompilerHelper.GetIndexedElement("Wix4IIsWebVirtualDir", (string)row[2]);
                         if (null != webVirtualDir)
                         {
-                            webVirtualDir.AddChild(httpHeader);
+                            webVirtualDir.Add(httpHeader);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisHttpHeaderTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ParentValue", (string)row[2], "IIsWebVirtualDir"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisHttpHeaderTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ParentValue", (string)row[2], "IIsWebVirtualDir"));
                         }
                     }
                     else if (2 == (int)row[1])
                     {
-                        IIs.WebSite webSite = (IIs.WebSite)this.Core.GetIndexedElement("IIsWebSite", (string)row[2]);
+                        var webSite = this.DecompilerHelper.GetIndexedElement("Wix4IIsWebSite", (string)row[2]);
                         if (null != webSite)
                         {
-                            webSite.AddChild(httpHeader);
+                            webSite.Add(httpHeader);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisHttpHeaderTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ParentValue", (string)row[2], "IIsWebSite"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisHttpHeaderTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ParentValue", (string)row[2], "IIsWebSite"));
                         }
                     }
                 }
@@ -1237,32 +1274,32 @@ namespace WixToolset.Iis
         /// </remarks>
         private void FinalizeIIsMimeMapTable(TableIndexedCollection tables)
         {
-            Table iisMimeMapTable = tables["IIsMimeMap"];
-
-            if (null != iisMimeMapTable)
+            Table iisMimeMapTable;
+            if (tables.TryGetTable("IIsMimeMap", out iisMimeMapTable)
+                || tables.TryGetTable("Wix4IIsMimeMap", out iisMimeMapTable))
             {
                 foreach (Row row in iisMimeMapTable.Rows)
                 {
-                    IIs.MimeMap mimeMap = (IIs.MimeMap)this.Core.GetIndexedElement(row);
+                    var mimeMap = this.DecompilerHelper.GetIndexedElement(row);
 
                     if (2 < (int)row[1] || 0 >= (int)row[1])
                     {
                         // TODO: warn about unknown parent type
                     }
 
-                    IIs.WebVirtualDir webVirtualDir = (IIs.WebVirtualDir)this.Core.GetIndexedElement("IIsWebVirtualDir", (string)row[2]);
-                    IIs.WebSite webSite = (IIs.WebSite)this.Core.GetIndexedElement("IIsWebSite", (string)row[2]);
+                    var webVirtualDir = this.DecompilerHelper.GetIndexedElement("Wix4IIsWebVirtualDir", (string)row[2]);
+                    var webSite = this.DecompilerHelper.GetIndexedElement("Wix4IIsWebSite", (string)row[2]);
                     if (null != webVirtualDir)
                     {
-                        webVirtualDir.AddChild(mimeMap);
+                        webVirtualDir.Add(mimeMap);
                     }
                     else if (null != webSite)
                     {
-                        webSite.AddChild(mimeMap);
+                        webSite.Add(mimeMap);
                     }
                     else
                     {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisMimeMapTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ParentValue", (string)row[2], "IIsWebVirtualDir"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisMimeMapTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ParentValue", (string)row[2], "IIsWebVirtualDir"));
                     }
                 }
             }
@@ -1278,29 +1315,35 @@ namespace WixToolset.Iis
         /// </remarks>
         private void FinalizeIIsWebApplicationTable(TableIndexedCollection tables)
         {
-            Table iisWebApplicationTable = tables["IIsWebApplication"];
-            Table iisWebSiteTable = tables["IIsWebSite"];
-            Table iisWebVirtualDirTable = tables["IIsWebVirtualDir"];
+            Table iisWebApplicationTable;
+            _ = tables.TryGetTable("IIsWebApplication", out iisWebApplicationTable)
+                || tables.TryGetTable("Wix4IIsWebApplication", out iisWebApplicationTable);
+
+            Table iisWebVirtualDirTable;
+            _ = tables.TryGetTable("IIsWebVirtualDir", out iisWebVirtualDirTable)
+                || tables.TryGetTable("Wix4IIsWebVirtualDir", out iisWebVirtualDirTable);
 
             Hashtable addedWebApplications = new Hashtable();
 
-            if (null != iisWebSiteTable)
+            Table iisWebSiteTable;
+            if (tables.TryGetTable("IIsWebSite", out iisWebSiteTable)
+                || tables.TryGetTable("Wix4IIsWebSite", out iisWebSiteTable))
             {
                 foreach (Row row in iisWebSiteTable.Rows)
                 {
                     if (null != row[9])
                     {
-                        IIs.WebSite webSite = (IIs.WebSite)this.Core.GetIndexedElement(row);
+                        var webSite = this.DecompilerHelper.GetIndexedElement(row);
 
-                        IIs.WebApplication webApplication = (IIs.WebApplication)this.Core.GetIndexedElement("IIsWebApplication", (string)row[9]);
+                        var webApplication = this.DecompilerHelper.GetIndexedElement("Wix4IIsWebApplication", (string)row[9]);
                         if (null != webApplication)
                         {
-                            webSite.AddChild(webApplication);
+                            webSite.Add(webApplication);
                             addedWebApplications[webApplication] = null;
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisWebSiteTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Application_", (string)row[9], "IIsWebApplication"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisWebSiteTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Application_", (string)row[9], "IIsWebApplication"));
                         }
                     }
                 }
@@ -1312,17 +1355,17 @@ namespace WixToolset.Iis
                 {
                     if (null != row[6])
                     {
-                        IIs.WebVirtualDir webVirtualDir = (IIs.WebVirtualDir)this.Core.GetIndexedElement(row);
+                        var webVirtualDir = this.DecompilerHelper.GetIndexedElement(row);
 
-                        IIs.WebApplication webApplication = (IIs.WebApplication)this.Core.GetIndexedElement("IIsWebApplication", (string)row[6]);
+                        var webApplication = this.DecompilerHelper.GetIndexedElement("Wix4IIsWebApplication", (string)row[6]);
                         if (null != webApplication)
                         {
-                            webVirtualDir.AddChild(webApplication);
+                            webVirtualDir.Add(webApplication);
                             addedWebApplications[webApplication] = null;
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisWebVirtualDirTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Application_", (string)row[6], "IIsWebApplication"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisWebVirtualDirTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Application_", (string)row[6], "IIsWebApplication"));
                         }
                     }
                 }
@@ -1332,11 +1375,11 @@ namespace WixToolset.Iis
             {
                 foreach (Row row in iisWebApplicationTable.Rows)
                 {
-                    IIs.WebApplication webApplication = (IIs.WebApplication)this.Core.GetIndexedElement(row);
+                    var webApplication = this.DecompilerHelper.GetIndexedElement(row);
 
                     if (!addedWebApplications.Contains(webApplication))
                     {
-                        this.Core.RootElement.AddChild(webApplication);
+                        this.DecompilerHelper.AddElementToRoot(webApplication);
                     }
                 }
             }
@@ -1352,38 +1395,38 @@ namespace WixToolset.Iis
         /// </remarks>
         private void FinalizeIIsWebErrorTable(TableIndexedCollection tables)
         {
-            Table iisWebErrorTable = tables["IIsWebError"];
-
-            if (null != iisWebErrorTable)
+            Table iisWebErrorTable;
+            if (tables.TryGetTable("IIsWebError", out iisWebErrorTable)
+                || tables.TryGetTable("Wix4IIsWebError", out iisWebErrorTable))
             {
                 foreach (Row row in iisWebErrorTable.Rows)
                 {
-                    IIs.WebError webError = (IIs.WebError)this.Core.GetIndexedElement(row);
+                    var webError = this.DecompilerHelper.GetIndexedElement(row);
 
                     if (1 == (int)row[2]) // WebVirtualDir parent
                     {
-                        IIs.WebVirtualDir webVirtualDir = (IIs.WebVirtualDir)this.Core.GetIndexedElement("IIsWebVirtualDir", (string)row[3]);
+                        var webVirtualDir = this.DecompilerHelper.GetIndexedElement("IIsWebVirtualDir", (string)row[3]);
 
                         if (null != webVirtualDir)
                         {
-                            webVirtualDir.AddChild(webError);
+                            webVirtualDir.Add(webError);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisWebErrorTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ParentValue", (string)row[3], "IIsWebVirtualDir"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisWebErrorTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ParentValue", (string)row[3], "IIsWebVirtualDir"));
                         }
                     }
                     else if (2 == (int)row[2]) // WebSite parent
                     {
-                        IIs.WebSite webSite = (IIs.WebSite)this.Core.GetIndexedElement("IIsWebSite", (string)row[3]);
+                        var webSite = this.DecompilerHelper.GetIndexedElement("Wix4IIsWebSite", (string)row[3]);
 
                         if (null != webSite)
                         {
-                            webSite.AddChild(webError);
+                            webSite.Add(webError);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisWebErrorTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ParentValue", (string)row[3], "IIsWebSite"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisWebErrorTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "ParentValue", (string)row[3], "IIsWebSite"));
                         }
                     }
                     else
@@ -1405,13 +1448,12 @@ namespace WixToolset.Iis
         /// </remarks>
         private void FinalizeIIsWebVirtualDirTable(TableIndexedCollection tables)
         {
-            Table iisWebSiteTable = tables["IIsWebSite"];
-            Table iisWebVirtualDirTable = tables["IIsWebVirtualDir"];
-
             Hashtable iisWebSiteRows = new Hashtable();
 
             // index the IIsWebSite rows by their primary keys
-            if (null != iisWebSiteTable)
+            Table iisWebSiteTable;
+            if (tables.TryGetTable("IIsWebSite", out iisWebSiteTable)
+                || tables.TryGetTable("Wix4IIsWebSite", out iisWebSiteTable))
             {
                 foreach (Row row in iisWebSiteTable.Rows)
                 {
@@ -1419,39 +1461,41 @@ namespace WixToolset.Iis
                 }
             }
 
-            if (null != iisWebVirtualDirTable)
+            Table iisWebVirtualDirTable;
+            if (tables.TryGetTable("IIsWebVirtualDir", out iisWebVirtualDirTable)
+                || tables.TryGetTable("Wix4IIsWebVirtualDir", out iisWebVirtualDirTable))
             {
                 foreach (Row row in iisWebVirtualDirTable.Rows)
                 {
-                    IIs.WebVirtualDir webVirtualDir = (IIs.WebVirtualDir)this.Core.GetIndexedElement(row);
+                    var webVirtualDir = this.DecompilerHelper.GetIndexedElement(row);
                     Row iisWebSiteRow = (Row)iisWebSiteRows[row[2]];
 
                     if (null != iisWebSiteRow)
                     {
                         if ((string)iisWebSiteRow[1] == (string)row[1])
                         {
-                            IIs.WebSite webSite = (IIs.WebSite)this.Core.GetIndexedElement(iisWebSiteRow);
+                            var webSite = this.DecompilerHelper.GetIndexedElement(iisWebSiteRow);
 
-                            webSite.AddChild(webVirtualDir);
+                            webSite.Add(webVirtualDir);
                         }
                         else
                         {
-                            Wix.Component component = (Wix.Component)this.Core.GetIndexedElement("Component", (string)row[1]);
+                            var component = this.DecompilerHelper.GetIndexedElement("Component", (string)row[1]);
 
                             if (null != component)
                             {
-                                webVirtualDir.WebSite = (string)row[2];
-                                component.AddChild(webVirtualDir);
+                                webVirtualDir.Add(new XAttribute("WebSite", (string)row[2]));
+                                component.Add(webVirtualDir);
                             }
                             else
                             {
-                                this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisWebVirtualDirTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
+                                this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisWebVirtualDirTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Component_", (string)row[1], "Component"));
                             }
                         }
                     }
                     else
                     {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisWebVirtualDirTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Web_", (string)row[2], "IIsWebSite"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisWebVirtualDirTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Web_", (string)row[2], "IIsWebSite"));
                     }
                 }
             }
@@ -1467,22 +1511,22 @@ namespace WixToolset.Iis
         /// </remarks>
         private void FinalizeIIsWebSiteCertificatesTable(TableIndexedCollection tables)
         {
-            Table IIsWebSiteCertificatesTable = tables["IIsWebSiteCertificates"];
-
-            if (null != IIsWebSiteCertificatesTable)
+            Table IIsWebSiteCertificatesTable;
+            if (tables.TryGetTable("IIsWebSiteCertificates", out IIsWebSiteCertificatesTable)
+                || tables.TryGetTable("Wix4IIsWebSiteCertificates", out IIsWebSiteCertificatesTable))
             {
                 foreach (Row row in IIsWebSiteCertificatesTable.Rows)
                 {
-                    IIs.CertificateRef certificateRef = (IIs.CertificateRef)this.Core.GetIndexedElement(row);
-                    IIs.WebSite webSite = (IIs.WebSite)this.Core.GetIndexedElement("IIsWebSite", (string)row[0]);
+                    var certificateRef = this.DecompilerHelper.GetIndexedElement(row);
+                    var webSite = this.DecompilerHelper.GetIndexedElement("Wix4IIsWebSite", (string)row[0]);
 
                     if (null != webSite)
                     {
-                        webSite.AddChild(certificateRef);
+                        webSite.Add(certificateRef);
                     }
                     else
                     {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, IIsWebSiteCertificatesTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Web_", (string)row[0], "IIsWebSite"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, IIsWebSiteCertificatesTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Web_", (string)row[0], "IIsWebSite"));
                     }
                 }
             }
@@ -1498,52 +1542,52 @@ namespace WixToolset.Iis
         /// </remarks>
         private void FinalizeWebAddressTable(TableIndexedCollection tables)
         {
-            Table iisWebAddressTable = tables["IIsWebAddress"];
-            Table iisWebSiteTable = tables["IIsWebSite"];
-
             Hashtable addedWebAddresses = new Hashtable();
 
-            if (null != iisWebSiteTable)
+            Table iisWebSiteTable;
+            if (tables.TryGetTable("IIsWebSite", out iisWebSiteTable)
+                || tables.TryGetTable("Wix4IIsWebSite", out iisWebSiteTable))
             {
                 foreach (Row row in iisWebSiteTable.Rows)
                 {
-                    IIs.WebSite webSite = (IIs.WebSite)this.Core.GetIndexedElement(row);
+                    var webSite = this.DecompilerHelper.GetIndexedElement(row);
 
-                    IIs.WebAddress webAddress = (IIs.WebAddress)this.Core.GetIndexedElement("IIsWebAddress", (string)row[7]);
+                    var webAddress = this.DecompilerHelper.GetIndexedElement("Wix4IIsWebAddress", (string)row[7]);
                     if (null != webAddress)
                     {
-                        webSite.AddChild(webAddress);
+                        webSite.Add(webAddress);
                         addedWebAddresses[webAddress] = null;
                     }
                     else
                     {
-                        this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisWebSiteTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "KeyAddress_", (string)row[7], "IIsWebAddress"));
+                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisWebSiteTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "KeyAddress_", (string)row[7], "IIsWebAddress"));
                     }
                 }
             }
 
-            if (null != iisWebAddressTable)
+            Table iisWebAddressTable;
+            if (tables.TryGetTable("IIsWebAddress", out iisWebAddressTable)
+                || tables.TryGetTable("Wix4IIsWebAddress", out iisWebAddressTable))
             {
                 foreach (Row row in iisWebAddressTable.Rows)
                 {
-                    IIs.WebAddress webAddress = (IIs.WebAddress)this.Core.GetIndexedElement(row);
+                    var webAddress = this.DecompilerHelper.GetIndexedElement(row);
 
                     if (!addedWebAddresses.Contains(webAddress))
                     {
-                        IIs.WebSite webSite = (IIs.WebSite)this.Core.GetIndexedElement("IIsWebSite", (string)row[1]);
+                        var webSite = this.DecompilerHelper.GetIndexedElement("Wix4IIsWebSite", (string)row[1]);
 
                         if (null != webSite)
                         {
-                            webSite.AddChild(webAddress);
+                            webSite.Add(webAddress);
                         }
                         else
                         {
-                            this.Core.OnMessage(WixWarnings.ExpectedForeignRow(row.SourceLineNumbers, iisWebAddressTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Web_", (string)row[1], "IIsWebSite"));
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, iisWebAddressTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Web_", (string)row[1], "IIsWebSite"));
                         }
                     }
                 }
             }
         }
     }
-#endif
 }
