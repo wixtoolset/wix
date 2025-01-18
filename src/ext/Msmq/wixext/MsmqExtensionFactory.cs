@@ -11,6 +11,7 @@ namespace WixToolset.Msmq
         protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(MsmqCompiler),
+            typeof(MsmqDecompiler),
             typeof(MsmqExtensionData),
             typeof(MsmqWindowsInstallerBackendBinderExtension),
         };
