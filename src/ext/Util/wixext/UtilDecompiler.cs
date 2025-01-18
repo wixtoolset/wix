@@ -435,11 +435,15 @@ namespace WixToolset.Util
         {
             foreach (var row in table.Rows)
             {
-                this.DecompilerHelper.AddElementToRoot(UtilConstants.GroupName,
+                var group = new XElement(UtilConstants.GroupName,
                     new XAttribute("Id", row.FieldAsString(0)),
                     new XAttribute("Name", row.FieldAsString(2)),
                     AttributeIfNotNull("Domain", row, 3)
                     );
+
+                this.DecompilerHelper.AddElementToRoot(group);
+
+                this.DecompilerHelper.IndexElement(row, group);
             }
         }
         /// <summary>

@@ -2,7 +2,10 @@
 
 namespace WixToolsetTest.Msmq
 {
+    using System.Data;
+    using System.IO;
     using System.Linq;
+    using System.Xml.Linq;
     using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
     using WixToolset.Msmq;
@@ -34,10 +37,39 @@ namespace WixToolsetTest.Msmq
             }, results);
         }
 
+        [Fact]
+        public void CanRoundtripMessageQueue()
+        {
+            var folder = TestData.Get(@"TestData\UsingMessageQueue");
+            var build = new Builder(folder, new[] { typeof(MsmqExtensionFactory), typeof(UtilExtensionFactory) }, new[] { folder });
+            var output = Path.Combine(folder, "MessageQueueDecompile.xml");
+
+            build.BuildAndDecompileAndBuild(Build, Decompile, output);
+
+            var doc = XDocument.Load(output);
+            var actual = doc.Descendants()
+                .Where(e => e.Name.Namespace == "http://wixtoolset.org/schemas/v4/wxs/msmq")
+                .Select(fe => new { Name = fe.Name.LocalName, Id = fe.Attributes().Where(a => a.Name == "Id").Select(a => a.Value).FirstOrDefault() })
+                .ToArray();
+
+            WixAssert.CompareLineByLine(new[]
+            {
+                "MessageQueue:TestMQ",
+                "MessageQueuePermission:TestMQ_TestUser",
+                "MessageQueuePermission:TestMQ_TestGroup",
+            }, actual.Select(a => $"{a.Name}:{a.Id}").ToArray());
+        }
+
         private static void Build(string[] args)
         {
             args = args.Concat(new[] { "-arch", "arm64" }).ToArray();
 
+            var result = WixRunner.Execute(args);
+            result.AssertSuccess();
+        }
+
+        private static void Decompile(string[] args)
+        {
             var result = WixRunner.Execute(args);
             result.AssertSuccess();
         }

@@ -144,17 +144,17 @@ namespace WixToolset.Msmq
 
                 if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueueAttributes.Authenticate))
                 {
-                    messageQueue.Add(new XAttribute("Authenticate", YesNoType.Yes));
+                    messageQueue.Add(new XAttribute("Authenticate", "yes"));
                 }
 
                 if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueueAttributes.Journal))
                 {
-                    messageQueue.Add(new XAttribute("Journal", YesNoType.Yes));
+                    messageQueue.Add(new XAttribute("Journal", "yes"));
                 }
 
                 if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueueAttributes.Transactional))
                 {
-                    messageQueue.Add(new XAttribute("Transactional", YesNoType.Yes));
+                    messageQueue.Add(new XAttribute("Transactional", "yes"));
                 }
 
                 this.DecompilerHelper.IndexElement(row, messageQueue);
@@ -337,82 +337,82 @@ namespace WixToolset.Msmq
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.DeleteMessage))
             {
-                element.Add("DeleteMessage", YesNoType.Yes);
+                element.Add(new XAttribute("DeleteMessage", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.PeekMessage))
             {
-                element.Add("PeekMessage", YesNoType.Yes);
+                element.Add(new XAttribute("PeekMessage", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.WriteMessage))
             {
-                element.Add("WriteMessage", YesNoType.Yes);
+                element.Add(new XAttribute("WriteMessage", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.DeleteJournalMessage))
             {
-                element.Add("DeleteJournalMessage", YesNoType.Yes);
+                element.Add(new XAttribute("DeleteJournalMessage", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.SetQueueProperties))
             {
-                element.Add("SetQueueProperties", YesNoType.Yes);
+                element.Add(new XAttribute("SetQueueProperties", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.GetQueueProperties))
             {
-                element.Add("GetQueueProperties", YesNoType.Yes);
+                element.Add(new XAttribute("GetQueueProperties", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.DeleteQueue))
             {
-                element.Add("DeleteQueue", YesNoType.Yes);
+                element.Add(new XAttribute("DeleteQueue", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.GetQueuePermissions))
             {
-                element.Add("GetQueuePermissions", YesNoType.Yes);
+                element.Add(new XAttribute("GetQueuePermissions", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.ChangeQueuePermissions))
             {
-                element.Add("ChangeQueuePermissions", YesNoType.Yes);
+                element.Add(new XAttribute("ChangeQueuePermissions", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.TakeQueueOwnership))
             {
-                element.Add("TakeQueueOwnership", YesNoType.Yes);
+                element.Add(new XAttribute("TakeQueueOwnership", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.ReceiveMessage))
             {
-                element.Add("ReceiveMessage", YesNoType.Yes);
+                element.Add(new XAttribute("ReceiveMessage", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.ReceiveJournalMessage))
             {
-                element.Add("ReceiveJournalMessage", YesNoType.Yes);
+                element.Add(new XAttribute("ReceiveJournalMessage", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.QueueGenericRead))
             {
-                element.Add("QueueGenericRead", YesNoType.Yes);
+                element.Add(new XAttribute("QueueGenericRead", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.QueueGenericWrite))
             {
-                element.Add("QueueGenericWrite", YesNoType.Yes);
+                element.Add(new XAttribute("QueueGenericWrite", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.QueueGenericExecute))
             {
-                element.Add("QueueGenericExecute", YesNoType.Yes);
+                element.Add(new XAttribute("QueueGenericExecute", "yes"));
             }
 
             if (0 != (attributes & (int)MsmqCompiler.MqiMessageQueuePermission.QueueGenericAll))
             {
-                element.Add("QueueGenericAll", YesNoType.Yes);
+                element.Add(new XAttribute("QueueGenericAll", "yes"));
             }
         }
     }
