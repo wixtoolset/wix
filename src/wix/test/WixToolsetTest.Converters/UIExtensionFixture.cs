@@ -126,7 +126,7 @@ namespace WixToolsetTest.Converters
             var actual = UnformattedDocumentLines(document);
 
             WixAssert.CompareLineByLine(expected, actual);
-            Assert.Single(messaging.Messages.Where(m => m.Id == 65));
+            Assert.Single(messaging.Messages, m => m.Id == 65);
             Assert.Equal(2, errors);
         }
     }

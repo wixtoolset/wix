@@ -125,9 +125,9 @@ namespace WixToolsetTest.CoreIntegration
                 var wixlib = Intermediate.Load(wixlibPath);
                 var binarySymbols = wixlib.Sections.SelectMany(s => s.Symbols).OfType<BinarySymbol>().ToList();
                 Assert.Equal(3, binarySymbols.Count);
-                Assert.Single(binarySymbols.Where(t => t.Data.Path == "wix-ir/foo.dll"));
-                Assert.Single(binarySymbols.Where(t => t.Data.Path == "wix-ir/foo.dll-1"));
-                Assert.Single(binarySymbols.Where(t => t.Data.Path == "wix-ir/foo.dll-2"));
+                Assert.Single(binarySymbols, t => t.Data.Path == "wix-ir/foo.dll");
+                Assert.Single(binarySymbols, t => t.Data.Path == "wix-ir/foo.dll-1");
+                Assert.Single(binarySymbols, t => t.Data.Path == "wix-ir/foo.dll-2");
             }
         }
 
