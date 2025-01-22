@@ -162,7 +162,7 @@ namespace WixToolsetTest.Converters
                 var result = RunConversion(targetFile);
 
                 Assert.Equal(13, result.ExitCode);
-                Assert.Single(result.Messages.Where(message => message.ToString().EndsWith("(QtExecCmdTimeoutAmbiguous)")));
+                Assert.Single(result.Messages, message => message.ToString().EndsWith("(QtExecCmdTimeoutAmbiguous)"));
 
                 var expected = File.ReadAllText(Path.Combine(folder, afterFileName)).Replace("\r\n", "\n");
                 var actual = File.ReadAllText(targetFile).Replace("\r\n", "\n");

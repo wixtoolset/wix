@@ -64,6 +64,7 @@
     <PackageVersion Include="System.Security.Principal.Windows" Version="5.0.0" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     <PackageVersion Include="System.Text.Json" Version="8.0.5" />
+    <PackageVersion Include="System.Memory" Version="4.5.5" />
 
     <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="8.0.12" />
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="3.11.2177" />
