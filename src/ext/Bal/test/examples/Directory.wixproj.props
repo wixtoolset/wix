@@ -4,7 +4,7 @@
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
     <TargetExt>.exe</TargetExt>
-    <HarvestDirectoryAdditionalOptions>-generate payloadgroup</HarvestDirectoryAdditionalOptions>
+    <HarvestDirectoryAdditionalOptions>-generate payloadgroup -sw5149</HarvestDirectoryAdditionalOptions>
     <OutputPath>$(OutputPath)examples\</OutputPath>
     <DefaultCompressionLevel>None</DefaultCompressionLevel>
     <InstallerPlatform>x64</InstallerPlatform>

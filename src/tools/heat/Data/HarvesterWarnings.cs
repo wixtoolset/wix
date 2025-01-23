@@ -2,13 +2,17 @@
 
 namespace WixToolset.Harvesters.Data
 {
-    using System;
     using System.Resources;
     using WixToolset.Data;
 
 #pragma warning disable 1591 // TODO: add documentation
     public static class HarvesterWarnings
     {
+        public static Message HeatIsDeprecated()
+        {
+            return Message(null, Ids.HeatIsDeprecated, "Heat is deprecated and will be removed in WiX v7. Consider alternative solutions, like the Files element.");
+        }
+
         public static Message AssemblyHarvestFailed(string file, string message)
         {
             return Message(null, Ids.AssemblyHarvestFailed, "Could not harvest data from a file that was expected to be an assembly: {0}. If this file is not an assembly you can ignore this warning. Otherwise, this error detail may be helpful to diagnose the failure: {1}", file, message);
@@ -66,6 +70,7 @@ namespace WixToolset.Harvesters.Data
 
         public enum Ids
         {
+            HeatIsDeprecated = 5149,
             SelfRegHarvestFailed = 5150,
             AssemblyHarvestFailed = 5151,
             TypeLibLoadFailed = 5152,

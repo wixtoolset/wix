@@ -47,7 +47,7 @@ namespace WixToolsetTest.Sdk
                 Assert.Single(heatCommandLines);
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
-                WixAssert.StringCollectionEmpty(warnings);
+                Assert.All(warnings, warning => warning.Contains("warning HEAT5149"));
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "Release", "_ProductComponents_INSTALLFOLDER_HeatFilePackage.wixproj_file.wxs");
                 var generatedContents = File.ReadAllText(generatedFilePath);
@@ -103,7 +103,7 @@ namespace WixToolsetTest.Sdk
                 Assert.Equal(2, heatCommandLines.Count());
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
-                WixAssert.StringCollectionEmpty(warnings);
+                Assert.All(warnings, warning => warning.Contains("warning HEAT5149"));
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "Release", "_TxtProductComponents_INSTALLFOLDER_MyProgram.txt_file.wxs");
                 Assert.True(File.Exists(generatedFilePath));
@@ -198,7 +198,7 @@ namespace WixToolsetTest.Sdk
                 }
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
-                WixAssert.StringCollectionEmpty(warnings);
+                Assert.All(warnings, warning => warning.Contains("warning HEAT5149"));
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "Release", "_Tools Version 4Cs.wxs");
                 Assert.True(File.Exists(generatedFilePath));
@@ -319,7 +319,7 @@ namespace WixToolsetTest.Sdk
                 }
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
-                WixAssert.StringCollectionEmpty(warnings);
+                Assert.All(warnings, warning => warning.Contains("warning HEAT5149"));
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "Release", "_SdkStyleCs.wxs");
                 Assert.True(File.Exists(generatedFilePath));
