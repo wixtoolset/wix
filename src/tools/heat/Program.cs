@@ -12,6 +12,7 @@ namespace WixToolset.Tools.Heat
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
     using WixToolset.Harvesters;
+    using WixToolset.Harvesters.Data;
     using WixToolset.Harvesters.Extensibility;
     using WixToolset.Tools.Core;
 
@@ -78,6 +79,9 @@ namespace WixToolset.Tools.Heat
 
             var commandLine = HeatCommandLineFactory.CreateCommandLine(serviceProvider, heatExtensions);
             var command = commandLine.ParseStandardCommandLine(arguments);
+
+            messaging.Write(HarvesterWarnings.HeatIsDeprecated());
+
             return command?.ExecuteAsync(CancellationToken.None) ?? Task.FromResult(1);
         }
     }

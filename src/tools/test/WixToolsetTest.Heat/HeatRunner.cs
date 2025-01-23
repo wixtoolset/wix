@@ -37,7 +37,7 @@ namespace WixToolsetTest.Heat
         /// <returns></returns>
         public static WixRunnerResult Execute(params string[] args)
         {
-            return Execute(true, args);
+            return Execute(warningsAsErrors: false, args);
         }
 
         /// <summary>
