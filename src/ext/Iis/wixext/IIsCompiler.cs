@@ -202,6 +202,21 @@ namespace WixToolset.Iis
                                     case "localMachine":
                                         storeLocation = 2; // SCA_CERTSYSTEMSTORE_LOCALMACHINE
                                         break;
+                                    case "services":
+                                        storeLocation = 3; // SCA_CERTSYSTEMSTORE_SERVICES
+                                        break;
+                                    case "users":
+                                        storeLocation = 4; // SCA_CERTSYSTEMSTORE_USERS
+                                        break;
+                                    case "userPolicy":
+                                        storeLocation = 5; // SCA_CERTSYSTEMSTORE_USER_POLICY
+                                        break;
+                                    case "localMachinePolicy":
+                                        storeLocation = 6; // SCA_CERTSYSTEMSTORE_LOCALMACHINE_POLICY
+                                        break;
+                                    case "localMachineEnterprise":
+                                        storeLocation = 7; // SCA_CERTSYSTEMSTORE_LOCALMACHINE_ENTERPRISE
+                                        break;
                                     default:
                                         storeLocation = -1;
                                         this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "StoreLocation", storeLocationValue, "currentUser", "localMachine"));

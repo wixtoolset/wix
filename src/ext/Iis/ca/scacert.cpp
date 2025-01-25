@@ -213,6 +213,21 @@ static HRESULT ConfigureCertificates(
         case SCA_CERTSYSTEMSTORE_LOCALMACHINE:
             dwStoreLocation = CERT_SYSTEM_STORE_LOCAL_MACHINE;
             break;
+        case SCA_CERTSYSTEMSTORE_SERVICES:
+            dwStoreLocation = CERT_SYSTEM_STORE_SERVICES;
+            break;
+        case SCA_CERTSYSTEMSTORE_USERS:
+            dwStoreLocation = CERT_SYSTEM_STORE_USERS;
+            break;
+        case SCA_CERTSYSTEMSTORE_USER_POLICY:
+            dwStoreLocation = CERT_SYSTEM_STORE_CURRENT_USER_GROUP_POLICY;
+            break;
+        case SCA_CERTSYSTEMSTORE_LOCALMACHINE_POLICY:
+            dwStoreLocation = CERT_SYSTEM_STORE_LOCAL_MACHINE_GROUP_POLICY;
+            break;
+        case SCA_CERTSYSTEMSTORE_LOCALMACHINE_ENTERPRISE:
+            dwStoreLocation = CERT_SYSTEM_STORE_LOCAL_MACHINE_ENTERPRISE;
+            break;
         default:
             hr = E_INVALIDARG;
             ExitOnFailure(hr, "Invalid store location value: %d", iData);
