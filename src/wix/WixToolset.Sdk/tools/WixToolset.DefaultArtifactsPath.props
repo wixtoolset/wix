@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Ported from: https://github.com/dotnet/sdk/blob/23e2ba847d79562b972dbf54eca3f87c3044d925/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.DefaultArtifactsPath.props
+Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+-->
+<Project>
+
+  <!-- This .props file may be imported either from Sdk.props or from Microsoft.NET.DefaultOutputPaths.targets, depending
+       on whether artifacts output properties were set in Directory.Build.props or not.
+
+       Set a property to indicate it was imported, so we can avoid a duplicate import. -->
+  <PropertyGroup>
+    <_DefaultArtifactsPathPropsImported>true</_DefaultArtifactsPathPropsImported>
+  </PropertyGroup>
+
+  <!-- Setting ArtifactsPath automatically opts in to the artifacts output format -->
+  <PropertyGroup Condition="'$(ArtifactsPath)' != '' And '$(UsingMicrosoftArtifactsSdk)' != 'true'">
+    <UseArtifactsOutput Condition="'$(UseArtifactsOutput)' == ''">true</UseArtifactsOutput>
+    <IncludeProjectNameInArtifactsPaths Condition="'$(IncludeProjectNameInArtifactsPaths)' == ''">true</IncludeProjectNameInArtifactsPaths>
+    <_ArtifactsPathLocationType>ExplicitlySpecified</_ArtifactsPathLocationType>
+  </PropertyGroup>
+
+  <!-- Set up base output folders if UseArtifactsOutput is set. The .NET SDK implementatino uses _DirectoryBuildPropsBasePath,
+       but this implementation uses DirectoryBuildPropsPath instead to avoid depending on a private property that may change in the future. -->
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true' And '$(ArtifactsPath)' == '' And '$(DirectoryBuildPropsPath)' != ''">
+    <!-- Default ArtifactsPath to be in the directory where Directory.Build.props is found
+         Note that we do not append a backslash to the ArtifactsPath as we do with most paths, because it may be a global property passed in on the command-line which we can't easily change -->
+    <ArtifactsPath>$([System.IO.Path]::GetDirectoryName('$(DirectoryBuildPropsPath)'))\artifacts</ArtifactsPath>
+    <IncludeProjectNameInArtifactsPaths Condition="'$(IncludeProjectNameInArtifactsPaths)' == ''">true</IncludeProjectNameInArtifactsPaths>
+    <_ArtifactsPathLocationType>DirectoryBuildPropsFolder</_ArtifactsPathLocationType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true' And '$(ArtifactsPath)' == ''">
+    <!-- If there was no Directory.Build.props file, then put the artifacts path in the project folder -->
+    <ArtifactsPath>$(MSBuildProjectDirectory)\artifacts</ArtifactsPath>
+    <_ArtifactsPathLocationType>ProjectFolder</_ArtifactsPathLocationType>
+  </PropertyGroup>
+</Project>

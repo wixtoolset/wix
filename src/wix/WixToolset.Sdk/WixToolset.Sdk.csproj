@@ -17,8 +17,11 @@
 
   <ItemGroup>
     <Content Include="build\$(MSBuildThisFileName).targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="tools\WixToolset.DefaultArtifactsPath.props" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="tools\WixToolset.DefaultOutputPaths.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="tools\WixToolset.Signing.props" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="tools\WixToolset.Signing.targets" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="tools\WixToolset.UseArtifactsOutputPath.props" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="tools\wix.props" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="tools\wix.targets" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Sdk\Sdk.props" CopyToOutputDirectory="PreserveNewest" />
