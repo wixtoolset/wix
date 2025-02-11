@@ -7,27 +7,31 @@ int __cdecl wmain(
     __in LPWSTR argv[]
     )
 {
+    DWORD er = ERROR_SUCCESS;
     HRESULT hr = S_OK;
-    DWORD dwExitCode = 0;
     LPCWSTR wzDestinationFile = argc > 1 ? argv[1] : NULL;
     LPCWSTR wzGoodFile = argc > 2 ? argv[2] : NULL;
-    LPCWSTR wzBadFile = argc > 3 ? argv[3] : NULL;
+    LPCWSTR wzBackupFile = argc > 3 ? argv[3] : NULL;
 
-    if (argc != 4)
+    if (!wzDestinationFile || !*wzDestinationFile || !wzGoodFile || !*wzGoodFile)
     {
         ExitWithRootFailure(hr, E_INVALIDARG, "Invalid args");
     }
 
-    if (!::MoveFileW(wzDestinationFile, wzBadFile))
+    if (wzBackupFile && *wzBackupFile && !::CopyFileW(wzDestinationFile, wzBackupFile, FALSE))
     {
-        ExitWithLastError(hr, "Failed to move bad file");
+        er = ::GetLastError();
+        if (ERROR_PATH_NOT_FOUND != er && ERROR_FILE_NOT_FOUND != er)
+        {
+            ExitOnWin32Error(er, hr, "Failed to copy to backup file");
+        }
     }
 
-    if (!::MoveFileW(wzGoodFile, wzDestinationFile))
+    if (!::CopyFileW(wzGoodFile, wzDestinationFile, FALSE))
     {
-        ExitWithLastError(hr, "Failed to move good file");
+        ExitWithLastError(hr, "Failed to copy in good file");
     }
 
 LExit:
-    return FAILED(hr) ? (int)hr : (int)dwExitCode;
+    return FAILED(hr) ? (int)hr : (int)0;
 }

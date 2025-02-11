@@ -2,7 +2,7 @@
 <Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
-    <BA>BrokenDncAlwaysPrereq</BA>
+    <BA>BrokenDncSecondary</BA>
     <UpgradeCode>{D2763AB7-979B-485C-AE52-DD03C23CCB93}</UpgradeCode>
   </PropertyGroup>
   <ItemGroup>

@@ -1,11 +1,9 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Fragment>
-    <BootstrapperApplication Id="BrokenMbaAlwaysPrereq" SourceFile="!(bindpath.net2x86)\TestBA.exe" Secondary="true">
+    <BootstrapperApplication Id="BrokenMbaSecondary" SourceFile="!(bindpath.net2x86)\TestBA.exe" Secondary="true">
       <Payload Name="good.config" SourceFile="!(bindpath.net2x86)\TestBA.exe.config" />
-      <Payload Name="TestBA.exe.config" SourceFile="bad.config" />
       <Payload SourceFile="!(bindpath.net2x86)\mbanative.dll" />
       <Payload SourceFile="!(bindpath.net2x86)\WixToolset.BootstrapperApplicationApi.dll" />
       <Payload SourceFile="$(var.PrereqBaf.TargetPath)" bal:BAFunctions="yes" />
@@ -15,13 +13,12 @@
   </Fragment>
 
   <Fragment>
-    <util:FileSearch Variable="GoodConfigPresent" Path="[BARuntimeDirectory]\good.config" Result="exists" />
-    <Variable Name="CAUSEINFINITELOOP" bal:Overridable="yes" />
+    <util:FileSearch Variable="TestBAConfigPresent" Path="[BARuntimeDirectory]\TestBA.exe.config" Result="exists" />
 
     <PackageGroup Id="BundlePackages">
       <ExePackage SourceFile="$(var.ReplaceConfig.TargetPath)" bal:PrereqPackage="yes"
-                  Permanent="yes" DetectCondition="NOT GoodConfigPresent OR CAUSEINFINITELOOP = 1"
-                  InstallArguments="&quot;[BARuntimeDirectory]TestBA.exe.config&quot; &quot;[BARuntimeDirectory]good.config&quot; &quot;[BARuntimeDirectory]bad.config&quot;" />
+                  Permanent="yes" DetectCondition="TestBAConfigPresent"
+                  InstallArguments="&quot;[BARuntimeDirectory]TestBA.exe.config&quot; &quot;[BARuntimeDirectory]good.config&quot;" />
       <MsiPackage Id="PackageB" SourceFile="$(var.PackageB.TargetPath)" bal:PrereqPackage="yes" Permanent="yes" />
       <MsiPackage Id="PackageC" SourceFile="$(var.PackageC.TargetPath)" />
     </PackageGroup>
