@@ -32,7 +32,7 @@ __out LPWSTR *ppwzFileNameNoExtension
 )
 {
     Assert(wzFileName && *wzFileName);
-   
+
     HRESULT hr = S_OK;
     size_t cchFileName = 0;
     LPWSTR pwzFileNameNoExtension = NULL;
@@ -90,7 +90,7 @@ extern "C" HRESULT DAPI FileChangeExtension(
 
 LExit:
     ReleaseStr(sczFileName);
-   
+
     return hr;
 }
 
@@ -140,7 +140,7 @@ extern "C" HRESULT DAPI FileAddSuffixToBaseName(
 
 LExit:
     ReleaseStr(sczNewFileName);
-   
+
     return hr;
 }
 
@@ -1340,6 +1340,51 @@ LExit:
 
 
 /*******************************************************************
+ FileCreateWithRetry - create a file with multiple attempts if necessary
+
+********************************************************************/
+extern "C" HRESULT DAPI FileCreateWithRetry(
+    __in LPCWSTR wzFile,
+    __in DWORD dwDesiredAccess,
+    __in DWORD dwShareMode,
+    __in_opt LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+    __in DWORD dwCreationDisposition,
+    __in DWORD dwFlagsAndAttributes,
+    __in DWORD cRetry,
+    __in DWORD dwWaitMilliseconds,
+    __out HANDLE* phFile
+    )
+{
+    HRESULT hr = HRESULT_FROM_WIN32(ERROR_INVALID_HANDLE);
+
+    *phFile = INVALID_HANDLE_VALUE;
+
+    for (DWORD i = 0; i <= cRetry; ++i)
+    {
+        if (0 < i)
+        {
+            ::Sleep(dwWaitMilliseconds);
+        }
+
+        *phFile = ::CreateFileW(wzFile, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, NULL);
+        if (INVALID_HANDLE_VALUE == *phFile)
+        {
+            DWORD er = ::GetLastError();
+            hr = HRESULT_FROM_WIN32(er ? er : ERROR_INVALID_HANDLE);
+        }
+        else
+        {
+            hr = S_OK;
+            break;
+        }
+    }
+    FileExitOnRootFailure(hr, "Failed to create file: %ls after %u retries.", wzFile, cRetry);
+
+LExit:
+    return hr;
+}
+
+/*******************************************************************
  FileIsSame
 
 ********************************************************************/
@@ -1479,7 +1524,7 @@ extern "C" HRESULT DAPI FileResetTime(
 
     hFile = ::CreateFileW(wzFile, FILE_WRITE_ATTRIBUTES | FILE_READ_ATTRIBUTES, FILE_SHARE_WRITE | FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
     FileExitOnInvalidHandleWithLastError(hFile, hr, "Failed to open file. File = '%ls'", wzFile);
-    
+
     if (!::GetFileTime(hFile, &ftCreateTime, NULL, NULL))
     {
         FileExitWithLastError(hr, "Failed to get file time for file. File = '%ls'", wzFile);
