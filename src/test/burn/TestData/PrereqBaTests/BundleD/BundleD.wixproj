@@ -2,7 +2,7 @@
 <Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
-    <BA>BrokenMbaAlwaysPrereq</BA>
+    <BA>BrokenMbaSecondary</BA>
     <UpgradeCode>{415CA128-60E1-4D16-ACE8-A1D43E98B997}</UpgradeCode>
   </PropertyGroup>
   <ItemGroup>

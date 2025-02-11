@@ -14,11 +14,11 @@
   </Fragment>
 
   <Fragment>
-    <util:FileSearch Variable="GoodConfigPresent" Path="[BARuntimeDirectory]\good.runtimeconfig.json" Result="exists" />
+    <util:FileSearch Variable="TestBAConfigPresent" Path="[BARuntimeDirectory]\good.runtimeconfig.json" Result="exists" />
 
     <PackageGroup Id="BundlePackages">
       <ExePackage SourceFile="$(var.ReplaceConfig.TargetPath)" bal:PrereqPackage="yes"
-                  Permanent="yes" DetectCondition="NOT GoodConfigPresent"
+                  Permanent="yes" DetectCondition="NOT TestBAConfigPresent"
                   InstallArguments="&quot;[BARuntimeDirectory]TestBA.runtimeconfig.json&quot; &quot;[BARuntimeDirectory]good.runtimeconfig.json&quot; &quot;[BARuntimeDirectory]bad.runtimeconfig.json&quot;" />
     </PackageGroup>
   </Fragment>

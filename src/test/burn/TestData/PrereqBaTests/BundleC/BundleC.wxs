@@ -2,11 +2,10 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Fragment>
-    <BootstrapperApplication Id="BrokenDncAlwaysPrereq" SourceFile="!(bindpath.dncx86)\TestBA.exe" Secondary="true">
+    <BootstrapperApplication Id="BrokenDncSecondary" SourceFile="!(bindpath.dncx86)\TestBA.exe" Secondary="yes">
       <Payload SourceFile="!(bindpath.dncx86)\TestBA.deps.json" />
       <Payload SourceFile="!(bindpath.dncx86)\TestBA.dll" />
       <Payload Name="good.runtimeconfig.json" SourceFile="!(bindpath.dncx86)\TestBA.runtimeconfig.json" />
-      <Payload Name="TestBA.runtimeconfig.json" SourceFile="bad.runtimeconfig.json" />
       <Payload SourceFile="!(bindpath.dncx86)\mbanative.dll" />
       <Payload SourceFile="!(bindpath.dncx86)\WixToolset.BootstrapperApplicationApi.dll" />
       <Payload SourceFile="$(var.PrereqBaf.TargetPath)" bal:BAFunctions="yes" />
@@ -16,13 +15,12 @@
   </Fragment>
 
   <Fragment>
-    <util:FileSearch Variable="GoodConfigPresent" Path="[BARuntimeDirectory]\good.runtimeconfig.json" Result="exists" />
-    <Variable Name="CAUSEINFINITELOOP" bal:Overridable="yes" />
+    <util:FileSearch Variable="TestBAConfigPresent" Path="[BARuntimeDirectory]TestBA.runtimeconfig.json" Result="exists" />
 
     <PackageGroup Id="BundlePackages">
       <ExePackage SourceFile="$(var.ReplaceConfig.TargetPath)" bal:PrereqPackage="yes"
-                  Permanent="yes" DetectCondition="NOT GoodConfigPresent OR CAUSEINFINITELOOP = 1"
-                  InstallArguments="&quot;[BARuntimeDirectory]TestBA.runtimeconfig.json&quot; &quot;[BARuntimeDirectory]good.runtimeconfig.json&quot; &quot;[BARuntimeDirectory]bad.runtimeconfig.json&quot;" />
+                  Permanent="yes" DetectCondition="TestBAConfigPresent"
+                  InstallArguments="&quot;[BARuntimeDirectory]TestBA.runtimeconfig.json&quot; &quot;[BARuntimeDirectory]good.runtimeconfig.json&quot;" />
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)" bal:PrereqPackage="yes" Permanent="yes" />
       <MsiPackage Id="PackageC" SourceFile="$(var.PackageC.TargetPath)" Cache="force" />
     </PackageGroup>
