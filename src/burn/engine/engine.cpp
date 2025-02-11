@@ -239,11 +239,6 @@ LExit:
         LoggingOpenFailed();
     }
 
-    BootstrapperApplicationRemove(&engineState.userExperience);
-
-    CacheRemoveBaseWorkingFolder(&engineState.cache);
-    CacheUninitialize(&engineState.cache);
-
     // If this is a related bundle (but not an update) suppress restart and return the standard restart error code.
     if (engineState.fRestart && BOOTSTRAPPER_RELATION_NONE != engineState.command.relationType && BOOTSTRAPPER_RELATION_UPDATE != engineState.command.relationType)
     {
@@ -311,6 +306,10 @@ LExit:
         // Log the exit code here to make sure it gets in the elevated log.
         LogId(REPORT_STANDARD, MSG_EXITING_ELEVATED, FAILED(hr) ? (int)hr : *pdwExitCode);
     }
+
+    BootstrapperApplicationRemove(&engineState.userExperience);
+
+    CacheRemoveBaseWorkingFolder(&engineState.cache);
 
     UninitializeEngineState(&engineState);
 
@@ -433,6 +432,7 @@ static void UninitializeEngineState(
     PackagesUninitialize(&pEngineState->packages);
     SectionUninitialize(&pEngineState->section);
     ContainersUninitialize(&pEngineState->containers);
+    CacheUninitialize(&pEngineState->cache);
 
     ReleaseStr(pEngineState->command.wzBootstrapperApplicationDataPath);
     ReleaseStr(pEngineState->command.wzBootstrapperWorkingFolder);
