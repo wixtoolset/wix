@@ -239,6 +239,7 @@ extern "C" void PayloadUninitialize(
         ReleaseMem(pPayload->pbCertificateRootThumbprint);
         ReleaseMem(pPayload->pbCertificateRootPublicKeyIdentifier);
         ReleaseStr(pPayload->sczSourcePath);
+        ReleaseFileHandle(pPayload->hLocalFile);
         ReleaseStr(pPayload->sczLocalFilePath);
         ReleaseStr(pPayload->sczFailedLocalAcquisitionPath);
         ReleaseStr(pPayload->downloadSource.sczUrl);
@@ -278,6 +279,7 @@ extern "C" HRESULT PayloadExtractUXContainer(
     LPWSTR sczStreamName = NULL;
     LPWSTR sczDirectory = NULL;
     BURN_PAYLOAD* pPayload = NULL;
+    HANDLE hTargetFile = INVALID_HANDLE_VALUE;
 
     // extract all payloads
     for (;;)
@@ -306,8 +308,17 @@ extern "C" HRESULT PayloadExtractUXContainer(
         hr = DirEnsureExists(sczDirectory, NULL);
         ExitOnFailure(hr, "Failed to ensure directory exists");
 
-        hr = ContainerStreamToFile(pContainerContext, pPayload->sczLocalFilePath);
+        hTargetFile = ::CreateFileW(pPayload->sczLocalFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        ExitOnInvalidHandleWithLastError(hTargetFile, hr, "Failed to create file: %ls", pPayload->sczLocalFilePath);
+
+        hr = ContainerStreamToHandle(pContainerContext, hTargetFile);
         ExitOnFailure(hr, "Failed to extract file.");
+
+        // Reopen the payload for read-only access to prevent the file from being removed or tampered with while the BA is running.
+        ReleaseFileHandle(hTargetFile);
+
+        hr = FileCreateWithRetry(pPayload->sczLocalFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 30, 100, &pPayload->hLocalFile);
+        ExitOnFailure(hr, "Failed to open file: %ls", pPayload->sczLocalFilePath);
 
         // flag that the payload has been acquired
         pPayload->state = BURN_PAYLOAD_STATE_ACQUIRED;
@@ -326,6 +337,7 @@ extern "C" HRESULT PayloadExtractUXContainer(
     }
 
 LExit:
+    ReleaseFileHandle(hTargetFile);
     ReleaseStr(sczStreamName);
     ReleaseStr(sczDirectory);
 

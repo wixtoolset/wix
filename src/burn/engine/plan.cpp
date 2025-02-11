@@ -2117,6 +2117,7 @@ static void ResetPlannedPayloadsState(
         pPayload->cRemainingInstances = 0;
         pPayload->state = BURN_PAYLOAD_STATE_NONE;
         pPayload->fFailedVerificationFromAcquisition = FALSE;
+        ReleaseFileHandle(pPayload->hLocalFile);
         ReleaseNullStr(pPayload->sczLocalFilePath);
         ReleaseNullStr(pPayload->sczFailedLocalAcquisitionPath);
     }

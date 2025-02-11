@@ -55,7 +55,7 @@ namespace Bootstrapper
             BURN_PIPE_CONNECTION* pConnection = &engineState.companionConnection;
             DWORD dwResult = S_OK;
 
-            engineState.sczBundleEngineWorkingPath = L"tests\\ignore\\this\\path\\to\\burn.exe";
+            engineState.cache.sczBundleEngineWorkingPath = L"tests\\ignore\\this\\path\\to\\burn.exe";
 
             try
             {

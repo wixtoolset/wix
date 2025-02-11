@@ -112,13 +112,15 @@ static HRESULT CopyEngineToWorkingFolder(
     __in_z LPCWSTR wzWorkingFolderName,
     __in_z LPCWSTR wzExecutableName,
     __in BURN_SECTION* pSection,
-    __deref_out_z_opt LPWSTR* psczEngineWorkingPath
+    __out_z LPWSTR* psczEngineWorkingPath,
+    __out HANDLE* phEngineWorkingFile
     );
 static HRESULT CopyEngineWithSignatureFixup(
     __in HANDLE hEngineFile,
     __in_z LPCWSTR wzEnginePath,
     __in_z LPCWSTR wzTargetPath,
-    __in BURN_SECTION* pSection
+    __in BURN_SECTION* pSection,
+    __out HANDLE* phEngineFile
     );
 static HRESULT RemoveBundleOrPackage(
     __in BURN_CACHE* pCache,
@@ -915,33 +917,59 @@ extern "C" HRESULT CacheBundleToWorkingDirectory(
     __in BOOL fElevated,
     __in BURN_CACHE* pCache,
     __in_z LPCWSTR wzExecutableName,
-    __in BURN_SECTION* pSection,
-    __deref_out_z_opt LPWSTR* psczEngineWorkingPath
+    __in BURN_SECTION* pSection
     )
 {
     Assert(pCache->fInitializedCache);
 
     HRESULT hr = S_OK;
     LPWSTR sczSourcePath = NULL;
+    LPWSTR sczEngineWorkingPath = NULL;
+    HANDLE hEngineWorkingFile = INVALID_HANDLE_VALUE;
+
+    // If we already cached the engine, bail.
+    if (pCache->sczBundleEngineWorkingPath && INVALID_HANDLE_VALUE != pCache->hBundleEngineWorkingFile)
+    {
+        ExitFunction();
+    }
 
     // Initialize the source.
     hr = PathForCurrentProcess(&sczSourcePath, NULL);
     ExitOnFailure(hr, "Failed to get current process path.");
 
     // If the bundle is running out of the package cache then we don't need to copy it to
-    // the working folder since we feel safe in the package cache and will run from there.
+    // the working folder (and we don't need to lock the file either) since we feel safe
+    // in the package cache and will run from there.
     if (CacheBundleRunningFromCache(pCache))
     {
-        hr = StrAllocString(psczEngineWorkingPath, sczSourcePath, 0);
-        ExitOnFailure(hr, "Failed to use current process path as target path.");
+        hr = StrAllocString(&sczEngineWorkingPath, sczSourcePath, 0);
+        ExitOnFailure(hr, "Failed to copy current process path as bundle engine working path.");
     }
-    else // otherwise, carry on putting the bundle in the working folder.
+    else // otherwise, carry on putting the bundle in the working folder and lock it.
     {
-        hr = CopyEngineToWorkingFolder(fElevated, pCache, sczSourcePath, BUNDLE_WORKING_FOLDER_NAME, wzExecutableName, pSection, psczEngineWorkingPath);
+        hr = CopyEngineToWorkingFolder(fElevated, pCache, sczSourcePath, BUNDLE_WORKING_FOLDER_NAME, wzExecutableName, pSection, &sczEngineWorkingPath, &hEngineWorkingFile);
         ExitOnFailure(hr, "Failed to copy engine to working folder.");
-    }
+
+        // Close the engine file handle (if we opened it) then reopen it read-only as quickly as possible to lock it.
+        ReleaseFileHandle(hEngineWorkingFile);
+
+        hr = FileCreateWithRetry(sczEngineWorkingPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 30, 100, &hEngineWorkingFile);
+        ExitOnFailure(hr, "Failed to lock bundle engine file: %ls", sczEngineWorkingPath);
+     }
+
+    // Clean out any previous values (there shouldn't be any).
+    ReleaseNullStr(pCache->sczBundleEngineWorkingPath);
+    ReleaseFileHandle(pCache->hBundleEngineWorkingFile);
+
+    pCache->sczBundleEngineWorkingPath = sczEngineWorkingPath;
+    sczEngineWorkingPath = NULL;
+
+    pCache->hBundleEngineWorkingFile = hEngineWorkingFile;
+    hEngineWorkingFile = INVALID_HANDLE_VALUE;
 
 LExit:
+    ReleaseFileHandle(hEngineWorkingFile);
+    ReleaseStr(sczEngineWorkingPath);
     ReleaseStr(sczSourcePath);
 
     return hr;
@@ -1206,9 +1234,14 @@ extern "C" HRESULT CacheRemoveBaseWorkingFolder(
 
     if (pCache->fInitializedBaseWorkingFolder)
     {
+        // Release the engine file handle if it is open to ensure the working folder can be deleted.
+        ReleaseFileHandle(pCache->hBundleEngineWorkingFile);
+
         // Try to clean out everything in the working folder.
         hr = DirEnsureDeleteEx(pCache->sczBaseWorkingFolder, DIR_DELETE_FILES | DIR_DELETE_RECURSE | DIR_DELETE_SCHEDULE);
         TraceError(hr, "Could not delete bundle engine working folder.");
+
+        pCache->fInitializedBaseWorkingFolder = FALSE;
     }
 
     return hr;
@@ -1396,6 +1429,8 @@ extern "C" void CacheUninitialize(
     ReleaseStr(pCache->sczBaseWorkingFolder);
     ReleaseStr(pCache->sczAcquisitionFolder);
     ReleaseStr(pCache->sczSourceProcessFolder);
+    ReleaseStr(pCache->sczBundleEngineWorkingPath)
+    ReleaseFileHandle(pCache->hBundleEngineWorkingFile)
 
     memset(pCache, 0, sizeof(BURN_CACHE));
 }
@@ -2094,16 +2129,15 @@ static HRESULT CopyEngineToWorkingFolder(
     __in_z LPCWSTR wzWorkingFolderName,
     __in_z LPCWSTR wzExecutableName,
     __in BURN_SECTION* pSection,
-    __deref_out_z_opt LPWSTR* psczEngineWorkingPath
+    __out_z LPWSTR* psczEngineWorkingPath,
+    __out HANDLE* phEngineWorkingFile
     )
 {
     HRESULT hr = S_OK;
     LPWSTR sczWorkingFolder = NULL;
     LPWSTR sczTargetDirectory = NULL;
     LPWSTR sczTargetPath = NULL;
-    LPWSTR sczSourceDirectory = NULL;
-    LPWSTR sczPayloadSourcePath = NULL;
-    LPWSTR sczPayloadTargetPath = NULL;
+    HANDLE hTargetFile = INVALID_HANDLE_VALUE;
 
     hr = CacheEnsureBaseWorkingFolder(fElevated, pCache, &sczWorkingFolder);
     ExitOnFailure(hr, "Failed to create working path to copy engine.");
@@ -2118,19 +2152,17 @@ static HRESULT CopyEngineToWorkingFolder(
     ExitOnFailure(hr, "Failed to combine working path with engine file name.");
 
     // Copy the engine without any attached containers to the working path.
-    hr = CopyEngineWithSignatureFixup(pSection->hEngineFile, wzSourcePath, sczTargetPath, pSection);
+    hr = CopyEngineWithSignatureFixup(pSection->hEngineFile, wzSourcePath, sczTargetPath, pSection, &hTargetFile);
     ExitOnFailure(hr, "Failed to copy engine: '%ls' to working path: %ls", wzSourcePath, sczTargetPath);
 
-    if (psczEngineWorkingPath)
-    {
-        hr = StrAllocString(psczEngineWorkingPath, sczTargetPath, 0);
-        ExitOnFailure(hr, "Failed to copy target path for engine working path.");
-    }
+    *psczEngineWorkingPath = sczTargetPath;
+    sczTargetPath = NULL;
+
+    *phEngineWorkingFile = hTargetFile;
+    hTargetFile = INVALID_HANDLE_VALUE;
 
 LExit:
-    ReleaseStr(sczPayloadTargetPath);
-    ReleaseStr(sczPayloadSourcePath);
-    ReleaseStr(sczSourceDirectory);
+    ReleaseFileHandle(hTargetFile);
     ReleaseStr(sczTargetPath);
     ReleaseStr(sczTargetDirectory);
     ReleaseStr(sczWorkingFolder);
@@ -2143,7 +2175,8 @@ static HRESULT CopyEngineWithSignatureFixup(
     __in HANDLE hEngineFile,
     __in_z LPCWSTR wzEnginePath,
     __in_z LPCWSTR wzTargetPath,
-    __in BURN_SECTION* pSection
+    __in BURN_SECTION* pSection,
+    __out HANDLE* phEngineFile
     )
 {
     HRESULT hr = S_OK;
@@ -2151,7 +2184,7 @@ static HRESULT CopyEngineWithSignatureFixup(
     LARGE_INTEGER li = { };
     DWORD dwZeroOriginals[3] = { };
 
-    hTarget = ::CreateFileW(wzTargetPath, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_DELETE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    hTarget = ::CreateFileW(wzTargetPath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (INVALID_HANDLE_VALUE == hTarget)
     {
         ExitWithLastError(hr, "Failed to create engine file at path: %ls", wzTargetPath);
@@ -2199,6 +2232,9 @@ static HRESULT CopyEngineWithSignatureFixup(
         hr = FileWriteHandle(hTarget, reinterpret_cast<LPBYTE>(&dwZeroOriginals), sizeof(dwZeroOriginals));
         ExitOnFailure(hr, "Failed to zero out original data offset.");
     }
+
+    *phEngineFile = hTarget;
+    hTarget = INVALID_HANDLE_VALUE;
 
 LExit:
     ReleaseFileHandle(hTarget);

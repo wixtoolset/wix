@@ -306,6 +306,14 @@ EXTERN_C HRESULT BootstrapperApplicationRemove(
 {
     HRESULT hr = S_OK;
 
+    // Release any open file handles so we can try to recursively delete the temp folder.
+    for (DWORD i = 0; i < pUserExperience->payloads.cPayloads; ++i)
+    {
+        BURN_PAYLOAD* pPayload = pUserExperience->payloads.rgPayloads + i;
+
+        ReleaseFileHandle(pPayload->hLocalFile);
+    }
+
     // Remove temporary UX directory
     if (pUserExperience->sczTempDirectory)
     {

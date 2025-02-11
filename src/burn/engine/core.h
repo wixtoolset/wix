@@ -172,7 +172,6 @@ typedef struct _BURN_ENGINE_STATE
     BURN_REDIRECTED_LOGGING_CONTEXT elevatedLoggingContext;
     HANDLE hUnelevatedLoggingThread;
 
-    LPWSTR sczBundleEngineWorkingPath;
     BURN_PIPE_CONNECTION companionConnection;
     BURN_PIPE_CONNECTION embeddedConnection;
 

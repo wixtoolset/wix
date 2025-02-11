@@ -48,6 +48,7 @@ enum BURN_CAB_OPERATION
     BURN_CAB_OPERATION_NEXT_STREAM,
     BURN_CAB_OPERATION_STREAM_TO_FILE,
     BURN_CAB_OPERATION_STREAM_TO_BUFFER,
+    BURN_CAB_OPERATION_STREAM_TO_HANDLE,
     BURN_CAB_OPERATION_SKIP_STREAM,
     BURN_CAB_OPERATION_CLOSE,
 };
@@ -183,6 +184,10 @@ HRESULT ContainerStreamToBuffer(
     __in BURN_CONTAINER_CONTEXT* pContext,
     __out BYTE** ppbBuffer,
     __out SIZE_T* pcbBuffer
+    );
+HRESULT ContainerStreamToHandle(
+    __in BURN_CONTAINER_CONTEXT* pContext,
+    __in HANDLE hFile
     );
 HRESULT ContainerSkipStream(
     __in BURN_CONTAINER_CONTEXT* pContext

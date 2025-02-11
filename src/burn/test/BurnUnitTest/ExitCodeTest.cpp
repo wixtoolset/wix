@@ -105,7 +105,7 @@ static void LoadEngineState(
                 { (DWORD)HRESULT_FROM_WIN32(ERROR_FAIL_REBOOT_INITIATED), HRESULT_FROM_WIN32(ERROR_FAIL_REBOOT_INITIATED), BOOTSTRAPPER_APPLY_RESTART_NONE, L"Custom" },
             };
 
-            engineState.sczBundleEngineWorkingPath = L"tests\\ignore\\this\\path\\to\\burn.exe";
+            engineState.cache.sczBundleEngineWorkingPath = L"tests\\ignore\\this\\path\\to\\burn.exe";
 
             try
             {
