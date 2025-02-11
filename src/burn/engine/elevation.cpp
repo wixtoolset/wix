@@ -1677,8 +1677,8 @@ static HRESULT LaunchElevatedProcess(
 
     // Since ShellExecuteEx doesn't support passing inherited handles, don't bother with CoreAppendFileHandleSelfToCommandLine.
     // We could fallback to using ::DuplicateHandle to inject the file handle later if necessary.
-    hr = ShelExec(pEngineState->sczBundleEngineWorkingPath, sczParameters, L"runas", NULL, SW_SHOWNA, hwndParent, &hProcess);
-    ExitOnFailure(hr, "Failed to launch elevated child process: %ls", pEngineState->sczBundleEngineWorkingPath);
+    hr = ShelExec(pEngineState->cache.sczBundleEngineWorkingPath, sczParameters, L"runas", NULL, SW_SHOWNA, hwndParent, &hProcess);
+    ExitOnFailure(hr, "Failed to launch elevated child process: %ls", pEngineState->cache.sczBundleEngineWorkingPath);
 
     pConnection->dwProcessId = ::GetProcessId(hProcess);
     pConnection->hProcess = hProcess;

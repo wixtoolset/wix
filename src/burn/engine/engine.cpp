@@ -364,6 +364,8 @@ static HRESULT InitializeEngineState(
     HANDLE hSectionFile = hEngineFile;
     HANDLE hSourceEngineFile = INVALID_HANDLE_VALUE;
 
+    pEngineState->cache.hBundleEngineWorkingFile = INVALID_HANDLE_VALUE;
+
     pEngineState->hUnelevatedLoggingThread = INVALID_HANDLE_VALUE;
     pEngineState->elevatedLoggingContext.hPipe = INVALID_HANDLE_VALUE;
     pEngineState->elevatedLoggingContext.hThread = INVALID_HANDLE_VALUE;
@@ -413,7 +415,6 @@ static void UninitializeEngineState(
 
     BurnPipeConnectionUninitialize(&pEngineState->embeddedConnection);
     BurnPipeConnectionUninitialize(&pEngineState->companionConnection);
-    ReleaseStr(pEngineState->sczBundleEngineWorkingPath)
 
     ReleaseHandle(pEngineState->hMessageWindowThread);
 

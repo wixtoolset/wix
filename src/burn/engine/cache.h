@@ -49,6 +49,10 @@ typedef struct _BURN_CACHE
     // Only valid after CacheEnsureBaseWorkingFolder
     BOOL fInitializedBaseWorkingFolder;
     LPWSTR sczBaseWorkingFolder;
+
+    // Only valid after CacheBundleToWorkingDirectory
+    LPWSTR sczBundleEngineWorkingPath;
+    HANDLE hBundleEngineWorkingFile;
 } BURN_CACHE;
 
 typedef struct _BURN_CACHE_MESSAGE
@@ -175,8 +179,7 @@ HRESULT CacheBundleToWorkingDirectory(
     __in BOOL fElvated,
     __in BURN_CACHE* pCache,
     __in_z LPCWSTR wzExecutableName,
-    __in BURN_SECTION* pSection,
-    __deref_out_z_opt LPWSTR* psczEngineWorkingPath
+    __in BURN_SECTION* pSection
     );
 HRESULT CacheLayoutBundle(
     __in_z LPCWSTR wzExecutableName,

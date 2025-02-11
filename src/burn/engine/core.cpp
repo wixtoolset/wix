@@ -586,11 +586,8 @@ extern "C" HRESULT CoreElevate(
     while (INVALID_HANDLE_VALUE == pEngineState->companionConnection.hPipe)
     {
         // If the elevated companion pipe isn't created yet, let's make that happen.
-        if (!pEngineState->sczBundleEngineWorkingPath)
-        {
-            hr = CacheBundleToWorkingDirectory(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
-            ExitOnFailure(hr, "Failed to cache engine to working directory.");
-        }
+        hr = CacheBundleToWorkingDirectory(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section);
+        ExitOnFailure(hr, "Failed to cache engine to working directory.");
 
         hr = ElevationElevate(pEngineState, reason, hwndParent);
         if (E_SUSPECTED_AV_INTERFERENCE == hr && 1 > cAVRetryAttempts)
@@ -695,11 +692,8 @@ extern "C" HRESULT CoreApply(
     ::InitializeCriticalSection(&applyContext.csApply);
 
     // Ensure the engine is cached to the working path.
-    if (!pEngineState->sczBundleEngineWorkingPath)
-    {
-        hr = CacheBundleToWorkingDirectory(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section, &pEngineState->sczBundleEngineWorkingPath);
-        ExitOnFailure(hr, "Failed to cache engine to working directory.");
-    }
+    hr = CacheBundleToWorkingDirectory(pEngineState->internalCommand.fInitiallyElevated, &pEngineState->cache, pEngineState->registration.sczExecutableName, &pEngineState->section);
+    ExitOnFailure(hr, "Failed to cache engine to working directory.");
 
     // Elevate.
     if (pEngineState->plan.fPerMachine)

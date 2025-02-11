@@ -326,6 +326,24 @@ extern "C" HRESULT ContainerStreamToBuffer(
     return hr;
 }
 
+extern "C" HRESULT ContainerStreamToHandle(
+    __in BURN_CONTAINER_CONTEXT* pContext,
+    __in HANDLE hFile
+    )
+{
+    HRESULT hr = S_OK;
+
+    switch (pContext->type)
+    {
+    case BURN_CONTAINER_TYPE_CABINET:
+        hr = CabExtractStreamToHandle(pContext, hFile);
+        break;
+    }
+
+//LExit:
+    return hr;
+}
+
 extern "C" HRESULT ContainerSkipStream(
     __in BURN_CONTAINER_CONTEXT* pContext
     )

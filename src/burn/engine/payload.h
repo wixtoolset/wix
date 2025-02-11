@@ -57,6 +57,7 @@ typedef struct _BURN_PAYLOAD
     // mutable members
     BURN_PAYLOAD_STATE state;
     LPWSTR sczLocalFilePath; // location of extracted or downloaded copy
+    HANDLE hLocalFile;
 
     LPWSTR sczUnverifiedPath;
     DWORD cRemainingInstances;
