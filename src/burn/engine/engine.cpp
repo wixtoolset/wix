@@ -517,6 +517,10 @@ static HRESULT RunNormal(
     }
     hr = S_OK;
 
+    // Best effort to prevent dotnet from displaying a message box to install .NET when launching a
+    // managed bootstrapper application when .NET is not installed.
+    ::SetEnvironmentVariableW(L"DOTNET_DISABLE_GUI_ERRORS", L"1");
+
     // Set some built-in variables before loading the BA.
     hr = VariableSetNumeric(&pEngineState->variables, BURN_BUNDLE_COMMAND_LINE_ACTION, pEngineState->command.action, TRUE);
     ExitOnFailure(hr, "Failed to set command line action variable.");
