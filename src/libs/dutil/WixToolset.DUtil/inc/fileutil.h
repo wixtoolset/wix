@@ -49,8 +49,8 @@ HRESULT DAPI FileAddSuffixToBaseName(
     __out_z LPWSTR* psczNewFileName
     );
 HRESULT DAPI FileVersionFromString(
-    __in_z LPCWSTR wzVersion, 
-    __out DWORD *pdwVerMajor, 
+    __in_z LPCWSTR wzVersion,
+    __out DWORD *pdwVerMajor,
     __out DWORD* pdwVerMinor
     );
 HRESULT DAPI FileVersionFromStringEx(
@@ -73,11 +73,11 @@ HRESULT DAPI FileSize(
     __out LONGLONG* pllSize
     );
 HRESULT DAPI FileSizeByHandle(
-    __in HANDLE hFile, 
+    __in HANDLE hFile,
     __out LONGLONG* pllSize
     );
 BOOL DAPI FileExistsEx(
-    __in_z LPCWSTR wzPath, 
+    __in_z LPCWSTR wzPath,
     __out_opt DWORD *pdwAttributes
     );
 BOOL DAPI FileExistsAfterRestart(
@@ -166,8 +166,8 @@ HRESULT DAPI FileEnsureCopyWithRetry(
     __in DWORD dwWaitMilliseconds
     );
 HRESULT DAPI FileEnsureMove(
-    __in_z LPCWSTR wzSource, 
-    __in_z LPCWSTR wzTarget, 
+    __in_z LPCWSTR wzSource,
+    __in_z LPCWSTR wzTarget,
     __in BOOL fOverwrite,
     __in BOOL fAllowCopy
     );
@@ -191,9 +191,20 @@ HRESULT DAPI FileCreateTempW(
     __deref_opt_out_z LPWSTR* ppwzTempFile,
     __out_opt HANDLE* phTempFile
     );
+HRESULT DAPI FileCreateWithRetry(
+    __in LPCWSTR wzFile,
+    __in DWORD dwDesiredAccess,
+    __in DWORD dwShareMode,
+    __in_opt LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+    __in DWORD dwCreationDisposition,
+    __in DWORD dwFlagsAndAttributes,
+    __in DWORD cRetry,
+    __in DWORD dwWaitMilliseconds,
+    __out HANDLE* phFile
+    );
 HRESULT DAPI FileVersion(
-    __in_z LPCWSTR wzFilename, 
-    __out DWORD *pdwVerMajor, 
+    __in_z LPCWSTR wzFilename,
+    __out DWORD *pdwVerMajor,
     __out DWORD* pdwVerMinor
     );
 HRESULT DAPI FileIsSame(
@@ -205,7 +216,7 @@ HRESULT DAPI FileEnsureDelete(
     __in_z LPCWSTR wzFile
     );
 HRESULT DAPI FileGetTime(
-    __in_z LPCWSTR wzFile,  
+    __in_z LPCWSTR wzFile,
     __out_opt  LPFILETIME lpCreationTime,
     __out_opt  LPFILETIME lpLastAccessTime,
     __out_opt  LPFILETIME lpLastWriteTime
