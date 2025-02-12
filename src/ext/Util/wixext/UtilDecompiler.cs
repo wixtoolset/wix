@@ -453,14 +453,14 @@ namespace WixToolset.Util
                 var groupId = row.FieldAsString(0);
                 if (this.DecompilerHelper.TryGetIndexedElement("Group", groupId, out var group))
                 {
-                    var attributes = (Group6Symbol.SymbolAttributes)(row.FieldAsNullableInteger(2) ?? 0);
+                    var attributes = (Group6SymbolAttributes)(row.FieldAsNullableInteger(2) ?? 0);
                     group.Add(AttributeIfNotNull("Comment", row, 1));
-                    group.Add(AttributeIfTrue("FailIfExists", ((attributes & Group6Symbol.SymbolAttributes.FailIfExists) != 0)));
-                    group.Add(AttributeIfTrue("UpdateIfExists", ((attributes & Group6Symbol.SymbolAttributes.UpdateIfExists) != 0)));
-                    group.Add(AttributeIfTrue("DontRemoveOnUninstall", ((attributes & Group6Symbol.SymbolAttributes.DontRemoveOnUninstall) != 0)));
-                    group.Add(AttributeIfTrue("DontCreateGroup", ((attributes & Group6Symbol.SymbolAttributes.DontCreateGroup) != 0)));
-                    group.Add(AttributeIfTrue("NonVital", ((attributes & Group6Symbol.SymbolAttributes.NonVital) != 0)));
-                    group.Add(AttributeIfTrue("RemoveComment", ((attributes & Group6Symbol.SymbolAttributes.RemoveComment) != 0)));
+                    group.Add(AttributeIfTrue("FailIfExists", ((attributes & Group6SymbolAttributes.FailIfExists) != 0)));
+                    group.Add(AttributeIfTrue("UpdateIfExists", ((attributes & Group6SymbolAttributes.UpdateIfExists) != 0)));
+                    group.Add(AttributeIfTrue("DontRemoveOnUninstall", ((attributes & Group6SymbolAttributes.DontRemoveOnUninstall) != 0)));
+                    group.Add(AttributeIfTrue("DontCreateGroup", ((attributes & Group6SymbolAttributes.DontCreateGroup) != 0)));
+                    group.Add(AttributeIfTrue("NonVital", ((attributes & Group6SymbolAttributes.NonVital) != 0)));
+                    group.Add(AttributeIfTrue("RemoveComment", ((attributes & Group6SymbolAttributes.RemoveComment) != 0)));
                 }
                 else
                 {

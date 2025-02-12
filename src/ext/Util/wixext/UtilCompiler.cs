@@ -1361,7 +1361,7 @@ namespace WixToolset.Util
             string domain = null;
             string name = null;
             string comment = null;
-            Group6Symbol.SymbolAttributes attributes = Group6Symbol.SymbolAttributes.None;
+            Group6SymbolAttributes attributes = Group6SymbolAttributes.None;
 
             foreach (var attrib in element.Attributes())
             {
@@ -1394,7 +1394,7 @@ namespace WixToolset.Util
 
                             if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
-                                attributes |= Group6Symbol.SymbolAttributes.DontCreateGroup;
+                                attributes |= Group6SymbolAttributes.DontCreateGroup;
                             }
                             break;
                         case "FailIfExists":
@@ -1405,7 +1405,7 @@ namespace WixToolset.Util
 
                             if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
-                                attributes |= Group6Symbol.SymbolAttributes.FailIfExists;
+                                attributes |= Group6SymbolAttributes.FailIfExists;
                             }
                             break;
                         case "UpdateIfExists":
@@ -1416,13 +1416,13 @@ namespace WixToolset.Util
 
                             if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
-                                attributes |= Group6Symbol.SymbolAttributes.UpdateIfExists;
+                                attributes |= Group6SymbolAttributes.UpdateIfExists;
                             }
                             break;
                         case "RemoveComment":
                             if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
-                                attributes |= Group6Symbol.SymbolAttributes.RemoveComment;
+                                attributes |= Group6SymbolAttributes.RemoveComment;
                             }
                             break;
                         case "RemoveOnUninstall":
@@ -1433,7 +1433,7 @@ namespace WixToolset.Util
 
                             if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
-                                attributes |= Group6Symbol.SymbolAttributes.DontRemoveOnUninstall;
+                                attributes |= Group6SymbolAttributes.DontRemoveOnUninstall;
                             }
                             break;
                         case "Vital":
@@ -1444,7 +1444,7 @@ namespace WixToolset.Util
 
                             if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
                             {
-                                attributes |= Group6Symbol.SymbolAttributes.NonVital;
+                                attributes |= Group6SymbolAttributes.NonVital;
                             }
                             break;
                         default:
@@ -1468,7 +1468,7 @@ namespace WixToolset.Util
                 this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, element.Name.LocalName, "Name"));
             }
 
-            if (null != comment && (Group6Symbol.SymbolAttributes.RemoveComment & attributes) != 0)
+            if (null != comment && (Group6SymbolAttributes.RemoveComment & attributes) != 0)
             {
                 this.Messaging.Write(ErrorMessages.IllegalAttributeWithOtherAttribute(sourceLineNumbers, element.Name.LocalName, "Comment", "RemoveComment"));
             }
