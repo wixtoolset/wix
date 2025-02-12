@@ -27,6 +27,7 @@ This repository contains the WiX Toolset codebase.
 | .NET Framework 4.7.2 SDK |
 | .NET Framework 4.7.2 targeting pack |
 | .NET Framework 4.6.2 targeting pack |
+| ATL v143 - VS 2022 C++ x64/x86 build tools (Latest) |
 | MSVC v143 - VS 2022 C++ ARM64/ARM64EC build tools (Latest) |
 | MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest) |
 | Git for Windows |
