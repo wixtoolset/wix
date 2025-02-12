@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - master
+    tags:
+      - v**
   pull_request:
     branches:
       - main
@@ -20,6 +21,8 @@ jobs:
   build:
     name: Build
     runs-on: windows-2022
+    env:
+      WixOfficialBuild: ${{ github.repository_owner == 'wixtoolset' && startsWith(github.ref, 'refs/tags/v') }}
     permissions:
       packages: write
       id-token: write
@@ -34,9 +37,9 @@ jobs:
       #   run: ./src/vs_config.cmd
 
       - name: Install sign tool
-        if: (github.ref == 'refs/heads/master')
+        if: ${{ env.WixOfficialBuild == 'true' }}
         shell: cmd
-        run: dotnet tool install --tool-path build\.tools sign --version 0.9.1-beta.24529.1
+        run: dotnet tool install --tool-path build\.tools sign --version 0.9.1-beta.24170.3
 
       - name: Configure automated logging and crash dumps
         shell: cmd
@@ -50,24 +53,24 @@ jobs:
           reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\Windows Error Reporting\LocalDumps" /t REG_DWORD /v DumpCount /d 10 /f
           reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\Windows Error Reporting\LocalDumps" /t REG_DWORD /v DumpType /d 1
 
-      - name: 'Az CLI login'
-        if: (github.ref == 'refs/heads/master')
-        uses: azure/login@v1
-        with:
-          allow-no-subscriptions: true
-          client-id: ${{ secrets.WIX_SIGNING_CLIENTID }}
-          tenant-id: ${{ secrets.WIX_SIGNING_TENANTID }}
+      # - name: 'Az CLI login'
+      #   if: ${{ env.WixOfficialBuild == 'true' }}
+      #   uses: azure/login@v1
+      #   with:
+      #     allow-no-subscriptions: true
+      #     client-id: ${{ secrets.WIX_SIGNING_CLIENTID }}
+      #     tenant-id: ${{ secrets.WIX_SIGNING_TENANTID }}
 
       - name: Build wix6
         shell: cmd
         run: ./src/build_official.cmd
         env:
           RuntimeTestsEnabled: true
-          SigningKeyVaultUri:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_VAULTURI || '' }}
-          SigningTenantId:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_TENANTID || '' }}
-          SigningClientId:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_CLIENTID || '' }}
-          SigningClientSecret:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_SECRET || '' }}
-          SigningCertName:  ${{ github.ref == 'refs/heads/master' && secrets.WIX_SIGNING_CERTNAME || '' }}
+          SigningKeyVaultUri:  ${{ env.WixOfficialBuild == 'true' && secrets.WIX_SIGNING_VAULTURI || '' }}
+          SigningTenantId:  ${{ env.WixOfficialBuild == 'true' && secrets.WIX_SIGNING_TENANTID || '' }}
+          SigningClientId:  ${{ env.WixOfficialBuild == 'true' && secrets.WIX_SIGNING_CLIENTID || '' }}
+          SigningClientSecret:  ${{ env.WixOfficialBuild == 'true' && secrets.WIX_SIGNING_SECRET || '' }}
+          SigningCertName:  ${{ env.WixOfficialBuild == 'true' && secrets.WIX_SIGNING_CERTNAME || '' }}
 
       - name: Validate test results
         shell: cmd
@@ -80,28 +83,28 @@ jobs:
           path: build/artifacts/
 
       - name: Collect integration test logs
-        if: always()
+        if: ${{ !cancelled() }}
         shell: cmd
         run: 7z a "build\logs\test_burn_%GITHUB_RUN_ID%.zip" "%TEMP%\*.log" "%TEMP%\..\*.log"
 
       - name: Export Application event log
-        if: always()
+        if: ${{ !cancelled() }}
         shell: cmd
         run: wevtutil epl Application build\logs\Application.evtx /q:"Event/System/TimeCreated[timediff(@SystemTime) <= 86400000]"
 
       - name: Export System event log
-        if: always()
+        if: ${{ !cancelled() }}
         shell: cmd
         run: wevtutil epl System build\logs\System.evtx /q:"Event/System/TimeCreated[timediff(@SystemTime) <= 86400000]"
 
-      # Do NOT publish logs on `master` branch as they may contain secrets in them.
+      # Do NOT publish logs on `official builds` (version tagged builds) as they may contain secrets in them.
       - name: Save logs
-        if: github.ref != 'refs/heads/master' && always()
+        if: ${{ env.WixOfficialBuild != 'true' && !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: logs_${{ github.run_id }}
           path: build/logs/
 
       - name: Push to GitHub Packages
-        if: github.event_name == 'push' && github.repository_owner == 'wixtoolset' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+        if: ${{ github.event_name == 'push' && github.repository_owner == 'wixtoolset' && (env.WixOfficialBuild == 'true' || github.ref == 'refs/heads/main') }}
         run: dotnet nuget push "build/artifacts/**/*.nupkg" --source https://nuget.pkg.github.com/wixtoolset/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
