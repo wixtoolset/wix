@@ -11,9 +11,9 @@ namespace WixToolset.Util
             UtilSymbolDefinitionType.Group.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(GroupSymbol.SymbolFields.ComponentRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(GroupSymbol.SymbolFields.Name), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(GroupSymbol.SymbolFields.Domain), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(GroupSymbolFields.ComponentRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(GroupSymbolFields.Name), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(GroupSymbolFields.Domain), IntermediateFieldType.String),
             },
             typeof(GroupSymbol));
 
@@ -21,9 +21,9 @@ namespace WixToolset.Util
             UtilSymbolDefinitionType.Group6.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(Group6Symbol.SymbolFields.GroupRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(Group6Symbol.SymbolFields.Comment), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(Group6Symbol.SymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(Group6SymbolFields.GroupRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(Group6SymbolFields.Comment), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(Group6SymbolFields.Attributes), IntermediateFieldType.Number),
             },
             typeof(Group6Symbol));
     }
@@ -34,15 +34,15 @@ namespace WixToolset.Util.Symbols
     using System;
     using WixToolset.Data;
 
+    public enum GroupSymbolFields
+    {
+        ComponentRef,
+        Name,
+        Domain,
+    }
+
     public class GroupSymbol : IntermediateSymbol
     {
-        public enum SymbolFields
-        {
-            ComponentRef,
-            Name,
-            Domain,
-        }
-
         public GroupSymbol() : base(UtilSymbolDefinitions.Group, null, null)
         {
         }
@@ -51,48 +51,48 @@ namespace WixToolset.Util.Symbols
         {
         }
 
-        public IntermediateField this[GroupSymbol.SymbolFields index] => this.Fields[(int)index];
+        public IntermediateField this[GroupSymbolFields index] => this.Fields[(int)index];
 
         public string ComponentRef
         {
-            get => this.Fields[(int)GroupSymbol.SymbolFields.ComponentRef].AsString();
-            set => this.Set((int)GroupSymbol.SymbolFields.ComponentRef, value);
+            get => this.Fields[(int)GroupSymbolFields.ComponentRef].AsString();
+            set => this.Set((int)GroupSymbolFields.ComponentRef, value);
         }
 
         public string Name
         {
-            get => this.Fields[(int)GroupSymbol.SymbolFields.Name].AsString();
-            set => this.Set((int)GroupSymbol.SymbolFields.Name, value);
+            get => this.Fields[(int)GroupSymbolFields.Name].AsString();
+            set => this.Set((int)GroupSymbolFields.Name, value);
         }
 
         public string Domain
         {
-            get => this.Fields[(int)GroupSymbol.SymbolFields.Domain].AsString();
-            set => this.Set((int)GroupSymbol.SymbolFields.Domain, value);
+            get => this.Fields[(int)GroupSymbolFields.Domain].AsString();
+            set => this.Set((int)GroupSymbolFields.Domain, value);
         }
+    }
+
+    [Flags]
+    public enum Group6SymbolAttributes
+    {
+        None = 0x00000000,
+        FailIfExists = 0x00000010,
+        UpdateIfExists = 0x00000020,
+        DontRemoveOnUninstall = 0x00000100,
+        DontCreateGroup = 0x00000200,
+        NonVital = 0x00000400,
+        RemoveComment = 0x00000800,
+    }
+
+    public enum Group6SymbolFields
+    {
+        GroupRef,
+        Comment,
+        Attributes,
     }
 
     public class Group6Symbol : IntermediateSymbol
     {
-        [Flags]
-        public enum SymbolAttributes
-        {
-            None = 0x00000000,
-            FailIfExists = 0x00000010,
-            UpdateIfExists = 0x00000020,
-            DontRemoveOnUninstall = 0x00000100,
-            DontCreateGroup = 0x00000200,
-            NonVital = 0x00000400,
-            RemoveComment = 0x00000800,
-        }
-
-        public enum SymbolFields
-        {
-            GroupRef,
-            Comment,
-            Attributes,
-        }
-
         public Group6Symbol() : base(UtilSymbolDefinitions.Group6, null, null)
         {
         }
@@ -101,24 +101,24 @@ namespace WixToolset.Util.Symbols
         {
         }
 
-        public IntermediateField this[Group6Symbol.SymbolFields index] => this.Fields[(int)index];
+        public IntermediateField this[Group6SymbolFields index] => this.Fields[(int)index];
 
         public string GroupRef
         {
-            get => this.Fields[(int)Group6Symbol.SymbolFields.GroupRef].AsString();
-            set => this.Set((int)Group6Symbol.SymbolFields.GroupRef, value);
+            get => this.Fields[(int)Group6SymbolFields.GroupRef].AsString();
+            set => this.Set((int)Group6SymbolFields.GroupRef, value);
         }
 
         public string Comment
         {
-            get => this.Fields[(int)Group6Symbol.SymbolFields.Comment].AsString();
-            set => this.Set((int)Group6Symbol.SymbolFields.Comment, value);
+            get => this.Fields[(int)Group6SymbolFields.Comment].AsString();
+            set => this.Set((int)Group6SymbolFields.Comment, value);
         }
 
-        public SymbolAttributes Attributes
+        public Group6SymbolAttributes Attributes
         {
-            get => (SymbolAttributes)this.Fields[(int)Group6Symbol.SymbolFields.Attributes].AsNumber();
-            set => this.Set((int)Group6Symbol.SymbolFields.Attributes, (int)value);
+            get => (Group6SymbolAttributes)this.Fields[(int)Group6SymbolFields.Attributes].AsNumber();
+            set => this.Set((int)Group6SymbolFields.Attributes, (int)value);
         }
     }
 }

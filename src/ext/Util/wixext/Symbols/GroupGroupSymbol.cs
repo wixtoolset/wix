@@ -11,8 +11,8 @@ namespace WixToolset.Util
             UtilSymbolDefinitionType.GroupGroup.ToString(),
             new[]
             {
-                new IntermediateFieldDefinition(nameof(GroupGroupSymbol.SymbolFields.ParentGroupRef), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(GroupGroupSymbol.SymbolFields.ChildGroupRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(GroupGroupSymbolFields.ParentGroupRef), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(GroupGroupSymbolFields.ChildGroupRef), IntermediateFieldType.String),
             },
             typeof(UserGroupSymbol));
     }
@@ -22,14 +22,14 @@ namespace WixToolset.Util.Symbols
 {
     using WixToolset.Data;
 
+    public enum GroupGroupSymbolFields
+    {
+        ParentGroupRef,
+        ChildGroupRef,
+    }
+
     public class GroupGroupSymbol : IntermediateSymbol
     {
-        public enum SymbolFields
-        {
-            ParentGroupRef,
-            ChildGroupRef,
-        }
-
         public GroupGroupSymbol() : base(UtilSymbolDefinitions.GroupGroup, null, null)
         {
         }
@@ -38,18 +38,18 @@ namespace WixToolset.Util.Symbols
         {
         }
 
-        public IntermediateField this[GroupGroupSymbol.SymbolFields index] => this.Fields[(int)index];
+        public IntermediateField this[GroupGroupSymbolFields index] => this.Fields[(int)index];
 
         public string ParentGroupRef
         {
-            get => this.Fields[(int)GroupGroupSymbol.SymbolFields.ParentGroupRef].AsString();
-            set => this.Set((int)GroupGroupSymbol.SymbolFields.ParentGroupRef, value);
+            get => this.Fields[(int)GroupGroupSymbolFields.ParentGroupRef].AsString();
+            set => this.Set((int)GroupGroupSymbolFields.ParentGroupRef, value);
         }
 
         public string ChildGroupRef
         {
-            get => this.Fields[(int)GroupGroupSymbol.SymbolFields.ChildGroupRef].AsString();
-            set => this.Set((int)GroupGroupSymbol.SymbolFields.ChildGroupRef, value);
+            get => this.Fields[(int)GroupGroupSymbolFields.ChildGroupRef].AsString();
+            set => this.Set((int)GroupGroupSymbolFields.ChildGroupRef, value);
         }
 
     }
