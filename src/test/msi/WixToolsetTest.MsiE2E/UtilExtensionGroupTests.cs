@@ -16,51 +16,60 @@ namespace WixToolsetTest.MsiE2E
         [RuntimeFact]
         public void CanInstallAndUninstallNonDomainGroups()
         {
-            UserGroupVerifier.CreateLocalGroup("testName3");
-            var productA = this.CreatePackageInstaller("ProductA");
+            try
+            {
+                UserGroupVerifier.CreateLocalGroup("testName3");
+                var productA = this.CreatePackageInstaller("ProductA");
 
-            productA.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                productA.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
-            // Validate New User Information.
-            Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("Group '{0}' was not created on Install", "testName1"));
-            Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("Group '{0}' was not created on Install", "testName2"));
-            Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName3"), String.Format("Group '{0}' was not created on Install", "testName3"));
+                // Validate New User Information.
+                Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("Group '{0}' was not created on Install", "testName1"));
+                Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("Group '{0}' was not created on Install", "testName2"));
+                Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName3"), String.Format("Group '{0}' was not created on Install", "testName3"));
 
-            productA.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                productA.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
-            // Verify Users marked as RemoveOnUninstall were removed.
-            Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("Group '{0}' was not removed on Uninstall", "testName1"));
-            Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("Group '{0}' was removed on Uninstall", "testName2"));
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
-            UserGroupVerifier.DeleteLocalGroup("testName2");
-            UserGroupVerifier.DeleteLocalGroup("testName3");
+                // Verify Users marked as RemoveOnUninstall were removed.
+                Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("Group '{0}' was not removed on Uninstall", "testName1"));
+                Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("Group '{0}' was removed on Uninstall", "testName2"));
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+                UserGroupVerifier.DeleteLocalGroup("testName2");
+                UserGroupVerifier.DeleteLocalGroup("testName3");
+            }
         }
 
         // Verify the rollback action reverts all Users changes.
         [RuntimeFact]
         public void CanRollbackNonDomainGroups()
         {
-            UserGroupVerifier.CreateLocalGroup("testName3");
-            var productFail = this.CreatePackageInstaller("ProductFail");
+            try
+            {
+                UserGroupVerifier.CreateLocalGroup("testName3");
+                var productFail = this.CreatePackageInstaller("ProductFail");
 
-            // make sure the user accounts are deleted before we start
-            UserGroupVerifier.DeleteLocalGroup("testName1");
-            UserGroupVerifier.DeleteLocalGroup("testName2");
+                // make sure the user accounts are deleted before we start
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+                UserGroupVerifier.DeleteLocalGroup("testName2");
 
-            productFail.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE);
+                productFail.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE);
 
-            // Verify added Users were removed on rollback.
-            Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("Group '{0}' was not removed on Rollback", "testName1"));
-            Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("Group '{0}' was not removed on Rollback", "testName2"));
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
-            UserGroupVerifier.DeleteLocalGroup("testName2");
-            UserGroupVerifier.DeleteLocalGroup("testName3");
+                // Verify added Users were removed on rollback.
+                Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("Group '{0}' was not removed on Rollback", "testName1"));
+                Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("Group '{0}' was not removed on Rollback", "testName2"));
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+                UserGroupVerifier.DeleteLocalGroup("testName2");
+                UserGroupVerifier.DeleteLocalGroup("testName3");
+            }
         }
-
 
         // Verify that command-line parameters aer not blocked by repair switches.
         // Original code signalled repair mode by using "-f ", which silently
@@ -68,58 +77,67 @@ namespace WixToolsetTest.MsiE2E
         [RuntimeFact()]
         public void CanRepairNonDomainGroupsWithCommandLineParameters()
         {
-            var arguments = new string[]
+            try
             {
-                "TESTPARAMETER1=testName1",
-            };
-            var productWithCommandLineParameters = this.CreatePackageInstaller("ProductWithCommandLineParameters");
+                var arguments = new string[]
+                {
+                    "TESTPARAMETER1=testName1",
+                };
+                var productWithCommandLineParameters = this.CreatePackageInstaller("ProductWithCommandLineParameters");
 
-            // Make sure that the user doesn't exist when we start the test.
-            UserGroupVerifier.DeleteLocalGroup("testName1");
+                // Make sure that the user doesn't exist when we start the test.
+                UserGroupVerifier.DeleteLocalGroup("testName1");
 
-            // Install
-            productWithCommandLineParameters.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
+                // Install
+                productWithCommandLineParameters.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
 
-            // Repair
-            productWithCommandLineParameters.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
+                // Repair
+                productWithCommandLineParameters.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
 
 
-            // Install
-            productWithCommandLineParameters.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
-
-            // Clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
+                // Install
+                productWithCommandLineParameters.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, arguments);
+            }
+            finally
+            {
+                // Clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+            }
         }
-
 
         // Verify that the groups specified in the authoring are created as expected on repair.
         [RuntimeFact()]
         public void CanRepairNonDomainGroups()
         {
-            UserGroupVerifier.CreateLocalGroup("testName3");
-            var productA = this.CreatePackageInstaller("ProductA");
+            try
+            {
+                UserGroupVerifier.CreateLocalGroup("testName3");
+                var productA = this.CreatePackageInstaller("ProductA");
 
-            productA.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                productA.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
-            // Validate New User Information.
-            UserGroupVerifier.DeleteLocalGroup("testName1");
+                // Validate New User Information.
+                UserGroupVerifier.DeleteLocalGroup("testName1");
 
-            productA.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                productA.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
-            // Validate New User Information.
-            Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("User '{0}' was not installed on Repair", "testName1"));
-            Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("User '{0}' was not installed after Repair", "testName2"));
+                // Validate New User Information.
+                Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("User '{0}' was not installed on Repair", "testName1"));
+                Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("User '{0}' was not installed after Repair", "testName2"));
 
-            productA.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                productA.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
-            // Verify Users marked as RemoveOnUninstall were removed.
-            Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("User '{0}' was not removed on Uninstall", "testName1"));
-            Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("User '{0}' was removed on Uninstall", "testName2"));
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
-            UserGroupVerifier.DeleteLocalGroup("testName2");
-            UserGroupVerifier.DeleteLocalGroup("testName3");
+                // Verify Users marked as RemoveOnUninstall were removed.
+                Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("User '{0}' was not removed on Uninstall", "testName1"));
+                Assert.True(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("User '{0}' was removed on Uninstall", "testName2"));
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+                UserGroupVerifier.DeleteLocalGroup("testName2");
+                UserGroupVerifier.DeleteLocalGroup("testName3");
+            }
         }
 
         // Verify that Installation fails if FailIfExists is set.
@@ -165,101 +183,131 @@ namespace WixToolsetTest.MsiE2E
         [RuntimeFact]
         public void CanCreateNewNonDomainGroupWithComment()
         {
-            var productNewUserWithComment = this.CreatePackageInstaller("ProductNewGroupWithComment");
+            try
+            {
+                var productNewUserWithComment = this.CreatePackageInstaller("ProductNewGroupWithComment");
 
-            productNewUserWithComment.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
-            UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "testComment1");
-            productNewUserWithComment.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
+                productNewUserWithComment.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "testComment1");
+                productNewUserWithComment.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+            }
         }
 
         // Verify that a comment can be added to an existing group
         [RuntimeFact]
         public void CanAddCommentToExistingNonDomainGroup()
         {
-            UserGroupVerifier.CreateLocalGroup("testName1");
-            var productAddCommentToExistingUser = this.CreatePackageInstaller("ProductAddCommentToExistingGroup");
+            try
+            {
+                UserGroupVerifier.CreateLocalGroup("testName1");
+                var productAddCommentToExistingUser = this.CreatePackageInstaller("ProductAddCommentToExistingGroup");
 
-            productAddCommentToExistingUser.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                productAddCommentToExistingUser.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
-            UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "testComment1");
+                UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "testComment1");
 
-            productAddCommentToExistingUser.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
+                productAddCommentToExistingUser.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+            }
         }
 
         // Verify that a comment can be repaired for a new group
         [RuntimeFact]
         public void CanRepairCommentOfNewNonDomainGroup()
         {
-            var productNewUserWithComment = this.CreatePackageInstaller("ProductNewGroupWithComment");
+            try
+            {
+                var productNewUserWithComment = this.CreatePackageInstaller("ProductNewGroupWithComment");
 
-            productNewUserWithComment.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
-            UserGroupVerifier.SetGroupComment(String.Empty, "testName1", "");
+                productNewUserWithComment.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                UserGroupVerifier.SetGroupComment(String.Empty, "testName1", "");
 
-            productNewUserWithComment.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS);
-            UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "testComment1");
-            productNewUserWithComment.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
+                productNewUserWithComment.RepairProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "testComment1");
+                productNewUserWithComment.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+            }
         }
 
         // Verify that a comment can be changed for an existing group
         [RuntimeFact]
         public void CanChangeCommentOfExistingNonDomainGroup()
         {
-            UserGroupVerifier.CreateLocalGroup("testName1");
-            UserGroupVerifier.SetGroupComment(String.Empty, "testName1", "initialTestComment1");
-            var productNewUserWithComment = this.CreatePackageInstaller("ProductNewGroupWithComment");
+            try
+            {
+                UserGroupVerifier.CreateLocalGroup("testName1");
+                UserGroupVerifier.SetGroupComment(String.Empty, "testName1", "initialTestComment1");
+                var productNewUserWithComment = this.CreatePackageInstaller("ProductNewGroupWithComment");
 
-            productNewUserWithComment.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
-            UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "testComment1");
-            productNewUserWithComment.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
+                productNewUserWithComment.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "testComment1");
+                productNewUserWithComment.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+            }
         }
 
         // Verify that a comment can be rolled back for an existing group
         [RuntimeFact]
         public void CanRollbackCommentOfExistingNonDomainGroup()
         {
-            UserGroupVerifier.CreateLocalGroup("testName1");
-            UserGroupVerifier.SetGroupComment(String.Empty, "testName1", "initialTestComment1");
-            var productCommentFail = this.CreatePackageInstaller("ProductCommentFail");
+            try
+            {
+                UserGroupVerifier.CreateLocalGroup("testName1");
+                UserGroupVerifier.SetGroupComment(String.Empty, "testName1", "initialTestComment1");
+                var productCommentFail = this.CreatePackageInstaller("ProductCommentFail");
 
-            productCommentFail.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE);
+                productCommentFail.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE);
 
-            // Verify that comment change was rolled back.
-            UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "initialTestComment1");
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
+                // Verify that comment change was rolled back.
+                UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "initialTestComment1");
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+            }
         }
 
         // Verify that a comment can be deleted for an existing group
         [RuntimeFact]
         public void CanDeleteCommentOfExistingNonDomainGroup()
         {
-            UserGroupVerifier.CreateLocalGroup("testName1");
-            UserGroupVerifier.SetGroupComment(String.Empty, "testName1", "testComment1");
-            var productCommentDelete = this.CreatePackageInstaller("ProductCommentDelete");
+            try
+            {
+                UserGroupVerifier.CreateLocalGroup("testName1");
+                UserGroupVerifier.SetGroupComment(String.Empty, "testName1", "testComment1");
+                var productCommentDelete = this.CreatePackageInstaller("ProductCommentDelete");
 
-            productCommentDelete.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+                productCommentDelete.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
 
-            // Verify that comment was removed.
-            UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "");
+                // Verify that comment was removed.
+                UserGroupVerifier.VerifyGroupComment(String.Empty, "testName1", "");
 
 
-            productCommentDelete.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
+                productCommentDelete.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS);
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+            }
         }
 
         #endregion
@@ -269,48 +317,58 @@ namespace WixToolsetTest.MsiE2E
         [RuntimeFact(DomainRequired = true)]
         public void CanNestDomainGroups()
         {
-            var testDomain = System.Environment.UserDomainName;
-            var productNestedGroups = this.CreatePackageInstaller("ProductNestedGroups");
+            try
+            {
+                var testDomain = System.Environment.UserDomainName;
+                var productNestedGroups = this.CreatePackageInstaller("ProductNestedGroups");
 
-            productNestedGroups.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, $"TESTDOMAIN={testDomain}");
+                productNestedGroups.InstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, $"TESTDOMAIN={testDomain}");
 
-            // Verify group nested membership
-            UserGroupVerifier.VerifyIsMemberOf(testDomain, "Domain Users", new string[] { "testName1", "testName2" });
-            //UserGroupVerifier.VerifyIsMemberOf(String.Empty, "Everyone", new string[] { "testName1" });
+                // Verify group nested membership
+                UserGroupVerifier.VerifyIsMemberOf(testDomain, "Domain Users", new string[] { "testName1", "testName2" });
+                //UserGroupVerifier.VerifyIsMemberOf(String.Empty, "Everyone", new string[] { "testName1" });
 
-            UserGroupVerifier.VerifyIsNotMemberOf(testDomain, "Domain Users", new string[] { "testName3" });
-            //UserGroupVerifier.VerifyIsNotMemberOf(String.Empty, "Everyone", new string[] { "testName2", "testName3" });
+                UserGroupVerifier.VerifyIsNotMemberOf(testDomain, "Domain Users", new string[] { "testName3" });
+                //UserGroupVerifier.VerifyIsNotMemberOf(String.Empty, "Everyone", new string[] { "testName2", "testName3" });
 
-            productNestedGroups.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, $"TESTDOMAIN={testDomain}");
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
-            UserGroupVerifier.DeleteLocalGroup("testName2");
-            UserGroupVerifier.DeleteLocalGroup("testName3");
+                productNestedGroups.UninstallProduct(MSIExec.MSIExecReturnCode.SUCCESS, $"TESTDOMAIN={testDomain}");
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+                UserGroupVerifier.DeleteLocalGroup("testName2");
+                UserGroupVerifier.DeleteLocalGroup("testName3");
+            }
         }
 
         // Verify the rollback action reverts all Users changes.
         [RuntimeFact(DomainRequired = true)]
         public void CanRollbackDomainGroups()
         {
-            var testDomain = System.Environment.UserDomainName;
-            UserGroupVerifier.CreateLocalGroup("testName3");
-            var productFail = this.CreatePackageInstaller("ProductFail");
+            try
+            {
+                var testDomain = System.Environment.UserDomainName;
+                UserGroupVerifier.CreateLocalGroup("testName3");
+                var productFail = this.CreatePackageInstaller("ProductFail");
 
-            // make sure the user accounts are deleted before we start
-            UserGroupVerifier.DeleteLocalGroup("testName1");
-            UserGroupVerifier.DeleteLocalGroup("testName2");
+                // make sure the user accounts are deleted before we start
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+                UserGroupVerifier.DeleteLocalGroup("testName2");
 
-            productFail.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE, $"TESTDOMAIN={testDomain}");
+                productFail.InstallProduct(MSIExec.MSIExecReturnCode.ERROR_INSTALL_FAILURE, $"TESTDOMAIN={testDomain}");
 
-            // Verify added Users were removed on rollback.
-            Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("Group '{0}' was not removed on Rollback", "testName1"));
-            Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("Group '{0}' was not removed on Rollback", "testName2"));
-
-            // clean up
-            UserGroupVerifier.DeleteLocalGroup("testName1");
-            UserGroupVerifier.DeleteLocalGroup("testName2");
-            UserGroupVerifier.DeleteLocalGroup("testName3");
+                // Verify added Users were removed on rollback.
+                Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName1"), String.Format("Group '{0}' was not removed on Rollback", "testName1"));
+                Assert.False(UserGroupVerifier.GroupExists(String.Empty, "testName2"), String.Format("Group '{0}' was not removed on Rollback", "testName2"));
+            }
+            finally
+            {
+                // clean up
+                UserGroupVerifier.DeleteLocalGroup("testName1");
+                UserGroupVerifier.DeleteLocalGroup("testName2");
+                UserGroupVerifier.DeleteLocalGroup("testName3");
+            }
         }
 
         #endregion
