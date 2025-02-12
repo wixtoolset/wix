@@ -18,6 +18,11 @@ namespace WixToolset.Extensibility.Data
         IServiceProvider ServiceProvider { get; }
 
         /// <summary>
+        /// Indicates whether to generate GUIDs backward compatible with WiX v3.
+        /// </summary>
+        bool BackwardCompatibleGuidGeneration { get; set; }
+
+        /// <summary>
         /// Bind paths used during resolution.
         /// </summary>
         IReadOnlyCollection<IBindPath> BindPaths { get; set; }

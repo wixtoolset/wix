@@ -47,6 +47,7 @@ namespace WixToolset.Core.CommandLine
             return new CommandLineHelp("", "build [options] sourcefile [sourcefile ...] -out output.ext", new[]
             {
                 new CommandLineHelpSwitch("-arch", "Set the architecture of the output."),
+                new CommandLineHelpSwitch("-bcgg", "Backward compatible GUID generation with WiX v3."),
                 new CommandLineHelpSwitch("-bindfiles", "-bf", "Bind files into an output .wixlib. Ignored if not building a .wixlib."),
                 new CommandLineHelpSwitch("-bindpath", "-b", "Bind path to search for content files."),
                 new CommandLineHelpSwitch("-bindpath:target", "-bt", "Bind path to search for target package's content files. Only used when building a patch."),
@@ -147,7 +148,7 @@ namespace WixToolset.Core.CommandLine
                         {
                             using (new IntermediateFieldContext("wix.bind"))
                             {
-                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.CabCachePath, this.commandLine.CabbingThreadCount, this.commandLine.BindPaths, this.commandLine.BindVariables, inputsOutputs, cancellationToken);
+                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.BackwardCompatibleGuidGeneration, this.commandLine.CabCachePath, this.commandLine.CabbingThreadCount, this.commandLine.BindPaths, this.commandLine.BindVariables, inputsOutputs, cancellationToken);
                             }
                         }
                     }
@@ -284,7 +285,7 @@ namespace WixToolset.Core.CommandLine
             return linker.Link(context);
         }
 
-        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, string cabCachePath, int cabbingThreadCount, IReadOnlyCollection<IBindPath> bindPaths, Dictionary<string, string> bindVariables, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
+        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, bool backwardCompatibleGuidGeneration, string cabCachePath, int cabbingThreadCount, IReadOnlyCollection<IBindPath> bindPaths, Dictionary<string, string> bindVariables, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
         {
             IResolveResult resolveResult;
             {
@@ -314,6 +315,7 @@ namespace WixToolset.Core.CommandLine
             {
                 {
                     var context = this.ServiceProvider.GetService<IBindContext>();
+                    context.BackwardCompatibleGuidGeneration = backwardCompatibleGuidGeneration;
                     context.BindPaths = bindPaths;
                     context.CabbingThreadCount = cabbingThreadCount;
                     context.CabCachePath = cabCachePath;
@@ -489,6 +491,8 @@ namespace WixToolset.Core.CommandLine
         {
             private static readonly char[] BindPathSplit = { '=' };
 
+            public bool BackwardCompatibleGuidGeneration { get; private set; }
+
             public bool BindFiles { get; private set; }
 
             public List<IBindPath> BindPaths { get; } = new List<IBindPath>();
@@ -565,6 +569,10 @@ namespace WixToolset.Core.CommandLine
 
                             return true;
                         }
+
+                        case "bcgg":
+                            this.BackwardCompatibleGuidGeneration = true;
+                            return true;
 
                         case "bf":
                         case "bindfiles":
