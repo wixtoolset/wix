@@ -22,6 +22,8 @@ namespace WixToolset.Core
 
         public string BurnStubPath { get; set; }
 
+        public bool BackwardCompatibleGuidGeneration { get; set; }
+
         public int CabbingThreadCount { get; set; }
 
         public string CabCachePath { get; set; }

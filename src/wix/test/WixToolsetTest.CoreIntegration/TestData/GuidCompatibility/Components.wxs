@@ -1,0 +1,29 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="FileFoo">
+        <File Name="Foo.bar" Source="$(sys.SOURCEFILEPATH)" />
+      </Component>
+
+      <Component Id="RegHklm">
+        <RegistryValue Root="HKLM" Key="WixToolset\TestKey" Name="Compat" Value="Foo Bar" Type="string"/>
+      </Component>
+
+      <Component Id="RegHkcr">
+        <RegistryValue Root="HKCR" Key="WixToolset\TestKey" Name="Compat" Value="Foo Bar" Type="string"/>
+      </Component>
+
+      <Component Id="RegHkcu">
+        <RegistryValue Root="HKCU" Key="WixToolset\TestKey" Name="Compat" Value="Foo Bar" Type="string"/>
+      </Component>
+
+      <Component Id="RegHkmu">
+        <RegistryValue Root="HKMU" Key="WixToolset\TestKey" Name="Compat" Value="Foo Bar" Type="string"/>
+      </Component>
+
+      <Component Id="RegHku">
+        <RegistryValue Root="HKU" Key="WixToolset\TestKey" Name="Compat" Value="Foo Bar" Type="string"/>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

@@ -1,0 +1,19 @@
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="GuidCompatibility" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="AD87A3DE-042B-5CB1-82C8-782626737A3B">
+    <Package />
+    <MajorUpgrade DowngradeErrorMessage="No" />
+    <MediaTemplate />
+
+    <Feature Id="ProductFeature">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="GuidCompatibility" />
+      </Directory>
+    </Directory>
+  </Fragment>
+</Wix>

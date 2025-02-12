@@ -32,6 +32,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.FileSystem = context.ServiceProvider.GetService<IFileSystem>();
             this.PathResolver = context.ServiceProvider.GetService<IPathResolver>();
 
+            this.BackwardCompatibleGuidGeneration = context.BackwardCompatibleGuidGeneration;
             this.CabbingThreadCount = context.CabbingThreadCount;
             this.CabCachePath = context.CabCachePath;
             this.DefaultCompressionLevel = context.DefaultCompressionLevel;
@@ -64,6 +65,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IFileSystem FileSystem { get; }
 
         private IPathResolver PathResolver { get; }
+
+        private bool BackwardCompatibleGuidGeneration { get; }
 
         private int CabbingThreadCount { get; }
 
@@ -410,7 +413,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             // Set generated component guids and validate all guids.
             {
-                var command = new FinalizeComponentGuids(this.Messaging, this.WindowsInstallerBackendHelper, this.PathResolver, section, platform);
+                var command = new FinalizeComponentGuids(this.Messaging, this.WindowsInstallerBackendHelper, this.PathResolver, section, platform, this.BackwardCompatibleGuidGeneration);
                 command.Execute();
             }
 

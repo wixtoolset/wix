@@ -16,13 +16,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     /// </summary>
     internal class FinalizeComponentGuids
     {
-        internal FinalizeComponentGuids(IMessaging messaging, IBackendHelper helper, IPathResolver pathResolver, IntermediateSection section, Platform platform)
+        internal FinalizeComponentGuids(IMessaging messaging, IBackendHelper helper, IPathResolver pathResolver, IntermediateSection section, Platform platform, bool backwardCompatibleGuidGeneration)
         {
             this.Messaging = messaging;
             this.BackendHelper = helper;
             this.PathResolver = pathResolver;
             this.Section = section;
             this.Platform = platform;
+            this.BackwardCompatibleGuidGeneration = backwardCompatibleGuidGeneration;
         }
 
         private IMessaging Messaging { get; }
@@ -34,6 +35,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private IntermediateSection Section { get; }
 
         private Platform Platform { get; }
+
+        private  bool BackwardCompatibleGuidGeneration { get; }
 
         private Dictionary<string, string> ComponentIdGenSeeds { get; set; }
 
@@ -98,7 +101,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 if (this.RegistrySymbolsById.TryGetValue(componentSymbol.KeyPath, out var registrySymbol))
                 {
                     var bitness = componentSymbol.Win64 ? "64" : String.Empty;
-                    var regkey = String.Concat(bitness, registrySymbol.Root, "\\", registrySymbol.Key, "\\", registrySymbol.Name);
+                    var regkey = this.BackwardCompatibleGuidGeneration ?
+                        String.Concat(bitness, (int)registrySymbol.Root, "\\", registrySymbol.Key, "\\", registrySymbol.Name) :
+                        String.Concat(bitness, registrySymbol.Root, "\\", registrySymbol.Key, "\\", registrySymbol.Name);
                     componentSymbol.ComponentId = this.BackendHelper.CreateGuid(BindDatabaseCommand.WixComponentGuidNamespace, regkey.ToLowerInvariant());
                 }
             }
