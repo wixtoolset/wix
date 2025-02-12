@@ -455,7 +455,9 @@ namespace WixToolset.Util
             foreach (var row in table.Rows)
             {
                 var groupId = row.FieldAsString(0);
-                if (this.DecompilerHelper.TryGetIndexedElement("Group", groupId, out var group))
+                XElement group;
+                if (this.DecompilerHelper.TryGetIndexedElement("Group", groupId, out group)
+                    || this.DecompilerHelper.TryGetIndexedElement("Wix4Group", groupId, out group))
                 {
                     var attributes = (Group6SymbolAttributes)(row.FieldAsNullableInteger(2) ?? 0);
                     group.Add(AttributeIfNotNull("Comment", row, 1));
@@ -483,10 +485,14 @@ namespace WixToolset.Util
             foreach (var row in table.Rows)
             {
                 var parentId = row.FieldAsString(0);
-                var parentExists = this.DecompilerHelper.TryGetIndexedElement("Group", parentId, out var parentGroup);
+                XElement parentGroup;
+                var parentExists = (this.DecompilerHelper.TryGetIndexedElement("Group", parentId, out parentGroup)
+                        || this.DecompilerHelper.TryGetIndexedElement("Wix4Group", parentId, out parentGroup));
 
                 var childId = row.FieldAsString(1);
-                var childExists = this.DecompilerHelper.TryGetIndexedElement("Group", childId, out var childGroup);
+                XElement childGroup;
+                var childExists = (this.DecompilerHelper.TryGetIndexedElement("Group", childId, out childGroup)
+                        || this.DecompilerHelper.TryGetIndexedElement("Wix4Group", childId, out childGroup));
 
                 if (parentExists && childExists)
                 {
