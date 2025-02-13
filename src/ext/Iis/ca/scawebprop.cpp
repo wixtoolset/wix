@@ -3,7 +3,7 @@
 #include "precomp.h"
 
 // sql queries
-enum eWebDirPropertiesQuery { wpqProperties = 1, wpqAccess, wpqAuthorization, wpqUser, wpqControlledPassword, wpqLogVisits, wpqIndex, wpqDefaultDoc,  wpqAspDetailedError, wpqHttpExp, wpqCCMaxAge, wpqCCCustom, wpqNoCustomError, wpqAccessSSLFlags, wpqAuthenticationProviders };
+enum eWebDirPropertiesQuery { wpqProperties = 1, wpqAccess, wpqAuthorization, wpqUser, wpqControlledPassword, wpqLogVisits, wpqIndex, wpqDefaultDoc,  wpqAspDetailedError, wpqHttpExp, wpqCCMaxAge, wpqCCCustom, wpqNoCustomError, wpqAccessSSLFlags, wpqAuthenticationProviders, wpqDirBrowseFlags };
 
 HRESULT ScaGetWebDirProperties(
     __in LPCWSTR wzProperties,
@@ -154,6 +154,9 @@ HRESULT ScaGetWebDirProperties(
         {
             pswp->wzAuthenticationProviders[0] = L'\0';
         }
+
+        hr = WcaGetRecordInteger(hRec, wpqDirBrowseFlags, &pswp->iDirBrowseFlags);
+        ExitOnFailure(hr, "failed to get IIsWebDirProperties.DirBrowseFlags");
     }
     else if (E_NOMOREITEMS == hr)
     {
@@ -294,6 +297,23 @@ HRESULT ScaWriteWebDirProperties(
         ExitOnFailure(hr, "Failed to copy authentication providers string");
         hr = ScaWriteMetabaseValue(piMetabase, wzRootOfWeb, NULL, MD_NTAUTHENTICATION_PROVIDERS, METADATA_INHERIT, IIS_MD_UT_FILE, STRING_METADATA, (LPVOID)wz);
         ExitOnFailure(hr, "Failed to write AuthenticationProviders for Web");
+    }
+
+    if (MSI_NULL_INTEGER != pswp->iDirBrowseFlags)
+    {
+        DWORD dwDirBrowseFlags = 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbDirBrowseShowDate) ? MD_DIRBROW_SHOW_DATE : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbDirBrowseShowExtension) ? MD_DIRBROW_SHOW_EXTENSION : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbDirBrowseShowLongDate) ? MD_DIRBROW_LONG_DATE : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbDirBrowseShowSize) ? MD_DIRBROW_SHOW_SIZE : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbDirBrowseShowTime) ? MD_DIRBROW_SHOW_TIME : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbEnableDefaultDoc) ? MD_DIRBROW_LOADDEFAULT : 0;
+        dwDirBrowseFlags |= (pswp->iDirBrowseFlags & wedbEnableDirBrowsing) ? MD_DIRBROW_ENABLED : 0;
+
+        // we XOR the flags, we only update things if they should be non-default
+        dwDirBrowseFlags ^= MD_DIRBROW_SHOW_DATE | MD_DIRBROW_SHOW_TIME | MD_DIRBROW_SHOW_SIZE | MD_DIRBROW_SHOW_EXTENSION | MD_DIRBROW_LONG_DATE | MD_DIRBROW_LOADDEFAULT;
+        hr = ScaWriteMetabaseValue(piMetabase, wzRootOfWeb, NULL, MD_DIRECTORY_BROWSING, METADATA_INHERIT, IIS_MD_UT_FILE, DWORD_METADATA, (LPVOID)((DWORD_PTR)dwDirBrowseFlags));
+        ExitOnFailure(hr, "Failed to write AccessSSLFlags for Web");
     }
 
 LExit:
