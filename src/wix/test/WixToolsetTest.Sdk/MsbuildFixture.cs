@@ -852,6 +852,182 @@ namespace WixToolsetTest.Sdk
             }
         }
 
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildPackageWithUseArtifactsOutput(BuildSystem buildSystem)
+        {
+            var expectedOutputFiles = new[]
+            {
+                @"artifacts\bin\MsiPackage\release_win-x86\en-US\cab1.cab",
+                @"artifacts\bin\MsiPackage\release_win-x86\en-US\MsiPackage.msi",
+                @"artifacts\bin\MsiPackage\release_win-x86\en-US\MsiPackage.wixpdb",
+                @"artifacts\obj\MsiPackage\release_win-x86\en-US\cab1.cab",
+                @"artifacts\obj\MsiPackage\release_win-x86\en-US\MsiPackage.msi",
+                @"artifacts\obj\MsiPackage\release_win-x86\en-US\MsiPackage.wixpdb",
+            };
+
+            var sourceFolder = TestData.Get(@"TestData", "SimpleMsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var artifactsFolder = Path.Combine(baseFolder, "artifacts");
+                var projectPath = Path.Combine(baseFolder, @"MsiPackage\MsiPackage.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    "-p:SuppressValidation=true",
+                    "-p:UseArtifactsOutput=true"
+                });
+                result.AssertSuccess();
+
+                var paths = Directory.EnumerateFiles(artifactsFolder, @"*.*", SearchOption.AllDirectories)
+                    .Where(s =>
+                        // ignore bind tracking files and MSBuild internals
+                        !s.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) &&
+                        !s.EndsWith(".cache", StringComparison.OrdinalIgnoreCase))
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                WixAssert.CompareLineByLine(expectedOutputFiles, paths);
+            }
+        }
+
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildPackageWithExplicitArtifactsPath(BuildSystem buildSystem)
+        {
+            var expectedOutputFiles = new[]
+            {
+                @"artifacts\subdir\bin\MsiPackage\release_win-x86\en-US\cab1.cab",
+                @"artifacts\subdir\bin\MsiPackage\release_win-x86\en-US\MsiPackage.msi",
+                @"artifacts\subdir\bin\MsiPackage\release_win-x86\en-US\MsiPackage.wixpdb",
+                @"artifacts\subdir\obj\MsiPackage\release_win-x86\en-US\cab1.cab",
+                @"artifacts\subdir\obj\MsiPackage\release_win-x86\en-US\MsiPackage.msi",
+                @"artifacts\subdir\obj\MsiPackage\release_win-x86\en-US\MsiPackage.wixpdb",
+            };
+
+            var sourceFolder = TestData.Get(@"TestData", "SimpleMsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var artifactsFolder = Path.Combine(baseFolder, @"artifacts\subdir");
+                var projectPath = Path.Combine(baseFolder, @"MsiPackage\MsiPackage.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    "-p:SuppressValidation=true",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "ArtifactsPath", Path.Combine(baseFolder, "artifacts", "subdir"))
+                });
+                result.AssertSuccess();
+
+                var paths = Directory.EnumerateFiles(artifactsFolder, @"*.*", SearchOption.AllDirectories)
+                    .Where(s =>
+                        // ignore bind tracking files and MSBuild internals
+                        !s.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) &&
+                        !s.EndsWith(".cache", StringComparison.OrdinalIgnoreCase))
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                WixAssert.CompareLineByLine(expectedOutputFiles, paths);
+            }
+        }
+
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildBundleWithUseArtifactsOutput(BuildSystem buildSystem)
+        {
+            var expectedOutputFiles = new[]
+            {
+                @"artifacts\bin\SimpleBundle\release_win-x86\SimpleBundle.exe",
+                @"artifacts\bin\SimpleBundle\release_win-x86\SimpleBundle.wixpdb",
+                @"artifacts\obj\SimpleBundle\release_win-x86\SimpleBundle.exe",
+                @"artifacts\obj\SimpleBundle\release_win-x86\SimpleBundle.wixpdb",
+            };
+
+            var sourceFolder = TestData.Get(@"TestData", "SimpleMsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var artifactsFolder = Path.Combine(baseFolder, "artifacts");
+                var projectPath = Path.Combine(baseFolder, @"SimpleBundle\SimpleBundle.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    "-p:SuppressValidation=true",
+                    "-p:UseArtifactsOutput=true"
+                });
+                result.AssertSuccess();
+
+                var paths = Directory.EnumerateFiles(artifactsFolder, @"*.*", SearchOption.AllDirectories)
+                    .Where(s =>
+                        // ignore bind tracking files and MSBuild internals
+                        !s.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) &&
+                        !s.EndsWith(".cache", StringComparison.OrdinalIgnoreCase))
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                WixAssert.CompareLineByLine(expectedOutputFiles, paths);
+            }
+        }
+
+        [Theory]
+        [InlineData(BuildSystem.DotNetCoreSdk)]
+        [InlineData(BuildSystem.MSBuild)]
+        [InlineData(BuildSystem.MSBuild64)]
+        public void CanBuildBundleWithExplicitArtifactsPath(BuildSystem buildSystem)
+        {
+            var expectedOutputFiles = new[]
+            {
+                @"artifacts\subdir\bin\SimpleBundle\release_win-x86\SimpleBundle.exe",
+                @"artifacts\subdir\bin\SimpleBundle\release_win-x86\SimpleBundle.wixpdb",
+                @"artifacts\subdir\obj\SimpleBundle\release_win-x86\SimpleBundle.exe",
+                @"artifacts\subdir\obj\SimpleBundle\release_win-x86\SimpleBundle.wixpdb",
+            };
+
+            var sourceFolder = TestData.Get(@"TestData", "SimpleMsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var artifactsFolder = Path.Combine(baseFolder, @"artifacts\subdir");
+                var projectPath = Path.Combine(baseFolder, @"SimpleBundle\SimpleBundle.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    "-p:SuppressValidation=true",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "ArtifactsPath", Path.Combine(baseFolder, "artifacts", "subdir"))
+                });
+                result.AssertSuccess();
+
+                var paths = Directory.EnumerateFiles(artifactsFolder, @"*.*", SearchOption.AllDirectories)
+                    .Where(s =>
+                        // ignore bind tracking files and MSBuild internals
+                        !s.EndsWith(".txt", StringComparison.OrdinalIgnoreCase) &&
+                        !s.EndsWith(".cache", StringComparison.OrdinalIgnoreCase))
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                WixAssert.CompareLineByLine(expectedOutputFiles, paths);
+            }
+        }
+
         [Theory(Skip = "Depends on creating broken publish which is not supported at this time")]
         [InlineData(BuildSystem.DotNetCoreSdk)]
         [InlineData(BuildSystem.MSBuild)]

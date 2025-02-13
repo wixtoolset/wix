@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Ported from: https://github.com/dotnet/sdk/blob/23e2ba847d79562b972dbf54eca3f87c3044d925/src/Tasks/Microsoft.NET.Build.Tasks/sdk/UseArtifactsOutputPath.props
+Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- If ArtifactsPath or UseArtifactsOutput are set, then import .props to set ArtifactsPath here, so that BaseIntermediateOutputPath can be
+       set in the ArtifactsPath.
+       If the .props file is not imported here, it will be imported from DefaultOutputPaths.targets, so that artifacts output
+       properties can be set directly in the project file too (only in that case they won't affect the intermediate output). -->
+  <Import Project="$(MSBuildThisFileDirectory)WixToolset.DefaultArtifactsPath.props"
+          Condition="'$(UseArtifactsOutput)' == 'true' Or '$(ArtifactsPath)' != ''"/>
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true'">
+    <UseArtifactsIntermediateOutput Condition="'$(UseArtifactsIntermediateOutput)' == ''">true</UseArtifactsIntermediateOutput>
+    <ArtifactsProjectName Condition="'$(ArtifactsProjectName)' == ''">$(MSBuildProjectName)</ArtifactsProjectName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true' And '$(BaseIntermediateOutputPath)' == '' And '$(UseArtifactsIntermediateOutput)' == 'true'">
+    <BaseIntermediateOutputPath Condition="'$(IncludeProjectNameInArtifactsPaths)' == 'true'">$(ArtifactsPath)\obj\$(ArtifactsProjectName)\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)' == ''">$(ArtifactsPath)\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <!-- Record whether ArtifactsPath / UseArtifactsOutput was set at this point in evaluation.  We will generate an error if these properties are set
+       after this point (ie in the project file). -->
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true'">
+    <_ArtifactsPathSetEarly>true</_ArtifactsPathSetEarly>
+  </PropertyGroup>
+</Project>
