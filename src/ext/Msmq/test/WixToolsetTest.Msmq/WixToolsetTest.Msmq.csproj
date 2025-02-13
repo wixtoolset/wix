@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\wixext\WixToolset.Msmq.wixext.csproj" />
+    <ProjectReference Include="..\..\..\Util\wixext\WixToolset.Util.wixext.csproj" />
   </ItemGroup>
 
   <ItemGroup>
