@@ -14,10 +14,10 @@
                 <File Id="debug_net472_x64" Source="!(bindpath.TestExe.Debug.net472.win_x64)\e_sqlite3.dll" />
             </Component>
             <Component Subdirectory="debug_net6_x86">
-                <File Id="debug_net6_x86" Source="!(bindpath.TestExe.Debug.net6.0.win_x86)\e_sqlite3.dll" />
+                <File Id="debug_net6_x86" Source="!(bindpath.TestExe.Debug.net8.0.win_x86)\e_sqlite3.dll" />
             </Component>
             <Component Subdirectory="debug_net6_x64">
-                <File Id="debug_net6_x64" Source="!(bindpath.TestExe.Debug.net6.0.win_x64)\e_sqlite3.dll" />
+                <File Id="debug_net6_x64" Source="!(bindpath.TestExe.Debug.net8.0.win_x64)\e_sqlite3.dll" />
             </Component>
             <Component Subdirectory="release_net472_x86">
                 <File Id="release_net472_x86" Source="!(bindpath.TestExe.Release.net472.win_x86)\e_sqlite3.dll" />
@@ -26,10 +26,10 @@
                 <File Id="release_net472_x64" Source="!(bindpath.TestExe.Release.net472.win_x64)\e_sqlite3.dll" />
             </Component>
             <Component Subdirectory="release_net6_x86">
-                <File Id="release_net6_x86" Source="!(bindpath.TestExe.Release.net6.0.win_x86)\e_sqlite3.dll" />
+                <File Id="release_net6_x86" Source="!(bindpath.TestExe.Release.net8.0.win_x86)\e_sqlite3.dll" />
             </Component>
             <Component Subdirectory="release_net6_x64">
-                <File Id="release_net6_x64" Source="!(bindpath.TestExe.Release.net6.0.win_x64)\e_sqlite3.dll" />
+                <File Id="release_net6_x64" Source="!(bindpath.TestExe.Release.net8.0.win_x64)\e_sqlite3.dll" />
             </Component>
         </ComponentGroup>
     </Fragment>

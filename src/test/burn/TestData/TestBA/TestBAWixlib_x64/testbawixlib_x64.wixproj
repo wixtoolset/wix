@@ -9,7 +9,7 @@
   <ItemGroup>
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net462\win-x64" BindName="net2x64" />
     <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net472\win-x64" BindName="net4x64" />
-    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net6.0-windows\win-x64" BindName="dncx64" />
+    <BindInputPaths Include="$(BaseOutputPath)$(Configuration)\net8.0-windows\win-x64" BindName="dncx64" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\TestBA\TestBA_x64.csproj" />
