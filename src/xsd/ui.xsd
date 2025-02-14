@@ -56,6 +56,14 @@
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="ExtendedPathValidation" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Enable checks to test whether the package is being installed to a network share or removable
+            disk. The default is no.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:anyAttribute namespace="##other" processContents="lax">
         <xs:annotation>
           <xs:documentation>
