@@ -27,8 +27,8 @@ msbuild api_t.proj -p:Configuration=%_C% -tl -nologo -warnaserror -bl:%_L%\api_b
 
 :: Test
 dotnet test ^
- %_B%\net6.0\WixToolsetTest.Data.dll ^
- %_B%\net6.0\win-x86\WixToolsetTest.BootstrapperApplicationApi.dll ^
+ %_B%\net8.0\WixToolsetTest.Data.dll ^
+ %_B%\net8.0\win-x86\WixToolsetTest.BootstrapperApplicationApi.dll ^
  %_B%\x86\BalUtilUnitTest.dll ^
  %_B%\x86\BextUtilUnitTest.dll ^
  --nologo -l "trx;LogFileName=%_L%\TestResults\api.trx" || exit /b
