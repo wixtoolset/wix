@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xse="http://wixtoolset.org/schemas/XmlSchemaExtension"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+    targetNamespace="http://wixtoolset.org/schemas/v4/wxl"
+              xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <xs:annotation>
+    <xs:documentation>
+      Schema for describing WiX Localization files (.wxl).
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="WixLocalization">
+    <xs:annotation>
+      <xs:appinfo>
+        <xse:remarks>
+          <html:p>You can specify any valid Windows code page by integer like 1252, or by web name like Windows-1252 or iso-8859-1. See [Code pages](../../tools/codepage.md) for more information.</html:p>
+        </xse:remarks>
+        <xse:howtoRef href="ui_and_localization/build_a_localized_version.html">How To: Build a localized version of your installer</xse:howtoRef>
+        <xse:howtoRef href="ui_and_localization/make_installer_localizable.html">How To: Make your installer localizable</xse:howtoRef>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="String" />
+        <xs:element ref="UI" />
+      </xs:choice>
+      <xs:attribute name="Codepage" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Optional code page integer value or web name for the resulting database. You can also specify -1 which will not reset the database code page. See remarks for more information.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Culture" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Optional culture for this localization file. If the Culture attribute is not provided, the localization file is considered to be language neutral. This culture value is used to filter applicable localization files during the build. Language neutral localization files are always included.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ExtensionDefaultCulture" type="LocalizationYesNoType">
+        <xs:annotation>
+          <xs:documentation>[WiX v5] Optional. Indicates that the localization file's culture is the default culture for a WiX Extension. Only valid when used in a WiX library included in a WiX Extension..</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Language" type="Integer">
+        <xs:annotation>
+          <xs:documentation>The decimal language ID (LCID) for the culture. Used only when processed by native code using locutil.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="SummaryInformationCodepage" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Optional code page integer value or web name for the resulting database's SummaryInformation. If not specified, the SummaryInformation codepage will be set to the same value from the Codepage attribute. If no codepage is provided, the SummaryInformation will default to the ANSI codepage. See remarks for more information.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="String">
+    <xs:annotation>
+      <xs:appinfo>
+        <xse:howtoRef href="ui_and_localization/build_a_localized_version.html">How To: Build a localized version of your installer</xse:howtoRef>
+        <xse:howtoRef href="ui_and_localization/make_installer_localizable.html">How To: Make your installer localizable</xse:howtoRef>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="Id" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Identity of the localized string. Referenced in .wxs files using `!(loc.Id)` or in locutil using `#(loc.Id)`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Overridable" type="LocalizationYesNoType">
+        <xs:annotation>
+          <xs:documentation>Determines if the localized string may be overridden by a definition in another localization file. The default value is `no`.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Localizable" type="LocalizationYesNoType">
+        <xs:annotation>
+          <xs:documentation>Indicates whether the string is localizable text or a non-localizable string that must be unique per locale. The value of this attribute is not used by the WiX Toolset. It provided as documentation for localizers to ignore things like GUIDs or identifiers that look like text.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Value" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The localized value for this string.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="UI">
+    <xs:annotation>
+      <xs:documentation>Allows a localization to override the position, size, and text of dialogs and controls.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType mixed="true">
+      <xs:attribute name="Dialog" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Identifies the dialog to localize or the dialog that a control to localize is in.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Control" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Combined with the Dialog attribute, identifies the control to localize.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="X" type="Integer">
+        <xs:annotation>
+          <xs:documentation>For a dialog, overrides the authored horizontal centering. For a control, overrides the authored horizontal coordinate of the upper-left corner of the rectangular boundary. This must be a non-negative number.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Y" type="Integer">
+        <xs:annotation>
+          <xs:documentation>For a dialog, overrides the authored vertical centering. For a control, overrides the authored vertical coordinate of the upper-left corner of the rectangular boundary of the control. This must be a non-negative number.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Width" type="Integer">
+        <xs:annotation>
+          <xs:documentation>For a dialog, overrides the authored width in dialog units. For a control, overrides the authored width of the rectangular boundary of the control. This must be a non-negative number.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Height" type="Integer">
+        <xs:annotation>
+          <xs:documentation>For a dialog, overrides the authored height in dialog units. For a control, overrides the authored height of the rectangular boundary of the control. This must be a non-negative number.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RightToLeft" type="LocalizationYesNoType">
+        <xs:annotation>
+          <xs:documentation>Set this attribute to "yes" to cause the Control to display from right to left. Not valid for a dialog.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RightAligned" type="LocalizationYesNoType">
+        <xs:annotation>
+          <xs:documentation>Set this attribute to "yes" to cause the Control to be right aligned. Not valid for a dialog.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LeftScroll" type="LocalizationYesNoType">
+        <xs:annotation>
+          <xs:documentation>Set this attribute to "yes" to cause the scroll bar to display on the left side of the Control. Not valid for a dialog.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Text" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Override the text of a UI element.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="Integer">
+    <xs:annotation>
+      <xs:documentation>Values of this type must be an integer or a preprocessor variable with the format `$(Variable)` or `$(var.Variable).</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[\d]+|\$\((var\.)?[_A-Za-z][0-9A-Za-z_.]*\)" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="LocalizationYesNoType">
+    <xs:annotation>
+      <xs:documentation>Values of this type will either be "yes"/"true" or "no"/"false".</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="no" />
+      <xs:enumeration value="false" />
+      <xs:enumeration value="yes" />
+      <xs:enumeration value="true" />
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
