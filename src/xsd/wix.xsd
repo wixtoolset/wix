@@ -184,6 +184,16 @@
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            _New in WiX v6: WiX v6 adds this attribute to the `Package` element._
+            A globally unique identiifer for the bundle in the world. It is recommended to use a prefix such as "CompanyName." to
+            create a namespace of sorts. By default, higher versioned upgrade lower versioned bundles with the same Id. Use this
+            attribute instead of the UpgradeCode attribute in new development.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="InProgressName" type="xs:string">
         <xs:annotation>
           <xs:documentation>
@@ -251,11 +261,13 @@
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="UpgradeCode" type="Guid" use="required">
+      <xs:attribute name="UpgradeCode" type="Guid">
         <xs:annotation>
           <xs:documentation>
-            Unique identifier for a family of bundles. If two bundles have the same UpgradeCode the
-            bundle with the highest version will be installed.
+            For new bundles, it is recommended to use the Id attribute instead. This attribute exists for
+            backwards compatibility scenarios. Use this attribute to provide a specific unique identifier
+            for a family of bundles. If two bundles have the same UpgradeCode the bundle with the highest
+            version will be installed.
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
@@ -808,15 +820,15 @@
           <html:code>SOFTWARE\[Manufacturer]\Updates\[ProductFamily]\[Name]</html:code></html:p>
           <html:ul>
             <html:li>ThisVersionInstalled: Y</html:li>
-            <html:li>PackageName: &gt;bundle name&lt;</html:li>
-            <html:li>PackageVersion: &gt;bundle version&lt;</html:li>
+            <html:li>PackageName: (bundle name)</html:li>
+            <html:li>PackageVersion: (bundle version)</html:li>
             <html:li>Publisher: [Manufacturer]</html:li>
             <html:li>PublishingGroup: [Department]</html:li>
             <html:li>ReleaseType: [Classification]</html:li>
             <html:li>InstalledBy: [LogonUser]</html:li>
             <html:li>InstalledDate: [Date]</html:li>
-            <html:li>InstallerName: &gt;installer name&lt;</html:li>
-            <html:li>InstallerVersion: &gt;installer version&lt;</html:li>
+            <html:li>InstallerName: (installer name)</html:li>
+            <html:li>InstallerVersion: (installer version)</html:li>
           </html:ul>
         </xse:remarks>
       </xs:appinfo>
@@ -850,8 +862,10 @@
       </xs:attribute>
       <xs:attribute name="Classification" type="xs:string" default="Update">
         <xs:annotation>
-          <xs:documentation>The release type of the update bundle, such as Update, Security Update, Service Pack, etc.
-          The default value is Update.</xs:documentation>
+          <xs:documentation>
+            The release type of the update bundle, such as Update, Security Update, Service Pack, etc.
+            The default value is Update.
+          </xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
@@ -2457,6 +2471,16 @@
           <xs:documentation>Indicates whether the package files are compressed. Default is compressed packages.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            _New in WiX v6: WiX v6 adds this attribute to the `Package` element._
+            A globally unique identiifer for the package in the world. It is recommended to use a prefix such as "CompanyName." to
+            create a namespace of sorts. By default, higher versioned upgrade lower versioned packages with the same Id.  Use this
+            attibute instead of the UpgradeCode attribute in new development.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
       <xs:attribute name="InstallerVersion" type="Integer">
         <xs:annotation>
           <xs:documentation>
@@ -2502,7 +2526,12 @@
       </xs:attribute>
       <xs:attribute name="UpgradeCode" type="Guid">
         <xs:annotation>
-          <xs:documentation>The upgrade code GUID for the package. Sets the UpgradeCode property.</xs:documentation>
+          <xs:documentation>
+            For new packages, it is recommended to use the Id attribute instead. This attribute exists for
+            backwards compatibility scenarios. Use this attribute to provide a specific upgrade code GUID
+            for a MSI package. See <html:a href="https://learn.microsoft.com/en-us/windows/win32/msi/upgradecode">UpgradeCode</html:a>
+            for more information.
+          </xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="UpgradeStrategy" type="UpgradeStrategyTypeUnion">
@@ -7020,9 +7049,9 @@
         <xse:msiRef table="AppId" href="http://msdn.microsoft.com/library/aa367566.aspx" />
         <xse:remarks>
           When being used in unadvertised mode, the attributes in the Class element correspond to registry
-          values under the `[HKCR\CLSID\{'{'}Id{'}'}]` and `[HKCR\CLSID\{'{'}Id{'}'}\Context]` keys as follows:
+          values under the `[HKCR\CLSID\{Id}]` and `[HKCR\CLSID\{Id}\Context]` keys as follows:
 
-          - `Id, Context`: [HKCR\CLSID\{'{'}Id{'}'}\Context]
+          - `Id, Context`: [HKCR\CLSID\{Id}\Context]
           - `Server`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\LocalServer32]\@="[!comserv.dll]"
           - `ForeignServer`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\LocalServer32]\@="mscoree.dll"
           - `AppId`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}]\AppId="{00000000-89AB-0000-0123-000000000000}"
@@ -14118,6 +14147,7 @@
       <xs:enumeration value="ProgramFiles64Folder" />
       <xs:enumeration value="ProgramFiles6432Folder" />
       <xs:enumeration value="ProgramMenuFolder" />
+      <xs:enumeration value="PerUserProgramFilesFolder" />
       <xs:enumeration value="RecentFolder" />
       <xs:enumeration value="SendToFolder" />
       <xs:enumeration value="StartMenuFolder" />
