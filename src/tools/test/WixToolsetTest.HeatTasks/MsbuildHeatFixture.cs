@@ -5,12 +5,13 @@ namespace WixToolsetTest.Sdk
     using System;
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
-    using Xunit;
 
+    [TestClass]
     public class MsbuildHeatFixture
     {
         public static readonly string HeatTargetsPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildHeatFixture).Assembly.CodeBase).LocalPath), "..", "..", "..", "publish", "WixToolset.Heat", "build", "WixToolset.Heat.targets");
@@ -20,10 +21,10 @@ namespace WixToolsetTest.Sdk
             EnsureWixSdkCached();
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildHeatFilePackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get("TestData", "HeatFilePackage");
@@ -44,10 +45,10 @@ namespace WixToolsetTest.Sdk
                 result.AssertSuccess();
 
                 var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem);
-                Assert.Single(heatCommandLines);
+                WixAssert.Single(heatCommandLines);
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
-                Assert.All(warnings, warning => warning.Contains("warning HEAT5149"));
+                WixAssert.All(warnings, warning => warning.Contains("warning HEAT5149"));
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "Release", "_ProductComponents_INSTALLFOLDER_HeatFilePackage.wixproj_file.wxs");
                 var generatedContents = File.ReadAllText(generatedFilePath);
@@ -76,10 +77,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildHeatFileWithMultipleFilesPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "HeatFileMultipleFilesSameFileName");
@@ -100,13 +101,13 @@ namespace WixToolsetTest.Sdk
                 result.AssertSuccess();
 
                 var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "file", buildSystem);
-                Assert.Equal(2, heatCommandLines.Count());
+                Assert.AreEqual(2, heatCommandLines.Count());
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
-                Assert.All(warnings, warning => warning.Contains("warning HEAT5149"));
+                WixAssert.All(warnings, warning => warning.Contains("warning HEAT5149"));
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "Release", "_TxtProductComponents_INSTALLFOLDER_MyProgram.txt_file.wxs");
-                Assert.True(File.Exists(generatedFilePath));
+                Assert.IsTrue(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
                 var testXml = generatedContents.GetTestXml();
@@ -126,7 +127,7 @@ namespace WixToolsetTest.Sdk
                     "</Wix>", testXml);
 
                 generatedFilePath = Path.Combine(intermediateFolder, "Release", "_JsonProductComponents_INSTALLFOLDER_MyProgram.json_file.wxs");
-                Assert.True(File.Exists(generatedFilePath));
+                Assert.IsTrue(File.Exists(generatedFilePath));
 
                 generatedContents = File.ReadAllText(generatedFilePath);
                 testXml = generatedContents.GetTestXml();
@@ -146,7 +147,7 @@ namespace WixToolsetTest.Sdk
                     "</Wix>", testXml);
 
                 var pdbPath = Path.Combine(binFolder, "HeatFileMultipleFilesSameFileName.wixpdb");
-                Assert.True(File.Exists(pdbPath));
+                Assert.IsTrue(File.Exists(pdbPath));
 
                 var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
@@ -157,13 +158,13 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk, true)]
-        [InlineData(BuildSystem.DotNetCoreSdk, false)]
-        [InlineData(BuildSystem.MSBuild, true)]
-        [InlineData(BuildSystem.MSBuild, false)]
-        [InlineData(BuildSystem.MSBuild64, true)]
-        [InlineData(BuildSystem.MSBuild64, false)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk, true)]
+        [DataRow(BuildSystem.DotNetCoreSdk, false)]
+        [DataRow(BuildSystem.MSBuild, true)]
+        [DataRow(BuildSystem.MSBuild, false)]
+        [DataRow(BuildSystem.MSBuild64, true)]
+        [DataRow(BuildSystem.MSBuild64, false)]
         public void CanBuildHeatProjectPreSdkStyle(BuildSystem buildSystem, bool useToolsVersion)
         {
             var sourceFolder = TestData.Get(@"TestData", "HeatProject");
@@ -186,22 +187,22 @@ namespace WixToolsetTest.Sdk
                 result.AssertSuccess();
 
                 var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "project", buildSystem);
-                var heatCommandLine = Assert.Single(heatCommandLines);
+                var heatCommandLine = WixAssert.Single(heatCommandLines);
 
                 if (useToolsVersion && buildSystem != BuildSystem.DotNetCoreSdk)
                 {
-                    Assert.Contains("-usetoolsversion", heatCommandLine);
+                    Assert.IsTrue(heatCommandLine.Contains("-usetoolsversion"));
                 }
                 else
                 {
-                    Assert.DoesNotContain("-usetoolsversion", heatCommandLine);
+                    Assert.IsFalse(heatCommandLine.Contains("-usetoolsversion"));
                 }
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
-                Assert.All(warnings, warning => warning.Contains("warning HEAT5149"));
+                WixAssert.All(warnings, warning => warning.Contains("warning HEAT5149"));
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "Release", "_Tools Version 4Cs.wxs");
-                Assert.True(File.Exists(generatedFilePath));
+                Assert.IsTrue(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
                 var testXml = generatedContents.GetTestXml();
@@ -260,7 +261,7 @@ namespace WixToolsetTest.Sdk
                     "</Wix>", testXml);
 
                 var pdbPath = Path.Combine(binFolder, "Release", "HeatProjectPreSdkStyle.wixpdb");
-                Assert.True(File.Exists(pdbPath));
+                Assert.IsTrue(File.Exists(pdbPath));
 
                 var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
@@ -270,13 +271,13 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk, true)]
-        [InlineData(BuildSystem.DotNetCoreSdk, false)]
-        [InlineData(BuildSystem.MSBuild, true)]
-        [InlineData(BuildSystem.MSBuild, false)]
-        [InlineData(BuildSystem.MSBuild64, true)]
-        [InlineData(BuildSystem.MSBuild64, false)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk, true)]
+        [DataRow(BuildSystem.DotNetCoreSdk, false)]
+        [DataRow(BuildSystem.MSBuild, true)]
+        [DataRow(BuildSystem.MSBuild, false)]
+        [DataRow(BuildSystem.MSBuild64, true)]
+        [DataRow(BuildSystem.MSBuild64, false)]
         public void CanBuildHeatProjectSdkStyle(BuildSystem buildSystem, bool useToolsVersion)
         {
             var sourceFolder = TestData.Get(@"TestData\HeatProject");
@@ -307,22 +308,22 @@ namespace WixToolsetTest.Sdk
                 result.AssertSuccess();
 
                 var heatCommandLines = MsbuildUtilities.GetToolCommandLines(result, "heat", "project", buildSystem);
-                var heatCommandLine = Assert.Single(heatCommandLines);
+                var heatCommandLine = WixAssert.Single(heatCommandLines);
 
                 if (useToolsVersion && buildSystem != BuildSystem.DotNetCoreSdk)
                 {
-                    Assert.Contains("-usetoolsversion", heatCommandLine);
+                    Assert.IsTrue(heatCommandLine.Contains("-usetoolsversion"));
                 }
                 else
                 {
-                    Assert.DoesNotContain("-usetoolsversion", heatCommandLine);
+                    Assert.IsFalse(heatCommandLine.Contains("-usetoolsversion"));
                 }
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).ToArray();
-                Assert.All(warnings, warning => warning.Contains("warning HEAT5149"));
+                WixAssert.All(warnings, warning => warning.Contains("warning HEAT5149"));
 
                 var generatedFilePath = Path.Combine(intermediateFolder, "Release", "_SdkStyleCs.wxs");
-                Assert.True(File.Exists(generatedFilePath));
+                Assert.IsTrue(File.Exists(generatedFilePath));
 
                 var generatedContents = File.ReadAllText(generatedFilePath);
                 var testXml = generatedContents.GetTestXml();
@@ -379,7 +380,7 @@ namespace WixToolsetTest.Sdk
                     "</Wix>", testXml);
 
                 var pdbPath = Path.Combine(binFolder, "Release", "HeatProjectSdkStyle.wixpdb");
-                Assert.True(File.Exists(pdbPath));
+                Assert.IsTrue(File.Exists(pdbPath));
 
                 var intermediate = Intermediate.Load(pdbPath);
                 var section = intermediate.Sections.Single();
