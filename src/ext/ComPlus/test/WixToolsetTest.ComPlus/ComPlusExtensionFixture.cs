@@ -3,14 +3,15 @@
 namespace WixToolsetTest.ComPlus
 {
     using System.Linq;
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.ComPlus;
-    using Xunit;
 
+    [TestClass]
     public class ComPlusExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingComPlusPartition()
         {
             var folder = TestData.Get(@"TestData\UsingComPlusPartition");

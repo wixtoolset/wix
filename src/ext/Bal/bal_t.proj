@@ -3,13 +3,6 @@
 
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
-    <!-- Restore: Explicitly restore the test projects, which need some hand-holding. -->
-    <ProjectReference Include="test\WixStdFnUnitTest\WixStdFnUnitTest.vcxproj" Targets="Restore" BuildInParallel="false" />
-    <ProjectReference Include="test\examples\examples.proj" Targets="Restore" />
-    <ProjectReference Include="wixext-backward-compatible\WixToolset.Bal.wixext.csproj" Targets="Restore" />
-
-    <!-- Build -->
-
     <!-- C++/CLI projects will try to build their dependent projects in parallel with others, so they must be built first. -->
     <ProjectReference Include="test\WixStdFnUnitTest\WixStdFnUnitTest.vcxproj" Properties="Platform=x86" BuildInParallel="false" />
 
@@ -17,11 +10,33 @@
     <ProjectReference Include="wixstdfn\wixstdfn.vcxproj" Properties="Platform=x64" />
     <ProjectReference Include="wixstdfn\wixstdfn.vcxproj" Properties="Platform=ARM64" />
 
-    <ProjectReference Include="test\examples\examples.proj" />
+    <ProjectReference Include="test\WixToolsetTest.BootstrapperApplications\WixToolsetTest.BootstrapperApplications.csproj" Properties="Platform=x64" />
 
-    <!-- Pack -->
     <ProjectReference Include="wixstdfn\wixstdfn.vcxproj" Properties="NoBuild=true" Targets="PackNative" />
     <ProjectReference Include="wixext\WixToolset.BootstrapperApplications.wixext.csproj" Properties="NoBuild=true" Targets="Pack" />
     <ProjectReference Include="wixext-backward-compatible\WixToolset.Bal.wixext.csproj" Targets="Pack" />
+
+    <ProjectReference Include="test\examples\examples.proj" />
+
+    <!-- 
+    Currently there are no unskipped unit tests in this project. Should that change,
+    we'll need to update the native test framework or figure out something else.
+
+    <ProjectReference Include="ext\Bal\test\WixStdFnUnitTest\WixStdFnUnitTest.vcxproj" /> 
+    -->
   </ItemGroup>
+
+  <Target Name="WixClean" BeforeTargets="Restore" Condition="'$(SuppressWixClean)' != 'true'">
+    <RemoveDir Directories="$(RootBuildFolder)Bal.wixext" />
+    <RemoveDir Directories="$(USERPROFILE)\.nuget\packages\wixtoolset.bal.wixext" Condition="'$(NUGET_PACKAGES)' == ''" />
+    <RemoveDir Directories="$(NUGET_PACKAGES)\wixtoolset.bal.wixext" Condition="'$(NUGET_PACKAGES)' != ''" />
+    <RemoveDir Directories="$(USERPROFILE)\.nuget\packages\wixtoolset.bootstrapperapplications.wixext" Condition="'$(NUGET_PACKAGES)' == ''" />
+    <RemoveDir Directories="$(NUGET_PACKAGES)\wixtoolset.bootstrapperapplications.wixext" Condition="'$(NUGET_PACKAGES)' != ''" />
+    <RemoveDir Directories="$(USERPROFILE)\.nuget\packages\wixtoolset.wixstandardbootstrapperapplicationfunctionapi.wixext" Condition="'$(NUGET_PACKAGES)' == ''" />
+    <RemoveDir Directories="$(NUGET_PACKAGES)\wixtoolset.wixstandardbootstrapperapplicationfunctionapi.wixext" Condition="'$(NUGET_PACKAGES)' != ''" />
+
+    <Delete Files="$(ArtifactsFolder)WixToolset.Bal.wixext.*.nupkg" />
+    <Delete Files="$(ArtifactsFolder)WixToolset.BootstrapperApplications.wixext.*.nupkg" />
+    <Delete Files="$(ArtifactsFolder)WixToolset.WixStandardBootstrapperApplicationFunctionApi.wixext.*.nupkg" />
+  </Target>
 </Project>

@@ -19,7 +19,9 @@ if exist ..\global.json (del ..\global.json)
 
 if exist "%_NUGET_CACHE%\wixinternal.basebuildtasks.sources" rd /s/q "%_NUGET_CACHE%\wixinternal.basebuildtasks.sources"
 if exist "%_NUGET_CACHE%\wixinternal.testsupport" rd /s/q "%_NUGET_CACHE%\wixinternal.testsupport"
+if exist "%_NUGET_CACHE%\wixinternal.mstestsupport" rd /s/q "%_NUGET_CACHE%\wixinternal.mstestsupport"
 if exist "%_NUGET_CACHE%\wixinternal.core.testpackage" rd /s/q "%_NUGET_CACHE%\wixinternal.core.testpackage"
+if exist "%_NUGET_CACHE%\wixinternal.core.mstestpackage" rd /s/q "%_NUGET_CACHE%\wixinternal.core.mstestpackage"
 if exist "%_NUGET_CACHE%\wixtoolset.bal.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.bal.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.bootstrapperapplications.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.bootstrapperapplications.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.bootstrapperextensionapi" rd /s/q "%_NUGET_CACHE%\wixtoolset.bootstrapperextensionapi"

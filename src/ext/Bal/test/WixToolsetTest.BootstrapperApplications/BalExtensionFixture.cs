@@ -6,13 +6,14 @@ namespace WixToolsetTest.BootstrapperApplications
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixInternal.Core.TestPackage;
-    using WixInternal.TestSupport;
-    using Xunit;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.Core.MSTestPackage;
+    using WixInternal.MSTestSupport;
 
+    [TestClass]
     public class BalExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingDisplayInternalUICondition()
         {
             using (var fs = new DisposableFileSystem())
@@ -35,7 +36,7 @@ namespace WixToolsetTest.BootstrapperApplications
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -46,11 +47,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "<WixBalPackageInfo PackageId='test.msi' DisplayInternalUICondition='1' />",
                 }, balPackageInfos);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "thm.wxl")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "thm.wxl")));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingBootstrapperApplicationId()
         {
             using (var fs = new DisposableFileSystem())
@@ -73,7 +74,7 @@ namespace WixToolsetTest.BootstrapperApplications
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -91,7 +92,7 @@ namespace WixToolsetTest.BootstrapperApplications
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingOverridable()
         {
             using (var fs = new DisposableFileSystem())
@@ -113,7 +114,7 @@ namespace WixToolsetTest.BootstrapperApplications
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -132,7 +133,7 @@ namespace WixToolsetTest.BootstrapperApplications
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixStdBa()
         {
             using (var fs = new DisposableFileSystem())
@@ -152,11 +153,11 @@ namespace WixToolsetTest.BootstrapperApplications
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
             }
         }
 
-        //[Fact]
+        // [TestMethod]
         //public void CanBuildUsingMBAWithAlwaysInstallPrereqs()
         //{
         //    using (var fs = new DisposableFileSystem())
@@ -179,7 +180,7 @@ namespace WixToolsetTest.BootstrapperApplications
 
         //        compileResult.AssertSuccess();
 
-        //        Assert.True(File.Exists(bundleFile));
+        //        Assert.IsTrue(File.Exists(bundleFile));
 
         //        var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
         //        extractResult.AssertSuccess();
@@ -198,7 +199,7 @@ namespace WixToolsetTest.BootstrapperApplications
         //    }
         //}
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingMBAWithNoPrereqs()
         {
             using (var fs = new DisposableFileSystem())
@@ -223,14 +224,14 @@ namespace WixToolsetTest.BootstrapperApplications
                 {
                     "The WixManagedBootstrapperApplicationHost element has been deprecated.",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
-                Assert.Equal(1130, compileResult.ExitCode);
+                Assert.AreEqual(1130, compileResult.ExitCode);
 
-                Assert.False(File.Exists(bundleFile));
-                Assert.False(File.Exists(Path.Combine(intermediateFolder, "test.exe")));
+                Assert.IsFalse(File.Exists(bundleFile));
+                Assert.IsFalse(File.Exists(Path.Combine(intermediateFolder, "test.exe")));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingDncbaMissingBAFactoryPayload()
         {
             using (var fs = new DisposableFileSystem())
@@ -254,14 +255,14 @@ namespace WixToolsetTest.BootstrapperApplications
                     "The WixDotNetCoreBootstrapperApplicationHost element has been deprecated.",
                     "The BootstrapperApplication element's Name or SourceFile attribute was not found; one of these is required."
                 }, compileResult.Messages.Select(x => x.ToString()).ToArray());
-                Assert.Equal(44, compileResult.ExitCode);
+                Assert.AreEqual(44, compileResult.ExitCode);
 
-                Assert.False(File.Exists(bundleFile));
-                Assert.False(File.Exists(Path.Combine(intermediateFolder, "test.exe")));
+                Assert.IsFalse(File.Exists(bundleFile));
+                Assert.IsFalse(File.Exists(Path.Combine(intermediateFolder, "test.exe")));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingOverridableWrongCase()
         {
             using (var fs = new DisposableFileSystem())
@@ -284,7 +285,7 @@ namespace WixToolsetTest.BootstrapperApplications
                     "-o", bundleFile,
                 });
 
-                Assert.InRange(result.ExitCode, 2, Int32.MaxValue);
+                Assert.IsTrue(result.ExitCode >= 2 && result.ExitCode <= Int32.MaxValue);
 
                 var messages = result.Messages.Select(m => m.ToString()).ToList();
                 messages.Sort();

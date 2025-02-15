@@ -3,14 +3,15 @@
 namespace WixToolsetTest.DirectX
 {
     using System.Linq;
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.DirectX;
-    using Xunit;
 
+    [TestClass]
     public class DirectXExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingPixelShaderVersion()
         {
             var folder = TestData.Get(@"TestData\UsingPixelShaderVersion");

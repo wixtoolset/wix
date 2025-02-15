@@ -105,6 +105,32 @@ namespace WixInternal.TestSupport
             Assert.NotEqual<object>(expected, actual, comparer);
         }
 
+        public static void Single(IEnumerable<string> collection)
+        {
+            Assert.Single(collection);
+            // TODO: MSTEST: Assert.Equal(1, collection.Count());
+        }
+
+        public static void Single(IEnumerable<string> collection, Func<string, bool> predicate)
+        {
+            var results = collection.Where(predicate);
+            Assert.Single(results);
+            // TODO: MSTEST: Assert.Equal(1, results.Count());
+        }
+
+        public static void Empty(IEnumerable<string> collection)
+        {
+            Assert.Empty(collection);
+            // TODO: MSTEST: Assert.Equal(0, collection.Count());
+        }
+
+        public static void Empty(IEnumerable<string> collection, Func<string, bool> predicate)
+        {
+            var results = collection.Where(predicate);
+            Assert.Empty(results);
+            // TODO: MSTEST: Assert.Equal(0, results.Count());
+        }
+
         // There appears to have been a bug in VC++, which might or might not have been partially
         // or completely corrected. It was unable to disambiguate a call to:
         //     Xunit::Assert::Throws(System::Type^, System::Action^)

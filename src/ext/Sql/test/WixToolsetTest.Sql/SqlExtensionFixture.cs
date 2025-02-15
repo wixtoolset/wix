@@ -3,14 +3,15 @@
 namespace WixToolsetTest.Sql
 {
     using System.Linq;
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.Sql;
-    using Xunit;
 
+    [TestClass]
     public class SqlExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingSqlStuff()
         {
             var folder = TestData.Get(@"TestData\UsingSql");

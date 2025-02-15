@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="test\WixToolsetTest.Firewall\WixToolsetTest.Firewall.csproj" />
+    <ProjectReference Include="wixext\WixToolset.Firewall.wixext.csproj" Targets="Pack" Properties="NoBuild=true" />
+  </ItemGroup>
+
+  <Target Name="WixClean" BeforeTargets="Restore" Condition="'$(SuppressWixClean)' != 'true'">
+    <RemoveDir Directories="$(RootBuildFolder)firewall.wixext" />
+    <RemoveDir Directories="$(USERPROFILE)\.nuget\packages\wixtoolset.firewall.wixext" Condition="'$(NUGET_PACKAGES)' == ''" />
+    <RemoveDir Directories="$(NUGET_PACKAGES)\wixtoolset.firewall.wixext" Condition="'$(NUGET_PACKAGES)' != ''" />
+
+    <Delete Files="$(ArtifactsFolder)WixToolset.Firewall.wixext.*.nupkg" />
+  </Target>
+</Project>

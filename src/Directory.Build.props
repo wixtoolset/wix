@@ -11,7 +11,9 @@
     <ProjectName Condition=" '$(ProjectName)' == '' ">$(MSBuildProjectName)</ProjectName>
     <RootBuildFolder>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\build\))</RootBuildFolder>
     <RootPackagesFolder>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\packages\))</RootPackagesFolder>
-    <PdbsFolder>$(RootBuildFolder)logs\pdbs\$(Configuration)\</PdbsFolder>
+    <LogsFolder>$(RootBuildFolder)logs\</LogsFolder>
+    <TestResultsFolder>$(LogsFolder)TestResults\</TestResultsFolder>
+    <PdbsFolder>$(LogsFolder)pdbs\$(Configuration)\</PdbsFolder>
     <ArtifactsFolder>$(RootBuildFolder)artifacts\</ArtifactsFolder>
     <ToolsFolder>$(RootBuildFolder).tools</ToolsFolder>
     <PackageOutputPath>$(ArtifactsFolder)</PackageOutputPath>

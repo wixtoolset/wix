@@ -8,6 +8,7 @@
     <ProjectReference Include="WixToolset.Core.Burn\WixToolset.Core.Burn.csproj" Properties="NoBuild=true" Targets="Pack" />
     <ProjectReference Include="WixToolset.Core.ExtensionCache\WixToolset.Core.ExtensionCache.csproj" Properties="NoBuild=true" Targets="Pack" />
     <ProjectReference Include="WixInternal.Core.TestPackage\WixInternal.Core.TestPackage.csproj" Properties="NoBuild=true" Targets="Pack" />
+    <ProjectReference Include="WixInternal.Core.MSTestPackage\WixInternal.Core.MSTestPackage.csproj" Properties="NoBuild=true" Targets="Pack" />
     <ProjectReference Include="WixToolset.Core.WindowsInstaller\WixToolset.Core.WindowsInstaller.csproj" Properties="NoBuild=true" Targets="Pack" />
 
     <ProjectReference Include="WixToolset.Converters\WixToolset.Converters.csproj" Properties="NoBuild=true" Targets="Pack" />

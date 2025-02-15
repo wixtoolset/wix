@@ -2,14 +2,15 @@
 
 namespace WixToolsetTest.Http
 {
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.Http;
-    using Xunit;
 
+    [TestClass]
     public class HttpExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingSsl()
         {
             var folder = TestData.Get("TestData", "Ssl");
@@ -29,7 +30,7 @@ namespace WixToolsetTest.Http
             }, results);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingUrlReservation()
         {
             var folder = TestData.Get(@"TestData\UsingUrlReservation");

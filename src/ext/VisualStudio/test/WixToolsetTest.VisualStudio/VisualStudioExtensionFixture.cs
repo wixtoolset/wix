@@ -2,15 +2,16 @@
 
 namespace WixToolsetTest.VisualStudio
 {
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.VisualStudio;
-    using Xunit;
     using System.Linq;
 
+    [TestClass]
     public class VisualStudioExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingVsixPackage()
         {
             var folder = TestData.Get(@"TestData\UsingVsixPackage");
@@ -36,7 +37,7 @@ namespace WixToolsetTest.VisualStudio
             }, results);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingVsixPackageOnArm64()
         {
             var folder = TestData.Get(@"TestData\UsingVsixPackage");

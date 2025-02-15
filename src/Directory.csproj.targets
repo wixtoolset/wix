@@ -7,17 +7,35 @@
     <DefineConstants Condition=" '$(Configuration)'=='Debug' ">$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(IsWixTestProject)'=='true' ">
+  <PropertyGroup Condition=" '$(IsWixTestProject)'=='true' OR '$(IsWixMSTestProject)'=='true' ">
     <RollForward>Major</RollForward>
     <IsPackable>false</IsPackable>
     <SignOutput>false</SignOutput>
   </PropertyGroup>
+
+
+  <PropertyGroup Condition=" '$(IsWixMSTestProject)' == 'true' ">
+    <!-- Force a .NET v6-compatible package. -->
+    <MicrosoftTestingExtensionsCodeCoverageVersion>17.11.5</MicrosoftTestingExtensionsCodeCoverageVersion>
+    <TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
+  </PropertyGroup>
+
+  <Target Name="RunWixTests" AfterTargets="Build" Condition=" '$(IsWixMSTestProject)' == 'true' AND '$(SuppressWixTests)' != 'true' ">
+    <Delete Files="$(TestResultsFolder)$(MSBuildProjectName).trx" />
+
+    <Exec 
+      Command="$(TargetPath.Replace('.dll', '.exe')) --results-directory $(TestResultsFolder) --report-trx --report-trx-filename $(MSBuildProjectName).trx --no-progress --settings $([MSBuild]::GetPathOfFileAbove('wix.runsettings'))" 
+      UseCommandProcessor="false" 
+      CustomErrorRegularExpression="  Test method .+ threw exception:" />
+  </Target>   
+
 
   <ItemGroup Condition=" '$(IsWixTestProject)'=='true' ">
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
   </ItemGroup>
+
 
   <ItemGroup Condition=" '$(IsWixTestProject)'!='true' ">
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />

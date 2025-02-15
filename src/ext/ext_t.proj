@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <!-- These projects are "special." -->
+    <ProjectReference Include="Util\util_t.proj" BuildInParallel="false" Targets="Restore;Build" Properties="SuppressWixTests=true" />
+    <ProjectReference Include="Bal\bal_t.proj" BuildInParallel="false" Targets="Restore;Build" Properties="SuppressWixTests=true" />
+    <!-- <ProjectReference Include="NetFx\netfx_t.proj" BuildInParallel="false" Targets="Restore;Build" Properties="SuppressWixTests=true" /> -->
+
+    <!-- Now run tests we skipped earlier along with everything in parallel. -->
+    <ProjectReference Include="Util\util_t.proj" Targets="Build" />
+    <ProjectReference Include="Bal\bal_t.proj" Targets="Build" />
+    <!-- <ProjectReference Include="NetFx\netfx_t.proj" Targets="Build" /> -->
+
+    <ProjectReference Include="NetFx\netfx_t.proj" BuildInParallel="false" Targets="Restore;Build" />
+    <ProjectReference Include="ComPlus\complus_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="Dependency\dependency_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="DirectX\directx_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="Firewall\firewall_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="Http\http_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="Iis\iis_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="Msmq\msmq_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="NetFx\netfx_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="PowerShell\powershell_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="Sql\sql_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="UI\ui_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="VisualStudio\visualstudio_t.proj" Targets="Restore;Build" />
+  </ItemGroup>
+</Project>
