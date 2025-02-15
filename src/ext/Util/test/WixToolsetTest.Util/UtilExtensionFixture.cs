@@ -2,19 +2,20 @@
 
 namespace WixToolsetTest.Util
 {
+    using System;
     using System.IO;
     using System.Linq;
     using System.Xml;
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
-    using WixToolset.Util;
-    using Xunit;
     using System.Xml.Linq;
-    using System;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
+    using WixToolset.Util;
 
+    [TestClass]
     public class UtilExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingFileShare()
         {
             var folder = TestData.Get(@"TestData\UsingFileShare");
@@ -35,7 +36,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingFileShareX64()
         {
             var folder = TestData.Get(@"TestData\UsingFileShare");
@@ -56,7 +57,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanRoundtripFileShare()
         {
             var folder = TestData.Get(@"TestData", "UsingFileShare");
@@ -79,7 +80,7 @@ namespace WixToolsetTest.Util
             }, utilElementNames);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildCloseApplication()
         {
             var folder = TestData.Get(@"TestData\CloseApplication");
@@ -96,7 +97,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildInternetShortcutInProduct()
         {
             var folder = TestData.Get(@"TestData\InternetShortcut");
@@ -116,7 +117,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildInternetShortcutInMergeModule()
         {
             var folder = TestData.Get(@"TestData\InternetShortcutModule");
@@ -136,7 +137,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildWithPermissionEx()
         {
             var folder = TestData.Get(@"TestData\PermissionEx");
@@ -153,7 +154,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildRemoveRegistryKeyExInMergeModule()
         {
             var folder = TestData.Get(@"TestData", "RemoveRegistryKeyEx");
@@ -168,7 +169,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildRemoveFolderExInMergeModule()
         {
             var folder = TestData.Get(@"TestData\RemoveFolderEx");
@@ -183,7 +184,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildRemoveFolderExInPackage()
         {
             var folder = TestData.Get(@"TestData\RemoveFolderExPackage");
@@ -198,7 +199,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildServiceConfig()
         {
             var folder = TestData.Get(@"TestData", "ServiceConfig");
@@ -215,7 +216,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildWithEventManifest()
         {
             var folder = TestData.Get(@"TestData\EventManifest");
@@ -240,7 +241,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildWithQueries()
         {
             var folder = TestData.Get(@"TestData\Queries");
@@ -259,7 +260,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildAndDecompiileQueries()
         {
             var folder = TestData.Get(@"TestData\Queries");
@@ -285,7 +286,7 @@ namespace WixToolsetTest.Util
             }, utilElementNames);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildWithXmlConfig()
         {
             var folder = TestData.Get(@"TestData", "XmlConfig");
@@ -301,7 +302,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanRoundtripXmlConfig()
         {
             var folder = TestData.Get(@"TestData", "XmlConfig");
@@ -324,7 +325,7 @@ namespace WixToolsetTest.Util
             }, utilElementNames);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildModuleWithXmlConfig()
         {
             var folder = TestData.Get(@"TestData", "XmlConfigModule");
@@ -338,7 +339,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildBundleWithSearches()
         {
             var folder = TestData.Get(@"TestData\BundleWithSearches");
@@ -366,15 +367,15 @@ namespace WixToolsetTest.Util
 
                 result.AssertSuccess();
 
-                Assert.True(File.Exists(bundlePath));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+                Assert.IsTrue(File.Exists(bundlePath));
+                Assert.IsTrue(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
 
                 var bootstrapperExtensionDatas = extractResult.SelectBootstrapperExtensionDataNodes("/be:BootstrapperExtensionData/be:BootstrapperExtension[@Id='Wix4UtilBootstrapperExtension_X86']");
-                Assert.Equal(1, bootstrapperExtensionDatas.Count);
-                Assert.Equal("<BootstrapperExtension Id='Wix4UtilBootstrapperExtension_X86'>" +
+                Assert.AreEqual(1, bootstrapperExtensionDatas.Count);
+                Assert.AreEqual("<BootstrapperExtension Id='Wix4UtilBootstrapperExtension_X86'>" +
                     "<WixWindowsFeatureSearch Id='DetectSHA2SupportId' Type='sha2CodeSigning' />" +
                     "</BootstrapperExtension>", bootstrapperExtensionDatas[0].GetTestXml());
 
@@ -394,7 +395,7 @@ namespace WixToolsetTest.Util
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanCreateUserGroupWithComment()
         {
             var folder = TestData.Get(@"TestData\CreateGroup");
@@ -550,7 +551,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanCreateUserAccountWithComment()
         {
             var folder = TestData.Get(@"TestData\CreateUser");
@@ -626,7 +627,7 @@ namespace WixToolsetTest.Util
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildBundleWithSearchesUsingBuiltinVariableNames()
         {
             var folder = TestData.Get("TestData", "BundleWithSearches");

@@ -6,14 +6,15 @@ namespace WixToolsetTest.Msmq
     using System.IO;
     using System.Linq;
     using System.Xml.Linq;
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.Msmq;
-    using Xunit;
 
+    [TestClass]
     public class MsmqExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingMessageQueue()
         {
             var folder = TestData.Get(@"TestData\UsingMessageQueue");
@@ -36,7 +37,8 @@ namespace WixToolsetTest.Msmq
             }, results);
         }
 
-        [Fact(Skip = "Util:Wix4Group and Util:Wix6Group decompilation issues prevent this usage currently")]
+        [TestMethod]
+        [Ignore("Util:Wix4Group and Util:Wix6Group decompilation issues prevent this usage currently")]
         public void CanRoundtripMessageQueue()
         {
             var folder = TestData.Get(@"TestData\UsingMessageQueue");

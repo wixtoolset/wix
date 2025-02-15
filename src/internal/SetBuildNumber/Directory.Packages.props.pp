@@ -17,6 +17,7 @@
     <PackageVersion Include="WixToolset.Dtf.WindowsInstaller.Package" Version="{packageversion}" />
 
     <PackageVersion Include="WixInternal.TestSupport" Version="{packageversion}" />
+    <PackageVersion Include="WixInternal.MSTestSupport" Version="{packageversion}" />
     <PackageVersion Include="WixInternal.TestSupport.Native" Version="{packageversion}" />
     <PackageVersion Include="WixInternal.BaseBuildTasks.Sources" Version="{packageversion}" />
 
@@ -37,6 +38,7 @@
     <PackageVersion Include="WixToolset.Core.Burn" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Core.WindowsInstaller" Version="{packageversion}" />
     <PackageVersion Include="WixInternal.Core.TestPackage" Version="{packageversion}" />
+    <PackageVersion Include="WixInternal.Core.MSTestPackage" Version="{packageversion}" />
 
     <PackageVersion Include="WixToolset.Heat" Version="{packageversion}" />
 
@@ -95,6 +97,10 @@
     <PackageVersion Include="xunit" Version="2.8.1" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.1" />
     <PackageVersion Include="xunit.assert" Version="2.8.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="MSTest.TestFramework" Version="3.7.3" />
   </ItemGroup>
 
   <ItemGroup>

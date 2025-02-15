@@ -4,15 +4,16 @@ namespace WixToolsetTest.UI
 {
     using System.IO;
     using System.Linq;
-    using WixInternal.Core.TestPackage;
-    using WixInternal.TestSupport;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.Core.MSTestPackage;
+    using WixInternal.MSTestSupport;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.UI;
-    using Xunit;
 
+    [TestClass]
     public class UIExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixUIAdvanced()
         {
             var folder = TestData.Get(@"TestData", "WixUI_Advanced");
@@ -20,7 +21,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "ControlEvent", "InstallUISequence");
-            Assert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -37,7 +38,7 @@ namespace WixToolsetTest.UI
                 "CustomAction:WixSetPerMachineFolder\t51\tAPPLICATIONFOLDER\t[WixPerMachineFolder]\t",
                 "CustomAction:WixSetPerUserFolder\t51\tAPPLICATIONFOLDER\t[WixPerUserFolder]\t",
             }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
-            Assert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).ToArray());
+            WixAssert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).ToArray());
             WixAssert.CompareLineByLine(new[]
             {
                 "InstallUISequence:AdvancedWelcomeEulaDlg\tNOT Installed\t1297",
@@ -45,7 +46,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixUIAdvancedX64()
         {
             var folder = TestData.Get(@"TestData", "WixUI_Advanced");
@@ -53,7 +54,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildX64, "Binary", "Dialog", "CustomAction", "ControlEvent", "InstallUISequence");
-            Assert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -70,10 +71,10 @@ namespace WixToolsetTest.UI
                 "CustomAction:WixSetPerMachineFolder\t51\tAPPLICATIONFOLDER\t[WixPerMachineFolder]\t",
                 "CustomAction:WixSetPerUserFolder\t51\tAPPLICATIONFOLDER\t[WixPerUserFolder]\t",
             }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
-            Assert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).ToArray());
+            WixAssert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixUIAdvancedARM64()
         {
             var folder = TestData.Get(@"TestData", "WixUI_Advanced");
@@ -81,7 +82,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildARM64, "Binary", "Dialog", "CustomAction", "ControlEvent", "InstallUISequence");
-            Assert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:AdvancedWelcomeEulaDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -98,10 +99,10 @@ namespace WixToolsetTest.UI
                 "CustomAction:WixSetPerMachineFolder\t51\tAPPLICATIONFOLDER\t[WixPerMachineFolder]\t",
                 "CustomAction:WixSetPerUserFolder\t51\tAPPLICATIONFOLDER\t[WixPerUserFolder]\t",
             }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
-            Assert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).ToArray());
+            WixAssert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixUIFeatureTree()
         {
             var folder = TestData.Get(@"TestData", "WixUI_FeatureTree");
@@ -109,9 +110,9 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildX64, "Binary", "Dialog", "CustomAction", "ControlEvent", "InstallUISequence");
-            Assert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
-            Assert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
-            Assert.Empty(results.Where(result => result.StartsWith("Dialog:SetupTypeDlg\t")));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
+            WixAssert.Empty(results.Where(result => result.StartsWith("Dialog:SetupTypeDlg\t")));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -125,14 +126,14 @@ namespace WixToolsetTest.UI
             {
                 "CustomAction:SetWIXUI_EXITDIALOGOPTIONALTEXT\t51\tWIXUI_EXITDIALOGOPTIONALTEXT\tThank you for installing [ProductName].\t",
             }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
-            Assert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")));
+            WixAssert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")));
             WixAssert.CompareLineByLine(new[]
             {
                 "InstallUISequence:WelcomeDlg\tNOT Installed OR PATCH\t1297",
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildWithWixUIInstallDirWithCustomizedEula()
         {
             var folder = TestData.Get(@"TestData", "WixUI_InstallDir");
@@ -140,8 +141,8 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildEula, "Binary", "Dialog", "CustomAction", "Property", "ControlEvent", "InstallUISequence");
-            Assert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
-            Assert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -171,7 +172,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixUIMinimal()
         {
             var folder = TestData.Get(@"TestData", "WixUI_Minimal");
@@ -179,7 +180,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "ControlEvent", "InstallUISequence");
-            Assert.Single(results, result => result.StartsWith("Dialog:WelcomeEulaDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:WelcomeEulaDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -189,8 +190,8 @@ namespace WixToolsetTest.UI
                 "Binary:WixUI_Ico_Exclam\t[Binary data]",
                 "Binary:WixUI_Ico_Info\t[Binary data]",
             }, results.Where(r => r.StartsWith("Binary:")).ToArray());
-            Assert.Empty(results.Where(r => r.StartsWith("CustomAction:")));
-            Assert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")));
+            WixAssert.Empty(results.Where(r => r.StartsWith("CustomAction:")));
+            WixAssert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")));
             WixAssert.CompareLineByLine(new[]
             {
                 "InstallUISequence:WelcomeDlg\tInstalled AND PATCH\t1296",
@@ -198,7 +199,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixUIMinimalInKazakh()
         {
             var folder = TestData.Get(@"TestData", "WixUI_Minimal");
@@ -207,10 +208,10 @@ namespace WixToolsetTest.UI
 
             var results = build.BuildAndQuery(BuildInKazakh, "Dialog");
             var welcomeDlg = results.Where(r => r.StartsWith("Dialog:WelcomeDlg\t")).Select(r => r.Split('\t')).Single();
-            Assert.Equal("[ProductName] бағдарламасын орнату", welcomeDlg[6]);
+            Assert.AreEqual("[ProductName] бағдарламасын орнату", welcomeDlg[6]);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixUIMinimalAndReadPdb()
         {
             var folder = TestData.Get(@"TestData", "WixUI_Minimal");
@@ -236,7 +237,7 @@ namespace WixToolsetTest.UI
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixUIMondo()
         {
             var folder = TestData.Get(@"TestData", "WixUI_Mondo");
@@ -244,9 +245,9 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "ControlEvent", "InstallUISequence");
-            Assert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
-            Assert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
-            Assert.Single(results, result => result.StartsWith("Dialog:SetupTypeDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:SetupTypeDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -271,7 +272,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixUIMondoLocalized()
         {
             var folder = TestData.Get(@"TestData", "WixUI_Mondo");
@@ -285,7 +286,7 @@ namespace WixToolsetTest.UI
             }, results.Where(s => s.StartsWith("Control:ErrorDlg\tY")).Select(s => s.Split('\t')[9]).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildWithInstallDirAndRemovedDialog()
         {
             var folder = TestData.Get(@"TestData", "InstallDir_NoLicense");
@@ -293,7 +294,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(Build, "Binary", "Dialog", "CustomAction", "Property", "ControlEvent", "InstallUISequence");
-            Assert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -318,7 +319,7 @@ namespace WixToolsetTest.UI
                 "ControlEvent:InstallDirDlg\tNext\tDoAction\tWixUIValidatePath_X86\t1\t2",
             }, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).OrderBy(s => s).ToArray());
 
-            Assert.Empty(results.Where(result => result.Contains("LicenseAgreementDlg")).ToArray());
+            WixAssert.Empty(results.Where(result => result.Contains("LicenseAgreementDlg")).ToArray());
 
             WixAssert.CompareLineByLine(new[]
             {
@@ -326,7 +327,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildWithInstallDirAndAddedDialog()
         {
             var folder = TestData.Get(@"TestData", "InstallDir_SpecialDlg");
@@ -334,7 +335,7 @@ namespace WixToolsetTest.UI
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
             var results = build.BuildAndQuery(BuildX64, "Binary", "Control", "Dialog", "CustomAction", "Property", "ControlEvent", "InstallUISequence");
-            Assert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
+            WixAssert.Single(results, result => result.StartsWith("Dialog:InstallDirDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -344,23 +345,23 @@ namespace WixToolsetTest.UI
                 "Binary:WixUI_Ico_Exclam\t[Binary data]",
                 "Binary:WixUI_Ico_Info\t[Binary data]",
             }, results.Where(r => r.StartsWith("Binary:")).ToArray());
-            Assert.Empty(results.Where(r => r.StartsWith("CustomAction:")).ToArray());
+            WixAssert.Empty(results.Where(r => r.StartsWith("CustomAction:")).ToArray());
             WixAssert.CompareLineByLine(new[]
             {
                 "Property:WIXUI_INSTALLDIR\tINSTALLFOLDER",
             }, results.Where(r => r.StartsWith("Property:WIXUI")).ToArray());
-            Assert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).OrderBy(s => s).ToArray());
+            WixAssert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).OrderBy(s => s).ToArray());
             WixAssert.CompareLineByLine(new[]
             {
                 "InstallUISequence:WelcomeDlg\tNOT Installed OR PATCH\t1297",
             }, results.Where(r => r.StartsWith("InstallUISequence:AdvancedWelcome") || r.StartsWith("InstallUISequence:Welcome")).ToArray());
 
-            Assert.Equal(10, results.Where(result => result.StartsWith("Control:") && result.Contains("SpecialDlg")).Count());
-            Assert.Equal(5, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("SpecialDlg")).Count());
-            Assert.Single(results.Where(result => result.StartsWith("Dialog:") && result.Contains("SpecialDlg")));
+            Assert.AreEqual(10, results.Where(result => result.StartsWith("Control:") && result.Contains("SpecialDlg")).Count());
+            Assert.AreEqual(5, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("SpecialDlg")).Count());
+            WixAssert.Single(results.Where(result => result.StartsWith("Dialog:") && result.Contains("SpecialDlg")));
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildWithV3LikeUIRef()
         {
             var folder = TestData.Get(@"TestData", "InvalidUIRef");
@@ -381,7 +382,7 @@ namespace WixToolsetTest.UI
 
                 var results = WixRunner.Execute(args);
                 var message = results.Messages.Single();
-                Assert.Equal("The identifier 'WixUI:WixUI_Mondo' is inaccessible due to its protection level.", message.ToString());
+                Assert.AreEqual("The identifier 'WixUI:WixUI_Mondo' is inaccessible due to its protection level.", message.ToString());
             }
         }
 

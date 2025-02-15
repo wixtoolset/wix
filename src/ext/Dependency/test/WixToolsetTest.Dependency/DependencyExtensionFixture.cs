@@ -4,14 +4,15 @@ namespace WixToolsetTest.Dependency
 {
     using System.Linq;
     using System.Text.RegularExpressions;
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.Dependency;
-    using Xunit;
 
+    [TestClass]
     public class DependencyExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingProvides()
         {
             var folder = TestData.Get(@"TestData\UsingProvides");

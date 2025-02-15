@@ -2,14 +2,15 @@
 
 namespace WixToolsetTest.PowerShell
 {
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.PowerShell;
-    using Xunit;
 
+    [TestClass]
     public class PowerShellExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CantBuildUsingTypesFileWithoutSnapIn()
         {
             var folder = TestData.Get(@"TestData\TypesFile");
@@ -19,8 +20,8 @@ namespace WixToolsetTest.PowerShell
             var results = build.BuildAndQuery(args => {
                 wixRunnerResult = WixRunner.Execute(args);
             });
-            Assert.NotNull(wixRunnerResult);
-            Assert.Equal((int)PSErrors.Ids.NeitherIdSpecified, wixRunnerResult.ExitCode);
+            Assert.IsNotNull(wixRunnerResult);
+            Assert.AreEqual((int)PSErrors.Ids.NeitherIdSpecified, wixRunnerResult.ExitCode);
         }
     }
 }

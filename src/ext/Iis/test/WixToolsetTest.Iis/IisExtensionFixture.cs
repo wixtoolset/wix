@@ -3,14 +3,15 @@
 namespace WixToolsetTest.Iis
 {
     using System.Linq;
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.Iis;
-    using Xunit;
 
+    [TestClass]
     public class IisExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingIIs()
         {
             var folder = TestData.Get(@"TestData\UsingIis");

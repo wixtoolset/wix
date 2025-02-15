@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project Sdk="Microsoft.Build.Traversal">
+  <ItemGroup>
+    <ProjectReference Include="wixlib\netfx.wixproj" />
+    <ProjectReference Include="test\WixToolsetTest.Netfx\WixToolsetTest.Netfx.csproj" />
+    <ProjectReference Include="wixext\WixToolset.Netfx.wixext.csproj" Targets="Pack" Properties="NoBuild=true" />
+  </ItemGroup>
+
+  <Target Name="WixClean" BeforeTargets="Restore" Condition="'$(SuppressWixClean)' != 'true'">
+    <!--
+    This should work but at first glance, the .vcxproj doesn't get detected as a "package.config-style project."
+    Worth finding out if we could trigger it artificially. It would let us stop needing nuget.exe.
+
+    <ProjectReference Include="netcoresearch\netcoresearch.vcxproj" Targets="Restore" Properties="RestorePackagesConfig=true" />
+    -->
+    <Exec Command="nuget restore netcoresearch\packages.config" />
+
+    <RemoveDir Directories="$(RootBuildFolder)NetFx.wixext" />
+    <RemoveDir Directories="$(USERPROFILE)\.nuget\packages\wixtoolset.netfx.wixext" Condition="'$(NUGET_PACKAGES)' == ''" />
+    <RemoveDir Directories="$(NUGET_PACKAGES)\wixtoolset.netfx.wixext" Condition="'$(NUGET_PACKAGES)' != ''" />
+
+    <Delete Files="$(ArtifactsFolder)WixToolset.NetFx.wixext.*.nupkg" />
+  </Target>
+</Project>

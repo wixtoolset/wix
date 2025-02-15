@@ -5,13 +5,14 @@ namespace WixToolsetTest.BootstrapperApplications
     using System.IO;
     using System.Linq;
     using System.Xml;
-    using WixInternal.Core.TestPackage;
-    using WixInternal.TestSupport;
-    using Xunit;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.Core.MSTestPackage;
+    using WixInternal.MSTestSupport;
 
+    [TestClass]
     public class InternalUIBAFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixIuiBa()
         {
             using (var fs = new DisposableFileSystem())
@@ -34,7 +35,7 @@ namespace WixToolsetTest.BootstrapperApplications
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -45,12 +46,12 @@ namespace WixToolsetTest.BootstrapperApplications
                     "<WixBalPackageInfo PackageId='test.msi' PrimaryPackageType='default' />",
                 }, balPackageInfos);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixIuiBaWithUrlPrereqPackage()
         {
             using (var fs = new DisposableFileSystem())
@@ -73,7 +74,7 @@ namespace WixToolsetTest.BootstrapperApplications
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -90,12 +91,12 @@ namespace WixToolsetTest.BootstrapperApplications
                     "<WixPrereqInformation PackageId='wixnative.exe' LicenseUrl='https://www.mysite.com/prereqterms' />",
                 }, mbaPrereqInfos);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixIuiBaWithImplicitPrimaryPackage()
         {
             using (var fs = new DisposableFileSystem())
@@ -118,7 +119,7 @@ namespace WixToolsetTest.BootstrapperApplications
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -135,12 +136,12 @@ namespace WixToolsetTest.BootstrapperApplications
                     "<WixPrereqInformation PackageId='wixnative.exe' />",
                 }, mbaPrereqInfos);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixIuiBaWithWarnings()
         {
             using (var fs = new DisposableFileSystem())
@@ -172,7 +173,7 @@ namespace WixToolsetTest.BootstrapperApplications
 
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -189,12 +190,12 @@ namespace WixToolsetTest.BootstrapperApplications
                     "<WixPrereqInformation PackageId='wixnative.exe' />",
                 }, mbaPrereqInfos);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingWixIuiBaAndForcedCachePrimaryPackage()
         {
             using (var fs = new DisposableFileSystem())
@@ -218,7 +219,7 @@ namespace WixToolsetTest.BootstrapperApplications
 
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundleFile, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -239,8 +240,8 @@ namespace WixToolsetTest.BootstrapperApplications
                     "<WixPrereqInformation PackageId='wixnative.exe' />",
                 }, mbaPrereqInfos);
 
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
-                Assert.True(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
+                Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
             }
 
             static void AssertCacheType(XmlNode node)
@@ -251,16 +252,16 @@ namespace WixToolsetTest.BootstrapperApplications
 
                 if (package == "test.msi")
                 {
-                    Assert.Equal("force", cache);
+                    Assert.AreEqual("force", cache);
                 }
                 else if (package == "wixnative.exe")
                 {
-                    Assert.Equal("keep", cache);
+                    Assert.AreEqual("keep", cache);
                 }
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithAllPrereqPackages()
         {
             using (var fs = new DisposableFileSystem())
@@ -285,11 +286,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "When using WixInternalUIBootstrapperApplication, there must be one package with bal:PrimaryPackageType=\"default\".",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(6808, compileResult.ExitCode);
+                Assert.AreEqual(6808, compileResult.ExitCode);
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithImplicitNonMsiPrimaryPackage()
         {
             using (var fs = new DisposableFileSystem())
@@ -314,11 +315,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "When using WixInternalUIBootstrapperApplication, packages must either be non-permanent and have the bal:PrimaryPackageType attribute, or be permanent and have the bal:PrereqPackage attribute set to 'yes'.",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(6811, compileResult.ExitCode);
+                Assert.AreEqual(6811, compileResult.ExitCode);
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithImplicitPrimaryPackageEnableFeatureSelection()
         {
             using (var fs = new DisposableFileSystem())
@@ -343,11 +344,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "When using WixInternalUIBootstrapperApplication, packages must either be non-permanent and have the bal:PrimaryPackageType attribute, or be permanent and have the bal:PrereqPackage attribute set to 'yes'.",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(6811, compileResult.ExitCode);
+                Assert.AreEqual(6811, compileResult.ExitCode);
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithMultipleNonPermanentNonPrimaryPackages()
         {
             using (var fs = new DisposableFileSystem())
@@ -373,11 +374,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "When using WixInternalUIBootstrapperApplication, packages must either be non-permanent and have the bal:PrimaryPackageType attribute, or be permanent and have the bal:PrereqPackage attribute set to 'yes'.",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(6811, compileResult.ExitCode);
+                Assert.AreEqual(6811, compileResult.ExitCode);
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithMultiplePrimaryPackagesOfSameType()
         {
             using (var fs = new DisposableFileSystem())
@@ -403,11 +404,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "The location of the package related to the previous error.",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(6810, compileResult.ExitCode);
+                Assert.AreEqual(6810, compileResult.ExitCode);
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithNoDefaultPrimaryPackage()
         {
             using (var fs = new DisposableFileSystem())
@@ -432,11 +433,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "When using WixInternalUIBootstrapperApplication, there must be one package with bal:PrimaryPackageType=\"default\".",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(6808, compileResult.ExitCode);
+                Assert.AreEqual(6808, compileResult.ExitCode);
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithNonMsiPrimaryPackage()
         {
             using (var fs = new DisposableFileSystem())
@@ -461,11 +462,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "When using WixInternalUIBootstrapperApplication, each primary package must be an MsiPackage.",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(6814, compileResult.ExitCode);
+                Assert.AreEqual(6814, compileResult.ExitCode);
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithNonPermanentPrereqPackage()
         {
             using (var fs = new DisposableFileSystem())
@@ -490,11 +491,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "When using WixInternalUIBootstrapperApplication and bal:PrereqPackage is set to 'yes', the package must be permanent.",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(6812, compileResult.ExitCode);
+                Assert.AreEqual(6812, compileResult.ExitCode);
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithPermanentPrimaryPackage()
         {
             using (var fs = new DisposableFileSystem())
@@ -520,11 +521,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "When using WixInternalUIBootstrapperApplication, there must be one package with bal:PrimaryPackageType=\"default\".",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(6808, compileResult.ExitCode);
+                Assert.AreEqual(6808, compileResult.ExitCode);
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithPrimaryPackageEnableFeatureSelection()
         {
             using (var fs = new DisposableFileSystem())
@@ -550,11 +551,11 @@ namespace WixToolsetTest.BootstrapperApplications
                     "When using WixInternalUIBootstrapperApplication, there must be one package with bal:PrimaryPackageType=\"default\".",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(6808, compileResult.ExitCode);
+                Assert.AreEqual(6808, compileResult.ExitCode);
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CannotBuildUsingWixIuiBaWithPrimaryPrereqPackage()
         {
             using (var fs = new DisposableFileSystem())
@@ -578,7 +579,7 @@ namespace WixToolsetTest.BootstrapperApplications
                     "The MsiPackage/@PrereqPackage attribute's value, 'yes', cannot be specified with attribute PrimaryPackageType present.",
                 }, compileResult.Messages.Select(m => m.ToString()).ToArray());
 
-                Assert.Equal(193, compileResult.ExitCode);
+                Assert.AreEqual(193, compileResult.ExitCode);
             }
         }
     }

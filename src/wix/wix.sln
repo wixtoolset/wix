@@ -48,6 +48,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "pack-wix", "pack-wix\pack-w
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixToolsetTest.Core", "test\WixToolsetTest.Core\WixToolsetTest.Core.csproj", "{392817AE-4493-4BED-A7FD-2399379E1B1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WixInternal.Core.MSTestPackage", "WixInternal.Core.MSTestPackage\WixInternal.Core.MSTestPackage.csproj", "{61003299-4D78-4291-862C-73806C62C3BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -412,6 +414,22 @@ Global
 		{392817AE-4493-4BED-A7FD-2399379E1B1C}.Release|x64.Build.0 = Release|Any CPU
 		{392817AE-4493-4BED-A7FD-2399379E1B1C}.Release|x86.ActiveCfg = Release|Any CPU
 		{392817AE-4493-4BED-A7FD-2399379E1B1C}.Release|x86.Build.0 = Release|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Debug|x64.Build.0 = Debug|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Debug|x86.Build.0 = Debug|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Release|ARM64.Build.0 = Release|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Release|x64.ActiveCfg = Release|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Release|x64.Build.0 = Release|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Release|x86.ActiveCfg = Release|Any CPU
+		{61003299-4D78-4291-862C-73806C62C3BD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

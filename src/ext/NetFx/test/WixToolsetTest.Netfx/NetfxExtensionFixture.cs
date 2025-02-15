@@ -4,14 +4,15 @@ namespace WixToolsetTest.Netfx
 {
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
-    using WixInternal.Core.TestPackage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.Netfx;
-    using Xunit;
 
+    [TestClass]
     public class NetfxExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingLatestDotNetCorePackages()
         {
             using (var fs = new DisposableFileSystem())
@@ -21,30 +22,24 @@ namespace WixToolsetTest.Netfx
                 var bundleSourceFolder = TestData.Get(@"TestData\UsingDotNetCorePackages");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var extensionResult = WixRunner.Execute(new[]
-                {
-                    "extension", "add",
-                    "WixToolset.BootstrapperApplications.wixext"
-                });
-
                 var compileResult = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(bundleSourceFolder, "BundleLatest.wxs"),
                     Path.Combine(bundleSourceFolder, "NetCore3.1.12_x86.wxs"),
                     Path.Combine(bundleSourceFolder, "NetCore3.1.12_x64.wxs"),
-                    "-ext", "WixToolset.BootstrapperApplications.wixext",
+                    "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll").Replace("NetFx.wixext", "Bal.wixext"),
                     "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingLatestDotNetCorePackages_X64()
         {
             using (var fs = new DisposableFileSystem())
@@ -54,29 +49,23 @@ namespace WixToolsetTest.Netfx
                 var bundleSourceFolder = TestData.Get(@"TestData\UsingDotNetCorePackages");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var extensionResult = WixRunner.Execute(new[]
-                {
-                    "extension", "add",
-                    "WixToolset.BootstrapperApplications.wixext"
-                });
-
                 var compileResult = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(bundleSourceFolder, "BundleLatest_x64.wxs"),
                     Path.Combine(bundleSourceFolder, "NetCore3.1.12_x64.wxs"),
-                    "-ext", "WixToolset.BootstrapperApplications.wixext",
+                    "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll").Replace("NetFx.wixext", "Bal.wixext"),
                     "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingNetFx481Packages()
         {
             using (var fs = new DisposableFileSystem())
@@ -86,17 +75,11 @@ namespace WixToolsetTest.Netfx
                 var bundleSourceFolder = TestData.Get(@"TestData\UsingNetFxPackages");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var extensionResult = WixRunner.Execute(new[]
-                {
-                    "extension", "add",
-                    "WixToolset.BootstrapperApplications.wixext"
-                });
-
                 var compileResult = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(bundleSourceFolder, "BundleLatest.wxs"),
-                    "-ext", "WixToolset.BootstrapperApplications.wixext",
+                    "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll").Replace("NetFx.wixext", "Bal.wixext"),
                     "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", bundleFile,
@@ -104,11 +87,11 @@ namespace WixToolsetTest.Netfx
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingNetFxSearches()
         {
             using (var fs = new DisposableFileSystem())
@@ -118,20 +101,12 @@ namespace WixToolsetTest.Netfx
                 var bundleSourceFolder = TestData.Get(@"TestData\UsingNetFxSearches");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
-                var extensionResult = WixRunner.Execute(warningsAsErrors: true, new[]
-                {
-                    "extension", "add",
-                    "WixToolset.BootstrapperApplications.wixext",
-                    "extension", "add",
-                    "WixToolset.Util.wixext",
-                });
-
                 var compileResult = WixRunner.Execute(new[]
                 {
                     "build",
                     Path.Combine(bundleSourceFolder, "BundleLatest.wxs"),
-                    "-ext", "WixToolset.BootstrapperApplications.wixext",
-                    "-ext", "WixToolset.Util.wixext",
+                    "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll").Replace("NetFx.wixext", "Bal.wixext"),
+                    "-ext", TestData.Get(@"WixToolset.Util.wixext.dll").Replace("NetFx.wixext", "Util.wixext"),
                     "-ext", TestData.Get(@"WixToolset.Netfx.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", bundleFile,
@@ -139,11 +114,11 @@ namespace WixToolsetTest.Netfx
                 });
                 compileResult.AssertSuccess();
 
-                Assert.True(File.Exists(bundleFile));
+                Assert.IsTrue(File.Exists(bundleFile));
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingNativeImage()
         {
             var folder = TestData.Get(@"TestData\UsingNativeImage");
@@ -162,7 +137,7 @@ namespace WixToolsetTest.Netfx
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingNativeImageX64()
         {
             var folder = TestData.Get(@"TestData\UsingNativeImage");
@@ -181,7 +156,7 @@ namespace WixToolsetTest.Netfx
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingNativeImageARM64()
         {
             var folder = TestData.Get(@"TestData\UsingNativeImage");
@@ -200,7 +175,7 @@ namespace WixToolsetTest.Netfx
             }, results.OrderBy(s => s).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingDotNetCompatibilityCheck()
         {
             var folder = TestData.Get(@"TestData\UsingDotNetCompatibilityCheck");

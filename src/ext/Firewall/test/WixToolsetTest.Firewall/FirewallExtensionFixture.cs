@@ -6,14 +6,15 @@ namespace WixToolsetTest.Firewall
     using System.IO;
     using System.Linq;
     using System.Xml.Linq;
-    using WixInternal.Core.TestPackage;
-    using WixInternal.TestSupport;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.Core.MSTestPackage;
+    using WixInternal.MSTestSupport;
     using WixToolset.Firewall;
-    using Xunit;
 
+    [TestClass]
     public class FirewallExtensionFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingFirewall()
         {
             var folder = TestData.Get(@"TestData\UsingFirewall");
@@ -52,7 +53,7 @@ namespace WixToolsetTest.Firewall
             }, results);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildUsingFirewallARM64()
         {
             var folder = TestData.Get(@"TestData\UsingFirewall");
@@ -91,7 +92,7 @@ namespace WixToolsetTest.Firewall
             }, results);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildWithProperties()
         {
             var folder = TestData.Get(@"TestData\UsingProperties");
@@ -112,7 +113,7 @@ namespace WixToolsetTest.Firewall
             }, results);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildWithPropertiesUsingFirewallARM64()
         {
             var folder = TestData.Get(@"TestData\UsingProperties");
@@ -133,7 +134,7 @@ namespace WixToolsetTest.Firewall
             }, results);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanRoundtripFirewallExceptions()
         {
             var folder = TestData.Get(@"TestData", "UsingFirewall");
@@ -181,7 +182,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Select(a => a.Name).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void CanRoundtripFirewallExceptionsWithProperties()
         {
             var folder = TestData.Get(@"TestData", "UsingProperties");
@@ -212,7 +213,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Select(a => a.Name).ToArray());
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForApp()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExampleApp");
@@ -230,7 +231,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForPort()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExamplePort");
@@ -248,7 +249,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForDNSScope()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExampleDNSScope");
@@ -264,7 +265,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForDHCPScope()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExampleDHCPScope");
@@ -281,7 +282,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForWINSScope()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExampleWINSScope");
@@ -298,7 +299,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForDefaultGatewayScope()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ExampleDefaultGatewayScope");
@@ -315,7 +316,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForINetFwRule3Values()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "INetFwRule3 values");
@@ -335,7 +336,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForINetFwRule3Properties()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "INetFwRule3 properties");
@@ -355,7 +356,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForGroupingValue()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "GroupingExample1");
@@ -370,7 +371,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForGroupingProperty()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "GroupingExample2");
@@ -386,7 +387,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForIcmpValue()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ICMPExample1");
@@ -401,7 +402,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForIcmpProperty()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "ICMPExample2");
@@ -416,7 +417,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForLocalScopeValue()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "LocalScopeExample1");
@@ -431,7 +432,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForLocalScopeProperty()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "LocalScopeExample2");
@@ -446,7 +447,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForRemotePorts()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "RemotePortExample1");
@@ -462,7 +463,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectForRemotePortsProperty()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "RemotePortExample2");
@@ -478,7 +479,7 @@ namespace WixToolsetTest.Firewall
             }, actual.Attributes);
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectWhenPropertiesAreUsed()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "[NAME]", "UsingProperties");
@@ -526,10 +527,10 @@ namespace WixToolsetTest.Firewall
                 });
 
             var nested = related.Select(e => e.Attributes().Single(a => a.Name.LocalName == "Name").Value);
-            Assert.False(nested.Any());
+            Assert.IsFalse(nested.Any());
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectWhenNestedPropertiesAreUsed()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "Single Nested properties", "UsingProperties");
@@ -559,10 +560,10 @@ namespace WixToolsetTest.Firewall
                 });
 
             var nested = related.Select(e => e.Attributes().Single(a => a.Name.LocalName == "Name").Value);
-            Assert.False(nested.Any());
+            Assert.IsFalse(nested.Any());
         }
 
-        [Fact]
+        [TestMethod]
         public void RoundtripAttributesAreCorrectWhenMultipleNestedPropertiesAreUsed()
         {
             var actual = BuildAndDecompileAndBuild("http://wixtoolset.org/schemas/v4/wxs/firewall", "Multiple Nested properties", "UsingProperties");
