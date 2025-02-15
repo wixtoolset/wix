@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:msmq="http://wixtoolset.org/schemas/v4/wxs/msmq">
+     xmlns:msmq="http://wixtoolset.org/schemas/v4/wxs/msmq"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Fragment>
+    <util:Group Id="TestGroup" Name="TestGroup" />
+    <util:User Id="TestUser" Name="TestUser" />
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
         <Component>
             <File Source="example.txt" />
-            <msmq:MessageQueue Id="TestMQ" Label="MQLabel" PathName="MQPath" />
+            <msmq:MessageQueue Id="TestMQ" Label="MQLabel" PathName="MQPath" >
+                <msmq:MessageQueuePermission Id="TestMQ_TestGroup" GetQueuePermissions="yes" GetQueueProperties="yes" Group="TestGroup" />
+                <msmq:MessageQueuePermission Id="TestMQ_TestUser" GetQueuePermissions="yes" GetQueueProperties="yes" User="TestUser" />
+            </msmq:MessageQueue>
         </Component>
     </ComponentGroup>
   </Fragment>

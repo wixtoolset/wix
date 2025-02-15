@@ -49,7 +49,7 @@ extern "C" UINT __stdcall MessageQueuingInstall(MSIHANDLE hInstall)
 
     // read message queues
     hr = MqiMessageQueueRead(&lstMessageQueues);
-    ExitOnFailure(hr, "Failed to read MessageQueue table");
+    ExitOnFailure(hr, "Failed to read Wix4MessageQueue table");
 
     // read message queue permissions
     hr = MqiMessageQueuePermissionRead(&lstMessageQueues, &lstMessageQueuePermissions);
@@ -78,7 +78,7 @@ extern "C" UINT __stdcall MessageQueuingInstall(MSIHANDLE hInstall)
 
         hr = MqiMessageQueuePermissionInstall(&lstMessageQueuePermissions, &pwzExecuteActionData);
         ExitOnFailure(hr, "Failed to add message queue permissions to execute action data");
-        iCost += lstMessageQueues.iInstallCount * COST_MESSAGE_QUEUE_PERMISSION_ADD;
+        iCost += lstMessageQueuePermissions.iInstallCount * COST_MESSAGE_QUEUE_PERMISSION_ADD;
 
         hr = WcaDoDeferredAction(CUSTOM_ACTION_DECORATION(L"MessageQueuingExecuteInstall"), pwzExecuteActionData, iCost);
         ExitOnFailure(hr, "Failed to schedule MessageQueuingExecuteInstall");
@@ -148,7 +148,7 @@ extern "C" UINT __stdcall MessageQueuingUninstall(MSIHANDLE hInstall)
 
     // read message queues
     hr = MqiMessageQueueRead(&lstMessageQueues);
-    ExitOnFailure(hr, "Failed to read MessageQueue table");
+    ExitOnFailure(hr, "Failed to read Wix4MessageQueue table");
 
     // read message queue permissions
     hr = MqiMessageQueuePermissionRead(&lstMessageQueues, &lstMessageQueuePermissions);
