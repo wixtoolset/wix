@@ -5,7 +5,7 @@ namespace WixToolsetTest.Heat
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using WixToolset.Core;
-    using WixInternal.Core.TestPackage;
+    using WixInternal.Core.MSTestPackage;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
     using WixToolset.Tools.Heat;

@@ -16,7 +16,7 @@ namespace WixInternal.MSTestSupport
 
     public static class MsbuildUtilities
     {
-        public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", string verbosityLevel = "normal", bool suppressValidation = true)
+        public static MsbuildRunnerResult BuildProject(BuildSystem buildSystem, string projectPath, string[] arguments = null, string configuration = "Release", string verbosityLevel = "normal", bool suppressValidation = true, bool binlog = true)
         {
             var allArgs = new List<string>
             {
@@ -26,8 +26,12 @@ namespace WixInternal.MSTestSupport
                 // Node reuse means that child msbuild processes can stay around after the build completes.
                 // Under that scenario, the root msbuild does not reliably close its streams which causes us to hang.
                 "-nr:false",
-                MsbuildUtilities.GetQuotedSwitch(buildSystem, "bl", Path.ChangeExtension(projectPath, ".binlog"))
             };
+
+            if (binlog)
+            {
+                MsbuildUtilities.GetQuotedSwitch(buildSystem, "bl", Path.ChangeExtension(projectPath, ".binlog"));
+            }
 
             if (arguments != null)
             {

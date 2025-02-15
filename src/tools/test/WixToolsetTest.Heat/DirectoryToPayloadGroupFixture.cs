@@ -5,12 +5,13 @@ namespace WixToolsetTest.Heat
     using System;
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
-    using Xunit;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
 
+    [TestClass]
     public class DirectoryToPayloadGroupFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanHarvestSimpleDirectory()
         {
             var folder = TestData.Get("TestData", "SingleFile");
@@ -43,7 +44,7 @@ namespace WixToolsetTest.Heat
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanHarvestSimpleDirectoryWithSourceDirSubstitution()
         {
             var folder = TestData.Get("TestData", "SingleFile");
@@ -77,7 +78,7 @@ namespace WixToolsetTest.Heat
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanHarvestNestedFiles()
         {
             var folder = TestData.Get("TestData", "NestedFiles");

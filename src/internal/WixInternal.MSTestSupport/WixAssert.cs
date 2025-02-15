@@ -77,15 +77,19 @@ namespace WixInternal.MSTestSupport
             Assert.AreNotEqual(expected, actual, comparer);
         }
 
-        public static void Single<T>(IEnumerable<T> collection)
+        public static T Single<T>(IEnumerable<T> collection)
         {
-            Assert.AreEqual(1, collection.Count());
+            return collection.Single();
         }
 
-        public static void Single<T>(IEnumerable<T> collection, Func<T, bool> predicate)
+        public static T Single<T>(IEnumerable<T> collection, Func<T, bool> predicate)
         {
-            var results = collection.Where(predicate);
-            Assert.AreEqual(1, results.Count());
+            return collection.Where(predicate).Single();
+        }
+
+        public static void All<T>(IEnumerable<T> collection, Func<T, bool> predicate)
+        {
+            Assert.IsTrue(collection.All(predicate));
         }
 
         public static void Empty<T>(IEnumerable<T> collection)

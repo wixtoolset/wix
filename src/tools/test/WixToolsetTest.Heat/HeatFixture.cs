@@ -4,12 +4,13 @@ namespace WixToolsetTest.Heat
 {
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
-    using Xunit;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
 
+    [TestClass]
     public class HeatFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanHarvestSimpleDirectory()
         {
             var folder = TestData.Get("TestData", "SingleFile");
@@ -48,7 +49,7 @@ namespace WixToolsetTest.Heat
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanHarvestSimpleDirectoryToComponentGroup()
         {
             var folder = TestData.Get("TestData", "SingleFile");
@@ -88,7 +89,7 @@ namespace WixToolsetTest.Heat
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanHarvestSimpleDirectoryToInstallFolder()
         {
             var folder = TestData.Get("TestData", "SingleFile");
@@ -129,7 +130,7 @@ namespace WixToolsetTest.Heat
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanHarvestFile()
         {
             var folder = TestData.Get("TestData", "SingleFile");
@@ -171,7 +172,7 @@ namespace WixToolsetTest.Heat
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanHarvestRegistry()
         {
             var folder = TestData.Get("TestData", "RegFile");
@@ -195,7 +196,7 @@ namespace WixToolsetTest.Heat
             }
         }
 
-        [Fact]
+        [TestMethod]
         public void CanHarvestRegistryIntoComponentGroup()
         {
             var folder = TestData.Get("TestData", "RegFile");
