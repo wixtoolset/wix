@@ -17,7 +17,7 @@
     <xs:annotation>
       <xs:appinfo>
         <xse:remarks>
-          <html:p>You can specify any valid Windows code page by integer like 1252, or by web name like Windows-1252 or iso-8859-1. See [Code pages](../../tools/codepage.md) for more information.</html:p>
+          <html:p>You can specify any valid Windows code page by integer like 1252, or by web name like Windows-1252 or iso-8859-1. See [Code pages](../../../tools/codepage/) for more information.</html:p>
         </xse:remarks>
         <xse:howtoRef href="ui_and_localization/build_a_localized_version.html">How To: Build a localized version of your installer</xse:howtoRef>
         <xse:howtoRef href="ui_and_localization/make_installer_localizable.html">How To: Make your installer localizable</xse:howtoRef>

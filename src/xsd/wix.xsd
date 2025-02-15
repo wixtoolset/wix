@@ -2395,7 +2395,7 @@
       </xs:documentation>
       <xs:appinfo>
         <xse:remarks>
-          <html:p>You can specify any valid Windows code page by integer like 1252, or by web name like Windows-1252. See [Code pages](../../tools/codepage.md) for more information.</html:p>
+          <html:p>You can specify any valid Windows code page by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/) for more information.</html:p>
         </xse:remarks>
       </xs:appinfo>
     </xs:annotation>
@@ -2626,7 +2626,7 @@
         <xs:annotation>
           <xs:documentation>
             The code page integer value or web name for the resulting MSM. You can specify any valid Windows
-            code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../tools/codepage.md)
+            code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/)
             for more information.
           </xs:documentation>
         </xs:annotation>
@@ -2929,7 +2929,7 @@
             </xs:documentation>
       <xs:appinfo>
         <xse:remarks>
-          <html:p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../tools/codepage.md) for more information.</html:p>
+          <html:p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/) for more information.</html:p>
           <html:p>The ClientPatchId attribute allows you to specify an easily referenced identity that you can use in product authoring. This identity prefixes properties added by WiX to a patch transform, such as <html:i>ClientPatchId</html:i>.PatchCode and <html:i>ClientPatchId</html:i>.AllowRemoval. If the patch code GUID is auto-generated you could not reference any properties using this auto-generated prefix.</html:p>
           <html:p>For example, if you were planning to ship a patch referred to as "QFE1" and needed to write your own registry values for Add/Remove Programs in product authoring such as the UninstallString for this patch, you could author a RegistryValue with the name UninstallString and the value <html:code>[SystemFolder]msiexec.exe /package [ProductCode] /uninstall [QFE1.PatchCode]</html:code>. In your patch authoring you would then set ClientPatchId to "QFE1" and WiX will add the QFE1.PatchCode property to the patch transform when the patch is created. If the Id attribute specified the patch code to be generated automatically, you could not reference the <html:i>prefix</html:i>.PatchCode property as shown above.</html:p>
           <html:p>The summary information is automatically populated from attribute values of the Patch element including the code page. If you want to override some of these summary information properties or use a different code page for the summary information itself, author the PatchInformation element.</html:p>
@@ -3373,7 +3373,7 @@
             </xs:documentation>
       <xs:appinfo>
         <xse:remarks>
-          <html:p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../tools/codepage.md) for more information.</html:p>
+          <html:p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/) for more information.</html:p>
         </xse:remarks>
       </xs:appinfo>
     </xs:annotation>
@@ -3441,7 +3441,7 @@
       <xs:documentation>Properties about the patch to be placed in the Summary Information Stream. These are visible from COM through the IStream interface, and these properties can be seen on the package in Explorer.</xs:documentation>
       <xs:appinfo>
         <xse:remarks>
-          <html:p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../tools/codepage.md) for more information.</html:p>
+          <html:p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/) for more information.</html:p>
         </xse:remarks>
       </xs:appinfo>
     </xs:annotation>
@@ -4008,7 +4008,7 @@
       </xs:documentation>
       <xs:appinfo>
         <xse:remarks>
-          <html:p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../tools/codepage.md) for more information.</html:p>
+          <html:p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/) for more information.</html:p>
         </xse:remarks>
       </xs:appinfo>
     </xs:annotation>
@@ -5678,7 +5678,7 @@
             Specifies the name of the installed file. If this attribute is omitted, then
             its default value is the file name portion of the Source attribute. If the
             Source attribute is omitted, you must specify a Name attribute. For more
-            information, see [Specifying source files](../../tools/payloads.md).
+            information, see [Specifying source files](../../../tools/payloads/).
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
@@ -5870,7 +5870,7 @@
             Specifies the path to the file in the build process. Overrides default source
             path set by parent directories and Name attribute. This attribute must be set
             if no source information can be gathered from parent directories. For more
-            information, see [Specifying source files](../../tools/payloads.md).
+            information, see [Specifying source files](../../../tools/payloads/).
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
@@ -8436,7 +8436,7 @@
         <xs:annotation>
           <xs:documentation>
             Used to set the default file system source for child Component elements. For more information, see
-            [Specifying source files](../../tools/payloads.md).
+            [Specifying source files](../../../tools/payloads/).
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
@@ -8733,7 +8733,7 @@
       <xs:attribute name="FileSource" type="xs:string">
         <xs:annotation>
           <xs:documentation>Used to set the file system source for this directory's child elements.
-          For more information, see [Specifying source files](../../tools/payloads.md).</xs:documentation>
+          For more information, see [Specifying source files](../../../tools/payloads/).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="Name" type="xs:string">
@@ -8842,7 +8842,7 @@
       <xs:attribute name="FileSource" type="xs:string">
         <xs:annotation>
           <xs:documentation>Used to set the file system source for this DirectoryRef's child elements.
-          For more information, see [Specifying source files](../../tools/payloads.md).</xs:documentation>
+          For more information, see [Specifying source files](../../../tools/payloads/).</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:anyAttribute namespace="##other" processContents="lax">
