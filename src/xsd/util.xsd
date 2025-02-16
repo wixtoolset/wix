@@ -701,19 +701,18 @@
 
   <xs:element name="Group">
     <xs:annotation>
+      <xs:documentation>Group for all kinds of (usergroup) things.  When it is not nested under a component it is included in the MSI so it can be referenced by other elements such as the GroupRef element under a User element (to add the User to the Group).  When it is nested under a Component element, the Group will be created on install and can also be used for reference.</xs:documentation>
       <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
         <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
         <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
         <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <xse:seeAlso ref="GroupRef" />
       </xs:appinfo>
-      <xs:documentation>
-        Finds user groups on the local machine or specified Active Directory domain. The local machine will be
-        searched for the group first then fallback to looking in Active Directory. This element is not capable
-        of creating new groups but can be used to add new or existing users to an existing group.
-      </xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="GroupRef" minOccurs="0" maxOccurs="unbounded" />
         <xs:any namespace="##other" processContents="lax">
           <xs:annotation>
             <xs:documentation>
@@ -730,12 +729,47 @@
       </xs:attribute>
       <xs:attribute name="Name" type="xs:string" use="required">
         <xs:annotation>
-          <xs:documentation>A [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that contains the name of the group to be found.</xs:documentation>
+          <xs:documentation>A [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that contains the name of the group.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="Domain" type="xs:string">
         <xs:annotation>
           <xs:documentation>An optional [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that specifies the domain for the group.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RemoveOnUninstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Indicates whether the group should be removed or left behind on uninstall.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="FailIfExists" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Indicates if the install should fail if the group already exists.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="UpdateIfExists" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Indicates if the group properties should be updated if the group already exists.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="CreateGroup" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Indicates whether or not to create the group.  Group creation can be skipped if all that is desired is to add group memberships.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Vital" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Indicates whether failure to create the group or add the group to another group fails the installation. The default value is "yes".</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Comment" type="xs:string">
+        <xs:annotation>
+            <xs:documentation>Optional comment to set on the group.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RemoveComment" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Indicates whether remove the comment from the group. The default value is "no".</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:anyAttribute namespace="##other" processContents="lax">
@@ -751,7 +785,7 @@
 
   <xs:element name="GroupRef">
     <xs:annotation>
-      <xs:documentation>Used to join a user to a group</xs:documentation>
+      <xs:documentation>Used to join a user / group to a group</xs:documentation>
     </xs:annotation>
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
@@ -1853,12 +1887,12 @@
       <xs:attribute name="Id" type="xs:string" />
       <xs:attribute name="Name" type="xs:string" use="required">
         <xs:annotation>
-          <xs:documentation>A [Formatted])(https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that contains the name of the user account.</xs:documentation>
+          <xs:documentation>A [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that contains the name of the user account.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="Domain" type="xs:string">
         <xs:annotation>
-          <xs:documentation>A [Formatted])(https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that contains the local machine or Active Directory domain for the user.</xs:documentation>
+          <xs:documentation>A [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that contains the local machine or Active Directory domain for the user.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
       <xs:attribute name="Password" type="xs:string">
