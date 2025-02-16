@@ -685,6 +685,12 @@
         </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="StoreLocation" use="required">
+        <xs:annotation>
+          <xs:documentation>
+              This attribute controls which Certificate Store Location will be used for the Certificate.
+              See <a href="https://learn.microsoft.com/en-us/windows/win32/seccrypto/system-store-locations" target="_blank">MSDN documentation</a> for more information.
+          </xs:documentation>
+        </xs:annotation>
         <xs:simpleType>
           <xs:restriction base="xs:string">
             <xs:enumeration value="currentUser"/>
