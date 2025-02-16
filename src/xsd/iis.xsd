@@ -689,6 +689,11 @@
           <xs:restriction base="xs:string">
             <xs:enumeration value="currentUser"/>
             <xs:enumeration value="localMachine"/>
+            <xs:enumeration value="services"/>
+            <xs:enumeration value="users"/>
+            <xs:enumeration value="userPolicy"/>
+            <xs:enumeration value="localMachinePolicy"/>
+            <xs:enumeration value="localMachineEnterprise"/>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
