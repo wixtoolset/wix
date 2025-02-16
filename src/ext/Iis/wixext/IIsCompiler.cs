@@ -219,7 +219,7 @@ namespace WixToolset.Iis
                                         break;
                                     default:
                                         storeLocation = -1;
-                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "StoreLocation", storeLocationValue, "currentUser", "localMachine"));
+                                        this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, element.Name.LocalName, "StoreLocation", storeLocationValue, "currentUser", "localMachine", "services", "users", "userPolicy", "localMachinePolicy", "localMachineEnterprise"));
                                         break;
                                 }
                             }
