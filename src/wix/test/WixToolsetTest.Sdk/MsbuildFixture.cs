@@ -6,18 +6,19 @@ namespace WixToolsetTest.Sdk
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
-    using Xunit;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
 
+    [TestClass]
     public class MsbuildFixture
     {
         public static readonly string WixMsbuildPath = Path.Combine(Path.GetDirectoryName(new Uri(typeof(MsbuildFixture).Assembly.CodeBase).LocalPath), "..", "..", "..", "publish", "WixToolset.Sdk");
         public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "Sdk", "Sdk.props");
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildSimpleBundle(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "SimpleMsiPackage");
@@ -57,10 +58,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildUncompressedBundle(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get("TestData", "SimpleMsiPackage");
@@ -100,10 +101,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMergeModule(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get("TestData", "MergeModule", "SimpleMergeModule");
@@ -135,10 +136,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
@@ -160,7 +161,7 @@ namespace WixToolsetTest.Sdk
                 result.AssertSuccess();
 
                 var platformSwitches = result.Output.Where(line => line.Contains("-platform x86"));
-                Assert.Single(platformSwitches);
+                WixAssert.Single(platformSwitches);
 
                 var warnings = result.Output.Where(line => line.Contains(": warning")).Select(line => ExtractWarningFromMessage(line, baseFolder)).ToArray();
                 WixAssert.CompareLineByLine(new[]
@@ -193,10 +194,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackageWithMergeModule(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "MergeModule");
@@ -229,10 +230,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildMsiPackageWithBindVariables(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get("TestData", "MsiPackageWithBindVariables");
@@ -276,10 +277,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildWithDefaultAndExplicitlyFullWixpdbs(BuildSystem buildSystem)
         {
             var expectedOutputs = new[]
@@ -293,10 +294,10 @@ namespace WixToolsetTest.Sdk
             this.AssertWixpdb(buildSystem, "Full", expectedOutputs);
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildWithNoWixpdb(BuildSystem buildSystem)
         {
             this.AssertWixpdb(buildSystem, "NONE", new[]
@@ -306,10 +307,10 @@ namespace WixToolsetTest.Sdk
                 });
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildWithWixpdbToDifferentFolder(BuildSystem buildSystem)
         {
             var expectedOutputFiles = new[]
@@ -346,10 +347,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuild64BitMsiPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
@@ -369,7 +370,7 @@ namespace WixToolsetTest.Sdk
                 result.AssertSuccess();
 
                 var platformSwitches = result.Output.Where(line => line.Contains("-platform x64"));
-                Assert.Single(platformSwitches);
+                WixAssert.Single(platformSwitches);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -384,10 +385,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildMsiPackageWithIceSuppressions(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get("TestData", "MsiPackageWithIceError", "MsiPackage");
@@ -408,10 +409,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackageWithWarningSuppressions(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get("TestData", "SimpleMsiPackage", "MsiPackage");
@@ -435,10 +436,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildSingleCultureWithFallbackMsiPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "SingleCultureWithFallbackMsiPackage");
@@ -469,10 +470,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildMultiCulturalMsiPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "MultiCulturalMsiPackage");
@@ -514,10 +515,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackageAsWixipl(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
@@ -537,7 +538,7 @@ namespace WixToolsetTest.Sdk
                 result.AssertSuccess();
 
                 var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem);
-                Assert.Single(wixBuildCommands);
+                WixAssert.Single(wixBuildCommands);
 
                 var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -546,10 +547,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildSimpleWixlib(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "Wixlib", "SimpleWixlib");
@@ -568,7 +569,7 @@ namespace WixToolsetTest.Sdk
                 result.AssertSuccess();
 
                 var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem);
-                Assert.Single(wixBuildCommands);
+                WixAssert.Single(wixBuildCommands);
 
                 var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
                     .Select(s => s.Substring(baseFolder.Length + 1))
@@ -577,10 +578,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildPackageIncludingSimpleWixlib(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "Wixlib");
@@ -610,10 +611,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildAndCleanSimpleMsiPackage(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
@@ -636,7 +637,7 @@ namespace WixToolsetTest.Sdk
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .OrderBy(s => s)
                     .ToArray();
-                Assert.NotEmpty(createdPaths);
+                WixAssert.NotEmpty(createdPaths);
 
                 // Clean
                 result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
@@ -670,10 +671,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildMultiTargetingWixlibUsingRids(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "MultiTargetingWixlib");
@@ -708,10 +709,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildMultiTargetingWixlibUsingRidsWithReleaseAndDebug(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "MultiTargetingWixlib");
@@ -750,10 +751,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CannotBuildMultiTargetingWixlibUsingExplicitSubsetOfTfmAndRid(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "MultiTargetingWixlib");
@@ -779,10 +780,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildWithWarningWhenExtensionIsMissing(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "WixlibMissingExtension");
@@ -818,10 +819,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildPackageWithComma(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "PackageWith,Comma");
@@ -852,10 +853,11 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory(Skip = "Depends on creating broken publish which is not supported at this time")]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [Ignore("Depends on creating broken publish which is not supported at this time")]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void ReportsInnerExceptionForUnexpectedExceptions(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
@@ -871,10 +873,10 @@ namespace WixToolsetTest.Sdk
                 {
                     MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixToolDir", Path.Combine(MsbuildFixture.WixMsbuildPath, "broken", "net461")),
                 });
-                Assert.Equal(1, result.ExitCode);
+                Assert.AreEqual(1, result.ExitCode);
 
                 var expectedMessage = "System.PlatformNotSupportedException: Could not find platform specific 'wixnative.exe' ---> System.IO.FileNotFoundException: Could not find internal piece of WiX Toolset from";
-                Assert.Contains(result.Output, m => m.Contains(expectedMessage));
+                WixAssert.Any(result.Output, m => m.Contains(expectedMessage));
             }
         }
 

@@ -5,8 +5,8 @@ namespace WixToolsetTest.Sdk
     using System;
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
-    using Xunit;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using WixInternal.MSTestSupport;
 
     // When these tests are run repeatedly, they will expose an issue
     // in the Windows Installer where ICE validations will occasionally
@@ -17,12 +17,13 @@ namespace WixToolsetTest.Sdk
     // around for manual testing. Uncomment or define the following
     // line to do so.
 #if DISABLE_VALIDATION_TESTS_DUE_TO_WINDOWS_INSTALLER_INCONSISTENCIES
+    [TestClass]
     public class MsbuildValidationFixture
     {
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CannotBuildMsiPackageWithIceIssues(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\MsiPackageWithIceError\MsiPackage");
@@ -59,10 +60,10 @@ namespace WixToolsetTest.Sdk
             }
         }
 
-        [Theory]
-        [InlineData(BuildSystem.DotNetCoreSdk)]
-        [InlineData(BuildSystem.MSBuild)]
-        [InlineData(BuildSystem.MSBuild64)]
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CannotBuildMsiPackageWithIceWarningsAsErrors(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData\MsiPackageWithIceError\MsiPackage");

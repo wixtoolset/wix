@@ -6,7 +6,7 @@
     <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
 
-  <Target Name="ZipPdbs" BeforeTargets="AfterBuild">
+  <Target Name="ZipPdbs" BeforeTargets="AfterBuild" Condition=" '$(Configuration)' == 'Release' ">
     <ZipDirectory
         SourceDirectory="$(PdbsFolder)"
         DestinationFile="$(ArtifactsFolder)\wix-pdbs.$(Version).zip"
