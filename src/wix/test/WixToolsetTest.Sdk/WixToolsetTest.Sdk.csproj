@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSTest.Sdk">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <DefaultItemExcludes>TestData\**;$(DefaultItemExcludes)</DefaultItemExcludes>
     <RequiresNativeWixAssets>true</RequiresNativeWixAssets>
-    <IsWixTestProject>true</IsWixTestProject>
+    <IsWixMSTestProject>true</IsWixMSTestProject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,10 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\WixInternal.Core.TestPackage\WixInternal.Core.TestPackage.csproj" />
+    <ProjectReference Include="..\..\WixInternal.Core.MSTestPackage\WixInternal.Core.MSTestPackage.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixInternal.TestSupport" /> 
+    <PackageReference Include="WixInternal.MSTestSupport" /> 
   </ItemGroup>
 </Project>

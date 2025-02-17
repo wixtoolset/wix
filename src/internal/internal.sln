@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WixInternal.TestSupport.Nat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WixInternal.BaseBuildTasks.Sources", "WixInternal.BaseBuildTasks.Sources\WixInternal.BaseBuildTasks.Sources.csproj", "{6B654490-AB0D-4F94-B564-DAA80044D5A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WixInternal.XunitTestSupport", "WixInternal.XunitTestSupport\WixInternal.XunitTestSupport.csproj", "{AF7C4730-583B-46F8-9BB6-16D1F0330932}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WixInternal.MSTestSupport", "WixInternal.MSTestSupport\WixInternal.MSTestSupport.csproj", "{E70898F2-8D08-4FCE-9CFF-EF1792FCA2E2}"
 EndProject
 Global

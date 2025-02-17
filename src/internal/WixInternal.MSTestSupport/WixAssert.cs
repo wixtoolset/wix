@@ -92,6 +92,16 @@ namespace WixInternal.MSTestSupport
             Assert.IsTrue(collection.All(predicate));
         }
 
+        public static void Any<T>(IEnumerable<T> collection, Func<T, bool> predicate)
+        {
+            Assert.IsTrue(collection.Any(predicate));
+        }
+
+        public static void NotEmpty<T>(IEnumerable<T> collection)
+        {
+            Assert.IsTrue(collection.Count() > 0);
+        }
+
         public static void Empty<T>(IEnumerable<T> collection)
         {
             Assert.AreEqual(0, collection.Count());
