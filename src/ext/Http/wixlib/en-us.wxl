@@ -8,10 +8,10 @@
     <String Id="WixRollbackHttpUrlReservationsUninstall" Overridable="yes" Value="Rolling back Windows HTTP Server configuration" />
     <String Id="WixExecHttpUrlReservationsUninstall" Overridable="yes" Value="Configuring Windows HTTP Server" />
 
-    <String Id="WixSchedHttpSniSslCertsInstall" Overridable="yes" Value="Preparing to configure Windows HTTP Server SSL" />
-    <String Id="WixSchedHttpSniSslCertsUninstall" Overridable="yes" Value="Preparing to configure Windows HTTP Server SSL" />
-    <String Id="WixRollbackHttpSniSslCertsInstall" Overridable="yes" Value="Rolling back Windows HTTP Server SSL configuration" />
-    <String Id="WixExecHttpSniSslCertsInstall" Overridable="yes" Value="Configuring Windows HTTP Server SSL" />
-    <String Id="WixRollbackHttpSniSslCertsUninstall" Overridable="yes" Value="Rolling back Windows HTTP Server SSL configuration" />
-    <String Id="WixExecHttpSniSslCertsUninstall" Overridable="yes" Value="Configuring Windows HTTP Server SSL" />
+    <String Id="SchedHttpCertificatesInstall" Overridable="yes" Value="Preparing to configure Windows HTTP Server SSL" />
+    <String Id="SchedHttpCertificatesUninstall" Overridable="yes" Value="Preparing to configure Windows HTTP Server SSL" />
+    <String Id="RollbackHttpCertificatesInstall" Overridable="yes" Value="Rolling back Windows HTTP Server SSL configuration" />
+    <String Id="ExecHttpCertificatesInstall" Overridable="yes" Value="Configuring Windows HTTP Server SSL" />
+    <String Id="RollbackHttpCertificatesUninstall" Overridable="yes" Value="Rolling back Windows HTTP Server SSL configuration" />
+    <String Id="ExecHttpCertificatesUninstall" Overridable="yes" Value="Configuring Windows HTTP Server SSL" />
 </WixLocalization>

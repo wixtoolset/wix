@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -28,7 +27,6 @@
       <Platform>ARM64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-
   <PropertyGroup Label="Globals">
     <ProjectGuid>{90743805-C043-47C7-B5FF-8F5EE5C8A2DE}</ProjectGuid>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -37,35 +35,28 @@
     <ProjectModuleDefinitionFile>wixhttpca.def</ProjectModuleDefinitionFile>
     <Description>WiX Toolset Http CustomAction</Description>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-
   <PropertyGroup>
     <ProjectAdditionalLinkLibraries>crypt32.lib;httpapi.lib;msi.lib;rpcrt4.lib;ws2_32.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
-
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="snisslcert.cpp" />
+    <ClCompile Include="httpcerts.cpp" />
     <ClCompile Include="wixhttpca.cpp" />
   </ItemGroup>
-
   <ItemGroup>
     <ClInclude Include="cost.h" />
     <ClInclude Include="precomp.h" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="wixhttpca.def" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="WixToolset.WcaUtil" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>
