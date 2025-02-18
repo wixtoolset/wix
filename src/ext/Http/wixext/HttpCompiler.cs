@@ -49,7 +49,11 @@ namespace WixToolset.Http
                     switch (element.Name.LocalName)
                     {
                         case "SniSslCertificate":
-                            this.ParseSniSslCertificateElement(intermediate, section, element, componentId);
+                            this.ParseCertificateElement(intermediate, section, element, componentId, CertificateType.SniSsl);
+                            break;
+
+                        case "SslCertificate":
+                            this.ParseCertificateElement(intermediate, section, element, componentId, CertificateType.IpSsl);
                             break;
 
                         case "UrlReservation":
@@ -71,7 +75,7 @@ namespace WixToolset.Http
         /// </summary>
         /// <param name="node">The element to parse.</param>
         /// <param name="componentId">Identifier of the component that owns this SNI SSL Certificate.</param>
-        private void ParseSniSslCertificateElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentId)
+        private void ParseCertificateElement(Intermediate intermediate, IntermediateSection section, XElement node, string componentId, CertificateType type)
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(node);
             Identifier id = null;
@@ -138,13 +142,25 @@ namespace WixToolset.Http
             // Need the element ID for child element processing, so generate now if not authored.
             if (null == id)
             {
-                id = this.ParseHelper.CreateIdentifier("ssl", componentId, host, port);
+                var prefix = type == CertificateType.IpSsl ? "ips" : "sni";
+
+                id = this.ParseHelper.CreateIdentifier(prefix, componentId, host, port);
             }
 
             // Required attributes.
             if (null == host)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Host"));
+                if (type == CertificateType.SniSsl)
+                {
+                    this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Host"));
+                }
+            }
+            else
+            {
+                if (type == CertificateType.IpSsl)
+                {
+                    this.Messaging.Write(ErrorMessages.IllegalAttributeExceptOnElement(sourceLineNumbers, node.Name.LocalName, "Host", "SniSslCertificate"));
+                }
             }
 
             if (null == port)
@@ -162,7 +178,7 @@ namespace WixToolset.Http
 
             if (!this.Messaging.EncounteredError)
             {
-                section.AddSymbol(new WixHttpSniSslCertSymbol(sourceLineNumbers, id)
+                section.AddSymbol(new HttpCertificateSymbol(sourceLineNumbers, id)
                 {
                     Host = host,
                     Port = port,
@@ -170,11 +186,12 @@ namespace WixToolset.Http
                     AppId = appId,
                     Store = store,
                     HandleExisting = handleExisting,
+                    CertificateType = type,
                     ComponentRef = componentId,
                 });
 
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4SchedHttpSniSslCertsInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
-                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4SchedHttpSniSslCertsUninstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix6SchedHttpCertificatesInstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+                this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix6SchedHttpCertificatesUninstall", this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
             }
         }
 

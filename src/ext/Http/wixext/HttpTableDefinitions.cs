@@ -6,18 +6,19 @@ namespace WixToolset.Http
 
     public static class HttpTableDefinitions
     {
-        public static readonly TableDefinition WixHttpSniSslCert = new TableDefinition(
-            "Wix4HttpSniSslCert",
-            HttpSymbolDefinitions.WixHttpSniSslCert,
+        public static readonly TableDefinition HttpCertificate = new TableDefinition(
+            "Wix6HttpCertificate",
+            HttpSymbolDefinitions.HttpCertificate,
             new[]
             {
-                new ColumnDefinition("Wix4HttpSniSslCert", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The non-localized primary key for the table.", modularizeType: ColumnModularizeType.Column),
-                new ColumnDefinition("Host", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Host for the SNI SSL certificate.", modularizeType: ColumnModularizeType.Property),
+                new ColumnDefinition("HttpCertificate", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Identifier, description: "The non-localized primary key for the table.", modularizeType: ColumnModularizeType.Column),
+                new ColumnDefinition("Host", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Host for the SNI SSL certificate.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Port", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "Port for the  SNI SSL certificate.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Thumbprint", ColumnType.String, 0, primaryKey: false, nullable: false, ColumnCategory.Formatted, description: "humbprint of the SNI SSL certificate to find.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("AppId", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Optional application id for the SNI SSL certificate.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("Store", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Optional application id for the SNI SSL certificate.", modularizeType: ColumnModularizeType.Property),
                 new ColumnDefinition("HandleExisting", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 2, description: "The behavior when trying to install a SNI SSL certificate and it already exists."),
+                new ColumnDefinition("Type", ColumnType.Number, 4, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "0: SNI; 1: non-SNI"),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key into the Component table referencing the component that controls the URL reservation.", modularizeType: ColumnModularizeType.Column),
             },
             symbolIdIsPrimaryKey: true
@@ -52,7 +53,7 @@ namespace WixToolset.Http
 
         public static readonly TableDefinition[] All = new[]
         {
-            WixHttpSniSslCert,
+            HttpCertificate,
             WixHttpUrlReservation,
             WixHttpUrlAce,
         };

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:http="http://wixtoolset.org/schemas/v4/wxs/http">
+    <Fragment>
+        <Property Id="PORTMANTEAU" Value="8088" />
+        <Property Id="SOME_THUMBPRINT" Value="8E64C2AB0A9F730C7D06C58441362A6376BD72FB" />
+        <Property Id="SOME_OTHER_THUMBPRINT" Value="14C1B207A930E29AE34778F3CE0680A1811E1AE1" />
+
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="example.txt" />
+                <http:SniSslCertificate Host="example.com" Port="8080" Thumbprint="[SOME_THUMBPRINT]" HandleExisting="fail" />
+                <http:SslCertificate Port="[PORTMANTEAU]" Thumbprint="[SOME_OTHER_THUMBPRINT]" HandleExisting="replace" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

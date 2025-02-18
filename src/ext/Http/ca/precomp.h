@@ -23,3 +23,9 @@ enum eHandleExisting
     heIgnore = 1,
     heFail = 2
 };
+
+enum eCertificateType
+{
+    ctSniSsl = 0,
+    ctIpSsl = 1,
+};
