@@ -1394,6 +1394,10 @@ namespace WixToolset.Iis
                             break;
                         case "CacheControlMaxAge":
                             cacheControlMaxAge = this.ParseHelper.GetAttributeLongValue(sourceLineNumbers, attrib, 0, uint.MaxValue); // 4294967295 (uint.MaxValue) represents unlimited
+                            if (cacheControlMaxAge == 0x8000_0000)
+                            {
+                                this.Messaging.Write(ErrorMessages.IllegalMsiUnsignedIntegerValue(sourceLineNumbers, element.Name.LocalName, "CacheControlMaxAge", cacheControlMaxAge.ToString()));
+                            }
                             break;
                         case "ClearCustomError":
                             notCustomError = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);

@@ -2271,6 +2271,11 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.OverlengthTableNameInProductOrMergeModule, "The table name '{0}' is invalid because the table name exceeds 31 characters in length. For more information, see: https://learn.microsoft.com/en-au/windows/win32/msi/table-names", tableName);
         }
 
+        public static Message IllegalMsiUnsignedIntegerValue(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
+        {
+            return Message(sourceLineNumbers, Ids.IllegalMsiUnsignedIntegerValue, "The {0}/@{1} attribute's value, '{2}', is not a legal MSI unsigned integer value. Legal MSI unsigned integer values are from 0 to 2,147,483,647, or 2,147,483,649 to 4,294,967,295", elementName, attributeName, value);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -2672,7 +2677,8 @@ namespace WixToolset.Data
             MsiTransactionInvalidPackage2 = 412,
             ExpectedAttributeOrElementWithOtherAttribute = 413,
             ExpectedAttributeOrElementWithoutOtherAttribute = 414,
-            OverlengthTableNameInProductOrMergeModule = 415
+            OverlengthTableNameInProductOrMergeModule = 415,
+            IllegalMsiUnsignedIntegerValue = 416
         }
     }
 }
