@@ -559,10 +559,20 @@ private:
         HRESULT hr = S_OK;
         WNDCLASSW wc = { };
         DWORD dwWindowStyle = WS_POPUP;
+        DWORD dwTitlePos = 0;
+        LPWSTR sczModulePath = NULL;
+        LPWSTR sczIconPath = NULL;
 
         wc.lpfnWndProc = CWixInternalUIBootstrapperApplication::WndProc;
         wc.hInstance = m_hModule;
         wc.lpszClassName = WIXIUIBA_WINDOW_CLASS;
+
+        hr = PathRelativeToModule(&sczModulePath, NULL, m_hModule);
+        BalExitOnFailure(hr, "Failed to get module path.");
+
+        hr = PathConcat(sczModulePath, L"icon.ico", &sczIconPath);
+
+        wc.hIcon = (HICON)LoadImageW(NULL, sczIconPath, IMAGE_ICON, 0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
 
         if (!::RegisterClassW(&wc))
         {
@@ -578,7 +588,14 @@ private:
             dwWindowStyle |= WS_VISIBLE;
         }
 
-        m_hWnd = ::CreateWindowExW(WS_EX_TOOLWINDOW, wc.lpszClassName, NULL, dwWindowStyle, 0, 0, 0, 0, HWND_DESKTOP, NULL, m_hModule, this);
+        // Get the primary MSI UI product name position
+        while ((m_Bundle.packages.rgPackages[dwTitlePos]).fPrereqPackage)
+        {
+            dwTitlePos++;
+        }
+
+        m_hWnd = ::CreateWindowExW(WS_EX_APPWINDOW, wc.lpszClassName, (m_Bundle.packages.rgPackages[dwTitlePos]).sczDisplayName, dwWindowStyle, 0, 0, 0, 0, HWND_DESKTOP, NULL, m_hModule, this);
+
         ExitOnNullWithLastError(m_hWnd, hr, "Failed to create internal UI main window.");
 
     LExit:
