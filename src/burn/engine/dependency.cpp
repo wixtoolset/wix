@@ -419,6 +419,7 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     STRINGDICT_HANDLE sdIgnoredDependents = NULL;
     BURN_DEPENDENCY_ACTION dependencyExecuteAction = BURN_DEPENDENCY_ACTION_NONE;
     BURN_DEPENDENCY_ACTION dependencyRollbackAction = BURN_DEPENDENCY_ACTION_NONE;
+    BOOL fDependenciesForcedAbsent = FALSE;
     BOOL fDependentBlocksUninstall = FALSE;
     BOOL fAttemptingUninstall = BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pPackage->execute || pPackage->compatiblePackage.fRemove;
 
@@ -467,7 +468,16 @@ extern "C" HRESULT DependencyPlanPackageBegin(
                 {
                     hr = S_OK;
 
-                    if (!fDependentBlocksUninstall)
+                    if (BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT == pPackage->requested)
+                    {
+                        if (!fDependenciesForcedAbsent)
+                        {
+                            fDependenciesForcedAbsent = TRUE;
+
+                            LogId(REPORT_STANDARD, MSG_DEPENDENCY_PACKAGE_DEPENDENTS_OVERRIDDEN, pPackage->sczId);
+                        }
+                    }
+                    else if (!fDependentBlocksUninstall)
                     {
                         fDependentBlocksUninstall = TRUE;
 
