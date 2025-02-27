@@ -427,7 +427,7 @@ HRESULT ScaGroupExecute(
     LPWSTR pwzBaseScriptKey = NULL;
     DWORD cScriptKey = 0;
 
-    LOCALGROUP_INFO_0 *pGroupInfo = NULL;
+    LOCALGROUP_INFO_1 *pGroupInfo1 = NULL;
     LPWSTR pwzScriptKey = NULL;
     LPWSTR pwzActionData = NULL;
     LPWSTR pwzRollbackData = NULL;
@@ -472,7 +472,7 @@ HRESULT ScaGroupExecute(
             }
         }
 
-        er = ::NetLocalGroupGetInfo(pwzServerName, psg->wzName, 0, reinterpret_cast<LPBYTE*>(&pGroupInfo));
+        er = ::NetLocalGroupGetInfo(pwzServerName, psg->wzName, 1, reinterpret_cast<LPBYTE*>(&pGroupInfo1));
         if (NERR_Success == er)
         {
             geGroupExists = GROUP_EXISTS_YES;
@@ -614,10 +614,10 @@ HRESULT ScaGroupExecute(
         ReleaseNullStr(pwzActionData);
         ReleaseNullStr(pwzRollbackData);
         ReleaseNullStr(pwzServerName);
-        if (pGroupInfo)
+        if (pGroupInfo1)
         {
-            ::NetApiBufferFree(static_cast<LPVOID>(pGroupInfo));
-            pGroupInfo = NULL;
+            ::NetApiBufferFree(static_cast<LPVOID>(pGroupInfo1));
+            pGroupInfo1 = NULL;
         }
     }
 
@@ -627,10 +627,10 @@ LExit:
     ReleaseStr(pwzActionData);
     ReleaseStr(pwzRollbackData);
     ReleaseStr(pwzServerName);
-    if (pGroupInfo)
+    if (pGroupInfo1)
     {
-        ::NetApiBufferFree(static_cast<LPVOID>(pGroupInfo));
-        pGroupInfo = NULL;
+        ::NetApiBufferFree(static_cast<LPVOID>(pGroupInfo1));
+        pGroupInfo1 = NULL;
     }
 
     return hr;
