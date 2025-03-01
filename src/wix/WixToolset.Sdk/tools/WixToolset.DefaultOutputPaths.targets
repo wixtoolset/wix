@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Ported from: https://github.com/dotnet/sdk/blob/23e2ba847d79562b972dbf54eca3f87c3044d925/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.DefaultOutputPaths.targets
+Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Import .props file to set ArtifactsPath if it wasn't already imported from Sdk.props (this is for the case when artifacts
+       properties are set in the project file instead of Directory.Build.props) -->
+  <Import Project="$(MSBuildThisFileDirectory)WixToolset.DefaultArtifactsPath.props"
+          Condition="'$(_DefaultArtifactsPathPropsImported)' != 'true'"/>
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true'">
+    <ArtifactsProjectName Condition="'$(ArtifactsProjectName)' == ''">$(MSBuildProjectName)</ArtifactsProjectName>
+
+    <ArtifactsBinOutputName Condition="'$(ArtifactsBinOutputName)' == ''">bin</ArtifactsBinOutputName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true' And '$(ArtifactsPivots)' == ''">
+    <!-- ArtifactsPivots will make the subdirectory within "bin" or "obj" become "debug" or "debug_win-x86" based on the configuration and platform. -->
+    <ArtifactsPivots>$(Configuration.ToLowerInvariant())</ArtifactsPivots>
+
+    <!-- Include the platform in the artifacts path if it is explicitly set. Prefix with "win-" to make it consistent with .NET runtime identifiers. -->
+    <ArtifactsPivots Condition="'$(Platform)' != ''">$(ArtifactsPivots)_win-$(Platform.ToLowerInvariant())</ArtifactsPivots>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true' And '$(IncludeProjectNameInArtifactsPaths)' == 'true'">
+    <!-- Set artifacts paths when project name should be included in the path -->
+    <BaseOutputPath Condition="'$(BaseOutputPath)' == ''">$(ArtifactsPath)\$(ArtifactsBinOutputName)\$(ArtifactsProjectName)\</BaseOutputPath>
+    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)' == '' And '$(UseArtifactsIntermediateOutput)' == 'true'">$(ArtifactsPath)\obj\$(ArtifactsProjectName)\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true' And '$(IncludeProjectNameInArtifactsPaths)' != 'true'">
+    <!-- Set artifacts paths when project name should not be included in the path -->
+    <BaseOutputPath Condition="'$(BaseOutputPath)' == ''">$(ArtifactsPath)\$(ArtifactsBinOutputName)\</BaseOutputPath>
+    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)' == '' And '$(UseArtifactsIntermediateOutput)' == 'true'">$(ArtifactsPath)\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true'">
+    <OutputPath Condition="'$(OutputPath)' == ''">$(BaseOutputPath)$(ArtifactsPivots)\</OutputPath>
+    <IntermediateOutputPath Condition=" $(IntermediateOutputPath) == '' And '$(UseArtifactsIntermediateOutput)' == 'true'">$(BaseIntermediateOutputPath)$(ArtifactsPivots)\</IntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' != 'true'">
+    <!-- Ensure BaseOutputPath for Microsoft.Common.targets -->
+    <BaseOutputPath Condition="'$(BaseOutputPath)' == ''">bin\</BaseOutputPath>
+    <BaseOutputPath Condition="!HasTrailingSlash('$(BaseOutputPath)')">$(BaseOutputPath)\</BaseOutputPath>
+  </PropertyGroup>
+
+  <!-- Configure default item exclusions -->
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' != 'true'">
+    <DefaultItemExcludes Condition=" '$(BaseOutputPath)' != '' ">$(DefaultItemExcludes);$(BaseOutputPath)**</DefaultItemExcludes>
+    <DefaultItemExcludes Condition=" '$(BaseIntermediateOutputPath)' != '' ">$(DefaultItemExcludes);$(BaseIntermediateOutputPath)**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(UseArtifactsOutput)' == 'true'">
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(ArtifactsPath)/**</DefaultItemExcludes>
+    <!-- Exclude bin and obj folders to avoid issues with projects that switch to using artifacts output format -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);bin/**;obj/**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefaultExcludesInProjectFolder>$(DefaultItemExcludesInProjectFolder);**/.*/**</DefaultExcludesInProjectFolder>
+  </PropertyGroup>
+
+  <Target Name="_CheckForUnsupportedArtifactsPath"
+          BeforeTargets="ResolveReferences">
+
+    <!-- Generate an error if ArtifactsPath or UseArtifactsOutput are set in the project file.
+
+         We generate an error because if they are set in the project file, it is too late to change the intermediate output path,
+         and because it would be confusing to set the property in the project file and have the artifacts path depend on whether
+         there happened to be a Directory.Build.props file defined.
+    -->
+
+    <Error Condition="'$(UseArtifactsOutput)' == 'true' and '$(_ArtifactsPathSetEarly)' != 'true'"
+           File="$(MSBuildProjectFile)"
+           Code="WIX9000"
+           Text="The ArtifactsPath and UseArtifactsOutput properties cannot be set in a project file, due to MSBuild ordering constraints. They must be set in a Directory.Build.props file or from the command line. See https://aka.ms/netsdk1199 for more information." />
+
+    <Error Condition="'$(_ArtifactsPathLocationType)' == 'ProjectFolder'"
+           File="$(MSBuildProjectFile)"
+           Code="WIX9001"
+           Text="If UseArtifactsPath is set to true and ArtifactsPath is not set, there must be a Directory.Build.props file in order to determine where the artifacts folder should be located." />
+
+  </Target>
+
+</Project>

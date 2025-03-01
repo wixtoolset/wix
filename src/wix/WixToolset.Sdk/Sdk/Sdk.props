@@ -12,6 +12,12 @@
     <EnableDefaultItems Condition=" '$(EnableDefaultItems)' == '' ">true</EnableDefaultItems>
     <EnableDefaultCompileItems Condition=" '$(EnableDefaultCompileItems)' == '' ">true</EnableDefaultCompileItems>
     <EnableDefaultEmbeddedResourceItems Condition=" '$(EnableDefaultEmbeddedResourceItems)' == '' ">true</EnableDefaultEmbeddedResourceItems>
+
+    <!--
+      Import UseArtifactsOutputPath.props after Directory.Build.props, where UseArtifactsOutput and similar settings will be configured by the consumer.
+      See https://github.com/dotnet/sdk/blob/23e2ba847d79562b972dbf54eca3f87c3044d925/src/Tasks/Microsoft.NET.Build.Tasks/sdk/Sdk.props#L41
+    -->
+    <CustomAfterDirectoryBuildProps>$(CustomAfterDirectoryBuildProps);$([MSBuild]::NormalizePath($(MSBuildThisFileDirectory), '..\tools\WixToolset.UseArtifactsOutputPath.props'))</CustomAfterDirectoryBuildProps>
   </PropertyGroup>
 
   <Import Project="$(WixPropsPath)" Condition=" '$(WixPropsPath)' != '' and Exists('$(WixPropsPath)')" />

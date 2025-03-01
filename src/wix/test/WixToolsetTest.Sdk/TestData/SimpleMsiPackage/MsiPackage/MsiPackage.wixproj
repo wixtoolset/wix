@@ -12,21 +12,21 @@
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformName>$(Platform)</PlatformName>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <OutputPath Condition="'$(UseArtifactsOutput)' != 'true'">bin\$(Platform)\$(Configuration)\</OutputPath>
     <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformName>$(Platform)</PlatformName>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <OutputPath Condition="'$(UseArtifactsOutput)' != 'true'">bin\$(Platform)\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <PlatformName>$(Platform)</PlatformName>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <OutputPath Condition="'$(UseArtifactsOutput)' != 'true'">bin\$(Platform)\$(Configuration)\</OutputPath>
     <DefineConstants>Debug</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <PlatformName>$(Platform)</PlatformName>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <OutputPath Condition="'$(UseArtifactsOutput)' != 'true'">bin\$(Platform)\$(Configuration)\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
