@@ -111,7 +111,7 @@ namespace WixToolsetTest.UI
             var results = build.BuildAndQuery(BuildX64, "Binary", "Dialog", "CustomAction", "ControlEvent", "InstallUISequence");
             Assert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
             Assert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
-            Assert.Empty(results.Where(result => result.StartsWith("Dialog:SetupTypeDlg\t")));
+            Assert.DoesNotContain(results, result => result.StartsWith("Dialog:SetupTypeDlg\t"));
             WixAssert.CompareLineByLine(new[]
             {
                 "Binary:WixUI_Bmp_Banner\t[Binary data]",
@@ -125,7 +125,7 @@ namespace WixToolsetTest.UI
             {
                 "CustomAction:SetWIXUI_EXITDIALOGOPTIONALTEXT\t51\tWIXUI_EXITDIALOGOPTIONALTEXT\tThank you for installing [ProductName].\t",
             }, results.Where(r => r.StartsWith("CustomAction:")).ToArray());
-            Assert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")));
+            Assert.DoesNotContain(results, result => result.StartsWith("ControlEvent:") && result.Contains("DoAction"));
             WixAssert.CompareLineByLine(new[]
             {
                 "InstallUISequence:WelcomeDlg\tNOT Installed OR PATCH\t1297",
@@ -189,8 +189,8 @@ namespace WixToolsetTest.UI
                 "Binary:WixUI_Ico_Exclam\t[Binary data]",
                 "Binary:WixUI_Ico_Info\t[Binary data]",
             }, results.Where(r => r.StartsWith("Binary:")).ToArray());
-            Assert.Empty(results.Where(r => r.StartsWith("CustomAction:")));
-            Assert.Empty(results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")));
+            Assert.DoesNotContain(results, r => r.StartsWith("CustomAction:"));
+            Assert.DoesNotContain(results, result => result.StartsWith("ControlEvent:") && result.Contains("DoAction"));
             WixAssert.CompareLineByLine(new[]
             {
                 "InstallUISequence:WelcomeDlg\tInstalled AND PATCH\t1296",
@@ -318,7 +318,7 @@ namespace WixToolsetTest.UI
                 "ControlEvent:InstallDirDlg\tNext\tDoAction\tWixUIValidatePath_X86\t1\t2",
             }, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("DoAction")).OrderBy(s => s).ToArray());
 
-            Assert.Empty(results.Where(result => result.Contains("LicenseAgreementDlg")).ToArray());
+            Assert.DoesNotContain(results, result => result.Contains("LicenseAgreementDlg"));
 
             WixAssert.CompareLineByLine(new[]
             {
@@ -357,7 +357,7 @@ namespace WixToolsetTest.UI
 
             Assert.Equal(10, results.Where(result => result.StartsWith("Control:") && result.Contains("SpecialDlg")).Count());
             Assert.Equal(5, results.Where(result => result.StartsWith("ControlEvent:") && result.Contains("SpecialDlg")).Count());
-            Assert.Single(results.Where(result => result.StartsWith("Dialog:") && result.Contains("SpecialDlg")));
+            Assert.Single(results, result => result.StartsWith("Dialog:") && result.Contains("SpecialDlg"));
         }
 
         [Fact]

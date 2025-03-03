@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TestGroupName Condition=" '$(TestGroupName)'=='' ">$([System.IO.Path]::GetFileName($([System.IO.Path]::GetDirectoryName($(MSBuildProjectDirectory)))))</TestGroupName>
     <BaseIntermediateOutputPath>$(BaseOutputPath)obj\$(TestGroupName)\$(ProjectName)\</BaseIntermediateOutputPath>
-    <OutputPath>$(OutputPath)net6.0-windows\TestData\$(TestGroupName)\</OutputPath>
+    <OutputPath>$(OutputPath)net8.0-windows\TestData\$(TestGroupName)\</OutputPath>
     <DefaultCompressionLevel>None</DefaultCompressionLevel>
     <CompilerAdditionalOptions>-wx</CompilerAdditionalOptions>
     <SuppressValidation>true</SuppressValidation>

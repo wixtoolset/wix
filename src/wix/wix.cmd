@@ -38,11 +38,11 @@ msbuild -t:Publish -p:Configuration=%_C% -tl -nologo -warnaserror WixToolset.Sdk
 
 :: Test
 dotnet test ^
- %_B%\test\WixToolsetTest.Converters\net6.0\WixToolsetTest.Converters.dll ^
+ %_B%\test\WixToolsetTest.Converters\net8.0\WixToolsetTest.Converters.dll ^
  %_B%\test\WixToolsetTest.Converters.Symbolizer\net472\WixToolsetTest.Converters.Symbolizer.dll ^
- %_B%\test\WixToolsetTest.Core\net6.0\WixToolsetTest.Core.dll ^
- %_B%\test\WixToolsetTest.Core.Native\net6.0\win-x64\WixToolsetTest.Core.Native.dll ^
- %_B%\test\WixToolsetTest.CoreIntegration\net6.0\WixToolsetTest.CoreIntegration.dll ^
+ %_B%\test\WixToolsetTest.Core\net8.0\WixToolsetTest.Core.dll ^
+ %_B%\test\WixToolsetTest.Core.Native\net8.0\win-x64\WixToolsetTest.Core.Native.dll ^
+ %_B%\test\WixToolsetTest.CoreIntegration\net8.0\WixToolsetTest.CoreIntegration.dll ^
  %_B%\test\WixToolsetTest.BuildTasks\net472\WixToolsetTest.BuildTasks.dll ^
  %_B%\test\WixToolsetTest.Sdk\net472\WixToolsetTest.Sdk.dll ^
  --nologo -l "trx;LogFileName=%_L%\TestResults\wix.trx" || exit /b

@@ -24,7 +24,7 @@ msbuild -Restore -p:Configuration=%_C% -tl -nologo -warnaserror -bl:%_L%\ext_uti
 
 :: Test
 dotnet test ^
- %_B%\net6.0\WixToolsetTest.Util.dll ^
+ %_B%\net8.0\WixToolsetTest.Util.dll ^
  --nologo -l "trx;LogFileName=%_L%\TestResults\util.wixext.trx" || exit /b
 
 :: Pack

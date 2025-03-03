@@ -2,23 +2,23 @@
   <PropertyGroup>
     <StagePublishX86>$(BaseIntermediateOutputPath)$(Configuration)\net472\x86\</StagePublishX86>
     <StagePublishX64>$(BaseIntermediateOutputPath)$(Configuration)\net472\x64\</StagePublishX64>
-    <StagePublishDnc>$(BaseIntermediateOutputPath)$(Configuration)\net6.0\</StagePublishDnc>
+    <StagePublishDnc>$(BaseIntermediateOutputPath)$(Configuration)\net8.0\</StagePublishDnc>
 
     <PublishBuildFolder>$(PublishRoot)WixToolset.Heat\build\</PublishBuildFolder>
     <PublishHere>$(PublishRoot)WixToolset.Heat\tools\net472\</PublishHere>
     <PublishX86>$(PublishRoot)WixToolset.Heat\tools\net472\x86\</PublishX86>
     <PublishX64>$(PublishRoot)WixToolset.Heat\tools\net472\x64\</PublishX64>
-    <PublishDnc>$(PublishRoot)WixToolset.Heat\tools\net6.0\</PublishDnc>
+    <PublishDnc>$(PublishRoot)WixToolset.Heat\tools\net8.0\</PublishDnc>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="WixToolset.HeatTasks\WixToolset.HeatTasks.csproj" Properties="TargetFramework=net472;PublishDir=$(StagePublishX86)WixToolset.HeatTasks" Targets="Publish" />
-    <ProjectReference Include="WixToolset.HeatTasks\WixToolset.HeatTasks.csproj" Properties="TargetFramework=net6.0;UseAppHost=false;PublishDir=$(StagePublishDnc)WixToolset.HeatTasks" Targets="Publish" />
+    <ProjectReference Include="WixToolset.HeatTasks\WixToolset.HeatTasks.csproj" Properties="TargetFramework=net8.0;UseAppHost=false;PublishDir=$(StagePublishDnc)WixToolset.HeatTasks" Targets="Publish" />
 
     <!-- heat.exe doesn't need to filter any files so publish it straight into its final location -->
     <ProjectReference Include="heat\heat.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-x86;PublishDir=$(PublishX86)" Targets="Publish" />
     <ProjectReference Include="heat\heat.csproj" Properties="TargetFramework=net472;RuntimeIdentifier=win-x64;PublishDir=$(PublishX64)" Targets="Publish" />
-    <ProjectReference Include="heat\heat.csproj" Properties="TargetFramework=net6.0-windows;UseAppHost=false;PublishDir=$(PublishDnc)" Targets="Publish" />
+    <ProjectReference Include="heat\heat.csproj" Properties="TargetFramework=net8.0-windows;UseAppHost=false;PublishDir=$(PublishDnc)" Targets="Publish" />
   </ItemGroup>
 
   <Target Name="CopyToFinalPublishFolder" AfterTargets="Build">

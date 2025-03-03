@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <Title>The WiX Toolset command-line interface.</Title>
     <Description>The WiX Toolset lets developers create installers for Windows. This package contains the WiX Toolset command-line interface.</Description>
