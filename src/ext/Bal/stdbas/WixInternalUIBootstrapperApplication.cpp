@@ -578,7 +578,7 @@ private:
             dwWindowStyle |= WS_VISIBLE;
         }
 
-        m_hWnd = ::CreateWindowExW(WS_EX_TOOLWINDOW, wc.lpszClassName, NULL, dwWindowStyle, 0, 0, 0, 0, HWND_DESKTOP, NULL, m_hModule, this);
+        m_hWnd = ::CreateWindowExW(WS_EX_APPWINDOW, wc.lpszClassName, NULL, dwWindowStyle, 0, 0, 0, 0, HWND_DESKTOP, NULL, m_hModule, this);
         ExitOnNullWithLastError(m_hWnd, hr, "Failed to create internal UI main window.");
 
     LExit:
