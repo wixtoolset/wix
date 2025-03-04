@@ -1,0 +1,461 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xse="http://wixtoolset.org/schemas/XmlSchemaExtension"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+          xmlns:wxs="http://wixtoolset.org/schemas/v4/wxs"
+    targetNamespace="http://wixtoolset.org/schemas/v4/wxs/sql"
+              xmlns="http://wixtoolset.org/schemas/v4/wxs/sql">
+  <xs:annotation>
+    <xs:documentation>
+      The source code schema for the WiX Toolset SQL Server Extension.
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:import namespace="http://wixtoolset.org/schemas/v4/wxs" />
+
+  <xs:element name="SqlDatabase">
+    <xs:annotation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <xse:remarks>
+            Nesting SqlDatabase under a Component element will result in a SqlDatabase being installed to the machine as the package is installed.
+
+            Nesting SqlDatabase under Package, Fragment, or Module
+            results in a database "locator" record being created in
+            the SqlDatabase table.  This means that the database
+            itself is neither installed nor uninstalled by the MSI
+            package.  It does make the database available for referencing
+            from a SqlString or SqlScript record.  This allows MSI to install
+            SqlScripts or SqlStrings to already existing databases on the machine.
+            The install will fail if the database does not exist in these cases.
+
+            The User attribute references credentials specified in a User element.
+            If a user is not specified then Windows Authentication will be used by default
+            using the credentials of the user performing the install to execute sql
+            strings, etc.
+        </xse:remarks>
+        <xse:seeAlso namespace="http://wixtoolset.org/schemas/v4/wxs/util" ref="User"/>
+      </xs:appinfo>
+      <xs:documentation>SQL Database</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="SqlFileSpec" />
+        <xs:element ref="SqlLogFileSpec" />
+        <xs:element ref="SqlScript"/>
+        <xs:element ref="SqlString"/>
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Unique identifier in your installation package for this database. If an Id is not provided, one will generated for you.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Server" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Database server name.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Instance" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Optional database server instance.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Database" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            The name of the database. The value can be a literal value or derived from a
+            Property element using the [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted)
+            syntax.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="User" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Optional user used to connect to database.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="CreateOnInstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Create the database during installation.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="CreateOnReinstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies whether to create the database when the associated component is reinstalled.  Setting CreateOnInstall to yes does <html:b>not</html:b> imply CreateOnReinstall is set to yes.  CreateOnReinstall must be set in addition to CreateOnInstall for it to be created during both install and reinstall.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="CreateOnUninstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Create the database during uninstallation.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="DropOnInstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Drop the database during installation.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="DropOnReinstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies whether to drop the database when the associated component is reinstalled.  Setting DropOnInstall to yes does <html:b>not</html:b> imply DropOnReinstall is set to yes.  DropOnReinstall must be set in addition to DropOnInstall for it to be dropped during both install and reinstall.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="DropOnUninstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Drop the database during uninstallation.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ContinueOnError" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Continue even if the database operation fails.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ConfirmOverwrite" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Prompt the user to overwrite the database.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SqlFileSpec">
+    <xs:annotation>
+      <xs:documentation>File specification for a Sql database.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" use="required" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Unique identifier in your installation package for this file specification. If an Id is not provided, one will generated for you.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Name" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Specifies the logical name for the database file.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Filename" use="required" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Specifies the operating-system file name for the database file.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Size" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the size of the database file. The GB, MB and KB suffixes can be used to specify gigabytes, 
+            megabytes or kilobytes. The default is megabytes if no suffix is specified. When a Size is not 
+            supplied for a database file, SQL Server uses the size of the primary file in the model database. 
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="MaxSize" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the maximum size to which the database file can grow. The GB, MB and KB suffixes can be used to 
+            to specify gigabytes, megabytes or kilobytes. The default is megabytes if no suffix is specified. If 
+            MaxSize is not specified, the file will grow until the disk is full.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="GrowthSize" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the growth increment of the database file. The GB, MB and KB and % suffixes can be used to 
+            specify gigabytes, megabytes, kilobytes or a percentage of the current file size to grow. The default is 
+            megabytes if no suffix is specified. The default value is 10% if GrowthSize is not specified, and the 
+            minimum value is 64 KB. The GrowthSize setting for a file cannot exceed the MaxSize setting.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SqlLogFileSpec">
+    <xs:annotation>
+      <xs:documentation>File specification for a Sql database.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Unique identifier in your installation package for this log file specification. If an Id is not provided, one will generated for you.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Name" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Specifies the logical name for the log file.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Filename" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Specifies the operating-system file name for the log file.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Size" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the size of the log file. The GB, MB and KB suffixes can be used to specify gigabytes, 
+            megabytes or kilobytes. The default is megabytes if no suffix is specified. When a Size is not 
+            supplied for a log file, SQL Server makes the file 1 MB.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="MaxSize" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the maximum size to which the log file can grow. The GB, MB and KB suffixes can be used to 
+            to specify gigabytes, megabytes or kilobytes. The default is megabytes if no suffix is specified. If 
+            MaxSize is not specified, the file will grow until the disk is full.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="GrowthSize" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the growth increment of the log file. The GB, MB and KB and % suffixes can be used to 
+            specify gigabytes, megabytes, kilobytes or a percentage of the current file size to grow. The default is 
+            megabytes if no suffix is specified. The default value is 10% if GrowthSize is not specified, and the 
+            minimum value is 64 KB. The GrowthSize setting for a file cannot exceed the MaxSize setting.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SqlScript">
+    <xs:annotation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </xs:appinfo>
+      <xs:documentation>SQL Script</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Unique identifier in your installation package for this sql script. If an Id is not provided, one will generated for you.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="SqlDb" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Id of the SqlDatabase to execute the script against. Required when not child of SqlDatabase.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="User" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Optional user used to connect to database.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="BinaryRef" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Reference to Binary stream that contains the SQL script to execute.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ExecuteOnInstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies to execute the script when the associated component is installed.  This attribute is mutually exclusive with the RollbackOnInstall, RollbackOnReinstall and RollbackOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ExecuteOnReinstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies whether to execute the script when the associated component is reinstalled.  Setting ExecuteOnInstall to yes does <html:b>not</html:b> imply ExecuteOnReinstall is set to yes.  ExecuteOnReinstall must be set in addition to ExecuteOnInstall for it to be executed during both install and reinstall.  This attribute is mutually exclusive with the RollbackOnInstall, RollbackOnReinstall and RollbackOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ExecuteOnUninstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies to execute the script when the associated component is uninstalled.  This attribute is mutually exclusive with the RollbackOnInstall, RollbackOnReinstall and RollbackOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RollbackOnInstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies whether to execute the script on rollback if an attempt is made to install the associated component.  This attribute is mutually exclusive with the ExecuteOnInstall, ExecuteOnReinstall and ExecuteOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RollbackOnReinstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies whether to execute the script on rollback if an attempt is made to reinstall the associated component.  This attribute is mutually exclusive with the ExecuteOnInstall, ExecuteOnReinstall and ExecuteOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RollbackOnUninstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies whether to execute the script on rollback if an attempt is made to uninstall the associated component.  This attribute is mutually exclusive with the ExecuteOnInstall, ExecuteOnReinstall and ExecuteOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ContinueOnError" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Continue executing scripts even if this one fails.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Sequence" type="wxs:Integer">
+        <xs:annotation>
+          <xs:documentation>Specifes the order to run the SQL Scripts.  It is recommended that rollback scripts be scheduled before their complementary execution script.  This order is also relative across the SqlString element.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="SqlString">
+    <xs:annotation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </xs:appinfo>
+      <xs:documentation>SQL String</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Unique identifier in your installation package for this sql command. If an Id is not provided, one will generated for you.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="SqlDb" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Id of the SqlDatabase to execute the script against. Required when not child of SqlDatabase.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="User" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Optional user used to connect to database.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="SQL" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>SQL command to execute against the database.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ExecuteOnInstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies to execute the string when the associated component is installed.  This attribute is mutually exclusive with the RollbackOnInstall, RollbackOnReinstall and RollbackOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ExecuteOnReinstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies whether to execute the string when the associated component is reinstalled.  Setting ExecuteOnInstall to yes does <html:b>not</html:b> imply ExecuteOnReinstall is set to yes.  ExecuteOnReinstall must be set in addition to ExecuteOnInstall for it to be executed during both install and reinstall.  This attribute is mutually exclusive with the RollbackOnInstall, RollbackOnReinstall and RollbackOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ExecuteOnUninstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies to execute the string when the associated component is uninstalled.  This attribute is mutually exclusive with the RollbackOnInstall, RollbackOnReinstall and RollbackOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RollbackOnInstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies whether to execute the string on rollback if an attempt is made to install the associated component.  This attribute is mutually exclusive with the ExecuteOnInstall, ExecuteOnReinstall and ExecuteOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RollbackOnReinstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies whether to execute the string on rollback if an attempt is made to reinstall the associated component.  This attribute is mutually exclusive with the ExecuteOnInstall, ExecuteOnReinstall and ExecuteOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RollbackOnUninstall" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Specifies whether to execute the string on rollback if an attempt is made to uninstall the associated component.  This attribute is mutually exclusive with the ExecuteOnInstall, ExecuteOnReinstall and ExecuteOnUninstall attributes.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ContinueOnError" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>Continue executing strings even if this one fails.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Sequence" type="wxs:Integer">
+        <xs:annotation>
+          <xs:documentation>Specifes the order to run the SQL Strings.  It is recommended that rollback strings be scheduled before their complementary execution string.  This order is also relative across the SqlScript element.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

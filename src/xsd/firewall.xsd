@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xse="http://wixtoolset.org/schemas/XmlSchemaExtension"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+          xmlns:wxs="http://wixtoolset.org/schemas/v4/wxs"
+    targetNamespace="http://wixtoolset.org/schemas/v4/wxs/firewall"
+              xmlns="http://wixtoolset.org/schemas/v4/wxs/firewall">
+  <xs:annotation>
+    <xs:documentation>
+      The source code schema for the WiX Toolset Firewall Extension.
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:import namespace="http://wixtoolset.org/schemas/v4/wxs" />
+
+  <xs:element name="FirewallException">
+    <xs:annotation>
+      <xs:documentation>
+        Registers an exception for a program or a specific port and protocol in the Windows Firewall.
+        For more information about the Windows Firewall, see [Windows Firewall with Advanced Security](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ics/windows-firewall-advanced-security-start-page).
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="File" />
+      </xs:appinfo>
+    </xs:annotation>
+
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Explicitly-listed remote addresses that this exception allows through the
+            firewall.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:element ref="LocalAddress" />
+        <xs:element ref="Interface" />
+        <xs:element ref="InterfaceType" />
+        <xs:element ref="RemoteAddress" />
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Unique ID of this firewall exception. If the Id is not specified, one will be generated.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Name" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Name of this firewall exception, visible to the user in the firewall
+            control panel.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Action" type="FirewallActionTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            The action for this firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Enabled" type="FirewallYesNoPropertyType">
+        <xs:annotation>
+          <xs:documentation>
+            Indicates whether the firewall exception should be enabled.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Grouping" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Grouping for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="IcmpTypesAndCodes" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            ICMP types and codes for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Interface" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Interface for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="InterfaceType" type="FirewallInterfaceTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Interface type for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="IPSecSecureFlags" type="FirewallIPSecSecureFlagsUnion">
+        <xs:annotation>
+          <xs:documentation>
+            IPSec secure flags for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="LocalAppPackageId" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Local AppPackageId for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="LocalUserAuthorizedList" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Local user authorized list for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="LocalUserOwner" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Local user owner for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="LocalScope" type="FirewallLocalScopeTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Local scope for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Scope" type="FirewallScopeTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            The scope of this firewall exception, which indicates whether incoming
+            connections can come from any computer including those on the Internet
+            or only those on the local network subnet. To more precisely specify
+            allowed remote address, specify a custom scope using RemoteAddress
+            child elements.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Port" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Port to allow through the firewall for this exception. By default,
+            any program is allowed access through the port unless a File or
+            Program attribute is specified.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Protocol" type="FirewallProtocolTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            IP protocol used for this firewall exception. If Port is defined,
+            "tcp" is assumed if the protocol is not specified.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="File" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Identifier of a File to be granted access through the firewall. By default,
+            all incoming ports and protocols are allowed unless the Port and.or Protocol
+            attributes are specified.
+
+            If you use File, you cannot also use Program.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Program" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Path to a target program to be granted access through the firewall. By default,
+            all incoming ports and protocols are allowed unless the Port and.or Protocol
+            attributes are specified.
+
+            Note that this is a formatted field, so you can use [#fileId]
+            syntax to refer to a file being installed. If you use Program, you cannot
+            also use File.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="IgnoreFailure" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            If "yes", failures to register this firewall exception will be silently
+            ignored. If "no" (the default), failures will cause rollback.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Profile" type="FirewallProfileTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Profile type for this firewall exception. Default is "all".
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Description" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Description for this firewall rule displayed in Windows Firewall manager.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="EdgeTraversal" type="FirewallEdgeTraversalTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Sets the edge traversal of the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="OnUpdate" type="FirewallOnUpdateTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Installation instruction when updating the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Outbound" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            If "yes", registers an outbound firewall rule. The default is "no".
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="RemoteMachineAuthorizedList" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Remote machine authorized list for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="RemoteUserAuthorizedList" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Remote user authorized list for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="RemotePort" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Remote port for the firewall exception.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:attribute name="Service" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Service for the firewall exception. Cannot be specified when the firewall exception is a child of a service element.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="LocalAddress">
+    <xs:annotation>
+      <xs:documentation>
+        [WiX v5] Registers a local address to the firewall rule.
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Value" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            A local address to which the port or program can listen. See [LocalAddresses](https://learn.microsoft.com/en-us/windows/win32/api/netfw/nf-netfw-inetfwrule-get_localaddresses)
+            for examples.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="Interface">
+    <xs:annotation>
+      <xs:documentation>
+        [WiX v5] Registers an interface with the firewall rule.
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Name" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            A interface to which the firewall rule applices. See [Interfaces](https://learn.microsoft.com/en-us/windows/win32/api/netfw/nf-netfw-inetfwrule-get_interfaces)
+            for examples.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="InterfaceType">
+    <xs:annotation>
+      <xs:documentation>
+        [WiX v5] Registers an inteface type to the firewall rule.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Value" type="FirewallInterfaceTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            A interface type to which the firewall rule applices. See [Interfaces](https://learn.microsoft.com/en-us/windows/win32/api/netfw/nf-netfw-inetfwrule-get_interfaces)
+            for examples.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="RemoteAddress">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Value" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            A remote address to which the port or program can listen. See [RemoteAddresses](https://learn.microsoft.com/en-us/windows/win32/api/netfw/nf-netfw-inetfwrule-get_remoteaddresses)
+            for examples.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="PropertyReference">
+    <xs:annotation>
+      <xs:documentation>A type that represents a Property reference.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\[.+\]" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FirewallActionTypeUnion">
+    <xs:union memberTypes="FirewallActionType PropertyReference wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType name="FirewallActionType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="allow" />
+      <xs:enumeration value="block" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FirewallEdgeTraversalTypeUnion">
+    <xs:union memberTypes="FirewallEdgeTraversalType PropertyReference wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType name="FirewallEdgeTraversalType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="allow" />
+      <xs:enumeration value="deferToApp" />
+      <xs:enumeration value="deferToUser" />
+      <xs:enumeration value="deny" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FirewallInterfaceTypeUnion">
+    <xs:union memberTypes="FirewallInterfaceType PropertyReference wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType name="FirewallInterfaceType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="all" />
+      <xs:enumeration value="lan" />
+      <xs:enumeration value="remoteAccess" />
+      <xs:enumeration value="wireless" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FirewallIPSecSecureFlagsUnion">
+    <xs:union memberTypes="FirewallIPSecSecureFlags PropertyReference wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType name="FirewallIPSecSecureFlags">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="none" />
+      <xs:enumeration value="encrypt" />
+      <xs:enumeration value="negotiateEncryption" />
+      <xs:enumeration value="noEncapsulation" />
+      <xs:enumeration value="withIntegrity" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FirewallLocalScopeTypeUnion">
+    <xs:union memberTypes="FirewallLocalScopeType PropertyReference wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType name="FirewallLocalScopeType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="any" />
+      <xs:enumeration value="dns" />
+      <xs:enumeration value="dhcp" />
+      <xs:enumeration value="wins" />
+      <xs:enumeration value="localSubnet" />
+      <xs:enumeration value="defaultGateway" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FirewallOnUpdateTypeUnion">
+    <xs:union memberTypes="FirewallOnUpdateType PropertyReference wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType name="FirewallOnUpdateType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="doNothing" />
+      <xs:enumeration value="enableOnly" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FirewallProfileTypeUnion">
+    <xs:union memberTypes="FirewallProfileType PropertyReference wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType name="FirewallProfileType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="domain" />
+      <xs:enumeration value="private" />
+      <xs:enumeration value="public" />
+      <xs:enumeration value="all" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FirewallProtocolTypeUnion">
+    <xs:union memberTypes="PropertyReference FirewallProtocolType FirewallProtocolNumber wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType name="FirewallProtocolType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="tcp" />
+      <xs:enumeration value="udp" />
+    </xs:restriction>
+  </xs:simpleType>
+ <xs:simpleType name="FirewallProtocolNumber">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="255"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FirewallScopeTypeUnion">
+    <xs:union memberTypes="FirewallScopeType PropertyReference wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType name="FirewallScopeType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="any" />
+      <xs:enumeration value="localSubnet" />
+      <xs:enumeration value="dns" />
+      <xs:enumeration value="dhcp" />
+      <xs:enumeration value="wins" />
+      <xs:enumeration value="defaultGateway" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FirewallYesNoPropertyType">
+    <xs:annotation>
+      <xs:documentation>
+        Allows "yes" or "true" or "no" or "false" or a Property reference.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="PropertyReference wxs:YesNoTypeUnion"/>
+  </xs:simpleType>
+</xs:schema>

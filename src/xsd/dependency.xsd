@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xse="http://wixtoolset.org/schemas/XmlSchemaExtension"
+          xmlns:wxs="http://wixtoolset.org/schemas/v4/wxs"
+    targetNamespace="http://wixtoolset.org/schemas/v4/wxs/dependency"
+              xmlns="http://wixtoolset.org/schemas/v4/wxs/dependency">
+  <xs:annotation>
+    <xs:documentation>
+      The source code schema for the WiX Toolset Dependency Extension.
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:import namespace="http://wixtoolset.org/schemas/v4/wxs" />
+
+  <xs:attribute name="Check" type="wxs:YesNoTypeUnion">
+    <xs:annotation>
+      <xs:documentation>
+        When set to "yes", adds a custom action to prompt the user when dependencies are still on the computer. The default is "no".
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Provides" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="Enforce" type="wxs:YesNoTypeUnion">
+    <xs:annotation>
+      <xs:documentation>
+        When set to "yes", adds a custom action to prompt the user when dependencies are missing from the computer. The default is "no".
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Requires" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="RequiresRef" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:attribute>
+</xs:schema>

@@ -1,0 +1,745 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xse="http://wixtoolset.org/schemas/XmlSchemaExtension"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+          xmlns:wxs="http://wixtoolset.org/schemas/v4/wxs"
+    targetNamespace="http://wixtoolset.org/schemas/v4/wxs/bal"
+              xmlns="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <xs:annotation>
+    <xs:documentation>
+      The source code schema for the WiX Toolset Bootstrapper Applications Extension.
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:import namespace="http://wixtoolset.org/schemas/v4/wxs" />
+
+  <xs:element name="Condition">
+    <xs:annotation>
+      <xs:documentation>
+        Conditions for a bundle using WixStdBA.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Message" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Set the value to the text to display when the condition fails and the installation must be terminated.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Condition" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            The condition that must evaluate to true for the installation to continue.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="WixInternalUIBootstrapperApplication">
+    <xs:annotation>
+      <xs:documentation>
+        Uses WixInternalUIBootstrapperApplication as the Bootstrapper Application for a Bundle.
+        WixInternalUIBootstrapperApplication has no UI itself, it relies on the splash screen, prereq BA, and MSI UI.
+
+        wixiuiba is not a typical BA because it has very specific requirements for the packages in the chain.
+        There can only be one non-permanent package in the chain, and it needs to be the last package.
+        The only exception is that multiple non-permanent packages can be specified with bal:PrimaryPackageType with a specific architecture.
+        Each primary package must be an MsiPackage that contains UI for install and maintenance.
+
+        If there are permanent packages, then they are always installed through the same prereq BA that is used for the managed BA hosts before executing the primary package.
+
+        Due to Windows limitations, a splash screen should be provided so that the elevation prompt and MSI UI is automatically given focus.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BootstrapperApplication" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="LogoFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the logo graphic.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ThemeFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the theme XML.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LocalizationFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the theme localization .wxl file.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Theme">
+        <xs:annotation>
+          <xs:documentation>The built-in theme to use.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="none" />
+            <xs:enumeration value="standard" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="WixStandardBootstrapperApplication">
+    <xs:annotation>
+      <xs:documentation>
+        Uses WixStandardBootstrapperApplication as the Bootstrapper Application for a Bundle.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BootstrapperApplication" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="LaunchTarget" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            If set, the success page will show a Launch button the user can use to launch the application being installed.
+            The string value can be formatted using Burn variables enclosed in brackets,
+            to refer to installation directories and so forth.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LaunchTargetElevatedId" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Id of the target ApprovedExeForElevation element.
+            If set with LaunchTarget, WixStdBA will launch the application through the Engine's LaunchApprovedExe method instead of through ShellExecute.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LaunchArguments" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            If set, WixStdBA will supply these arguments when launching the application specified by the LaunchTarget attribute.
+            The string value can be formatted using Burn variables enclosed in brackets,
+            to refer to installation directories and so forth.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LaunchHidden" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            If set to "yes", WixStdBA will launch the application specified by the LaunchTarget attribute with the SW_HIDE flag.
+            This attribute is ignored when the LaunchTargetElevatedId attribute is specified.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LaunchWorkingFolder" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            WixStdBA will use this working folder when launching the specified application.
+            The string value can be formatted using Burn variables enclosed in brackets,
+            to refer to installation directories and so forth.
+            This attribute is ignored when the LaunchTargetElevatedId attribute is specified.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LicenseFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the RTF license file. Cannot be used simultaneously with LicenseUrl.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LicenseUrl" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>URL target of the license link. Cannot be used simultaneously with LicenseFile. This attribute can be empty to hide the license link completely.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LogoFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the logo graphic.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LogoSideFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the side logo graphic.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ThemeFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the theme XML.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LocalizationFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the theme localization .wxl file.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="SuppressOptionsUI" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>If set to "yes", the Options button will not be shown and the user will not be able to choose an installation directory.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="SuppressDowngradeFailure" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            If set to "yes", attempting to installer a downgraded version of a bundle will be treated as a successful do-nothing operation.
+            The default behavior (or when explicitly set to "no") is to treat downgrade attempts as failures.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="SuppressRepair" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>If set to "yes", the Repair button will not be shown in the maintenance-mode UI.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ShowVersion" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>If set to "yes", the application version will be displayed on the UI.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="SupportCacheOnly" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>If set to "yes", the bundle can be pre-cached using the /cache command line argument.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Theme" use="required">
+        <xs:annotation>
+          <xs:documentation>The built-in theme to use.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="hyperlinkLargeLicense" />
+            <xs:enumeration value="hyperlinkLicense" />
+            <xs:enumeration value="hyperlinkSidebarLicense" />
+            <xs:enumeration value="none" />
+            <xs:enumeration value="rtfLargeLicense" />
+            <xs:enumeration value="rtfLicense" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="WixManagedBootstrapperApplicationHost">
+    <xs:annotation>
+      <xs:documentation>
+        Uses WixManagedBootstrapperApplicationHost as the Bootstrapper Application for a Bundle.
+
+        _Available in WiX v4. Deprecated in WiX v5; use WixPrerequisiteBootstrapperApplication instead._
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BootstrapperApplication" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="AlwaysInstallPrereqs" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            When not set or set to "no", the prereq BA is only used when the .NET Framework runtime can't be loaded.
+            When set to "yes", the prereq BA will always run before the .NET Framework runtime is attempted to be loaded.
+            If set to "yes" and all prereq packages are already installed, then the prereq BA's UI is not shown.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LogoFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the logo graphic.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ThemeFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the theme XML.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LocalizationFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the theme localization .wxl file.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Theme">
+        <xs:annotation>
+          <xs:documentation>The built-in theme to use. The default is "standard".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="none" />
+            <xs:enumeration value="standard" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ManagedBootstrapperApplicationPrereqInformation">
+    <xs:annotation>
+      <xs:documentation>
+        Adds license information for a prereq package, should only be used when unable to add the license attributes to the package directly.
+
+        _Available in WiX v4. Deprecated in WiX v5; use BootstrapperApplicationPrerequisiteInformation instead._
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="PackageId" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Id of the target package.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LicenseFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the license. May not be used with LicenseUrl.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LicenseUrl" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source url of the license. May not be used with LicenseFile.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="WixDotNetCoreBootstrapperApplicationHost">
+    <xs:annotation>
+      <xs:documentation>
+        Uses WixDotNetCoreBootstrapperApplicationHost as the Bootstrapper Application for a Bundle.
+
+        _Available in WiX v4. Deprecated in WiX v5; use WixPrerequisiteBootstrapperApplication instead._
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BootstrapperApplication" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="AlwaysInstallPrereqs" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            When not set or set to "no", the prereq BA is only used when the .NET Core runtime can't be loaded.
+            When set to "yes", the prereq BA will always run before the .NET Core runtime is attempted to be loaded.
+            If set to "yes" and all prereq packages are already installed, then the prereq BA's UI is not shown.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LogoFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the logo graphic.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ThemeFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the theme XML.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LocalizationFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the theme localization .wxl file.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="SelfContainedDeployment" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Whether the .NET Core BA was published as self-contained (SCD).
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Theme">
+        <xs:annotation>
+          <xs:documentation>The built-in theme to use. The default value is "standard".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="none" />
+            <xs:enumeration value="standard" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="WixPrerequisiteBootstrapperApplication">
+    <xs:annotation>
+      <xs:documentation>
+        Uses WixPrerequisiteBootstrapperApplication as a secondary Bootstrapper Application for a Bundle,
+        to bootstrap the prerequisites needed for a primary bootstrapper application.
+
+        _Available in WiX v5._
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BootstrapperApplication" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="LogoFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the logo graphic.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="ThemeFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the theme XML.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LocalizationFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the theme localization .wxl file.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Theme">
+        <xs:annotation>
+          <xs:documentation>The built-in theme to use. The default is "standard".</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="none" />
+            <xs:enumeration value="standard" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="BootstrapperApplicationPrerequisiteInformation">
+    <xs:annotation>
+      <xs:documentation>
+        Adds license information for a prereq package, should only be used when unable to add the license attributes to the package directly.
+
+        _Available in WiX v5._
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="PackageId" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Id of the target package.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LicenseFile" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source file of the license. May not be used with LicenseUrl.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="LicenseUrl" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Source url of the license. May not be used with LicenseFile.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:attribute name="BAFactoryAssembly" type="wxs:YesNoTypeUnion">
+    <xs:annotation>
+      <xs:documentation>
+        When set to "yes", WixDotNetCoreBootstrapperApplicationHost will load the DLL and instantiate the type with the BootstrapperApplicationFactoryAttribute.
+        The DLL must have been built referencing the WixToolset.Dnc.HostGenerator source generator NuGet package.
+        The .NET Core project must have been published, not just built.
+        Only one payload may be marked with this attribute set to "yes".
+
+        _Available in WiX v4. Deprecated in WiX v5. Move the Payload/@SourceFile attribute to be the BootstrapperApplication/@SourceFile attribute and remove the Payload element._
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Payload" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="BAFunctions" type="wxs:YesNoTypeUnion">
+    <xs:annotation>
+      <xs:documentation>
+        When set to "yes", WixStdBA will load the DLL and work with it to handle BA messages.
+        Only one payload may be marked with this attribute set to "yes".
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Payload" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="CommandLineVariables">
+    <xs:annotation>
+      <xs:documentation>
+        This value determines whether case sensitivity is used to match overridable variables specified on the command line. The default is "caseSensitive".
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="caseSensitive" />
+        <xs:enumeration value="caseInsensitive" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+
+  <xs:attribute name="DisplayInternalUICondition" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies whether the bundle will show the UI authored into the msi package. If not specified or the condition evaluates
+        to false, all information is routed to the bootstrapper application to provide a unified installation experience.
+        Otherwise, the UI authored into the msi package will be displayed on top of any bootstrapper application UI.
+        WixStdBA doesn't support EmbeddedUI.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MspPackage" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="Overridable" type="wxs:YesNoTypeUnion">
+    <xs:annotation>
+      <xs:documentation>
+        When set to "yes", lets the user override the variable's default value by specifying another value on the command line,
+        in the form Variable=Value. Otherwise, WixStdBA won't overwrite the default value and will log
+        "Ignoring attempt to set non-overridable variable: 'BAR'."
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Variable" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="PrereqLicenseFile" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>
+        Source file of the RTF license file.
+        There may only be one package in the bundle that has either the PrereqLicenseFile attribute or the PrereqLicenseUrl attribute.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BundlePackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="ExePackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MspPackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsuPackage" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="PrereqLicenseUrl" type="xs:string">
+    <xs:annotation>
+      <xs:documentation>
+        URL target of the license link.
+        There may only be one package in the bundle that has either the PrereqLicenseFile attribute or the PrereqLicenseUrl attribute.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BundlePackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="ExePackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MspPackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsuPackage" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="PrereqPackage" type="wxs:YesNoTypeUnion">
+    <xs:annotation>
+      <xs:documentation>
+        When set to "yes", the Prereq BA will plan the package to be installed if its InstallCondition is "true" or empty.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BundlePackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="ExePackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MspPackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsuPackage" />
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:attribute>
+
+  <xs:attribute name="PrimaryPackageType">
+    <xs:annotation>
+      <xs:documentation>Used by WixInternalUIBootstrapperApplication to determine which package is the primary package. The default value is "default".</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BundlePackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="ExePackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MspPackage" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsuPackage" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:NMTOKEN">
+        <xs:enumeration value="default">
+          <xs:annotation>
+            <xs:documentation>
+              This package is used unless there is a package for the runtime machine's architecture.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="x86">
+          <xs:annotation>
+            <xs:documentation>
+              This package is used when the runtime machine's OS is x86 (IMAGE_FILE_MACHINE_I386).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="x64">
+          <xs:annotation>
+            <xs:documentation>
+              This package is used when the runtime machine's OS is x64 (IMAGE_FILE_MACHINE_AMD64).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:enumeration>
+        <xs:enumeration value="arm64">
+          <xs:annotation>
+            <xs:documentation>
+              This package is used when the runtime machine's OS is ARM64 (IMAGE_FILE_MACHINE_ARM64).
+            </xs:documentation>
+          </xs:annotation>
+        </xs:enumeration>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:attribute>
+</xs:schema>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xse="http://wixtoolset.org/schemas/XmlSchemaExtension"
+         xmlns:html="http://www.w3.org/1999/xhtml"
+          xmlns:wxs="http://wixtoolset.org/schemas/v4/wxs"
+    targetNamespace="http://wixtoolset.org/schemas/v4/wxs/vs"
+              xmlns="http://wixtoolset.org/schemas/v4/wxs/vs">
+  <xs:annotation>
+    <xs:documentation>
+      The source code schema for the WiX Toolset Visual Studio Extension.
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:import namespace="http://wixtoolset.org/schemas/v4/wxs" />
+
+  <xs:element name="FindVisualStudio">
+    <xs:annotation>
+      <xs:documentation>
+        This element detects which, if any, Visual Studio instances are installed. If so, it sets
+        the appropriate property or properties: `VS2017_ROOT_FOLDER`, `VS2019_ROOT_FOLDER`, or
+        `VS2022_ROOT_FOLDER`.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="VsixPackage">
+    <xs:annotation>
+      <xs:documentation>
+        This element provides the metdata required to install/uninstall a file as
+        a VSIX Package. The VSIX package file will be installed as part of the MSI
+        then passed to the VSIX installer to install the VSIX package. To avoid the
+        duplication, simply use the MSI to install the VSIX package itself.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="File" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="File" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Reference to file identifer. This attribute is required when the element is not a
+            child of a File element and is invalid when the element is a child of the File element.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="PackageId" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Identity of the VSIX package per its internal manifest. If this value is not correct
+            the VSIX package will not correctly uninstall.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Permanent" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Indicates whether the VSIX package is uninstalled when the parent Component is uninstalled.
+            The default is 'no'.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Target" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the SKU of Visual Studio in which to register the extension. If no target
+            is specified the extension is registered with all installed SKUs. If the Target
+            attribute is specified the TargetVersion attribute must also be specified. The 
+            following is a list of known Visual Studio targets: integratedShell, professional,
+            premium, ultimate, vbExpress, vcExpress, vcsExpress, vwdExpress
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="TargetVersion" type="wxs:VersionType">
+        <xs:annotation>
+          <xs:documentation>
+            Specifies the version of Visual Studio in which to register the extension. This attribute
+            is required if the Target attribute is specified.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Vital" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Indicates whether failure to install the VSIX package causes the installation to rollback.
+            The default is 'yes'.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="VsixInstallerPathProperty" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            Optional reference to a Property element that contains the path to the VsixInstaller.exe.
+            By default, the latest VsixInstaller.exe on the machine will be used to install the VSIX
+            package. It is highly recommended that this attribute is *not* used.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
