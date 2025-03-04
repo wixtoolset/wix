@@ -138,13 +138,6 @@ namespace WixToolset.Core
                     command.Execute();
                 }
 
-                // If there are no authored features, create a default feature and assign
-                // the components to it.
-                {
-                    var command = new AssignDefaultFeatureCommand(find, sections);
-                    command.Execute();
-                }
-
                 // Resolve the symbol references to find the set of sections we care about for linking.
                 // Of course, we start with the entry section (that's how it got its name after all).
                 var resolve = new ResolveReferencesCommand(this.Messaging, find.EntrySection, find.SymbolsByName);
@@ -153,6 +146,13 @@ namespace WixToolset.Core
                 if (this.Messaging.EncounteredError)
                 {
                     return null;
+                }
+
+                // If there are no authored features, create a default feature and assign
+                // the components to it.
+                {
+                    var command = new AssignDefaultFeatureCommand(find, resolve.ResolvedSections);
+                    command.Execute();
                 }
 
                 // Reset the sections to only those that were resolved then flatten the complex

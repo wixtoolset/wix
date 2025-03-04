@@ -10,20 +10,22 @@ namespace WixToolset.Core
 
     internal class AssignDefaultFeatureCommand
     {
-        public AssignDefaultFeatureCommand(FindEntrySectionAndLoadSymbolsCommand find, List<IntermediateSection> sections)
+        private static readonly string DefaultFeatureName = "WixDefaultFeature";
+
+        public AssignDefaultFeatureCommand(FindEntrySectionAndLoadSymbolsCommand find, ISet<IntermediateSection> sections)
         {
             this.Find = find;
             this.Sections = sections;
         }
 
-        public IEnumerable<IntermediateSection> Sections { get; }
+        public ISet<IntermediateSection> Sections { get; }
 
         public FindEntrySectionAndLoadSymbolsCommand Find { get; }
 
         public void Execute()
         {
             if (this.Find.EntrySection.Type == SectionType.Package
-                && !this.Sections.Where(s => s.Id != WixStandardLibraryIdentifiers.DefaultFeatureName)
+                && !this.Sections.Where(s => s.Id != DefaultFeatureName)
                 .SelectMany(s => s.Symbols).OfType<FeatureSymbol>().Any())
             {
                 var addedToDefaultFeature = false;
@@ -35,7 +37,7 @@ namespace WixToolset.Core
                     {
                         this.Find.EntrySection.AddSymbol(new WixComplexReferenceSymbol(component.SourceLineNumbers)
                         {
-                            Parent = WixStandardLibraryIdentifiers.DefaultFeatureName,
+                            Parent = DefaultFeatureName,
                             ParentType = ComplexReferenceParentType.Feature,
                             ParentLanguage = null,
                             Child = component.Id.Id,
@@ -45,7 +47,7 @@ namespace WixToolset.Core
 
                         this.Find.EntrySection.AddSymbol(new WixGroupSymbol(component.SourceLineNumbers)
                         {
-                            ParentId = WixStandardLibraryIdentifiers.DefaultFeatureName,
+                            ParentId = DefaultFeatureName,
                             ParentType = ComplexReferenceParentType.Feature,
                             ChildId = component.Id.Id,
                             ChildType = ComplexReferenceChildType.Component,
@@ -57,10 +59,11 @@ namespace WixToolset.Core
 
                 if (addedToDefaultFeature)
                 {
-                    this.Find.EntrySection.AddSymbol(new WixSimpleReferenceSymbol()
+                    this.Find.EntrySection.AddSymbol(new FeatureSymbol(null, new Identifier(AccessModifier.Virtual, DefaultFeatureName))
                     {
-                        Table = "Feature",
-                        PrimaryKeys = WixStandardLibraryIdentifiers.DefaultFeatureName,
+                        Level = 1,
+                        Display = 0,
+                        InstallDefault = FeatureInstallDefault.Local,
                     });
                 }
             }
