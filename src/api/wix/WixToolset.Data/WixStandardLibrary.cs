@@ -93,20 +93,6 @@ namespace WixToolset.Data
                 yield return section;
             }
 
-            // Default feature.
-            {
-                var symbol = new FeatureSymbol(sourceLineNumber, new Identifier(AccessModifier.Virtual, WixStandardLibraryIdentifiers.DefaultFeatureName))
-                {
-                    Level = 1,
-                    Display = 0,
-                    InstallDefault = FeatureInstallDefault.Local,
-                };
-
-                var section = CreateSectionAroundSymbol(symbol);
-
-                yield return section;
-            }
-
             // Package References.
             {
                 var section = CreateSection(WixStandardLibraryIdentifiers.WixStandardPackageReferences);

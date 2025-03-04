@@ -66,6 +66,17 @@ namespace WixToolsetTest.CoreIntegration
                 Assert.Empty(result.Messages);
 
                 Assert.True(File.Exists(msiPath));
+
+                result = WixRunner.Execute(new[]
+                {
+                    "msi",
+                    "validate",
+                    "-intermediateFolder", intermediateFolder,
+                    msiPath
+                });
+
+                Assert.Empty(result.Messages);
+
                 var results = Query.QueryDatabase(msiPath, new[] { "Feature", "FeatureComponents", "Shortcut" });
                 WixAssert.CompareLineByLine(new[]
                 {

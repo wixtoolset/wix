@@ -18,11 +18,6 @@ namespace WixToolset.Data
         public static readonly string WixStandardModuleReferences = "WixStandardModuleReferences";
 
         /// <summary>
-        /// Default feature name.
-        /// </summary>
-        public static readonly string DefaultFeatureName = "WixDefaultFeature";
-
-        /// <summary>
         /// WiX Standard localization strings.
         /// </summary>
         public static readonly string WixStandardLocalizationStrings = "WixStandardLocalizationStrings";
