@@ -23,7 +23,7 @@ LPCWSTR vcsWebErrorQuery =
     L"SELECT `ErrorCode`, `SubCode`, `ParentType`, `ParentValue`, `File`, `URL` "
     L"FROM `Wix4IIsWebError` ORDER BY `ErrorCode`, `SubCode`";
 
-LPCWSTR vcsWebDirPropertiesQuery = L"SELECT `DirProperties`, `Access`, `Authorization`, `AnonymousUser_`, `IIsControlledPassword`, `LogVisits`, `Index`, `DefaultDoc`, `AspDetailedError`, `HttpExpires`, `CacheControlMaxAge`, `CacheControlCustom`, `NoCustomError`, `AccessSSLFlags`, `AuthenticationProviders` "
+LPCWSTR vcsWebDirPropertiesQuery = L"SELECT `DirProperties`, `Access`, `Authorization`, `AnonymousUser_`, `IIsControlledPassword`, `LogVisits`, `Index`, `DefaultDoc`, `AspDetailedError`, `HttpExpires`, `CacheControlMaxAge`, `CacheControlCustom`, `NoCustomError`, `AccessSSLFlags`, `AuthenticationProviders`, `Attributes`"
     L"FROM `Wix4IIsWebDirProperties`";
 
 LPCWSTR vcsSslCertificateQuery = L"SELECT `Wix4Certificate`.`StoreName`, `Wix4CertificateHash`.`Hash`, `Wix4IIsWebSiteCertificates`.`Web_` FROM `Wix4Certificate`, `Wix4CertificateHash`, `Wix4IIsWebSiteCertificates` WHERE `Wix4Certificate`.`Certificate`=`Wix4CertificateHash`.`Certificate_` AND `Wix4CertificateHash`.`Certificate_`=`Wix4IIsWebSiteCertificates`.`Certificate_`";
