@@ -5694,7 +5694,7 @@ namespace WixToolset.Core
                 // so and create a file and component symbol with the right data.
                 id = id ?? this.Core.CreateIdentifier("nkf", directoryId, name, condition, win64.ToString());
 
-                var keyPath = this.ParseFileElementOtherAttributes(node, id.Id, directoryId, diskId: CompilerConstants.IntegerNotSet, id, name, shortName, source, out var _, componentGuid: "*", isNakedFile: true, fileSymbol: out var fileSymbol, assemblySymbol: out var assemblySymbol);
+                this.ParseFileElementOtherAttributes(node, id.Id, directoryId, diskId: CompilerConstants.IntegerNotSet, id, name, shortName, source, out var _, componentGuid: "*", isNakedFile: true, fileSymbol: out var fileSymbol, assemblySymbol: out var assemblySymbol);
 
                 this.Core.AddSymbol(fileSymbol);
 
@@ -5721,7 +5721,7 @@ namespace WixToolset.Core
                     this.Core.AddSymbol(assemblySymbol);
                 }
 
-                this.ParseFileElementChildren(node, fileSymbol, keyPath, win64);
+                this.ParseFileElementChildren(node, fileSymbol, keyPath: YesNoType.Yes, win64);
 
                 // if this is a module, automatically add this component to the references to ensure it gets in the ModuleComponents table
                 if (this.compilingModule)
