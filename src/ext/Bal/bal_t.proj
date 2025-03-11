@@ -10,7 +10,7 @@
     <ProjectReference Include="wixstdfn\wixstdfn.vcxproj" Properties="Platform=x64" />
     <ProjectReference Include="wixstdfn\wixstdfn.vcxproj" Properties="Platform=ARM64" />
 
-    <ProjectReference Include="test\WixToolsetTest.BootstrapperApplications\WixToolsetTest.BootstrapperApplications.csproj" Properties="Platform=x64" />
+    <ProjectReference Include="test\WixToolsetTest.BootstrapperApplications\WixToolsetTest.BootstrapperApplications.csproj" />
 
     <ProjectReference Include="wixstdfn\wixstdfn.vcxproj" Properties="NoBuild=true" Targets="PackNative" />
     <ProjectReference Include="wixext\WixToolset.BootstrapperApplications.wixext.csproj" Properties="NoBuild=true" Targets="Pack" />
