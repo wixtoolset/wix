@@ -1,0 +1,687 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xse="http://wixtoolset.org/schemas/XmlSchemaExtension"
+          xmlns:wxs="http://wixtoolset.org/schemas/v4/wxs"
+    targetNamespace="http://wixtoolset.org/schemas/v4/wxs/netfx"
+              xmlns="http://wixtoolset.org/schemas/v4/wxs/netfx">
+  <xs:annotation>
+    <xs:documentation>
+      The source code schema for the WiX Toolset .NET Framework Extension.
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:import namespace="http://wixtoolset.org/schemas/v4/wxs" />
+
+  <xs:element name="NativeImage">
+    <xs:annotation>
+      <xs:documentation>
+        Improves the performance of managed applications by creating native images.
+        Requires the .NET Framework 2.0 or newer to be installed on the target machine since
+        it runs [NGen](https://learn.microsoft.com/en-us/dotnet/framework/tools/ngen-exe-native-image-generator).
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="File" />
+        <xse:remarks>
+          Native images are files containing compiled processor-specific machine code, which
+          are installed into the native image cache on the local computer. The runtime
+          can use native images from the cache instead using the just-in-time (JIT)
+          compiler to compile the original assembly.
+
+          The native image custom actions are configured to ignore failures so that failing
+          to generate or remove a native image will not cause setup to fail and roll back.
+        </xse:remarks>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Identifier for the native image in the output database. If the Id is not specified, one will be generated.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="AppBaseDirectory" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            The directory to use for locating dependent assemblies.
+            For DLL assemblies and assemblies installed to the Global Assembly Cache (GAC),
+            this attribute should be set to the directory of the application which loads this
+            assembly.  For EXE assemblies, this attribute does not need to be set because NGen
+            will use the directory of the assembly file by default.
+
+            The value can be in the form of a directory identifier, or a formatted string
+            that resolves to either a directory identifier or a full path to a directory.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="AssemblyApplication" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+            The application which will load this assembly.
+            For DLL assemblies which are loaded via reflection, this attribute should
+            be set to indicate the application which will load this assembly.
+            The configuration of the application (usually specified via an exe.config file) will be used
+            to determine how to resolve dependencies for this assembly.
+
+            The value can be in the form of a file identifier, or a formatted string
+            that resolves to either a file identifier or a full path to a file.
+
+            When a shared component is loaded at run time, using the Load method, the
+            application's configuration file determines the dependencies that are loaded
+            for the shared component — for example, the version of a dependency that is loaded.
+            This attribute gives guidance on which dependencies would be loaded at run time in order
+            to figure out which dependency assemblies will also need to have native images generated
+            (assuming the Dependency attribute is not set to "no").
+
+            This attribute cannot be set if the AssemblyApplication attribute is set on the parent
+            File element (please note that these attributes both refer to the same application
+            assembly but do very different things: specifiying File/@AssemblyApplication will force
+            an assembly to install to a private location next to the indicated application, whereas
+            this AssemblyApplication attribute will be used to help resolve dependent assemblies
+            while generating native images for this assembly).
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Debug" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Set to "yes" to generate native images that can be used under a debugger.
+            The default value is "no".
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Dependencies" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Set to "no" to generate the minimum number of native images.
+            The default value is "yes".
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Platform" type="NativeImagePreprocessorPlatformType">
+        <xs:annotation>
+          <xs:documentation>
+            Sets the platform(s) for which native images will be generated.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Priority">
+        <xs:annotation>
+          <xs:documentation>
+            Sets the priority of generating the native images for this assembly.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="0">
+              <xs:annotation>
+                <xs:documentation>
+                  This is the highest priority, it means that image generation occurs
+                  and completes during setup. This option ensures images are generated
+                  by the time setup is complete.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="1">
+              <xs:annotation>
+                <xs:documentation>
+                  This will queue image generation to the NGen service to occur immediately.
+                  This option will slow down setup performance.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="2">
+              <xs:annotation>
+                <xs:documentation>
+                  This will queue image generation to the NGen service to occur after all priority 1
+                  assemblies have completed.
+                  This option will slow down setup performance.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="3">
+              <xs:annotation>
+                <xs:documentation>
+                  This is the lowest priority, it will queue image generation to occur when the
+                  machine is idle.
+                  This option should not slow down setup performance.
+                  This is the default value.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="Profile" type="wxs:YesNoTypeUnion">
+        <xs:annotation>
+          <xs:documentation>
+            Set to "yes" to generate native images that can be used under a profiler.
+            The default value is "no".
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DotNetCoreSearch">
+    <xs:annotation>
+      <xs:documentation>
+        Searches for an installation of .NET Core.
+        The variable gets set to the latest version of the given Runtime, Platform, and Major Version.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Identifier for the search. If the Id is not specified, one will be generated.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Variable" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Name of the variable in which to place the result of the search.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Condition" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Condition for evaluating the search. If this evaluates to false, the search is not executed at all.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="After" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Id of the search that this one should come after.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RuntimeType">
+        <xs:annotation>
+          <xs:documentation>The type of .NET Core runtime to search for.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="aspnet">
+              <xs:annotation>
+                <xs:documentation>
+                  Attempt to check for an ASP.NET Core type runtime.
+                  The ASP.NET Core Runtime enables you to run web/server applications.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="core">
+              <xs:annotation>
+                <xs:documentation>
+                  Attempt to check for a .NET type runtime.
+                  The .NET Core Runtime contains just the components needed to run a console app.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="desktop">
+              <xs:annotation>
+                <xs:documentation>
+                  Attempt to check for a .NET Desktop type runtime.
+                  The .NET Desktop Runtime enables you to run Windows desktop applications.
+                </xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="Platform" type="NetfxPreprocessorPlatformType">
+        <xs:annotation>
+          <xs:documentation>The platform to search for.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="MajorVersion" type="wxs:Integer">
+        <xs:annotation>
+          <xs:documentation>Major version of .NET. For example, "6".</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DotNetCoreSearchRef">
+    <xs:annotation>
+      <xs:documentation>References a DotNetCoreSearch.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string" use="required" />
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DotNetCoreSdkSearch">
+    <xs:annotation>
+      <xs:documentation>
+        Searches for an installation of .NET Core SDK.
+        The variable gets set to the latest version of the given Platform and Major Version.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Identifier for the search. If the Id is not specified, one will be generated.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Variable" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Name of the variable in which to place the result of the search.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Condition" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Condition for evaluating the search. If this evaluates to false, the search is not executed at all.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="After" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Id of the search that this one should come after.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Platform" type="NetfxPreprocessorPlatformType">
+        <xs:annotation>
+          <xs:documentation>The platform to search for.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="MajorVersion" type="wxs:Integer">
+        <xs:annotation>
+          <xs:documentation>Major version of .NET SDK. For example, "6".</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DotNetCoreSdkSearchRef">
+    <xs:annotation>
+      <xs:documentation>References a DotNetCoreSdkSearch.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string" use="required" />
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DotNetCoreSdkFeatureBandSearch">
+    <xs:annotation>
+      <xs:documentation>
+        Searches for an installation of .NET Core SDK of the given platform.
+        The variable gets set to the latest version of the SDK that is in the feature band specified by Version.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Identifier for the search. If the Id is not specified, one will be generated.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Variable" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>Name of the variable in which to place the result of the search.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Condition" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Condition for evaluating the search. If this evaluates to false, the search is not executed at all.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="After" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Id of the search that this one should come after.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Platform" type="NetfxPreprocessorPlatformType">
+        <xs:annotation>
+          <xs:documentation>The platform to search for.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Version" type="wxs:StrictThreePartVersionType">
+        <xs:annotation>
+          <xs:documentation>
+            A specific .NET Core SDK feature band. For example, "6.0.400".
+            For more information about feature bands, see https://learn.microsoft.com/en-us/dotnet/core/releases-and-support#feature-bands-sdk-only.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DotNetCoreSdkFeatureBandSearchRef">
+    <xs:annotation>
+      <xs:documentation>References a DotNetCoreSdkFeatureBandSearch.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string" use="required" />
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DotNetCompatibilityCheck">
+    <xs:annotation>
+      <xs:documentation>
+        Validates whether the specified .NET is installed on the computer.
+      </xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>Identifier for the compatibility check. If the Id is not specified, one will be generated.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Property" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            Name of the property in which to place the result of the compatibility check. The possible values are:
+              - 0 - Successful compatibility check.
+              - 13 - Requested platform is not compatible with OS. _Introduced in WiX v5.0._
+              - 12289 - No runtime is installed.
+              - 12290 - Required runtime is not installed.
+              - 12291 - Failed to get hostfxr exports.
+              - 12292 - Invalid arguments.
+              - 12293 - Failed to construct temp json file path.
+              - 12294 - Failed to create temp json file.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RuntimeType">
+        <xs:annotation>
+          <xs:documentation>The .NET runtime to check against.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="aspnet" />
+            <xs:enumeration value="core" />
+            <xs:enumeration value="desktop" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:attribute name="Platform" type="NetfxPreprocessorPlatformType">
+        <xs:annotation>
+          <xs:documentation>The platform to use to validate.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Version" type="wxs:StrictThreePartVersionType">
+        <xs:annotation>
+          <xs:documentation>Version of .NET to check against.</xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="RollForward">
+        <xs:annotation>
+          <xs:documentation>The roll forward policy to use while validating.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleType>
+          <xs:restriction base="xs:NMTOKEN">
+            <xs:enumeration value="latestMajor" />
+            <xs:enumeration value="major" />
+            <xs:enumeration value="latestMinor" />
+            <xs:enumeration value="minor" />
+            <xs:enumeration value="latestPatch" />
+            <xs:enumeration value="disable" />
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="DotNetCompatibilityCheckRef">
+    <xs:annotation>
+      <xs:documentation>References a DotNetCompatibilityCheck.</xs:documentation>
+      <xs:appinfo>
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <xse:parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Id" type="xs:string" use="required" />
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="NativeImagePlatformType">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="32bit">
+        <xs:annotation>
+          <xs:documentation>
+            Attempt to generate native images only for the 32-bit version of the .NET Framework
+            on the target machine. If the 32-bit version of the .NET Framework 2.0 or newer is not
+            present on the target machine, native image custom actions will not be scheduled.
+            This is the default value.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="64bit">
+        <xs:annotation>
+          <xs:documentation>
+            Attempt to generate native images only for the 64-bit version of the .NET Framework
+            on the target machine. If a 64-bit version of the .NET Framework 2.0 or newer is not
+            present on the target machine, native image custom actions will not be scheduled.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="all">
+        <xs:annotation>
+          <xs:documentation>
+            Attempt to generate native images for the 32-bit and 64-bit versions of the .NET Framework
+            on the target machine. If a version of the .NET Framework 2.0 or newer is not present on the
+            target machine for a processor architecture, native image custom actions will not be
+            scheduled for that processor architecture.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NativeImagePreprocessorPlatformType">
+    <xs:annotation>
+      <xs:documentation>
+        Platform referencing the machine architecture.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="NativeImagePlatformType wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="NetfxPlatformType">
+    <xs:annotation>
+      <xs:documentation>
+        Platform referencing the machine architecture.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="arm64" />
+      <xs:enumeration value="x64" />
+      <xs:enumeration value="x86" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NetfxPreprocessorPlatformType">
+    <xs:annotation>
+      <xs:documentation>
+        Platform referencing the machine architecture.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="NetfxPlatformType wxs:PreprocessorVariables"/>
+  </xs:simpleType>
+</xs:schema>
