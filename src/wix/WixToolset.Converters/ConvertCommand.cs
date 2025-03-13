@@ -36,7 +36,7 @@ namespace WixToolset.Converters
         {
             this.ParseSettings(SettingsFileDefault);
 
-            var converter = new WixConverter(this.Messaging, this.IndentationAmount, this.ErrorsAsWarnings, this.IgnoreErrors);
+            var converter = new WixConverter(this.Messaging, this.IndentationAmount, this.ErrorsAsWarnings, this.IgnoreErrors, this.CustomTableSetting);
 
             var errors = base.Inspect(Inspector, cancellationToken);
 
