@@ -135,35 +135,35 @@ namespace WixToolset.Core
 
             var files = new List<WildcardFile>();
 
-            try
+            foreach (var pattern in patterns)
             {
-                foreach (var pattern in patterns)
+                // Resolve bind paths, if any, which might result in multiple directories.
+                foreach (var path in this.ResolveBindPaths(sourceLineNumbers, pattern))
                 {
-                    // Resolve bind paths, if any, which might result in multiple directories.
-                    foreach (var path in this.ResolveBindPaths(sourceLineNumbers, pattern))
+                    var sourceDirectory = String.IsNullOrEmpty(sourcePath) ? Path.GetDirectoryName(sourceLineNumbers.FileName) : sourcePath;
+                    var recursive = path.IndexOf("**") >= 0;
+                    var filePortion = Path.GetFileName(path);
+                    var directoryPortion = Path.GetDirectoryName(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+                    if (directoryPortion?.EndsWith(@"\**") == true)
                     {
-                        var sourceDirectory = String.IsNullOrEmpty(sourcePath) ? Path.GetDirectoryName(sourceLineNumbers.FileName) : sourcePath;
-                        var recursive = path.IndexOf("**") >= 0;
-                        var filePortion = Path.GetFileName(path);
-                        var directoryPortion = Path.GetDirectoryName(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                        directoryPortion = directoryPortion.Substring(0, directoryPortion.Length - 3);
+                    }
 
-                        if (directoryPortion?.EndsWith(@"\**") == true)
-                        {
-                            directoryPortion = directoryPortion.Substring(0, directoryPortion.Length - 3);
-                        }
+                    if (directoryPortion is null || directoryPortion.Length == 0 || directoryPortion == "**")
+                    {
+                        directoryPortion = sourceDirectory;
 
-                        if (directoryPortion is null || directoryPortion.Length == 0 || directoryPortion == "**")
-                        {
-                            directoryPortion = sourceDirectory;
+                    }
+                    else if (!Path.IsPathRooted(directoryPortion))
+                    {
+                        directoryPortion = Path.Combine(sourceDirectory, directoryPortion);
+                    }
 
-                        }
-                        else if (!Path.IsPathRooted(directoryPortion))
-                        {
-                            directoryPortion = Path.Combine(sourceDirectory, directoryPortion);
-                        }
+                    var recursiveDirOffset = directoryPortion.Length + 1;
 
-                        var recursiveDirOffset = directoryPortion.Length + 1;
-
+                    try
+                    {
                         var foundFiles = Directory.EnumerateFiles(directoryPortion, filePortion, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
                         foreach (var foundFile in foundFiles)
@@ -176,11 +176,11 @@ namespace WixToolset.Core
                             });
                         }
                     }
+                    catch (DirectoryNotFoundException e)
+                    {
+                        this.Messaging.Write(OptimizerWarnings.ExpectedDirectory(harvestFile.SourceLineNumbers, e.Message));
+                    }
                 }
-            }
-            catch (DirectoryNotFoundException e)
-            {
-                this.Messaging.Write(OptimizerWarnings.ExpectedDirectory(harvestFile.SourceLineNumbers, e.Message));
             }
 
             return files;
