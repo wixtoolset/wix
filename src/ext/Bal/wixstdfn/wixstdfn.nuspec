@@ -6,9 +6,10 @@
     <title>$title$</title>
     <description>$description$</description>
     <authors>$authors$</authors>
-    <icon>wix.png</icon>
+    <icon>icon.png</icon>
     <license type="file">OSMFEULA.txt</license>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <tags>$packageTags$</tags>
     <copyright>$copyright$</copyright>
     <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
@@ -23,9 +24,9 @@
 
   <files>
     <file src="$eulaTxt$" />
+    <file src="$iconPng$" />
     <file src="$projectFolder$\README.md" />
     <file src="$projectFolder$\build\$id$.props" target="build\" />
-    <file src="$projectFolder$\..\..\..\internal\images\wix.png" />
     <file src="$projectFolder$\inc\*" target="lib\native\include" />
     <file src="..\..\v143\x86\wixstdfn.lib" target="lib\native\v14\x86" />
     <file src="..\..\v143\x64\wixstdfn.lib" target="lib\native\v14\x64" />

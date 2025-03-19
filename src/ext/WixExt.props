@@ -7,6 +7,7 @@
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <NoWarn>NU5100</NoWarn>
     <WixExtensionPackageFolder>wixext6</WixExtensionPackageFolder>
+    <PackageTags>$(PackageTags) wixext CustomActions</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

@@ -27,21 +27,29 @@
     <PlatformToolset Condition=" '$(ConfigurationType)' == 'StaticLibrary' ">$(WixNativeSdkLibraryToolset)</PlatformToolset>
     <PlatformToolset Condition=" '$(PlatformToolset)' == '' ">v143</PlatformToolset>
 
-    <Authors>WiX Toolset Team</Authors>
-    <Company>WiX Toolset</Company>
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <NuGetAuditLevel>low</NuGetAuditLevel>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors Condition=" '$(WixOfficialBuild)'!='true' ">Private WiX Build</Authors>
+    <Authors Condition=" '$(WixOfficialBuild)'=='true' ">WiX Toolset Team</Authors>
+    <Company Condition=" '$(WixOfficialBuild)'!='true' ">Private WiX Build</Company>
+    <Company Condition=" '$(WixOfficialBuild)'=='true' ">WiX Toolset</Company>
     <Copyright>Copyright (c) .NET Foundation and contributors. All rights reserved.</Copyright>
 
     <PackageEulaSource>$(RootFolder)OSMFEULA.txt</PackageEulaSource>
     <PackageLicenseFile>OSMFEULA.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
-    <Product>WiX Toolset</Product>
+    <Product Condition=" '$(WixOfficialBuild)'!='true' ">Private WiX Build</Product>
+    <Product Condition=" '$(WixOfficialBuild)'=='true' ">WiX Toolset</Product>
     <ProjectUrl>https://wixtoolset.org/</ProjectUrl>
-    <PackageIcon>wix.png</PackageIcon>
-
-    <NuGetAudit>true</NuGetAudit>
-    <NuGetAuditMode>all</NuGetAuditMode>
-    <NuGetAuditLevel>low</NuGetAuditLevel>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconSource Condition=" '$(WixOfficialBuild)'!='true' ">$(MSBuildThisFileDirectory)internal\images\icon.png</PackageIconSource>
+    <PackageIconSource Condition=" '$(WixOfficialBuild)'=='true' ">$(MSBuildThisFileDirectory)internal\images\official\icon.png</PackageIconSource>
+    <PackageTags>WiX MSI install setup</PackageTags>
   </PropertyGroup>
 
   <Import Project="Directory$(MSBuildProjectExtension).props" Condition=" Exists('Directory$(MSBuildProjectExtension).props') " />
