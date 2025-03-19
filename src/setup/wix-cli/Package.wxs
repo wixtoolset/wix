@@ -1,7 +1,7 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
      xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
-  <Package Id="WixToolset.CommandLineTools$(SetupMajorVersion).Package" Name="WiX Toolset Command-Line Tools" Manufacturer="WiX Toolset" Version="!(bind.fileVersion.WixExe)">
+  <Package Id="WixToolset.CommandLineTools$(SetupMajorVersion).Package" Name="WiX Toolset Command-Line Tools" Manufacturer="$(Company)" Version="!(bind.fileVersion.WixExe)">
     <MediaTemplate EmbedCab="yes" />
 
     <ComponentGroupRef Id="BinaryFiles" />

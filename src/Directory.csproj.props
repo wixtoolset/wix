@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(IsWixTestProject)'!='true' ">
-    <Content Include="$(MSBuildThisFileDirectory)internal\images\wix.png" PackagePath="/" />
+    <Content Include="$(PackageEulaSource)" Pack="true" PackagePath="/" />
+    <Content Include="$(PackageIconSource)" Pack="true" PackagePath="/" />
   </ItemGroup>
 </Project>
