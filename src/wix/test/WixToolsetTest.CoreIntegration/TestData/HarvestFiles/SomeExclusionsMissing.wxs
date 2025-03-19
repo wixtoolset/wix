@@ -1,0 +1,17 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Id="WixToolsetTest.SomeExclusionsMissing" Name="MsiPackage" Version="1.0.0.0" Manufacturer="Example Corporation">
+
+        <Files Include="files2\files2_sub2\**">
+            <Exclude Files="files2\files2_sub2\MissingDirectory\**" />
+            <Exclude Files="files2\files2_sub2\pleasedontincludeme.dat" />
+            <Exclude Files="files2\files2_sub2\ThisDirectoryIsAlsoMissing\**" />
+        </Files>
+
+    </Package>
+
+    <Fragment>
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+        </StandardDirectory>
+    </Fragment>
+</Wix>
