@@ -57,6 +57,30 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void MissingHarvestExclusionsDoesNotBlockAllHarvesting()
+        {
+            Build("SomeExclusionsMissing.wxs", (msiPath, sourceFolder, baseFolder, result) =>
+            {
+                var expectedWarnings = new[]
+                {
+                    @"8601: Missing directory for harvesting files: Could not find a part of the path '<sourceFolder>\files2\files2_sub2\MissingDirectory'.",
+                    @"8601: Missing directory for harvesting files: Could not find a part of the path '<sourceFolder>\files2\files2_sub2\ThisDirectoryIsAlsoMissing'.",
+                };
+
+                var expectedFiles = new[]
+                {
+                    @"flsCswDB8sBfZz7_oHNtra3tiFivPE=PFiles\MsiPackage\test20.txt",
+                    @"fls4200C_IADZMINQyhQg52G3WxxfU=PFiles\MsiPackage\test21.txt",
+                };
+
+                var messages = result.Messages.Select(m => FormatMessage(m, sourceFolder, baseFolder)).ToArray();
+                WixAssert.CompareLineByLine(expectedWarnings, messages);
+
+                AssertFileIdsAndTargetPaths(msiPath, expectedFiles);
+            }, warningsAsErrors: false);
+        }
+
+        [Fact]
         public void DuplicateFilesSomethingSomething()
         {
             Build("DuplicateFiles.wxs", (_, result) =>
