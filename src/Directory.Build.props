@@ -9,6 +9,7 @@
     <NoWarn>$(NoWarn);MSB3026</NoWarn>
 
     <ProjectName Condition=" '$(ProjectName)' == '' ">$(MSBuildProjectName)</ProjectName>
+    <RootFolder>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\))</RootFolder>
     <RootBuildFolder>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\build\))</RootBuildFolder>
     <RootPackagesFolder>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)..\packages\))</RootPackagesFolder>
     <LogsFolder>$(RootBuildFolder)logs\</LogsFolder>
@@ -29,7 +30,11 @@
     <Authors>WiX Toolset Team</Authors>
     <Company>WiX Toolset</Company>
     <Copyright>Copyright (c) .NET Foundation and contributors. All rights reserved.</Copyright>
-    <PackageLicenseExpression>MS-RL</PackageLicenseExpression>
+
+    <PackageEulaSource>$(RootFolder)OSMFEULA.txt</PackageEulaSource>
+    <PackageLicenseFile>OSMFEULA.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+
     <Product>WiX Toolset</Product>
     <ProjectUrl>https://wixtoolset.org/</ProjectUrl>
     <PackageIcon>wix.png</PackageIcon>

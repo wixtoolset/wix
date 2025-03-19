@@ -28,6 +28,10 @@
     <BindPath Include="$(RootBuildFolder)VisualStudio.wixext\$(Configuration)\netstandard2.0\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" />
+  </ItemGroup>
+
   <UsingTask TaskName="GenerateMetadata" AssemblyFile="$(BaseOutputPath)$(Configuration)\net472\MetadataTask.dll" />
 
   <Target Name="GenerateMetadata" AfterTargets="AfterBuild">

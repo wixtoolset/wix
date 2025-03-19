@@ -7,14 +7,15 @@
     <description>$description$</description>
     <authors>$authors$</authors>
     <icon>wix.png</icon>
-    <license type="expression">MS-RL</license>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">OSMFEULA.txt</license>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
     <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
   </metadata>
 
   <files>
+    <file src="$eulaTxt$" />
     <file src="$projectFolder$\..\..\..\internal\images\wix.png" />
     <file src="$projectFolder$\WixToolset.Bal.wixext.targets"  target="build" />
     <file src="WixToolset.BootstrapperApplications.wixext.dll" target="$wixExtensionPackageFolder$" />

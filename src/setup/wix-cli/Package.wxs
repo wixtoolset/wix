@@ -1,5 +1,6 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
   <Package Id="WixToolset.CommandLineTools$(SetupMajorVersion).Package" Name="WiX Toolset Command-Line Tools" Manufacturer="WiX Toolset" Version="!(bind.fileVersion.WixExe)">
     <MediaTemplate EmbedCab="yes" />
 
@@ -9,6 +10,9 @@
     <Property Id="ARPURLINFOABOUT" Value="https://wixtoolset.org/" />
     <Property Id="ARPHELPLINK" Value="https://wixtoolset.org/docs/gethelp/" />
     <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLFOLDER]" After="CostFinalize" />
+
+    <ui:WixUI Id="WixUI_Minimal" />
+    <WixVariable Id="WixUILicenseRtf" Value="..\OSMFEULA.rtf" />
   </Package>
 
   <Fragment>
