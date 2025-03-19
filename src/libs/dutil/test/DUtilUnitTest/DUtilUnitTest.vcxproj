@@ -55,7 +55,8 @@
     <ClCompile Include="FileUtilTest.cpp" />
     <ClCompile Include="GuidUtilTest.cpp" />
     <ClCompile Include="IniUtilTest.cpp" />
-    <ClCompile Include="LocUtilTests.cpp" />
+    <ClCompile Include="LocControlsUtilTests.cpp" />
+    <ClCompile Include="LocStringsUtilTests.cpp" />
     <ClCompile Include="MemUtilTest.cpp" />
     <ClCompile Include="MonUtilTest.cpp" />
     <ClCompile Include="PathUtilTest.cpp" />
