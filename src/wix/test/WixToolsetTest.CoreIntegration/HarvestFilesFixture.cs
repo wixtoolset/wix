@@ -9,7 +9,7 @@ namespace WixToolsetTest.CoreIntegration
     using System.Linq;
     using WixInternal.Core.TestPackage;
     using WixInternal.TestSupport;
-    using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Data;
     using Xunit;
 
     public class HarvestFilesFixture
@@ -30,12 +30,12 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void ZeroFilesHarvestedIsAWarning()
         {
-            Build("ZeroFiles.wxs", (_, result) =>
+            Build("ZeroFiles.wxs", (_, sourceFolder, baseFolder, result) =>
             {
-                var messages = result.Messages.Select(m => m.Id);
-                Assert.Equal(new[]
+                var messages = result.Messages.Select(m => FormatMessage(m, sourceFolder, baseFolder)).ToArray();
+                WixAssert.CompareLineByLine(new[]
                 {
-                    8600,
+                    "8600: Files inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify your Files paths, inclusions, and exclusions for accuracy.",
                 }, messages);
             });
         }
@@ -43,15 +43,15 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void MissingHarvestDirectoryIsAWarning()
         {
-            Build("BadDirectory.wxs", (_, result) =>
+            Build("BadDirectory.wxs", (_, sourceFolder, baseFolder, result) =>
             {
-                var messages = result.Messages.Select(m => m.Id);
-                Assert.Equal(new[]
+                var messages = result.Messages.Select(m => FormatMessage(m, sourceFolder, baseFolder)).ToArray();
+                WixAssert.CompareLineByLine(new[]
                 {
-                    8601,
-                    8600,
-                    8601,
-                    8600,
+                    @"8601: Missing directory for harvesting files: Could not find a part of the path '<sourceFolder>\files2\MissingDirectory'.",
+                    @"8600: Files inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify your Files paths, inclusions, and exclusions for accuracy.",
+                    @"8601: Missing directory for harvesting files: Could not find a part of the path '<sourceFolder>\files2\ThisDirectoryIsAlsoMissing'.",
+                    @"8600: Files inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify your Files paths, inclusions, and exclusions for accuracy.",
                 }, messages);
             });
         }
@@ -392,17 +392,21 @@ namespace WixToolsetTest.CoreIntegration
 
         private static void AssertFileIdsAndTargetPaths(string msiPath, string[] expected)
         {
-            var pkg = new WixToolset.Dtf.WindowsInstaller.Package.InstallPackage(msiPath,
-                WixToolset.Dtf.WindowsInstaller.DatabaseOpenMode.ReadOnly);
-            var sortedExpected = expected.OrderBy(s => s);
-            var actual = pkg.Files.OrderBy(kvp => kvp.Key).Select(kvp => $"{kvp.Key}={kvp.Value.TargetPath}");
+            var pkg = new WixToolset.Dtf.WindowsInstaller.Package.InstallPackage(msiPath, WixToolset.Dtf.WindowsInstaller.DatabaseOpenMode.ReadOnly);
+            var sortedExpected = expected.OrderBy(s => s).ToArray();
+            var actual = pkg.Files.OrderBy(kvp => kvp.Key).Select(kvp => $"{kvp.Key}={kvp.Value.TargetPath}").ToArray();
 
-            Assert.Equal(sortedExpected, actual);
+            WixAssert.CompareLineByLine(sortedExpected, actual);
         }
 
         private static void Build(string file, Action<string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPath = false, params string[] additionalCommandLineArguments)
         {
-            var folder = TestData.Get("TestData", "HarvestFiles");
+            Build(file, (msiPath, sourceFolder, baseFolder, result) => tester(msiPath, result), isMsi, warningsAsErrors, addUnnamedBindPath, additionalCommandLineArguments);
+        }
+
+        private static void Build(string file, Action<string, string, string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPath = false, params string[] additionalCommandLineArguments)
+        {
+            var sourceFolder = TestData.Get("TestData", "HarvestFiles");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -414,17 +418,17 @@ namespace WixToolsetTest.CoreIntegration
                 var arguments = new List<string>()
                 {
                     "build",
-                    Path.Combine(folder, file),
+                    Path.Combine(sourceFolder, file),
                     "-intermediateFolder", intermediateFolder,
-                    "-bindpath", @$"ToBeHarvested={folder}\files1",
-                    "-bindpath", @$"ToBeHarvested={folder}\files2",
+                    "-bindpath", @$"ToBeHarvested={sourceFolder}\files1",
+                    "-bindpath", @$"ToBeHarvested={sourceFolder}\files2",
                     "-o", msiPath,
                 };
 
                 if (addUnnamedBindPath)
                 {
                     arguments.Add("-bindpath");
-                    arguments.Add(Path.Combine(folder, "unnamedbindpath"));
+                    arguments.Add(Path.Combine(sourceFolder, "unnamedbindpath"));
                 }
 
                 if (additionalCommandLineArguments.Length > 0)
@@ -434,8 +438,13 @@ namespace WixToolsetTest.CoreIntegration
 
                 var result = WixRunner.Execute(warningsAsErrors, arguments.ToArray());
 
-                tester(msiPath, result);
+                tester(msiPath, sourceFolder, baseFolder, result);
             }
+        }
+
+        private static string FormatMessage(Message m, string sourceFolder, string baseFolder)
+        {
+            return $"{m.Id}: {m.ToString().Replace(sourceFolder, "<sourceFolder>").Replace(baseFolder, "<baseFolder>")}";
         }
     }
 }
