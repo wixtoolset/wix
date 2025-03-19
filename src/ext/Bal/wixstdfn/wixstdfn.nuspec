@@ -7,8 +7,8 @@
     <description>$description$</description>
     <authors>$authors$</authors>
     <icon>wix.png</icon>
-    <license type="expression">MS-RL</license>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">OSMFEULA.txt</license>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <copyright>$copyright$</copyright>
     <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
@@ -22,6 +22,7 @@
   </metadata>
 
   <files>
+    <file src="$eulaTxt$" />
     <file src="$projectFolder$\README.md" />
     <file src="$projectFolder$\build\$id$.props" target="build\" />
     <file src="$projectFolder$\..\..\..\internal\images\wix.png" />
