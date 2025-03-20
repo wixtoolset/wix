@@ -3,15 +3,9 @@
 
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
-    <!-- These projects are "special." -->
-    <ProjectReference Include="Util\util_t.proj" BuildInParallel="false" Targets="Restore;Build" Properties="SuppressWixTests=true" />
-    <ProjectReference Include="Bal\bal_t.proj" BuildInParallel="false" Targets="Restore;Build" Properties="SuppressWixTests=true" />
-    <!-- <ProjectReference Include="NetFx\netfx_t.proj" BuildInParallel="false" Targets="Restore;Build" Properties="SuppressWixTests=true" /> -->
-
-    <!-- Now run tests we skipped earlier along with everything in parallel. -->
-    <ProjectReference Include="Util\util_t.proj" Targets="Build" />
-    <ProjectReference Include="Bal\bal_t.proj" Targets="Build" />
-    <!-- <ProjectReference Include="NetFx\netfx_t.proj" Targets="Build" /> -->
+    <!-- These projects are "special" and cannot build in parallel. -->
+    <ProjectReference Include="Util\util_t.proj" BuildInParallel="false" Targets="Restore;Build" />
+    <ProjectReference Include="Bal\bal_t.proj" BuildInParallel="false" Targets="Restore;Build" />
 
     <ProjectReference Include="NetFx\netfx_t.proj" BuildInParallel="false" Targets="Restore;Build" />
     <ProjectReference Include="ComPlus\complus_t.proj" Targets="Restore;Build" />

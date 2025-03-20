@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
-    <ProjectReference Include="test\WixToolsetTest.Firewall\WixToolsetTest.Firewall.csproj" />
+    <ProjectReference Include="test\WixToolsetTest.Firewall\WixToolsetTest.Firewall.csproj" Targets="Test" />
     <ProjectReference Include="wixext\WixToolset.Firewall.wixext.csproj" Targets="Pack" Properties="NoBuild=true" />
   </ItemGroup>
 

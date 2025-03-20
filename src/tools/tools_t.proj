@@ -12,8 +12,8 @@
     <!-- <ProjectReference Include="heat\heat.csproj" />
     <ProjectReference Include="WixToolset.HeatTasks\WixToolset.HeatTasks.csproj" /> -->
 
-    <ProjectReference Include="test\WixToolsetTest.HeatTasks\WixToolsetTest.HeatTasks.csproj" />
-    <ProjectReference Include="test\WixToolsetTest.Heat\WixToolsetTest.Heat.csproj" />
+    <ProjectReference Include="test\WixToolsetTest.HeatTasks\WixToolsetTest.HeatTasks.csproj" Targets="Test" />
+    <ProjectReference Include="test\WixToolsetTest.Heat\WixToolsetTest.Heat.csproj" Targets="Test" />
 
     <ProjectReference Include="WixToolset.Heat\WixToolset.Heat.csproj" Targets="Pack" />
   </ItemGroup>

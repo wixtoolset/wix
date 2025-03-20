@@ -26,7 +26,7 @@ msbuild -t:Restore wix.sln -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl
 :: Build
 msbuild wixnative\wixnative_t.proj -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\wixnative_build.binlog || exit /b
 
-msbuild wix.sln -p:Configuration=%_C% -p:SuppressWixTests=true -tl -nologo -m -warnaserror -bl:%_L%\wix_build.binlog || exit /b
+msbuild wix.sln -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\wix_build.binlog || exit /b
 
 msbuild publish_t.proj -p:Configuration=%_C% -tl -nologo -warnaserror -bl:%_L%\wix_publish.binlog || exit /b
 
@@ -35,7 +35,7 @@ msbuild -t:Publish -p:Configuration=%_C% -tl -nologo -warnaserror WixToolset.Sdk
 :: TODO - used by MsbuildFixture.ReportsInnerExceptionForUnexpectedExceptions test
 :: msbuild -t:Publish -Restore -p:Configuration=%_C% -p:TargetFramework=net472 -p:RuntimeIdentifier=linux-x86 -p:PublishDir=%_P%WixToolset.Sdk\broken\net472\ wix\wix.csproj || exit /b
 
-msbuild -t:RunWixTests test\WixToolsetTest.Sdk\WixToolsetTest.Sdk.csproj -p:Configuration=%_C% -p:NoBuild=true -tl -nologo -warnaserror  || exit /b
+msbuild -t:Test test\WixToolsetTest.Sdk\WixToolsetTest.Sdk.csproj -p:Configuration=%_C% -tl -nologo -warnaserror  || exit /b
 
 :: Test
 dotnet test ^

@@ -100,7 +100,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="MSTest.TestFramework" Version="3.8.0" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.8.3" />
   </ItemGroup>
 
   <ItemGroup>

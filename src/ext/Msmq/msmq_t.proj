@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
-    <ProjectReference Include="test\WixToolsetTest.Msmq\WixToolsetTest.Msmq.csproj" />
+    <ProjectReference Include="test\WixToolsetTest.Msmq\WixToolsetTest.Msmq.csproj" Targets="Test" />
     <ProjectReference Include="wixext\WixToolset.Msmq.wixext.csproj" Targets="Pack" Properties="NoBuild=true" />
   </ItemGroup>
 
