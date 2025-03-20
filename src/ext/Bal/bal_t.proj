@@ -18,6 +18,8 @@
 
     <ProjectReference Include="test\examples\examples.proj" />
 
+    <ProjectReference Include="test\WixToolsetTest.BootstrapperApplications\WixToolsetTest.BootstrapperApplications.csproj" Targets="Test" />
+
     <!-- 
     Currently there are no unskipped unit tests in this project. Should that change,
     we'll need to update the native test framework or figure out something else.

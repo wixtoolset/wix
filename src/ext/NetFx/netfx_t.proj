@@ -4,7 +4,7 @@
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
     <ProjectReference Include="wixlib\netfx.wixproj" />
-    <ProjectReference Include="test\WixToolsetTest.Netfx\WixToolsetTest.Netfx.csproj" />
+    <ProjectReference Include="test\WixToolsetTest.Netfx\WixToolsetTest.Netfx.csproj" Targets="Test" />
     <ProjectReference Include="wixext\WixToolset.Netfx.wixext.csproj" Targets="Pack" Properties="NoBuild=true" />
   </ItemGroup>
 

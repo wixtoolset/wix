@@ -20,16 +20,6 @@
     <TestingPlatformShowTestsFailure>true</TestingPlatformShowTestsFailure>
   </PropertyGroup>
 
-  <Target Name="RunWixTests" AfterTargets="Build" Condition=" '$(IsWixMSTestProject)' == 'true' AND '$(SuppressWixTests)' != 'true' ">
-    <Delete Files="$(TestResultsFolder)$(MSBuildProjectName).trx" />
-
-    <Exec 
-      Command="$(TargetPath.Replace('.dll', '.exe')) --results-directory $(TestResultsFolder) --report-trx --report-trx-filename $(MSBuildProjectName).trx --no-progress --settings $([MSBuild]::GetPathOfFileAbove('wix.runsettings'))" 
-      UseCommandProcessor="false" 
-      CustomErrorRegularExpression="  Test method .+ threw exception:" />
-  </Target>   
-
-
   <ItemGroup Condition=" '$(IsWixTestProject)'=='true' ">
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit" />
