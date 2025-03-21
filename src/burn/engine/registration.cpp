@@ -809,7 +809,7 @@ extern "C" HRESULT RegistrationSessionBegin(
     }
 
     // Update registration.
-    if (pRegistration->update.fRegisterUpdate)
+    if (pRegistration->update.fRegisterUpdate && BOOTSTRAPPER_REGISTRATION_TYPE_FULL == registrationType)
     {
         hr = WriteUpdateRegistration(pRegistration, pVariables);
         ExitOnFailure(hr, "Failed to write update registration.");
