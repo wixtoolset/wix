@@ -6,6 +6,7 @@ namespace WixTestTools
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Xml.Linq;
     using Microsoft.Win32;
     using WixInternal.TestSupport;
     using WixToolset.Data;
@@ -23,6 +24,8 @@ namespace WixTestTools
 
         private WixBundleSymbol BundleSymbol { get; set; }
 
+        private WixUpdateRegistrationSymbol UpdateRegistrationSymbol { get; set; }
+
         private WixBundleSymbol GetBundleSymbol()
         {
             if (this.BundleSymbol == null)
@@ -34,6 +37,19 @@ namespace WixTestTools
             }
 
             return this.BundleSymbol;
+        }
+
+        private WixUpdateRegistrationSymbol GetUpdateRegistrationSymbol()
+        {
+            if (this.UpdateRegistrationSymbol == null)
+            {
+                using var wixOutput = WixOutput.Read(this.BundlePdb);
+                var intermediate = Intermediate.Load(wixOutput);
+                var section = intermediate.Sections.Single();
+                this.UpdateRegistrationSymbol = section.Symbols.OfType<WixUpdateRegistrationSymbol>().Single();
+            }
+
+            return this.UpdateRegistrationSymbol;
         }
 
         public string GetFullBurnPolicyRegistryPath()
@@ -115,6 +131,27 @@ namespace WixTestTools
             else
             {
                 return BundleRegistration.TryGetPerUserBundleRegistrationById(bundleCode, out registration);
+            }
+        }
+
+        public bool TryGetUpdateRegistration(out BundleUpdateRegistration registration)
+        {
+            var bundleSymbol = this.GetBundleSymbol();
+            var x64 = bundleSymbol.Platform != Platform.X86;
+
+            var updateRegistrationSymbol = this.GetUpdateRegistrationSymbol();
+            var manufacturer = updateRegistrationSymbol.Manufacturer;
+            var productFamily = updateRegistrationSymbol.ProductFamily;
+            var name = updateRegistrationSymbol.Name;
+
+
+            if (bundleSymbol.PerMachine)
+            {
+                return BundleUpdateRegistration.TryGetPerMachineBundleUpdateRegistration(manufacturer, productFamily, name, x64, out registration);
+            }
+            else
+            {
+                return BundleUpdateRegistration.TryGetPerUserBundleUpdateRegistration(manufacturer, productFamily, name, out registration);
             }
         }
 
