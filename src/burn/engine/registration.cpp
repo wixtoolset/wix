@@ -808,13 +808,6 @@ extern "C" HRESULT RegistrationSessionBegin(
         ExitOnFailure(hr, "Failed to write software tags.");
     }
 
-    // Update registration.
-    if (pRegistration->update.fRegisterUpdate)
-    {
-        hr = WriteUpdateRegistration(pRegistration, pVariables);
-        ExitOnFailure(hr, "Failed to write update registration.");
-    }
-
     // Only set install date and initial estimated size here for the first time.
     // Estimated size will always get updated at the end of the session.
     if (fCreated)
@@ -904,6 +897,13 @@ extern "C" HRESULT RegistrationSessionEnd(
 
         hr = UpdateEstimatedSize(hkRegistration, qwEstimatedSize);
         ExitOnFailure(hr, "Failed to update estimated size.");
+
+        // Update registration.
+        if (pRegistration->update.fRegisterUpdate)
+        {
+            hr = WriteUpdateRegistration(pRegistration, pVariables);
+            ExitOnFailure(hr, "Failed to write update registration.");
+        }
     }
 
     // Update resume mode.
