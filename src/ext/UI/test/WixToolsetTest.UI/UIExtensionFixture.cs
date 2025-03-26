@@ -109,7 +109,7 @@ namespace WixToolsetTest.UI
             var bindFolder = TestData.Get(@"TestData", "data");
             var build = new Builder(folder, typeof(UIExtensionFactory), new[] { bindFolder });
 
-            var results = build.BuildAndQuery(BuildX64, "Binary", "Dialog", "CustomAction", "ControlEvent", "InstallUISequence");
+            var results = build.BuildAndQuery(Build, validate: true, "Binary", "Dialog", "CustomAction", "ControlEvent", "InstallUISequence");
             WixAssert.Single(results, result => result.StartsWith("Dialog:WelcomeDlg\t"));
             WixAssert.Single(results, result => result.StartsWith("Dialog:CustomizeDlg\t"));
             WixAssert.Empty(results.Where(result => result.StartsWith("Dialog:SetupTypeDlg\t")));
