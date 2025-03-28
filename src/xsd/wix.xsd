@@ -2341,7 +2341,14 @@
           </xs:annotation>
         </xs:any>
       </xs:choice>
-      <xs:attribute name="Id" type="Guid" use="required">
+      <xs:attribute name="Id" type="Guid">
+        <xs:annotation>
+          <xs:appinfo>
+            <xse:deprecated ref="Code" />
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="Code" type="Guid" use="required">
         <xs:annotation>
           <xs:documentation>The identifier of the RelatedBundle group.</xs:documentation>
         </xs:annotation>
