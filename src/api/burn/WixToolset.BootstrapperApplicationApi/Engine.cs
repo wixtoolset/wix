@@ -271,9 +271,9 @@ namespace WixToolset.BootstrapperApplicationApi
         }
 
         /// <inheritdoc/>
-        public void SetDownloadSource(string packageOrContainerId, string payloadId, string url, string user, string password)
+        public void SetDownloadSource(string packageOrContainerId, string payloadId, string url, string user, string password, string authorizationHeader)
         {
-            this.engine.SetDownloadSource(packageOrContainerId, payloadId, url, user, password);
+            this.engine.SetDownloadSource(packageOrContainerId, payloadId, url, user, password, authorizationHeader);
         }
 
         /// <inheritdoc/>

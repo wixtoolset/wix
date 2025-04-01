@@ -108,6 +108,16 @@ namespace WixToolsetTest.BurnE2E
         }
 
         /// <summary>
+        /// Forces a download action and sets the download source.
+        /// </summary>
+        /// <param name="packageId">Package identity.</param>
+        /// <param name="actionName">The URL format string.</param>
+        public void SetPackageForceDownloadSource(string packageId, string url)
+        {
+            this.SetPackageState(packageId, "ForceDownloadSource", url);
+        }
+
+        /// <summary>
         /// Cancels the execute of a package at the next progess after the specified MSI action start.
         /// </summary>
         /// <param name="packageId">Package identity.</param>

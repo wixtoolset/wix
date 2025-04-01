@@ -129,14 +129,15 @@ namespace WixToolset.BootstrapperApplicationApi
             );
 
         /// <summary>
-        /// See <see cref="IEngine.SetDownloadSource(string, string, string, string, string)"/>.
+        /// See <see cref="IEngine.SetDownloadSource(string, string, string, string, string, string)"/>.
         /// </summary>
         void SetDownloadSource(
             [MarshalAs(UnmanagedType.LPWStr)] string wzPackageOrContainerId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzPayloadId,
             [MarshalAs(UnmanagedType.LPWStr)] string wzUrl,
             [MarshalAs(UnmanagedType.LPWStr)] string wzUser,
-            [MarshalAs(UnmanagedType.LPWStr)] string wzPassword
+            [MarshalAs(UnmanagedType.LPWStr)] string wzPassword,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzAuthorizationHeader
             );
 
         /// <summary>
