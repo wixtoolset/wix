@@ -37,14 +37,14 @@ namespace WixToolset.BootstrapperApplicationApi
         /// <summary>
         /// Fired when the engine has begun acquiring the payload or container.
         /// The BA can change the source using <see cref="IEngine.SetLocalSource(String, String, String)"/>
-        /// or <see cref="IEngine.SetDownloadSource(String, String, String, String, String)"/>.
+        /// or <see cref="IEngine.SetDownloadSource(String, String, String, String, String, String)"/>.
         /// </summary>
         event EventHandler<CacheAcquireBeginEventArgs> CacheAcquireBegin;
 
         /// <summary>
         /// Fired when the engine has completed the acquisition of the payload or container.
         /// The BA can change the source using <see cref="IEngine.SetLocalSource(String, String, String)"/>
-        /// or <see cref="IEngine.SetDownloadSource(String, String, String, String, String)"/>.
+        /// or <see cref="IEngine.SetDownloadSource(String, String, String, String, String, String)"/>.
         /// </summary>
         event EventHandler<CacheAcquireCompleteEventArgs> CacheAcquireComplete;
 

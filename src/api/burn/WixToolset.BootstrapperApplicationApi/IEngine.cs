@@ -174,7 +174,8 @@ namespace WixToolset.BootstrapperApplicationApi
         /// <param name="url">The new url.</param>
         /// <param name="user">The user name for proxy authentication.</param>
         /// <param name="password">The password for proxy authentication.</param>
-        void SetDownloadSource(string packageOrContainerId, string payloadId, string url, string user, string password);
+        /// <param name="authorizationHeader">Additional proxy authentication header. Not currently used.</param>
+        void SetDownloadSource(string packageOrContainerId, string payloadId, string url, string user, string password, string authorizationHeader);
 
         /// <summary>
         /// Sets numeric variables for the engine.

@@ -2,7 +2,6 @@
 
 namespace WixToolsetTest.BurnE2E
 {
-    using System.Threading;
     using WixTestTools;
     using WixToolset.BootstrapperApplicationApi;
     using Xunit;
@@ -11,6 +10,24 @@ namespace WixToolsetTest.BurnE2E
     public class FailureTests : BurnE2ETests
     {
         public FailureTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper) { }
+
+        [RuntimeFact]
+        public void CanSetDownloadSourceAndForceDownload()
+        {
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var bundleA = this.CreateBundleInstaller("BundleA");
+            var testBAController = this.CreateTestBAController();
+
+            testBAController.SetPackageForceDownloadSource("PackageA", "https://1e1bf2be1c384fd1a0c4c0500eef971b/downloads/payloads/{0}");
+
+            packageA.VerifyInstalled(false);
+
+            bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            bundleA.Install(0x2ee7/*ERROR_INTERNET_NAME_NOT_RESOLVED*/);
+
+            packageA.VerifyInstalled(false);
+        }
 
         [RuntimeFact]
         public void CanCancelExePackageAndAbandonIt()

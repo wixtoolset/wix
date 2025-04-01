@@ -41,6 +41,7 @@ namespace WixToolset.Test.BA
         private int cancelOnProgressAtProgress;
         private int retryExecuteFilesInUse;
         private bool rollingBack;
+        private string forceDownloadSource;
 
         private IBootstrapperCommand Command { get; set; }
 
@@ -375,6 +376,12 @@ namespace WixToolset.Test.BA
             {
                 this.Log("    CancelCacheAtProgress: {0}", this.cancelCacheAtProgress);
             }
+
+            this.forceDownloadSource = this.ReadPackageAction(args.PackageId, "ForceDownloadSource");
+            if (!String.IsNullOrEmpty(this.forceDownloadSource))
+            {
+                this.Log("    ForceDownloadSource: {0}", this.forceDownloadSource);
+            }
         }
 
         protected override void OnCachePackageNonVitalValidationFailure(CachePackageNonVitalValidationFailureEventArgs args)
@@ -385,6 +392,29 @@ namespace WixToolset.Test.BA
             }
 
             this.Log("OnCachePackageNonVitalValidationFailure() - id: {0}, default: {1}, requested: {2}", args.PackageId, args.Recommendation, args.Action);
+        }
+
+        protected override void OnCacheAcquireResolving(CacheAcquireResolvingEventArgs args)
+        {
+            if (!String.IsNullOrEmpty(this.forceDownloadSource))
+            {
+                args.Action = CacheResolveOperation.Download;
+                var url = String.Format(this.forceDownloadSource, args.PayloadId);
+
+                this.Log("OnCacheAcquireResolving: {0} => {1}", this.forceDownloadSource, url);
+
+                this.engine.SetDownloadSource(
+                    String.Empty,
+                    args.PayloadId,
+                    url,
+                    String.Empty,
+                    String.Empty,
+                    String.Empty);
+            }
+            else
+            {
+                this.Log("OnCacheAcquireResolving not forcing download");
+            }
         }
 
         protected override void OnCacheAcquireProgress(CacheAcquireProgressEventArgs args)
