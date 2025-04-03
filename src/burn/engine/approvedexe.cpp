@@ -3,6 +3,13 @@
 #include "precomp.h"
 
 
+// internal function declarations
+
+static HRESULT IsRunDll32(
+    __in BURN_VARIABLES* pVariables,
+    __in LPCWSTR wzExecutablePath
+    );
+
 // function definitions
 
 extern "C" HRESULT ApprovedExesParseFromXml(
@@ -221,12 +228,15 @@ LExit:
 extern "C" HRESULT ApprovedExesVerifySecureLocation(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
-    __in LPCWSTR wzExecutablePath
+    __in LPCWSTR wzExecutablePath,
+    __in int argc,
+    __in LPCWSTR* argv
     )
 {
     HRESULT hr = S_OK;
     LPWSTR scz = NULL;
     LPWSTR sczSecondary = NULL;
+    LPWSTR sczRunDll32Param = NULL;
 
     const LPCWSTR vrgSecureFolderVariables[] = {
         L"ProgramFiles64Folder",
@@ -273,11 +283,104 @@ extern "C" HRESULT ApprovedExesVerifySecureLocation(
         ExitFunction();
     }
 
+    // Test if executable is rundll32.exe, and it's target is in a secure location
+    // Example for CUDA UninstallString: "C:\WINDOWS\SysWOW64\RunDll32.EXE" "C:\Program Files\NVIDIA Corporation\Installer2\InstallerCore\NVI2.DLL",UninstallPackage CUDAToolkit_12.8
+    if (argc && argv && argv[0] && *argv[0])
+    {
+        hr = IsRunDll32(pVariables, wzExecutablePath);
+        ExitOnFailure(hr, "Failed to test whether executable is rundll32");
+
+        if (hr == S_OK)
+        {
+            LPCWSTR szComma = wcschr(argv[0], L',');
+            if (szComma && *szComma)
+            {
+                hr = StrAllocString(&sczRunDll32Param, argv[0], szComma - argv[0]);
+                ExitOnFailure(hr, "Failed to allocate string");
+            }
+            else
+            {
+                hr = StrAllocString(&sczRunDll32Param, argv[0], 0);
+                ExitOnFailure(hr, "Failed to allocate string");
+            }
+
+            hr = ApprovedExesVerifySecureLocation(pCache, pVariables, sczRunDll32Param, 0, NULL);
+            ExitOnFailure(hr, "Failed to test whether rundll32's parameter, '%ls', is in a secure location", sczRunDll32Param);
+            if (hr == S_OK)
+            {
+                ExitFunction();
+            }
+        }
+    }
+
     hr = S_FALSE;
 
 LExit:
     ReleaseStr(scz);
     ReleaseStr(sczSecondary);
+    ReleaseStr(sczRunDll32Param);
+
+    return hr;
+}
+
+static HRESULT IsRunDll32(
+    __in BURN_VARIABLES* pVariables,
+    __in LPCWSTR wzExecutablePath
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczFolder = NULL;
+    LPWSTR sczFullPath = NULL;
+    BOOL fEqual = FALSE;
+
+    hr = VariableGetString(pVariables, L"SystemFolder", &sczFolder);
+    ExitOnFailure(hr, "Failed to get the variable: SystemFolder");
+
+    hr = PathConcat(sczFolder, L"rundll32.exe", &sczFullPath);
+    ExitOnFailure(hr, "Failed to combine paths");
+
+    hr = PathCompareCanonicalized(wzExecutablePath, sczFullPath, &fEqual);
+    ExitOnFailure(hr, "Failed to compare paths");
+    if (fEqual)
+    {
+        hr = S_OK;
+        ExitFunction();
+    }
+
+    hr = VariableGetString(pVariables, L"System64Folder", &sczFolder);
+    ExitOnFailure(hr, "Failed to get the variable: System64Folder");
+
+    hr = PathConcat(sczFolder, L"rundll32.exe", &sczFullPath);
+    ExitOnFailure(hr, "Failed to combine paths");
+
+    hr = PathCompareCanonicalized(wzExecutablePath, sczFullPath, &fEqual);
+    ExitOnFailure(hr, "Failed to compare paths");
+    if (fEqual)
+    {
+        hr = S_OK;
+        ExitFunction();
+    }
+
+    // Sysnative
+    hr = PathSystemWindowsSubdirectory(L"SysNative\\", &sczFolder);
+    ExitOnFailure(hr, "Failed to append SysNative directory.");
+
+    hr = PathConcat(sczFolder, L"rundll32.exe", &sczFullPath);
+    ExitOnFailure(hr, "Failed to combine paths");
+
+    hr = PathCompareCanonicalized(wzExecutablePath, sczFullPath, &fEqual);
+    ExitOnFailure(hr, "Failed to compare paths");
+    if (fEqual)
+    {
+        hr = S_OK;
+        ExitFunction();
+    }
+
+    hr = S_FALSE;
+
+LExit:
+    ReleaseStr(sczFolder);
+    ReleaseStr(sczFullPath);
 
     return hr;
 }

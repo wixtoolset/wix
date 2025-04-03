@@ -30,7 +30,7 @@ namespace WixToolsetTest.BurnE2E
             perMachineArpEntryExePackageBundle.VerifyUnregisteredAndRemovedFromPackageCache();
             arpEntryExePackage.VerifyRegistered(false);
 
-            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}"));
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}\""));
         }
 
         [RuntimeFact]
@@ -52,7 +52,7 @@ namespace WixToolsetTest.BurnE2E
             perMachineArpEntryExePackageBundle.VerifyUnregisteredAndRemovedFromPackageCache();
             arpEntryExePackage.VerifyRegistered(false);
 
-            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}"));
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}\""));
         }
 
         [RuntimeFact]
@@ -85,7 +85,7 @@ namespace WixToolsetTest.BurnE2E
             packageTestExe.VerifyInstalled(true);
 
             Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, "TESTBA: OnCachePackageNonVitalValidationFailure() - id: TestExe, default: None, requested: Acquire"));
-            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}"));
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}\""));
             Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"TestExe.exe\" /regw \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId},DisplayVersion,String,1.0.0.0\" /regw \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId},QuietUninstallString,String,\\\""));
         }
 
@@ -113,7 +113,7 @@ namespace WixToolsetTest.BurnE2E
             packageTestExe.VerifyInstalled(true);
 
             Assert.False(LogVerifier.MessageInLogFile(uninstallLogPath, "TESTBA: OnCachePackageNonVitalValidationFailure() - id: TestExe"));
-            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}"));
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}\""));
             Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"TestExe.exe\" /regw \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId},DisplayVersion,String,1.0.0.0\" /regw \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId},QuietUninstallString,String,\\\""));
         }
 
@@ -144,7 +144,7 @@ namespace WixToolsetTest.BurnE2E
             packageTestExe.VerifyInstalled(true);
 
             Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, "TESTBA: OnCachePackageNonVitalValidationFailure() - id: TestExe, default: None, requested: None"));
-            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}"));
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}\""));
         }
 
         [RuntimeFact]
@@ -161,7 +161,7 @@ namespace WixToolsetTest.BurnE2E
             arpEntryExePackage.VerifyRegistered(false);
 
             Assert.True(LogVerifier.MessageInLogFile(installLogPath, $"TestExe.exe\" /regw \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId},DisplayVersion,String,1.0.0.0\" /regw \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId},QuietUninstallString,String,\\\""));
-            Assert.True(LogVerifier.MessageInLogFile(installLogPath, $"testexe.exe\" /regd HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}"));
+            Assert.True(LogVerifier.MessageInLogFile(installLogPath, $"testexe.exe\" /regd \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}\""));
         }
 
         [RuntimeFact]
@@ -209,7 +209,7 @@ namespace WixToolsetTest.BurnE2E
             perUserArpEntryExePackageBundle.VerifyUnregisteredAndRemovedFromPackageCache();
             arpEntryExePackage.VerifyRegistered(false);
 
-            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}"));
+            Assert.True(LogVerifier.MessageInLogFile(uninstallLogPath, $"testexe.exe\" /regd \"HKCU\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{arpId}\""));
         }
 
         [RuntimeFact]
