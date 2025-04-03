@@ -489,29 +489,30 @@ extern "C" HRESULT ExeEngineExecutePackage(
     }
     else if (BURN_EXE_DETECTION_TYPE_ARP == pPackage->Exe.detectionType && BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->exePackage.action)
     {
-        ExitOnNull(sczArpUninstallString, hr, E_INVALIDARG, "%hs is null.", pPackage->Exe.fArpUseUninstallString ? "UninstallString" : "QuietUninstallString");
+        LPCWSTR szRegName = pPackage->Exe.fArpUseUninstallString ? L"UninstallString" : L"QuietUninstallString";
+        ExitOnNull(sczArpUninstallString, hr, E_INVALIDARG, "%ls is null.", szRegName);
 
         hr = AppParseCommandLine(sczArpUninstallString, &argcArp, &argvArp);
-        ExitOnFailure(hr, "Failed to parse QuietUninstallString: %ls.", sczArpUninstallString);
+        ExitOnFailure(hr, "Failed to parse %ls: %ls.", szRegName, sczArpUninstallString);
 
-        ExitOnNull(argcArp, hr, E_INVALIDARG, "QuietUninstallString must contain an executable path.");
+        ExitOnNull(argcArp, hr, E_INVALIDARG, "%ls must contain an executable path.", szRegName);
 
         hr = StrAllocString(&sczExecutablePath, argvArp[0], 0);
         ExitOnFailure(hr, "Failed to copy executable path.");
 
         if (pPackage->fPerMachine)
         {
-            hr = ApprovedExesVerifySecureLocation(pCache, pVariables, sczExecutablePath);
-            ExitOnFailure(hr, "Failed to verify the QuietUninstallString executable path is in a secure location: %ls", sczExecutablePath);
+            hr = ApprovedExesVerifySecureLocation(pCache, pVariables, sczExecutablePath, argcArp - 1, (argcArp > 1) ? const_cast<LPCWSTR*>(argvArp + 1) : NULL);
+            ExitOnFailure(hr, "Failed to verify the %ls executable path is in a secure location: %ls", szRegName, sczExecutablePath);
             if (S_FALSE == hr)
             {
-                LogStringLine(REPORT_STANDARD, "The QuietUninstallString executable path is not in a secure location: %ls", sczExecutablePath);
+                LogStringLine(REPORT_STANDARD, "The %ls executable path is not in a secure location: %ls", szRegName, sczExecutablePath);
                 ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_ACCESS_DENIED));
             }
         }
 
         hr = PathGetDirectory(sczExecutablePath, &sczCachedDirectory);
-        ExitOnFailure(hr, "Failed to get parent directory for QuietUninstallString executable path: %ls", sczExecutablePath);
+        ExitOnFailure(hr, "Failed to get parent directory for %ls executable path: %ls", szRegName, sczExecutablePath);
     }
     else
     {
@@ -587,13 +588,15 @@ extern "C" HRESULT ExeEngineExecutePackage(
     }
 
     // build base command
-    hr = StrAllocFormatted(&sczBaseCommand, L"\"%ls\"", sczExecutablePath);
-    ExitOnFailure(hr, "Failed to allocate base command.");
-
-    for (int i = 1; i < argcArp; ++i)
+    if (sczArpUninstallString && *sczArpUninstallString)
     {
-        hr = AppAppendCommandLineArgument(&sczBaseCommand, argvArp[i]);
-        ExitOnFailure(hr, "Failed to append argument from ARP.");
+        hr = StrAllocString(&sczBaseCommand, sczArpUninstallString, 0);
+        ExitOnFailure(hr, "Failed to allocate base command.");
+    }
+    else
+    {
+        hr = StrAllocFormatted(&sczBaseCommand, L"\"%ls\"", sczExecutablePath);
+        ExitOnFailure(hr, "Failed to allocate base command.");
     }
 
     if (pPackage->Exe.fBundle)

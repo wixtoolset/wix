@@ -45,6 +45,7 @@
 
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="ApprovedExeTest.cpp" />
     <ClCompile Include="CacheTest.cpp" />
     <ClCompile Include="ElevationTest.cpp" />
     <ClCompile Include="EmbeddedTest.cpp" />

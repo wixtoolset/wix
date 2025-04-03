@@ -3876,7 +3876,7 @@ static HRESULT OnLaunchApprovedExe(
     hr = RegReadString(hKey, pApprovedExe->sczValueName, &pLaunchApprovedExe->sczExecutablePath);
     ExitOnFailure(hr, "Failed to read the value for the approved exe path.");
 
-    hr = ApprovedExesVerifySecureLocation(pCache, pVariables, pLaunchApprovedExe->sczExecutablePath);
+    hr = ApprovedExesVerifySecureLocation(pCache, pVariables, pLaunchApprovedExe->sczExecutablePath, 0, NULL);
     ExitOnFailure(hr, "Failed to verify the executable path is in a secure location: %ls", pLaunchApprovedExe->sczExecutablePath);
     if (S_FALSE == hr)
     {
