@@ -1,0 +1,58 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<?ifndef TestVersion?>
+<?define TestVersion = 1.0.0.0?>
+<?endif?>
+<?ifndef BundleLogDirectory?>
+<?define BundleLogDirectory = .?>
+<?endif?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Bundle Name="~$(TestGroupName)" Version="$(TestVersion)" Manufacturer="Acme" UpgradeCode="$(UpgradeCode)" Compressed="yes">
+    <Log Prefix="$(BundleLogDirectory)\~$(TestGroupName)_$(BundleName)" />
+
+    <Variable Name="TestGroupName" Value="$(TestGroupName)" />
+
+    <OptionalUpdateRegistration ProductFamily="GreetingsAndFelicitations" Department="Setup Geeks" Classification="Bundle" />
+
+    <?ifdef SoftwareTag?>
+    <SoftwareTag Regid="regid.1995-08.com.example" InstallPath="[CommonAppDataFolder]TestingSwidTags" />
+    <?endif?>
+
+    <?ifndef BA?>
+      <!-- pulled in through the PackageGroupRef below -->
+    <?elseif $(BA) = "TestBA_x64"?>
+      <!-- pulled in through the PackageGroupRef below -->
+    <?elseif $(BA) = "WixBA"?>
+      <!-- pulled in through the PackageGroupRef below -->
+    <?elseif $(BA) = "hyperlinkLicense"?>
+      <BootstrapperApplication>
+        <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" />
+        <PayloadGroupRef Id="ExtraPayloads" />
+      </BootstrapperApplication>
+    <?elseif $(BA) = "iui"?>
+      <BootstrapperApplication>
+        <bal:WixInternalUIBootstrapperApplication />
+      </BootstrapperApplication>
+    <?else?>
+      <BootstrapperApplicationRef Id="$(BA)" />
+    <?endif?>
+
+    <Chain>
+      <?ifndef BA?>
+        <PackageGroupRef Id="TestBA" />
+      <?elseif $(BA) = "TestBA_x64"?>
+        <PackageGroupRef Id="TestBA_x64" />
+      <?elseif $(BA) = "WixBA"?>
+        <PackageGroupRef Id="WixBA" />
+      <?endif?>
+
+      <PackageGroupRef Id="BundlePackages" />
+    </Chain>
+  </Bundle>
+
+  <Fragment>
+    <PayloadGroup Id="virtual ExtraPayloads" />
+  </Fragment>
+
+</Wix>
