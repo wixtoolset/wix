@@ -7,8 +7,13 @@
     <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net472</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
     <Description>WiX Toolset Versioning</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <DebugType>embedded</DebugType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>

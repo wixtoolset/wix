@@ -1,6 +1,6 @@
-# WixToolset.Dependency.wixext - Dependency WiX Toolset Extension
+# WixToolset.BootstrapperApplicationApi - managed BootstrapperApplication API
 
-This WiX Extension provides support for configuring package dependencies.
+The `WixToolset.BootstrapperApplicationApi` package contains the SDK for building managed BootstrapperApplications.
 
 [Web Site][web] | [Documentation][docs] | [Issue Tracker][issues] | [Discussions][discussions]
 
@@ -14,25 +14,10 @@ To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/wixto
 
 ## Getting started
 
-Add the WiX Extension as a PackageReference to your .wixproj:
+BAFunctions are native-code DLLs (typically written in C++) that let you supplement the behavior of WixStdBA, rather than writing an entirely new BA to tweak existing BA behavior.
 
-```
-<Project Sdk="WixToolset.Sdk/6.0.0">
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Dependency.wixext" Version="6.0.0" />
-  </ItemGroup>
-</Project>
-```
+The best way to learn is via the samples at: https://github.com/wixtoolset/wix/tree/HEAD/src/ext/Bal/Samples/bafunctions
 
-Then add the extension's namespace:
-
-```
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:dep="http://wixtoolset.org/schemas/v4/wxs/dependency">
-
-  ..
-</Wix>
-```
 
 ## Additional resources
 

@@ -7,6 +7,7 @@
     <RootNamespace>WixToolset.Msmq</RootNamespace>
     <Description>WiX Toolset MSMQ Extension</Description>
     <Title>WiX Toolset MSMQ Extension</Title>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
@@ -14,6 +15,10 @@
 
   <ItemGroup>
     <EmbeddedResource Include="$(OutputPath)..\msmq.wixlib" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(NCrunch)'=='' ">

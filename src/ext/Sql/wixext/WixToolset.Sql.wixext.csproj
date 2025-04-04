@@ -7,6 +7,7 @@
     <RootNamespace>WixToolset.Sql</RootNamespace>
     <Description>WiX Toolset Sql Extension</Description>
     <Title>WiX Toolset Sql Extension</Title>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
@@ -14,6 +15,10 @@
 
   <ItemGroup>
     <EmbeddedResource Include="$(OutputPath)..\sql.wixlib" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(NCrunch)'=='' ">

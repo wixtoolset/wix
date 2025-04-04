@@ -7,10 +7,12 @@
     <AssemblyName>WixToolset.Dtf.Compression</AssemblyName>
     <TargetFrameworks>netstandard2.0;net20</TargetFrameworks>
     <Description>Abstract base libraries for archive packing and unpacking</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="Compression.cd" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>

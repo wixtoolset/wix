@@ -7,6 +7,7 @@
     <description>$description$</description>
     <authors>$authors$</authors>
     <icon>icon.png</icon>
+    <readme>README.md</readme>
     <license type="file">OSMFEULA.txt</license>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <tags>$packageTags$</tags>
@@ -25,6 +26,7 @@
   <files>
     <file src="$eulaTxt$" />
     <file src="$iconPng$" />
+    <file src="$projectFolder$\README.md" />
 
     <file src="$projectFolder$\build\WixToolset.BootstrapperApplicationApi.props" target="build\" />
 

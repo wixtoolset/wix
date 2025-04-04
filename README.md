@@ -1,4 +1,4 @@
-<img src="https://github.com/wixtoolset/Home/raw/master/imgs/wix-white-bg.png" alt="WiX Toolset" height="128" />
+![The WiX Toolset Logo](https://github.com/wixtoolset/.github/raw/master/profile/images/readme-header.png)
 
 [![latest version](https://img.shields.io/nuget/vpre/wix)](https://www.nuget.org/packages/wix)
 [![download count](https://img.shields.io/nuget/dt/wix)](https://www.nuget.org/stats/packages/WiX?groupby=Version)
@@ -6,14 +6,25 @@
 
 # WiX Toolset
 
-This repository contains the WiX Toolset codebase.
+The WiX Toolset is the most powerful set of tools available to create your Windows installation experience. This repository contains the WiX Toolset code itself.
 
-# Developing WiX
+If you're new to WiX, check out our [Quick Start](https://docs.firegiant.com/quick-start/) to build your first installation package in just a few minutes.
 
-## Prerequisites
 
-- A command line Git client that is in the system path
-- Visual Studio 2022 (17.8.2 or higher) with the following installed:
+## Open Source Maintenance Fee
+
+To ensure the long-term sustainability of this project, use of the WiX Toolset requires an [Open Source Maintenance Fee](https://opensourcemaintenancefee.org). While the source code is freely available under the terms of the [LICENSE](./LICENSE.TXT), all other aspects of the project--including opening or commenting on issues, participating in discussions and downloading releases--require [adherence to the Maintenance Fee](./OSMFEULA.txt).
+
+In short, if you use this project to generate revenue, the [Maintenance Fee is required](./OSMFEULA.txt).
+
+To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/wixtoolset).
+
+
+## Developing WiX
+
+### Prerequisites
+
+Before building the WiX Toolset, ensure you have Visual Studio 2022 (17.8.2 or higher) with the following installed:
 
 | Workloads |
 | :-------- |
@@ -32,26 +43,26 @@ This repository contains the WiX Toolset codebase.
 | MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest) |
 | Git for Windows |
 
-- [Download the latest nuget.exe command-line tool](https://www.nuget.org/downloads) and put it in a directory on the path.
+Also, download the latest [nuget.exe command-line tool](https://www.nuget.org/downloads) and place it in a directory on your path.
 
-##### Getting started:
+#### Getting started:
 
 * [Fork the WiX repository](https://github.com/wixtoolset/wix/fork)
  into your own GitHub repository
 * Clone the WiX repository from your fork (`git clone https://github.com/yourdomain/wix.git`)
  into the directory of your choice
 
-##### To build the WiX toolset:
+#### To build the WiX toolset:
 
  * Start a VS2022 'Developer Command Prompt'
  * Change directory to the root of the cloned repository
  * Issue the command `devbuild` (or `devbuild release` if you want to create a release version)
 
- ##### Executing your newly built WiX toolset
+#### Executing your newly built WiX toolset
 
  * `build\wix\Debug\publish\wix\wix --help` (Change `Debug` to `Release` if you built in release mode)
 
- ##### Pull request expectations
+#### Pull request expectations
 
  * Pick an [outstanding WiX issue](https://github.com/wixtoolset/issues/issues?q=is%3Aissue+is%3Aopen+label%3A%22up+for+grabs%22) (or [create a new one](https://github.com/wixtoolset/issues/issues/new/choose)). Add a comment requesting that you be assigned to the issue. Wait for confirmation.
  * To create a pull request, [fork a new branch](https://github.com/wixtoolset/wix/fork) from the `main` branch
@@ -60,3 +71,10 @@ This repository contains the WiX Toolset codebase.
  * If the `main` branch has changed since you created your branch, rebase to the latest updates.
  * If needed (ie, you squashed or rebased), do a force push of your branch
  * Create a pull request with your branch against the WiX repository.
+
+## Additional information
+
+* Web site: https://www.firegiant.com/wixtoolset/
+* Documentation [WiX Documentation](https://docs.firegiant.com/wixtoolset/)
+* Issue Tracker: [GitHub Issues](https://github.com/wixtoolset/issues/issues)
+* Discussions: [WiX Toolset Discussions](https://github.com/orgs/wixtoolset/discussions)

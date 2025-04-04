@@ -6,13 +6,18 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(Configuration)'=='Release' ">$(TargetFrameworks);net472</TargetFrameworks>
     <LangVersion>7.3</LangVersion>
-    <Description>WiX Toolset Data</Description>
     <DebugType>embedded</DebugType>
+    <Description>WiX Toolset Data</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <CreateDocumentationFile>true</CreateDocumentationFile>
     <!-- TODO: This shouldn't be ignored because this is public-facing -->
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.IO.Compression" />

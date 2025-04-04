@@ -1,6 +1,6 @@
-# WixToolset.Dependency.wixext - Dependency WiX Toolset Extension
+# WixToolset.Versioning - WiX Toolset Versioning library
 
-This WiX Extension provides support for configuring package dependencies.
+The `WixToolset.Versioning` package provides methods for handling the various version types supported in the WiX Toolset. Standard 4-part versions (#.#.#.#) are supported as is SemVer (#.#.#-pre.#) and tolerance for very unusual versions created by other installation technologies.
 
 [Web Site][web] | [Documentation][docs] | [Issue Tracker][issues] | [Discussions][discussions]
 
@@ -11,28 +11,6 @@ To ensure the long-term sustainability of this project, users of this package wh
 
 To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/wixtoolset).
 
-
-## Getting started
-
-Add the WiX Extension as a PackageReference to your .wixproj:
-
-```
-<Project Sdk="WixToolset.Sdk/6.0.0">
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Dependency.wixext" Version="6.0.0" />
-  </ItemGroup>
-</Project>
-```
-
-Then add the extension's namespace:
-
-```
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:dep="http://wixtoolset.org/schemas/v4/wxs/dependency">
-
-  ..
-</Wix>
-```
 
 ## Additional resources
 
