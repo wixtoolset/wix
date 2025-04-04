@@ -33,9 +33,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Authors Condition=" '$(WixOfficialBuild)'!='true' ">Private WiX Build</Authors>
+    <Authors Condition=" '$(WixOfficialBuild)'!='true' ">WiX Dev Build</Authors>
     <Authors Condition=" '$(WixOfficialBuild)'=='true' ">WiX Toolset Team</Authors>
-    <Company Condition=" '$(WixOfficialBuild)'!='true' ">Private WiX Build</Company>
+    <Company Condition=" '$(WixOfficialBuild)'!='true' ">WiX Dev Build</Company>
     <Company Condition=" '$(WixOfficialBuild)'=='true' ">WiX Toolset</Company>
     <Copyright>Copyright (c) .NET Foundation and contributors. All rights reserved.</Copyright>
 
@@ -43,7 +43,7 @@
     <PackageLicenseFile>OSMFEULA.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
-    <Product Condition=" '$(WixOfficialBuild)'!='true' ">Private WiX Build</Product>
+    <Product Condition=" '$(WixOfficialBuild)'!='true' ">WiX Dev Build</Product>
     <Product Condition=" '$(WixOfficialBuild)'=='true' ">WiX Toolset</Product>
     <ProjectUrl>https://wixtoolset.org/</ProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
