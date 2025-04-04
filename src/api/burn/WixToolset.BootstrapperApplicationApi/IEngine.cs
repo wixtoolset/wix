@@ -156,7 +156,8 @@ namespace WixToolset.BootstrapperApplicationApi
         /// Sets the URL to the update feed.
         /// </summary>
         /// <param name="url">URL of the update feed.</param>
-        void SetUpdateSource(string url);
+        /// <param name="authorizationHeader">Additional proxy authentication header. Not currently used.</param>
+        void SetUpdateSource(string url, string authorizationHeader);
 
         /// <summary>
         /// Set the local source for a package or container.

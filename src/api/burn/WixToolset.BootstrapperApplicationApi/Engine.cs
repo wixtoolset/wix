@@ -259,9 +259,9 @@ namespace WixToolset.BootstrapperApplicationApi
         }
 
         /// <inheritdoc/>
-        public void SetUpdateSource(string url)
+        public void SetUpdateSource(string url, string authorizationHeader)
         {
-            this.engine.SetUpdateSource(url);
+            this.engine.SetUpdateSource(url, authorizationHeader);
         }
 
         /// <inheritdoc/>
