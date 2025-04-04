@@ -42,6 +42,7 @@ namespace WixToolset.Test.BA
         private int retryExecuteFilesInUse;
         private bool rollingBack;
         private string forceDownloadSource;
+        private string forceUpdateSource;
 
         private IBootstrapperCommand Command { get; set; }
 
@@ -217,9 +218,28 @@ namespace WixToolset.Test.BA
             }
         }
 
+        protected override void OnDetectBegin(DetectBeginEventArgs args)
+        {
+            this.Log("OnDetectBegin");
+
+            this.forceUpdateSource = this.ReadPackageAction(null, "ForceUpdateSource");
+            if (!String.IsNullOrEmpty(this.forceUpdateSource))
+            {
+                this.Log("    OnDetectBegin::ForceUpdateSource: {0}", this.forceUpdateSource);
+            }
+
+        }
+
         protected override void OnDetectUpdateBegin(DetectUpdateBeginEventArgs args)
         {
             this.Log("OnDetectUpdateBegin");
+
+            if (!String.IsNullOrEmpty(this.forceUpdateSource))
+            {
+                this.Log("    OnDetectUpdateBegin::ForceUpdateSource: {0}", this.forceUpdateSource);
+                this.Engine.SetUpdateSource(this.forceUpdateSource, String.Empty);
+            }
+
             if (LaunchAction.UpdateReplaceEmbedded == this.action || LaunchAction.UpdateReplace == this.action)
             {
                 args.Skip = false;

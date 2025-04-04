@@ -220,7 +220,8 @@ namespace WixToolset.BootstrapperApplicationApi
         /// Sets the URL to the update feed.
         /// </summary>
         void SetUpdateSource(
-            [MarshalAs(UnmanagedType.LPWStr)] string url
+            [MarshalAs(UnmanagedType.LPWStr)] string url,
+            [MarshalAs(UnmanagedType.LPWStr)] string wzAuthorizationHeader
             );
 
         /// <summary>

@@ -67,6 +67,11 @@ namespace WixToolsetTest.BurnE2E
             this.SetBurnTestValue("QuitAfterDetect", value);
         }
 
+        public void SetForceUpdateSource(string url)
+        {
+            this.SetBurnTestValue("ForceUpdateSource", url);
+        }
+
         /// <summary>
         /// Slows the cache progress of a package.
         /// </summary>

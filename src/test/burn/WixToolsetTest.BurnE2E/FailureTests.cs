@@ -30,6 +30,24 @@ namespace WixToolsetTest.BurnE2E
         }
 
         [RuntimeFact]
+        public void CanSetUpdateSource()
+        {
+            var packageA = this.CreatePackageInstaller("PackageA");
+            var bundleA = this.CreateBundleInstaller("BundleUpdate");
+            var testBAController = this.CreateTestBAController();
+
+            testBAController.SetForceUpdateSource("https://1e1bf2be1c384fd1a0c4c0500eef971b/update_feed.atom.xml");
+
+            packageA.VerifyInstalled(false);
+
+            bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            bundleA.Install();
+
+            packageA.VerifyInstalled(true);
+        }
+
+        [RuntimeFact]
         public void CanCancelExePackageAndAbandonIt()
         {
             var bundleD = this.CreateBundleInstaller("BundleD");
