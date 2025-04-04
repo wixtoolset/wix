@@ -7,6 +7,18 @@
 // global sql queries provided for optimization
 extern LPCWSTR vcsWebDirPropertiesQuery;
 
+// enumerations
+enum eWebDirAttributes
+{
+    wedbDirBrowseShowDate       = 1 << 0,
+    wedbDirBrowseShowExtension  = 1 << 1,
+    wedbDirBrowseShowLongDate   = 1 << 2,
+    wedbDirBrowseShowSize       = 1 << 3,
+    wedbDirBrowseShowTime       = 1 << 4,
+    wedbEnableDefaultDoc        = 1 << 5,
+    wedbEnableDirBrowsing       = 1 << 6,
+};
+
 
 // structs
 struct SCA_WEB_PROPERTIES
@@ -39,6 +51,8 @@ struct SCA_WEB_PROPERTIES
 	BOOL fNoCustomError;
 
 	int iAccessSSLFlags;
+
+    int iAttributes;
 
 	WCHAR wzAuthenticationProviders[MAX_DARWIN_COLUMN + 1];
 };
