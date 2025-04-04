@@ -7,6 +7,7 @@
     <description>$description$</description>
     <authors>$authors$</authors>
     <icon>icon.png</icon>
+    <readme>README.md</readme>
     <license type="file">OSMFEULA.txt</license>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <tags>$packageTags$ CustomActions</tags>
@@ -21,6 +22,7 @@
   <files>
     <file src="$eulaTxt$" />
     <file src="$iconPng$" />
+    <file src="$projectFolder$\README.md" />
     <file src="$projectFolder$\$id$.targets" target="build" />
     <file src="net472\WixToolset.Dtf.MakeSfxCA.exe" target="tools" />
     <file src="net472\WixToolset.Dtf.MakeSfxCA.exe.config" target="tools" />

@@ -7,7 +7,6 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <Title>The WiX Toolset Managed CustomAction Framework.</Title>
     <Description>The WiX Toolset lets developers create managed custom actions for the Windows Installer. This package contains the tools necessary to convert your project into a managed custom action.</Description>
-
     <NuspecBasePath>$(OutputPath)</NuspecBasePath>
   </PropertyGroup>
 

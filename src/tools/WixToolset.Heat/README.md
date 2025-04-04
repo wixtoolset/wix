@@ -1,6 +1,6 @@
-# WixToolset.Dependency.wixext - Dependency WiX Toolset Extension
+# WixToolset.Heat - old harvesting tool from WiX v3
 
-This WiX Extension provides support for configuring package dependencies.
+The `WixToolset.Heat` package provides the (now deprecated) harvesting tools originally designed for WiX v3. The bulk of the functionality provided by this package has been eclipsed by the `Files` element. It is recommended to migrate to that new functionality or a custom solution.
 
 [Web Site][web] | [Documentation][docs] | [Issue Tracker][issues] | [Discussions][discussions]
 
@@ -11,28 +11,6 @@ To ensure the long-term sustainability of this project, users of this package wh
 
 To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/wixtoolset).
 
-
-## Getting started
-
-Add the WiX Extension as a PackageReference to your .wixproj:
-
-```
-<Project Sdk="WixToolset.Sdk/6.0.0">
-  <ItemGroup>
-    <PackageReference Include="WixToolset.Dependency.wixext" Version="6.0.0" />
-  </ItemGroup>
-</Project>
-```
-
-Then add the extension's namespace:
-
-```
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:dep="http://wixtoolset.org/schemas/v4/wxs/dependency">
-
-  ..
-</Wix>
-```
 
 ## Additional resources
 

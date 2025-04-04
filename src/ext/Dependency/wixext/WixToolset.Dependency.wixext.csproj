@@ -7,6 +7,7 @@
     <RootNamespace>WixToolset.Dependency</RootNamespace>
     <Description>WiX Toolset Dependency Extension</Description>
     <Title>WiX Toolset Dependency Extension</Title>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
@@ -14,6 +15,10 @@
 
   <ItemGroup>
     <EmbeddedResource Include="$(OutputPath)..\dependency.wixlib" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(NCrunch)'=='' ">

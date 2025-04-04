@@ -7,6 +7,11 @@
     <AssemblyName>WixToolset.Dtf.Resources</AssemblyName>
     <TargetFrameworks>netstandard2.0;net20</TargetFrameworks>
     <Description>Classes for reading and writing resource data in executable files</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>

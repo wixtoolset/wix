@@ -7,6 +7,7 @@
     <AssemblyName>WixToolset.Dtf.WindowsInstaller</AssemblyName>
     <TargetFrameworks>netstandard2.0;net20</TargetFrameworks>
     <Description>Managed libraries for Windows Installer</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
 
@@ -17,6 +18,7 @@
   <ItemGroup>
     <None Include="Errors.txt" />
     <None Include="WindowsInstaller.cd" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)'=='net20' ">

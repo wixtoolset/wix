@@ -7,13 +7,13 @@
     <description>$description$</description>
     <authors>$authors$</authors>
     <icon>icon.png</icon>
+    <readme>README.md</readme>
     <license type="file">OSMFEULA.txt</license>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <tags>$packageTags$</tags>
     <copyright>$copyright$</copyright>
     <projectUrl>$projectUrl$</projectUrl>
     <repository type="$repositorytype$" url="$repositoryurl$" commit="$repositorycommit$" />
-    <readme>README.md</readme>
     <dependencies>
       <group targetFramework="Native">
         <dependency id="WixToolset.BootstrapperApplicationApi" version="[$version$,$nextmajorversion$)" />

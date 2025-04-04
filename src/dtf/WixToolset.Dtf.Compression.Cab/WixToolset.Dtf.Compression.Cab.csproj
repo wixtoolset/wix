@@ -7,11 +7,13 @@
     <AssemblyName>WixToolset.Dtf.Compression.Cab</AssemblyName>
     <TargetFrameworks>netstandard2.0;net20</TargetFrameworks>
     <Description>Managed libraries for cabinet archive packing and unpacking</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <CreateDocumentationFile>true</CreateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="Errors.txt" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
     <EmbeddedResource Include="Errors.resources" />
   </ItemGroup>
 
