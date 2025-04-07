@@ -817,7 +817,7 @@ static HRESULT ExecuteBundle(
 
         if (pPackage->fPerMachine)
         {
-            hr = ApprovedExesVerifySecureLocation(pCache, pVariables, sczExecutablePath);
+            hr = ApprovedExesVerifySecureLocation(pCache, pVariables, sczExecutablePath, argcArp - 1, (argcArp > 1) ? const_cast<LPCWSTR*>(argvArp + 1) : NULL);
             ExitOnFailure(hr, "Failed to verify the QuietUninstallString executable path is in a secure location: %ls", sczExecutablePath);
             if (S_FALSE == hr)
             {

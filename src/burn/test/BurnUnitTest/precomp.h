@@ -74,6 +74,7 @@
 #include "splashscreen.h"
 #include "detect.h"
 #include "externalengine.h"
+#include "approvedexe.h"
 
 #include "engine.version.h"
 
