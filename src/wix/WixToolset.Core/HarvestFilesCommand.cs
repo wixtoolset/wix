@@ -206,7 +206,7 @@ namespace WixToolset.Core
 
             if (String.IsNullOrEmpty(bindName))
             {
-                var unnamedBindPath = this.Context.BindPaths.SingleOrDefault(bp => bp.Name == null)?.Path;
+                var unnamedBindPath = this.Context.BindPaths.FirstOrDefault(bp => bp.Name == null)?.Path;
 
                 resultingDirectories.Add(unnamedBindPath is null ? path : Path.Combine(unnamedBindPath, path));
             }
