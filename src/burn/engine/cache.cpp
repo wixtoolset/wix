@@ -260,6 +260,9 @@ extern "C" HRESULT CacheInitializeSources(
     hr = PathForCurrentProcess(&sczCurrentPath, NULL);
     ExitOnFailure(hr, "Failed to get current process path.");
 
+    hr = VariableSetString(pVariables, BURN_BUNDLE_SOURCE_PROCESS_PATH, sczCurrentPath, FALSE, FALSE);
+    ExitOnFailure(hr, "Failed to set %ls variable.", BURN_BUNDLE_SOURCE_PROCESS_PATH);
+
     // Determine if we are running from the package cache or not.
     hr = CacheGetCompletedPath(pCache, pRegistration->fPerMachine, pRegistration->sczCode, &sczCompletedFolder);
     ExitOnFailure(hr, "Failed to get completed path for bundle.");
@@ -274,6 +277,9 @@ extern "C" HRESULT CacheInitializeSources(
 
     hr = PathGetDirectory(sczCurrentPath, &pCache->sczSourceProcessFolder);
     ExitOnFailure(hr, "Failed to initialize cache source folder.");
+
+    hr = VariableSetString(pVariables, BURN_BUNDLE_SOURCE_PROCESS_FOLDER, pCache->sczSourceProcessFolder, FALSE, FALSE);
+    ExitOnFailure(hr, "Failed to set %ls variable.", BURN_BUNDLE_SOURCE_PROCESS_FOLDER);
 
     // If we're not running from the cache, ensure the original source is set.
     if (!pCache->fRunningFromCache)
