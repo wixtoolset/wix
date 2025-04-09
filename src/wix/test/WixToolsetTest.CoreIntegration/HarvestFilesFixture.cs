@@ -317,7 +317,7 @@ namespace WixToolsetTest.CoreIntegration
                 @"flsu53T_9CcaBegDflAImGHTajDbJ0=PFiles\HarvestedFiles\unnamedfile.txt",
             };
 
-            Build("BindPathsUnnamed.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected), addUnnamedBindPath: true);
+            Build("BindPathsUnnamed.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected), addUnnamedBindPaths: true);
         }
 
         [Fact]
@@ -423,12 +423,12 @@ namespace WixToolsetTest.CoreIntegration
             WixAssert.CompareLineByLine(sortedExpected, actual);
         }
 
-        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPath = false, params string[] additionalCommandLineArguments)
+        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPaths = false, params string[] additionalCommandLineArguments)
         {
-            Build(file, (msiPath, sourceFolder, baseFolder, result) => tester(msiPath, result), isMsi, warningsAsErrors, addUnnamedBindPath, additionalCommandLineArguments);
+            Build(file, (msiPath, sourceFolder, baseFolder, result) => tester(msiPath, result), isMsi, warningsAsErrors, addUnnamedBindPaths, additionalCommandLineArguments);
         }
 
-        private static void Build(string file, Action<string, string, string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPath = false, params string[] additionalCommandLineArguments)
+        private static void Build(string file, Action<string, string, string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPaths = false, params string[] additionalCommandLineArguments)
         {
             var sourceFolder = TestData.Get("TestData", "HarvestFiles");
 
@@ -449,8 +449,11 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", msiPath,
                 };
 
-                if (addUnnamedBindPath)
+                if (addUnnamedBindPaths)
                 {
+                    arguments.Add("-bindpath");
+                    arguments.Add(Path.Combine(sourceFolder, "unnamedbindpath"));
+
                     arguments.Add("-bindpath");
                     arguments.Add(Path.Combine(sourceFolder, "unnamedbindpath"));
                 }
