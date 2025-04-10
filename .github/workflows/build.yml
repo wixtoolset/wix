@@ -1,4 +1,4 @@
-name: Build WiX Toolset v6
+name: Build WiX Toolset v7
 
 on:
   push:
@@ -63,7 +63,7 @@ jobs:
       #     client-id: ${{ secrets.WIX_SIGNING_CLIENTID }}
       #     tenant-id: ${{ secrets.WIX_SIGNING_TENANTID }}
 
-      - name: Build wix6
+      - name: Build wix7
         shell: cmd
         run: ./src/build_official.cmd
         env:
