@@ -940,7 +940,7 @@ static HRESULT ExecuteBundle(
 
     if (wzRelationTypeCommandLine)
     {
-        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -%ls", wzRelationTypeCommandLine);
+        hr = StrAllocConcatFormatted(&sczBaseCommand, L" -quiet -%ls", wzRelationTypeCommandLine);
         ExitOnFailure(hr, "Failed to append relation type argument.");
     }
 
