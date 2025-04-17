@@ -58,7 +58,9 @@ HRESULT ApprovedExesLaunch(
 HRESULT ApprovedExesVerifySecureLocation(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
-    __in LPCWSTR wzExecutablePath
+    __in LPCWSTR wzExecutablePath,
+    __in int argc,
+    __in LPCWSTR* argv
     );
 
 
