@@ -2990,6 +2990,18 @@ namespace Bootstrapper
             ValidateNonPermanentPackageExpectedStates(&pEngineState->packages.rgPackages[1], L"PackageA", BURN_PACKAGE_REGISTRATION_STATE_PRESENT, BURN_PACKAGE_REGISTRATION_STATE_PRESENT);
         }
 
+        [Fact]
+        void ValidateCacheVariables()
+        {
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+
+            InitializeEngineStateForCorePlan(wzSlipstreamModifiedManifestFileName, pEngineState);
+
+            Assert::EndsWith(gcnew String(L".exe"), VariableGetStringHelper(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_PATH));
+            Assert::EndsWith(gcnew String(L"\\"), VariableGetStringHelper(&pEngineState->variables, BURN_BUNDLE_SOURCE_PROCESS_FOLDER));
+        }
+
     private:
         // This doesn't initialize everything, just enough for CorePlan to work.
         void InitializeEngineStateForCorePlan(LPCWSTR wzManifestFileName, BURN_ENGINE_STATE* pEngineState)
