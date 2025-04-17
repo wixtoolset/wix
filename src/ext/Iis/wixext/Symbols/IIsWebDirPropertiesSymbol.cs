@@ -25,6 +25,7 @@ namespace WixToolset.Iis
                 new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.NoCustomError), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.AccessSSLFlags), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.AuthenticationProviders), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(IIsWebDirPropertiesSymbolFields.Attributes), IntermediateFieldType.Number),
             },
             typeof(IIsWebDirPropertiesSymbol));
     }
@@ -50,6 +51,7 @@ namespace WixToolset.Iis.Symbols
         NoCustomError,
         AccessSSLFlags,
         AuthenticationProviders,
+        Attributes,
     }
 
     public class IIsWebDirPropertiesSymbol : IntermediateSymbol
@@ -146,6 +148,12 @@ namespace WixToolset.Iis.Symbols
         {
             get => this.Fields[(int)IIsWebDirPropertiesSymbolFields.AuthenticationProviders].AsString();
             set => this.Set((int)IIsWebDirPropertiesSymbolFields.AuthenticationProviders, value);
+        }
+
+        public int? Attributes
+        {
+            get => (int?)this.Fields[(int)IIsWebDirPropertiesSymbolFields.Attributes].AsNullableNumber();
+            set => this.Set((int)IIsWebDirPropertiesSymbolFields.Attributes, value);
         }
     }
 }

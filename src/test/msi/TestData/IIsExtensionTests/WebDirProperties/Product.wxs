@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:iis="http://wixtoolset.org/schemas/v4/wxs/iis">
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="example.txt" />
+
+                <iis:WebSite Id="Test" Description="Test web server" Directory="INSTALLFOLDER" AutoStart="yes" ConfigureIfExists="no" >
+                    <!--<iis:WebDirProperties Id="Test"
+                        AccessSSL="yes"
+                        AccessSSL128="yes"
+                        AccessSSLMapCert="yes"
+                        AccessSSLNegotiateCert="yes"
+                        AccessSSLRequireCert="yes"
+
+                        AnonymousAccess="yes"
+                        WindowsAuthentication="yes"
+                        AuthenticationProviders="NTLM"
+                        PassportAuthentication="yes"
+                        BasicAuthentication="yes"
+                        DigestAuthentication="yes"
+                        IIsControlledPassword="yes"
+
+                        ClearCustomError="yes"
+                        AspDetailedError="yes"
+                        LogVisits="yes"
+                        Index="yes"
+
+                        Execute="yes"
+                        Read="yes"
+                        Script="yes"
+                        Write="yes"
+
+                        DirBrowseShowDate="no"
+                        DirBrowseShowExtension="no"
+                        DirBrowseShowLongDate="yes"
+                        DirBrowseShowSize="no"
+                        DirBrowseShowTime="no"
+                        EnableDefaultDoc="no"
+                        EnableDirBrowsing="yes"
+                        /> -->
+                    <iis:WebAddress Id="TestAddress" Port="[PORT]" Secure="no" />
+
+                    <!-- Test case for AnonymousUser -->
+                    <!-- todo... requires Wix4User, don't want to do today
+                    <iis:WebDir Path="TestAnonymousUser">
+                        <iis:WebDirProperties AnonymousUser="no" />
+                    </iis:WebDir>
+                    -->
+                    <iis:WebDir Id="TestDirAspDetailedError" Path="TestAspDetailedError">
+                        <iis:WebDirProperties Id="TestAspDetailedError" AspDetailedError="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirAuthenticationProviders" Path="TestAuthenticationProviders">
+                        <iis:WebDirProperties Id="TestAuthenticationProviders" AuthenticationProviders="NTLM" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirCacheControlCustom" Path="TestCacheControlCustom">
+                        <iis:WebDirProperties Id="TestCacheControlCustom" CacheControlCustom="CacheControl" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirCacheControlMaxAge" Path="TestCacheControlMaxAge">
+                        <iis:WebDirProperties Id="TestCacheControlMaxAge" CacheControlMaxAge="4294967295" />
+                    </iis:WebDir>
+                    <!-- This will crash out validation of DB (since this value is = MSI_NULL_INTEGER)
+                    <iis:WebDir Id="TestDirCacheControlMaxAgeNull" Path="TestCacheControlMaxAgeNull">
+                        <iis:WebDirProperties Id="TestCacheControlMaxAgeNull" CacheControlMaxAge="2147483648" />
+                    </iis:WebDir>-->
+                    <iis:WebDir Id="TestDirClearCustomError" Path="TestClearCustomError">
+                        <iis:WebDirProperties Id="TestClearCustomError" ClearCustomError="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirDefaultDocuments" Path="TestDefaultDocuments">
+                        <iis:WebDirProperties Id="TestDefaultDocuments" DefaultDocuments="DefaultDocument.html,index.html,index.htm" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirHttpExpires" Path="TestHttpExpires">
+                        <iis:WebDirProperties Id="TestHttpExpires" HttpExpires="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirIIsControlledPassword" Path="TestIIsControlledPassword">
+                        <iis:WebDirProperties Id="TestIIsControlledPassword" IIsControlledPassword="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirIndex" Path="TestIndex">
+                        <iis:WebDirProperties Id="TestIndex" Index="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirLogVisits" Path="TestLogVisits">
+                        <iis:WebDirProperties Id="TestLogVisits" LogVisits="yes" />
+                    </iis:WebDir>
+
+                    <!-- Test cases for Access attributes -->
+                    <iis:WebDir Id="TestDirExecute" Path="TestExecute">
+                        <iis:WebDirProperties Id="TestExecute" Execute="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirRead" Path="TestRead">
+                        <iis:WebDirProperties Id="TestRead" Read="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirScript" Path="TestScript">
+                        <iis:WebDirProperties Id="TestScript" Script="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirWrite" Path="TestWrite">
+                        <iis:WebDirProperties Id="TestWrite" Write="yes" />
+                    </iis:WebDir>
+
+                    <!-- Test cases for AccessSSL attributes -->
+                    <iis:WebDir Id="TestDirAccessSSL" Path="TestAccessSSL">
+                        <iis:WebDirProperties Id="TestAccessSSL" AccessSSL="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirAccessSSL128" Path="TestAccessSSL128">
+                        <iis:WebDirProperties Id="TestAccessSSL128" AccessSSL128="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirAccessSSLMapCert" Path="TestAccessSSLMapCert">
+                        <iis:WebDirProperties Id="TestAccessSSLMapCert" AccessSSLMapCert="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirAccessSSLNegotiateCert" Path="TestAccessSSLNegotiateCert">
+                        <iis:WebDirProperties Id="TestAccessSSLNegotiateCert" AccessSSLNegotiateCert="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirAccessSSLRequireCert" Path="TestAccessSSLRequireCert">
+                        <iis:WebDirProperties Id="TestAccessSSLRequireCert" AccessSSLRequireCert="yes" />
+                    </iis:WebDir>
+
+                    <!-- Test cases for DirBrowseFlags -->
+                    <iis:WebDir Id="TestDirDirBrowseShowDate" Path="TestDirBrowseShowDate">
+                        <iis:WebDirProperties Id="TestDirBrowseShowDate" DirBrowseShowDate="no" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirDirBrowseShowExtension" Path="TestDirBrowseShowExtension">
+                        <iis:WebDirProperties Id="TestDirBrowseShowExtension" DirBrowseShowExtension="no" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirDirBrowseShowLongDate" Path="TestDirBrowseShowLongDate">
+                        <iis:WebDirProperties Id="TestDirBrowseShowLongDate" DirBrowseShowLongDate="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirDirBrowseShowSize" Path="TestDirBrowseShowSize">
+                        <iis:WebDirProperties Id="TestDirBrowseShowSize" DirBrowseShowSize="no" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirDirBrowseShowTime" Path="TestDirBrowseShowTime">
+                        <iis:WebDirProperties Id="TestDirBrowseShowTime" DirBrowseShowTime="no" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirEnableDefaultDoc" Path="TestEnableDefaultDoc">
+                        <iis:WebDirProperties Id="TestEnableDefaultDoc" EnableDefaultDoc="no" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirEnableDirBrowsing" Path="TestEnableDirBrowsing">
+                        <iis:WebDirProperties Id="TestEnableDirBrowsing" EnableDirBrowsing="yes" />
+                    </iis:WebDir>
+
+                    <!-- Test cases for Authorization attributes -->
+                    <iis:WebDir Id="TestDirAnonymousAccess" Path="TestAnonymousAccess">
+                        <iis:WebDirProperties Id="TestAnonymousAccess" AnonymousAccess="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirBasicAuthentication" Path="TestBasicAuthentication">
+                        <iis:WebDirProperties Id="TestBasicAuthentication" BasicAuthentication="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirDigestAuthentication" Path="TestDigestAuthentication">
+                        <iis:WebDirProperties Id="TestDigestAuthentication" DigestAuthentication="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirPassportAuthentication" Path="TestPassportAuthentication">
+                        <iis:WebDirProperties Id="TestPassportAuthentication" PassportAuthentication="yes" />
+                    </iis:WebDir>
+                    <iis:WebDir Id="TestDirWindowsAuthentication" Path="TestWindowsAuthentication">
+                        <iis:WebDirProperties Id="TestWindowsAuthentication" WindowsAuthentication="yes" />
+                    </iis:WebDir>
+                </iis:WebSite>
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
