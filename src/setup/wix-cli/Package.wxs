@@ -30,9 +30,6 @@
         <Exclude Files="!(bindpath.Files)\**\*.xml" />
         <Exclude Files="!(bindpath.Files)\**\*.targets" />
       </Files>
-
-      <Files Include="!(bindpath.Heat_x64)\**" Subdirectory="x64" />
-      <Files Include="!(bindpath.Heat_x86)\**" Subdirectory="x86" />
     </ComponentGroup>
   </Fragment>
 

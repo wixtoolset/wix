@@ -357,11 +357,6 @@ namespace WixToolset.Data
             return Message(null, Ids.ImplicitMergeModulePrimaryFeature, "The merge module '{0}' does not have an explicit primary feature parent specified. If the source files are linked in a different order, the primary parent feature may change. To prevent accidental changes, the primary feature parent should be set to 'yes' in one of the MergeRef/@Primary or FeatureGroupRef/@Primary locations for this component.", componentId);
         }
 
-        public static Message InsufficientPermissionHarvestTypeLib()
-        {
-            return Message(null, Ids.InsufficientPermissionHarvestTypeLib, "Not enough permissions to harvest type library. On Windows Vista, you must either run Heat elevated, or install Windows Vista SP1 (or higher).");
-        }
-
         public static Message InvalidAttributeCombination(SourceLineNumber sourceLineNumbers, string attrib1, string attrib2, string name, string value)
         {
             return Message(sourceLineNumbers, Ids.InvalidAttributeCombination, "It is invalid to combine attributes {0} and {1}. The decompiled output will set attribute {2} to {3}.", attrib1, attrib2, name, value);
@@ -813,7 +808,6 @@ namespace WixToolset.Data
             UnexpectedEntrySection = 1109,
             NewComponentAddedToExistingFeature = 1110,
             DeprecatedAttributeValue = 1111,
-            InsufficientPermissionHarvestTypeLib = 1112,
             UnclearShortcut = 1113,
             TooManyProgIds = 1114,
             BadColumnDataIgnored = 1115,
