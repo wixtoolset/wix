@@ -26,8 +26,6 @@ msbuild -Restore tools_t.proj -p:Configuration=%_C% -tl -nologo -m -warnaserror 
 
 :clean
 @rd /s/q "..\..\build\tools" 2> nul
-@del "..\..\build\artifacts\WixToolset.Heat.*.nupkg" 2> nul
-@rd /s/q "%USERPROFILE%\.nuget\packages\wixtoolset.heat" 2> nul
 @exit /b
 
 :end

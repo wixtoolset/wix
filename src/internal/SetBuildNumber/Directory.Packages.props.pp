@@ -40,8 +40,6 @@
     <PackageVersion Include="WixInternal.Core.TestPackage" Version="{packageversion}" />
     <PackageVersion Include="WixInternal.Core.MSTestPackage" Version="{packageversion}" />
 
-    <PackageVersion Include="WixToolset.Heat" Version="{packageversion}" />
-
     <PackageVersion Include="WixToolset.Bal.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.BootstrapperApplications.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.ComPlus.wixext" Version="{packageversion}" />

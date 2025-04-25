@@ -133,32 +133,6 @@ namespace WixE2E
             Assert.NotEqual(firstHashes, secondHashes);
         }
 
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void CanBuildPackageWithHarvesting(bool x64)
-        {
-            var projectPath = TestData.Get("TestData", "WixprojPackageHarvesting", "WixprojPackageHarvesting.wixproj");
-
-            CleanEverything();
-
-            var result = RestoreAndBuild(projectPath, x64);
-            result.AssertSuccess();
-        }
-
-        [Theory]
-        [InlineData(false)]
-        [InlineData(true)]
-        public void CanBuildPackageWithHeatDir(bool x64)
-        {
-            var projectPath = TestData.Get("TestData", "WixprojPackageHeatDir", "WixprojPackageHeatDir.wixproj");
-
-            CleanEverything();
-
-            var result = RestoreAndBuild(projectPath, x64);
-            result.AssertSuccess();
-        }
-
         [Fact(Skip = "Investigate if .NET Core WebApplications can be incrementally built")]
         public void CanIncrementalBuildPackageWithNetCoreWebAppWithoutEdits()
         {

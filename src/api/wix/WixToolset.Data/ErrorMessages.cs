@@ -248,11 +248,6 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.DuplicateCabinetName2, "Duplicate cabinet name '{0}' error related to previous error.", cabinetName);
         }
 
-        public static Message DuplicateCommandLineOptionInExtension(string arg)
-        {
-            return Message(null, Ids.DuplicateCommandLineOptionInExtension, "The command line option '{0}' has already been loaded by another Heat extension.", arg);
-        }
-
         public static Message DuplicateComponentGuids(SourceLineNumber sourceLineNumbers, string componentId, string guid, string type, string keyPath)
         {
             return Message(sourceLineNumbers, Ids.DuplicateComponentGuids, "Component/@Id='{0}' with {2} '{3}' has a @Guid value '{1}' that duplicates another component in this package. It is recommended to give each component its own unique GUID.", componentId, guid, type, keyPath);
@@ -703,16 +698,6 @@ namespace WixToolset.Data
         public static Message HarvestSourceNotSpecified()
         {
             return Message(null, Ids.HarvestSourceNotSpecified, "A harvest source must be specified after the harvest type and can be followed by harvester arguments.");
-        }
-
-        public static Message HarvestTypeNotFound()
-        {
-            return Message(null, Ids.HarvestTypeNotFound, "The harvest type was not found in the list of loaded Heat extensions.");
-        }
-
-        public static Message HarvestTypeNotFound(string harvestType)
-        {
-            return Message(null, Ids.HarvestTypeNotFound, "The harvest type '{0}' was specified. Harvest types cannot start with a '-'. Remove the '-' to specify a valid harvest type.", harvestType);
         }
 
         public static Message IdentifierNotFound(string type, string identifier)
@@ -2588,8 +2573,6 @@ namespace WixToolset.Data
             SameFileIdDifferentSource = 317,
             HarvestSourceNotSpecified = 318,
             OutputTargetNotSpecified = 319,
-            DuplicateCommandLineOptionInExtension = 320,
-            HarvestTypeNotFound = 321,
             BothUpgradeCodesRequired = 322,
             IllegalBinderClassName = 323,
             SpecifiedBinderNotFound = 324,
