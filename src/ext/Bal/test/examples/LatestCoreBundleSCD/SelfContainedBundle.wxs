@@ -1,9 +1,11 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
     <Bundle Name="SCDLatestCoreMBA" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="5CE5B5C7-4B6B-4B95-B297-731F1F956533">
-        <BootstrapperApplication SourceFile="Example.LatestCoreMBA.exe">
-            <!-- <bal:WixDotNetCoreBootstrapperApplicationHost SelfContainedDeployment="yes" /> -->
-            <PayloadGroupRef Id="publish.Example.LatestCoreMBA.scd" />
+        <BootstrapperApplication SourceFile="!(bindpath.ba.payloads)\Example.LatestCoreMBA.exe">
+            <Payloads Include="!(bindpath.ba.payloads)\**">
+              <Exclude Files="!(bindpath.ba.payloads)\Example.LatestCoreMBA.exe" />
+            </Payloads>
         </BootstrapperApplication>
+
         <Chain>
             <ExePackage DetectCondition="none" UninstallArguments="-foo" SourceFile="..\.data\notanexe.exe" PerMachine="yes" />
         </Chain>

@@ -4,7 +4,7 @@
   <Fragment>
     <PackageGroup Id="BundlePackages">
       <MsiPackage Id="PackageA" SourceFile="$(var.PackageA.TargetPath)">
-        <PayloadGroupRef Id="PackagePayloads" />
+        <Payloads Include="$(sys.SOURCEFILEDIR)\PackagePayloads\**" />
       </MsiPackage>
     </PackageGroup>
   </Fragment>

@@ -364,6 +364,9 @@ namespace WixToolset.Core
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Layout, Compiler.BundleLayoutOnlyPayloads);
                             break;
+                        case "Payloads":
+                            this.ParsePayloadsElement(child, ComplexReferenceParentType.Layout, Compiler.BundleLayoutOnlyPayloads);
+                            break;
                         case "RelatedBundle":
                             this.ParseRelatedBundleElement(child);
                             break;
@@ -694,15 +697,15 @@ namespace WixToolset.Core
                                 this.Messaging.Write(CompilerErrors.AlreadyDefinedBootstrapperApplicationSource(childSourceLineNumbers, exePayloadSourceLineNumbers, exePayloadRefNode.Name.LocalName));
                             }
                             break;
-
                         case "Payload":
                             this.ParsePayloadElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId, isRemoteAllowed: false);
                             break;
-
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
                             break;
-
+                        case "Payloads":
+                            this.ParsePayloadsElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
+                            break;
                         default:
                             this.Core.UnexpectedElement(node, child);
                             break;
@@ -878,6 +881,9 @@ namespace WixToolset.Core
                             break;
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
+                            break;
+                        case "Payloads":
+                            this.ParsePayloadsElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
                             break;
                         default:
                             this.Core.UnexpectedElement(node, child);
@@ -1264,6 +1270,9 @@ namespace WixToolset.Core
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
                             break;
+                        case "Payloads":
+                            this.ParsePayloadsElement(child, ComplexReferenceParentType.Container, Compiler.BurnUXContainerId);
+                            break;
                         default:
                             this.Core.UnexpectedElement(node, child);
                             break;
@@ -1560,6 +1569,9 @@ namespace WixToolset.Core
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.PayloadGroup, id);
                             break;
+                        case "Payloads":
+                            this.ParsePayloadsElement(child, ComplexReferenceParentType.PayloadGroup, id);
+                            break;
                         default:
                             this.Core.UnexpectedElement(node, child);
                             break;
@@ -1630,6 +1642,80 @@ namespace WixToolset.Core
             this.Core.CreateGroupAndOrderingRows(sourceLineNumbers, parentType, parentId?.Id, ComplexReferenceChildType.PayloadGroup, id?.Id, ComplexReferenceChildType.Unknown, null);
 
             return id;
+        }
+
+        /// <summary>
+        /// Parses a payloads harvesting element.
+        /// </summary>
+        /// <param name="node">Element to parse.</param>
+        /// <param name="parentType">ComplexReferenceParentType of parent element (BA or PayloadGroup).</param>
+        /// <param name="parentId">Identifier of parent element.</param>
+        private void ParsePayloadsElement(XElement node, ComplexReferenceParentType parentType, Identifier parentId)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            var win64 = this.Context.IsCurrentPlatform64Bit;
+            var inclusions = new List<string>();
+            var exclusions = new List<string>();
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                        case "Include":
+                            inclusions.AddRange(this.Core.GetAttributeValue(sourceLineNumbers, attrib).Split(';'));
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
+                    }
+                }
+                else
+                {
+                    var context = new Dictionary<string, string>() { { "Win64", win64.ToString() } };
+                    this.Core.ParseExtensionAttribute(node, attrib, context);
+                }
+            }
+
+            foreach (var child in node.Elements())
+            {
+                if (CompilerCore.WixNamespace == child.Name.Namespace)
+                {
+                    switch (child.Name.LocalName)
+                    {
+                        case "Exclude":
+                            this.ParseFilesOrPayloadsExcludeElement(child, exclusions);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
+                    }
+                }
+                else
+                {
+                    var context = new Dictionary<string, string>() { { "Win64", win64.ToString() } };
+                    this.Core.ParseExtensionElement(node, child, context);
+                }
+            }
+
+            if (!inclusions.Any())
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Include"));
+            }
+
+            var inclusionsAsString = String.Join(";", inclusions);
+            var exclusionsAsString = String.Join(";", exclusions);
+
+            var id = this.Core.CreateIdentifier("hvp", parentId.Id, inclusionsAsString, exclusionsAsString);
+
+            this.Core.AddSymbol(new HarvestPayloadsSymbol(sourceLineNumbers, id)
+            {
+                Inclusions = inclusionsAsString,
+                Exclusions = exclusionsAsString,
+                ComplexReferenceParentType = parentType.ToString(),
+                ParentId = parentId.Id,
+            });
         }
 
         /// <summary>
@@ -2278,6 +2364,9 @@ namespace WixToolset.Core
                             break;
                         case "PayloadGroupRef":
                             this.ParsePayloadGroupRefElement(child, ComplexReferenceParentType.Package, id);
+                            break;
+                        case "Payloads":
+                            this.ParsePayloadsElement(child, ComplexReferenceParentType.Package, id);
                             break;
                         case "Provides":
                             this.ParseProvidesElement(child, packageType, id.Id, out _);

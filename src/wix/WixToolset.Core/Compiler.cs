@@ -5787,7 +5787,7 @@ namespace WixToolset.Core
                     switch (child.Name.LocalName)
                     {
                         case "Exclude":
-                            this.ParseFilesExcludeElement(child, exclusions);
+                            this.ParseFilesOrPayloadsExcludeElement(child, exclusions);
                             break;
                         default:
                             this.Core.UnexpectedElement(node, child);
@@ -5833,7 +5833,7 @@ namespace WixToolset.Core
             });
         }
 
-        private void ParseFilesExcludeElement(XElement node, IList<string> paths)
+        private void ParseFilesOrPayloadsExcludeElement(XElement node, IList<string> paths)
         {
             var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
 
