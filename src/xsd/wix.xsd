@@ -87,6 +87,7 @@
         <xs:element ref="Log" minOccurs="0" maxOccurs="1" />
         <xs:element ref="PayloadGroup" />
         <xs:element ref="PayloadGroupRef" />
+        <xs:element ref="Payloads" />
         <xs:element ref="RelatedBundle" />
         <xs:element ref="Requires" />
         <xs:element ref="SetVariable" />
@@ -462,6 +463,7 @@
         <xs:element ref="BootstrapperApplicationDll" minOccurs="0" maxOccurs="1" />
         <xs:element ref="Payload" />
         <xs:element ref="PayloadGroupRef" />
+        <xs:element ref="Payloads" />
         <xs:any namespace="##other" processContents="lax">
           <xs:annotation>
             <xs:documentation>
@@ -524,6 +526,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="Payload" />
         <xs:element ref="PayloadGroupRef" />
+        <xs:element ref="Payloads" />
         <xs:any namespace="##other" processContents="lax">
           <xs:annotation>
             <xs:documentation>
@@ -666,6 +669,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="Payload" />
         <xs:element ref="PayloadGroupRef" />
+        <xs:element ref="Payloads" />
         <xs:any namespace="##other" processContents="lax">
           <xs:annotation>
             <xs:documentation>
@@ -934,6 +938,7 @@
         <xs:element ref="SlipstreamMsp" />
         <xs:element ref="Payload" />
         <xs:element ref="PayloadGroupRef" />
+        <xs:element ref="Payloads" />
         <xs:element ref="MsiPackagePayload" />
         <xs:element ref="Provides" />
         <xs:any namespace="##other" processContents="lax">
@@ -998,6 +1003,7 @@
         <xs:element ref="MsiProperty" />
         <xs:element ref="Payload" />
         <xs:element ref="PayloadGroupRef" />
+        <xs:element ref="Payloads" />
         <xs:element ref="MspPackagePayload" />
         <xs:element ref="Provides" />
         <xs:any namespace="##other" processContents="lax">
@@ -1045,6 +1051,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="Payload" />
         <xs:element ref="PayloadGroupRef" />
+        <xs:element ref="Payloads" />
         <xs:element ref="MsuPackagePayload" />
         <xs:element ref="Provides" />
         <xs:any namespace="##other" processContents="lax">
@@ -1081,6 +1088,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="Payload" />
         <xs:element ref="PayloadGroupRef" />
+        <xs:element ref="Payloads" />
         <xs:element ref="ExePackagePayload" />
         <xs:element ref="ExitCode" />
         <xs:element ref="CommandLine" />
@@ -1169,6 +1177,7 @@
       <xs:choice minOccurs="0" maxOccurs="unbounded">
         <xs:element ref="Payload" />
         <xs:element ref="PayloadGroupRef" />
+        <xs:element ref="Payloads" />
         <xs:element ref="BundlePackagePayload" />
         <xs:element ref="ExitCode" />
         <xs:element ref="CommandLine" />
@@ -1930,6 +1939,7 @@
         <xs:element ref="MsuPackagePayload" />
         <xs:element ref="Payload" />
         <xs:element ref="PayloadGroupRef" />
+        <xs:element ref="Payloads" />
       </xs:choice>
       <xs:attribute name="Id" type="xs:string" use="required">
         <xs:annotation>
@@ -8973,6 +8983,54 @@
       </xs:anyAttribute>
     </xs:complexType>
   </xs:element>
+  <xs:element name="Payloads">
+    <xs:annotation>
+      <xs:documentation>
+        Authoring to define the set of files to be harvested for inclusion in a bundle.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="Exclude" />
+        <xs:any namespace="##other" processContents="lax">
+          <xs:annotation>
+            <xs:documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:any>
+      </xs:choice>
+      <xs:attribute name="Include" type="xs:string" use="required">
+        <xs:annotation>
+          <xs:documentation>
+            A file-selection pattern that can include directory names, file names, and wildcards.
+            If a pattern is not an absolute path (via a preprocessor variable, unnamed bind path,
+            or named bind path), it is interpreted as relative to the directory containing the
+            source file. Absolute paths via a named bind path are recommended.
+
+            Wildcards include typical `*.ext` globs and MSBuild-style `**` globs to indicate
+            that directories should be recursed. Examples include:
+
+            | Pattern | Description |
+            | ------- | ----------- |
+            | `!(bindpath.ToBeHarvested)\**` | All files in the parent directory identified by the `ToBeHarvested` bind path and its subdirectories. |
+            | `$(PayloadFiles)\bin\Release\**` | All files in the `bin\Release` subdirectory in the directory named by the `PayloadFiles` preprocessor variable and its subdirectories. |
+            | `!(bindpath.arm64)\**.pdb` | All files with `.pdb` extension in the parent directory identified by the `arm64` bind path and its subdirectories. |
+            | `**` | If an unnamed bind path was specified, all files in that directory and its subdirectories. If an unnamed bind path was _not_ specified, all files in directory of the source .wxs file and its subdirectories. |
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+      <xs:anyAttribute namespace="##other" processContents="lax">
+        <xs:annotation>
+          <xs:documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:anyAttribute>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="Files">
     <xs:annotation>
       <xs:documentation>
@@ -9040,7 +9098,7 @@
   <xs:element name="Exclude">
     <xs:annotation>
       <xs:documentation>
-        Using wildcards, defines the files from a parent `Files` element that should be excluded from harvesting.
+        Using wildcards, defines the files from a parent `Files` or `Payloads` element that should be excluded from harvesting.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
@@ -9057,7 +9115,7 @@
       <xs:attribute name="Files" type="xs:string" use="required">
         <xs:annotation>
           <xs:documentation>
-            Excludes files from the set of files harvested via the parent `Files` element.
+            Excludes files from the set of files harvested via the parent `Files` or `Payloads` element.
             Inclusion and exclusion wildcards must match paths. For example, if you have a
             `Files` element with `Include="!(bindpath.ToBeHarvested)\**"` and want to
             exclude one of the files, use an `Exclude` element with a `Files` attribute

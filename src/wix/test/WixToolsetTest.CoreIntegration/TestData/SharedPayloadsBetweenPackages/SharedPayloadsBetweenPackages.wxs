@@ -10,9 +10,10 @@
             </ExePackage>
         </PackageGroup>
     </Fragment>
+    
     <Fragment>
         <PayloadGroup Id="SharedPayloads">
-            <Payload Id="SourceFilePayload" SourceFile="$(sys.SOURCEFILEPATH)" />
+            <Payloads Include="$(sys.SOURCEFILEDIR)\**" />
         </PayloadGroup>
     </Fragment>
 </Wix>

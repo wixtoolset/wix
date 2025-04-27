@@ -26,7 +26,7 @@ namespace WixToolset.Core
             }
 
             {
-                var command = new HarvestFilesCommand(context);
+                var command = new HarvestFilesAndPayloadsCommand(context);
                 command.Execute();
             }
 
