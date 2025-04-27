@@ -8,24 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <HarvestDirectory Include="BAPayloads">
-      <ComponentGroupName>BAPayloads</ComponentGroupName>
-      <DirectoryRefId>BAPayloads</DirectoryRefId>
-      <Transforms>ba.xslt</Transforms>
-    </HarvestDirectory>
-    <HarvestDirectory Include="PackagePayloads">
-      <ComponentGroupName>PackagePayloads</ComponentGroupName>
-      <DirectoryRefId>PackagePayloads</DirectoryRefId>
-      <Transforms>package.xslt</Transforms>
-    </HarvestDirectory>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PackageA\PackageA.wixproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixToolset.Heat" />
     <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
   </ItemGroup>
 

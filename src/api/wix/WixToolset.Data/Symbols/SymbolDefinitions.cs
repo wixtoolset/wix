@@ -41,6 +41,7 @@ namespace WixToolset.Data
         File,
         FileSFPCatalog,
         HarvestFiles,
+        HarvestPayloads,
         Icon,
         ImageFamilies,
         IniFile,

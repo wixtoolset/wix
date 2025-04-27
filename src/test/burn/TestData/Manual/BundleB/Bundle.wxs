@@ -30,11 +30,11 @@
     <?elseif $(var.BA) = "hyperlinkLicense"?>
       <BootstrapperApplication>
         <bal:WixStandardBootstrapperApplication LicenseUrl="" Theme="hyperlinkLicense" />
-        <PayloadGroupRef Id="BAPayloads" />
+        <Payloads Include="$(sys.SOURCEFILEDIR)\BAPayloads\**" />
       </BootstrapperApplication>
     <?else?>
       <BootstrapperApplicationRef Id="$(var.BA)">
-        <PayloadGroupRef Id="BAPayloads" />
+        <Payloads Include="$(sys.SOURCEFILEDIR)\BAPayloads\**" />
       </BootstrapperApplicationRef>
     <?endif?>
 

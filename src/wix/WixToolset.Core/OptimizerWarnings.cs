@@ -8,7 +8,7 @@ namespace WixToolset.Core
     {
         public static Message ZeroFilesHarvested(SourceLineNumber sourceLineNumbers)
         {
-            return Message(sourceLineNumbers, Ids.ZeroFilesHarvested, "Files inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify your Files paths, inclusions, and exclusions for accuracy.");
+            return Message(sourceLineNumbers, Ids.ZeroFilesHarvested, "Inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify paths, inclusions, and exclusions on Files or Payloads for accuracy.");
         }
 
         public static Message ExpectedDirectory(SourceLineNumber sourceLineNumbers, string harvestDirectory)
