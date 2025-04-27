@@ -58,6 +58,7 @@ namespace WixToolset.Core.Burn.Bind
                 switch (symbol.Definition.Type)
                 {
                     // Symbols used internally and are not added to a data manifest.
+                    case SymbolDefinitionType.HarvestPayloads:
                     case SymbolDefinitionType.ProvidesDependency:
                     case SymbolDefinitionType.WixApprovedExeForElevation:
                     case SymbolDefinitionType.WixBootstrapperApplication:

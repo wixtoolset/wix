@@ -11,11 +11,11 @@ namespace WixToolset.Core
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
 
-    internal class HarvestFilesCommand
+    internal class HarvestFilesAndPayloadsCommand
     {
         private const string BindPathOpenString = "!(bindpath.";
 
-        public HarvestFilesCommand(IOptimizeContext context)
+        public HarvestFilesAndPayloadsCommand(IOptimizeContext context)
         {
             this.Context = context;
             this.Messaging = this.Context.ServiceProvider.GetService<IMessaging>();
@@ -31,12 +31,21 @@ namespace WixToolset.Core
         internal void Execute()
         {
             var harvestedFiles = new HashSet<string>();
+            var harvestedPayloads = new HashSet<string>();
 
             foreach (var section in this.Context.Intermediates.SelectMany(i => i.Sections))
             {
                 foreach (var harvestFiles in section.Symbols.OfType<HarvestFilesSymbol>().ToList())
                 {
                     this.HarvestFiles(harvestFiles, section, harvestedFiles);
+                }
+            }
+
+            foreach (var section in this.Context.Intermediates.SelectMany(i => i.Sections))
+            {
+                foreach (var harvestPayloads in section.Symbols.OfType<HarvestPayloadsSymbol>().ToList())
+                {
+                    this.HarvestPayloads(harvestPayloads, section, harvestedPayloads);
                 }
             }
         }
@@ -52,8 +61,8 @@ namespace WixToolset.Core
 
             var resolvedFiles = Enumerable.Empty<WildcardFile>();
 
-            var included = this.GetWildcardFiles(harvestFile, inclusions);
-            var excluded = this.GetWildcardFiles(harvestFile, exclusions);
+            var included = this.GetWildcardFiles(inclusions, harvestFile.SourceLineNumbers, harvestFile.SourcePath);
+            var excluded = this.GetWildcardFiles(exclusions, harvestFile.SourceLineNumbers, harvestFile.SourcePath);
 
             foreach (var excludedFile in excluded)
             {
@@ -128,10 +137,70 @@ namespace WixToolset.Core
             }
         }
 
-        private IEnumerable<WildcardFile> GetWildcardFiles(HarvestFilesSymbol harvestFile, IEnumerable<string> patterns)
+        private void HarvestPayloads(HarvestPayloadsSymbol harvestPayload, IntermediateSection section, HashSet<string> harvestedPayloads)
         {
-            var sourceLineNumbers = harvestFile.SourceLineNumbers;
-            var sourcePath = harvestFile.SourcePath?.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var sourceLineNumbers = harvestPayload.SourceLineNumbers;
+            var inclusions = harvestPayload.Inclusions.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var exclusions = harvestPayload.Exclusions.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+            var comparer = new WildcardFileComparer();
+
+            var resolvedFiles = Enumerable.Empty<WildcardFile>();
+
+            var included = this.GetWildcardFiles(inclusions, sourceLineNumbers);
+            var excluded = this.GetWildcardFiles(exclusions, sourceLineNumbers);
+
+            foreach (var excludedFile in excluded)
+            {
+                this.Messaging.Write(OptimizerVerboses.ExcludedFile(sourceLineNumbers, excludedFile.Path));
+            }
+
+            resolvedFiles = included.Except(excluded, comparer).ToList();
+
+            if (!resolvedFiles.Any())
+            {
+                this.Messaging.Write(OptimizerWarnings.ZeroFilesHarvested(sourceLineNumbers));
+            }
+
+            foreach (var payloadByRecursiveDir in resolvedFiles.GroupBy(resolvedFile => resolvedFile.RecursiveDir, resolvedFile => resolvedFile.Path))
+            {
+                var recursiveDir = payloadByRecursiveDir.Key;
+
+                foreach (var file in payloadByRecursiveDir)
+                {
+                    if (harvestedPayloads.Add(file))
+                    {
+                        var name = Path.GetFileName(file);
+
+                        var id = this.ParseHelper.CreateIdentifier("pld", harvestPayload.ParentId, recursiveDir.ToUpperInvariant(), name.ToUpperInvariant());
+
+                        this.Messaging.Write(OptimizerVerboses.HarvestedFile(sourceLineNumbers, file));
+
+                        section.AddSymbol(new WixBundlePayloadSymbol(sourceLineNumbers, id)
+                        {
+                            Name = Path.Combine(recursiveDir, name),
+                            SourceFile = new IntermediateFieldPathValue { Path = file },
+                            Compressed = null,
+                            UnresolvedSourceFile = file, // duplicate of sourceFile but in a string column so it won't get resolved to a full path during binding.
+                        });
+
+                        if (Enum.TryParse<ComplexReferenceParentType>(harvestPayload.ComplexReferenceParentType, out var parentType)
+                            && ComplexReferenceParentType.Unknown != parentType && null != harvestPayload.ParentId)
+                        {
+                            this.ParseHelper.CreateWixGroupSymbol(section, sourceLineNumbers, parentType, harvestPayload.ParentId, ComplexReferenceChildType.Payload, id.Id);
+                        }
+                    }
+                    else
+                    {
+                        this.Messaging.Write(OptimizerWarnings.SkippingDuplicateFile(sourceLineNumbers, file));
+                    }
+                }
+            }
+        }
+
+        private IEnumerable<WildcardFile> GetWildcardFiles(IEnumerable<string> patterns, SourceLineNumber sourceLineNumbers, string sourcePath = null)
+        {
+            sourcePath = sourcePath?.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
             var files = new List<WildcardFile>();
 
@@ -177,7 +246,7 @@ namespace WixToolset.Core
                     }
                     catch (DirectoryNotFoundException e)
                     {
-                        this.Messaging.Write(OptimizerWarnings.ExpectedDirectory(harvestFile.SourceLineNumbers, e.Message));
+                        this.Messaging.Write(OptimizerWarnings.ExpectedDirectory(sourceLineNumbers, e.Message));
                     }
                 }
             }

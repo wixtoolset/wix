@@ -35,7 +35,7 @@ namespace WixToolsetTest.CoreIntegration
                 var messages = result.Messages.Select(m => FormatMessage(m, sourceFolder, baseFolder)).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "8600: Files inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify your Files paths, inclusions, and exclusions for accuracy.",
+                    "8600: Inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify paths, inclusions, and exclusions on Files or Payloads for accuracy.",
                 }, messages);
             });
         }
@@ -49,9 +49,9 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(new[]
                 {
                     @"8601: Missing directory for harvesting files: Could not find a part of the path '<sourceFolder>\files2\MissingDirectory'.",
-                    @"8600: Files inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify your Files paths, inclusions, and exclusions for accuracy.",
+                    @"8600: Inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify paths, inclusions, and exclusions on Files or Payloads for accuracy.",
                     @"8601: Missing directory for harvesting files: Could not find a part of the path '<sourceFolder>\files2\ThisDirectoryIsAlsoMissing'.",
-                    @"8600: Files inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify your Files paths, inclusions, and exclusions for accuracy.",
+                    @"8600: Inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify paths, inclusions, and exclusions on Files or Payloads for accuracy.",
                 }, messages);
             });
         }
