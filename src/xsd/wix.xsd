@@ -6167,87 +6167,19 @@
           </xs:documentation>
         </xs:annotation>
       </xs:attribute>
-      <xs:attribute name="Type">
+      <xs:attribute name="Type" type="RegistryValueTypeUnion">
         <xs:annotation>
           <xs:documentation>
-            Set this attribute to the type of the desired registry key. This attribute must be specified whenever the Value
-            attribute or a child RegistryValue element is specified. This attribute
-            should only be set when the value of the Action attribute does not include the word 'remove'.
+            Set this attribute to the type of the desired registry key. If not specified, the default is 'string'.
           </xs:documentation>
         </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:NMTOKEN">
-            <xs:enumeration value="string">
-              <xs:annotation>
-                <xs:documentation>
-                  The value is interpreted and stored as a string (REG_SZ).
-                </xs:documentation>
-              </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="integer">
-              <xs:annotation>
-                <xs:documentation>
-                  The value is interpreted and stored as an integer (REG_DWORD).
-                </xs:documentation>
-              </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="binary">
-              <xs:annotation>
-                <xs:documentation>
-                  The value is interpreted and stored as a hexadecimal value (REG_BINARY).
-                </xs:documentation>
-              </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="expandable">
-              <xs:annotation>
-                <xs:documentation>
-                  The value is interpreted and stored as an expandable string (REG_EXPAND_SZ).
-                </xs:documentation>
-              </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="multiString">
-              <xs:annotation>
-                <xs:documentation>
-                  The value is interpreted and stored as a multiple strings (REG_MULTI_SZ).
-                  Please note that this value will only result in a multi-string value if there is more than one registry value
-                  or the Action attribute's value is 'append' or 'prepend'. Otherwise a string value will be created.
-                </xs:documentation>
-              </xs:annotation>
-            </xs:enumeration>
-          </xs:restriction>
-        </xs:simpleType>
       </xs:attribute>
-      <xs:attribute name="Action">
+      <xs:attribute name="Action" type="RegistryValueActionUnion">
         <xs:annotation>
           <xs:documentation>
-            This is the action that will be taken for this registry value.
+            This is the action that will be taken for this registry value. If not specified, the default is 'write'.
           </xs:documentation>
         </xs:annotation>
-        <xs:simpleType>
-          <xs:restriction base="xs:NMTOKEN">
-            <xs:enumeration value="append">
-              <xs:annotation>
-                <xs:documentation>
-                  Appends the specified value(s) to a multiString registry value.
-                </xs:documentation>
-              </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="prepend">
-              <xs:annotation>
-                <xs:documentation>
-                  Prepends the specified value(s) to a multiString registry value.
-                </xs:documentation>
-              </xs:annotation>
-            </xs:enumeration>
-            <xs:enumeration value="write">
-              <xs:annotation>
-                <xs:documentation>
-                  Writes a registry value. This is the default value.
-                </xs:documentation>
-              </xs:annotation>
-            </xs:enumeration>
-          </xs:restriction>
-        </xs:simpleType>
       </xs:attribute>
       <xs:attribute name="KeyPath" type="YesNoTypeUnion">
         <xs:annotation>
@@ -14431,6 +14363,88 @@
           <xs:documentation>
                         Operation occurs under HKEY_USERS.
                     </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="RegistryValueTypeUnion">
+    <xs:annotation>
+      <xs:documentation>Values of this type represent possible registry value types.</xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="RegistryValueType PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType name="RegistryValueType">
+    <xs:annotation>
+      <xs:documentation>Values of this type represent possible registry value types.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="string">
+        <xs:annotation>
+          <xs:documentation>The value is interpreted and stored as a string (REG_SZ).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="integer">
+        <xs:annotation>
+          <xs:documentation>
+              The value is interpreted and stored as an integer (REG_DWORD).
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="binary">
+        <xs:annotation>
+          <xs:documentation>
+              The value is interpreted and stored as a hexadecimal value (REG_BINARY).
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="expandable">
+        <xs:annotation>
+          <xs:documentation>
+              The value is interpreted and stored as an expandable string (REG_EXPAND_SZ).
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="multiString">
+        <xs:annotation>
+          <xs:documentation>
+              The value is interpreted and stored as a multiple strings (REG_MULTI_SZ).
+              Please note that this value will only result in a multi-string value if there is more than one registry value
+              or the Action attribute's value is 'append' or 'prepend'. Otherwise a string value will be created.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="RegistryValueActionUnion">
+    <xs:annotation>
+      <xs:documentation>Values of this type represent possible registry value actions.</xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="RegistryValue PreprocessorVariables"/>
+  </xs:simpleType>
+  <xs:simpleType type="RegistryValueAction">
+    <xs:annotation>
+      <xs:documentation>Values of this type represent possible registry value actions.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="append">
+        <xs:annotation>
+          <xs:documentation>
+            Appends the specified value(s) to a multiString registry value.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="prepend">
+        <xs:annotation>
+          <xs:documentation>
+            Prepends the specified value(s) to a multiString registry value.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="write">
+        <xs:annotation>
+          <xs:documentation>
+            Writes a registry value.
+          </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
     </xs:restriction>
