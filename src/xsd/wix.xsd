@@ -4535,7 +4535,7 @@
       </xs:attribute>
       <xs:attribute name="Languages" type="xs:string">
         <xs:annotation>
-          <xs:documentation>The languages supported by the file.</xs:documentation>
+          <xs:documentation>The languages supported by the file. If multiple languages are provided, then the search is for a file that supports all of those languages.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
