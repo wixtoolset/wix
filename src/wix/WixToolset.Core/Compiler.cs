@@ -3982,6 +3982,10 @@ namespace WixToolset.Core
             {
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
             }
+            else if (id == "TARGETDIR")
+            {
+                this.Core.Write(CompilerWarnings.DirectoryRefStandardDirectoryDeprecated(sourceLineNumbers));
+            }
             else if (WindowsInstallerStandard.IsStandardDirectory(id))
             {
                 this.Core.Write(CompilerWarnings.DirectoryRefStandardDirectoryDeprecated(sourceLineNumbers, id));

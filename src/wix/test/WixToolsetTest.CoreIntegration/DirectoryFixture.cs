@@ -5,8 +5,8 @@ namespace WixToolsetTest.CoreIntegration
     using System;
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using Xunit;
@@ -392,6 +392,32 @@ namespace WixToolsetTest.CoreIntegration
                     "ProgramFilesFolder:TARGETDIR:PFiles",
                     "TARGETDIR::SourceDir"
                 }, directoryRows.Select(r => r.FieldAsString(0) + ":" + r.FieldAsString(1) + ":" + r.FieldAsString(2)).OrderBy(s => s).ToArray());
+            }
+        }
+
+        [Fact]
+        public void GetsWarningForRedundantTargetDir()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, "bin", "test.msi");
+                var wixpdbPath = Path.ChangeExtension(msiPath, ".wixpdb");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Directory", "RedundantTargetDir.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                var error = result.Messages.Single();
+                Assert.Equal(5436/*CompilerWarnings.Id.DirectoryRefStandardDirectoryDeprecated*/, error.Id);
             }
         }
     }
