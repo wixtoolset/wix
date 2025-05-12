@@ -538,7 +538,7 @@ namespace WixToolset.Util
                     new XAttribute("Name", Path.GetFileNameWithoutExtension(row.FieldAsString(3))), // remove .lnk/.url extension because compiler extension adds it back for us
                     new XAttribute("Type", type),
                     new XAttribute("Target", row.FieldAsString(4)),
-                    new XAttribute("IconFile", row.FieldAsString(6)),
+                    AttributeIfNotNull("IconFile", row, 6),
                     NumericAttributeIfNotNull("IconIndex", row, 7)
                     );
 
