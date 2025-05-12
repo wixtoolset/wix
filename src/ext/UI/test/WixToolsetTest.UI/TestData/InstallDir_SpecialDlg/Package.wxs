@@ -32,8 +32,8 @@
                     <Publish Event="SpawnDialog" Value="CancelDlg" />
                 </Control>
                 <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
-                <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="373" Height="0" />
-                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="373" Height="0" />
+                <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+                <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
                 <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="My Special Dialog &amp; Stuff" />
                 <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="&#x2714; A dialog where special stuff happens" />
             </Dialog>
