@@ -2852,15 +2852,16 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         break;
 
                     default:
-                        if (this.ExtensionsByTableName.TryGetValue(table.Name, out var extension))
-                        {
-                            extension.TryDecompileTable(table);
-                        }
-                        else if (!this.SuppressCustomTables)
+                    {
+                        var decompiled = this.Extensions.FirstOrDefault(x => x.TryDecompileTable(table)) != null;
+
+                        if (!decompiled && !this.SuppressCustomTables)
                         {
                             this.DecompileCustomTable(table);
                         }
+
                         break;
+                    }
                 }
             }
         }
