@@ -1,0 +1,36 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+  <Package Name="MsiPackage" Language="1033" Version="1.0.0.0" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+    <MajorUpgrade DowngradeErrorMessage="(DowngradeError)" />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="FAll">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="MsiPackage" />
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component>
+        <File Name="fw.exe" Source="$(sys.SOURCEFILEPATH)">
+          <Shortcut Id="FwShortcut" Directory="INSTALLFOLDER" Name="Firewall" />
+          <fw:FirewallException Id="ExampleFirewall" Description="An app-based firewall exception" Name="ExampleApp" Port="42">
+              <fw:RemoteAddress Value="Defaultgateway" />
+              <fw:RemoteAddress Value="DHCP" />
+              <fw:RemoteAddress Value="DNS" />
+              <fw:RemoteAddress Value="255.255.255.0" />
+              <fw:RemoteAddress Value="1.1.1.1-2.2.2.2" />
+          </fw:FirewallException>
+        </File>
+
+        <fw:FirewallException Description="A port-based firewall exception" Name="ExamplePort" Port="42" Outbound="yes" Scope="localSubnet" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>
