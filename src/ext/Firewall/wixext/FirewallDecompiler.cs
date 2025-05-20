@@ -4,8 +4,6 @@ namespace WixToolset.Firewall
 {
     using System;
     using System.Collections.Generic;
-    using System.Reflection;
-    using System.Security;
     using System.Xml.Linq;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
@@ -83,7 +81,7 @@ namespace WixToolset.Firewall
                     string[] addresses = ((string)row[2]).Split(',');
                     if (addresses.Length == 1)
                     {
-                        switch(addresses[0])
+                        switch (addresses[0])
                         {
                             case "*":
                                 firewallException.Add(new XAttribute("Scope", "any"));
@@ -482,20 +480,25 @@ namespace WixToolset.Firewall
         /// <param name="tables">Collection of all tables.</param>
         private void FinalizeFirewallExceptionTable(TableIndexedCollection tables)
         {
-            if (tables.TryGetTable("Wix5FirewallException", out var firewallExceptionTable))
-            {
-                foreach (var row in firewallExceptionTable.Rows)
-                {
-                    var xmlConfig = this.DecompilerHelper.GetIndexedElement(row);
+            var possibleTableNames = new List<string>() { "WixFirewallException", "Wix4FirewallException", "Wix5FirewallException", };
 
-                    var componentId = row.FieldAsString(8);
-                    if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
+            foreach (var tableName in possibleTableNames)
+            {
+                if (tables.TryGetTable(tableName, out var firewallExceptionTable))
+                {
+                    foreach (var row in firewallExceptionTable.Rows)
                     {
-                        component.Add(xmlConfig);
-                    }
-                    else
-                    {
-                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, firewallExceptionTable.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
+                        var xmlConfig = this.DecompilerHelper.GetIndexedElement(row);
+
+                        var componentId = row.FieldAsString(8);
+                        if (this.DecompilerHelper.TryGetIndexedElement("Component", componentId, out var component))
+                        {
+                            component.Add(xmlConfig);
+                        }
+                        else
+                        {
+                            this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, firewallExceptionTable.Name, row.GetPrimaryKey(), "Component_", componentId, "Component"));
+                        }
                     }
                 }
             }

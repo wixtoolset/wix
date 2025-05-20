@@ -621,6 +621,39 @@ namespace WixToolsetTest.Firewall
             }, locals.ToArray());
         }
 
+        [TestMethod]
+        public void CanDecompileWix4FirewallPackage()
+        {
+            var folder = TestData.Get(@"TestData\DecompileWix4Firewall");
+            var output = Path.Combine(folder, "DecompiledWix4Firewall.xml");
+
+            var result = WixRunner.Execute(
+                "msi",
+                "decompile",
+                "-ext", Path.GetFullPath(typeof(FirewallExtensionFactory).Assembly.Location),
+                Path.Combine(folder, "Firewall4.msi"),
+                "-o", output
+                );
+            result.AssertSuccess();
+
+            var doc = XDocument.Load(output);
+            var actual = doc.Descendants()
+                .Where(e => e.Name.Namespace == "http://wixtoolset.org/schemas/v4/wxs/firewall")
+                .Select(fe => new { Name = fe.Name.LocalName, Attributes = fe.Attributes().Select(a => $"{a.Name.LocalName}={a.Value}").ToArray() })
+                .ToArray();
+
+            WixAssert.CompareLineByLine(new[]
+            {
+                "FirewallException",
+                "RemoteAddress",
+                "RemoteAddress",
+                "RemoteAddress",
+                "RemoteAddress",
+                "RemoteAddress",
+                "FirewallException",
+            }, actual.Select(a => a.Name).ToArray());
+        }
+
         private static void Build(string[] args)
         {
             var result = WixRunner.Execute(args);
