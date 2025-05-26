@@ -1344,6 +1344,11 @@
                 <xs:documentation>Saves the version of a matching product if found; 0.0.0.0 otherwise. This is the default.</xs:documentation>
               </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="exists">
+              <xs:annotation>
+                <xs:documentation>Saves true if a matching product entry is found; false otherwise.</xs:documentation>
+              </xs:annotation>
+            </xs:enumeration>
           </xs:restriction>
         </xs:simpleType>
       </xs:attribute>
