@@ -2736,8 +2736,11 @@ namespace WixToolset.Util
                                 case "assignment":
                                     type = WixProductSearchType.Assignment;
                                     break;
+                                case "exists":
+                                    type = WixProductSearchType.Exists;
+                                    break;
                                 default:
-                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName, result, "version", "language", "state", "assignment"));
+                                    this.Messaging.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, attrib.Parent.Name.LocalName, attrib.Name.LocalName, result, "version", "language", "state", "assignment", "exists"));
                                     break;
                             }
                             break;

@@ -334,6 +334,10 @@ extern "C" HRESULT SearchesParseFromXml(
             {
                 pSearch->MsiProductSearch.Type = BURN_MSI_PRODUCT_SEARCH_TYPE_ASSIGNMENT;
             }
+            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"exists", -1))
+            {
+                pSearch->MsiProductSearch.Type = BURN_MSI_PRODUCT_SEARCH_TYPE_EXISTS;
+            }
             else
             {
                 ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
@@ -1144,6 +1148,7 @@ static HRESULT MsiProductSearch(
     case BURN_MSI_PRODUCT_SEARCH_TYPE_LANGUAGE:
         wzProperty = INSTALLPROPERTY_LANGUAGE;
         break;
+    case BURN_MSI_PRODUCT_SEARCH_TYPE_EXISTS: __fallthrough;
     case BURN_MSI_PRODUCT_SEARCH_TYPE_STATE:
         wzProperty = INSTALLPROPERTY_PRODUCTSTATE;
         break;
@@ -1218,6 +1223,7 @@ static HRESULT MsiProductSearch(
         case BURN_MSI_PRODUCT_SEARCH_TYPE_LANGUAGE:
             // is supposed to remain empty
             break;
+        case BURN_MSI_PRODUCT_SEARCH_TYPE_EXISTS: __fallthrough;
         case BURN_MSI_PRODUCT_SEARCH_TYPE_STATE:
             value.Type = BURN_VARIANT_TYPE_NUMERIC;
             value.llValue = INSTALLSTATE_ABSENT;
@@ -1237,6 +1243,7 @@ static HRESULT MsiProductSearch(
     case BURN_MSI_PRODUCT_SEARCH_TYPE_LANGUAGE:
         type = BURN_VARIANT_TYPE_STRING;
         break;
+    case BURN_MSI_PRODUCT_SEARCH_TYPE_EXISTS: __fallthrough;
     case BURN_MSI_PRODUCT_SEARCH_TYPE_STATE: __fallthrough;
     case BURN_MSI_PRODUCT_SEARCH_TYPE_ASSIGNMENT:
         type = BURN_VARIANT_TYPE_NUMERIC;
@@ -1244,6 +1251,12 @@ static HRESULT MsiProductSearch(
     }
     hr = BVariantChangeType(&value, type);
     ExitOnFailure(hr, "Failed to change value type.");
+
+    // Alter value here after value has changed to numberic type.
+    if (BURN_MSI_PRODUCT_SEARCH_TYPE_EXISTS == pSearch->MsiProductSearch.Type)
+    {
+        value.llValue = (value.llValue == INSTALLSTATE_ABSENT) ? 0 : 1;
+    }
 
     // Set variable.
     hr = VariableSetVariant(pVariables, pSearch->sczVariable, &value);

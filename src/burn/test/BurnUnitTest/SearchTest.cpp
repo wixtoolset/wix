@@ -410,6 +410,8 @@ namespace Bootstrapper
                     L"    <MsiProductSearch Id='Search4' Type='state' ProductCode='{600D0000-0000-0000-0000-000000000000}' Variable='Variable4' />"
                     L"    <MsiProductSearch Id='Search5' Type='assignment' ProductCode='{600D0000-0000-0000-0000-000000000000}' Variable='Variable5' />"
                     L"    <MsiProductSearch Id='Search6' Type='version' ProductCode='{600D0000-1000-0000-0000-000000000000}' Variable='Variable6' />"
+                    L"    <MsiProductSearch Id='Search7' Type='exists' ProductCode='{600D0000-0000-0000-0000-000000000000}' Variable='Variable7' />"
+                    L"    <MsiProductSearch Id='Search8' Type='exists' ProductCode='{BAD00000-0000-0000-0000-000000000000}' Variable='Variable8' />"
                     L"</Bundle>";
 
                 // load XML document
@@ -429,6 +431,8 @@ namespace Bootstrapper
                 Assert::Equal(5ll, VariableGetNumericHelper(&variables, L"Variable4"));
                 Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable5"));
                 Assert::Equal<String^>(gcnew String(L"1.0.0.0"), VariableGetVersionHelper(&variables, L"Variable6"));
+                Assert::Equal(1ll, VariableGetNumericHelper(&variables, L"Variable7"));
+                Assert::Equal(0ll, VariableGetNumericHelper(&variables, L"Variable8"));
             }
             finally
             {
