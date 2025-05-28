@@ -18,7 +18,7 @@ Here's a minimal .wixproj that builds an MSI from the .wxs source files in the p
 
 Example project file: `QuickStart.wixproj`
 ```
-<Project Sdk="WixToolset.Sdk/6.0.0">
+<Project Sdk="WixToolset.Sdk/7.0.0">
 </Project>
 ```
 
