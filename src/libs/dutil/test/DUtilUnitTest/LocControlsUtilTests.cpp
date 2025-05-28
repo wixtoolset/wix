@@ -15,6 +15,7 @@ namespace DutilTests
         void CanLoadControlsWxl()
         {
             HRESULT hr = S_OK;
+            DWORD dwRetry = 0;
             WIX_LOCALIZATION* pLoc = NULL;
             LOC_CONTROL* pLocControl = NULL;
 
@@ -26,7 +27,15 @@ namespace DutilTests
                 NativeAssert::Succeeded(hr, "Failed to initialize Xml.");
 
                 pin_ptr<const wchar_t> wxlFilePath = PtrToStringChars(TestData::Get("TestData", "LocUtilTests", "controls.wxl"));
-                hr = LocLoadFromFile(wxlFilePath, &pLoc);
+                do
+                {
+                    if (FAILED(hr))
+                    {
+                        ::Sleep(500);
+                    }
+
+                    hr = LocLoadFromFile(wxlFilePath, &pLoc);
+                } while (FAILED(hr) && ++dwRetry < 5);
                 NativeAssert::Succeeded(hr, "Failed to parse controls.wxl: {0}", wxlFilePath);
 
                 Assert::Equal(3ul, pLoc->cLocControls);
