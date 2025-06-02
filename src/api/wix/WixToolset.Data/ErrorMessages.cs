@@ -295,7 +295,7 @@ namespace WixToolset.Data
 
         public static Message DuplicateLocalizationIdentifier(SourceLineNumber sourceLineNumbers, string localizationId)
         {
-            return Message(sourceLineNumbers, Ids.DuplicateLocalizationIdentifier, "The localization identifier '{0}' has been duplicated in multiple locations. Please resolve the conflict.", localizationId);
+            return Message(sourceLineNumbers, Ids.DuplicateLocalizationIdentifier, "Either the localization identifier '{0}' has been duplicated in multiple locations or you are missing a default culture file. Please resolve the conflict.", localizationId);
         }
 
         public static Message DuplicateModuleCaseInsensitiveFileIdentifier(SourceLineNumber sourceLineNumbers, string moduleId, string fileId1, string fileId2)
