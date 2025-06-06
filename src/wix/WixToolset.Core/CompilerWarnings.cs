@@ -11,6 +11,11 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.DirectoryRefStandardDirectoryDeprecated, "Using DirectoryRef to reference the standard directory '{0}' is deprecated. Use the StandardDirectory element instead.", directoryId);
         }
 
+        public static Message DirectoryRefStandardDirectoryDeprecated(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.DirectoryRefStandardDirectoryDeprecated, "Using DirectoryRef to reference the standard directory 'TARGETDIR' is deprecated. WiX automatically supplies a root 'TARGETDIR' directory, so you can just omit a DirectoryRef to 'TARGETDIR'. You can also use the StandardDirectory element instead.");
+        }
+
         public static Message DefiningStandardDirectoryDeprecated(SourceLineNumber sourceLineNumbers, string directoryId)
         {
             return Message(sourceLineNumbers, Ids.DefiningStandardDirectoryDeprecated, "It is no longer necessary to define the standard directory '{0}'. Use the StandardDirectory element instead.", directoryId);
