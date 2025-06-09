@@ -9053,9 +9053,14 @@
         <xs:annotation>
           <xs:documentation>
             A file-selection pattern that can include directory names, file names, and wildcards.
-            If a pattern is not an absolute path (via a preprocessor variable, unnamed bind path,
-            or named bind path), it is interpreted as relative to the directory containing the
-            source file. Absolute paths via a named bind path are recommended.
+            
+            We recommend that patterns be fully-qualified, absolute paths, 
+            preferably via named bind path. You can also use preprocessor 
+            variables or unnamed bind paths to create absolute paths.
+
+            If the pattern is a relative path, it is interpreted as relative to either:
+            - an unnamed bind path, if one or more is specified.
+            - the source directory of the file containing the `Files` element, if no unnamed bind paths are specified.
 
             Wildcards include typical `*.ext` globs and MSBuild-style `**` globs to indicate
             that directories should be recursed. Examples include:
