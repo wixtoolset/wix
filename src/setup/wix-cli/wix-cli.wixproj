@@ -9,8 +9,6 @@
 
   <ItemGroup>
     <BindPath BindName="Files" Include="$(RootBuildFolder)wix\$(Configuration)\net472\win-$(Platform)" />
-    <BindPath BindName="Heat_x64" Include="$(RootBuildFolder)tools\$(Configuration)\net472\win-x64\" />
-    <BindPath BindName="Heat_x86" Include="$(RootBuildFolder)tools\$(Configuration)\net472\win-x86\" />
 
     <BindPath Include="$(RootBuildFolder)Bal.wixext\$(Configuration)\netstandard2.0\" />
     <BindPath Include="$(RootBuildFolder)ComPlus.wixext\$(Configuration)\netstandard2.0\" />

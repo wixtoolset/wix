@@ -48,7 +48,6 @@ if exist "%_NUGET_CACHE%\wixtoolset.dtf.windowsinstaller.package" rd /s/q "%_NUG
 if exist "%_NUGET_CACHE%\wixtoolset.dutil" rd /s/q "%_NUGET_CACHE%\wixtoolset.dutil"
 if exist "%_NUGET_CACHE%\wixtoolset.extensibility" rd /s/q "%_NUGET_CACHE%\wixtoolset.extensibility"
 if exist "%_NUGET_CACHE%\wixtoolset.firewall.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.firewall.wixext"
-if exist "%_NUGET_CACHE%\wixtoolset.heat" rd /s/q "%_NUGET_CACHE%\wixtoolset.heat"
 if exist "%_NUGET_CACHE%\wixtoolset.http.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.http.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.iis.wixext" rd /s/q "%_NUGET_CACHE%\wixtoolset.iis.wixext"
 if exist "%_NUGET_CACHE%\wixtoolset.bootstrapperapplicationapi" rd /s/q "%_NUGET_CACHE%\wixtoolset.bootstrapperapplicationapi"

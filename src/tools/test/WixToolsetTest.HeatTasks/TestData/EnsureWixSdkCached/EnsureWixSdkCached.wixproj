@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="WixToolset.Sdk">
-  <!-- This project exists only to pre-cache the WixToolset.Sdk for use by the other test data projects. -->
-</Project>
