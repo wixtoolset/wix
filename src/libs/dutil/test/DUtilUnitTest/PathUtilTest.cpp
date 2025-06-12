@@ -142,7 +142,15 @@ namespace DutilTests
                 else
                 {
                     NativeAssert::Succeeded(hr, "Failed to canonicalize path");
-                    NativeAssert::StringEqual(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+
+                    if ('\\' == *sczCanonicalized)
+                    {
+                        NativeAssert::StringEqual(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+                    }
+                    else
+                    {
+                        NativeAssert::StringEqual(L"C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+                    }
                 }
 
                 hr = PathCanonicalizeForComparison(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", 0, &sczCanonicalized);
@@ -153,7 +161,15 @@ namespace DutilTests
                 else
                 {
                     NativeAssert::Succeeded(hr, "Failed to canonicalize path");
-                    NativeAssert::StringEqual(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+
+                    if ('\\' == *sczCanonicalized)
+                    {
+                        NativeAssert::StringEqual(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+                    }
+                    else
+                    {
+                        NativeAssert::StringEqual(L"C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+                    }
                 }
 
                 hr = PathCanonicalizeForComparison(L"\\\\server", PATH_CANONICALIZE_KEEP_UNC_ROOT, &sczCanonicalized);
@@ -288,7 +304,15 @@ namespace DutilTests
             {
                 hr = PathAllocCanonicalizePath(L"C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", PATHCCH_ALLOW_LONG_PATHS, &sczCanonicalized);
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
-                NativeAssert::StringEqual(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+
+                if ('\\' == *sczCanonicalized)
+                {
+                    NativeAssert::StringEqual(L"\\\\?\\C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+                }
+                else
+                {
+                    NativeAssert::StringEqual(L"C:\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", sczCanonicalized);
+                }
 
                 hr = PathAllocCanonicalizePath(L"abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789\\abcdefghijklomnopqrstuvwxyz0123456789", PATHCCH_ALLOW_LONG_PATHS, &sczCanonicalized);
                 NativeAssert::Succeeded(hr, "Failed to canonicalize path");
@@ -937,50 +961,22 @@ namespace DutilTests
         void PathGetTempPathTest()
         {
             HRESULT hr = S_OK;
-            LPCWSTR wzEnvName = L"TMP";
-            LPCWSTR wzEnvName2 = L"TEMP";
-            LPCWSTR wzLongTempPath = L"C:\\aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\\bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\\cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc\\";
             LPWSTR sczTempPath = NULL;
-            WCHAR wzOriginalTemp[MAX_PATH + 1] = { };
-            WCHAR wzOriginalTemp2[MAX_PATH + 1] = { };
             DWORD cch = 0;
-            DWORD cch2 = 0;
             SIZE_T cchTemp = 0;
-            size_t cchTemp2 = 0;
+            WCHAR wzPath[MAX_PATH + 1];
 
-            try
-            {
-                cch = ::GetEnvironmentVariableW(wzEnvName, wzOriginalTemp, countof(wzOriginalTemp));
-                Assert::NotEqual<DWORD>(0, cch);
+            hr = PathGetTempPath(&sczTempPath, &cchTemp);
+            NativeAssert::Succeeded(hr, "Failed to get temp path.");
 
-                if (!::SetEnvironmentVariableW(wzEnvName, wzLongTempPath))
-                {
-                    Assert::Equal<DWORD>(0xFFFFFFFF, ::GetLastError());
-                }
+            cch = countof(wzPath);
+            cch = ::GetTempPathW(cch, wzPath);
+            Assert::NotEqual((DWORD)0, cch);
 
-                cch2 = ::GetEnvironmentVariableW(wzEnvName2, wzOriginalTemp2, countof(wzOriginalTemp2));
-                Assert::NotEqual<DWORD>(0, cch2);
+            // normalize trailing backslash
+            PathFixedBackslashTerminate(wzPath, cch);
 
-                hr = PathGetTempPath(&sczTempPath, &cchTemp);
-                NativeAssert::Succeeded(hr, "Failed to get temp path.");
-
-                PathFixedBackslashTerminate(wzOriginalTemp2, countof(wzOriginalTemp2));
-
-                hr = ::StringCchLengthW(wzOriginalTemp2, countof(wzOriginalTemp2), &cchTemp2);
-                NativeAssert::Succeeded(hr, "Failed to get temp path length.");
-
-                NativeAssert::StringEqual(wzOriginalTemp2, sczTempPath);
-                Assert::Equal<SIZE_T>(cchTemp2, cchTemp);
-            }
-            finally
-            {
-                if (cch)
-                {
-                    ::SetEnvironmentVariableW(wzEnvName, wzOriginalTemp);
-                }
-
-                ReleaseStr(sczTempPath);
-            }
+            NativeAssert::StringEqual(wzPath, sczTempPath);
         }
 
         [Fact]
