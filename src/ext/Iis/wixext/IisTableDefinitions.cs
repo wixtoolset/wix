@@ -118,6 +118,7 @@ namespace WixToolset.Iis
                 new ColumnDefinition("NoCustomError", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, possibilities: "0;1", description: "Specifies whether IIs will return custom errors for this directory."),
                 new ColumnDefinition("AccessSSLFlags", ColumnType.Number, 2, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Specifies AccessSSLFlags IIS metabase property."),
                 new ColumnDefinition("AuthenticationProviders", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Comma delimited list, in order of precedence, of Windows authentication providers that IIS will attempt to use: NTLM, Kerberos, Negotiate, and others."),
+                new ColumnDefinition("Attributes", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Unknown, description: "Flags for WebDir IIS metabase properties"),
             },
             symbolIdIsPrimaryKey: true
         );

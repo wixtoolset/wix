@@ -55,6 +55,24 @@ namespace WixToolset.Iis
         }
 
         /// <summary>
+        /// Web Directory Browse Flags.
+        /// </summary>
+        /// <remarks>Note that this must be kept in sync with the eWebDirAttributes in scawebprop.h.</remarks>
+        [Flags]
+        public enum WebDirAttributes : int
+        {
+            DirBrowseShowDate       = 1 <<  1,
+            DirBrowseShowExtension  = 1 <<  2,
+            DirBrowseShowLongDate   = 1 <<  3,
+            DirBrowseShowSize       = 1 <<  4,
+            DirBrowseShowTime       = 1 <<  5,
+            EnableDefaultDoc        = 1 <<  6,
+            EnableDirBrowsing       = 1 <<  7,
+
+            Reserved                = 1 << 31,
+        }
+
+        /// <summary>
         /// Processes an element for the Compiler.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line number for the parent element.</param>
@@ -1336,6 +1354,8 @@ namespace WixToolset.Iis
             var accessSet = false;
             int accessSSLFlags = 0;
             var accessSSLFlagsSet = false;
+            WebDirAttributes attributes = 0;
+            var dirAttributesFlagsSet = false;
             string anonymousUser = null;
             var aspDetailedError = YesNoType.NotSet;
             string authenticationProviders = null;
@@ -1374,6 +1394,10 @@ namespace WixToolset.Iis
                             break;
                         case "CacheControlMaxAge":
                             cacheControlMaxAge = this.ParseHelper.GetAttributeLongValue(sourceLineNumbers, attrib, 0, uint.MaxValue); // 4294967295 (uint.MaxValue) represents unlimited
+                            if (cacheControlMaxAge == 0x8000_0000)
+                            {
+                                this.Messaging.Write(ErrorMessages.IllegalMsiUnsignedIntegerValue(sourceLineNumbers, element.Name.LocalName, "CacheControlMaxAge", cacheControlMaxAge.ToString()));
+                            }
                             break;
                         case "ClearCustomError":
                             notCustomError = this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib);
@@ -1495,6 +1519,57 @@ namespace WixToolset.Iis
                                 accessSSLFlags &= ~64;
                             }
                             accessSSLFlagsSet = true;
+                            break;
+
+                        // DirBrowse attributes
+                        case "DirBrowseShowDate":
+                            if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |=  WebDirAttributes.DirBrowseShowDate;
+                                dirAttributesFlagsSet = true;
+                            }
+                            break;
+                        case "DirBrowseShowExtension":
+                            if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= WebDirAttributes.DirBrowseShowExtension;
+                                dirAttributesFlagsSet = true;
+                            }
+                            break;
+                        case "DirBrowseShowLongDate":
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= WebDirAttributes.DirBrowseShowLongDate;
+                                dirAttributesFlagsSet = true;
+                            }
+                            break;
+                        case "DirBrowseShowSize":
+                            if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= WebDirAttributes.DirBrowseShowSize;
+                                dirAttributesFlagsSet = true;
+                            }
+                            break;
+                        case "DirBrowseShowTime":
+                            if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= WebDirAttributes.DirBrowseShowTime;
+                                dirAttributesFlagsSet = true;
+                            }
+                            break;
+                        case "EnableDefaultDoc":
+                            if (YesNoType.No == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= WebDirAttributes.EnableDefaultDoc;
+                                dirAttributesFlagsSet = true;
+                            }
+                            break;
+                        case "EnableDirBrowsing":
+                            if (YesNoType.Yes == this.ParseHelper.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                attributes |= WebDirAttributes.EnableDirBrowsing;
+                                dirAttributesFlagsSet = true;
+                            }
                             break;
 
                         // Authorization attributes
@@ -1633,6 +1708,11 @@ namespace WixToolset.Iis
                 if (null != authenticationProviders)
                 {
                     symbol.AuthenticationProviders = authenticationProviders;
+                }
+
+                if (dirAttributesFlagsSet)
+                {
+                    symbol.Attributes = (int)attributes;
                 }
             }
 

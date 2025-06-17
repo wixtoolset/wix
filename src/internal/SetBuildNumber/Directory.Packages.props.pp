@@ -42,15 +42,21 @@
 
     <PackageVersion Include="WixToolset.Heat" Version="{packageversion}" />
 
-    <PackageVersion Include="WixToolset.Bal.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.BootstrapperApplications.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Bal.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.ComPlus.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Dependency.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.DirectX.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Firewall.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Http.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Iis.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Msmq.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.NetFx.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.PowerShell.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.Sql.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.UI.wixext" Version="{packageversion}" />
     <PackageVersion Include="WixToolset.Util.wixext" Version="{packageversion}" />
-    <PackageVersion Include="WixToolset.Firewall.wixext" Version="{packageversion}" />
-    <PackageVersion Include="WixToolset.Msmq.wixext" Version="{packageversion}" />
+    <PackageVersion Include="WixToolset.VisualStudio.wixext" Version="{packageversion}" />
   </ItemGroup>
 
   <ItemGroup>

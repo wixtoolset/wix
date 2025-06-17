@@ -11,6 +11,7 @@ namespace WixToolset.Iis
         protected override IReadOnlyCollection<Type> ExtensionTypes => new[]
         {
             typeof(IIsCompiler),
+            typeof(IIsDecompiler),
             typeof(IIsExtensionData),
             typeof(IisWindowsInstallerBackendBinderExtension),
         };

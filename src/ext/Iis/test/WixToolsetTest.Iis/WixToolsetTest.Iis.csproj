@@ -12,6 +12,10 @@
     <Content Include="TestData\UsingIis\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingIis\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="TestData\UsingIis\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WebDirProperties\example.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WebDirProperties\Package.en-us.wxl" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WebDirProperties\Package.wxs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="TestData\WebDirProperties\PackageComponents.wxs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
