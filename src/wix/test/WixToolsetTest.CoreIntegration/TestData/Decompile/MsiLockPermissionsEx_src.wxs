@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Package Id="Acme.HelloWorld" Name="HelloWorld" Version="6.0.0" Manufacturer="Acme">
+		<MediaTemplate EmbedCab="yes" />
+
+		<File Source="$(sys.SOURCEFILEPATH)" FontTitle="Helvetibob Bold Oblique" Condition="INSTALLCOOLFONTS">
+			<PermissionEx Condition="INSTALLCOOLFONTSWITHPERMISSIONS" Sddl="asdf" />
+		</File>
+
+		<Component Id="Permissions" Guid="{9E0E9393-9F96-48D1-991E-A99EDAE3F345}">
+			<RegistryKey Root="HKLM" Key="SOFTWARE\Acme\HelloWorld">
+				<RegistryValue Name="EnvironmentVariables" Value="1" Type="integer" KeyPath="yes">
+					<PermissionEx Sddl="qwer" />
+				</RegistryValue>
+			</RegistryKey>
+
+			<CreateFolder Subdirectory="Blargh">
+				<PermissionEx Sddl="zxcv" />
+			</CreateFolder>
+		</Component>
+	</Package>
+</Wix>

@@ -108,6 +108,18 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanDecompileMsiLockPermissionsEx()
+        {
+            DecompileAndCompare("MsiLockPermissionsEx.msi", extract: false, "MsiLockPermissionsEx_expected.wxs", "TestData", "Decompile");
+        }
+
+        [Fact]
+        public void CanDecompileLockPermissions()
+        {
+            DecompileAndCompare("LockPermissions.msi", extract: false, "LockPermissions_expected.wxs", "TestData", "Decompile");
+        }
+
+        [Fact]
         public void CanDecompileMergeModuleWithKeepModularizationIds()
         {
             using (var fs = new DisposableFileSystem())

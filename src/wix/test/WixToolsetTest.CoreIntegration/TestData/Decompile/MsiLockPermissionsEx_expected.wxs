@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Codepage="65001" Id="Acme.HelloWorld" Manufacturer="Acme" ProductCode="{6068AC19-D69C-4862-8A30-05EDBDA2AE84}" Language="0" Name="HelloWorld" Version="6.0.0" UpgradeCode="{002C7487-6DD2-5C30-9445-8D02984AC904}">
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" ShortName="fwpsjck5" Name="Acme HelloWorld">
+        <Directory Id="dRmny_KvyDONxhM5Hhb1TRAHxI2Y" Name="Blargh" />
+        <Component Id="nkf.QewusgIMYDSgIl11WJ5JrljyXg" Guid="{98E2424B-98B4-5561-AAFF-87374A41B6DA}" Bitness="always32" Condition="INSTALLCOOLFONTS">
+          <File Id="nkf.QewusgIMYDSgIl11WJ5JrljyXg" ShortName="kot60v3u.wxs" Name="MsiLockPermissionsEx_src.wxs" FontTitle="Helvetibob Bold Oblique" KeyPath="yes" Source="SourceDir\File\nkf.QewusgIMYDSgIl11WJ5JrljyXg">
+            <PermissionEx Id="pmeWXloTBzPOCqmZnvaF6EFmtnWGyg" Sddl="asdf" Condition="INSTALLCOOLFONTSWITHPERMISSIONS" />
+          </File>
+        </Component>
+        <Component Id="Permissions" Guid="{9E0E9393-9F96-48D1-991E-A99EDAE3F345}" Bitness="always32">
+          <CreateFolder Directory="dRmny_KvyDONxhM5Hhb1TRAHxI2Y">
+            <PermissionEx Id="pmeIGYDv2CC.loRcT25hwAabyEVb1k" Sddl="zxcv" />
+          </CreateFolder>
+          <RegistryValue Id="regWNla9n07njmsmnBd7dVCQVPibZM" Key="SOFTWARE\Acme\HelloWorld" Name="EnvironmentVariables" Root="HKLM" Type="integer" Value="1" KeyPath="yes">
+            <PermissionEx Id="pmeAxeHnEF3Y.VKHIK5m8RywpU1Jz0" Sddl="qwer" />
+          </RegistryValue>
+        </Component>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramFilesFolder" />
+    <Feature Id="WixDefaultFeature" Level="1" Display="hidden">
+      <ComponentRef Id="nkf.QewusgIMYDSgIl11WJ5JrljyXg" />
+      <ComponentRef Id="Permissions" />
+    </Feature>
+    <Media Id="1" EmbedCab="yes" Cabinet="cab1.cab" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+  </Package>
+</Wix>
