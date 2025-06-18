@@ -1444,12 +1444,13 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// </remarks>
         private void FinalizePermissionsTable(TableIndexedCollection tables, string tableName)
         {
-            var createFoldersById = this.IndexTableOneToMany(tables, tableName);
+            var createFoldersById = this.IndexTableOneToMany(tables, "CreateFolder");
+            var msiLockPermissionsEx = tableName == "MsiLockPermissionsEx";
 
             foreach (var row in tables[tableName]?.Rows ?? Enumerable.Empty<Row>())
             {
-                var id = row.FieldAsString(0);
-                var table = row.FieldAsString(1);
+                var id = row.FieldAsString(msiLockPermissionsEx ? 1 : 0);
+                var table = row.FieldAsString(msiLockPermissionsEx ? 2 : 1);
                 var xPermission = this.DecompilerHelper.GetIndexedElement(row);
 
                 if ("CreateFolder" == table)

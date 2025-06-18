@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Codepage="65001" Id="Acme.HelloWorld" Manufacturer="Acme" ProductCode="{AC257DA2-5CFB-42E6-9392-E96BFE70EBBE}" Language="0" Name="HelloWorld" Version="6.0.0" UpgradeCode="{002C7487-6DD2-5C30-9445-8D02984AC904}">
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" ShortName="fwpsjck5" Name="Acme HelloWorld">
+        <Directory Id="dRmny_KvyDONxhM5Hhb1TRAHxI2Y" Name="Blargh" />
+        <Component Id="nkf88TB7NualpER94lroZ5_cgKEJZk" Guid="{F89F8234-8CBF-5EB3-AE62-71C2F5EA966C}" Bitness="always32" Condition="INSTALLCOOLFONTS">
+          <File Id="nkf88TB7NualpER94lroZ5_cgKEJZk" ShortName="uj0jcrbw.wxs" Name="LockPermissions_src.wxs" FontTitle="Helvetibob Bold Oblique" KeyPath="yes" Source="SourceDir\File\nkf88TB7NualpER94lroZ5_cgKEJZk">
+            <Permission User="Bob" Write="yes" WriteAttributes="yes" Delete="yes" />
+          </File>
+        </Component>
+        <Component Id="Permissions" Guid="{9E0E9393-9F96-48D1-991E-A99EDAE3F345}" Bitness="always32">
+          <CreateFolder Directory="dRmny_KvyDONxhM5Hhb1TRAHxI2Y">
+            <Permission User="Bob" CreateFile="yes" CreateChild="yes" Delete="yes" />
+          </CreateFolder>
+          <RegistryValue Id="regWNla9n07njmsmnBd7dVCQVPibZM" Key="SOFTWARE\Acme\HelloWorld" Name="EnvironmentVariables" Root="HKLM" Type="integer" Value="1" KeyPath="yes">
+            <Permission User="Bob" Write="yes" Delete="yes" />
+          </RegistryValue>
+        </Component>
+      </Directory>
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramFilesFolder" />
+    <Feature Id="WixDefaultFeature" Level="1" Display="hidden">
+      <ComponentRef Id="nkf88TB7NualpER94lroZ5_cgKEJZk" />
+      <ComponentRef Id="Permissions" />
+    </Feature>
+    <Media Id="1" EmbedCab="yes" Cabinet="cab1.cab" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+  </Package>
+</Wix>
