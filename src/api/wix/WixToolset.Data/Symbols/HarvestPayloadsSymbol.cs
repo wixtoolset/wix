@@ -10,10 +10,10 @@ namespace WixToolset.Data
             SymbolDefinitionType.HarvestPayloads,
             new[]
             {
-                new IntermediateFieldDefinition(nameof(HarvestFilesSymbolFields.Inclusions), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HarvestFilesSymbolFields.Exclusions), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HarvestFilesSymbolFields.ComplexReferenceParentType), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(HarvestFilesSymbolFields.ParentId), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HarvestPayloadsSymbolFields.Inclusions), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HarvestPayloadsSymbolFields.Exclusions), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HarvestPayloadsSymbolFields.ComplexReferenceParentType), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(HarvestPayloadsSymbolFields.ParentId), IntermediateFieldType.String),
             },
             typeof(HarvestPayloadsSymbol));
     }
