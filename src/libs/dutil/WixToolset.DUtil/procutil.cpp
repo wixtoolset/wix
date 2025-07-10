@@ -44,6 +44,14 @@ extern "C" HRESULT DAPI ProcElevated(
     HANDLE hToken = NULL;
     TOKEN_ELEVATION tokenElevated = { };
     DWORD cbToken = 0;
+    BOOL bPrivileged = FALSE;
+
+    if (OsCouldRunPrivileged(&bPrivileged) != S_OK ||
+        !bPrivileged)
+    {
+        *pfElevated = FALSE;
+        ExitFunction1(hr = S_OK);
+    }
 
     if (!::OpenProcessToken(hProcess, TOKEN_QUERY, &hToken))
     {
