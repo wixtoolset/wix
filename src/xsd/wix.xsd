@@ -1378,7 +1378,10 @@
     </xs:attribute>
     <xs:attribute name="CacheId" type="xs:string">
       <xs:annotation>
-        <xs:documentation>The identifier to use when caching the package.</xs:documentation>
+        <xs:documentation>
+          The identifier to use when caching the package. WiX provides default cache ids---do not override the default unless you
+          have a specific need and understand the implications.
+        </xs:documentation>
       </xs:annotation>
     </xs:attribute>
     <xs:attribute name="DisplayName" type="xs:string">
