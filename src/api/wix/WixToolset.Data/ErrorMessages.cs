@@ -1163,7 +1163,7 @@ namespace WixToolset.Data
 
         public static Message InvalidDateTimeFormat(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value)
         {
-            return Message(sourceLineNumbers, Ids.InvalidDateTimeFormat, "The {0}/@{1} attribute's value '{2}' is not a valid date/time value. A date/time value should follow the format YYYY-MM-DDTHH:mm:ss.", elementName, attributeName, value);
+            return Message(sourceLineNumbers, Ids.InvalidDateTimeFormat, "The {0}/@{1} attribute's value '{2}' is not a valid date/time value. A date/time value should follow the format YYYY-MM-DDTHH:mm:ss and be a valid date and time between 1980 and 2043, inclusive.", elementName, attributeName, value);
         }
 
         public static Message InvalidDocumentElement(SourceLineNumber sourceLineNumbers, string elementName, string fileType, string expectedElementName)
