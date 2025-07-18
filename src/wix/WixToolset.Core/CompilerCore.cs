@@ -550,6 +550,11 @@ namespace WixToolset.Core
                 {
                     DateTime date = DateTime.Parse(value, CultureInfo.InvariantCulture.DateTimeFormat);
 
+                    if (date.Year < 1980 || date.Year > 2043)
+                    {
+                        this.Write(ErrorMessages.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    }
+
                     return ((((date.Year - 1980) * 512) + (date.Month * 32 + date.Day)) * 65536) +
                         (date.Hour * 2048) + (date.Minute * 32) + (date.Second / 2);
                 }
