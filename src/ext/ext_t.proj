@@ -7,18 +7,33 @@
     <ProjectReference Include="Util\util_t.proj" BuildInParallel="false" Targets="Restore;Build" />
     <ProjectReference Include="Bal\bal_t.proj" BuildInParallel="false" Targets="Restore;Build" />
 
-    <ProjectReference Include="NetFx\netfx_t.proj" BuildInParallel="false" Targets="Restore;Build" />
+    <ProjectReference Include="Firewall\firewall_t.proj" Targets="Restore;Build" />
+    <ProjectReference Include="UI\ui_t.proj" Targets="Restore;Build" />
     <ProjectReference Include="ComPlus\complus_t.proj" Targets="Restore;Build" />
     <ProjectReference Include="Dependency\dependency_t.proj" Targets="Restore;Build" />
     <ProjectReference Include="DirectX\directx_t.proj" Targets="Restore;Build" />
-    <ProjectReference Include="Firewall\firewall_t.proj" Targets="Restore;Build" />
     <ProjectReference Include="Http\http_t.proj" Targets="Restore;Build" />
     <ProjectReference Include="Iis\iis_t.proj" Targets="Restore;Build" />
     <ProjectReference Include="Msmq\msmq_t.proj" Targets="Restore;Build" />
     <ProjectReference Include="NetFx\netfx_t.proj" Targets="Restore;Build" />
     <ProjectReference Include="PowerShell\powershell_t.proj" Targets="Restore;Build" />
     <ProjectReference Include="Sql\sql_t.proj" Targets="Restore;Build" />
-    <ProjectReference Include="UI\ui_t.proj" Targets="Restore;Build" />
     <ProjectReference Include="VisualStudio\visualstudio_t.proj" Targets="Restore;Build" />
+
+    <ProjectReference Include="Firewall\firewall_t.proj" Targets="WixTest" />
+    <ProjectReference Include="UI\ui_t.proj" Targets="WixTest" />
+    <ProjectReference Include="Util\util_t.proj" Targets="WixTest" />
+    <ProjectReference Include="Bal\bal_t.proj" Targets="WixTest" />
+    <ProjectReference Include="ComPlus\complus_t.proj" Targets="WixTest" />
+    <ProjectReference Include="Dependency\dependency_t.proj" Targets="WixTest" />
+    <ProjectReference Include="DirectX\directx_t.proj" Targets="WixTest" />
+    <ProjectReference Include="Http\http_t.proj" Targets="WixTest" />
+    <ProjectReference Include="Iis\iis_t.proj" Targets="WixTest" />
+    <ProjectReference Include="Msmq\msmq_t.proj" Targets="WixTest" />
+    <ProjectReference Include="NetFx\netfx_t.proj" Targets="WixTest" />
+    <ProjectReference Include="PowerShell\powershell_t.proj" Targets="WixTest" />
+    <ProjectReference Include="Sql\sql_t.proj" Targets="WixTest" />
+    <ProjectReference Include="VisualStudio\visualstudio_t.proj" Targets="WixTest" />
+
   </ItemGroup>
 </Project>

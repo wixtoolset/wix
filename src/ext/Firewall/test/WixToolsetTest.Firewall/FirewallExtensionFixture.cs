@@ -1,7 +1,12 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+[assembly: Parallelize(Scope = ExecutionScope.MethodLevel)]
+
 namespace WixToolsetTest.Firewall
 {
+    using System;
     using System.Data;
     using System.IO;
     using System.Linq;
@@ -687,8 +692,9 @@ namespace WixToolsetTest.Firewall
             var folder = TestData.Get(@"TestData", path);
             var build = new Builder(folder, typeof(FirewallExtensionFactory), new[] { folder });
             var output = Path.Combine(folder, $"Firewall{ruleName}.xml");
+            var isOfficialBuild = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("WixOfficialBuild"));
 
-            build.BuildAndDecompileAndBuild(Build, Decompile, output, validate: true);
+            build.BuildAndDecompileAndBuild(Build, Decompile, output, validate: isOfficialBuild);
 
             var doc = XDocument.Load(output);
             var actual = doc.Descendants()

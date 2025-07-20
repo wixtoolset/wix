@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
-    <ProjectReference Include="test\WixToolsetTest.Util\WixToolsetTest.Util.csproj" Targets="Test" />
+    <ProjectReference Include="test\WixToolsetTest.Util\WixToolsetTest.Util.csproj" />
     <ProjectReference Include="wixext\WixToolset.Util.wixext.csproj" Targets="Pack" Properties="NoBuild=true" />
   </ItemGroup>
 
@@ -13,5 +13,9 @@
     <RemoveDir Directories="$(NUGET_PACKAGES)\wixtoolset.util.wixext" Condition="'$(NUGET_PACKAGES)' != ''" />
 
     <Delete Files="$(ArtifactsFolder)WixToolset.Util.wixext.*.nupkg" />
+  </Target>
+
+  <Target Name="WixTest">
+    <MSBuild Projects="test\WixToolsetTest.Util\WixToolsetTest.Util.csproj" Targets="Test" />
   </Target>
 </Project>

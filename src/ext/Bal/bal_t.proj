@@ -18,7 +18,7 @@
 
     <ProjectReference Include="test\examples\examples.proj" />
 
-    <ProjectReference Include="test\WixToolsetTest.BootstrapperApplications\WixToolsetTest.BootstrapperApplications.csproj" Targets="Test" />
+    <ProjectReference Include="test\WixToolsetTest.BootstrapperApplications\WixToolsetTest.BootstrapperApplications.csproj" />
 
     <!-- 
     Currently there are no unskipped unit tests in this project. Should that change,
@@ -40,5 +40,9 @@
     <Delete Files="$(ArtifactsFolder)WixToolset.Bal.wixext.*.nupkg" />
     <Delete Files="$(ArtifactsFolder)WixToolset.BootstrapperApplications.wixext.*.nupkg" />
     <Delete Files="$(ArtifactsFolder)WixToolset.WixStandardBootstrapperApplicationFunctionApi.wixext.*.nupkg" />
+  </Target>
+
+  <Target Name="WixTest">
+    <MSBuild Projects="test\WixToolsetTest.BootstrapperApplications\WixToolsetTest.BootstrapperApplications.csproj" Targets="Test" />
   </Target>
 </Project>

@@ -3,7 +3,7 @@
 
 <Project Sdk="Microsoft.Build.Traversal">
   <ItemGroup>
-    <ProjectReference Include="test\WixToolsetTest.Firewall\WixToolsetTest.Firewall.csproj" Targets="Test" />
+    <ProjectReference Include="test\WixToolsetTest.Firewall\WixToolsetTest.Firewall.csproj" />
     <ProjectReference Include="wixext\WixToolset.Firewall.wixext.csproj" Targets="Pack" Properties="NoBuild=true" />
   </ItemGroup>
 
@@ -13,5 +13,9 @@
     <RemoveDir Directories="$(NUGET_PACKAGES)\wixtoolset.firewall.wixext" Condition="'$(NUGET_PACKAGES)' != ''" />
 
     <Delete Files="$(ArtifactsFolder)WixToolset.Firewall.wixext.*.nupkg" />
+  </Target>
+
+  <Target Name="WixTest">
+    <MSBuild Projects="test\WixToolsetTest.Firewall\WixToolsetTest.Firewall.csproj" Targets="Test" />
   </Target>
 </Project>
