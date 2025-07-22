@@ -290,7 +290,7 @@ namespace WixToolset.Data
 
         public static Message DuplicateLocalizationIdentifier(SourceLineNumber sourceLineNumbers, string localizationId)
         {
-            return Message(sourceLineNumbers, Ids.DuplicateLocalizationIdentifier, "Either the localization identifier '{0}' has been duplicated in multiple locations or you are missing a default culture file. Please resolve the conflict.", localizationId);
+            return Message(sourceLineNumbers, Ids.DuplicateLocalizationIdentifier, "The localization identifier '{0}' has been duplicated in multiple locations. A common cause is a bundle .wixproj that automatically loads .wxl files that are intended for the bootstrapper application. You can turn off that behavior by setting the EnableDefaultEmbeddedResourceItems property to false.", localizationId);
         }
 
         public static Message DuplicateModuleCaseInsensitiveFileIdentifier(SourceLineNumber sourceLineNumbers, string moduleId, string fileId1, string fileId2)
