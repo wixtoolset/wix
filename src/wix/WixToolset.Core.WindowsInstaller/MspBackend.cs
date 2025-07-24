@@ -58,7 +58,7 @@ namespace WixToolset.Core.WindowsInstaller
                 subStorages = command.Execute();
             }
 
-            // Create WindowsInstallerData with patch metdata and transforms as sub-storages
+            // Create WindowsInstallerData with patch metadata and transforms as sub-storages
             // and create MSP from that WindowsInstallerData.
             IBindResult result = null;
             try
