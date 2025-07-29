@@ -323,19 +323,22 @@ namespace WixToolsetTest.BurnE2E
             if (this.SupportAddonAndPatchRelatedBundles)
             {
                 bundleJ_Patch.VerifyRegisteredAndInPackageCache();
-
+            
                 packageA.VerifyInstalled(true);
                 packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
                 packageEv1.VerifyInstalledWithVersion(false);
                 packageEv101.VerifyInstalledWithVersion(true);
+            
+                bundleJ_Patch.Uninstall(0, "-burn.related.patch");
+                bundleJ_Patch.VerifyUnregisteredAndRemovedFromPackageCache();
             }
-
-            bundleJ.Uninstall(0, "-burn.related.patch");
+            
+            bundleJ.Uninstall();
             if (this.SupportAddonAndPatchRelatedBundles)
             {
                 bundleJ.VerifyUnregisteredAndRemovedFromPackageCache();
                 bundleJ_Patch.VerifyUnregisteredAndRemovedFromPackageCache();
-
+            
                 packageA.VerifyInstalled(false);
                 packageEv1.VerifyInstalledWithVersion(false);
                 packageEv101.VerifyInstalledWithVersion(false);
