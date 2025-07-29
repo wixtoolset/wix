@@ -331,6 +331,8 @@ namespace WixToolsetTest.BurnE2E
             
                 bundleJ_Patch.Uninstall(0, "-burn.related.patch");
                 bundleJ_Patch.VerifyUnregisteredAndRemovedFromPackageCache();
+                packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
+                packageEv101.VerifyInstalledWithVersion(false);
             }
             
             bundleJ.Uninstall();
