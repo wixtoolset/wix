@@ -135,6 +135,9 @@ namespace WixToolset.Core.Burn
                 case WixProductSearchType.Assignment:
                     writer.WriteAttributeString("Type", "assignment");
                     break;
+                case WixProductSearchType.Exists:
+                    writer.WriteAttributeString("Type", "exists");
+                    break;
                 default:
                     throw new NotImplementedException();
             }
