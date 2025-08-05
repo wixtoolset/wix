@@ -291,8 +291,73 @@ namespace WixToolsetTest.BurnE2E
             }
         }
 
-        [RuntimeFact(Skip = "https://github.com/wixtoolset/issues/issues/9138")]
+        [RuntimeFact]
         public void CanUninstallPatchBundleFromARP()
+        {
+            var originalVersion = "1.0.0.0";
+            var patchedVersion = "1.0.1.0";
+            var testRegistryValue = "PackageA";
+        
+            var packageA = this.CreatePackageInstaller("PackageAv1");
+            var packageEv1 = this.CreatePackageInstaller("PackageEv1");
+            var packageEv101 = this.CreatePackageInstaller("PackageEv1_0_1");
+            var bundleJ = this.CreateBundleInstaller("BundleJ");
+            var bundleJ_Patch = this.CreateBundleInstaller("BundleJ_Patch");
+        
+            packageA.VerifyInstalled(false);
+            packageEv1.VerifyInstalledWithVersion(false);
+            packageEv101.VerifyInstalledWithVersion(false);
+        
+            bundleJ.Install();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ.VerifyRegisteredAndInPackageCache();
+        
+                packageA.VerifyInstalled(true);
+                packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
+                packageEv1.VerifyInstalledWithVersion(true);
+            }
+        
+            bundleJ_Patch.Install();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ_Patch.VerifyRegisteredAndInPackageCache();
+        
+                packageA.VerifyInstalled(true);
+                packageA.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
+                packageEv1.VerifyInstalledWithVersion(false);
+                packageEv101.VerifyInstalledWithVersion(true);
+            }
+        
+            bundleJ_Patch.Uninstall(0, "-burn.related.patch");
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ_Patch.VerifyUnregisteredAndRemovedFromPackageCache();
+                packageA.VerifyTestRegistryValue(testRegistryValue, originalVersion);
+        
+                // Uninstalling a patch bundle does not uninstall the bundle patch updated msi
+                //packageEv101.VerifyInstalledWithVersion(false);
+            }
+        
+            bundleJ.Uninstall();
+            if (this.SupportAddonAndPatchRelatedBundles)
+            {
+                bundleJ.VerifyUnregisteredAndRemovedFromPackageCache();
+                bundleJ_Patch.VerifyUnregisteredAndRemovedFromPackageCache();
+        
+                packageA.VerifyInstalled(false);
+                packageEv1.VerifyInstalledWithVersion(false);
+        
+                // Uninstalling a patch bundle does not uninstall the bundle patch updated msi
+                // https://github.com/wixtoolset/issues/issues/9138
+                if (packageEv101.IsInstalledWithVersion())
+                {
+                    packageEv101.UninstallProduct();
+                }
+            }
+        }
+        [RuntimeFact(Skip = "https://github.com/wixtoolset/issues/issues/9138")]
+        public void CanUninstallPatchBundleFromARPRemoveUpdatedMSI()
         {
             var originalVersion = "1.0.0.0";
             var patchedVersion = "1.0.1.0";
