@@ -371,6 +371,7 @@ static void OnEraseBkgnd(
     HDC hdc = reinterpret_cast<HDC>(wParam);
     HDC hdcMem = ::CreateCompatibleDC(hdc);
     HBITMAP hDefaultBitmap = static_cast<HBITMAP>(::SelectObject(hdcMem, pSplashScreen->hBitmap));
+    ::SetStretchBltMode(hdc, HALFTONE);
     ::StretchBlt(hdc, 0, 0, pSplashScreen->size.cx, pSplashScreen->size.cy, hdcMem, 0, 0, pSplashScreen->defaultDpiSize.cx, pSplashScreen->defaultDpiSize.cy, SRCCOPY);
     ::SelectObject(hdcMem, hDefaultBitmap);
     ::DeleteDC(hdcMem);
