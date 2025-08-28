@@ -17,9 +17,9 @@ To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/wixto
 Add the WiX Extension as a PackageReference to your .wixproj:
 
 ```
-<Project Sdk="WixToolset.Sdk/6.0.1">
+<Project Sdk="WixToolset.Sdk/6.0.2">
   <ItemGroup>
-    <PackageReference Include="WixToolset.Msmq.wixext" Version="6.0.1" />
+    <PackageReference Include="WixToolset.Msmq.wixext" Version="6.0.2" />
   </ItemGroup>
 </Project>
 ```

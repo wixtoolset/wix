@@ -18,7 +18,7 @@ For most users, we recommend using the [WixToolset.Sdk][sdk] to build your insta
 
 Example project file: `QuickStart.wixproj`
 ```
-<Project Sdk="WixToolset.Sdk/6.0.1">
+<Project Sdk="WixToolset.Sdk/6.0.2">
 </Project>
 ```
 
