@@ -99,7 +99,7 @@ namespace WixInternal.MSTestSupport
 
         public static void NotEmpty<T>(IEnumerable<T> collection)
         {
-            Assert.IsTrue(collection.Count() > 0);
+            Assert.IsGreaterThan(0, collection.Count());
         }
 
         public static void Empty<T>(IEnumerable<T> collection)

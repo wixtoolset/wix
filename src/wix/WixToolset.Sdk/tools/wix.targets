@@ -26,7 +26,7 @@
 
   <!-- These properties can be overridden to support non-default installations. -->
   <PropertyGroup>
-    <WixBinDir Condition=" '$(WixBinDir)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)net6.0\</WixBinDir>
+    <WixBinDir Condition=" '$(WixBinDir)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">$(MSBuildThisFileDirectory)net8.0\</WixBinDir>
     <WixBinDir Condition=" '$(WixBinDir)' == '' ">$(MSBuildThisFileDirectory)net472\</WixBinDir>
     <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixBinDir)WixToolset.BuildTasks.dll</WixTasksPath>
   </PropertyGroup>

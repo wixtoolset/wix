@@ -377,7 +377,7 @@ namespace WixToolsetTest.Util
                 extractResult.AssertSuccess();
 
                 var bootstrapperExtensionDatas = extractResult.SelectBootstrapperExtensionDataNodes("/be:BootstrapperExtensionData/be:BootstrapperExtension[@Id='Wix4UtilBootstrapperExtension_X86']");
-                Assert.AreEqual(1, bootstrapperExtensionDatas.Count);
+                Assert.HasCount(1, bootstrapperExtensionDatas);
                 Assert.AreEqual("<BootstrapperExtension Id='Wix4UtilBootstrapperExtension_X86'>" +
                     "<WixWindowsFeatureSearch Id='DetectSHA2SupportId' Type='sha2CodeSigning' />" +
                     "</BootstrapperExtension>", bootstrapperExtensionDatas[0].GetTestXml());

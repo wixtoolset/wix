@@ -26,7 +26,6 @@
     <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="All" />
   </ItemGroup>
 
-
   <ItemGroup Condition=" '$(IsWixTestProject)'!='true' ">
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>

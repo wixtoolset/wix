@@ -3,7 +3,7 @@
 
 <Project Sdk="MSTest.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <DefaultItemExcludes>TestData\**;$(DefaultItemExcludes)</DefaultItemExcludes>
     <RequiresNativeWixAssets>true</RequiresNativeWixAssets>
     <IsWixMSTestProject>true</IsWixMSTestProject>
@@ -18,6 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="WixInternal.MSTestSupport" /> 
+    <PackageReference Include="WixInternal.MSTestSupport" />
   </ItemGroup>
 </Project>

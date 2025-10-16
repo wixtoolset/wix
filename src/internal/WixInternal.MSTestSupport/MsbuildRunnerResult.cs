@@ -13,7 +13,7 @@ namespace WixInternal.MSTestSupport
 
         public void AssertSuccess()
         {
-            Assert.IsTrue(0 == this.ExitCode, $"MSBuild failed unexpectedly. Output:{Environment.NewLine}{String.Join(Environment.NewLine, this.Output)}");
+            Assert.AreEqual(0, this.ExitCode, $"MSBuild failed unexpectedly. Output:{Environment.NewLine}{String.Join(Environment.NewLine, this.Output)}");
         }
     }
 }

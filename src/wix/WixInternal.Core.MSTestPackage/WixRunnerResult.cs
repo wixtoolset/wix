@@ -23,7 +23,7 @@ namespace WixInternal.Core.MSTestPackage
         public Message[] Messages { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         public WixRunnerResult AssertSuccess()
@@ -33,13 +33,13 @@ namespace WixInternal.Core.MSTestPackage
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="exitCode"></param>
         /// <param name="messages"></param>
         public static void AssertSuccess(int exitCode, IEnumerable<Message> messages)
         {
-            Assert.IsTrue(0 == exitCode, $"\r\n\r\nWixRunner failed with exit code: {exitCode}\r\n   Output: {String.Join("\r\n           ", FormatMessages(messages))}\r\n");
+            Assert.AreEqual(0, exitCode, $"\r\n\r\nWixRunner failed with exit code: {exitCode}\r\n   Output: {String.Join("\r\n           ", FormatMessages(messages))}\r\n");
         }
 
         private static IEnumerable<string> FormatMessages(IEnumerable<Message> messages)
