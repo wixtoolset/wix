@@ -3,7 +3,7 @@
 
 <Project Sdk="MSTest.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <IsWixMSTestProject>true</IsWixMSTestProject>
   </PropertyGroup>
 

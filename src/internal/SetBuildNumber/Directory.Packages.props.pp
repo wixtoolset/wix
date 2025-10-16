@@ -52,58 +52,52 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="6.0.2" />
-    <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="6.0.2" />
-    <PackageVersion Include="System.DirectoryServices" Version="6.0.2" />
-    <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="6.0.1" />
-    <PackageVersion Include="System.Management" Version="6.0.2" />
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="8.0.1" />
+    <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="8.0.1" />
+    <PackageVersion Include="System.DirectoryServices" Version="8.0.0" />
+    <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="8.0.1" />
+    <PackageVersion Include="System.Management" Version="8.0.0" />
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
     <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
     <PackageVersion Include="System.Net.NetworkInformation" Version="4.3.0" />
-    <PackageVersion Include="System.Reflection.Metadata" Version="6.0.2" />
+    <PackageVersion Include="System.Reflection.Metadata" Version="8.0.1" />
     <PackageVersion Include="System.Security.Principal.Windows" Version="5.0.0" />
-    <PackageVersion Include="System.Text.Encoding.CodePages" Version="6.0.1" />
-    <PackageVersion Include="System.Text.Json" Version="8.0.5" />
-    <PackageVersion Include="System.Memory" Version="4.5.5" />
+    <PackageVersion Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.6" />
+    <PackageVersion Include="System.Memory" Version="4.6.3" />
 
-    <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="3.1.13" />
-    <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="3.10.2154" />
+    <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="8.0.21" />
+    <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="3.14.2075" />
     <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="NuGet.Credentials" Version="6.12.1" />
-    <PackageVersion Include="NuGet.Protocol" Version="6.12.1" />
-    <PackageVersion Include="NuGet.Versioning" Version="6.12.1" />
+    <PackageVersion Include="NuGet.Credentials" Version="6.13.2" />
+    <PackageVersion Include="NuGet.Protocol" Version="6.13.2" />
+    <PackageVersion Include="NuGet.Versioning" Version="6.13.2" />
   </ItemGroup>
 
-  <!--
-    These MSBuild versions are trapped in antiquity for heat.exe.
-  -->
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="14.3.0" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'">
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="15.7.179" />
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.13.26" />
   </ItemGroup>
 
   <!-- Keep the following versions in sync with internal\WixInternal.TestSupport.Native\packages.config -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
 
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-    <PackageVersion Include="xunit" Version="2.8.1" />
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.1" />
-    <PackageVersion Include="xunit.assert" Version="2.8.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="xunit.assert" Version="2.9.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="MSTest.TestFramework" Version="3.8.3" />
+    <PackageVersion Include="MSTest.TestFramework" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="Microsoft.NET.Tools.NETCoreCheck.x86" Version="6.0.0" />
-    <PackageVersion Include="Microsoft.NET.Tools.NETCoreCheck.x64" Version="6.0.0" />
-    <PackageVersion Include="Microsoft.NET.Tools.NETCoreCheck.arm64" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.NET.Tools.NETCoreCheck.x86" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.NET.Tools.NETCoreCheck.x64" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.NET.Tools.NETCoreCheck.arm64" Version="7.0.0" />
   </ItemGroup>
 </Project>

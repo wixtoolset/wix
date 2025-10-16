@@ -36,7 +36,7 @@ Before building the WiX Toolset, ensure you have Visual Studio 2022 (17.8.2 or h
 
 | Individual components |
 | :-------------------- |
-| .NET 6.0 Runtime (Long Term Support) |
+| .NET 8.0 Runtime (Long Term Support) |
 | .NET Framework 4.7.2 SDK |
 | .NET Framework 4.7.2 targeting pack |
 | .NET Framework 4.6.2 targeting pack |

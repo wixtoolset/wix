@@ -1,9 +1,12 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+[assembly: Parallelize(Scope = ExecutionScope.MethodLevel)]
+
 namespace WixToolsetTest.ComPlus
 {
     using System.Linq;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using WixInternal.MSTestSupport;
     using WixInternal.Core.MSTestPackage;
     using WixToolset.ComPlus;
