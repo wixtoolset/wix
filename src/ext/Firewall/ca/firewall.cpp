@@ -464,29 +464,30 @@ static HRESULT GetFwRuleInterfaces(
         }
     }
 
-    ExitOnNull(iInterfacesCount, hr, S_OK, "All interfaces are empty values");
-
-    vInterfaces.vt = VT_ARRAY | VT_VARIANT;
-    // this will be cleaned up by ReleaseVariant call of the calling function
-    vInterfaces.parray = SafeArrayCreateVector(VT_VARIANT, 0, iInterfacesCount);
-
-    for (LPCWSTR pwzElement = bstrInterfaces; pwzElement < (bstrInterfaces + iLength); ++pwzElement)
+    if (iInterfacesCount > 0)
     {
-        if (*pwzElement)
+        vInterfaces.vt = VT_ARRAY | VT_VARIANT;
+        // this will be cleaned up by ReleaseVariant call of the calling function
+        vInterfaces.parray = SafeArrayCreateVector(VT_VARIANT, 0, iInterfacesCount);
+
+        for (LPCWSTR pwzElement = bstrInterfaces; pwzElement < (bstrInterfaces + iLength); ++pwzElement)
         {
-            VARIANT vElement;
-            ::VariantInit(&vElement);
+            if (*pwzElement)
+            {
+                VARIANT vElement;
+                ::VariantInit(&vElement);
 
-            vElement.vt = VT_BSTR;
-            // this will be cleaned up by ReleaseVariant call of the calling function
-            vElement.bstrVal = ::SysAllocString(pwzElement);
-            ExitOnNull(vElement.bstrVal, hr, E_OUTOFMEMORY, "failed SysAllocString for interface element");
+                vElement.vt = VT_BSTR;
+                // this will be cleaned up by ReleaseVariant call of the calling function
+                vElement.bstrVal = ::SysAllocString(pwzElement);
+                ExitOnNull(vElement.bstrVal, hr, E_OUTOFMEMORY, "failed SysAllocString for interface element");
 
-            hr = SafeArrayPutElement(vInterfaces.parray, &iIndex, &vElement);
-            ExitOnFailure(hr, "failed to put interface '%ls' into safe array", pwzElement);
+                hr = SafeArrayPutElement(vInterfaces.parray, &iIndex, &vElement);
+                ExitOnFailure(hr, "failed to put interface '%ls' into safe array", pwzElement);
 
-            pwzElement += ::SysStringLen(vElement.bstrVal);
-            iIndex++;
+                pwzElement += ::SysStringLen(vElement.bstrVal);
+                iIndex++;
+            }
         }
     }
 
