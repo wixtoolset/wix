@@ -11,43 +11,43 @@ namespace DutilTests
     public ref class FileUtil
     {
     public:
-        [Fact(Skip="Skipped until we have a good way to reference ANSI.txt.")]
-        void FileUtilTest()
-        {
-            HRESULT hr = S_OK;
-            LPWSTR sczTempDir = NULL;
-            LPWSTR sczFileDir = NULL;
+        // [Fact(Skip="Skipped until we have a good way to reference ANSI.txt.")]
+        // void FileUtilTest()
+        // {
+        //     HRESULT hr = S_OK;
+        //     LPWSTR sczTempDir = NULL;
+        //     LPWSTR sczFileDir = NULL;
 
-            DutilInitialize(&DutilTestTraceError);
+        //     DutilInitialize(&DutilTestTraceError);
 
-            try
-            {
-                hr = PathExpand(&sczTempDir, L"%TEMP%\\FileUtilTest\\", PATH_EXPAND_ENVIRONMENT);
-                NativeAssert::Succeeded(hr, "Failed to get temp dir");
+        //     try
+        //     {
+        //         hr = PathExpand(&sczTempDir, L"%TEMP%\\FileUtilTest\\", PATH_EXPAND_ENVIRONMENT);
+        //         NativeAssert::Succeeded(hr, "Failed to get temp dir");
 
-                hr = PathExpand(&sczFileDir, L"%WIX_ROOT%\\examples\\data\\TextEncodings\\", PATH_EXPAND_ENVIRONMENT);
-                NativeAssert::Succeeded(hr, "Failed to get path to encodings file dir");
+        //         hr = PathExpand(&sczFileDir, L"%WIX_ROOT%\\examples\\data\\TextEncodings\\", PATH_EXPAND_ENVIRONMENT);
+        //         NativeAssert::Succeeded(hr, "Failed to get path to encodings file dir");
 
-                hr = DirEnsureExists(sczTempDir, NULL);
-                NativeAssert::Succeeded(hr, "Failed to ensure directory exists: {0}", sczTempDir);
+        //         hr = DirEnsureExists(sczTempDir, NULL);
+        //         NativeAssert::Succeeded(hr, "Failed to ensure directory exists: {0}", sczTempDir);
 
-                TestFile(sczFileDir, sczTempDir, L"ANSI.txt", 32, FILE_ENCODING_UTF8);
-                // Big endian not supported today!
-                //TestFile(sczFileDir, L"UnicodeBENoBOM.txt", 34);
-                //TestFile(sczFileDir, L"UnicodeBEWithBOM.txt", 34);
-                TestFile(sczFileDir, sczTempDir, L"UnicodeLENoBOM.txt", 34, FILE_ENCODING_UTF16);
-                TestFile(sczFileDir, sczTempDir, L"UnicodeLEWithBOM.txt", 34, FILE_ENCODING_UTF16_WITH_BOM);
-                TestFile(sczFileDir, sczTempDir, L"UTF8WithSignature.txt", 34, FILE_ENCODING_UTF8_WITH_BOM);
+        //         TestFile(sczFileDir, sczTempDir, L"ANSI.txt", 32, FILE_ENCODING_UTF8);
+        //         // Big endian not supported today!
+        //         //TestFile(sczFileDir, L"UnicodeBENoBOM.txt", 34);
+        //         //TestFile(sczFileDir, L"UnicodeBEWithBOM.txt", 34);
+        //         TestFile(sczFileDir, sczTempDir, L"UnicodeLENoBOM.txt", 34, FILE_ENCODING_UTF16);
+        //         TestFile(sczFileDir, sczTempDir, L"UnicodeLEWithBOM.txt", 34, FILE_ENCODING_UTF16_WITH_BOM);
+        //         TestFile(sczFileDir, sczTempDir, L"UTF8WithSignature.txt", 34, FILE_ENCODING_UTF8_WITH_BOM);
 
-                hr = DirEnsureDelete(sczTempDir, TRUE, TRUE);
-            }
-            finally
-            {
-                ReleaseStr(sczTempDir);
-                ReleaseStr(sczFileDir);
-                DutilUninitialize();
-            }
-        }
+        //         hr = DirEnsureDelete(sczTempDir, TRUE, TRUE);
+        //     }
+        //     finally
+        //     {
+        //         ReleaseStr(sczTempDir);
+        //         ReleaseStr(sczFileDir);
+        //         DutilUninitialize();
+        //     }
+        // }
 
     private:
         void TestFile(LPWSTR wzDir, LPCWSTR wzTempDir, LPWSTR wzFileName, size_t cbExpectedStringLength, FILE_ENCODING feExpectedEncoding)
