@@ -190,7 +190,7 @@
         <xs:annotation>
           <xs:documentation>
             Identifier of a File to be granted access through the firewall. By default,
-            all incoming ports and protocols are allowed unless the Port and.or Protocol
+            all incoming ports and protocols are allowed unless the Port and/or Protocol
             attributes are specified.
 
             If you use File, you cannot also use Program.
@@ -202,7 +202,7 @@
         <xs:annotation>
           <xs:documentation>
             Path to a target program to be granted access through the firewall. By default,
-            all incoming ports and protocols are allowed unless the Port and.or Protocol
+            all incoming ports and protocols are allowed unless the Port and/or Protocol
             attributes are specified.
 
             Note that this is a formatted field, so you can use [#fileId]

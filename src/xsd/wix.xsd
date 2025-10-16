@@ -5419,11 +5419,11 @@
   <xs:element name="PermissionEx">
     <xs:annotation>
       <xs:documentation>
-                Sets ACLs on File, Registry, or CreateFolder. When under a Registry element, this cannot be used
-                if the Action attribute's value is remove or removeKeyOnInstall. This element is only available
-                when installing with MSI 5.0. For downlevel support, see the PermissionEx element from the
-                WixUtilExtension.
-            </xs:documentation>
+        Sets ACLs on File, Registry, CreateFolder, or ServiceInstall. When under a Registry element, this cannot be used
+        if the Action attribute's value is remove or removeKeyOnInstall. This element is only available
+        when installing with MSI 5.0. For downlevel support, see the PermissionEx element from the
+        WixUtilExtension.
+      </xs:documentation>
       <xs:appinfo>
         <xse:msiRef table="MsiLockPermissionsEx" href="http://msdn.microsoft.com/library/aa369774.aspx" />
       </xs:appinfo>
@@ -7539,6 +7539,15 @@
         <xse:msiRef table="ServiceControl" href="http://msdn.microsoft.com/library/aa371634.aspx" />
       </xs:appinfo>
     </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="Value" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+             A Formatted value for the Service argument.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
   </xs:element>
   <xs:element name="ServiceControl">
     <xs:annotation>
@@ -7613,13 +7622,22 @@
   <xs:element name="RequiredPrivilege" type="xs:string">
     <xs:annotation>
       <xs:documentation>
-        Privilege required by service configured by ServiceConfig parent. Valid values are a <html:a href="http://msdn.microsoft.com/en-us/library/bb530716.aspx">privilege constant</html:a> or a
-        Formatted property that resolves to a privilege constant.
+        Privilege required by service configured by ServiceConfig parent.
       </xs:documentation>
       <xs:appinfo>
         <xse:msiRef table="MsiServiceConfig" href="https://learn.microsoft.com/en-us/windows/win32/msi/msiserviceconfig-table" />
       </xs:appinfo>
     </xs:annotation>
+    <xs:complexType>
+      <xs:attribute name="Name" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+             Valid values are a <html:a href="http://msdn.microsoft.com/en-us/library/bb530716.aspx">privilege constant</html:a> or a
+             Formatted property that resolves to a privilege constant.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
   </xs:element>
   <xs:element name="ServiceConfig">
     <xs:annotation>
@@ -8972,9 +8990,9 @@
         <xs:annotation>
           <xs:documentation>
             A file-selection pattern that can include directory names, file names, and wildcards.
-            
-            We recommend that patterns be fully-qualified, absolute paths, 
-            preferably via named bind path. You can also use preprocessor 
+
+            We recommend that patterns be fully-qualified, absolute paths,
+            preferably via named bind path. You can also use preprocessor
             variables or unnamed bind paths to create absolute paths.
 
             If the pattern is a relative path, it is interpreted as relative to either:
