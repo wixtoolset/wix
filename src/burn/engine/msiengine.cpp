@@ -904,7 +904,7 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         else if ((BOOTSTRAPPER_REQUEST_STATE_ABSENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested) &&
                  !pPackage->fPermanent) // removing a package that should be removed.
         {
-            execute = BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED == pPackage->currentState ? BOOTSTRAPPER_ACTION_STATE_NONE : BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+            execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
         }
         else if (BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT == pPackage->requested)
         {
