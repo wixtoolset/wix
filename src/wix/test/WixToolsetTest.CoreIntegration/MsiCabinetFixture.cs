@@ -252,5 +252,40 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.CompareLineByLine(expectedMedia, mediaSymbols.Select(s => String.Join(" ", s.DiskId, s.Cabinet, s.LastSequence)).ToArray());
             }
         }
+
+        [Fact]
+        public void CanBuildNoFilesCompressed()
+        {
+            var folder = TestData.Get(@"TestData", "NoFileCompressed");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var intermediateFolder = fs.GetFolder();
+
+                var result = WixRunner.Execute(
+                [
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(intermediateFolder, @"bin\test.msi")
+                ], out var messages, warningsAsErrors: false);
+
+                Assert.Equal(0, result);
+                WixAssert.CompareLineByLine(
+                [
+                    "1079 Warning - The cabinet 'example.cab' does not contain any files. If this installation contains no files, this warning can likely be safely ignored. Otherwise, please add files to the cabinet or remove it."
+                ], [.. messages.Select(m => $"{m.Id} {m.Level} - {m}")]);
+
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, "bin", "test.msi")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, "bin", "example.cab")));
+                Assert.True(File.Exists(Path.Combine(intermediateFolder, "bin", "test.wixpdb")));
+
+                var intermediate = Intermediate.Load(Path.Combine(intermediateFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+
+                Assert.Empty(section.Symbols.OfType<FileSymbol>());
+            }
+        }
     }
 }

@@ -1,0 +1,9 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Id="WixTest.NoFiles" Name="MsiPackage" Language="1033" Version="0.0.1" Manufacturer="Example Corporation" Compressed="yes">
+    <Media Id="1" Cabinet="example.cab" />
+
+    <Component>
+      <RegistryValue Root="HKMU" Key="SOFTWARE\Wix Test" Name="Foo" Value="Bar" />
+    </Component>
+  </Package>
+</Wix>
