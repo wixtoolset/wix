@@ -2,6 +2,9 @@
 
 #include "precomp.h"
 
+static HRESULT WixNativeReadStdinPreamble();
+
+
 int __cdecl wmain(int argc, LPWSTR argv[])
 {
     HRESULT hr = E_INVALIDARG;
@@ -11,8 +14,14 @@ int __cdecl wmain(int argc, LPWSTR argv[])
     if (argc < 2)
     {
         ConsoleWriteError(hr, CONSOLE_COLOR_RED, "Must specify a command");
+
+        ExitFunction();
     }
-    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"smartcab", -1))
+
+    hr = WixNativeReadStdinPreamble();
+    ExitOnFailure(hr, "failed to read stdin preamble");
+
+    if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"smartcab", -1))
     {
         hr = SmartCabCommand(argc - 2, argv + 2);
     }
@@ -33,11 +42,12 @@ int __cdecl wmain(int argc, LPWSTR argv[])
         ConsoleWriteError(hr, CONSOLE_COLOR_RED, "Unknown command: %ls", argv[1]);
     }
 
+LExit:
     ConsoleUninitialize();
     return HRESULT_CODE(hr);
 }
 
-HRESULT WixNativeReadStdinPreamble()
+static HRESULT WixNativeReadStdinPreamble()
 {
     HRESULT hr = S_OK;
     LPWSTR sczLine = NULL;

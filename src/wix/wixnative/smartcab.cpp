@@ -69,9 +69,6 @@ HRESULT SmartCabCommand(
 
     if (uiFileCount > 0)
     {
-        hr = WixNativeReadStdinPreamble();
-        ExitOnFailure(hr, "failed to read stdin preamble before smartcabbing");
-
         hr = CompressFiles(hCab, &sczFirstFileToken);
         ExitOnFailure(hr, "failed to compress files into cabinet: %ls", sczCabPath);
 

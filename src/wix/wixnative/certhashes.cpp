@@ -27,9 +27,6 @@ HRESULT CertificateHashesCommand(
     LPWSTR sczPublicKeyIdentifier = NULL;
     LPWSTR sczThumbprint = NULL;
 
-    hr = WixNativeReadStdinPreamble();
-    ExitOnFailure(hr, "Failed to read stdin preamble before reading paths to get certificate hashes");
-
     // Get the hash for each provided file.
     for (;;)
     {
