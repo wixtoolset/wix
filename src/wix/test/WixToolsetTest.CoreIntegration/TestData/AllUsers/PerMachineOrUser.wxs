@@ -1,0 +1,10 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Id="WixToolsetTest.TestPackage"
+           Version="1"
+           Name="PerMachine Or User Msi"
+           Manufacturer="Example Corporation"
+           Scope="perMachineOrUser">
+
+    <File Source="PerMachineOrUser.wxs" />
+  </Package>
+</Wix>

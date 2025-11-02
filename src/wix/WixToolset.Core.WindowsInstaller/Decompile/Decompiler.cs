@@ -3056,9 +3056,16 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                                         {
                                             xAllUsers?.Remove();
                                         }
-                                        else if (xAllUsers?.Attribute("Value")?.Value == "2" && xMsiInstallerPerUser?.Attribute("Value")?.Value == "1")
+                                        else if (xAllUsers?.Attribute("Value")?.Value == "2")
                                         {
-                                            this.DecompilerHelper.RootElement.SetAttributeValue("Scope", "perUserOrMachine");
+                                            if (xMsiInstallerPerUser?.Attribute("Value")?.Value == "1")
+                                            {
+                                                this.DecompilerHelper.RootElement.SetAttributeValue("Scope", "perUserOrMachine");
+                                            }
+                                            else
+                                            {
+                                                this.DecompilerHelper.RootElement.SetAttributeValue("Scope", "perMachineOrUser");
+                                            }
 
                                             xAllUsers?.Remove();
                                             xMsiInstallerPerUser?.Remove();

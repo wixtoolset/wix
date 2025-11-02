@@ -54,6 +54,7 @@ namespace WixToolset.Data.Symbols
         PerMachine,
         PerUser,
         PerUserOrMachine,
+        PerMachineOrUser,
     }
 
     public enum WixPackageUpgradeStrategy

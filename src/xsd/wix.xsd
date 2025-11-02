@@ -14187,6 +14187,16 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
+      <xs:enumeration value="perMachineOrUser">
+        <xs:annotation>
+          <xs:documentation>
+            _New in WiX v7: WiX v7 adds this option to the Package Scope attribute._
+            Set this value to declare that the package is [dual-purpose that can install per-machine or per-user](https://learn.microsoft.com/en-us/windows/win32/msi/single-package-authoring)
+            and defaults to installing per-machine.
+            Sets the ALLUSERS property to 2.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
       <xs:enumeration value="perUser">
         <xs:annotation>
           <xs:documentation>
@@ -14198,7 +14208,8 @@
       <xs:enumeration value="perUserOrMachine">
         <xs:annotation>
           <xs:documentation>
-            Set this value to declare that the package is [dual-purpose that can install per-user or per-machine](https://learn.microsoft.com/en-us/windows/win32/msi/single-package-authoring).
+            Set this value to declare that the package is [dual-purpose that can install per-user or per-machine](https://learn.microsoft.com/en-us/windows/win32/msi/single-package-authoring)
+            and defaults to installing per-user.
             Sets the ALLUSERS property to 2 and MSIINSTALLPERUSER property to 1.
           </xs:documentation>
         </xs:annotation>
