@@ -93,6 +93,9 @@ namespace WixToolset.Core
                             case "perMachine":
                                 // handled below after we create the section.
                                 break;
+                            case "perMachineOrUser":
+                                scope = WixPackageScope.PerMachineOrUser;
+                                break;
                             case "perUser":
                                 scope = WixPackageScope.PerUser;
                                 sourceBits |= 8;
@@ -101,7 +104,7 @@ namespace WixToolset.Core
                                 scope = WixPackageScope.PerUserOrMachine;
                                 break;
                             default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser", "perUserOrMachine"));
+                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perMachineOrUser", "perUser", "perUserOrMachine"));
                                 break;
                             }
                         break;
@@ -209,6 +212,10 @@ namespace WixToolset.Core
                 {
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ALLUSERS"), "2", false, false, false, false);
                     this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "MSIINSTALLPERUSER"), "1", false, false, false, false);
+                }
+                else if (scope == WixPackageScope.PerMachineOrUser)
+                {
+                    this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "ALLUSERS"), "2", false, false, false, false);
                 }
                 else if (scope == WixPackageScope.PerMachine)
                 {

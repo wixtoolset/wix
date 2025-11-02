@@ -23,6 +23,18 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanCheckPerMachineOrUserMsi()
+        {
+            var propertyRows = BuildAndQueryPropertyTable("PerMachineOrUser.wxs");
+
+            WixAssert.CompareLineByLine(new[]
+            {
+                "_SummaryInformation:WordCount\t2",
+                "Property:ALLUSERS\t2"
+            }, propertyRows);
+        }
+
+        [Fact]
         public void CanCheckPerUserMsi()
         {
             var propertyRows = BuildAndQueryPropertyTable("PerUser.wxs");
