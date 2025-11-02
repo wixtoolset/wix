@@ -115,8 +115,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (IOException e)
             {
-                // TODO: this error message doesn't seem specific enough
-                throw new WixException(ErrorMessages.FileNotFound(new SourceLineNumber(this.OutputPath), this.OutputPath), e);
+                this.Messaging.Write(WindowsInstallerBackendErrors.OpenDatabaseFailed(this.OutputPath, e.Message));
+            }
+            catch (MsiException e)
+            {
+                this.Messaging.Write(WindowsInstallerBackendErrors.OpenDatabaseFailed(this.OutputPath, e.Message));
             }
         }
 

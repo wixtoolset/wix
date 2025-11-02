@@ -17,16 +17,16 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="error">The error code from the MsiXxx() function call.</param>
         public MsiException(int error) : base(error)
         {
-            IntPtr handle = MsiInterop.MsiGetLastErrorRecord();
+            var handle = MsiInterop.MsiGetLastErrorRecord();
             if (IntPtr.Zero != handle)
             {
-                using (Record record = new Record(handle))
+                using (var record = new Record(handle))
                 {
                     this.MsiError = record.GetInteger(1);
 
-                    int errorInfoCount = record.GetFieldCount() - 1;
+                    var errorInfoCount = record.GetFieldCount() - 1;
                     this.ErrorInfo = new string[errorInfoCount];
-                    for (int i = 0; i < errorInfoCount; ++i)
+                    for (var i = 0; i < errorInfoCount; ++i)
                     {
                         this.ErrorInfo[i] = record.GetString(i + 2);
                     }

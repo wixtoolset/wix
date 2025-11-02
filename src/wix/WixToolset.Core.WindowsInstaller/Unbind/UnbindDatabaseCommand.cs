@@ -104,7 +104,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             {
                 if (0x6E == e.NativeErrorCode) // ERROR_OPEN_FAILED
                 {
-                    throw new WixException(ErrorMessages.OpenDatabaseFailed(this.DatabasePath));
+                    throw new WixException(WindowsInstallerBackendErrors.OpenDatabaseFailed(this.DatabasePath, e.Message));
                 }
 
                 throw;

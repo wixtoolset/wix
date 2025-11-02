@@ -7,6 +7,11 @@ namespace WixToolset.Core.WindowsInstaller
 
     internal static class WindowsInstallerBackendErrors
     {
+        public static Message OpenDatabaseFailed(string databaseFile, string error)
+        {
+            return Message(null, Ids.OpenDatabaseFailed, "Failed to open database '{0}'. Ensure it is a valid database, is writable, and it is not open by another process. {1}", databaseFile, error);
+        }
+
         public static Message CannotLoadWixoutAsTransform(SourceLineNumber sourceLineNumbers, Exception exception)
         {
             var additionalDetail = exception == null ? String.Empty : ", detail: " + exception.Message;
@@ -51,6 +56,8 @@ namespace WixToolset.Core.WindowsInstaller
 
         public enum Ids
         {
+            OpenDatabaseFailed = 223,
+
             CannotLoadWixoutAsTransform = 7500,
             InvalidModuleVersion = 7501,
             ExceededMaximumAllowedComponentsInMsi = 7502,
