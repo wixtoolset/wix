@@ -224,7 +224,7 @@ extern "C" HRESULT DAPI SceCreateDatabase(
     LPWSTR sczDirectory = NULL;
     SCE_DATABASE *pNewSceDatabase = NULL;
     SCE_DATABASE_INTERNAL *pNewSceDatabaseInternal = NULL;
-    IDBDataSourceAdmin *pIDBDataSourceAdmin = NULL; 
+    IDBDataSourceAdmin *pIDBDataSourceAdmin = NULL;
     DBPROPSET rgdbpDataSourcePropSet[2] = { };
     DBPROP rgdbpDataSourceProp[2] = { };
     DBPROP rgdbpDataSourceSsceProp[1] = { };
@@ -239,7 +239,7 @@ extern "C" HRESULT DAPI SceCreateDatabase(
 
     hr = CreateSqlCe(wzSqlCeDllPath, &pNewSceDatabaseInternal->pIDBInitialize, &pNewSceDatabaseInternal->hSqlCeDll);
     ExitOnFailure(hr, "Failed to get IDBInitialize interface");
-    
+
     hr = pNewSceDatabaseInternal->pIDBInitialize->QueryInterface(IID_IDBDataSourceAdmin, reinterpret_cast<void **>(&pIDBDataSourceAdmin));
     ExitOnFailure(hr, "Failed to get IDBDataSourceAdmin interface");
 
@@ -259,7 +259,7 @@ extern "C" HRESULT DAPI SceCreateDatabase(
     rgdbpDataSourceProp[1].vValue.vt = VT_I4;
     rgdbpDataSourceProp[1].vValue.lVal = DB_MODE_SHARE_DENY_NONE;
 
-    // SQL CE doesn't seem to allow us to specify DBPROP_INIT_PROMPT if we include any properties from DBPROPSET_SSCE_DBINIT 
+    // SQL CE doesn't seem to allow us to specify DBPROP_INIT_PROMPT if we include any properties from DBPROPSET_SSCE_DBINIT
     rgdbpDataSourcePropSet[0].guidPropertySet = DBPROPSET_DBINIT;
     rgdbpDataSourcePropSet[0].rgProperties = rgdbpDataSourceProp;
     rgdbpDataSourcePropSet[0].cProperties = _countof(rgdbpDataSourceProp);
@@ -336,7 +336,7 @@ extern "C" HRESULT DAPI SceOpenDatabase(
 
     hr = CreateSqlCe(wzSqlCeDllPath, &pNewSceDatabaseInternal->pIDBInitialize, &pNewSceDatabaseInternal->hSqlCeDll);
     ExitOnFailure(hr, "Failed to get IDBInitialize interface");
-    
+
     hr = pNewSceDatabaseInternal->pIDBInitialize->QueryInterface(IID_IDBProperties, reinterpret_cast<void **>(&pNewSceDatabaseInternal->pIDBProperties));
     ExitOnFailure(hr, "Failed to get IDBProperties interface");
 
@@ -369,7 +369,7 @@ extern "C" HRESULT DAPI SceOpenDatabase(
     rgdbpDataSourceProp[1].vValue.vt = VT_I4;
     rgdbpDataSourceProp[1].vValue.lVal = DB_MODE_SHARE_DENY_NONE;
 
-    // SQL CE doesn't seem to allow us to specify DBPROP_INIT_PROMPT if we include any properties from DBPROPSET_SSCE_DBINIT 
+    // SQL CE doesn't seem to allow us to specify DBPROP_INIT_PROMPT if we include any properties from DBPROPSET_SSCE_DBINIT
     rgdbpDataSourcePropSet[0].guidPropertySet = DBPROPSET_DBINIT;
     rgdbpDataSourcePropSet[0].rgProperties = rgdbpDataSourceProp;
     rgdbpDataSourcePropSet[0].cProperties = _countof(rgdbpDataSourceProp);
@@ -407,7 +407,7 @@ extern "C" HRESULT DAPI SceOpenDatabase(
     hr = GetDatabaseSchemaInfo(pNewSceDatabase, &sczSchemaType, &dwVersionFound);
     ExitOnFailure(hr, "Failed to find schema version of database");
 
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, 0, sczSchemaType, -1, wzExpectedSchemaType, -1))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(sczSchemaType, -1, wzExpectedSchemaType, -1, FALSE))
     {
         hr = HRESULT_FROM_WIN32(ERROR_BAD_FILE_TYPE);
         ExitOnRootFailure(hr, "Tried to open wrong database type - expected type %ls, found type %ls", wzExpectedSchemaType, sczSchemaType);
@@ -2306,8 +2306,8 @@ static HRESULT SetSessionProperties(
     rgdbpDataSourceProp[0].dwPropertyID = DBPROP_SSCE_TRANSACTION_COMMIT_MODE;
     rgdbpDataSourceProp[0].dwOptions = DBPROPOPTIONS_REQUIRED;
     rgdbpDataSourceProp[0].vValue.vt = VT_I4;
-    rgdbpDataSourceProp[0].vValue.lVal = DBPROPVAL_SSCE_TCM_FLUSH; 
-        
+    rgdbpDataSourceProp[0].vValue.lVal = DBPROPVAL_SSCE_TCM_FLUSH;
+
     rgdbpDataSourcePropSet[0].guidPropertySet = DBPROPSET_SSCE_SESSION;
     rgdbpDataSourcePropSet[0].rgProperties = rgdbpDataSourceProp;
     rgdbpDataSourcePropSet[0].cProperties = 1;

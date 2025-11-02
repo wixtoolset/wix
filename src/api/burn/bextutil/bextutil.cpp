@@ -87,7 +87,7 @@ DAPI_(HRESULT) BextGetBootstrapperExtensionDataNode(
         hr = XmlGetAttributeEx(pixnNode, L"Id", &sczId);
         ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Id.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczId, -1, wzExtensionId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(sczId, -1, wzExtensionId, -1, FALSE))
         {
             *ppixnBootstrapperExtension = pixnNode;
             pixnNode = NULL;

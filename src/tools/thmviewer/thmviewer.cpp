@@ -495,14 +495,14 @@ static void OnNewTheme(
             tvi.item.lParam = i + 1; //prgdwPageIds[i]; - TODO: do the right thing here by calling ThemeGetPageIds(), should not assume we know how the page ids will be calculated.
 
             HTREEITEM hti = reinterpret_cast<HTREEITEM>(::SendMessage(pTreeControl->hWnd, TVM_INSERTITEMW, 0, reinterpret_cast<LPARAM>(&tvi)));
-            if (*wzSelectedPage && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pPage->sczName, -1, wzSelectedPage, -1))
+            if (*wzSelectedPage && CSTR_EQUAL == ::CompareStringOrdinal(pPage->sczName, -1, wzSelectedPage, -1, FALSE))
             {
                 htiSelected = hti;
             }
         }
     }
 
-    if (*wzSelectedPage && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, L"Application", -1, wzSelectedPage, -1))
+    if (*wzSelectedPage && CSTR_EQUAL == ::CompareStringOrdinal(L"Application", -1, wzSelectedPage, -1, FALSE))
     {
         htiSelected = tvi.hParent;
     }
@@ -519,7 +519,7 @@ static BOOL OnThemeLoadingControl(
     __in THEME_LOADINGCONTROL_RESULTS* pResults
     )
 {
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pArgs->pThemeControl->sczName, -1, L"Tree", -1))
+    if (CSTR_EQUAL == ::CompareStringOrdinal(pArgs->pThemeControl->sczName, -1, L"Tree", -1, FALSE))
     {
         pResults->wId = THMVWR_CONTROL_TREE;
     }

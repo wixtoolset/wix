@@ -771,7 +771,7 @@ extern "C" void MspEngineUpdateInstallRegistrationState(
         {
             pTargetProduct = pPackage->Msp.rgTargetProducts + j;
             if (pAction->mspTarget.fPerMachineTarget == (MSIINSTALLCONTEXT_MACHINE == pTargetProduct->context) &&
-                CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pAction->mspTarget.sczTargetProductCode, -1, pTargetProduct->wzTargetProductCode, -1))
+                CSTR_EQUAL == ::CompareStringOrdinal(pAction->mspTarget.sczTargetProductCode, -1, pTargetProduct->wzTargetProductCode, -1, FALSE))
             {
                 break;
             }
@@ -1069,7 +1069,7 @@ static HRESULT DeterminePatchChainedTarget(
     {
         BURN_PACKAGE* pPackage = pPackages->rgPackages + iPackage;
 
-        if (BURN_PACKAGE_TYPE_MSI == pPackage->type && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzTargetProductCode, -1, pPackage->Msi.sczProductCode, -1))
+        if (BURN_PACKAGE_TYPE_MSI == pPackage->type && CSTR_EQUAL == ::CompareStringOrdinal(wzTargetProductCode, -1, pPackage->Msi.sczProductCode, -1, FALSE))
         {
             pTargetProduct->pChainedTargetPackage = pPackage;
 
@@ -1123,7 +1123,7 @@ static HRESULT PlanTargetProduct(
         if (BURN_EXECUTE_ACTION_TYPE_MSP_TARGET == pAction->type &&
             pAction->mspTarget.action == actionState &&
             pAction->mspTarget.fPerMachineTarget == (MSIINSTALLCONTEXT_MACHINE == pTargetProduct->context) &&
-            CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pAction->mspTarget.sczTargetProductCode, -1, pTargetProduct->wzTargetProductCode, -1))
+            CSTR_EQUAL == ::CompareStringOrdinal(pAction->mspTarget.sczTargetProductCode, -1, pTargetProduct->wzTargetProductCode, -1, FALSE))
         {
             dwInsertSequence = i;
             break;

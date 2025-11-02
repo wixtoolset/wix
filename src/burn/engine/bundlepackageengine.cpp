@@ -146,7 +146,7 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
         hr = XmlGetAttributeEx(pixnElement, L"Code", &sczCode);
         ExitOnFailure(hr, "Failed to get @Code.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Detect", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(sczAction, -1, L"Detect", -1, FALSE))
         {
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczDetectCodes), *pcDetectCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Detect code array");
@@ -155,7 +155,7 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
             sczCode = NULL;
             *pcDetectCodes += 1;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Upgrade", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(sczAction, -1, L"Upgrade", -1, FALSE))
         {
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczUpgradeCodes), *pcUpgradeCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Upgrade code array");
@@ -164,7 +164,7 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
             sczCode = NULL;
             *pcUpgradeCodes += 1;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Addon", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(sczAction, -1, L"Addon", -1, FALSE))
         {
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczAddonCodes), *pcAddonCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Addon code array");
@@ -173,7 +173,7 @@ extern "C" HRESULT BundlePackageEngineParseRelatedCodes(
             sczCode = NULL;
             *pcAddonCodes += 1;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczAction, -1, L"Patch", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(sczAction, -1, L"Patch", -1, FALSE))
         {
             hr = MemEnsureArraySizeForNewItems(reinterpret_cast<LPVOID*>(prgsczPatchCodes), *pcPatchCodes, 1, sizeof(LPWSTR), 5);
             ExitOnFailure(hr, "Failed to resize Patch code array");

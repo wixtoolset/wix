@@ -47,7 +47,7 @@ STDMETHODIMP UtilSearchParseFromXml(
         BextExitOnFailure(hr, "Failed to get @Id.");
 
         // Read type specific attributes.
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"WixWindowsFeatureSearch", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"WixWindowsFeatureSearch", -1, FALSE))
         {
             pSearch->Type = UTIL_SEARCH_TYPE_WINDOWS_FEATURE_SEARCH;
 
@@ -55,7 +55,7 @@ STDMETHODIMP UtilSearchParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
             BextExitOnFailure(hr, "Failed to get @Type.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"sha2CodeSigning", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"sha2CodeSigning", -1, FALSE))
             {
                 pSearch->WindowsFeatureSearch.type = UTIL_WINDOWS_FEATURE_SEARCH_TYPE_SHA2_CODE_SIGNING;
             }
@@ -144,7 +144,7 @@ STDMETHODIMP UtilSearchFindById(
     {
         UTIL_SEARCH* pSearch = &pSearches->rgSearches[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pSearch->sczId, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pSearch->sczId, -1, wzId, -1, FALSE))
         {
             *ppSearch = pSearch;
             ExitFunction1(hr = S_OK);

@@ -928,7 +928,7 @@ static HRESULT CompareStringValues(
     )
 {
     HRESULT hr = S_OK;
-    DWORD dwCompareString = (comparison & INSENSITIVE) ? NORM_IGNORECASE : 0;
+    BOOL fIgnoreCase = (comparison & INSENSITIVE) ? TRUE : FALSE;
     size_t cchLeftSize = 0;
     size_t cchRightSize = 0;
     int cchLeft = 0;
@@ -958,7 +958,7 @@ static HRESULT CompareStringValues(
     case BURN_SYMBOL_TYPE_EQ_I:
     case BURN_SYMBOL_TYPE_NE_I:
         {
-            int i = ::CompareStringW(LOCALE_INVARIANT, dwCompareString, wzLeftOperand, cchLeft, wzRightOperand, cchRight);
+            int i = ::CompareStringOrdinal(wzLeftOperand, cchLeft, wzRightOperand, cchRight, fIgnoreCase);
             hr = CompareIntegerValues(comparison, i, CSTR_EQUAL, pfResult);
         }
         break;
@@ -967,7 +967,7 @@ static HRESULT CompareStringValues(
         // test if left string contains right string
         for (int i = 0; (i + cchRight) <= cchLeft; ++i)
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, dwCompareString, wzLeftOperand + i, cchRight, wzRightOperand, cchRight))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(wzLeftOperand + i, cchRight, wzRightOperand, cchRight, fIgnoreCase))
             {
                 *pfResult = TRUE;
                 ExitFunction();
@@ -978,12 +978,12 @@ static HRESULT CompareStringValues(
     case BURN_SYMBOL_TYPE_HIEQ:
     case BURN_SYMBOL_TYPE_HIEQ_I:
         // test if left string starts with right string
-        *pfResult = cchLeft >= cchRight && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, dwCompareString, wzLeftOperand, cchRight, wzRightOperand, cchRight);
+        *pfResult = cchLeft >= cchRight && CSTR_EQUAL == ::CompareStringOrdinal(wzLeftOperand, cchRight, wzRightOperand, cchRight, fIgnoreCase);
         break;
     case BURN_SYMBOL_TYPE_LOEQ:
     case BURN_SYMBOL_TYPE_LOEQ_I:
         // test if left string ends with right string
-        *pfResult = cchLeft >= cchRight && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, dwCompareString, wzLeftOperand + (cchLeft - cchRight), cchRight, wzRightOperand, cchRight);
+        *pfResult = cchLeft >= cchRight && CSTR_EQUAL == ::CompareStringOrdinal(wzLeftOperand + (cchLeft - cchRight), cchRight, wzRightOperand, cchRight, fIgnoreCase);
         break;
     default:
         ExitFunction1(hr = E_INVALIDARG);

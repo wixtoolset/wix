@@ -98,7 +98,7 @@ extern "C" void DAPI XmlUninitialize(
         {
             ::CoUninitialize();
         }
-    } 
+    }
 }
 
 extern "C" HRESULT DAPI XmlCreateElement(
@@ -738,7 +738,7 @@ HRESULT DAPI XmlGetYesNoAttribute(
     {
         XmlExitOnFailure(hr, "Failed to get attribute.");
 
-        *pfYes = CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczValue, -1, L"yes", -1);
+        *pfYes = CSTR_EQUAL == ::CompareStringOrdinal(sczValue, -1, L"yes", -1, FALSE);
     }
 
 LExit:

@@ -190,7 +190,7 @@ DAPI_(HRESULT) BalInfoAddRelatedBundleAsPackage(
     // Check to see if the bundle is already in the list of packages.
     for (DWORD i = 0; i < pPackages->cPackages; ++i)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzId, -1, pPackages->rgPackages[i].sczId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(wzId, -1, pPackages->rgPackages[i].sczId, -1, FALSE))
         {
             ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS));
         }
@@ -232,7 +232,7 @@ DAPI_(HRESULT) BalInfoAddUpdateBundleAsPackage(
     // Check to see if the bundle is already in the list of packages.
     for (DWORD i = 0; i < pPackages->cPackages; ++i)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzId, -1, pPackages->rgPackages[i].sczId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(wzId, -1, pPackages->rgPackages[i].sczId, -1, FALSE))
         {
             ExitFunction1(hr = HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS));
         }
@@ -270,7 +270,7 @@ DAPI_(HRESULT) BalInfoFindPackageById(
 
     for (DWORD i = 0; i < pPackages->cPackages; ++i)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzId, -1, pPackages->rgPackages[i].sczId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(wzId, -1, pPackages->rgPackages[i].sczId, -1, FALSE))
         {
             *ppPackage = pPackages->rgPackages + i;
             break;
@@ -409,23 +409,23 @@ static HRESULT ParsePackagesFromXml(
         hr = XmlGetAttributeEx(pNode, L"PackageType", &scz);
         ExitOnRequiredXmlQueryFailure(hr, "Failed to get package type for package.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, L"Bundle", -1, scz, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(L"Bundle", -1, scz, -1, FALSE))
         {
             prgPackages[iPackage].type = BAL_INFO_PACKAGE_TYPE_BUNDLE_CHAIN;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, L"Exe", -1, scz, -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(L"Exe", -1, scz, -1, FALSE))
         {
             prgPackages[iPackage].type = BAL_INFO_PACKAGE_TYPE_EXE;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, L"Msi", -1, scz, -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(L"Msi", -1, scz, -1, FALSE))
         {
             prgPackages[iPackage].type = BAL_INFO_PACKAGE_TYPE_MSI;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, L"Msp", -1, scz, -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(L"Msp", -1, scz, -1, FALSE))
         {
             prgPackages[iPackage].type = BAL_INFO_PACKAGE_TYPE_MSP;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, L"Msu", -1, scz, -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(L"Msu", -1, scz, -1, FALSE))
         {
             prgPackages[iPackage].type = BAL_INFO_PACKAGE_TYPE_MSU;
         }
@@ -454,15 +454,15 @@ static HRESULT ParsePackagesFromXml(
         hr = XmlGetAttributeEx(pNode, L"Cache", &scz);
         ExitOnRequiredXmlQueryFailure(hr, "Failed to get cache type for package.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, scz, -1, L"remove", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"remove", -1, FALSE))
         {
             prgPackages[iPackage].cacheType = BOOTSTRAPPER_CACHE_TYPE_REMOVE;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, scz, -1, L"keep", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"keep", -1, FALSE))
         {
             prgPackages[iPackage].cacheType = BOOTSTRAPPER_CACHE_TYPE_KEEP;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, scz, -1, L"force", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"force", -1, FALSE))
         {
             prgPackages[iPackage].cacheType = BOOTSTRAPPER_CACHE_TYPE_FORCE;
         }
@@ -522,19 +522,19 @@ static HRESULT ParseBalPackageInfoFromXml(
 
         if (fXmlFound)
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"default", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"default", -1, FALSE))
             {
                 pPackage->primaryPackageType = BAL_INFO_PRIMARY_PACKAGE_TYPE_DEFAULT;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"x86", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"x86", -1, FALSE))
             {
                 pPackage->primaryPackageType = BAL_INFO_PRIMARY_PACKAGE_TYPE_X86;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"x64", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"x64", -1, FALSE))
             {
                 pPackage->primaryPackageType = BAL_INFO_PRIMARY_PACKAGE_TYPE_X64;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"arm64", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"arm64", -1, FALSE))
             {
                 pPackage->primaryPackageType = BAL_INFO_PRIMARY_PACKAGE_TYPE_ARM64;
             }
@@ -611,11 +611,11 @@ static HRESULT ParseOverridableVariablesFromXml(
         hr = XmlGetAttributeEx(pCommandLineNode, L"VariableType", &scz);
         ExitOnRequiredXmlQueryFailure(hr, "Failed to get command line variable type.");
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"caseInsensitive", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"caseInsensitive", -1, FALSE))
         {
             pOverridableVariables->commandLineType = BAL_INFO_VARIABLE_COMMAND_LINE_TYPE_CASE_INSENSITIVE;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"caseSensitive", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"caseSensitive", -1, FALSE))
         {
             pOverridableVariables->commandLineType = BAL_INFO_VARIABLE_COMMAND_LINE_TYPE_CASE_SENSITIVE;
         }

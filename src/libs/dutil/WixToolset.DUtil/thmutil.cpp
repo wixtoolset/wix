@@ -1145,7 +1145,7 @@ DAPI_(void) ThemeGetPageIds(
         for (DWORD j = 0; j < pTheme->cPages; ++j)
         {
             LPCWSTR wzPageName = pTheme->rgPages[j].sczName;
-            if (wzPageName && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzPageName, -1, wzFindName, -1))
+            if (wzPageName && CSTR_EQUAL == ::CompareStringOrdinal(wzPageName, -1, wzFindName, -1, FALSE))
             {
                 rgdwPageIds[i] = j + 1; // add one to make the page ids 1-based (so zero is invalid).
                 break;
@@ -2082,7 +2082,7 @@ static HRESULT ParseButtonImages(
             ThmExitOnFailure(hr, "Null element encountered!");
         }
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"ButtonFocusImage", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"ButtonFocusImage", -1, FALSE))
         {
             if (pFocusImageRef)
             {
@@ -2091,7 +2091,7 @@ static HRESULT ParseButtonImages(
 
             pImageRef = pFocusImageRef = pControl->Button.rgImageRef + 3;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"ButtonHoverImage", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"ButtonHoverImage", -1, FALSE))
         {
             if (pHoverImageRef)
             {
@@ -2100,7 +2100,7 @@ static HRESULT ParseButtonImages(
 
             pImageRef = pHoverImageRef = pControl->Button.rgImageRef + 1;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"ButtonSelectedImage", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"ButtonSelectedImage", -1, FALSE))
         {
             if (pSelectedImageRef)
             {
@@ -2776,35 +2776,35 @@ static HRESULT GetFontColor(
 
     if (pdwSystemColor)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstr, -1, L"btnface", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstr, -1, L"btnface", -1, FALSE))
         {
             *pdwSystemColor = COLOR_BTNFACE;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstr, -1, L"btntext", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstr, -1, L"btntext", -1, FALSE))
         {
             *pdwSystemColor = COLOR_BTNTEXT;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstr, -1, L"graytext", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstr, -1, L"graytext", -1, FALSE))
         {
             *pdwSystemColor = COLOR_GRAYTEXT;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstr, -1, L"highlight", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstr, -1, L"highlight", -1, FALSE))
         {
             *pdwSystemColor = COLOR_HIGHLIGHT;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstr, -1, L"highlighttext", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstr, -1, L"highlighttext", -1, FALSE))
         {
             *pdwSystemColor = COLOR_HIGHLIGHTTEXT;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstr, -1, L"hotlight", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstr, -1, L"hotlight", -1, FALSE))
         {
             *pdwSystemColor = COLOR_HOTLIGHT;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstr, -1, L"window", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstr, -1, L"window", -1, FALSE))
         {
             *pdwSystemColor = COLOR_WINDOW;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstr, -1, L"windowtext", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstr, -1, L"windowtext", -1, FALSE))
         {
             *pdwSystemColor = COLOR_WINDOWTEXT;
         }
@@ -3229,71 +3229,71 @@ static HRESULT ParseControls(
             ThmExitOnFailure(hr, "Null element encountered!");
         }
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Billboard", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Billboard", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_BILLBOARD;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Button", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Button", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_BUTTON;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Checkbox", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Checkbox", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_CHECKBOX;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Combobox", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Combobox", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_COMBOBOX;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"CommandLink", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"CommandLink", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_COMMANDLINK;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Editbox", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Editbox", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_EDITBOX;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Hyperlink", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Hyperlink", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_HYPERLINK;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Hypertext", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Hypertext", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_HYPERTEXT;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"ImageControl", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"ImageControl", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_IMAGE;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Label", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Label", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_LABEL;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"ListView", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"ListView", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_LISTVIEW;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Panel", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Panel", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_PANEL;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Progressbar", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Progressbar", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_PROGRESSBAR;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Richedit", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Richedit", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_RICHEDIT;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Static", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Static", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_STATIC;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"Tabs", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"Tabs", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_TAB;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"TreeView", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"TreeView", -1, FALSE))
         {
             type = THEME_CONTROL_TYPE_TREEVIEW;
         }
@@ -3705,14 +3705,14 @@ static HRESULT ParseActions(
 
             THEME_ACTION* pAction = pControl->rgActions + i;
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"BrowseDirectoryAction", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"BrowseDirectoryAction", -1, FALSE))
             {
                 pAction->type = THEME_ACTION_TYPE_BROWSE_DIRECTORY;
 
                 hr = XmlGetAttributeEx(pixnChild, L"VariableName", &pAction->BrowseDirectory.sczVariableName);
                 ThmExitOnFailure(hr, "Failed when querying BrowseDirectoryAction/@VariableName attribute.");
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"ChangePageAction", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"ChangePageAction", -1, FALSE))
             {
                 pAction->type = THEME_ACTION_TYPE_CHANGE_PAGE;
 
@@ -3725,7 +3725,7 @@ static HRESULT ParseActions(
                     ThmExitOnFailure(hr, "Failed when querying ChangePageAction/@Cancel attribute.");
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrType, -1, L"CloseWindowAction", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrType, -1, L"CloseWindowAction", -1, FALSE))
             {
                 pAction->type = THEME_ACTION_TYPE_CLOSE_WINDOW;
             }
@@ -4367,7 +4367,7 @@ static HRESULT FindImageList(
 
     for (DWORD i = 0; i < pTheme->cImageLists; ++i)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pTheme->rgImageLists[i].sczName, -1, wzImageListName, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pTheme->rgImageLists[i].sczName, -1, wzImageListName, -1, FALSE))
         {
             *phImageList = pTheme->rgImageLists[i].hImageList;
             ExitFunction1(hr = S_OK);
@@ -5027,7 +5027,7 @@ static void OnBrowseDirectory(
         THEME_CONTROL* pControl = pTheme->rgControls + i;
 
         if ((!pControl->wPageId || pControl->wPageId == pTheme->dwCurrentPageId) &&
-            CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pControl->sczName, -1, pAction->BrowseDirectory.sczVariableName, -1))
+            CSTR_EQUAL == ::CompareStringOrdinal(pControl->sczName, -1, pAction->BrowseDirectory.sczVariableName, -1, FALSE))
         {
             pTargetControl = pControl;
             break;
@@ -5790,7 +5790,7 @@ static HRESULT ShowControl(
 
             hr = S_OK;
 
-            Button_SetCheck(hWnd, (!sczText && !pControl->sczValue) || (sczText && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczText, -1, pControl->sczValue, -1)));
+            Button_SetCheck(hWnd, (!sczText && !pControl->sczValue) || (sczText && CSTR_EQUAL == ::CompareStringOrdinal(sczText, -1, pControl->sczValue, -1, FALSE)));
         }
     }
 

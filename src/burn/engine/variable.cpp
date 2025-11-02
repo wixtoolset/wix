@@ -397,7 +397,7 @@ extern "C" HRESULT VariablesParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
             ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"formatted", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"formatted", -1, FALSE))
             {
                 if (!fHidden)
                 {
@@ -405,7 +405,7 @@ extern "C" HRESULT VariablesParseFromXml(
                 }
                 valueType = BURN_VARIANT_TYPE_FORMATTED;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"numeric", -1, FALSE))
             {
                 if (!fHidden)
                 {
@@ -413,7 +413,7 @@ extern "C" HRESULT VariablesParseFromXml(
                 }
                 valueType = BURN_VARIANT_TYPE_NUMERIC;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"string", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"string", -1, FALSE))
             {
                 if (!fHidden)
                 {
@@ -421,7 +421,7 @@ extern "C" HRESULT VariablesParseFromXml(
                 }
                 valueType = BURN_VARIANT_TYPE_STRING;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"version", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"version", -1, FALSE))
             {
                 if (!fHidden)
                 {
@@ -1556,7 +1556,7 @@ static HRESULT FindVariableIndexByName(
         DWORD iPosition = cRangeLength / 2;
         BURN_VARIABLE* pVariable = &pVariables->rgVariables[iRangeFirst + iPosition];
 
-        switch (::CompareStringW(LOCALE_INVARIANT, SORT_STRINGSORT, wzVariable, -1, pVariable->sczName, -1))
+        switch (::CompareStringOrdinal(wzVariable, -1, pVariable->sczName, -1, FALSE))
         {
         case CSTR_LESS_THAN:
             // restrict range to elements before the current
@@ -1591,7 +1591,7 @@ static HRESULT InsertUserVariable(
 {
     HRESULT hr = S_OK;
 
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, wzVariable, 3, L"Wix", 3))
+    if (CSTR_EQUAL == ::CompareStringOrdinal(wzVariable, 3, L"Wix", 3, FALSE))
     {
         ExitWithRootFailure(hr, E_INVALIDARG, "Attempted to insert variable with reserved prefix: %ls", wzVariable);
     }

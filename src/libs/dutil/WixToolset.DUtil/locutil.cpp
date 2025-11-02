@@ -315,7 +315,7 @@ extern "C" HRESULT DAPI LocGetControl(
     {
         pLocControl = &pWixLoc->rgLocControls[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pLocControl->wzControl, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pLocControl->wzControl, -1, wzId, -1, FALSE))
         {
             *ppLocControl = pLocControl;
             ExitFunction1(hr = S_OK);
@@ -341,7 +341,7 @@ extern "C" HRESULT DAPI LocGetString(
     {
         pLocString = pWixLoc->rgLocStrings + i;
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pLocString->wzId, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pLocString->wzId, -1, wzId, -1, FALSE))
         {
             *ppLocString = pLocString;
             hr = S_OK;
@@ -555,7 +555,7 @@ static HRESULT ParseWxlString(
 
     if (S_OK == hr)
     {
-        pLocString->bOverridable = CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrText, -1, L"yes", -1);
+        pLocString->bOverridable = CSTR_EQUAL == ::CompareStringOrdinal(bstrText, -1, L"yes", -1, FALSE);
     }
 
     ReleaseNullBSTR(bstrText);

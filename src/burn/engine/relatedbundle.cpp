@@ -116,7 +116,7 @@ extern "C" HRESULT RelatedBundleFindById(
         pRelatedBundle = pRelatedBundles->rgRelatedBundles + i;
         pPackage = &pRelatedBundle->package;
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPackage->sczId, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pPackage->sczId, -1, wzId, -1, FALSE))
         {
             *ppRelatedBundle = pRelatedBundle;
             ExitFunction1(hr = S_OK);

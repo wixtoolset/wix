@@ -223,15 +223,15 @@ extern "C" HRESULT RegistrationParseFromXml(
 
         if (fFoundXml)
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"button", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"button", -1, FALSE))
             {
                 pRegistration->modify = BURN_REGISTRATION_MODIFY_DISABLE_BUTTON;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"yes", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"yes", -1, FALSE))
             {
                 pRegistration->modify = BURN_REGISTRATION_MODIFY_DISABLE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"no", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"no", -1, FALSE))
             {
                 pRegistration->modify = BURN_REGISTRATION_MODIFY_ENABLED;
             }
@@ -1512,7 +1512,7 @@ static HRESULT RemoveUpdateRegistration(
         hr = RegReadString(hkKey, L"PackageVersion", &sczPackageVersion);
         if (SUCCEEDED(hr))
         {
-            if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, 0, sczPackageVersion, -1, pRegistration->sczDisplayVersion, -1))
+            if (CSTR_EQUAL != ::CompareStringOrdinal(sczPackageVersion, -1, pRegistration->sczDisplayVersion, -1, FALSE))
             {
                 fDeleteRegKey = FALSE;
             }

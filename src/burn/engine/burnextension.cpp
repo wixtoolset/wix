@@ -214,7 +214,7 @@ EXTERN_C HRESULT BurnExtensionFindById(
     {
         pExtension = &pBurnExtensions->rgExtensions[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pExtension->sczId, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pExtension->sczId, -1, wzId, -1, FALSE))
         {
             *ppExtension = pExtension;
             ExitFunction1(hr = S_OK);
