@@ -86,7 +86,7 @@ HRESULT GetSearchStateFromArguments(
 
     wzSearchKind = argv[1];
 
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzSearchKind, -1, L"runtime", -1))
+    if (CSTR_EQUAL == ::CompareStringOrdinal(wzSearchKind, -1, L"runtime", -1, TRUE))
     {
         if (argc != 4)
         {
@@ -103,7 +103,7 @@ HRESULT GetSearchStateFromArguments(
 
         pSearchState->Runtime.wzTargetName = wzTargetName;
     }
-    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzSearchKind, -1, L"sdk", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(wzSearchKind, -1, L"sdk", -1, TRUE))
     {
         if (argc != 3)
         {
@@ -117,7 +117,7 @@ HRESULT GetSearchStateFromArguments(
         hr = StrStringToUInt32(wzMajorVersion, 0, reinterpret_cast<UINT*>(&pSearchState->Sdk.dwMajorVersion));
         ConsoleExitOnFailure(hr, CONSOLE_COLOR_RED, "Failed to get sdk major version from: %ls", wzMajorVersion);
     }
-    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzSearchKind, -1, L"sdkfeatureband", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(wzSearchKind, -1, L"sdkfeatureband", -1, TRUE))
     {
         if (argc != 5)
         {
@@ -208,7 +208,7 @@ static HRESULT PerformRuntimeSearch(
         const hostfxr_dotnet_environment_framework_info* pFrameworkInfo = pInfo->frameworks + i;
         ReleaseVerutilVersion(pFrameworkVersion);
 
-        if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzTargetName, -1, pFrameworkInfo->name, -1))
+        if (CSTR_EQUAL != ::CompareStringOrdinal(wzTargetName, -1, pFrameworkInfo->name, -1, TRUE))
         {
             continue;
         }

@@ -206,7 +206,7 @@ static __callback int __cdecl CompareRelatedBundlesDetect(
         VerCompareParsedVersions(pBundleLeft->pVersion, pBundleRight->pVersion, &ret);
         if (0 == ret)
         {
-            ret = ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pBundleLeft->package.sczId, -1, pBundleRight->package.sczId, -1) - 2;
+            ret = ::CompareStringOrdinal(pBundleLeft->package.sczId, -1, pBundleRight->package.sczId, -1, TRUE) - 2;
         }
     }
 
@@ -249,7 +249,7 @@ static __callback int __cdecl CompareRelatedBundlesPlan(
         VerCompareParsedVersions(pBundleLeft->pVersion, pBundleRight->pVersion, &ret);
         if (0 == ret)
         {
-            ret = ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pBundleLeft->package.sczId, -1, pBundleRight->package.sczId, -1) - 2;
+            ret = ::CompareStringOrdinal(pBundleLeft->package.sczId, -1, pBundleRight->package.sczId, -1, TRUE) - 2;
         }
     }
 
@@ -284,7 +284,7 @@ static HRESULT LoadIfRelatedBundle(
     BURN_RELATED_BUNDLE* pRelatedBundle = NULL;
 
     // If we found our bundle code, it's not a related bundle.
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pBundle->wzBundleCode, -1, pRegistration->sczCode, -1))
+    if (CSTR_EQUAL == ::CompareStringOrdinal(pBundle->wzBundleCode, -1, pRegistration->sczCode, -1, TRUE))
     {
         ExitFunction1(hr = S_FALSE);
     }

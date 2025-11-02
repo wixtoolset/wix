@@ -1144,7 +1144,7 @@ extern "C" BOOL VariableIsHiddenCommandLine(
     {
         pVariable = pVariables->rgVariables + i;
 
-        if (pVariable->fHidden && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pVariable->sczName, -1, wzVariable, -1))
+        if (pVariable->fHidden && CSTR_EQUAL == ::CompareStringOrdinal(pVariable->sczName, -1, wzVariable, -1, TRUE))
         {
             fHidden = TRUE;
             break;

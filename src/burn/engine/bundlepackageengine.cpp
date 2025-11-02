@@ -686,7 +686,7 @@ static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
     BOOTSTRAPPER_RELATION_TYPE relationType = RelatedBundleConvertRelationType(pBundle->relationType);
     BOOL fPerMachine = BUNDLE_INSTALL_CONTEXT_MACHINE == pBundle->installContext;
 
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pBundle->wzBundleCode, -1, pPackage->Bundle.sczBundleCode, -1) &&
+    if (CSTR_EQUAL == ::CompareStringOrdinal(pBundle->wzBundleCode, -1, pPackage->Bundle.sczBundleCode, -1, TRUE) &&
         pPackage->Bundle.fWin64 == (REG_KEY_64BIT == pBundle->regBitness))
     {
         Assert(BOOTSTRAPPER_RELATION_UPGRADE == relationType);

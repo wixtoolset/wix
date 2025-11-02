@@ -43,14 +43,14 @@ DAPI_(HRESULT) BalInfoParseCommandLine(
 
         if (argv[i][0] == L'-' || argv[i][0] == L'/')
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"norestart", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"norestart", -1, TRUE))
             {
                 if (BAL_INFO_RESTART_UNKNOWN == pCommand->restart)
                 {
                     pCommand->restart = BAL_INFO_RESTART_NEVER;
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"forcerestart", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"forcerestart", -1, TRUE))
             {
                 if (BAL_INFO_RESTART_UNKNOWN == pCommand->restart)
                 {

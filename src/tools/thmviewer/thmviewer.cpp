@@ -241,7 +241,7 @@ static HRESULT ProcessCommandLine(
         {
             if (argv[i][0] == L'-' || argv[i][0] == L'/')
             {
-                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"lang", -1))
+                if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"lang", -1, TRUE))
                 {
                     if (i + 1 >= argc)
                     {
@@ -254,7 +254,7 @@ static HRESULT ProcessCommandLine(
             else
             {
                 LPCWSTR wzExtension = PathExtension(argv[i]);
-                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzExtension, -1, L".wxl", -1))
+                if (CSTR_EQUAL == ::CompareStringOrdinal(wzExtension, -1, L".wxl", -1, TRUE))
                 {
                     hr = StrAllocString(psczWxlFile, argv[i], 0);
                 }

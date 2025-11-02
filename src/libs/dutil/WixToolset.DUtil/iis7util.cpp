@@ -222,7 +222,7 @@ BOOL DAPI CompareVariantPath(
         IisExitOnFailure(hr, "Failed to expand path %ls", pVariant2->bstrVal);
     }
 
-    fEqual = CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzValue1, -1, wzValue2, -1);
+    fEqual = CSTR_EQUAL == ::CompareStringOrdinal(wzValue1, -1, wzValue2, -1, TRUE);
 
 LExit:
     ReleaseNullStr(wzValue1);
@@ -258,7 +258,7 @@ extern "C" BOOL DAPI Iis7IsMatchingAppHostElement(
 
     hr = pElement->get_Name(&bstrElementName);
     IisExitOnFailure(hr, "Failed to get name of element");
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pComparison->sczElementName, -1, bstrElementName, -1))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(pComparison->sczElementName, -1, bstrElementName, -1, TRUE))
     {
         ExitFunction();
     }
@@ -293,7 +293,7 @@ BOOL DAPI IsMatchingAppHostMethod(
 
     Assert(bstrName);
 
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, wzMethodName, -1, bstrName, -1))
+    if (CSTR_EQUAL == ::CompareStringOrdinal(wzMethodName, -1, bstrName, -1, TRUE))
     {
         fResult = TRUE;
     }

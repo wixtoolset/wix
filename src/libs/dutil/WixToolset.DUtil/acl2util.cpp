@@ -106,7 +106,7 @@ extern "C" HRESULT DAPI AclGetAccountSidStringEx(
             HRESULT hrLength = ::StringCchLengthW(wzAccount, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cchAccount));
             AclExitOnFailure(hrLength, "Failed to get the length of the account name.");
 
-            if (11 < cchAccount && CSTR_EQUAL == CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, L"NT SERVICE\\", 11, wzAccount, 11))
+            if (11 < cchAccount && CSTR_EQUAL == CompareStringOrdinal(L"NT SERVICE\\", 11, wzAccount, 11, TRUE))
             {
                 // If the service is not installed then LookupAccountName doesn't resolve the SID, but we can calculate it.
                 LPCWSTR wzServiceName = &wzAccount[11];

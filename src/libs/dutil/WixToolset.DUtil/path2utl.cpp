@@ -306,7 +306,7 @@ DAPI_(HRESULT) PathCompareCanonicalized(
     hr = PathCanonicalizeForComparison(wzPath2, dwDefaultFlags, &sczCanonicalized2);
     PathExitOnFailure(hr, "Failed to canonicalize wzPath2.");
 
-    nResult = ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, sczCanonicalized1, -1, sczCanonicalized2, -1);
+    nResult = ::CompareStringOrdinal(sczCanonicalized1, -1, sczCanonicalized2, -1, TRUE);
     PathExitOnNullWithLastError(nResult, hr, "Failed to compare canonicalized paths.");
 
     *pfEqual = CSTR_EQUAL == nResult;
@@ -364,7 +364,7 @@ DAPI_(HRESULT) PathDirectoryContainsPath(
         ExitFunction1(hr = S_FALSE);
     }
 
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, sczCanonicalizedDirectory, (DWORD)cchDirectory, sczCanonicalizedPath, (DWORD)cchDirectory))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(sczCanonicalizedDirectory, (DWORD)cchDirectory, sczCanonicalizedPath, (DWORD)cchDirectory, TRUE))
     {
         ExitFunction1(hr = S_FALSE);
     }

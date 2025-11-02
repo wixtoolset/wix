@@ -124,7 +124,7 @@ HRESULT ScaWebAppExtensionsWrite(
         }
 
         // if verbs were specified and not the keyword "all"
-        if (pswappext->wzVerbs[0] && CSTR_EQUAL != CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pswappext->wzVerbs, -1, L"all", -1))
+        if (pswappext->wzVerbs[0] && CSTR_EQUAL != CompareStringOrdinal(pswappext->wzVerbs, -1, L"all", -1, TRUE))
         {
             hr = ::StringCchCatW(wzAppExtension, countof(wzAppExtension), L",");
             ExitOnFailure(hr, "Failed to concatenate comma to app extension string");

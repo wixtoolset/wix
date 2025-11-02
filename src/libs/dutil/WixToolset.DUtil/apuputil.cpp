@@ -112,7 +112,7 @@ extern "C" HRESULT DAPI ApupAllocChainFromAtom(
     }
 
     // Trim the unused entries from the end, if any of the entries failed to parse or validate
-    if (pChain->cEntries != pFeed->cEntries) 
+    if (pChain->cEntries != pFeed->cEntries)
     {
         if (pChain->cEntries > 0)
         {
@@ -354,22 +354,22 @@ static HRESULT ParseEnclosure(
                     dwDigestLength = 0;
                     if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, L"algorithm", -1, pAttribute->wzAttribute, -1))
                     {
-                        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, L"md5", -1, pAttribute->wzValue, -1))
+                        if (CSTR_EQUAL == ::CompareStringOrdinal(L"md5", -1, pAttribute->wzValue, -1, TRUE))
                         {
                             pEnclosure->digestAlgorithm = APUP_HASH_ALGORITHM_MD5;
                             dwDigestLength = MD5_HASH_LEN;
                         }
-                        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, L"sha1", -1, pAttribute->wzValue, -1))
+                        else if (CSTR_EQUAL == ::CompareStringOrdinal(L"sha1", -1, pAttribute->wzValue, -1, TRUE))
                         {
                             pEnclosure->digestAlgorithm = APUP_HASH_ALGORITHM_SHA1;
                             dwDigestLength = SHA1_HASH_LEN;
                         }
-                        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, L"sha256", -1, pAttribute->wzValue, -1))
+                        else if (CSTR_EQUAL == ::CompareStringOrdinal(L"sha256", -1, pAttribute->wzValue, -1, TRUE))
                         {
                             pEnclosure->digestAlgorithm = APUP_HASH_ALGORITHM_SHA256;
                             dwDigestLength = SHA256_HASH_LEN;
                         }
-                        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, L"sha512", -1, pAttribute->wzValue, -1))
+                        else if (CSTR_EQUAL == ::CompareStringOrdinal(L"sha512", -1, pAttribute->wzValue, -1, TRUE))
                         {
                             pEnclosure->digestAlgorithm = APUP_HASH_ALGORITHM_SHA512;
                             dwDigestLength = SHA512_HASH_LEN;

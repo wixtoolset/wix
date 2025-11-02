@@ -2928,7 +2928,7 @@ private:
 
                 if (argv[i][0] == L'-' || argv[i][0] == L'/')
                 {
-                    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"lang", -1))
+                    if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"lang", -1, TRUE))
                     {
                         if (i + 1 >= argc)
                         {
@@ -2941,7 +2941,7 @@ private:
                         hr = StrAllocString(psczLanguage, &argv[i][0], 0);
                         BalExitOnFailure(hr, "Failed to copy language.");
                     }
-                    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"cache", -1))
+                    else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"cache", -1, TRUE))
                     {
                         m_fRequestedCacheOnly = TRUE;
                     }

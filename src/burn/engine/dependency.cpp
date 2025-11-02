@@ -263,7 +263,7 @@ extern "C" HRESULT DependencyDetectProviderKeyBundleCode(
         hr = StrAllocString(&pRegistration->sczDetectedProviderKeyBundleCode, pRegistration->sczProviderKey, 0);
         ExitOnFailure(hr, "Failed to initialize provider key bundle code.");
     }
-    else if (CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczCode, -1, pRegistration->sczDetectedProviderKeyBundleCode, -1))
+    else if (CSTR_EQUAL != ::CompareStringOrdinal(pRegistration->sczCode, -1, pRegistration->sczDetectedProviderKeyBundleCode, -1, TRUE))
     {
         pRegistration->fDetectedForeignProviderKeyBundleCode = TRUE;
         LogId(REPORT_STANDARD, MSG_DETECTED_FOREIGN_BUNDLE_PROVIDER_REGISTRATION, pRegistration->sczProviderKey, pRegistration->sczDetectedProviderKeyBundleCode);
@@ -293,12 +293,12 @@ extern "C" HRESULT DependencyDetectBundle(
         {
             DEPENDENCY* pDependent = pRegistration->rgDependents + i;
 
-            if (pDependencies->fActiveParent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pDependencies->wzActiveParent, -1, pDependent->sczKey, -1))
+            if (pDependencies->fActiveParent && CSTR_EQUAL == ::CompareStringOrdinal(pDependencies->wzActiveParent, -1, pDependent->sczKey, -1, TRUE))
             {
                 pRegistration->fParentRegisteredAsDependent = TRUE;
             }
 
-            if (pDependencies->fSelfDependent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pDependencies->wzSelfDependent, -1, pDependent->sczKey, -1))
+            if (pDependencies->fSelfDependent && CSTR_EQUAL == ::CompareStringOrdinal(pDependencies->wzSelfDependent, -1, pDependent->sczKey, -1, TRUE))
             {
                 pRegistration->fSelfRegisteredAsDependent = TRUE;
             }
@@ -905,7 +905,7 @@ extern "C" HRESULT DependencyDetectCompatibleEntry(
                 continue;
             }
         }
-        else if (sczId && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, wzPackageProviderId, -1, sczId, -1))
+        else if (sczId && CSTR_EQUAL == ::CompareStringOrdinal(wzPackageProviderId, -1, sczId, -1, TRUE))
         {
             continue;
         }
@@ -969,7 +969,7 @@ static HRESULT DetectPackageDependents(
         {
             DEPENDENCY* pDependent = pProvider->rgDependents + iDependent;
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczCode, -1, pDependent->sczKey, -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(pRegistration->sczCode, -1, pDependent->sczKey, -1, TRUE))
             {
                 pProvider->fBundleRegisteredAsDependent = TRUE;
                 fBundleRegisteredAsDependent = TRUE;
@@ -1043,7 +1043,7 @@ static HRESULT SplitIgnoreDependencies(
             hr = DictAddKey(sdIgnoreDependencies, wzToken);
             ExitOnFailure(hr, "Failed to add \"%ls\" to the string dictionary.", wzToken);
 
-            if (!*pfIgnoreAll && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, L"ALL", -1, wzToken, -1))
+            if (!*pfIgnoreAll && CSTR_EQUAL == ::CompareStringOrdinal(L"ALL", -1, wzToken, -1, TRUE))
             {
                 *pfIgnoreAll = TRUE;
             }

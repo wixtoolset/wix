@@ -19,15 +19,15 @@ int __cdecl wmain(int argc, LPWSTR argv[])
     {
         fShowUsage = TRUE;
     }
-    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"reload", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(argv[1], -1, L"reload", -1, TRUE))
     {
         hr = RunReloadEngine(argv[2], argv[3]);
     }
-    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"shutdown", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(argv[1], -1, L"shutdown", -1, TRUE))
     {
         hr = RunShutdownEngine(argv[2], argv[3]);
     }
-    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"waitforquit", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(argv[1], -1, L"waitforquit", -1, TRUE))
     {
         hr = RunWaitForQuitEngine(argv[2], argv[3]);
     }

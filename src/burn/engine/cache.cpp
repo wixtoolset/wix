@@ -619,8 +619,8 @@ extern "C" HRESULT CacheGetLocalSourcePaths(
 
     hr = GetLastUsedSourceFolder(pVariables, &sczLastSourceFolder);
     fPreferSourcePathLocation = !pCache->fRunningFromCache || FAILED(hr);
-    fTryLastFolder = SUCCEEDED(hr) && sczLastSourceFolder && *sczLastSourceFolder && CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pCache->sczSourceProcessFolder, -1, sczLastSourceFolder, -1);
-    fTryRelativePath = CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, wzSourcePath, -1, wzRelativePath, -1);
+    fTryLastFolder = SUCCEEDED(hr) && sczLastSourceFolder && *sczLastSourceFolder && CSTR_EQUAL != ::CompareStringOrdinal(pCache->sczSourceProcessFolder, -1, sczLastSourceFolder, -1, TRUE);
+    fTryRelativePath = CSTR_EQUAL != ::CompareStringOrdinal(wzSourcePath, -1, wzRelativePath, -1, TRUE);
     fSourceIsAbsolute = PathIsRooted(wzSourcePath);
 
     // If the source path provided is a full path, try that first.
@@ -797,7 +797,7 @@ extern "C" HRESULT CacheSetLastUsedSource(
 
     // If the source path ends with the relative path then this source could be a new path.
     iSourceRelativePath = cchSourcePath - cchRelativePath;
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, wzSourcePath + iSourceRelativePath, -1, wzRelativePath, -1))
+    if (CSTR_EQUAL == ::CompareStringOrdinal(wzSourcePath + iSourceRelativePath, -1, wzRelativePath, -1, TRUE))
     {
         hr = StrAllocString(&sczSourceFolder, wzSourcePath, iSourceRelativePath);
         ExitOnFailure(hr, "Failed to trim source folder.");
@@ -805,7 +805,7 @@ extern "C" HRESULT CacheSetLastUsedSource(
         hr = VariableGetString(pVariables, BURN_BUNDLE_LAST_USED_SOURCE, &sczLastSourceFolder);
         if (SUCCEEDED(hr))
         {
-            nCompare = ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, sczSourceFolder, -1, sczLastSourceFolder, -1);
+            nCompare = ::CompareStringOrdinal(sczSourceFolder, -1, sczLastSourceFolder, -1, TRUE);
         }
         else if (E_NOTFOUND == hr)
         {
@@ -1031,7 +1031,7 @@ extern "C" HRESULT CacheCompleteBundle(
     ExitOnFailure(hr, "Failed to combine completed path with engine file name.");
 
     // We can't just use wzExecutablePath because we needed to call CreateCompletedPath to ensure that the destination was secured.
-    Assert(CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, wzExecutablePath, -1, sczTargetPath, -1));
+    Assert(CSTR_EQUAL == ::CompareStringOrdinal(wzExecutablePath, -1, sczTargetPath, -1, TRUE));
 
     // If the bundle is running out of the package cache then we don't need to copy it there
     // (and don't want to since it'll be in use) so bail.

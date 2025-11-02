@@ -523,7 +523,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
             ExitOnFailure(hr, "Failed to enum related products.");
 
             // If we found ourselves, skip because saying that a package is related to itself is nonsensical.
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pPackage->Msi.sczProductCode, -1, wzProductCode, -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(pPackage->Msi.sczProductCode, -1, wzProductCode, -1, TRUE))
             {
                 continue;
             }
@@ -631,7 +631,7 @@ extern "C" HRESULT MsiEngineDetectPackage(
                 }
                 // It can't be a downgrade if the upgrade codes aren't the same.
                 else if (BOOTSTRAPPER_PACKAGE_STATE_ABSENT == pPackage->currentState &&
-                         pPackage->Msi.sczUpgradeCode && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pPackage->Msi.sczUpgradeCode, -1, pRelatedMsi->sczUpgradeCode, -1))
+                         pPackage->Msi.sczUpgradeCode && CSTR_EQUAL == ::CompareStringOrdinal(pPackage->Msi.sczUpgradeCode, -1, pRelatedMsi->sczUpgradeCode, -1, TRUE))
                 {
                     relatedMsiOperation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
                     pPackage->Msi.operation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
