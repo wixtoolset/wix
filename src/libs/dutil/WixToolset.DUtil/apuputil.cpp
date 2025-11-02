@@ -70,16 +70,16 @@ extern "C" HRESULT DAPI ApupAllocChainFromAtom(
     // First search the ATOM feed's custom elements to try and find the default application identity.
     for (ATOM_UNKNOWN_ELEMENT* pElement = pFeed->pUnknownElements; pElement; pElement = pElement->pNext)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzNamespace, -1, APPLICATION_SYNDICATION_NAMESPACE, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pElement->wzNamespace, -1, APPLICATION_SYNDICATION_NAMESPACE, -1, FALSE))
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzElement, -1, L"application", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(pElement->wzElement, -1, L"application", -1, FALSE))
             {
                 hr = StrAllocString(&pChain->wzDefaultApplicationId, pElement->wzValue, 0);
                 ApupExitOnFailure(hr, "Failed to allocate default application id.");
 
                 for (ATOM_UNKNOWN_ATTRIBUTE* pAttribute = pElement->pAttributes; pAttribute; pAttribute = pAttribute->pNext)
                 {
-                    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzAttribute, -1, L"type", -1))
+                    if (CSTR_EQUAL == ::CompareStringOrdinal(pAttribute->wzAttribute, -1, L"type", -1, FALSE))
                     {
                         hr = StrAllocString(&pChain->wzDefaultApplicationType, pAttribute->wzValue, 0);
                         ApupExitOnFailure(hr, "Failed to allocate default application type.");
@@ -213,44 +213,44 @@ static HRESULT ProcessEntry(
     // First search the ATOM entry's custom elements to try and find the application update information.
     for (ATOM_UNKNOWN_ELEMENT* pElement = pAtomEntry->pUnknownElements; pElement; pElement = pElement->pNext)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzNamespace, -1, APPLICATION_SYNDICATION_NAMESPACE, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pElement->wzNamespace, -1, APPLICATION_SYNDICATION_NAMESPACE, -1, FALSE))
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzElement, -1, L"application", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(pElement->wzElement, -1, L"application", -1, FALSE))
             {
                 hr = StrAllocString(&pApupEntry->wzApplicationId, pElement->wzValue, 0);
                 ApupExitOnFailure(hr, "Failed to allocate application identity.");
 
                 for (ATOM_UNKNOWN_ATTRIBUTE* pAttribute = pElement->pAttributes; pAttribute; pAttribute = pAttribute->pNext)
                 {
-                    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzAttribute, -1, L"type", -1))
+                    if (CSTR_EQUAL == ::CompareStringOrdinal(pAttribute->wzAttribute, -1, L"type", -1, FALSE))
                     {
                         hr = StrAllocString(&pApupEntry->wzApplicationType, pAttribute->wzValue, 0);
                         ApupExitOnFailure(hr, "Failed to allocate application type.");
                     }
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzElement, -1, L"upgrade", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(pElement->wzElement, -1, L"upgrade", -1, FALSE))
             {
                 hr = StrAllocString(&pApupEntry->wzUpgradeId, pElement->wzValue, 0);
                 ApupExitOnFailure(hr, "Failed to allocate upgrade id.");
 
                 for (ATOM_UNKNOWN_ATTRIBUTE* pAttribute = pElement->pAttributes; pAttribute; pAttribute = pAttribute->pNext)
                 {
-                    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzAttribute, -1, L"version", -1))
+                    if (CSTR_EQUAL == ::CompareStringOrdinal(pAttribute->wzAttribute, -1, L"version", -1, FALSE))
                     {
                         hr = VerParseVersion(pAttribute->wzValue, 0, FALSE, &pApupEntry->pUpgradeVersion);
                         ApupExitOnFailure(hr, "Failed to parse upgrade version string '%ls' from ATOM entry.", pAttribute->wzValue);
                     }
-                    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzAttribute, -1, L"exclusive", -1))
+                    else if (CSTR_EQUAL == ::CompareStringOrdinal(pAttribute->wzAttribute, -1, L"exclusive", -1, FALSE))
                     {
-                        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pAttribute->wzValue, -1, L"true", -1))
+                        if (CSTR_EQUAL == ::CompareStringOrdinal(pAttribute->wzValue, -1, L"true", -1, FALSE))
                         {
                             pApupEntry->fUpgradeExclusive = TRUE;
                         }
                     }
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzElement, -1, L"version", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(pElement->wzElement, -1, L"version", -1, FALSE))
             {
                 hr = VerParseVersion(pElement->wzValue, 0, FALSE, &pApupEntry->pVersion);
                 ApupExitOnFailure(hr, "Failed to parse version string '%ls' from ATOM entry.", pElement->wzValue);
@@ -309,7 +309,7 @@ static HRESULT ProcessEntry(
     for (DWORD i = 0; i < pAtomEntry->cLinks; ++i)
     {
         ATOM_LINK* pLink = pAtomEntry->rgLinks + i;
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pLink->wzRel, -1, L"enclosure", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pLink->wzRel, -1, L"enclosure", -1, FALSE))
         {
             hr = ParseEnclosure(pLink, pApupEntry->rgEnclosures + pApupEntry->cEnclosures);
             ApupExitOnFailure(hr, "Failed to parse enclosure.");
@@ -344,15 +344,15 @@ static HRESULT ParseEnclosure(
     // First search the ATOM link's custom elements to try and find the application update enclosure information.
     for (ATOM_UNKNOWN_ELEMENT* pElement = pLink->pUnknownElements; pElement; pElement = pElement->pNext)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pElement->wzNamespace, -1, APPLICATION_SYNDICATION_NAMESPACE, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pElement->wzNamespace, -1, APPLICATION_SYNDICATION_NAMESPACE, -1, FALSE))
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, L"digest", -1, pElement->wzElement, -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(L"digest", -1, pElement->wzElement, -1, FALSE))
             {
                 // Find the digest[@algorithm] which is required. Everything else is ignored.
                 for (ATOM_UNKNOWN_ATTRIBUTE* pAttribute = pElement->pAttributes; pAttribute; pAttribute = pAttribute->pNext)
                 {
                     dwDigestLength = 0;
-                    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, L"algorithm", -1, pAttribute->wzAttribute, -1))
+                    if (CSTR_EQUAL == ::CompareStringOrdinal(L"algorithm", -1, pAttribute->wzAttribute, -1, FALSE))
                     {
                         if (CSTR_EQUAL == ::CompareStringOrdinal(L"md5", -1, pAttribute->wzValue, -1, TRUE))
                         {
@@ -406,7 +406,7 @@ static HRESULT ParseEnclosure(
 
                 break;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, L"name", -1, pElement->wzElement, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(L"name", -1, pElement->wzElement, -1, FALSE))
             {
                 hr = StrAllocString(&pEnclosure->wzLocalName, pElement->wzValue, 0);
                 ApupExitOnFailure(hr, "Failed to copy local name.");

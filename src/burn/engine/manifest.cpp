@@ -177,7 +177,7 @@ static void ValidateHarvestingAttributes(
     hr = XmlGetYesNoAttribute(pixeBundle, L"Win64", &fWin64);
     ExitOnRequiredXmlQueryFailure(hr, "Failed to get BurnManifest/@Win64 attribute.");
 
-    Assert(CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, sczEngineVersion, -1, wzVerMajorMinorBuild, -1));
+    Assert(CSTR_EQUAL == ::CompareStringOrdinal(sczEngineVersion, -1, wzVerMajorMinorBuild, -1, FALSE));
 
     Assert(BURN_PROTOCOL_VERSION == dwProtocolVersion);
 

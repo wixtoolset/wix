@@ -158,7 +158,7 @@ HRESULT ScaFiltersInstall(
     {
         if (WcaIsInstalling(psf->isInstalled, psf->isAction))
         {
-            if (!wzPreviousFilterRoot || CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, 0, wzPreviousFilterRoot, -1, psf->wzFilterRoot, -1))
+            if (!wzPreviousFilterRoot || CSTR_EQUAL != ::CompareStringOrdinal(wzPreviousFilterRoot, -1, psf->wzFilterRoot, -1, FALSE))
             {
                 if (pwzLoadOrder)
                 {
@@ -234,7 +234,7 @@ HRESULT ScaFiltersUninstall(
     {
         if (WcaIsUninstalling(psf->isInstalled, psf->isAction))
         {
-            if (!wzPreviousFilterRoot || CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, 0, wzPreviousFilterRoot, -1, psf->wzFilterRoot, -1))
+            if (!wzPreviousFilterRoot || CSTR_EQUAL != ::CompareStringOrdinal(wzPreviousFilterRoot, -1, psf->wzFilterRoot, -1, FALSE))
             {
                 if (pwzLoadOrder)
                 {

@@ -80,11 +80,11 @@ extern "C" HRESULT PayloadsParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"Packaging", &scz);
             ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Packaging.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"embedded", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"embedded", -1, FALSE))
             {
                 pPayload->packaging = BURN_PAYLOAD_PACKAGING_EMBEDDED;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"external", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"external", -1, FALSE))
             {
                 pPayload->packaging = BURN_PAYLOAD_PACKAGING_EXTERNAL;
             }

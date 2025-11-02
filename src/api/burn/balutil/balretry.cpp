@@ -211,7 +211,7 @@ static BOOL IsActiveRetryEntry(
 {
     BOOL fActive = FALSE;
 
-    fActive = vrgRetryInfo[type].sczId && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, sczId, -1, vrgRetryInfo[type].sczId, -1);
+    fActive = vrgRetryInfo[type].sczId && CSTR_EQUAL == ::CompareStringOrdinal(sczId, -1, vrgRetryInfo[type].sczId, -1, FALSE);
 
     return fActive;
 }

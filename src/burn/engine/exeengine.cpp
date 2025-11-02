@@ -25,15 +25,15 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
     hr = XmlGetAttributeEx(pixnExePackage, L"DetectionType", &scz);
     ExitOnRequiredXmlQueryFailure(hr, "Failed to get @DetectionType.");
 
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"condition", -1))
+    if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"condition", -1, FALSE))
     {
         pPackage->Exe.detectionType = BURN_EXE_DETECTION_TYPE_CONDITION;
     }
-    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"arp", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"arp", -1, FALSE))
     {
         pPackage->Exe.detectionType = BURN_EXE_DETECTION_TYPE_ARP;
     }
-    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"none", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"none", -1, FALSE))
     {
         pPackage->Exe.detectionType = BURN_EXE_DETECTION_TYPE_NONE;
     }
@@ -114,15 +114,15 @@ extern "C" HRESULT ExeEngineParsePackageFromXml(
 
     if (fFoundXml)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"burn", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"burn", -1, FALSE))
         {
             pPackage->Exe.protocol = BURN_EXE_PROTOCOL_TYPE_BURN;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"netfx4", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"netfx4", -1, FALSE))
         {
             pPackage->Exe.protocol = BURN_EXE_PROTOCOL_TYPE_NETFX4;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"none", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"none", -1, FALSE))
         {
             pPackage->Exe.protocol = BURN_EXE_PROTOCOL_TYPE_NONE;
         }

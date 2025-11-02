@@ -129,7 +129,7 @@ extern "C" HRESULT ApprovedExesFindById(
     {
         pApprovedExe = &pApprovedExes->rgApprovedExes[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pApprovedExe->sczId, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pApprovedExe->sczId, -1, wzId, -1, FALSE))
         {
             *ppApprovedExe = pApprovedExe;
             ExitFunction1(hr = S_OK);

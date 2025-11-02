@@ -1598,14 +1598,14 @@ static HRESULT FindRequestIndex(
             switch (pWaiterContext->rgRequests[i].type)
             {
             case MON_DIRECTORY:
-                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pWaiterContext->rgRequests[i].rgsczPathHierarchy[pWaiterContext->rgRequests[i].cPathHierarchy - 1], -1, pMessage->directory.sczDirectory, -1) && pWaiterContext->rgRequests[i].fRecursive == pMessage->fRecursive)
+                if (CSTR_EQUAL == ::CompareStringOrdinal(pWaiterContext->rgRequests[i].rgsczPathHierarchy[pWaiterContext->rgRequests[i].cPathHierarchy - 1], -1, pMessage->directory.sczDirectory, -1, FALSE) && pWaiterContext->rgRequests[i].fRecursive == pMessage->fRecursive)
                 {
                     *pdwIndex = i;
                     ExitFunction1(hr = S_OK);
                 }
                 break;
             case MON_REGKEY:
-                if (reinterpret_cast<DWORD_PTR>(pMessage->regkey.hkRoot) == reinterpret_cast<DWORD_PTR>(pWaiterContext->rgRequests[i].regkey.hkRoot) && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pWaiterContext->rgRequests[i].rgsczPathHierarchy[pWaiterContext->rgRequests[i].cPathHierarchy - 1], -1, pMessage->regkey.sczSubKey, -1) && pWaiterContext->rgRequests[i].fRecursive == pMessage->fRecursive && pWaiterContext->rgRequests[i].regkey.kbKeyBitness == pMessage->regkey.kbKeyBitness)
+                if (reinterpret_cast<DWORD_PTR>(pMessage->regkey.hkRoot) == reinterpret_cast<DWORD_PTR>(pWaiterContext->rgRequests[i].regkey.hkRoot) && CSTR_EQUAL == ::CompareStringOrdinal(pWaiterContext->rgRequests[i].rgsczPathHierarchy[pWaiterContext->rgRequests[i].cPathHierarchy - 1], -1, pMessage->regkey.sczSubKey, -1, FALSE) && pWaiterContext->rgRequests[i].fRecursive == pMessage->fRecursive && pWaiterContext->rgRequests[i].regkey.kbKeyBitness == pMessage->regkey.kbKeyBitness)
                 {
                     *pdwIndex = i;
                     ExitFunction1(hr = S_OK);

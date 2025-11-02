@@ -106,7 +106,7 @@ extern "C" HRESULT SearchesParseFromXml(
         ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get @Condition.");
 
         // read type specific attributes
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"DirectorySearch", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"DirectorySearch", -1, FALSE))
         {
             pSearch->Type = BURN_SEARCH_TYPE_DIRECTORY;
 
@@ -118,11 +118,11 @@ extern "C" HRESULT SearchesParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
             ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"exists", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"exists", -1, FALSE))
             {
                 pSearch->DirectorySearch.Type = BURN_DIRECTORY_SEARCH_TYPE_EXISTS;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"path", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"path", -1, FALSE))
             {
                 pSearch->DirectorySearch.Type = BURN_DIRECTORY_SEARCH_TYPE_PATH;
             }
@@ -131,7 +131,7 @@ extern "C" HRESULT SearchesParseFromXml(
                 ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"FileSearch", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"FileSearch", -1, FALSE))
         {
             pSearch->Type = BURN_SEARCH_TYPE_FILE;
 
@@ -147,15 +147,15 @@ extern "C" HRESULT SearchesParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
             ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"exists", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"exists", -1, FALSE))
             {
                 pSearch->FileSearch.Type = BURN_FILE_SEARCH_TYPE_EXISTS;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"version", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"version", -1, FALSE))
             {
                 pSearch->FileSearch.Type = BURN_FILE_SEARCH_TYPE_VERSION;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"path", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"path", -1, FALSE))
             {
                 pSearch->FileSearch.Type = BURN_FILE_SEARCH_TYPE_PATH;
             }
@@ -164,7 +164,7 @@ extern "C" HRESULT SearchesParseFromXml(
                 ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"RegistrySearch", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"RegistrySearch", -1, FALSE))
         {
             pSearch->Type = BURN_SEARCH_TYPE_REGISTRY;
 
@@ -172,19 +172,19 @@ extern "C" HRESULT SearchesParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"Root", &scz);
             ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Root.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"HKCR", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"HKCR", -1, FALSE))
             {
                 pSearch->RegistrySearch.hRoot = HKEY_CLASSES_ROOT;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"HKCU", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"HKCU", -1, FALSE))
             {
                 pSearch->RegistrySearch.hRoot = HKEY_CURRENT_USER;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"HKLM", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"HKLM", -1, FALSE))
             {
                 pSearch->RegistrySearch.hRoot = HKEY_LOCAL_MACHINE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"HKU", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"HKU", -1, FALSE))
             {
                 pSearch->RegistrySearch.hRoot = HKEY_USERS;
             }
@@ -208,11 +208,11 @@ extern "C" HRESULT SearchesParseFromXml(
             hr = XmlGetYesNoAttribute(pixnNode, L"Win64", &pSearch->RegistrySearch.fWin64);
             ExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to get Win64 attribute.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"exists", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"exists", -1, FALSE))
             {
                 pSearch->RegistrySearch.Type = BURN_REGISTRY_SEARCH_TYPE_EXISTS;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"value", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"value", -1, FALSE))
             {
                 pSearch->RegistrySearch.Type = BURN_REGISTRY_SEARCH_TYPE_VALUE;
 
@@ -224,19 +224,19 @@ extern "C" HRESULT SearchesParseFromXml(
                 hr = XmlGetAttributeEx(pixnNode, L"VariableType", &scz);
                 ExitOnRequiredXmlQueryFailure(hr, "Failed to get @VariableType.");
 
-                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"formatted", -1))
+                if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"formatted", -1, FALSE))
                 {
                     pSearch->RegistrySearch.VariableType = BURN_VARIANT_TYPE_FORMATTED;
                 }
-                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
+                else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"numeric", -1, FALSE))
                 {
                     pSearch->RegistrySearch.VariableType = BURN_VARIANT_TYPE_NUMERIC;
                 }
-                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"string", -1))
+                else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"string", -1, FALSE))
                 {
                     pSearch->RegistrySearch.VariableType = BURN_VARIANT_TYPE_STRING;
                 }
-                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"version", -1))
+                else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"version", -1, FALSE))
                 {
                     pSearch->RegistrySearch.VariableType = BURN_VARIANT_TYPE_VERSION;
                 }
@@ -250,7 +250,7 @@ extern "C" HRESULT SearchesParseFromXml(
                 ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"MsiComponentSearch", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"MsiComponentSearch", -1, FALSE))
         {
             pSearch->Type = BURN_SEARCH_TYPE_MSI_COMPONENT;
 
@@ -266,15 +266,15 @@ extern "C" HRESULT SearchesParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
             ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"keyPath", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"keyPath", -1, FALSE))
             {
                 pSearch->MsiComponentSearch.Type = BURN_MSI_COMPONENT_SEARCH_TYPE_KEYPATH;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"state", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"state", -1, FALSE))
             {
                 pSearch->MsiComponentSearch.Type = BURN_MSI_COMPONENT_SEARCH_TYPE_STATE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"directory", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"directory", -1, FALSE))
             {
                 pSearch->MsiComponentSearch.Type = BURN_MSI_COMPONENT_SEARCH_TYPE_DIRECTORY;
             }
@@ -283,7 +283,7 @@ extern "C" HRESULT SearchesParseFromXml(
                 ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"MsiProductSearch", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"MsiProductSearch", -1, FALSE))
         {
             pSearch->Type = BURN_SEARCH_TYPE_MSI_PRODUCT;
             pSearch->MsiProductSearch.GuidType = BURN_MSI_PRODUCT_SEARCH_GUID_TYPE_NONE;
@@ -318,19 +318,19 @@ extern "C" HRESULT SearchesParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
             ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"version", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"version", -1, FALSE))
             {
                 pSearch->MsiProductSearch.Type = BURN_MSI_PRODUCT_SEARCH_TYPE_VERSION;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"language", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"language", -1, FALSE))
             {
                 pSearch->MsiProductSearch.Type = BURN_MSI_PRODUCT_SEARCH_TYPE_LANGUAGE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"state", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"state", -1, FALSE))
             {
                 pSearch->MsiProductSearch.Type = BURN_MSI_PRODUCT_SEARCH_TYPE_STATE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"assignment", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"assignment", -1, FALSE))
             {
                 pSearch->MsiProductSearch.Type = BURN_MSI_PRODUCT_SEARCH_TYPE_ASSIGNMENT;
             }
@@ -339,7 +339,7 @@ extern "C" HRESULT SearchesParseFromXml(
                 ExitWithRootFailure(hr, E_INVALIDARG, "Invalid value for @Type: %ls", scz);
             }
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"ExtensionSearch", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"ExtensionSearch", -1, FALSE))
         {
             pSearch->Type = BURN_SEARCH_TYPE_EXTENSION;
 
@@ -350,7 +350,7 @@ extern "C" HRESULT SearchesParseFromXml(
             hr = BurnExtensionFindById(pBurnExtensions, scz, &pSearch->ExtensionSearch.pExtension);
             ExitOnRootFailure(hr, "Failed to find extension '%ls' for search '%ls'", scz, pSearch->sczKey);
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"SetVariable", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"SetVariable", -1, FALSE))
         {
             pSearch->Type = BURN_SEARCH_TYPE_SET_VARIABLE;
 
@@ -367,19 +367,19 @@ extern "C" HRESULT SearchesParseFromXml(
                 hr = XmlGetAttributeEx(pixnNode, L"Type", &scz);
                 ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Type.");
 
-                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"formatted", -1))
+                if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"formatted", -1, FALSE))
                 {
                     pSearch->SetVariable.targetType = BURN_VARIANT_TYPE_FORMATTED;
                 }
-                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"numeric", -1))
+                else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"numeric", -1, FALSE))
                 {
                     pSearch->SetVariable.targetType = BURN_VARIANT_TYPE_NUMERIC;
                 }
-                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"string", -1))
+                else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"string", -1, FALSE))
                 {
                     pSearch->SetVariable.targetType = BURN_VARIANT_TYPE_STRING;
                 }
-                else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"version", -1))
+                else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"version", -1, FALSE))
                 {
                     pSearch->SetVariable.targetType = BURN_VARIANT_TYPE_VERSION;
                 }

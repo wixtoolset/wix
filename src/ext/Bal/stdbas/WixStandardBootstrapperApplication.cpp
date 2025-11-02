@@ -614,7 +614,7 @@ public: // IBootstrapperApplication
         {
             // After restart we need to finish the dependency registration for our package so allow the package
             // to go present.
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzPackageId, -1, m_sczAfterForcedRestartPackage, -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(wzPackageId, -1, m_sczAfterForcedRestartPackage, -1, FALSE))
             {
                 // Do not allow a repair because that could put us in a perpetual restart loop.
                 if (BOOTSTRAPPER_REQUEST_STATE_REPAIR == *pRequestState)
@@ -3570,7 +3570,7 @@ private:
         for (DWORD iAssignControl = 0; iAssignControl < countof(m_rgInitControls); ++iAssignControl)
         {
             THEME_ASSIGN_CONTROL_ID* pAssignControl = m_rgInitControls + iAssignControl;
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pArgs->pThemeControl->sczName, -1, pAssignControl->wzName, -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(pArgs->pThemeControl->sczName, -1, pAssignControl->wzName, -1, FALSE))
             {
                 if (!pAssignControl->ppControl)
                 {

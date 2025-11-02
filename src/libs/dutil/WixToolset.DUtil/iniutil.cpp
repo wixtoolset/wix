@@ -441,7 +441,7 @@ extern "C" HRESULT DAPI IniGetValue(
 
     for (DWORD i = 0; i < pi->cValues; ++i)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pi->rgivValues[i].wzName, -1, wzValueName, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pi->rgivValues[i].wzName, -1, wzValueName, -1, FALSE))
         {
             pValue = pi->rgivValues + i;
             break;
@@ -483,7 +483,7 @@ extern "C" HRESULT DAPI IniSetValue(
 
     for (DWORD i = 0; i < pi->cValues; ++i)
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pi->rgivValues[i].wzName, -1, wzValueName, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pi->rgivValues[i].wzName, -1, wzValueName, -1, FALSE))
         {
             pValue = pi->rgivValues + i;
             break;
@@ -507,7 +507,7 @@ extern "C" HRESULT DAPI IniSetValue(
     {
         if (pValue)
         {
-            if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, 0, pValue->wzValue, -1, wzValue, -1))
+            if (CSTR_EQUAL != ::CompareStringOrdinal(pValue->wzValue, -1, wzValue, -1, FALSE))
             {
                 pi->fModified = TRUE;
                 hr = StrAllocString(const_cast<LPWSTR *>(&pValue->wzValue), wzValue, 0);
@@ -660,7 +660,7 @@ extern "C" HRESULT DAPI IniWriteFile(
         IniExitOnFailure(hr, "Failed to get section prefix from name: %ls", pi->rgivValues[i].wzName);
 
         // If the new section prefix is different, write a section out for it
-        if (fSections && sczNewSectionPrefix && (NULL == sczCurrentSectionPrefix || CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, 0, sczNewSectionPrefix, -1, sczCurrentSectionPrefix, -1)))
+        if (fSections && sczNewSectionPrefix && (NULL == sczCurrentSectionPrefix || CSTR_EQUAL != ::CompareStringOrdinal(sczNewSectionPrefix, -1, sczCurrentSectionPrefix, -1, FALSE)))
         {
             hr = StrAllocConcat(&sczContents, pi->sczOpenTagPrefix, 0);
             IniExitOnFailure(hr, "Failed to concat open tag prefix to string");
@@ -674,7 +674,7 @@ extern "C" HRESULT DAPI IniWriteFile(
 
             hr = StrAllocConcat(&sczContents, L"\r\n", 2);
             IniExitOnFailure(hr, "Failed to add endline to ini output buffer in-memory");
-            
+
             ReleaseNullStr(sczCurrentSectionPrefix);
             sczCurrentSectionPrefix = sczNewSectionPrefix;
             sczNewSectionPrefix = NULL;

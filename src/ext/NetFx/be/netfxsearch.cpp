@@ -46,7 +46,7 @@ STDMETHODIMP NetfxSearchParseFromXml(
         BextExitOnFailure(hr, "Failed to get @Id.");
 
         // Read type specific attributes.
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"NetFxNetCoreSearch", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"NetFxNetCoreSearch", -1, FALSE))
         {
             pSearch->Type = NETFX_SEARCH_TYPE_NET_CORE_SEARCH;
 
@@ -63,7 +63,7 @@ STDMETHODIMP NetfxSearchParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"MajorVersion", &netCoreSearch.sczMajorVersion);
             BextExitOnFailure(hr, "Failed to get @MajorVersion.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"NetFxNetCoreSdkSearch", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"NetFxNetCoreSdkSearch", -1, FALSE))
         {
             pSearch->Type = NETFX_SEARCH_TYPE_NET_CORE_SDK_SEARCH;
 
@@ -76,7 +76,7 @@ STDMETHODIMP NetfxSearchParseFromXml(
             hr = XmlGetAttributeEx(pixnNode, L"MajorVersion", &netCoreSdkSearch.sczMajorVersion);
             BextExitOnFailure(hr, "Failed to get @MajorVersion.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"NetFxNetCoreSdkFeatureBandSearch", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"NetFxNetCoreSdkFeatureBandSearch", -1, FALSE))
         {
             pSearch->Type = NETFX_SEARCH_TYPE_NET_CORE_SDK_FEATURE_BAND_SEARCH;
 
@@ -176,7 +176,7 @@ STDMETHODIMP NetfxSearchFindById(
     {
         NETFX_SEARCH* pSearch = &pSearches->rgSearches[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pSearch->sczId, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pSearch->sczId, -1, wzId, -1, FALSE))
         {
             *ppSearch = pSearch;
             ExitFunction1(hr = S_OK);

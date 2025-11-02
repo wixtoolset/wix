@@ -123,15 +123,15 @@ extern "C" HRESULT PackagesParseFromXml(
 
         if (fFoundXml)
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"remove", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"remove", -1, FALSE))
             {
                 pPackage->authoredCacheType = BOOTSTRAPPER_CACHE_TYPE_REMOVE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"keep", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"keep", -1, FALSE))
             {
                 pPackage->authoredCacheType = BOOTSTRAPPER_CACHE_TYPE_KEEP;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"force", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"force", -1, FALSE))
             {
                 pPackage->authoredCacheType = BOOTSTRAPPER_CACHE_TYPE_FORCE;
             }
@@ -210,28 +210,28 @@ extern "C" HRESULT PackagesParseFromXml(
         }
 
         // read type specific attributes
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"BundlePackage", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"BundlePackage", -1, FALSE))
         {
             pPackage->type = BURN_PACKAGE_TYPE_BUNDLE;
 
             hr = BundlePackageEngineParsePackageFromXml(pixnNode, pPackage); // TODO: Modularization
             ExitOnFailure(hr, "Failed to parse BUNDLE package.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"ExePackage", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"ExePackage", -1, FALSE))
         {
             pPackage->type = BURN_PACKAGE_TYPE_EXE;
 
             hr = ExeEngineParsePackageFromXml(pixnNode, pPackage); // TODO: Modularization
             ExitOnFailure(hr, "Failed to parse EXE package.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"MsiPackage", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"MsiPackage", -1, FALSE))
         {
             pPackage->type = BURN_PACKAGE_TYPE_MSI;
 
             hr = MsiEngineParsePackageFromXml(pixnNode, pPackage); // TODO: Modularization
             ExitOnFailure(hr, "Failed to parse MSI package.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"MspPackage", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"MspPackage", -1, FALSE))
         {
             pPackage->type = BURN_PACKAGE_TYPE_MSP;
 
@@ -240,7 +240,7 @@ extern "C" HRESULT PackagesParseFromXml(
 
             ++cMspPackages;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"MsuPackage", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"MsuPackage", -1, FALSE))
         {
             pPackage->type = BURN_PACKAGE_TYPE_MSU;
 
@@ -315,7 +315,7 @@ extern "C" HRESULT PackagesParseFromXml(
                     {
                         for (DWORD k = 0; k < pMsiPackage->Msi.cSlipstreamMspPackages; ++k)
                         {
-                            if (pMsiPackage->Msi.rgsczSlipstreamMspPackageIds[k] && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPackage->sczId, -1, pMsiPackage->Msi.rgsczSlipstreamMspPackageIds[k], -1))
+                            if (pMsiPackage->Msi.rgsczSlipstreamMspPackageIds[k] && CSTR_EQUAL == ::CompareStringOrdinal(pPackage->sczId, -1, pMsiPackage->Msi.rgsczSlipstreamMspPackageIds[k], -1, FALSE))
                             {
                                 BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pMsiPackage->Msi.rgSlipstreamMsps + k;
                                 pSlipstreamMsp->pMspPackage = pPackage;
@@ -486,7 +486,7 @@ extern "C" HRESULT PackageFindById(
     {
         pPackage = &pPackages->rgPackages[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pPackage->sczId, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pPackage->sczId, -1, wzId, -1, FALSE))
         {
             *ppPackage = pPackage;
             ExitFunction1(hr = S_OK);
@@ -508,7 +508,7 @@ extern "C" HRESULT PackageFindRelatedById(
 {
     HRESULT hr = S_OK;
     BURN_RELATED_BUNDLE* pRelatedBundle = NULL;
-    
+
     hr = RelatedBundleFindById(pRelatedBundles, wzId, &pRelatedBundle);
     *ppPackage = FAILED(hr) ? NULL : &pRelatedBundle->package;
 
@@ -551,7 +551,7 @@ extern "C" HRESULT PackageGetProperty(
     {
         const BURN_MSIPROPERTY* pProperty = &rgProperties[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pProperty->sczId, -1, wzProperty, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pProperty->sczId, -1, wzProperty, -1, FALSE))
         {
             if (psczValue)
             {
@@ -580,7 +580,7 @@ extern "C" HRESULT PackageFindRollbackBoundaryById(
     {
         pRollbackBoundary = &pPackages->rgRollbackBoundaries[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pRollbackBoundary->sczId, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pRollbackBoundary->sczId, -1, wzId, -1, FALSE))
         {
             *ppRollbackBoundary = pRollbackBoundary;
             ExitFunction1(hr = S_OK);
@@ -730,7 +730,7 @@ static HRESULT FindRollbackBoundaryById(
     {
         pRollbackBoundary = &pPackages->rgRollbackBoundaries[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pRollbackBoundary->sczId, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pRollbackBoundary->sczId, -1, wzId, -1, FALSE))
         {
             *ppRollbackBoundary = pRollbackBoundary;
             ExitFunction1(hr = S_OK);

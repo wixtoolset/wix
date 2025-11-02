@@ -400,7 +400,7 @@ extern "C" HRESULT ContainerFindById(
     {
         pContainer = &pContainers->rgContainers[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, pContainer->sczId, -1, wzId, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pContainer->sczId, -1, wzId, -1, FALSE))
         {
             *ppContainer = pContainer;
             ExitFunction1(hr = S_OK);

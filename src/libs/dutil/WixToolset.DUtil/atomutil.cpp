@@ -341,63 +341,63 @@ static HRESULT ParseAtomFeed(
 
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"generator", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"generator", -1, FALSE))
         {
             hr = AssignString(&pNewFeed->wzGenerator, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM feed generator.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"icon", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"icon", -1, FALSE))
         {
             hr = AssignString(&pNewFeed->wzIcon, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM feed icon.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"id", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"id", -1, FALSE))
         {
             hr = AssignString(&pNewFeed->wzId, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM feed id.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"logo", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"logo", -1, FALSE))
         {
             hr = AssignString(&pNewFeed->wzLogo, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM feed logo.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"subtitle", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"subtitle", -1, FALSE))
         {
             hr = AssignString(&pNewFeed->wzSubtitle, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM feed subtitle.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"title", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"title", -1, FALSE))
         {
             hr = AssignString(&pNewFeed->wzTitle, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM feed title.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"updated", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"updated", -1, FALSE))
         {
             hr = AssignDateTime(&pNewFeed->ftUpdated, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM feed updated.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"author", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"author", -1, FALSE))
         {
             hr = ParseAtomAuthor(pNode, &pNewFeed->rgAuthors[cAuthors]);
             AtomExitOnFailure(hr, "Failed to parse ATOM author.");
 
             ++cAuthors;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"category", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"category", -1, FALSE))
         {
             hr = ParseAtomCategory(pNode, &pNewFeed->rgCategories[cCategories]);
             AtomExitOnFailure(hr, "Failed to parse ATOM category.");
 
             ++cCategories;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"entry", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"entry", -1, FALSE))
         {
             hr = ParseAtomEntry(pNode, &pNewFeed->rgEntries[cEntries]);
             AtomExitOnFailure(hr, "Failed to parse ATOM entry.");
 
             ++cEntries;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"link", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"link", -1, FALSE))
         {
             hr = ParseAtomLink(pNode, &pNewFeed->rgLinks[cLinks]);
             AtomExitOnFailure(hr, "Failed to parse ATOM link.");
@@ -516,17 +516,17 @@ static HRESULT ParseAtomAuthor(
 
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"name", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"name", -1, FALSE))
         {
             hr = AssignString(&pAuthor->wzName, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM author name.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"email", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"email", -1, FALSE))
         {
             hr = AssignString(&pAuthor->wzEmail, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM author email.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"uri", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"uri", -1, FALSE))
         {
             hr = AssignString(&pAuthor->wzUrl, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM author uri.");
@@ -570,17 +570,17 @@ static HRESULT ParseAtomCategory(
 
     while (S_OK == (hr = XmlNextAttribute(pixnnmAttributes, &pNode, &bstrNodeName)))
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"label", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"label", -1, FALSE))
         {
             hr = AssignString(&pCategory->wzLabel, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM category label.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"scheme", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"scheme", -1, FALSE))
         {
             hr = AssignString(&pCategory->wzScheme, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM category scheme.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"term", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"term", -1, FALSE))
         {
             hr = AssignString(&pCategory->wzTerm, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM category term.");
@@ -639,12 +639,12 @@ static HRESULT ParseAtomContent(
 
     while (S_OK == (hr = XmlNextAttribute(pixnnmAttributes, &pNode, &bstrNodeName)))
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"type", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"type", -1, FALSE))
         {
             hr = AssignString(&pContent->wzType, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM content type.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"url", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"url", -1, FALSE))
         {
             hr = AssignString(&pContent->wzUrl, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM content scheme.");
@@ -721,46 +721,46 @@ static HRESULT ParseAtomEntry(
 
     while (S_OK == (hr = XmlNextElement(pNodeList, &pNode, &bstrNodeName)))
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"id", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"id", -1, FALSE))
         {
             hr = AssignString(&pEntry->wzId, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM entry id.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"summary", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"summary", -1, FALSE))
         {
             hr = AssignString(&pEntry->wzSummary, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM entry summary.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"title", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"title", -1, FALSE))
         {
             hr = AssignString(&pEntry->wzTitle, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM entry title.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"published", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"published", -1, FALSE))
         {
             hr = AssignDateTime(&pEntry->ftPublished, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM entry published.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"updated", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"updated", -1, FALSE))
         {
             hr = AssignDateTime(&pEntry->ftUpdated, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM entry updated.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"author", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"author", -1, FALSE))
         {
             hr = ParseAtomAuthor(pNode, &pEntry->rgAuthors[cAuthors]);
             AtomExitOnFailure(hr, "Failed to parse ATOM entry author.");
 
             ++cAuthors;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"category", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"category", -1, FALSE))
         {
             hr = ParseAtomCategory(pNode, &pEntry->rgCategories[cCategories]);
             AtomExitOnFailure(hr, "Failed to parse ATOM entry category.");
 
             ++cCategories;
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"content", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"content", -1, FALSE))
         {
             if (NULL != pEntry->pContent)
             {
@@ -774,7 +774,7 @@ static HRESULT ParseAtomEntry(
             hr = ParseAtomContent(pNode, pEntry->pContent);
             AtomExitOnFailure(hr, "Failed to parse ATOM entry content.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"link", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"link", -1, FALSE))
         {
             hr = ParseAtomLink(pNode, &pEntry->rgLinks[cLinks]);
             AtomExitOnFailure(hr, "Failed to parse ATOM entry link.");
@@ -842,17 +842,17 @@ static HRESULT ParseAtomLink(
 
     while (S_OK == (hr = XmlNextAttribute(pixnnmAttributes, &pNode, &bstrNodeName)))
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"rel", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"rel", -1, FALSE))
         {
             hr = AssignString(&pLink->wzRel, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM link rel.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"href", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"href", -1, FALSE))
         {
             hr = AssignString(&pLink->wzUrl, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM link href.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"length", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"length", -1, FALSE))
         {
             hr = XmlGetAttributeUInt64(pixnLink, bstrNodeName, &pLink->dw64Length);
             if (E_INVALIDARG == hr)
@@ -861,12 +861,12 @@ static HRESULT ParseAtomLink(
             }
             AtomExitOnFailure(hr, "Failed to parse ATOM link length.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"title", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"title", -1, FALSE))
         {
             hr = AssignString(&pLink->wzTitle, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM link title.");
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, bstrNodeName, -1, L"type", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(bstrNodeName, -1, L"type", -1, FALSE))
         {
             hr = AssignString(&pLink->wzType, pNode);
             AtomExitOnFailure(hr, "Failed to allocate ATOM link type.");

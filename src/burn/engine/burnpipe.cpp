@@ -515,7 +515,7 @@ static HRESULT ChildPipeConnected(
     ExitOnFailure(hr, "Failed to read verification secret from parent pipe.");
 
     // Verify the secrets match.
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, 0, sczVerificationSecret, -1, wzSecret, -1))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(sczVerificationSecret, -1, wzSecret, -1, FALSE))
     {
         hr = HRESULT_FROM_WIN32(ERROR_INVALID_DATA);
         ExitOnRootFailure(hr, "Verification secret from parent does not match.");

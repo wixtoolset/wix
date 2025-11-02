@@ -499,14 +499,9 @@ static BOOL IsMatchExact(
     )
 {
     LPCWSTR wzMatchString = GetKey(psd, TranslateOffsetToValue(psd, psd->ppvBuckets[dwMatchIndex]));
-    DWORD dwFlags = 0;
+    BOOL fIgnoreCase = (DICT_FLAG_CASEINSENSITIVE & psd->dfFlags) ? TRUE : FALSE;
 
-    if (DICT_FLAG_CASEINSENSITIVE & psd->dfFlags)
-    {
-        dwFlags |= NORM_IGNORECASE;
-    }
-
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, dwFlags, wzOriginalString, -1, wzMatchString, -1))
+    if (CSTR_EQUAL == ::CompareStringOrdinal(wzOriginalString, -1, wzMatchString, -1, fIgnoreCase))
     {
         return TRUE;
     }
@@ -605,7 +600,7 @@ static HRESULT GetInsertIndex(
         // If we wrapped all the way back around to our original index, the dict is full - throw an error
         if (dwIndexCandidate == dwOriginalIndexCandidate)
         {
-            // The dict table is full - this error seems to be a reasonably close match 
+            // The dict table is full - this error seems to be a reasonably close match
             hr = HRESULT_FROM_WIN32(ERROR_DATABASE_FULL);
             DictExitOnRootFailure(hr, "Failed to add item '%ls' to dict table because dict table is full of items", pszString);
         }

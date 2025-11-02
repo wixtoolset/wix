@@ -61,7 +61,7 @@ public: // IBAFunctions
         __inout DWORD* /*pdwAutomaticBehaviorType*/
         )
     {
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, wzName, -1, L"InstallTestButton", -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(wzName, -1, L"InstallTestButton", -1, FALSE))
         {
             *pfProcessed = TRUE;
             *pwId = BAF_CONTROL_INSTALL_TEST_BUTTON;
@@ -343,7 +343,7 @@ private:
 
         for (DWORD iAssignControl = 0; iAssignControl < countof(vrgInitControls); ++iAssignControl)
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, 0, pArgs->pThemeControl->sczName, -1, vrgInitControls[iAssignControl].wzName, -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(pArgs->pThemeControl->sczName, -1, vrgInitControls[iAssignControl].wzName, -1, FALSE))
             {
                 fProcessed = TRUE;
                 pResults->wId = vrgInitControls[iAssignControl].wId;
