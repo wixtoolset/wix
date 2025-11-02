@@ -152,7 +152,7 @@ static DWORD WINAPI LoadThreadProc(
                 // If our file was updated, check to see if the modified time really changed. The notifications
                 // are often trigger happy thinking the file changed two or three times in a row. Maybe it's AV
                 // software creating the problems but actually checking the modified date works well.
-                if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pNotification->FileName, pNotification->FileNameLength / sizeof(WCHAR), wzFileName, -1))
+                if (CSTR_EQUAL == ::CompareStringOrdinal(pNotification->FileName, pNotification->FileNameLength / sizeof(WCHAR), wzFileName, -1, TRUE))
                 {
                     FILETIME ft = { };
                     FileGetTime(sczThemePath, NULL, NULL, &ft);

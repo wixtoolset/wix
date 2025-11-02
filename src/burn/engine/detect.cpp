@@ -130,7 +130,7 @@ extern "C" HRESULT DetectForwardCompatibleBundles(
             BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgRelatedBundles + iRelatedBundle;
 
             if (BOOTSTRAPPER_RELATION_UPGRADE == pRelatedBundle->detectRelationType &&
-                CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pRegistration->sczDetectedProviderKeyBundleCode, -1, pRelatedBundle->package.sczId, -1))
+                CSTR_EQUAL == ::CompareStringOrdinal(pRegistration->sczDetectedProviderKeyBundleCode, -1, pRelatedBundle->package.sczId, -1, TRUE))
             {
                 hr = VerCompareParsedVersions(pRegistration->pVersion, pRelatedBundle->pVersion, &nCompareResult);
                 ExitOnFailure(hr, "Failed to compare bundle version '%ls' to related bundle version '%ls'", pRegistration->pVersion->sczVersion, pRelatedBundle->pVersion->sczVersion);

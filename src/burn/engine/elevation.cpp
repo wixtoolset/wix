@@ -3380,7 +3380,7 @@ static HRESULT OnUninstallMsiCompatiblePackage(
     }
 
     if (!sczCompatiblePackageId || !*sczCompatiblePackageId ||
-        CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pCompatiblePackage->compatibleEntry.sczId, -1, sczCompatiblePackageId, -1))
+        CSTR_EQUAL != ::CompareStringOrdinal(pCompatiblePackage->compatibleEntry.sczId, -1, sczCompatiblePackageId, -1, TRUE))
     {
         ExitWithRootFailure(hr, E_INVALIDARG, "Package '%ls' has no compatible package with id: %ls", sczPackageId, sczCompatiblePackageId);
     }
@@ -3792,7 +3792,7 @@ static HRESULT OnCleanCompatiblePackage(
     }
 
     if (!sczCompatiblePackageId || !*sczCompatiblePackageId ||
-        CSTR_EQUAL != ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pCompatiblePackage->compatibleEntry.sczId, -1, sczCompatiblePackageId, -1))
+        CSTR_EQUAL != ::CompareStringOrdinal(pCompatiblePackage->compatibleEntry.sczId, -1, sczCompatiblePackageId, -1, TRUE))
     {
         ExitWithRootFailure(hr, E_INVALIDARG, "Package '%ls' has no compatible package with id: %ls", sczPackageId, sczCompatiblePackageId);
     }

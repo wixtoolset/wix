@@ -80,7 +80,7 @@ HRESULT ScaAppPoolRead(
         WcaLog(LOGMSG_VERBOSE, "Skipping ScaAppPoolRead() - required table not present");
         ExitFunction1(hr = S_FALSE);
     }
-    
+
     hr = WcaBeginUnwrapQuery(&hComponentQuery, ppwzCustomActionData);
     ExitOnFailure(hr, "Failed to unwrap query for ScaAppPoolRead");
 
@@ -478,17 +478,17 @@ HRESULT ScaWriteAppPool(
     }
     else if (psap->iAttributes & APATTR_OTHERUSER)
     {
-        if (!*psap->suUser.wzDomain || CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, psap->suUser.wzDomain, -1, L".", -1))
+        if (!*psap->suUser.wzDomain || CSTR_EQUAL == ::CompareStringOrdinal(psap->suUser.wzDomain, -1, L".", -1, TRUE))
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, psap->suUser.wzName, -1, L"NetworkService", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(psap->suUser.wzName, -1, L"NetworkService", -1, TRUE))
             {
                 dwIdentity = MD_APPPOOL_IDENTITY_TYPE_NETWORKSERVICE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, psap->suUser.wzName, -1, L"LocalService", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(psap->suUser.wzName, -1, L"LocalService", -1, TRUE))
             {
                 dwIdentity = MD_APPPOOL_IDENTITY_TYPE_LOCALSERVICE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, psap->suUser.wzName, -1, L"LocalSystem", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(psap->suUser.wzName, -1, L"LocalSystem", -1, TRUE))
             {
                 dwIdentity = MD_APPPOOL_IDENTITY_TYPE_LOCALSYSTEM;
             }
@@ -497,17 +497,17 @@ HRESULT ScaWriteAppPool(
                 dwIdentity = MD_APPPOOL_IDENTITY_TYPE_SPECIFICUSER;
             }
         }
-        else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, psap->suUser.wzDomain, -1, L"NT AUTHORITY", -1))
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(psap->suUser.wzDomain, -1, L"NT AUTHORITY", -1, TRUE))
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, psap->suUser.wzName, -1, L"NETWORK SERVICE", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(psap->suUser.wzName, -1, L"NETWORK SERVICE", -1, TRUE))
             {
                 dwIdentity = MD_APPPOOL_IDENTITY_TYPE_NETWORKSERVICE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, psap->suUser.wzName, -1, L"SERVICE", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(psap->suUser.wzName, -1, L"SERVICE", -1, TRUE))
             {
                 dwIdentity = MD_APPPOOL_IDENTITY_TYPE_LOCALSERVICE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, psap->suUser.wzName, -1, L"SYSTEM", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(psap->suUser.wzName, -1, L"SYSTEM", -1, TRUE))
             {
                 dwIdentity = MD_APPPOOL_IDENTITY_TYPE_LOCALSYSTEM;
             }

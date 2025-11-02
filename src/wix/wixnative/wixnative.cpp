@@ -21,19 +21,19 @@ int __cdecl wmain(int argc, LPWSTR argv[])
     hr = WixNativeReadStdinPreamble();
     ExitOnFailure(hr, "failed to read stdin preamble");
 
-    if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"smartcab", -1))
+    if (CSTR_EQUAL == ::CompareStringOrdinal(argv[1], -1, L"smartcab", -1, TRUE))
     {
         hr = SmartCabCommand(argc - 2, argv + 2);
     }
-    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"extractcab", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(argv[1], -1, L"extractcab", -1, TRUE))
     {
         hr = ExtractCabCommand(argc - 2, argv + 2);
     }
-    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"enumcab", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(argv[1], -1, L"enumcab", -1, TRUE))
     {
         hr = EnumCabCommand(argc - 2, argv + 2);
     }
-    else if (CSTR_EQUAL == ::CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, argv[1], -1, L"certhashes", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(argv[1], -1, L"certhashes", -1, TRUE))
     {
         hr = CertificateHashesCommand(argc - 2, argv + 2);
     }

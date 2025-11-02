@@ -740,17 +740,17 @@ static HRESULT NextSymbol(
                     ::GetStringTypeW(CT_CTYPE1, &pContext->wzRead[n], 1, &charType);
                 } while (C1_ALPHA & charType || C1_DIGIT & charType || L'_' == pContext->wzRead[n]);
 
-                if (2 == n && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pContext->wzRead, 2, L"OR", 2))
+                if (2 == n && CSTR_EQUAL == ::CompareStringOrdinal(pContext->wzRead, 2, L"OR", 2, TRUE))
                 {
                     // OR
                     pContext->NextSymbol.Type = BURN_SYMBOL_TYPE_OR;
                 }
-                else if (3 == n && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pContext->wzRead, 3, L"AND", 3))
+                else if (3 == n && CSTR_EQUAL == ::CompareStringOrdinal(pContext->wzRead, 3, L"AND", 3, TRUE))
                 {
                     // AND
                     pContext->NextSymbol.Type = BURN_SYMBOL_TYPE_AND;
                 }
-                else if (3 == n && CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pContext->wzRead, 3, L"NOT", 3))
+                else if (3 == n && CSTR_EQUAL == ::CompareStringOrdinal(pContext->wzRead, 3, L"NOT", 3, TRUE))
                 {
                     // NOT
                     pContext->NextSymbol.Type = BURN_SYMBOL_TYPE_NOT;

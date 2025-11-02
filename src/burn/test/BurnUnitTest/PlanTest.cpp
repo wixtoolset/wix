@@ -3161,12 +3161,12 @@ namespace Bootstrapper
 
             if (pDependencies->fSelfDependent || pDependencies->fActiveParent)
             {
-                if (pDependencies->fActiveParent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pDependencies->wzActiveParent, -1, wzId, -1))
+                if (pDependencies->fActiveParent && CSTR_EQUAL == ::CompareStringOrdinal(pDependencies->wzActiveParent, -1, wzId, -1, TRUE))
                 {
                     pRegistration->fParentRegisteredAsDependent = TRUE;
                 }
 
-                if (pDependencies->fSelfDependent && CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pDependencies->wzSelfDependent, -1, wzId, -1))
+                if (pDependencies->fSelfDependent && CSTR_EQUAL == ::CompareStringOrdinal(pDependencies->wzSelfDependent, -1, wzId, -1, TRUE))
                 {
                     pRegistration->fSelfRegisteredAsDependent = TRUE;
                 }

@@ -1215,8 +1215,8 @@ HRESULT CoreAppendLogToCommandLine(
         if (rgszArgs[i][0] == L'-' || rgszArgs[i][0] == L'/')
         {
             // Now looking for 'log' or 'l'
-            if ((CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &rgszArgs[i][1], -1, L"log", -1))
-                || (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &rgszArgs[i][1], -1, L"l", -1)))
+            if ((CSTR_EQUAL == ::CompareStringOrdinal(&rgszArgs[i][1], -1, L"log", -1, TRUE))
+                || (CSTR_EQUAL == ::CompareStringOrdinal(&rgszArgs[i][1], -1, L"l", -1, TRUE)))
             {
                 ExitFunction1(hr = S_FALSE);
             }
@@ -1360,13 +1360,13 @@ extern "C" HRESULT CoreParseCommandLine(
 
         if (argv[i][0] == L'-' || argv[i][0] == L'/')
         {
-            if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"l", -1) ||
-                CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"log", -1) ||
-                CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"xlog", -1))
+            if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"l", -1, TRUE) ||
+                CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"log", -1, TRUE) ||
+                CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"xlog", -1, TRUE))
             {
                 pInternalCommand->dwLoggingAttributes &= ~BURN_LOGGING_ATTRIBUTE_APPEND;
 
-                if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], 1, L"x", 1))
+                if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], 1, L"x", 1, TRUE))
                 {
                     pInternalCommand->dwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_VERBOSE | BURN_LOGGING_ATTRIBUTE_EXTRADEBUG;
                 }
@@ -1382,24 +1382,24 @@ extern "C" HRESULT CoreParseCommandLine(
                 hr = PathExpand(&pInternalCommand->sczLogFile, argv[i], PATH_EXPAND_FULLPATH);
                 ExitOnFailure(hr, "Failed to copy log file path.");
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"?", -1) ||
-                     CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"h", -1) ||
-                     CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"help", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"?", -1, TRUE) ||
+                     CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"h", -1, TRUE) ||
+                     CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"help", -1, TRUE))
             {
                 pCommand->action = BOOTSTRAPPER_ACTION_HELP;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"q", -1) ||
-                     CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"quiet", -1) ||
-                     CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"s", -1) ||
-                     CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"silent", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"q", -1, TRUE) ||
+                     CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"quiet", -1, TRUE) ||
+                     CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"s", -1, TRUE) ||
+                     CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"silent", -1, TRUE))
             {
                 pCommand->display = BOOTSTRAPPER_DISPLAY_NONE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"passive", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"passive", -1, TRUE))
             {
                 pCommand->display = BOOTSTRAPPER_DISPLAY_PASSIVE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"layout", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"layout", -1, TRUE))
             {
                 if (BOOTSTRAPPER_ACTION_HELP != pCommand->action)
                 {
@@ -1415,47 +1415,47 @@ extern "C" HRESULT CoreParseCommandLine(
                     ExitOnFailure(hr, "Failed to copy path for layout directory.");
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"unsafeuninstall", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"unsafeuninstall", -1, TRUE))
             {
                 if (BOOTSTRAPPER_ACTION_HELP != pCommand->action)
                 {
                     pCommand->action = BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL;
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"uninstall", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"uninstall", -1, TRUE))
             {
                 if (BOOTSTRAPPER_ACTION_HELP != pCommand->action)
                 {
                     pCommand->action = BOOTSTRAPPER_ACTION_UNINSTALL;
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"repair", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"repair", -1, TRUE))
             {
                 if (BOOTSTRAPPER_ACTION_HELP != pCommand->action)
                 {
                     pCommand->action = BOOTSTRAPPER_ACTION_REPAIR;
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"modify", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"modify", -1, TRUE))
             {
                 if (BOOTSTRAPPER_ACTION_HELP != pCommand->action)
                 {
                     pCommand->action = BOOTSTRAPPER_ACTION_MODIFY;
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"package", -1) ||
-                     CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"update", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"package", -1, TRUE) ||
+                     CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"update", -1, TRUE))
             {
                 if (BOOTSTRAPPER_ACTION_UNKNOWN == pCommand->action)
                 {
                     pCommand->action = BOOTSTRAPPER_ACTION_INSTALL;
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"noaupause", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"noaupause", -1, TRUE))
             {
                 pInternalCommand->automaticUpdates = BURN_AU_PAUSE_ACTION_NONE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"keepaupaused", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"keepaupaused", -1, TRUE))
             {
                 // Switch /noaupause takes precedence.
                 if (BURN_AU_PAUSE_ACTION_NONE != pInternalCommand->automaticUpdates)
@@ -1463,11 +1463,11 @@ extern "C" HRESULT CoreParseCommandLine(
                     pInternalCommand->automaticUpdates = BURN_AU_PAUSE_ACTION_IFELEVATED_NORESUME;
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"disablesystemrestore", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"disablesystemrestore", -1, TRUE))
             {
                 pInternalCommand->fDisableSystemRestore = TRUE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, L"originalsource", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"originalsource", -1, TRUE))
             {
                 if (i + 1 >= argc)
                 {
@@ -1479,7 +1479,7 @@ extern "C" HRESULT CoreParseCommandLine(
                 hr = PathExpand(&pInternalCommand->sczOriginalSource, argv[i], PATH_EXPAND_FULLPATH);
                 ExitOnFailure(hr, "Failed to copy last used source.");
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PARENT, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PARENT, -1, TRUE))
             {
                 if (i + 1 >= argc)
                 {
@@ -1492,12 +1492,12 @@ extern "C" HRESULT CoreParseCommandLine(
                 hr = StrAllocString(&pInternalCommand->sczActiveParent, argv[i], 0);
                 ExitOnFailure(hr, "Failed to copy parent.");
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PARENT_NONE, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PARENT_NONE, -1, TRUE))
             {
                 hr = StrAllocString(&pInternalCommand->sczActiveParent, L"", 0);
                 ExitOnFailure(hr, "Failed to initialize parent to none.");
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_LOG_APPEND, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_LOG_APPEND, -1, TRUE))
             {
                 if (i + 1 >= argc)
                 {
@@ -1512,7 +1512,7 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 pInternalCommand->dwLoggingAttributes |= BURN_LOGGING_ATTRIBUTE_APPEND;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_LOG_MODE), BURN_COMMANDLINE_SWITCH_LOG_MODE, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_LOG_MODE), BURN_COMMANDLINE_SWITCH_LOG_MODE, -1, TRUE))
             {
                 // Get a pointer to the next character after the switch.
                 LPCWSTR wzParam = &argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_LOG_MODE)];
@@ -1541,7 +1541,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     }
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_ELEVATED, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_ELEVATED, -1, TRUE))
             {
                 if (i + 3 >= argc)
                 {
@@ -1579,7 +1579,7 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 i += 2;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT), BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT, lstrlenW(BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT)))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT), BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT, lstrlenW(BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT), TRUE))
             {
                 // Get a pointer to the next character after the switch.
                 LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_SYSTEM_COMPONENT)];
@@ -1602,7 +1602,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     pInternalCommand->fArpSystemComponent = TRUE;
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_EMBEDDED, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_EMBEDDED, -1, TRUE))
             {
                 if (i + 3 >= argc)
                 {
@@ -1633,59 +1633,59 @@ extern "C" HRESULT CoreParseCommandLine(
 
                 i += 2;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_DETECT, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_DETECT, -1, TRUE))
             {
                 pCommand->relationType = BOOTSTRAPPER_RELATION_DETECT;
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_UPGRADE, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_UPGRADE, -1, TRUE))
             {
                 pCommand->relationType = BOOTSTRAPPER_RELATION_UPGRADE;
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_ADDON, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_ADDON, -1, TRUE))
             {
                 pCommand->relationType = BOOTSTRAPPER_RELATION_ADDON;
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_DEPENDENT_ADDON, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_DEPENDENT_ADDON, -1, TRUE))
             {
                 pCommand->relationType = BOOTSTRAPPER_RELATION_DEPENDENT_ADDON;
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_PATCH, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_PATCH, -1, TRUE))
             {
                 pCommand->relationType = BOOTSTRAPPER_RELATION_PATCH;
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_DEPENDENT_PATCH, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_DEPENDENT_PATCH, -1, TRUE))
             {
                 pCommand->relationType = BOOTSTRAPPER_RELATION_DEPENDENT_PATCH;
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_UPDATE, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_UPDATE, -1, TRUE))
             {
                 pCommand->relationType = BOOTSTRAPPER_RELATION_UPDATE;
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_CHAIN_PACKAGE, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RELATED_CHAIN_PACKAGE, -1, TRUE))
             {
                 pCommand->relationType = BOOTSTRAPPER_RELATION_CHAIN_PACKAGE;
 
                 LogId(REPORT_STANDARD, MSG_BURN_RUN_BY_RELATED_BUNDLE, LoggingRelationTypeToString(pCommand->relationType));
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PASSTHROUGH, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_PASSTHROUGH, -1, TRUE))
             {
                 pCommand->fPassthrough = TRUE;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RUNONCE, -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, BURN_COMMANDLINE_SWITCH_RUNONCE, -1, TRUE))
             {
                 switch (pInternalCommand->mode)
                 {
@@ -1698,7 +1698,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     TraceLog(E_INVALIDARG, "Multiple mode command-line switches were provided.");
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES), BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, lstrlenW(BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES)))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES), BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES, lstrlenW(BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES), TRUE))
             {
                 // Get a pointer to the next character after the switch.
                 LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_IGNOREDEPENDENCIES)];
@@ -1713,7 +1713,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     ExitOnFailure(hr, "Failed to allocate the list of dependencies to ignore.");
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_ANCESTORS), BURN_COMMANDLINE_SWITCH_ANCESTORS, lstrlenW(BURN_COMMANDLINE_SWITCH_ANCESTORS)))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_ANCESTORS), BURN_COMMANDLINE_SWITCH_ANCESTORS, lstrlenW(BURN_COMMANDLINE_SWITCH_ANCESTORS), TRUE))
             {
                 // Get a pointer to the next character after the switch.
                 LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_ANCESTORS)];
@@ -1728,7 +1728,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     ExitOnFailure(hr, "Failed to allocate the list of ancestors.");
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY), BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY, lstrlenW(BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY)))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY), BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY, lstrlenW(BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY), TRUE))
             {
                 // Get a pointer to the next character after the switch.
                 LPCWSTR wzParam = &argv[i][1 + lstrlenW(BURN_COMMANDLINE_SWITCH_WORKING_DIRECTORY)];
@@ -1743,7 +1743,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     ExitOnFailure(hr, "Failed to store the custom working directory.");
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED), BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED)))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED), BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED), TRUE))
             {
                 LPCWSTR wzParam = &argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_ATTACHED)];
                 if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
@@ -1765,7 +1765,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     }
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF), BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF)))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF), BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF, lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF), TRUE))
             {
                 LPCWSTR wzParam = &argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF)];
                 if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
@@ -1787,7 +1787,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     }
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN), BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN, lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN)))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN), BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN, lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN), TRUE))
             {
                 LPCWSTR wzParam = &argv[i][2 + lstrlenW(BURN_COMMANDLINE_SWITCH_SPLASH_SCREEN)];
                 if (L'=' != wzParam[-1] || L'\0' == wzParam[0])
@@ -1809,7 +1809,7 @@ extern "C" HRESULT CoreParseCommandLine(
                     }
                 }
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, &argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX), BURN_COMMANDLINE_SWITCH_PREFIX, lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX)))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX), BURN_COMMANDLINE_SWITCH_PREFIX, lstrlenW(BURN_COMMANDLINE_SWITCH_PREFIX), TRUE))
             {
                 // Skip (but log) any other private burn switches we don't recognize, so that
                 // adding future private variables doesn't break old bundles

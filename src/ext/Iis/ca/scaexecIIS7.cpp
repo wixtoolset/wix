@@ -566,7 +566,7 @@ HRESULT IIS7AspProperty(
     //
     //Do not append trailing '/' for default vDir
     //
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pwzPathName, -1, L"/", -1))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(pwzPathName, -1, L"/", -1, TRUE))
     {
         hr = StrAllocConcat(&pwzLocationPath, L"/", 0);
         ExitOnFailure(hr, "failed to copy location WebDir '/'");
@@ -742,7 +742,7 @@ HRESULT IIS7WebDir(
             //
             //Do not append trailing '/' for default vDir
             //
-            if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pwzPathName, -1, L"/", -1))
+            if (CSTR_EQUAL != ::CompareStringOrdinal(pwzPathName, -1, L"/", -1, TRUE))
             {
                 hr = StrAllocConcat(&pwzLocationPath, L"/", 0);
                 ExitOnFailure(hr, "failed to copy location WebDir '/'");
@@ -998,7 +998,7 @@ HRESULT IIS7WebError(
     hr = StrAllocFormatted(&pwzConfigPath, L"%s/%s", IIS_CONFIG_APPHOST_ROOT, pwzSiteName);
     ExitOnFailure(hr, "failed to format web error config path");
 
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pwzAppName, -1, L"/", -1))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(pwzAppName, -1, L"/", -1, TRUE))
     {
         hr = StrAllocConcat(&pwzConfigPath, L"/", 0);
         ExitOnFailure(hr, "failed to copy web error config path delim");
@@ -1325,7 +1325,7 @@ HRESULT IIS7HttpHeader(
     hr = StrAllocFormatted(&pwzConfigPath, L"%s/%s", IIS_CONFIG_APPHOST_ROOT, pwzSiteName);
     ExitOnFailure(hr, "failed to format web error config path");
 
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pwzAppName, -1, L"/", -1))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(pwzAppName, -1, L"/", -1, TRUE))
     {
         hr = StrAllocConcat(&pwzConfigPath, L"/", 0);
         ExitOnFailure(hr, "failed to copy web error config path delim");
@@ -2340,7 +2340,7 @@ HRESULT IIS7AppExtension(
     //
     //Do not append trailing '/' for default vDir
     //
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pwzWebRoot, -1, L"/", -1))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(pwzWebRoot, -1, L"/", -1, TRUE))
     {
         hr = StrAllocConcat(&pwzConfigPath, L"/", 0);
         ExitOnFailure(hr, "failed to copy appext config path delim");
@@ -2495,7 +2495,7 @@ LExit:
     //
     //Do not append trailing '/' for default vDir
     //
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pwzWebRoot, -1, L"/", -1))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(pwzWebRoot, -1, L"/", -1, TRUE))
     {
         hr = StrAllocConcat(&pwzConfigPath, L"/", 0);
         ExitOnFailure(hr, "failed to copy appext config path delim");
@@ -2627,7 +2627,7 @@ HRESULT IIS7DirProperties(
     //
     //Do not append trailing '/' for default vDir
     //
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pwzWebRoot, -1, L"/", -1))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(pwzWebRoot, -1, L"/", -1, TRUE))
     {
         hr = StrAllocConcat(&pwzConfigPath, L"/", 0);
         ExitOnFailure(hr, "failed to copy appext config path delim");
@@ -3337,7 +3337,7 @@ static HRESULT CreateWebLog(
     ExitOnFailure(hr, "Failed get logfile element");
     ReleaseVariant(vtProp);
 
-    if (CSTR_EQUAL != ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, pwzFormat, -1, L"none", -1))
+    if (CSTR_EQUAL != ::CompareStringOrdinal(pwzFormat, -1, L"none", -1, TRUE))
     {
         hr = Iis7PutPropertyString(pLogFile, IIS_CONFIG_LOGFORMAT, pwzFormat);
         ExitOnFailure(hr, "Failed set logfile format property");
@@ -4118,7 +4118,7 @@ static HRESULT ClearLocationTag(
         ExitOnFailure(hr, "Failed to get IIS location collection count");
 
         hr = pLocation->get_Path(&bstrLocationPath);
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, swLocationPath, -1, bstrLocationPath, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(swLocationPath, -1, bstrLocationPath, -1, TRUE))
         {
             hr = pLocationCollection->DeleteLocation(vtIndex);
             ExitOnFailure(hr, "Failed to delete IIS location tag %ls",swLocationPath);

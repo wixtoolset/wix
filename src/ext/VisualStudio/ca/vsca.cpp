@@ -219,7 +219,7 @@ static HRESULT InstanceInProducts(
     {
         const LPCWSTR wzProduct = rgwzProducts[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, bstrId, -1, wzProduct, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(bstrId, -1, wzProduct, -1, TRUE))
         {
             hr = S_OK;
             ExitFunction();
@@ -579,7 +579,7 @@ static HRESULT SetPropertyForComponent(
     {
         const VS_COMPONENT_PROPERTY* pComponent = &rgComponents[i];
 
-        if (CSTR_EQUAL == ::CompareStringW(LOCALE_NEUTRAL, NORM_IGNORECASE, pComponent->pwzComponent, -1, wzComponent, -1))
+        if (CSTR_EQUAL == ::CompareStringOrdinal(pComponent->pwzComponent, -1, wzComponent, -1, TRUE))
         {
             hr = WcaSetIntProperty(pComponent->pwzProperty, 1);
             ExitOnFailure(hr, "Failed to set property: %ls", pComponent->pwzProperty);
