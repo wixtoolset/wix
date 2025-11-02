@@ -409,6 +409,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 this.GenerateDatabase(targetOutput, targetDatabaseFile, keepAddedColumns: false);
                 this.GenerateDatabase(updatedOutput, updatedDatabaseFile, keepAddedColumns: true);
 
+                if (this.Messaging.EncounteredError)
+                {
+                    return;
+                }
+
                 // make sure the directory exists
                 Directory.CreateDirectory(Path.GetDirectoryName(this.OutputPath));
 

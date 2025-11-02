@@ -25,6 +25,7 @@ namespace WixToolset.Core.Native.Msi
             {
                 throw new MsiException(error);
             }
+
             this.Handle = handle;
         }
 

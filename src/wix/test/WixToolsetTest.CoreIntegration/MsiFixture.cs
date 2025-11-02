@@ -56,6 +56,55 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CannotBuildReadOnlyMsi()
+        {
+            var folder = TestData.Get(@"TestData", "AllUsers");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var binFolder = Path.Combine(baseFolder, "bin");
+                var msiPath = Path.Combine(binFolder, "test.msi");
+
+                var msiFile = new FileInfo(msiPath);
+
+                try
+                {
+                    msiFile.Directory.Create();
+
+                    using (var stream = msiFile.CreateText())
+                    {
+                        stream.WriteLine("This is a read-only file.");
+                    }
+
+                    msiFile.IsReadOnly = true;
+
+                    var result = WixRunner.Execute(
+                    [
+                        "build",
+                        Path.Combine(folder, "PerMachine.wxs"),
+                        "-bindpath", folder,
+                        "-intermediateFolder", intermediateFolder,
+                        "-o", msiPath
+                    ], out var messages);
+                    Assert.Equal(223, result);
+
+                    // Note the use of substring in the message below. The error message detail may vary depending on whether extended
+                    // error information is available on the system.
+                    WixAssert.CompareLineByLine(
+                    [
+                        @"223 Error - Failed to open database '<baseFolder>\bin\test.msi'. Ensure it is a valid database, is writable, and it is not open by another process. ",
+                    ], [.. messages.Select(m => $"{m.Id} {m.Level} - {m.ToString().Replace(folder, "<folder>").Replace(baseFolder, "<baseFolder>").Substring(0, 136)}")]);
+                }
+                finally
+                {
+                    msiFile.IsReadOnly = false;
+                }
+            }
+        }
+
+        [Fact]
         public void CannotBuildMissingFile()
         {
             var folder = TestData.Get(@"TestData\SingleFile");

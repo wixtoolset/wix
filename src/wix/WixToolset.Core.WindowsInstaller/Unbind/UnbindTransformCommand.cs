@@ -82,12 +82,22 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             // Bind the schema msi.
             this.GenerateDatabase(schemaData);
 
+            if (this.Messaging.EncounteredError)
+            {
+                return transform;
+            }
+
             var transformViewTable = this.OpenTransformViewForAddedAndModifiedRows(schemaDatabasePath);
 
             var addedRows = this.CreatePlaceholdersForModifiedRowsAndIndexAddedRows(schemaData, transformViewTable);
 
             // Re-bind the schema output with the placeholder rows over top the original schema database.
             this.GenerateDatabase(schemaData);
+
+            if (this.Messaging.EncounteredError)
+            {
+                return transform;
+            }
 
             this.PopulateTransformFromView(schemaDatabasePath, transform, transformViewTable, addedRows);
 

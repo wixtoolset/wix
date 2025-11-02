@@ -1561,11 +1561,6 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.NoUniqueActionSequenceNumber2, "The location of the sequenced action related to previous error.");
         }
 
-        public static Message OpenDatabaseFailed(string databaseFile)
-        {
-            return Message(null, Ids.OpenDatabaseFailed, "Failed to open database '{0}'. Ensure it is a valid database, and it is not open by another process.", databaseFile);
-        }
-
         public static Message OrderingReferenceLoopDetected(SourceLineNumber sourceLineNumbers, string loopList)
         {
             return Message(sourceLineNumbers, Ids.OrderingReferenceLoopDetected, "A circular reference of ordering dependencies was detected. The infinite loop includes: {0}. Ordering dependency references must form a directed acyclic graph.", loopList);
@@ -2479,7 +2474,6 @@ namespace WixToolset.Data
             InvalidKeyColumn = 220,
             CollidingModularizationTypes = 221,
             CubeFileNotFound = 222,
-            OpenDatabaseFailed = 223,
             OutputTypeMismatch = 224,
             RealTableMissingPrimaryKeyColumn = 225,
             IllegalColumnName = 226,
