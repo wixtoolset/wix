@@ -34,11 +34,13 @@ namespace WixToolset.Core.Native.Msi
             var buffer = new StringBuilder(65535);
             var size = buffer.Capacity;
 
-            var error = MsiInterop.MsiExtractPatchXMLData(path, 0, buffer, ref size);
+            var shortPath = PathUtil.GetShortPath(path);
+
+            var error = MsiInterop.MsiExtractPatchXMLData(shortPath, 0, buffer, ref size);
             if (234 == error)
             {
                 buffer.EnsureCapacity(++size);
-                error = MsiInterop.MsiExtractPatchXMLData(path, 0, buffer, ref size);
+                error = MsiInterop.MsiExtractPatchXMLData(shortPath, 0, buffer, ref size);
             }
 
             if (error != 0)
@@ -57,8 +59,12 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="hash">Int array that receives the returned file hash information.</param>
         public static void GetFileHash(string filePath, int options, out int[] hash)
         {
-            var hashInterop = new MSIFILEHASHINFO();
-            hashInterop.FileHashInfoSize = 20;
+            var hashInterop = new MSIFILEHASHINFO
+            {
+                FileHashInfoSize = 20
+            };
+
+            filePath = PathUtil.GetPrefixedLongPath(filePath);
 
             var error = MsiInterop.MsiGetFileHash(filePath, Convert.ToUInt32(options), hashInterop);
             if (0 != error)
@@ -76,9 +82,9 @@ namespace WixToolset.Core.Native.Msi
         }
 
         /// <summary>
-        /// Returns the version string and language string in the format that the installer 
-        /// expects to find them in the database.  If you just want version information, set 
-        /// lpLangBuf and pcchLangBuf to zero. If you just want language information, set 
+        /// Returns the version string and language string in the format that the installer
+        /// expects to find them in the database.  If you just want version information, set
+        /// lpLangBuf and pcchLangBuf to zero. If you just want language information, set
         /// lpVersionBuf and pcchVersionBuf to zero.
         /// </summary>
         /// <param name="filePath">Specifies the path to the file.</param>
@@ -90,6 +96,8 @@ namespace WixToolset.Core.Native.Msi
             var languageLength = 20;
             var versionBuffer = new StringBuilder(versionLength);
             var languageBuffer = new StringBuilder(languageLength);
+
+            filePath = PathUtil.GetPrefixedLongPath(filePath);
 
             var error = MsiInterop.MsiGetFileVersion(filePath, versionBuffer, ref versionLength, languageBuffer, ref languageLength);
             if (234 == error)

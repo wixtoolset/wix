@@ -18,13 +18,14 @@ namespace WixToolset.Core.Native.Msi
         /// </summary>
         /// <param name="path">Path to the database to be opened.</param>
         /// <param name="type">Persist mode to use when opening the database.</param>
-        public Database(string path, OpenDatabase type)
+        private Database(string path, OpenDatabase type)
         {
             var error = MsiInterop.MsiOpenDatabase(path, (IntPtr)type, out var handle);
             if (0 != error)
             {
                 throw new MsiException(error);
             }
+
             this.Handle = handle;
         }
 
@@ -34,14 +35,89 @@ namespace WixToolset.Core.Native.Msi
         public static int MsiMaxStreamNameLength => MsiInterop.MsiMaxStreamNameLength;
 
         /// <summary>
+        /// Creates a new <see cref="Database"/> with the specified path.
+        /// </summary>
+        /// <param name="path">Path of database to be created.</param>
+        /// <param name="asPatch">Indicates whether the database should be opened as a patch file.</param>
+        public static Database Create(string path, bool asPatch = false)
+        {
+            var fileCreated = false;
+            var mode = OpenDatabase.CreateDirect;
+
+            if (asPatch)
+            {
+                mode |= OpenDatabase.OpenPatchFile;
+            }
+
+            try
+            {
+                fileCreated = PathUtil.CreateOrGetShortPath(path, out var shortPath);
+
+                return new Database(shortPath, mode);
+            }
+            catch // cleanup on error if we created the short path file.
+            {
+                if (fileCreated)
+                {
+                    File.Delete(path);
+                }
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Opens an existing <see cref="Database"/> with the specified path.
+        /// </summary>
+        /// <param name="path">Path of database to open.</param>
+        /// <param name="transact">Indicates whether to open the database in transaction mode.</param>
+        /// <param name="asPatch">Indicates whether the database should be opened as a patch file.</param>
+        public static Database Open(string path, bool transact = false, bool asPatch = false)
+        {
+            var mode = transact ? OpenDatabase.Transact : OpenDatabase.Direct;
+
+            if (asPatch)
+            {
+                mode |= OpenDatabase.OpenPatchFile;
+            }
+
+            // Use the short path to avoid issues with long paths in the MSI API.
+            var shortPath = PathUtil.GetShortPath(path);
+
+            return new Database(shortPath, mode);
+        }
+
+        /// <summary>
+        /// Opens an existing <see cref="Database"/> with the specified path.
+        /// </summary>
+        /// <param name="path">Path of database to open.</param>
+        /// <param name="asPatch">Indicates whether the database should be opened as a patch file.</param>
+        public static Database OpenAsReadOnly(string path, bool asPatch = false)
+        {
+            var mode = OpenDatabase.ReadOnly;
+
+            if (asPatch)
+            {
+                mode |= OpenDatabase.OpenPatchFile;
+            }
+
+            // Use the short path to avoid issues with long paths in the MSI API.
+            var shortPath = PathUtil.GetShortPath(path);
+
+            return new Database(shortPath, mode);
+        }
+
+        /// <summary>
         /// Apply a transform to the MSI.
         /// </summary>
         /// <param name="transformFile">Path to transform to apply.</param>
         public void ApplyTransform(string transformFile)
         {
+            var shortTransformFile = PathUtil.GetShortPath(transformFile);
+
             // get the curret validation bits
             var conditions = TransformErrorConditions.None;
-            using (var summaryInfo = new SummaryInformation(transformFile))
+            using (var summaryInfo = new SummaryInformation(shortTransformFile))
             {
                 try
                 {
@@ -64,7 +140,9 @@ namespace WixToolset.Core.Native.Msi
         /// <param name="errorConditions">Specifies the error conditions that are to be suppressed.</param>
         public void ApplyTransform(string transformFile, TransformErrorConditions errorConditions)
         {
-            var error = MsiInterop.MsiDatabaseApplyTransform(this.Handle, transformFile, errorConditions);
+            var shortTransformFile = PathUtil.GetShortPath(transformFile);
+
+            var error = MsiInterop.MsiDatabaseApplyTransform(this.Handle, shortTransformFile, errorConditions);
             if (0 != error)
             {
                 throw new MsiException(error);
@@ -118,7 +196,9 @@ namespace WixToolset.Core.Native.Msi
         /// shows which properties should be validated to verify that this transform can be applied to the database.</param>
         public void CreateTransformSummaryInfo(Database referenceDatabase, string transformFile, TransformErrorConditions errorConditions, TransformValidations validations)
         {
-            var error = MsiInterop.MsiCreateTransformSummaryInfo(this.Handle, referenceDatabase.Handle, transformFile, errorConditions, validations);
+            var shortTransformFile = PathUtil.GetShortPath(transformFile);
+
+            var error = MsiInterop.MsiCreateTransformSummaryInfo(this.Handle, referenceDatabase.Handle, shortTransformFile, errorConditions, validations);
             if (0 != error)
             {
                 throw new MsiException(error);
@@ -136,7 +216,9 @@ namespace WixToolset.Core.Native.Msi
             var folderPath = Path.GetFullPath(Path.GetDirectoryName(idtPath));
             var fileName = Path.GetFileName(idtPath);
 
-            var error = MsiInterop.MsiDatabaseImport(this.Handle, folderPath, fileName);
+            var shortFolderPath = PathUtil.GetShortPath(folderPath);
+
+            var error = MsiInterop.MsiDatabaseImport(this.Handle, shortFolderPath, fileName);
             if (1627 == error) // ERROR_FUNCTION_FAILED
             {
                 throw new WixInvalidIdtException(idtPath);
@@ -160,7 +242,9 @@ namespace WixToolset.Core.Native.Msi
                 folderPath = Environment.CurrentDirectory;
             }
 
-            var error = MsiInterop.MsiDatabaseExport(this.Handle, tableName, folderPath, fileName);
+            var shortFolderPath = PathUtil.GetShortPath(folderPath);
+
+            var error = MsiInterop.MsiDatabaseExport(this.Handle, tableName, shortFolderPath, fileName);
             if (0 != error)
             {
                 throw new MsiException(error);
@@ -176,13 +260,29 @@ namespace WixToolset.Core.Native.Msi
         /// there are no differences between the two databases.</returns>
         public bool GenerateTransform(Database referenceDatabase, string transformFile)
         {
-            var error = MsiInterop.MsiDatabaseGenerateTransform(this.Handle, referenceDatabase.Handle, transformFile, 0, 0);
-            if (0 != error && 0xE8 != error) // ERROR_NO_DATA(0xE8) means no differences were found
-            {
-                throw new MsiException(error);
-            }
+            var fileCreated = false;
 
-            return (0xE8 != error);
+            try
+            {
+                fileCreated = PathUtil.CreateOrGetShortPath(transformFile, out var shortTransformFile);
+
+                var error = MsiInterop.MsiDatabaseGenerateTransform(this.Handle, referenceDatabase.Handle, shortTransformFile, 0, 0);
+                if (0 != error && 0xE8 != error) // ERROR_NO_DATA(0xE8) means no differences were found
+                {
+                    throw new MsiException(error);
+                }
+
+                return (0xE8 != error);
+            }
+            catch // Cleanup on error
+            {
+                if (fileCreated)
+                {
+                    File.Delete(transformFile);
+                }
+
+                throw;
+            }
         }
 
         /// <summary>

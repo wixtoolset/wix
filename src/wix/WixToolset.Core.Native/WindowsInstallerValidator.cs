@@ -93,7 +93,7 @@ namespace WixToolset.Core.Native
 
             try
             {
-                using (var database = new Database(this.DatabasePath, OpenDatabase.Direct))
+                using (var database = Database.Open(this.DatabasePath))
                 {
                     var propertyTableExists = database.TableExists("Property");
                     string productCode = null;
@@ -130,7 +130,7 @@ namespace WixToolset.Core.Native
 
                         try
                         {
-                            using (var cubeDatabase = new Database(findCubeFile.Path, OpenDatabase.ReadOnly))
+                            using (var cubeDatabase = Database.OpenAsReadOnly(findCubeFile.Path))
                             {
                                 try
                                 {

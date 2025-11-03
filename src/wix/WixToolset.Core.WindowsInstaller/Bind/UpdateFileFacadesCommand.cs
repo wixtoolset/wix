@@ -76,7 +76,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var assemblySymbols = this.Section.Symbols.OfType<AssemblySymbol>().ToDictionary(t => t.Id.Id);
 
             Parallel.ForEach(facades,
-                new ParallelOptions{
+                new ParallelOptions
+                {
                     CancellationToken = this.CancellationToken,
                     MaxDegreeOfParallelism = this.ThreadCount
                 },

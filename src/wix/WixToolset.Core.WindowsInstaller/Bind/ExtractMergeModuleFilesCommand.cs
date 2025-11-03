@@ -90,7 +90,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             try
             {
                 // read the module's File table to get its FileMediaInformation entries and gather any other information needed from the module.
-                using (var db = new Database(wixMergeRow.SourceFile, OpenDatabase.ReadOnly))
+                using (var db = Database.OpenAsReadOnly(wixMergeRow.SourceFile))
                 {
                     if (db.TableExists("File") && db.TableExists("Component"))
                     {

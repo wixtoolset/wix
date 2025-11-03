@@ -61,7 +61,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                 return shouldCommit;
             }
 
-            using (var database = new Database(databasePath, OpenDatabase.Transact))
+            using (var database = Database.Open(databasePath, transact: true))
             {
                 // Just use the English codepage, because the tables we're importing only have binary streams / MSI identifiers / other non-localizable content
                 var codepage = 1252;

@@ -164,7 +164,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 this.CheckIfWindowsInstallerFileTooLarge(this.PackagePayload.SourceLineNumbers, sourcePath, "MSI");
 
-                using (var db = new Database(sourcePath, OpenDatabase.ReadOnly))
+                using (var db = Database.OpenAsReadOnly(sourcePath))
                 {
                     // Read data out of the msi database...
                     using (var sumInfo = new SummaryInformation(db))
