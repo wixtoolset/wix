@@ -55,6 +55,9 @@
     <ClCompile Include="extractcab.cpp" />
     <ClCompile Include="smartcab.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="wixnative.manifest" />
+  </ItemGroup>
 
   <ItemGroup>
     <ClInclude Include="precomp.h" />

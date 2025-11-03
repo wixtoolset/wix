@@ -220,8 +220,10 @@ namespace WixToolset.Core.Native.Msi
                 throw new ArgumentNullException(nameof(databaseFile));
             }
 
+            var shortDatabaseFile = PathUtil.GetShortPath(databaseFile);
+
             var handle = IntPtr.Zero;
-            var error = MsiInterop.MsiGetSummaryInformation(IntPtr.Zero, databaseFile, 0, ref handle);
+            var error = MsiInterop.MsiGetSummaryInformation(IntPtr.Zero, shortDatabaseFile, 0, ref handle);
             if (0 != error)
             {
                 throw new MsiException(error);

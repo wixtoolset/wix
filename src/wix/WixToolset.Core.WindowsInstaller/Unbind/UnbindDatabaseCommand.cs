@@ -86,7 +86,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
             {
                 if (this.Database == null)
                 {
-                    database = new Database(this.DatabasePath, OpenDatabase.ReadOnly);
+                    database = Database.OpenAsReadOnly(this.DatabasePath);
                     this.Database = database;
                 }
 

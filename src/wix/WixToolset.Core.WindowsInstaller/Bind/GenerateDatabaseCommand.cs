@@ -81,20 +81,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var idtFolder = Path.Combine(baseDirectory, IdtsSubFolder);
 
-            var type = OpenDatabase.CreateDirect;
-
-            if (OutputType.Patch == this.Data.Type)
-            {
-                type |= OpenDatabase.OpenPatchFile;
-            }
-
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(this.OutputPath));
 
                 Directory.CreateDirectory(idtFolder);
 
-                using (var db = new Database(this.OutputPath, type))
+                using (var db = Database.Create(this.OutputPath, asPatch: OutputType.Patch == this.Data.Type))
                 {
                     // If we're not using the default codepage, import a new one into our
                     // database before we add any tables (or the tables would be added

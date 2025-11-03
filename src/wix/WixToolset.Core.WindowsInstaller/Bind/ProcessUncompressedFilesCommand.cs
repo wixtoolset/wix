@@ -64,7 +64,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var mediaRows = this.Section.Symbols.OfType<MediaSymbol>().ToDictionary(t => t.DiskId);
 
-            using (var db = new Database(this.DatabasePath, OpenDatabase.ReadOnly))
+            using (var db = Database.OpenAsReadOnly(this.DatabasePath))
             {
                 using (var directoryView = db.OpenExecuteView("SELECT `Directory`, `Directory_Parent`, `DefaultDir` FROM `Directory`"))
                 {

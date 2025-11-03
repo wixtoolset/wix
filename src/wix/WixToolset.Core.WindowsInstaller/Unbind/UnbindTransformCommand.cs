@@ -273,7 +273,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
         private Database ApplyTransformToSchemaDatabase(string schemaDatabasePath, TransformErrorConditions transformConditions)
         {
-            var msiDatabase = new Database(schemaDatabasePath, OpenDatabase.Transact);
+            var msiDatabase = Database.Open(schemaDatabasePath, transact: true);
 
             try
             {

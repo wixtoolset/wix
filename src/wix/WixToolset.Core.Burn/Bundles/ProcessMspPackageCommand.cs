@@ -98,7 +98,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             try
             {
-                using (var db = new Database(sourcePath, OpenDatabase.ReadOnly | OpenDatabase.OpenPatchFile))
+                using (var db = Database.OpenAsReadOnly(sourcePath, asPatch: true))
                 {
                     // Read data out of the msp database...
                     using (var sumInfo = new SummaryInformation(db))

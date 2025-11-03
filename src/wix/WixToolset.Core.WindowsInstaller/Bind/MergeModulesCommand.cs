@@ -223,7 +223,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 return;
             }
 
-            using (var db = new Database(this.OutputPath, OpenDatabase.Direct))
+            using (var db = Database.Open(this.OutputPath))
             {
                 // Suppress individual actions.
                 foreach (var suppressAction in this.Section.Symbols.OfType<WixSuppressActionSymbol>())

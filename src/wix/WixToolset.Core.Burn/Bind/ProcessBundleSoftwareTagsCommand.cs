@@ -69,7 +69,7 @@ namespace WixToolset.Core.Burn.Bind
                 {
                     var payload = payloadSymbolsById[msiPackage.PayloadRef];
 
-                    using (var db = new Database(payload.SourceFile.Path, OpenDatabase.ReadOnly))
+                    using (var db = Database.OpenAsReadOnly(payload.SourceFile.Path))
                     {
                         if (db.TableExists("SoftwareIdentificationTag"))
                         {

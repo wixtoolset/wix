@@ -418,8 +418,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 Directory.CreateDirectory(Path.GetDirectoryName(this.OutputPath));
 
                 // create the transform file
-                using (var targetDatabase = new Database(targetDatabaseFile, OpenDatabase.ReadOnly))
-                using (var updatedDatabase = new Database(updatedDatabaseFile, OpenDatabase.ReadOnly))
+                using (var targetDatabase = Database.OpenAsReadOnly(targetDatabaseFile))
+                using (var updatedDatabase = Database.OpenAsReadOnly(updatedDatabaseFile))
                 {
                     if (updatedDatabase.GenerateTransform(targetDatabase, this.OutputPath))
                     {
