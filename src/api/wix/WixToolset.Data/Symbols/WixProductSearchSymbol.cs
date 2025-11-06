@@ -46,6 +46,7 @@ namespace WixToolset.Data.Symbols
         Language,
         State,
         Assignment,
+        Exists,
     }
 
     public class WixProductSearchSymbol : IntermediateSymbol
