@@ -59,6 +59,12 @@ static HRESULT ProcessVS2022(
     __in BOOL fComplete
     );
 
+static HRESULT ProcessVS2026(
+    __in_opt ISetupInstance* pInstance,
+    __in DWORD64 qwVersion,
+    __in BOOL fComplete
+    );
+
 static HRESULT SetPropertyForComponent(
     __in DWORD cComponents,
     __in VS_COMPONENT_PROPERTY* rgComponents,
@@ -70,6 +76,7 @@ static VS_INSTANCE vrgInstances[] =
     { FILEMAKEVERSION(15, 0, 0, 0), FILEMAKEVERSION(15, 0xffff, 0xffff, 0xffff), ProcessVS2017 },
     { FILEMAKEVERSION(16, 0, 0, 0), FILEMAKEVERSION(16, 0xffff, 0xffff, 0xffff), ProcessVS2019 },
     { FILEMAKEVERSION(17, 0, 0, 0), FILEMAKEVERSION(17, 0xffff, 0xffff, 0xffff), ProcessVS2022 },
+    { FILEMAKEVERSION(18, 0, 0, 0), FILEMAKEVERSION(18, 0xffff, 0xffff, 0xffff), ProcessVS2026 },
 };
 
 /******************************************************************
@@ -565,6 +572,81 @@ LExit:
 
     return hr;
 }
+
+static HRESULT ProcessVS2026(
+    __in_opt ISetupInstance* pInstance,
+    __in DWORD64 qwVersion,
+    __in BOOL fComplete
+    )
+{
+    static ISetupInstance* pLatest = NULL;
+    static DWORD64 qwLatest = 0;
+
+    static LPCWSTR rgwzProducts[] =
+    {
+        L"Microsoft.VisualStudio.Product.Community",
+        L"Microsoft.VisualStudio.Product.Professional",
+        L"Microsoft.VisualStudio.Product.Enterprise",
+    };
+
+    // TODO: Consider making table-driven with these defaults per-version for easy customization.
+    static VS_COMPONENT_PROPERTY rgComponents[] =
+    {
+        { L"Microsoft.VisualStudio.Component.FSharp", L"VS2026_IDE_FSHARP_PROJECTSYSTEM_INSTALLED" },
+        { L"Microsoft.VisualStudio.Component.Roslyn.LanguageServices", L"VS2026_IDE_VB_PROJECTSYSTEM_INSTALLED" },
+        { L"Microsoft.VisualStudio.Component.Roslyn.LanguageServices", L"VS2026_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED" },
+        { L"Microsoft.VisualStudio.PackageGroup.TestTools.Core", L"VS2026_IDE_VSTS_TESTSYSTEM_INSTALLED" },
+        { L"Microsoft.VisualStudio.Component.VC.CoreIde", L"VS2026_IDE_VC_PROJECTSYSTEM_INSTALLED" },
+        { L"Microsoft.VisualStudio.Component.Web", L"VS2026_IDE_VWD_PROJECTSYSTEM_INSTALLED" },
+        { L"Microsoft.VisualStudio.PackageGroup.DslRuntime", L"VS2026_IDE_MODELING_PROJECTSYSTEM_INSTALLED" },
+    };
+
+    HRESULT hr = S_OK;
+
+    if (fComplete)
+    {
+        if (pLatest)
+        {
+            hr = ProcessInstance(pLatest, L"VS2026_ROOT_FOLDER", countof(rgComponents), rgComponents);
+            ExitOnFailure(hr, "Failed to process VS2026 instance.");
+        }
+    }
+    else if (pInstance)
+    {
+        hr = InstanceInProducts(pInstance, countof(rgwzProducts), rgwzProducts);
+        ExitOnFailure(hr, "Failed to compare product IDs.");
+
+        if (S_FALSE == hr)
+        {
+            ExitFunction();
+        }
+
+        hr = InstanceIsGreater(pLatest, qwLatest, pInstance, qwVersion);
+        ExitOnFailure(hr, "Failed to compare instances.");
+
+        if (S_FALSE == hr)
+        {
+            ExitFunction();
+        }
+
+        ReleaseNullObject(pLatest);
+
+        pLatest = pInstance;
+        qwLatest = qwVersion;
+
+        // Caller will do a final Release() otherwise.
+        pLatest->AddRef();
+    }
+
+LExit:
+    if (fComplete)
+    {
+        ReleaseObject(pLatest);
+    }
+
+    return hr;
+}
+
 
 static HRESULT SetPropertyForComponent(
     __in DWORD cComponents,
