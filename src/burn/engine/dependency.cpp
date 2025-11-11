@@ -453,6 +453,7 @@ extern "C" HRESULT DependencyPlanPackageBegin(
     else
     {
         hr = S_OK;
+        BOOL fDependenciesWarned = FALSE;
 
         for (DWORD i = 0; i < pPackage->cDependencyProviders; ++i)
         {
@@ -467,7 +468,15 @@ extern "C" HRESULT DependencyPlanPackageBegin(
                 {
                     hr = S_OK;
 
-                    if (!fDependentBlocksUninstall)
+                    if (pPackage->requested == BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT)
+                    {
+                        if (!fDependenciesWarned)
+                        {
+                            fDependenciesWarned = TRUE;
+                            LogId(REPORT_STANDARD, MSG_DEPENDENCY_PACKAGE_DEPENDENTS_OVERRIDDEN, pPackage->sczId);
+                        }
+                    }
+                    else if (!fDependentBlocksUninstall)
                     {
                         fDependentBlocksUninstall = TRUE;
 
