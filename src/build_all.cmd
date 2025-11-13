@@ -84,7 +84,7 @@ if not exist "%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
   exit /b 2
 )
 
-for /f "usebackq delims=" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -version [17.0^,18.0^) -property installationPath`) do (
+for /f "usebackq delims=" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -version [18^,19^) -property installationPath`) do (
   if exist "%%i\Common7\Tools\vsdevcmd.bat" (
     call "%%i\Common7\Tools\vsdevcmd.bat" -no_logo
     exit /b
