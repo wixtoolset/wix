@@ -26,7 +26,7 @@ To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/wixto
 
 ### Prerequisites
 
-Before building the WiX Toolset, ensure you have Visual Studio 2022 (17.8.2 or higher) with the following installed:
+Before building the WiX Toolset, ensure you have Visual Studio 2026 (17.8.2 or higher) with the following installed:
 
 | Workloads |
 | :-------- |
@@ -36,13 +36,13 @@ Before building the WiX Toolset, ensure you have Visual Studio 2022 (17.8.2 or h
 
 | Individual components |
 | :-------------------- |
-| .NET 8.0 Runtime (Long Term Support) |
+| .NET 10.0 Runtime (Long Term Support) |
 | .NET Framework 4.7.2 SDK |
 | .NET Framework 4.7.2 targeting pack |
 | .NET Framework 4.6.2 targeting pack |
-| ATL v143 - VS 2022 C++ x64/x86 build tools (Latest) |
-| MSVC v143 - VS 2022 C++ ARM64/ARM64EC build tools (Latest) |
-| MSVC v143 - VS 2022 C++ x64/x86 build tools (Latest) |
+| ATL v143 - VS 2026 C++ x64/x86 build tools (Latest) |
+| MSVC v143 - VS 2026 C++ ARM64/ARM64EC build tools (Latest) |
+| MSVC v143 - VS 2026 C++ x64/x86 build tools (Latest) |
 | Git for Windows |
 
 Also, download the latest [nuget.exe command-line tool](https://www.nuget.org/downloads) and place it in a directory on your path.
@@ -56,7 +56,7 @@ Also, download the latest [nuget.exe command-line tool](https://www.nuget.org/do
 
 #### To build the WiX toolset:
 
- * Start a VS2022 'Developer Command Prompt'
+ * Start a VS2026 'Developer Command Prompt'
  * Change directory to the root of the cloned repository
  * Issue the command `devbuild` (or `devbuild release` if you want to create a release version)
 
