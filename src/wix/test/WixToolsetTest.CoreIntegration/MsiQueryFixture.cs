@@ -70,11 +70,13 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(msiPath));
                 var results = Query.QueryDatabase(msiPath, new[] { "AppSearch", "DrLocator" });
-                WixAssert.CompareLineByLine(new[]
-                {
+                WixAssert.CompareLineByLine(
+                [
+                    "AppSearch:EXAMPLEDIRFOUND\tdircdo7ICRtQ3CvoztHSvflmt6yVh4",
                     "AppSearch:SAMPLEDIRFOUND\tSampleDirSearch",
+                    "DrLocator:dircdo7ICRtQ3CvoztHSvflmt6yVh4\t\tC:\\ExampleDir\t",
                     "DrLocator:SampleDirSearch\t\tC:\\SampleDir\t",
-                }, results);
+                ], results);
             }
         }
 

@@ -2,11 +2,15 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
         <ComponentGroup Id="ProductComponents">
-            <ComponentGroupRef Id="MinimalComponentGroup"></ComponentGroupRef>
+            <ComponentGroupRef Id="MinimalComponentGroup" />
         </ComponentGroup>
 
         <Property Id="SAMPLEDIRFOUND">
-            <DirectorySearch Id="SampleDirSearch" AssignToProperty="yes" Path="C:\SampleDir"></DirectorySearch>
+            <DirectorySearch Id="SampleDirSearch" AssignToProperty="yes" Path="C:\SampleDir" />
+        </Property>
+
+        <Property Id="EXAMPLEDIRFOUND">
+            <DirectorySearch AssignToProperty="yes" Path="C:\ExampleDir" />
         </Property>
     </Fragment>
 </Wix>
