@@ -1,0 +1,13 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="engine/engine.vcxproj" Id="8119537d-e1d9-6591-d51a-49768a2f9c37" />
+  <Project Path="stub/stub.vcxproj" Id="c38373aa-882f-4f55-b03f-2aab4bfbe3f1" />
+  <Project Path="test/BurnUnitTest/BurnUnitTest.vcxproj" Id="9d1f1ba3-9393-4833-87a3-d5f1fc08ef67">
+    <Platform Solution="*|ARM64" Project="x64" />
+    <Build Solution="*|ARM64" Project="false" />
+  </Project>
+</Solution>

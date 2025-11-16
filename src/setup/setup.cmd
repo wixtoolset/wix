@@ -20,7 +20,7 @@
 :: Build
 msbuild -Restore MetadataTask\MetadataTask.csproj -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\setup_task.binlog || exit /b
 
-msbuild -Restore setup.sln -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\setup_build.binlog || exit /b
+msbuild -Restore setup.slnx -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\setup_build.binlog || exit /b
 
 :: Publish
 

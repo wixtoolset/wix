@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/test/" />
+  <Project Path="thmviewer/thmviewer.vcxproj" Id="95228c13-97f5-484a-b4a2-ecf4618b0881">
+    <Platform Project="Win32" />
+  </Project>
+  <Project Path="WixToolset.Templates/WixToolset.Templates.csproj" />
+</Solution>

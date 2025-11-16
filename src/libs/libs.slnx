@@ -1,0 +1,24 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="dutil/test/DUtilUnitTest/DUtilUnitTest.vcxproj" Id="ab7ee608-e5fb-42a5-831f-0deeea141223">
+    <Platform Project="Win32" />
+    <Build Solution="*|Any CPU" Project="false" />
+    <Build Solution="*|ARM64" Project="false" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
+  <Project Path="dutil/WixToolset.DUtil/dutil.vcxproj" Id="1244e671-f108-4334-ba52-8a7517f26ecd">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+    <Build Solution="*|Any CPU" Project="false" />
+  </Project>
+  <Project Path="test/WixToolsetTest.Versioning/WixToolsetTest.Versioning.csproj" />
+  <Project Path="wcautil/WixToolset.WcaUtil/wcautil.vcxproj" Id="5b3714b6-3a76-463e-8595-d48da276c512">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+    <Build Solution="*|Any CPU" Project="false" />
+  </Project>
+  <Project Path="WixToolset.Versioning/WixToolset.Versioning.csproj" />
+</Solution>

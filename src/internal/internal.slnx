@@ -1,0 +1,16 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="WixInternal.BaseBuildTasks.Sources/WixInternal.BaseBuildTasks.Sources.csproj" />
+  <Project Path="WixInternal.MSTestSupport/WixInternal.MSTestSupport.csproj" />
+  <Project Path="WixInternal.TestSupport.Native/WixInternal.TestSupport.Native.vcxproj" Id="95babd97-fbdb-453a-af8a-fa031a07b599">
+    <Platform Project="Win32" />
+    <Build Solution="*|ARM64" Project="false" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
+  <Project Path="WixInternal.TestSupport/WixInternal.TestSupport.csproj" />
+</Solution>

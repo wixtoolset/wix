@@ -1,0 +1,12 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="test/DUtilUnitTest/DUtilUnitTest.vcxproj" Id="ab7ee608-e5fb-42a5-831f-0deeea141223">
+    <Platform Solution="*|ARM64" Project="x64" />
+    <Build Solution="*|ARM64" Project="false" />
+  </Project>
+  <Project Path="WixToolset.DUtil/dutil.vcxproj" Id="1244e671-f108-4334-ba52-8a7517f26ecd" />
+</Solution>

@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ca/dependencyca.vcxproj" Id="b86af46c-0f90-49cc-923f-a800b088d015">
+    <Platform Project="Win32" />
+  </Project>
+  <Project Path="test/WixToolsetTest.Dependency/WixToolsetTest.Dependency.csproj" />
+  <Project Path="wixext/WixToolset.Dependency.wixext.csproj" />
+  <Project Path="wixlib/dependency.wixproj">
+    <Platform Project="x86" />
+    <Build />
+  </Project>
+</Solution>

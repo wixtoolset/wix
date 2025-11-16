@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ca/iisca.vcxproj" Id="cb3fb8c4-14bf-4ea6-9f01-7fb258e5aef3">
+    <Platform Project="Win32" />
+  </Project>
+  <Project Path="test/WixToolsetTest.Iis/WixToolsetTest.Iis.csproj" />
+  <Project Path="wixext/WixToolset.Iis.wixext.csproj" />
+  <Project Path="wixlib/iis.wixproj">
+    <Platform Project="x86" />
+    <Build />
+  </Project>
+</Solution>

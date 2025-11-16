@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ca/directxca.vcxproj" Id="76542b28-0ffd-47d3-ad6a-d0f20fa875ac">
+    <Platform Project="Win32" />
+  </Project>
+  <Project Path="test/WixToolsetTest.DirectX/WixToolsetTest.DirectX.csproj" />
+  <Project Path="wixext/WixToolset.DirectX.wixext.csproj" />
+  <Project Path="wixlib/directx.wixproj">
+    <Platform Project="x86" />
+    <Build />
+  </Project>
+</Solution>

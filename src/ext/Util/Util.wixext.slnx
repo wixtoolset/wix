@@ -1,0 +1,22 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="be/utilbe.vcxproj" Id="630c1ee7-2517-4a8c-83e3-da1150308b58">
+    <Platform Project="Win32" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
+  <Project Path="ca/utilca.vcxproj" Id="076018f7-19bd-423a-abbf-229273da08d8">
+    <Platform Project="Win32" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
+  <Project Path="test/WixToolsetTest.Util/WixToolsetTest.Util.csproj" />
+  <Project Path="wixext/WixToolset.Util.wixext.csproj" />
+  <Project Path="wixlib/util.wixproj">
+    <Platform Project="x86" />
+    <Build Solution="*|Any CPU" />
+    <Build Solution="*|x86" />
+  </Project>
+</Solution>
