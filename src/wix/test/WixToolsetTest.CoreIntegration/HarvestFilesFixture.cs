@@ -24,7 +24,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     10,
                 }, messages);
-            });
+            }, assertSuccess: false);
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "8600: Inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify paths, inclusions, and exclusions on Files or Payloads for accuracy.",
                 }, messages);
-            });
+            }, assertSuccess: false);
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace WixToolsetTest.CoreIntegration
                     @"8601: Missing directory for harvesting files: Could not find a part of the path '<sourceFolder>\files2\ThisDirectoryIsAlsoMissing'.",
                     @"8600: Inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify paths, inclusions, and exclusions on Files or Payloads for accuracy.",
                 }, messages);
-            });
+            }, assertSuccess: false);
         }
 
         [Fact]
@@ -93,7 +93,7 @@ namespace WixToolsetTest.CoreIntegration
                     8602,
                     8602,
                 }, messages);
-            });
+            }, assertSuccess: false);
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace WixToolsetTest.CoreIntegration
                     267,
                     267,
                 }, messages);
-            });
+            }, assertSuccess: false);
         }
 
         [Fact]
@@ -300,24 +300,19 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
-        public void CanHarvestFilesWithUnnamedBindPaths()
+        public void CanHarvestFilesRelativeToSourceFile()
         {
             var expected = new[]
             {
-                @"flsNNsTNrgmjASmTBbP.45J1F50dEc=PFiles\HarvestedFiles\test1.txt",
-                @"flsASLR5pHQzLmWRE.Snra7ndH7sIA=PFiles\HarvestedFiles\test2.txt",
-                @"flsTZFPiMHb.qfUxdGKQYrnXOhZ.8M=PFiles\HarvestedFiles\files1_sub1\test10.txt",
-                @"flsLGcTTZPIU3ELiWybqnm.PQ0Ih_g=PFiles\HarvestedFiles\files1_sub1\files1_sub2\test120.txt",
-                @"fls1Jx2Y9Vea_.WZBH_h2e79arvDRU=PFiles\HarvestedFiles\test3.txt",
-                @"flsJ9gNxWaau2X3ufphQuCV9WwAgcw=PFiles\HarvestedFiles\test4.txt",
-                @"flswcmX9dpMQytmD_5QA5aJ5szoQVA=PFiles\HarvestedFiles\files2_sub2\test20.txt",
-                @"flskKeCKFUtCYMuvw564rgPLJmyBx0=PFiles\HarvestedFiles\files2_sub2\test21.txt",
-                @"fls2agLZFnQwjoijShwT9Z0RwHyGrI=PFiles\HarvestedFiles\files2_sub3\FileName.Extension",
-                @"fls9UMOE.TOv61JuYF8IhvCKb8eous=PFiles\HarvestedFiles\namedfile.txt",
-                @"flsu53T_9CcaBegDflAImGHTajDbJ0=PFiles\HarvestedFiles\unnamedfile.txt",
+                @"flsiYjLzK34LeZEChPfagEeCq391QE=PFiles\Example Corporation HarvestedFiles\BadAuthoring.wxs",
+                @"flssFAX35joEC73c.9dGg2Cxy9yZHg=PFiles\Example Corporation HarvestedFiles\BadDirectory.wxs",
+                @"flsYgiwrDUkZnBEK6iUMkxxaJlD8yQ=PFiles\Example Corporation HarvestedFiles\test1.txt",
+                @"flsj.cb0sFWqIPHPFSKJSEEaPDuAQ4=PFiles\Example Corporation HarvestedFiles\test2.txt",
+                @"flsD7JQZm.Ts2375WMT.zsTxqCAf.s=PFiles\Example Corporation HarvestedFiles\files1_sub1\test10.txt",
+                @"flslrDWblm4pE.4i4jR58_XyYMmR8I=PFiles\Example Corporation HarvestedFiles\files1_sub1\files1_sub2\test120.txt",
             };
 
-            Build("BindPathsUnnamed.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected), addUnnamedBindPaths: true);
+            Build("RelativeToSource.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected), addUnnamedBindPaths: true);
         }
 
         [Fact]
@@ -423,12 +418,12 @@ namespace WixToolsetTest.CoreIntegration
             WixAssert.CompareLineByLine(sortedExpected, actual);
         }
 
-        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPaths = false, params string[] additionalCommandLineArguments)
+        private static void Build(string file, Action<string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPaths = false, bool assertSuccess = true, params string[] additionalCommandLineArguments)
         {
-            Build(file, (msiPath, sourceFolder, baseFolder, result) => tester(msiPath, result), isMsi, warningsAsErrors, addUnnamedBindPaths, additionalCommandLineArguments);
+            Build(file, (msiPath, sourceFolder, baseFolder, result) => tester(msiPath, result), isMsi, warningsAsErrors, addUnnamedBindPaths, assertSuccess, additionalCommandLineArguments);
         }
 
-        private static void Build(string file, Action<string, string, string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPaths = false, params string[] additionalCommandLineArguments)
+        private static void Build(string file, Action<string, string, string, WixRunnerResult> tester, bool isMsi = true, bool warningsAsErrors = true, bool addUnnamedBindPaths = false, bool assertSuccess = true, params string[] additionalCommandLineArguments)
         {
             var sourceFolder = TestData.Get("TestData", "HarvestFiles");
 
@@ -464,6 +459,11 @@ namespace WixToolsetTest.CoreIntegration
                 }
 
                 var result = WixRunner.Execute(warningsAsErrors, arguments.ToArray());
+
+                if (assertSuccess)
+                {
+                    result.AssertSuccess();
+                }
 
                 tester(msiPath, sourceFolder, baseFolder, result);
             }
