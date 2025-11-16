@@ -1,0 +1,8 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="WixToolset.WcaUtil/wcautil.vcxproj" Id="5b3714b6-3a76-463e-8595-d48da276c512" />
+</Solution>

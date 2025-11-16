@@ -486,7 +486,7 @@ namespace WixToolsetTest.Sdk
             {
                 fs.Initialize(sourceFolder);
                 var baseFolder = fs.BaseFolder;
-                var slnPath = Path.Combine(baseFolder, "MultiCulturalMsiPackage.sln");
+                var slnPath = Path.Combine(baseFolder, "MultiCulturalMsiPackage.slnx");
                 var projectFolder = Path.Combine(baseFolder, "MsiPackage");
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, slnPath, new[]

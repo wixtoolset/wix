@@ -1,0 +1,14 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="test/WixToolsetTest.PowerShell/WixToolsetTest.PowerShell.csproj" />
+  <Project Path="wixext/WixToolset.PowerShell.wixext.csproj" />
+  <Project Path="wixlib/powershell.wixproj">
+    <Platform Project="x86" />
+    <Build Solution="*|Any CPU" />
+    <Build Solution="*|x86" />
+  </Project>
+</Solution>

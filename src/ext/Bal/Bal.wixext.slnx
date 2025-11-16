@@ -1,0 +1,26 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Samples/bafunctions/bafunctions.vcxproj" Id="eb0a7d51-2133-4ee7-b6ca-87dbeac67e02">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+  </Project>
+  <Project Path="stdbas/stdbas.vcxproj" Id="dbbf5f32-baea-46a8-99a0-17277a906456" />
+  <Project Path="test/WixStdFnUnitTest/WixStdFnUnitTest.vcxproj" Id="9b507af9-035e-4db6-8c0c-5dcc3fef2631">
+    <Platform Project="Win32" />
+  </Project>
+  <Project Path="test/WixToolsetTest.BootstrapperApplications/WixToolsetTest.BootstrapperApplications.csproj" />
+  <Project Path="wixext/WixToolset.BootstrapperApplications.wixext.csproj" />
+  <Project Path="wixiuiba/wixiuiba.vcxproj" Id="0f73e566-925c-448d-99cb-3a7f5df399c8" />
+  <Project Path="wixlib/bas.wixproj">
+    <Platform Project="x86" />
+    <Build Solution="*|Any CPU" />
+    <Build Solution="*|x86" />
+  </Project>
+  <Project Path="wixstdba/wixstdba.vcxproj" Id="41085a22-e6aa-4e8b-ab1b-ddee0dc89dfa">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+  </Project>
+</Solution>

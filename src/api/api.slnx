@@ -1,0 +1,41 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/burn/">
+    <Project Path="burn/balutil/balutil.vcxproj" Id="edcb8095-0e6a-43e0-bc33-c4f762fc5cdb">
+      <Platform Solution="*|Any CPU" Project="Win32" />
+      <Build Solution="Release|Any CPU" Project="false" />
+    </Project>
+    <Project Path="burn/bextutil/bextutil.vcxproj" Id="06027492-1cb9-48bc-b31e-c1f9356ed07e">
+      <Platform Solution="*|Any CPU" Project="Win32" />
+      <Build Solution="Release|Any CPU" Project="false" />
+    </Project>
+    <Project Path="burn/mbanative/mbanative.vcxproj" Id="665e0441-17f9-4105-b202-edf274657f6e">
+      <Platform Solution="*|Any CPU" Project="Win32" />
+      <Build Solution="Release|Any CPU" Project="false" />
+    </Project>
+    <Project Path="burn/test/BalUtilUnitTest/BalUtilUnitTest.vcxproj" Id="9b507af9-035e-4db6-8c0c-5dcc3fef2631">
+      <Platform Project="Win32" />
+      <Build Solution="*|ARM64" Project="false" />
+      <Build Solution="*|x64" Project="false" />
+      <Build Solution="Release|Any CPU" Project="false" />
+    </Project>
+    <Project Path="burn/test/BextUtilUnitTest/BextUtilUnitTest.vcxproj" Id="b69e6422-49b0-4e28-92f9-b8a7410a6ed9">
+      <Platform Project="Win32" />
+      <Build Solution="*|ARM64" Project="false" />
+      <Build Solution="*|x64" Project="false" />
+      <Build Solution="Release|Any CPU" Project="false" />
+    </Project>
+    <Project Path="burn/test/WixToolsetTest.BootstrapperApplicationApi/WixToolsetTest.BootstrapperApplicationApi.csproj" />
+    <Project Path="burn/WixToolset.BootstrapperApplicationApi/WixToolset.BootstrapperApplicationApi.csproj" />
+  </Folder>
+  <Folder Name="/wix/">
+    <Project Path="wix/test/WixToolsetTest.Data/WixToolsetTest.Data.csproj" />
+    <Project Path="wix/WixToolset.Data/WixToolset.Data.csproj" />
+    <Project Path="wix/WixToolset.Extensibility/WixToolset.Extensibility.csproj" />
+  </Folder>
+</Solution>

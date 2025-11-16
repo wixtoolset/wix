@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="EmbeddedUI/EmbeddedUI.csproj">
+    <BuildType Project="Debug" />
+  </Project>
+  <Project Path="ManagedCA/ManagedCA.csproj" />
+</Solution>
