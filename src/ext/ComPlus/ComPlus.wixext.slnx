@@ -1,0 +1,16 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ca/complusca.vcxproj" Id="bdef51ed-e242-4fa2-801a-01b127df851a">
+    <Platform Project="Win32" />
+  </Project>
+  <Project Path="test/WixToolsetTest.ComPlus/WixToolsetTest.ComPlus.csproj" />
+  <Project Path="wixext/WixToolset.ComPlus.wixext.csproj" />
+  <Project Path="wixlib/complus.wixproj">
+    <BuildDependency Project="ca/complusca.vcxproj" />
+    <Platform Project="x86" />
+    <Build />
+  </Project>
+</Solution>

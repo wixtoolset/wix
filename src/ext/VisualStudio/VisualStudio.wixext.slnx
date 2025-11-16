@@ -1,0 +1,18 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ca/vsca.vcxproj" Id="45308b85-0628-4978-8fc8-6ad9e1ad5949">
+    <Platform Project="Win32" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
+  <Project Path="test/WixToolsetTest.VisualStudio/WixToolsetTest.VisualStudio.csproj" />
+  <Project Path="wixext/WixToolset.VisualStudio.wixext.csproj" />
+  <Project Path="wixlib/vs.wixproj">
+    <Platform Project="x86" />
+    <Build Solution="*|Any CPU" />
+    <Build Solution="*|x86" />
+  </Project>
+</Solution>

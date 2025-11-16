@@ -1,0 +1,36 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/test/">
+    <Project Path="test/WixToolsetTests.Dtf.Compression.Cab/WixToolsetTests.Dtf.Compression.Cab.csproj" Id="4544158c-2d63-4146-85ff-62169280144e">
+      <BuildType Solution="Release|Any CPU" Project="Debug" />
+    </Project>
+    <Project Path="test/WixToolsetTests.Dtf.Compression.Zip/WixToolsetTests.Dtf.Compression.Zip.csproj" Id="328799bb-7b03-4b28-8180-4132211fd07d">
+      <BuildType Solution="Release|Any CPU" Project="Debug" />
+    </Project>
+    <Project Path="test/WixToolsetTests.Dtf.Compression/WixToolsetTests.Dtf.Compression.csproj" Id="f045ffc1-05f9-4ea2-9f03-e1cbdb7bc4f9">
+      <BuildType Solution="Release|Any CPU" Project="Debug" />
+    </Project>
+    <Project Path="test/WixToolsetTests.Dtf.WindowsInstaller.CustomActions/WixToolsetTests.Dtf.WindowsInstaller.CustomActions.csproj" Id="137d376b-989f-4fea-9a67-01d8d38ca0de">
+      <BuildType Solution="Release|Any CPU" Project="Debug" />
+    </Project>
+    <Project Path="test/WixToolsetTests.Dtf.WindowsInstaller.Linq/WixToolsetTests.Dtf.WindowsInstaller.Linq.csproj" Id="4f55f9b8-d8b6-41eb-8796-221b4cd98324">
+      <BuildType Solution="Release|Any CPU" Project="Debug" />
+    </Project>
+    <Project Path="test/WixToolsetTests.Dtf.WindowsInstaller/WixToolsetTests.Dtf.WindowsInstaller.csproj" Id="16f5202f-9276-4166-975c-c9654baf8012">
+      <BuildType Solution="Release|Any CPU" Project="Debug" />
+    </Project>
+  </Folder>
+  <Project Path="WixToolset.Dtf.Compression.Cab/WixToolset.Dtf.Compression.Cab.csproj" />
+  <Project Path="WixToolset.Dtf.Compression.Zip/WixToolset.Dtf.Compression.Zip.csproj" />
+  <Project Path="WixToolset.Dtf.Compression/WixToolset.Dtf.Compression.csproj" />
+  <Project Path="WixToolset.Dtf.CustomAction/WixToolset.Dtf.CustomAction.csproj" />
+  <Project Path="WixToolset.Dtf.MakeSfxCA/WixToolset.Dtf.MakeSfxCA.csproj" />
+  <Project Path="WixToolset.Dtf.Resources/WixToolset.Dtf.Resources.csproj" />
+  <Project Path="WixToolset.Dtf.WindowsInstaller.Linq/WixToolset.Dtf.WindowsInstaller.Linq.csproj" />
+  <Project Path="WixToolset.Dtf.WindowsInstaller.Package/WixToolset.Dtf.WindowsInstaller.Package.csproj" />
+  <Project Path="WixToolset.Dtf.WindowsInstaller/WixToolset.Dtf.WindowsInstaller.csproj" />
+</Solution>

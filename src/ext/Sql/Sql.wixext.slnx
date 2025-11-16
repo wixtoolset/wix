@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ca/sqlca.vcxproj" Id="4dca6e4b-a1f1-4450-bc2d-94ac20f31935">
+    <Platform Project="Win32" />
+  </Project>
+  <Project Path="test/WixToolsetTest.Sql/WixToolsetTest.Sql.csproj" />
+  <Project Path="wixext/WixToolset.Sql.wixext.csproj" />
+  <Project Path="wixlib/sql.wixproj">
+    <Platform Project="x86" />
+    <Build />
+  </Project>
+</Solution>

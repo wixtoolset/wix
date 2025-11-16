@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ca/msmqca.vcxproj" Id="cad56a7e-342b-4324-9dcb-bceb8f3bc80d">
+    <Platform Project="Win32" />
+  </Project>
+  <Project Path="test/WixToolsetTest.Msmq/WixToolsetTest.Msmq.csproj" />
+  <Project Path="wixext/WixToolset.Msmq.wixext.csproj" />
+  <Project Path="wixlib/msmq.wixproj">
+    <Platform Project="x86" />
+    <Build />
+  </Project>
+</Solution>
