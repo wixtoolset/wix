@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="TestComponentNative/TestComponentNative.vcxproj" Id="eb199fa2-f9f7-4a2f-a4d3-6689f8a18952" />
+  <Project Path="TestComponentNET3/TestComponentNET3.csproj" Id="b4cd7ece-7245-445b-9f04-d2952631554d" />
+  <Project Path="TestComponentNET4/TestComponentNET4.csproj" Id="ea2afcce-677d-433e-8517-4cfbbd3ebfaa" />
+  <Project Path="TestComponentNET8/TestComponentNET8.csproj" />
+</Solution>

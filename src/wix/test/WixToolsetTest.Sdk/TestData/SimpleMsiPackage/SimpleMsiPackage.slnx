@@ -1,0 +1,13 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="MsiPackage/MsiPackage.wixproj">
+    <Build />
+  </Project>
+  <Project Path="SimpleBundle/SimpleBundle.wixproj">
+    <Platform Project="x86" />
+    <Build Solution="*|x86" />
+  </Project>
+</Solution>

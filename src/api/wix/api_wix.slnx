@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="test/WixToolsetTest.Data/WixToolsetTest.Data.csproj" />
+  <Project Path="WixToolset.Data/WixToolset.Data.csproj" />
+  <Project Path="WixToolset.Extensibility/WixToolset.Extensibility.csproj" />
+</Solution>

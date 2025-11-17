@@ -1,0 +1,19 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="CsprojClassLibraryMultiTarget/CsprojClassLibraryMultiTarget.csproj" />
+  <Project Path="CsprojClassLibraryNetCore/CsprojClassLibraryNetCore.csproj" />
+  <Project Path="CsprojClassLibraryNetFx/CsprojClassLibraryNetFx.csproj" Id="984d615d-adb1-49b4-ae0b-4496ed963881" />
+  <Project Path="CsprojConsoleNetCore/CsprojConsoleNetCore.csproj" />
+  <Project Path="CsprojWebApplicationNetCore/CsprojWebApplicationNetCore.csproj" />
+  <Project Path="CsprojWebApplicationNetFx/CsprojWebApplicationNetFx.csproj" Id="3ddd967d-2e14-44a3-afe1-1ed4c25033bc" />
+  <Project Path="CsprojWindowsFormsNetFx/CsprojWindowsFormsNetFx.csproj" Id="3b5570ad-4191-4a66-a81d-8cbd14496340" />
+  <Project Path="CsprojWpfNetCore/CsprojWpfNetCore.csproj" />
+  <Project Path="VcxprojConsoleApplication/VcxprojConsoleApplication.vcxproj" Id="7edf70c5-dec2-417d-82e3-f354be59e3a7" />
+  <Project Path="VcxprojDll/VcxprojDll.vcxproj" Id="2b70c248-1090-4d04-bda0-bf0e48716e5b" />
+  <Project Path="VcxprojStaticLib/VcxprojStaticLib.vcxproj" Id="c4bbeb93-e40f-4f91-9a9d-db9656db04f0" />
+  <Project Path="VcxprojWindowsApp/VcxprojWindowsApp.vcxproj" Id="8f2a12cd-6d3b-4648-81a9-2a852a63ea90" />
+</Solution>

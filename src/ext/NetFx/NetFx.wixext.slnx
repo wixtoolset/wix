@@ -1,0 +1,23 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="be/netfxbe.vcxproj" Id="b65719c0-b2cc-45f9-af33-6f147f741adb">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+  </Project>
+  <Project Path="ca/netfxca.vcxproj" Id="f72d34ca-48da-4dfd-91a9-a0c78bef6981">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+  </Project>
+  <Project Path="netcoresearch/netcoresearch.vcxproj" Id="a7fd9ef2-68cf-4c8e-ad81-3e8a6c7e1937">
+    <Platform Solution="*|Any CPU" Project="Win32" />
+  </Project>
+  <Project Path="test/WixToolsetTest.Netfx/WixToolsetTest.Netfx.csproj" />
+  <Project Path="wixext/WixToolset.Netfx.wixext.csproj" />
+  <Project Path="wixlib/netfx.wixproj">
+    <Platform Project="x86" />
+    <Build Solution="*|Any CPU" />
+    <Build Solution="*|x86" />
+  </Project>
+</Solution>

@@ -1,0 +1,18 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ca/fwca.vcxproj" Id="f72d34ca-48da-4dfd-91a9-a0c78bef6981">
+    <Platform Project="Win32" />
+    <Build Solution="*|x64" Project="false" />
+  </Project>
+  <Project Path="test/WixToolsetTest.Firewall/WixToolsetTest.Firewall.csproj" />
+  <Project Path="wixext/WixToolset.Firewall.wixext.csproj" />
+  <Project Path="wixlib/firewall.wixproj">
+    <Platform Project="x86" />
+    <Build Solution="*|Any CPU" />
+    <Build Solution="*|x86" />
+  </Project>
+</Solution>

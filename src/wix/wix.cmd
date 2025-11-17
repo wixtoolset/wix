@@ -20,13 +20,13 @@
 @echo Building wix %_C%
 
 :: Restore
-msbuild -t:Restore wix.sln -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\wix_restore.binlog || exit /b
+msbuild -t:Restore wix.slnx -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\wix_restore.binlog || exit /b
 
 
 :: Build
 msbuild wixnative\wixnative_t.proj -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\wixnative_build.binlog || exit /b
 
-msbuild wix.sln -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\wix_build.binlog || exit /b
+msbuild wix.slnx -p:Configuration=%_C% -tl -nologo -m -warnaserror -bl:%_L%\wix_build.binlog || exit /b
 
 msbuild publish_t.proj -p:Configuration=%_C% -tl -nologo -warnaserror -bl:%_L%\wix_publish.binlog || exit /b
 

@@ -1,0 +1,35 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/test/">
+    <Project Path="test/CompileCoreTestExtensionWixlib/CompileCoreTestExtensionWixlib.csproj" />
+    <Project Path="test/Example.Extension/Example.Extension.csproj" />
+    <Project Path="test/WixToolsetTest.BuildTasks/WixToolsetTest.BuildTasks.csproj" />
+    <Project Path="test/WixToolsetTest.Converters.Symbolizer/WixToolsetTest.Converters.Symbolizer.csproj" />
+    <Project Path="test/WixToolsetTest.Converters/WixToolsetTest.Converters.csproj" />
+    <Project Path="test/WixToolsetTest.Core.Native/WixToolsetTest.Core.Native.csproj" />
+    <Project Path="test/WixToolsetTest.Core/WixToolsetTest.Core.csproj" />
+    <Project Path="test/WixToolsetTest.CoreIntegration/WixToolsetTest.CoreIntegration.csproj" />
+    <Project Path="test/WixToolsetTest.Sdk/WixToolsetTest.Sdk.csproj" />
+  </Folder>
+  <Project Path="pack-wix/pack-wix.csproj" />
+  <Project Path="wix/wix.csproj" />
+  <Project Path="WixInternal.Core.MSTestPackage/WixInternal.Core.MSTestPackage.csproj" />
+  <Project Path="WixInternal.Core.TestPackage/WixInternal.Core.TestPackage.csproj" />
+  <Project Path="wixnative/wixnative.vcxproj" Id="8497ec72-b8d0-4272-a9d0-7e9d871cefbf">
+    <Platform Solution="Release|Any CPU" Project="Win32" />
+  </Project>
+  <Project Path="WixToolset.BuildTasks/WixToolset.BuildTasks.csproj" />
+  <Project Path="WixToolset.Converters.Symbolizer/WixToolset.Converters.Symbolizer.csproj" />
+  <Project Path="WixToolset.Converters/WixToolset.Converters.csproj" />
+  <Project Path="WixToolset.Core.Burn/WixToolset.Core.Burn.csproj" />
+  <Project Path="WixToolset.Core.ExtensionCache/WixToolset.Core.ExtensionCache.csproj" />
+  <Project Path="WixToolset.Core.Native/WixToolset.Core.Native.csproj" />
+  <Project Path="WixToolset.Core.WindowsInstaller/WixToolset.Core.WindowsInstaller.csproj" />
+  <Project Path="WixToolset.Core/WixToolset.Core.csproj" />
+  <Project Path="WixToolset.Sdk/WixToolset.Sdk.csproj" />
+</Solution>

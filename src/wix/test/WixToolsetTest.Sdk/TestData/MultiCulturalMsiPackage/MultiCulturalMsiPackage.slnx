@@ -1,0 +1,9 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="MsiPackage/MsiPackage.wixproj">
+    <Build />
+  </Project>
+</Solution>

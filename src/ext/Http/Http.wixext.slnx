@@ -1,0 +1,15 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ca/httpca.vcxproj" Id="90743805-c043-47c7-b5ff-8f5ee5c8a2de">
+    <Platform Project="Win32" />
+  </Project>
+  <Project Path="test/WixToolsetTest.Http/WixToolsetTest.Http.csproj" />
+  <Project Path="wixext/WixToolset.Http.wixext.csproj" />
+  <Project Path="wixlib/http.wixproj">
+    <Platform Project="x86" />
+    <Build />
+  </Project>
+</Solution>
