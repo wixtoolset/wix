@@ -8972,6 +8972,10 @@
     <xs:annotation>
       <xs:documentation>
         Authoring to define the set of files to be harvested for inclusion in a package.
+        
+        Note that using `Files` in per-user packages generates components and files that
+        do not pass ICE validation. The preferred solution is to use per-user-or-machine
+        or per-machine-or-user packages.
       </xs:documentation>
     </xs:annotation>
     <xs:complexType>
