@@ -37,6 +37,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("Binary:")).ToArray());
             WixAssert.CompareLineByLine(new[]
             {
+                "CustomAction:WixSetDefaultPerMachine64Folder\t51\tWixPerMachineFolder\t[ProgramFiles64Folder][ApplicationFolderName]\t",
                 "CustomAction:WixSetDefaultPerMachineFolder\t51\tWixPerMachineFolder\t[ProgramFilesFolder][ApplicationFolderName]\t",
                 "CustomAction:WixSetDefaultPerUserFolder\t51\tWixPerUserFolder\t[LocalAppDataFolder]Apps\\[ApplicationFolderName]\t",
                 "CustomAction:WixSetPerMachineFolder\t51\tAPPLICATIONFOLDER\t[WixPerMachineFolder]\t",
@@ -70,6 +71,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("Binary:")).ToArray());
             WixAssert.CompareLineByLine(new[]
             {
+                "CustomAction:WixSetDefaultPerMachine64Folder\t51\tWixPerMachineFolder\t[ProgramFiles64Folder][ApplicationFolderName]\t",
                 "CustomAction:WixSetDefaultPerMachineFolder\t51\tWixPerMachineFolder\t[ProgramFilesFolder][ApplicationFolderName]\t",
                 "CustomAction:WixSetDefaultPerUserFolder\t51\tWixPerUserFolder\t[LocalAppDataFolder]Apps\\[ApplicationFolderName]\t",
                 "CustomAction:WixSetPerMachineFolder\t51\tAPPLICATIONFOLDER\t[WixPerMachineFolder]\t",
@@ -98,6 +100,7 @@ namespace WixToolsetTest.UI
             }, results.Where(r => r.StartsWith("Binary:")).ToArray());
             WixAssert.CompareLineByLine(new[]
             {
+                "CustomAction:WixSetDefaultPerMachine64Folder\t51\tWixPerMachineFolder\t[ProgramFiles64Folder][ApplicationFolderName]\t",
                 "CustomAction:WixSetDefaultPerMachineFolder\t51\tWixPerMachineFolder\t[ProgramFilesFolder][ApplicationFolderName]\t",
                 "CustomAction:WixSetDefaultPerUserFolder\t51\tWixPerUserFolder\t[LocalAppDataFolder]Apps\\[ApplicationFolderName]\t",
                 "CustomAction:WixSetPerMachineFolder\t51\tAPPLICATIONFOLDER\t[WixPerMachineFolder]\t",

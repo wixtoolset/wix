@@ -22,6 +22,8 @@ Todo:
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <?foreach WIXUIARCH in X86;X64;A64 ?>
     <Fragment>
+        <WixVariable Id="WixUIAdvancedArch" Value="$(WIXUIARCH)" />
+
         <UI Id="WixUI_Advanced_$(WIXUIARCH)">
             <Publish Dialog="BrowseDlg" Control="OK" Event="CheckTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1" />
 
@@ -56,19 +58,22 @@ Todo:
 
         <CustomAction Id="WixSetDefaultPerUserFolder" Property="WixPerUserFolder" Value="[LocalAppDataFolder]Apps\[ApplicationFolderName]" Execute="immediate" />
         <CustomAction Id="WixSetDefaultPerMachineFolder" Property="WixPerMachineFolder" Value="[ProgramFilesFolder][ApplicationFolderName]" Execute="immediate" />
+        <CustomAction Id="WixSetDefaultPerMachine64Folder" Property="WixPerMachineFolder" Value="[ProgramFiles64Folder][ApplicationFolderName]" Execute="immediate" />
         <CustomAction Id="WixSetPerUserFolder" Property="APPLICATIONFOLDER" Value="[WixPerUserFolder]" Execute="immediate" />
         <CustomAction Id="WixSetPerMachineFolder" Property="APPLICATIONFOLDER" Value="[WixPerMachineFolder]" Execute="immediate" />
 
         <InstallExecuteSequence>
             <Custom Action="WixSetDefaultPerUserFolder" Before="CostFinalize" />
-            <Custom Action="WixSetDefaultPerMachineFolder" After="WixSetDefaultPerUserFolder" />
-            <Custom Action="WixSetPerUserFolder" After="WixSetDefaultPerMachineFolder" Condition="ACTION=&quot;INSTALL&quot; AND APPLICATIONFOLDER=&quot;&quot; AND (ALLUSERS=&quot;&quot; OR (ALLUSERS=2 AND (NOT Privileged)))" />
+            <Custom Action="WixSetDefaultPerMachineFolder" After="WixSetDefaultPerUserFolder" Condition="&quot;!(wix.WixUIAdvancedArch)&quot;=&quot;X86&quot;" />
+            <Custom Action="WixSetDefaultPerMachine64Folder" After="WixSetDefaultPerMachineFolder" Condition="&quot;!(wix.WixUIAdvancedArch)&quot;=&quot;X64&quot; OR &quot;!(wix.WixUIAdvancedArch)&quot;=&quot;A64&quot;" />
+            <Custom Action="WixSetPerUserFolder" After="WixSetDefaultPerMachine64Folder" Condition="ACTION=&quot;INSTALL&quot; AND APPLICATIONFOLDER=&quot;&quot; AND (ALLUSERS=&quot;&quot; OR (ALLUSERS=2 AND (NOT Privileged)))" />
             <Custom Action="WixSetPerMachineFolder" After="WixSetPerUserFolder" Condition="ACTION=&quot;INSTALL&quot; AND APPLICATIONFOLDER=&quot;&quot; AND (ALLUSERS=1 OR (ALLUSERS=2 AND Privileged))" />
         </InstallExecuteSequence>
         <InstallUISequence>
             <Custom Action="WixSetDefaultPerUserFolder" Before="CostFinalize" />
-            <Custom Action="WixSetDefaultPerMachineFolder" After="WixSetDefaultPerUserFolder" />
-            <Custom Action="WixSetPerUserFolder" After="WixSetDefaultPerMachineFolder" Condition="ACTION=&quot;INSTALL&quot; AND APPLICATIONFOLDER=&quot;&quot; AND (ALLUSERS=&quot;&quot; OR (ALLUSERS=2 AND (NOT Privileged)))" />
+            <Custom Action="WixSetDefaultPerMachineFolder" After="WixSetDefaultPerUserFolder" Condition="&quot;!(wix.WixUIAdvancedArch)&quot;=&quot;X86&quot;" />
+            <Custom Action="WixSetDefaultPerMachine64Folder" After="WixSetDefaultPerMachineFolder" Condition="&quot;!(wix.WixUIAdvancedArch)&quot;=&quot;X64&quot; OR &quot;!(wix.WixUIAdvancedArch)&quot;=&quot;A64&quot;" />
+            <Custom Action="WixSetPerUserFolder" After="WixSetDefaultPerMachine64Folder" Condition="ACTION=&quot;INSTALL&quot; AND APPLICATIONFOLDER=&quot;&quot; AND (ALLUSERS=&quot;&quot; OR (ALLUSERS=2 AND (NOT Privileged)))" />
             <Custom Action="WixSetPerMachineFolder" After="WixSetPerUserFolder" Condition="ACTION=&quot;INSTALL&quot; AND APPLICATIONFOLDER=&quot;&quot; AND (ALLUSERS=1 OR (ALLUSERS=2 AND Privileged))" />
         </InstallUISequence>
 
