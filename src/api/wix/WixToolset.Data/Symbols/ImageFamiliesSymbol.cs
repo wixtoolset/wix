@@ -2,10 +2,12 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using WixToolset.Data.Symbols;
 
     public static partial class SymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition ImageFamilies = new IntermediateSymbolDefinition(
             SymbolDefinitionType.ImageFamilies,
             new[]
@@ -23,6 +25,9 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
+    [Obsolete]
     public enum ImageFamiliesSymbolFields
     {
         Family,
@@ -33,6 +38,7 @@ namespace WixToolset.Data.Symbols
         VolumeLabel,
     }
 
+    [Obsolete]
     public class ImageFamiliesSymbol : IntermediateSymbol
     {
         public ImageFamiliesSymbol() : base(SymbolDefinitions.ImageFamilies, null, null)

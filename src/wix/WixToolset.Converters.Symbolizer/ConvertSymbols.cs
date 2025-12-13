@@ -822,8 +822,6 @@ namespace WixToolset.Converters.Symbolizer
                 return SectionType.Module;
             case Wix3.OutputType.Patch:
                 return SectionType.Patch;
-            case Wix3.OutputType.PatchCreation:
-                return SectionType.PatchCreation;
             case Wix3.OutputType.Product:
                 return SectionType.Package;
             case Wix3.OutputType.Transform:

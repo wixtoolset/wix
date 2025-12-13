@@ -121,7 +121,6 @@
             <xs:enumeration value="module" />
             <xs:enumeration value="package" />
             <xs:enumeration value="product" />
-            <xs:enumeration value="patchCreation" />
             <xs:enumeration value="patch" />
         </xs:restriction>
     </xs:simpleType>

@@ -563,11 +563,6 @@ namespace WixToolset.Data
             return Message(null, Ids.ExpectedPatchIdInWixMsp, "The WixMsp is missing the patch ID.");
         }
 
-        public static Message ExpectedRowInPatchCreationPackage(string tableName)
-        {
-            return Message(null, Ids.ExpectedRowInPatchCreationPackage, "Could not find a row in the '{0}' table for this patch creation package. Patch creation packages must contain at least one row in the '{0}' table.", tableName);
-        }
-
         public static Message ExpectedSignedCabinetName(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.ExpectedSignedCabinetName, "The Media/@Cabinet attribute was not found; it is required when this element contains a DigitalSignature child element. This is because Windows Installer can only verify the digital signatures of external cabinets. Please either remove the DigitalSignature element or specify a valid external cabinet name via the Cabinet attribute.");
@@ -1413,7 +1408,7 @@ namespace WixToolset.Data
 
         public static Message MissingEntrySection()
         {
-            return Message(null, Ids.MissingEntrySection, "Could not find entry section in provided list of intermediates. Supported entry section types are: Package, Bundle, Patch, PatchCreation, Module.");
+            return Message(null, Ids.MissingEntrySection, "Could not find entry section in provided list of intermediates. Supported entry section types are: Package, Bundle, Patch, Module.");
         }
 
         public static Message MissingEntrySection(string sectionType)
@@ -2056,11 +2051,6 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.UnexpectedTableInPatch, "An unexpected row in the '{0}' table was found in this patch. Patches cannot contain the '{0}' table.", tableName);
         }
 
-        public static Message UnexpectedTableInPatchCreationPackage(SourceLineNumber sourceLineNumbers, string tableName)
-        {
-            return Message(sourceLineNumbers, Ids.UnexpectedTableInPatchCreationPackage, "An unexpected row in the '{0}' table was found in this patch creation package. Patch creation packages cannot contain the '{0}' table.", tableName);
-        }
-
         public static Message UnhandledExtensionAttribute(SourceLineNumber sourceLineNumbers, string elementName, string extensionAttributeName, string extensionNamespace)
         {
             return Message(sourceLineNumbers, Ids.UnhandledExtensionAttribute, "The {0} element contains an unhandled extension attribute '{1}'. Please ensure that the extension for attributes in the '{2}' namespace has been provided.", elementName, extensionAttributeName, extensionNamespace);
@@ -2435,9 +2425,7 @@ namespace WixToolset.Data
             NoUniqueActionSequenceNumber2 = 180,
             ActionScheduledRelativeToItself = 181,
             MissingTableDefinition = 182,
-            ExpectedRowInPatchCreationPackage = 183,
             UnexpectedTableInMergeModule = 184,
-            UnexpectedTableInPatchCreationPackage = 185,
             MergeExcludedModule = 186,
             MergeFeatureRequired = 187,
             MergeLanguageFailed = 188,

@@ -2,10 +2,12 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using WixToolset.Data.Symbols;
 
     public static partial class SymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition TargetImages = new IntermediateSymbolDefinition(
             SymbolDefinitionType.TargetImages,
             new[]
@@ -24,6 +26,9 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
+    [Obsolete]
     public enum TargetImagesSymbolFields
     {
         Target,
@@ -35,6 +40,7 @@ namespace WixToolset.Data.Symbols
         IgnoreMissingSrcFiles,
     }
 
+    [Obsolete]
     public class TargetImagesSymbol : IntermediateSymbol
     {
         public TargetImagesSymbol() : base(SymbolDefinitions.TargetImages, null, null)

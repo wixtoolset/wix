@@ -566,6 +566,53 @@ namespace WixToolset.Core
         }
 
         /// <summary>
+        /// Parses all reference elements under a PatchFamily.
+        /// </summary>
+        /// <param name="node">The element to parse.</param>
+        /// <param name="tableName">Table that reference was made to.</param>
+        private void ParsePatchChildRefElement(XElement node, string tableName)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+            string id = null;
+
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    switch (attrib.Name.LocalName)
+                    {
+                    case "Id":
+                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                        break;
+                    default:
+                        this.Core.UnexpectedAttribute(node, attrib);
+                        break;
+                    }
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            if (null == id)
+            {
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Id"));
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            if (!this.Core.EncounteredError)
+            {
+                this.Core.AddSymbol(new WixPatchRefSymbol(sourceLineNumbers)
+                {
+                    Table = tableName,
+                    PrimaryKeys = id
+                });
+            }
+        }
+
+        /// <summary>
         /// Parses a TargetProductCodes element.
         /// </summary>
         /// <param name="node">The element to parse.</param>
@@ -641,6 +688,42 @@ namespace WixToolset.Core
                         ProductCode = targetProductCode
                     });
                 }
+            }
+        }
+
+        /// <summary>
+        /// Parses the All element under a PatchFamily.
+        /// </summary>
+        /// <param name="node">The element to parse.</param>
+        private void ParseAllElement(XElement node)
+        {
+            var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
+
+            // find unexpected attributes
+            foreach (var attrib in node.Attributes())
+            {
+                if (String.IsNullOrEmpty(attrib.Name.NamespaceName) || CompilerCore.WixNamespace == attrib.Name.Namespace)
+                {
+                    this.Core.UnexpectedAttribute(node, attrib);
+                }
+                else
+                {
+                    this.Core.ParseExtensionAttribute(node, attrib);
+                }
+            }
+
+            this.Core.ParseForExtensionElements(node);
+
+            // Always warn when using the All element.
+            this.Core.Write(WarningMessages.AllChangesIncludedInPatch(sourceLineNumbers));
+
+            if (!this.Core.EncounteredError)
+            {
+                this.Core.AddSymbol(new WixPatchRefSymbol(sourceLineNumbers)
+                {
+                    Table = "*",
+                    PrimaryKeys = "*",
+                });
             }
         }
 

@@ -25,6 +25,7 @@ namespace WixToolset.Data
         Patch,
 
         /// <summary>Patch Creation output type.</summary>
+        [Obsolete]
         PatchCreation,
 
         /// <summary>Package output type.</summary>

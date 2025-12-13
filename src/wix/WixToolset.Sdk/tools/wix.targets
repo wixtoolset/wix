@@ -91,7 +91,6 @@
     <TargetExt Condition=" '$(OutputType)' == 'Package' ">.msi</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'Module' ">.msm</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'Patch' ">.msp</TargetExt>
-    <TargetExt Condition=" '$(OutputType)' == 'PatchCreation' ">.pcp</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'Library' ">.wixlib</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'Bundle' ">.exe</TargetExt>
     <TargetExt Condition=" '$(OutputType)' == 'IntermediatePostLink' ">.wixipl</TargetExt>
@@ -479,7 +478,7 @@
     -->
   <Target
       Name="AssignTargetPaths"
-      Condition=" '$(OutputType)' == 'Package' or '$(OutputType)' == 'PatchCreation' or '$(OutputType)' == 'Module' ">
+      Condition=" '$(OutputType)' == 'Package' or '$(OutputType)' == 'Module' ">
 
     <WixAssignCulture Cultures="$(Cultures)" Files="@(EmbeddedResource)">
       <Output TaskParameter="CultureGroups" ItemName="CultureGroup" />

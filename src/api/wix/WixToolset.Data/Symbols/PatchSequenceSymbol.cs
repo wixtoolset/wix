@@ -2,10 +2,12 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using WixToolset.Data.Symbols;
 
     public static partial class SymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition PatchSequence = new IntermediateSymbolDefinition(
             SymbolDefinitionType.PatchSequence,
             new[]
@@ -21,6 +23,9 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
+    [Obsolete]
     public enum PatchSequenceSymbolFields
     {
         PatchFamily,
@@ -29,6 +34,7 @@ namespace WixToolset.Data.Symbols
         Supersede,
     }
 
+    [Obsolete]
     public class PatchSequenceSymbol : IntermediateSymbol
     {
         public PatchSequenceSymbol() : base(SymbolDefinitions.PatchSequence, null, null)

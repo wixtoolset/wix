@@ -10,7 +10,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
         public static readonly XName PackageElement = WxsNamespace + "Package";
         public static readonly XName ModuleElement = WxsNamespace + "Module";
-        public static readonly XName PatchCreationElement = WxsNamespace + "PatchCreation";
 
         public static readonly XName SummaryInformationElement = WxsNamespace + "SummaryInformation";
 
@@ -27,9 +26,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
         public static readonly XName PropertyElement = WxsNamespace + "Property";
 
-        public static readonly XName ProtectRangeElement = WxsNamespace + "ProtectRange";
-        public static readonly XName ProtectFileElement = WxsNamespace + "ProtectFile";
-
         public static readonly XName FileElement = WxsNamespace + "File";
 
         public static readonly XName EnsureTableElement = WxsNamespace + "EnsureTable";
@@ -44,7 +40,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
         public static readonly XName BillboardElement = WxsNamespace + "Billboard";
         public static readonly XName BillboardActionElement = WxsNamespace + "BillboardAction";
-        
+
         public static readonly XName BinaryElement = WxsNamespace + "Binary";
 
         public static readonly XName ClassElement = WxsNamespace + "Class";
@@ -115,8 +111,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         public static readonly XName ODBCTranslatorElement = WxsNamespace + "ODBCTranslator";
         public static readonly XName PatchMetadataElement = WxsNamespace + "PatchMetadata";
         public static readonly XName OptimizeCustomActionsElement = WxsNamespace + "OptimizeCustomActions";
-        public static readonly XName CustomPropertyElement = WxsNamespace + "CustomProperty";
-        public static readonly XName PatchSequenceElement = WxsNamespace + "PatchSequence";
         public static readonly XName ProgIdElement = WxsNamespace + "ProgId";
         public static readonly XName ReplacePatchElement = WxsNamespace + "ReplacePatch";
         public static readonly XName TargetProductCodeElement = WxsNamespace + "TargetProductCode";

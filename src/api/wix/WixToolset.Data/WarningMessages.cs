@@ -167,11 +167,6 @@ namespace WixToolset.Data
             return Message(sourceLineNumbers, Ids.DeprecatedLongNameAttribute, "The {0}/@{1} attribute has been deprecated. Since WiX now has the ability to generate short file/directory names, the desired name should be specified in the {2} attribute instead. If the name specified in the {2} attribute is a short name, then WiX will not generate a short name. If the name specified in the {2} attribute is a long name and you want to manually specify the short name, please set the short name value in the {3} attribute.", elementName, longNameAttributeName, nameAttributeName, shortNameAttributeName);
         }
 
-        public static Message DeprecatedPatchSequenceTargetAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName)
-        {
-            return Message(sourceLineNumbers, Ids.DeprecatedPatchSequenceTargetAttribute, "The {0}/@{1} attribute has been deprecated in favor of the more strongly-typed ProductCode or TargetImage attributes. Please use the ProductCode attribute for indicating the ProductCode of a patch family directly, or the TargetImage attribute to specify the TargetImage which in turn will retrieve the ProductCode of the patch family.", elementName, attributeName);
-        }
-
         public static Message DeprecatedPreProcVariable(SourceLineNumber sourceLineNumbers, string oldName, string newName)
         {
             return Message(sourceLineNumbers, Ids.DeprecatedPreProcVariable, "The built-in preprocessor variable '{0}' is deprecated. Please correct your authoring to use the new '{1}' preprocessor variable instead.", oldName, newName);
@@ -330,11 +325,6 @@ namespace WixToolset.Data
         public static Message IllegalColumnValue(SourceLineNumber sourceLineNumbers, string tableName, string columnName, object value)
         {
             return Message(sourceLineNumbers, Ids.IllegalColumnValue, "The {0}.{1} column's value, '{2}', is not a recognized legal value. This information will be left out of the decompiled output.", tableName, columnName, value);
-        }
-
-        public static Message IllegalPatchCreationTable(SourceLineNumber sourceLineNumbers, string tableName)
-        {
-            return Message(sourceLineNumbers, Ids.IllegalPatchCreationTable, "The {0} table is not legal in a patch creation file. The information in this table will be left out of the decompiled output.", tableName);
         }
 
         public static Message IllegalRegistryKeyPath(SourceLineNumber sourceLineNumbers, string componentName, string registryId)
@@ -540,11 +530,6 @@ namespace WixToolset.Data
         public static Message SkippingMergeModuleTable(SourceLineNumber sourceLineNumbers, string tableName)
         {
             return Message(sourceLineNumbers, Ids.SkippingMergeModuleTable, "The {0} table can only be represented in WiX for merge modules. The information in this table will be left out of the decompiled output.", tableName);
-        }
-
-        public static Message SkippingPatchCreationTable(SourceLineNumber sourceLineNumbers, string tableName)
-        {
-            return Message(sourceLineNumbers, Ids.SkippingPatchCreationTable, "The {0} table can only be represented in WiX for patch creation files. The information in this table will be left out of the decompiled output.", tableName);
         }
 
         public static Message StandardDirectoryConflictInMergeModule(SourceLineNumber sourceLineNumbers, string directory, string standardDirectory)
@@ -762,9 +747,7 @@ namespace WixToolset.Data
             IllegalActionInSequence = 1058,
             ExpectedForeignRow = 1059,
             DecompilingAsCustomTable = 1060,
-            IllegalPatchCreationTable = 1061,
             SkippingMergeModuleTable = 1062,
-            SkippingPatchCreationTable = 1063,
             UnrepresentableColumnValue = 1064,
             DeprecatedTable = 1065,
             PatchTable = 1066,
@@ -782,7 +765,6 @@ namespace WixToolset.Data
             EmptyCabinet = 1079,
             DeprecatedRegistryElement = 1080,
             IllegalRegistryKeyPath = 1081,
-            DeprecatedPatchSequenceTargetAttribute = 1082,
             ProductIdAuthored = 1083,
             ImplicitMergeModulePrimaryFeature = 1084,
             DeprecatedIgnoreModularizationElement = 1085,

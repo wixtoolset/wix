@@ -37,10 +37,6 @@ namespace WixToolset.Core.WindowsInstaller
                 case ".msp":
                     backend = new MspBackend();
                     return true;
-
-                //case "patchcreation":
-                //case ".pcp":
-                //    return new PatchCreationBackend();
             }
 
             backend = null;

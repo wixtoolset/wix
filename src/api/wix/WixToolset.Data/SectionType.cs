@@ -29,6 +29,7 @@ namespace WixToolset.Data
         Product = Package,
 
         /// <summary>Patch creation section type.</summary>
+        [Obsolete]
         PatchCreation,
 
         /// <summary>Patch section type.</summary>
