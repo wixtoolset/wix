@@ -85,6 +85,14 @@
           WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
   </Target>
 
+  <!-- We want to be very precise about which MSIs we sign, so use 'true' for that precision. -->
+  <Target Name="SignMsi" Condition=" '$(SigningCertName)'!='' and '$(SignOutput)'=='true' ">
+    <Message Importance="high" Text="Signing MSI: @(SignMsi->&apos;%(Identity)&apos;)" />
+
+    <Exec Command='"$(SigningToolExe)" $(SigningCommand) $(SigningConfiguration) "@(SignMsi->&apos;%(Identity)&apos;)"'
+          WorkingDirectory="$(MSBuildProjectDirectory)" EchoOff="true" />
+  </Target>
+
   <Target Name="SignBundleEngine" Condition=" '$(SigningCertName)'!='' and '$(SignOutput)'!='false' ">
     <Message Importance="high" Text="Signing bundle engine: @(SignBundleEngine->&apos;%(Identity)&apos;)" />
 
