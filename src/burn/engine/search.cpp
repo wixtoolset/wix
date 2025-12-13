@@ -1252,7 +1252,8 @@ static HRESULT MsiProductSearch(
     hr = BVariantChangeType(&value, type);
     ExitOnFailure(hr, "Failed to change value type.");
 
-    // Alter value here after value has changed to numberic type.
+    // When testing if a product exists, replace the value with a numeric "true" or "false"
+    // based on the calculated install state.
     if (BURN_MSI_PRODUCT_SEARCH_TYPE_EXISTS == pSearch->MsiProductSearch.Type)
     {
         value.llValue = (value.llValue == INSTALLSTATE_ABSENT) ? 0 : 1;
