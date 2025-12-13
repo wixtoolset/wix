@@ -2,10 +2,12 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using WixToolset.Data.Symbols;
 
     public static partial class SymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition UpgradedFilesToIgnore = new IntermediateSymbolDefinition(
             SymbolDefinitionType.UpgradedFilesToIgnore,
             new[]
@@ -19,12 +21,16 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
+    [Obsolete]
     public enum UpgradedFilesToIgnoreSymbolFields
     {
         Upgraded,
         FTK,
     }
 
+    [Obsolete]
     public class UpgradedFilesToIgnoreSymbol : IntermediateSymbol
     {
         public UpgradedFilesToIgnoreSymbol() : base(SymbolDefinitions.UpgradedFilesToIgnore, null, null)

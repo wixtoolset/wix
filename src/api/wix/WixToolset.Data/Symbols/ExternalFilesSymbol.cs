@@ -2,10 +2,12 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using WixToolset.Data.Symbols;
 
     public static partial class SymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition ExternalFiles = new IntermediateSymbolDefinition(
             SymbolDefinitionType.ExternalFiles,
             new[]
@@ -25,6 +27,9 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
+    [Obsolete]
     public enum ExternalFilesSymbolFields
     {
         Family,
@@ -37,6 +42,7 @@ namespace WixToolset.Data.Symbols
         Order,
     }
 
+    [Obsolete]
     public class ExternalFilesSymbol : IntermediateSymbol
     {
         public ExternalFilesSymbol() : base(SymbolDefinitions.ExternalFiles, null, null)

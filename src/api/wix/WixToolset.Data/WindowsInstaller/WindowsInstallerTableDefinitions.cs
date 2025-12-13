@@ -2,6 +2,7 @@
 
 namespace WixToolset.Data.WindowsInstaller
 {
+    using System;
     using WixToolset.Data.WindowsInstaller.Rows;
 
     public static class WindowsInstallerTableDefinitions
@@ -861,6 +862,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+        [Obsolete]
         public static readonly TableDefinition PatchMetadata = new TableDefinition(
             "PatchMetadata",
             SymbolDefinitions.PatchMetadata,
@@ -908,6 +910,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+        [Obsolete]
         public static readonly TableDefinition PatchSequence = new TableDefinition(
             "PatchSequence",
             SymbolDefinitions.PatchSequence,
@@ -1560,6 +1563,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+        [Obsolete]
         public static readonly TableDefinition ImageFamilies = new TableDefinition(
             "ImageFamilies",
             SymbolDefinitions.ImageFamilies,
@@ -1575,6 +1579,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+        [Obsolete]
         public static readonly TableDefinition UpgradedImages = new TableDefinition(
             "UpgradedImages",
             SymbolDefinitions.UpgradedImages,
@@ -1589,6 +1594,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+        [Obsolete]
         public static readonly TableDefinition UpgradedFilesToIgnore = new TableDefinition(
             "UpgradedFilesToIgnore",
             SymbolDefinitions.UpgradedFilesToIgnore,
@@ -1600,6 +1606,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+        [Obsolete]
         public static readonly TableDefinition UpgradedFilesOptionalData = new TableDefinition(
             "UpgradedFiles_OptionalData",
             SymbolDefinitions.UpgradedFilesOptionalData,
@@ -1614,6 +1621,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+        [Obsolete]
         public static readonly TableDefinition TargetImages = new TableDefinition(
             "TargetImages",
             SymbolDefinitions.TargetImages,
@@ -1630,6 +1638,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+        [Obsolete]
         public static readonly TableDefinition TargetFilesOptionalData = new TableDefinition(
             "TargetFiles_OptionalData",
             SymbolDefinitions.TargetFilesOptionalData,
@@ -1645,6 +1654,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+        [Obsolete]
         public static readonly TableDefinition FamilyFileRanges = new TableDefinition(
             "FamilyFileRanges",
             SymbolDefinitions.FamilyFileRanges,
@@ -1658,6 +1668,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+        [Obsolete]
         public static readonly TableDefinition ExternalFiles = new TableDefinition(
             "ExternalFiles",
             SymbolDefinitions.ExternalFiles,
@@ -1772,6 +1783,7 @@ namespace WixToolset.Data.WindowsInstaller
             symbolIdIsPrimaryKey: false
         );
 
+#pragma warning disable CS0612 // includes some obsolete table definitions
         public static readonly TableDefinition[] All = new[]
         {
             ActionText,
@@ -1903,5 +1915,6 @@ namespace WixToolset.Data.WindowsInstaller
             WixDependencyProvider,
             WixDependencyRef,
         };
+#pragma warning restore CS0618
     }
 }

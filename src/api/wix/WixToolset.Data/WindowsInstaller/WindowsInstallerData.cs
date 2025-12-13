@@ -214,9 +214,11 @@ namespace WixToolset.Data.WindowsInstaller
                             case "Patch":
                                 output.Type = OutputType.Patch;
                                 break;
+#pragma warning disable CS0612 // still supported backward compatiblity
                             case "PatchCreation":
                                 output.Type = OutputType.PatchCreation;
                                 break;
+#pragma warning restore CS0612
                             case "Package":
                             case "Product":
                                 output.Type = OutputType.Package;

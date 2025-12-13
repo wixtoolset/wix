@@ -31,6 +31,11 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.DiscouragedVersionAttribute, "The Provides/@Version attribute should not be specified for MSI package {0}. The ProductVersion will be used by default.", id);
         }
 
+        public static Message PatchCreationDeprecated(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.PatchCreationDeprecated, "The PatchCreation element is not supported in WiX v4 and later. Use the Patch element instead.");
+        }
+
         public static Message PropertyRemoved(string name)
         {
             return Message(null, Ids.PropertyRemoved, "The property {0} was authored in the package with a value and will be removed. The property should not be authored.", name);
@@ -72,6 +77,7 @@ namespace WixToolset.Core
             DefiningStandardDirectoryDeprecated = 5437,
             ReadonlyLogVariableTarget = 5438,
             // DO_NOT_REUSE ReservedBurnNamespaceWarning = 5439,
+            PatchCreationDeprecated = 5440,
         } // 5400-5499 and 6600-6699 were the ranges for Dependency and Tag which are now in Core between CompilerWarnings and CompilerErrors.
     }
 }

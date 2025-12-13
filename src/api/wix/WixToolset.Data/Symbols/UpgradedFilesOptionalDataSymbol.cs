@@ -2,10 +2,12 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using WixToolset.Data.Symbols;
 
     public static partial class SymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition UpgradedFilesOptionalData = new IntermediateSymbolDefinition(
             SymbolDefinitionType.UpgradedFilesOptionalData,
             new[]
@@ -22,6 +24,9 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
+    [Obsolete]
     public enum UpgradedFilesOptionalDataSymbolFields
     {
         Upgraded,
@@ -31,6 +36,7 @@ namespace WixToolset.Data.Symbols
         IncludeWholeFile,
     }
 
+    [Obsolete]
     public class UpgradedFilesOptionalDataSymbol : IntermediateSymbol
     {
         public UpgradedFilesOptionalDataSymbol() : base(SymbolDefinitions.UpgradedFilesOptionalData, null, null)

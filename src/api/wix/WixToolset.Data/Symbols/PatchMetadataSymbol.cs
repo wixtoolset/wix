@@ -2,10 +2,12 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using WixToolset.Data.Symbols;
 
     public static partial class SymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition PatchMetadata = new IntermediateSymbolDefinition(
             SymbolDefinitionType.PatchMetadata,
             new[]
@@ -22,6 +24,7 @@ namespace WixToolset.Data.Symbols
 {
     using System;
 
+    [Obsolete]
     public enum PatchMetadataSymbolFields
     {
         Company,
@@ -29,33 +32,7 @@ namespace WixToolset.Data.Symbols
         Value,
     }
 
-    /// <summary>
-    /// Values for the OptimizeCA MsiPatchMetdata property, which indicates whether custom actions can be skipped when applying the patch.
-    /// </summary>
-    [Flags]
-    public enum OptimizeCAFlags
-    {
-        /// <summary>
-        /// No custom actions are skipped.
-        /// </summary>
-        None = 0,
-
-        /// <summary>
-        /// Skip property (type 51) and directory (type 35) assignment custom actions.
-        /// </summary>
-        SkipAssignment = 1,
-
-        /// <summary>
-        /// Skip immediate custom actions that are not property or directory assignment custom actions.
-        /// </summary>
-        SkipImmediate = 2,
-
-        /// <summary>
-        /// Skip custom actions that run within the script.
-        /// </summary>
-        SkipDeferred = 4
-    }
-
+    [Obsolete]
     public class PatchMetadataSymbol : IntermediateSymbol
     {
         public PatchMetadataSymbol() : base(SymbolDefinitions.PatchMetadata, null, null)

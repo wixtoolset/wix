@@ -2,10 +2,12 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using WixToolset.Data.Symbols;
 
     public static partial class SymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition FamilyFileRanges = new IntermediateSymbolDefinition(
             SymbolDefinitionType.FamilyFileRanges,
             new[]
@@ -21,6 +23,9 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
+    [Obsolete]
     public enum FamilyFileRangesSymbolFields
     {
         Family,
@@ -29,6 +34,7 @@ namespace WixToolset.Data.Symbols
         RetainLengths,
     }
 
+    [Obsolete]
     public class FamilyFileRangesSymbol : IntermediateSymbol
     {
         public FamilyFileRangesSymbol() : base(SymbolDefinitions.FamilyFileRanges, null, null)

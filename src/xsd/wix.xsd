@@ -34,7 +34,6 @@
             <xs:element ref="Package" />
             <xs:element ref="Module" />
             <xs:element ref="Patch" />
-            <xs:element ref="PatchCreation" />
           </xs:choice>
           <xs:element ref="Fragment" minOccurs="0" maxOccurs="unbounded" />
         </xs:sequence>
@@ -3384,77 +3383,6 @@
       </xs:annotation>
     </xs:anyAttribute>
   </xs:complexType>
-</xs:element>
-  <xs:element name="PatchCreation">
-    <xs:annotation>
-      <xs:documentation>
-            The PatchCreation element is analogous to the main function in a C program. When linking, only one PatchCreation section
-            can be given to the linker to produce a successful result. Using this element creates a pcp file.
-            </xs:documentation>
-      <xs:appinfo>
-        <xse:remarks>
-          <html:p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/) for more information.</html:p>
-        </xse:remarks>
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="PatchInformation" />
-        <xs:element ref="PatchMetadata" minOccurs="0" />
-        <xs:element ref="Family" maxOccurs="unbounded" />
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element ref="PatchProperty" />
-          <xs:element ref="PatchSequence" />
-          <xs:element ref="ReplacePatch" />
-          <xs:element ref="TargetProductCode" />
-        </xs:choice>
-      </xs:sequence>
-      <xs:attribute name="Id" type="Guid" use="required">
-        <xs:annotation>
-          <xs:documentation>PatchCreation identifier; this is the primary key for identifying patches.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="AllowMajorVersionMismatches" type="YesNoTypeUnion">
-        <xs:annotation>
-          <xs:documentation>Use this to set whether the major versions between the upgrade and target images match. See <html:a href="http://msdn.microsoft.com/library/aa370890.aspx">AllowProductVersionMajorMismatches</html:a> for more information.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="AllowProductCodeMismatches" type="YesNoTypeUnion">
-        <xs:annotation>
-          <xs:documentation>Use this to set whether the product code between the upgrade and target images match. See <html:a href="http://msdn.microsoft.com/library/aa370890.aspx">AllowProductCodeMismatches</html:a> for more information.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="CleanWorkingFolder" type="YesNoTypeUnion">
-        <xs:annotation>
-          <xs:documentation>Use this to set whether Patchwiz should clean the temp folder when finished. See <html:a href="http://msdn.microsoft.com/library/aa370890.aspx">DontRemoveTempFolderWhenFinished</html:a> for more information.	</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Codepage" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>The code page integer value or web name for the resulting PCP. See remarks for more information.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="OutputPath" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>The full path, including file name, of the patch package file that is to be generated. See <html:a href="http://msdn.microsoft.com/library/aa370890.aspx">PatchOutputPath</html:a> for more information.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="SourceList" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Used to locate the .msp file for the patch if the cached copy is unavailable. See <html:a href="http://msdn.microsoft.com/library/aa370890.aspx">PatchSourceList</html:a> for more information.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="SymbolFlags" type="xs:int">
-        <xs:annotation>
-          <xs:documentation>An 8-digit hex integer representing the combination of patch symbol usage flags to use when creating a binary file patch. See <html:a href="http://msdn.microsoft.com/library/aa370890.aspx">ApiPatchingSymbolFlags</html:a> for more information.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="WholeFilesOnly" type="YesNoTypeUnion">
-        <xs:annotation>
-          <xs:documentation>Use this to set whether changing files should be included in their entirety. See <html:a href="http://msdn.microsoft.com/library/aa370890.aspx">IncludeWholeFilesOnly</html:a> for more information.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
   </xs:element>
   <xs:element name="PatchInformation">
     <xs:annotation>
@@ -3537,123 +3465,6 @@
       </xs:attribute>
     </xs:complexType>
   </xs:element>
-  <xs:element name="PatchMetadata">
-    <xs:annotation>
-      <xs:documentation>Properties about the patch to be placed in the PatchMetadata table.</xs:documentation>
-      <xs:appinfo>
-        <xse:msiRef table="MsiPatchMetadata" href="http://msdn.microsoft.com/library/aa370344.aspx" />
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element ref="CustomProperty" minOccurs="0">
-            <xs:annotation>
-              <xs:documentation>A custom property that extends the standard set.</xs:documentation>
-            </xs:annotation>
-          </xs:element>
-          <xs:element ref="OptimizeCustomActions" minOccurs="0" maxOccurs="1">
-            <xs:annotation>
-              <xs:documentation>Indicates whether custom actions can be skipped when applying the patch.</xs:documentation>
-            </xs:annotation>
-          </xs:element>
-        </xs:choice>
-      </xs:sequence>
-      <xs:attribute name="AllowRemoval" type="YesNoTypeUnion" use="required">
-        <xs:annotation>
-          <xs:documentation>Whether this is an uninstallable patch.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Classification" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Category of updates. Recommended values are Critical Update, Hotfix, Security Rollup, Security Update, Service Pack, Update, Update Rollup.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="CreationTimeUTC" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Creation time of the .msp file in the form mm-dd-yy HH:MM (month-day-year hour:minute).</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Description" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Description of the patch.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="DisplayName" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>A title for the patch that is suitable for public display. In Add/Remove Programs from XP SP2 on.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="ManufacturerName" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Name of the manufacturer.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="MinorUpdateTargetRTM" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>
-                    Indicates that the patch targets the RTM version of the product or the most recent major
-                    upgrade patch. Author this optional property in minor update patches that contain sequencing
-                    information to indicate that the patch removes all patches up to the RTM version of the
-                    product, or up to the most recent major upgrade patch. This property is available beginning
-                    with Windows Installer 3.1.
-                </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="MoreInfoURL" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>A URL that provides information specific to this patch. In Add/Remove Programs from XP SP2 on.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="OptimizedInstallMode" type="YesNoTypeUnion">
-        <xs:annotation>
-          <xs:documentation>
-                    If this attribute is set to 'yes' in all the patches to be applied in a transaction, the
-                    application of the patch is optimized if possible. Available beginning with Windows Installer 3.1.
-                </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="TargetProductName" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Name of the application or target product suite.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CustomProperty">
-    <xs:annotation>
-      <xs:documentation>A custom property for the PatchMetadata table.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name="Company" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>The name of the company.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Property" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>The name of the metadata property.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Value" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Value of the metadata property.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ReplacePatch">
-    <xs:annotation>
-      <xs:documentation>A patch that is deprecated by this patch.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name="Id" type="Guid" use="required">
-        <xs:annotation>
-          <xs:documentation>Patch GUID to be unregistered if it exists on the machine targeted by this patch.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
   <xs:element name="TargetProductCodes">
     <xs:annotation>
       <xs:documentation>
@@ -3674,12 +3485,11 @@
   <xs:element name="TargetProductCode">
     <xs:annotation>
       <xs:documentation>
-                A product code for a product that can accept the patch.
-            </xs:documentation>
+        A product code for a product that can accept the patch.
+      </xs:documentation>
       <xs:appinfo>
         <xse:remarks>
-          <html:p>When using the PatchCreation element, if the Id attribute value is '*' or this element is not authored, the product codes of all products referenced by the TargetImages element are used.</html:p>
-          <html:p>When using the Patch element, the Id attribute value must not be '*'. Use the TargetProductCodes/@Replace attribute instead.</html:p>
+          The Id attribute value must not be '*'. Use the TargetProductCodes/@Replace attribute instead.
         </xse:remarks>
       </xs:appinfo>
     </xs:annotation>
@@ -3687,8 +3497,8 @@
       <xs:attribute name="Id" type="xs:string" use="required">
         <xs:annotation>
           <xs:documentation>
-                        The product code for a product that can accept the patch. This can be '*'. See remarks for more information.
-                    </xs:documentation>
+            The product code for a product that can accept the patch. This can be '*'. See remarks for more information.
+          </xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
@@ -3699,7 +3509,7 @@
       <xs:appinfo>
         <xse:msiRef table="MsiPatchMetadata" href="http://msdn.microsoft.com/library/aa370344.aspx" />
         <xse:remarks>
-          <html:p>When authored under the Patch element, the PatchProperty defines entries in the MsiPatchMetadata table.</html:p>
+          The PatchProperty defines entries in the MsiPatchMetadata table.
         </xse:remarks>
       </xs:appinfo>
     </xs:annotation>
@@ -3717,305 +3527,6 @@
       <xs:attribute name="Value" type="xs:string" use="required">
         <xs:annotation>
           <xs:documentation>Value of the patch property.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="PatchSequence">
-    <xs:annotation>
-      <xs:documentation>Sequence information for this patch database. Sequence information is generated automatically in most cases, and rarely needs to be set explicitly.</xs:documentation>
-      <xs:appinfo>
-        <xse:msiRef table="MsiPatchSequence" href="http://msdn.microsoft.com/library/aa370350.aspx" />
-      </xs:appinfo>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name="PatchFamily" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Identifier which indicates a sequence family to which this patch belongs.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="ProductCode" type="Guid">
-        <xs:annotation>
-          <xs:documentation>
-                        Specifies the ProductCode of the product that this family applies to.
-                        This attribute cannot the specified if the TargetImage attribute is specified.
-                    </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Sequence" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Used to populate the sequence column of the MsiPatchSequence table in the final MSP file. Specified in x.x.x.x format. See documentation for Sequence column of MsiPatchSequence table in MSI SDK.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Supersede" type="YesNoTypeUnion">
-        <xs:annotation>
-          <xs:documentation>
-                        Set this value to 'yes' to indicate that this patch will supersede all previous patches in this patch family.
-                        The default value is 'no'.
-                    </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Target" type="xs:string">
-        <xs:annotation>
-          <xs:appinfo>
-            <xse:deprecated ref="TargetImage" />
-          </xs:appinfo>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="TargetImage" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>
-                        Specifies the TargetImage that this family applies to.
-                        This attribute cannot the specified if the ProductCode attribute is specified.
-                    </xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Family">
-    <xs:annotation>
-      <xs:documentation>Group of one or more upgraded images of a product.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="UpgradeImage" maxOccurs="unbounded" />
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element ref="ExternalFile" />
-          <xs:element ref="ProtectFile" />
-        </xs:choice>
-      </xs:sequence>
-      <xs:attribute name="DiskId" type="DiskIdType">
-        <xs:annotation>
-          <xs:documentation>Entered into the DiskId field of the new Media table record.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="DiskPrompt" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Value to display in the "[1]" of the DiskPrompt Property. Using this attribute will require you to define a DiskPrompt Property.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="MediaSrcProp" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Entered into the Source field of the new Media table entry of the upgraded image.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Name" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Identifier for the family.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="SequenceStart" type="xs:int">
-        <xs:annotation>
-          <xs:documentation>Sequence number for the starting file.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="VolumeLabel" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Entered into the VolumeLabel field of the new Media table record.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="UpgradeImage">
-    <xs:annotation>
-      <xs:documentation>Contains information about the upgraded images of the product.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="TargetImage" maxOccurs="unbounded" />
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element ref="SymbolPath" />
-          <xs:element ref="UpgradeFile" />
-        </xs:choice>
-      </xs:sequence>
-      <xs:attribute name="Id" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Identifier to connect target images with upgraded image.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="SourceFile" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Full path to location of msi file for upgraded image.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="SourcePatch" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Modified copy of the upgraded installation database that contains additional authoring specific to patching.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TargetImage">
-    <xs:annotation>
-      <xs:documentation>Contains information about the target images of the product.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="SymbolPath" />
-        <xs:element ref="TargetFile" />
-      </xs:choice>
-      <xs:attribute name="Id" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Identifier for the target image.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="SourceFile" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Full path to the location of the msi file for the target image.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Order" type="xs:int" use="required">
-        <xs:annotation>
-          <xs:documentation>Relative order of the target image.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Validation" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Product checking to avoid applying irrelevant transforms.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="IgnoreMissingFiles" type="YesNoTypeUnion">
-        <xs:annotation>
-          <xs:documentation>Files missing from the target image are ignored by the installer.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TargetFile">
-    <xs:annotation>
-      <xs:documentation>Information about specific files in a target image.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="SymbolPath" minOccurs="0" />
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element ref="IgnoreRange" />
-          <xs:element ref="ProtectRange" />
-        </xs:choice>
-      </xs:sequence>
-      <xs:attribute name="Id" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Foreign key into the File table.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="IgnoreRange">
-    <xs:annotation>
-      <xs:documentation>Specifies part of a file that is to be ignored during patching.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name="Offset" type="xs:int" use="required">
-        <xs:annotation>
-          <xs:documentation>Offset of the start of the range.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Length" type="xs:int" use="required">
-        <xs:annotation>
-          <xs:documentation>Length of the range.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ProtectRange">
-    <xs:annotation>
-      <xs:documentation>Specifies part of a file that cannot be overwritten during patching.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name="Offset" type="xs:int" use="required">
-        <xs:annotation>
-          <xs:documentation>Offset of the start of the range.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Length" type="xs:int" use="required">
-        <xs:annotation>
-          <xs:documentation>Length of the range.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ProtectFile">
-    <xs:annotation>
-      <xs:documentation>Specifies a file to be protected.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:choice maxOccurs="unbounded">
-        <xs:element ref="ProtectRange" />
-      </xs:choice>
-      <xs:attribute name="File" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Foreign key into the File table.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ExternalFile">
-    <xs:annotation>
-      <xs:documentation>Contains information about specific files that are not part of a regular target image.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="ProtectRange" maxOccurs="unbounded" />
-        <xs:element ref="SymbolPath" maxOccurs="unbounded" />
-        <xs:choice minOccurs="0" maxOccurs="unbounded">
-          <xs:element ref="IgnoreRange" />
-        </xs:choice>
-      </xs:sequence>
-      <xs:attribute name="File" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Foreign key into the File table.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Source" type="xs:string">
-        <xs:annotation>
-          <xs:documentation>Full path of the external file.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Order" type="xs:int" use="required">
-        <xs:annotation>
-          <xs:documentation>Specifies the order of the external files to use when creating the patch.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="UpgradeFile">
-    <xs:annotation>
-      <xs:documentation>Specifies files to either ignore or to specify optional data about a file.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element ref="SymbolPath" />
-      </xs:choice>
-      <xs:attribute name="File" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>Foreign key into the File table.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="Ignore" type="YesNoTypeUnion" use="required">
-        <xs:annotation>
-          <xs:documentation>If yes, the file is ignored during patching, and the next two attributes are ignored.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="AllowIgnoreOnError" type="YesNoTypeUnion">
-        <xs:annotation>
-          <xs:documentation>Specifies whether patching this file is vital.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-      <xs:attribute name="WholeFile" type="YesNoTypeUnion">
-        <xs:annotation>
-          <xs:documentation>Whether the whole file should be installed, rather than creating a binary patch.</xs:documentation>
-        </xs:annotation>
-      </xs:attribute>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SymbolPath">
-    <xs:annotation>
-      <xs:documentation>A path to symbols.</xs:documentation>
-    </xs:annotation>
-    <xs:complexType>
-      <xs:attribute name="Path" type="xs:string" use="required">
-        <xs:annotation>
-          <xs:documentation>The path.</xs:documentation>
         </xs:annotation>
       </xs:attribute>
     </xs:complexType>
@@ -4063,9 +3574,9 @@
   <xs:element name="AssemblyName">
     <xs:annotation>
       <xs:documentation>
-                The MsiAssemblyName table specifies the schema for the elements of a strong assembly cache name for a .NET Framework or Win32 assembly.
-                Consider using the Assembly attribute on File element to have the toolset populate these entries automatically.
-            </xs:documentation>
+        The MsiAssemblyName table specifies the schema for the elements of a strong assembly cache name for a .NET Framework or Win32 assembly.
+        Consider using the Assembly attribute on File element to have the toolset populate these entries automatically.
+      </xs:documentation>
       <xs:appinfo>
         <xse:msiRef table="MsiAssemblyName" href="http://msdn.microsoft.com/library/aa370062.aspx" />
       </xs:appinfo>

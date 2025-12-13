@@ -133,9 +133,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 case OutputType.Module:
                     this.DecompilerHelper.RootElement = new XElement(Names.ModuleElement);
                     break;
-                case OutputType.PatchCreation:
-                    this.DecompilerHelper.RootElement = new XElement(Names.PatchCreationElement);
-                    break;
                 case OutputType.Package:
                     this.DecompilerHelper.RootElement = new XElement(Names.PackageElement);
                     break;
@@ -571,31 +568,24 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         /// <param name="tables">The collection of all tables.</param>
         private void FinalizeDecompile(TableIndexedCollection tables)
         {
-            if (OutputType.PatchCreation == this.OutputType)
-            {
-                this.FinalizeFamilyFileRangesTable(tables);
-            }
-            else
-            {
-                this.FinalizeSummaryInformationStream(tables);
-                this.FinalizeCheckBoxTable(tables);
-                this.FinalizeComponentTable(tables);
-                this.FinalizeDialogTable(tables);
-                this.FinalizeDuplicateMoveFileTables(tables);
-                this.FinalizeFeatureComponentsTable(tables);
-                this.FinalizeFileTable(tables);
-                this.FinalizeMIMETable(tables);
-                this.FinalizeMsiLockPermissionsExTable(tables);
-                this.FinalizeLockPermissionsTable(tables);
-                this.FinalizeProgIdTable(tables);
-                this.FinalizePropertyTable(tables);
-                this.FinalizeRemoveFileTable(tables);
-                this.FinalizeSearchTables(tables);
-                this.FinalizeShortcutTable(tables);
-                this.FinalizeUpgradeTable(tables);
-                this.FinalizeSequenceTables(tables);
-                this.FinalizeVerbTable(tables);
-            }
+            this.FinalizeSummaryInformationStream(tables);
+            this.FinalizeCheckBoxTable(tables);
+            this.FinalizeComponentTable(tables);
+            this.FinalizeDialogTable(tables);
+            this.FinalizeDuplicateMoveFileTables(tables);
+            this.FinalizeFeatureComponentsTable(tables);
+            this.FinalizeFileTable(tables);
+            this.FinalizeMIMETable(tables);
+            this.FinalizeMsiLockPermissionsExTable(tables);
+            this.FinalizeLockPermissionsTable(tables);
+            this.FinalizeProgIdTable(tables);
+            this.FinalizePropertyTable(tables);
+            this.FinalizeRemoveFileTable(tables);
+            this.FinalizeSearchTables(tables);
+            this.FinalizeShortcutTable(tables);
+            this.FinalizeUpgradeTable(tables);
+            this.FinalizeSequenceTables(tables);
+            this.FinalizeVerbTable(tables);
 
             foreach (var extension in this.Extensions)
             {
@@ -966,126 +956,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     else
                     {
                         xCopyFile.SetAttributeValue("DestinationProperty", destination);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Finalize the FamilyFileRanges table.
-        /// </summary>
-        /// <param name="tables">The collection of all tables.</param>
-        private void FinalizeFamilyFileRangesTable(TableIndexedCollection tables)
-        {
-            var familyFileRangesTable = tables["FamilyFileRanges"];
-            if (null != familyFileRangesTable)
-            {
-                foreach (var row in familyFileRangesTable.Rows)
-                {
-                    var xProtectRange = new XElement(Names.ProtectRangeElement);
-
-                    if (!row.IsColumnNull(2) && !row.IsColumnNull(3))
-                    {
-                        var retainOffsets = row.FieldAsString(2).Split(',');
-                        var retainLengths = row.FieldAsString(3).Split(',');
-
-                        if (retainOffsets.Length == retainLengths.Length)
-                        {
-                            for (var i = 0; i < retainOffsets.Length; i++)
-                            {
-                                if (retainOffsets[i].StartsWith("0x", StringComparison.Ordinal))
-                                {
-                                    xProtectRange.SetAttributeValue("Offset", Convert.ToInt32(retainOffsets[i].Substring(2), 16));
-                                }
-                                else
-                                {
-                                    xProtectRange.SetAttributeValue("Offset", Convert.ToInt32(retainOffsets[i], CultureInfo.InvariantCulture));
-                                }
-
-                                if (retainLengths[i].StartsWith("0x", StringComparison.Ordinal))
-                                {
-                                    xProtectRange.SetAttributeValue("Length", Convert.ToInt32(retainLengths[i].Substring(2), 16));
-                                }
-                                else
-                                {
-                                    xProtectRange.SetAttributeValue("Length", Convert.ToInt32(retainLengths[i], CultureInfo.InvariantCulture));
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // TODO: warn
-                        }
-                    }
-                    else if (!row.IsColumnNull(2) || !row.IsColumnNull(3))
-                    {
-                        // TODO: warn about mismatch between columns
-                    }
-
-                    this.DecompilerHelper.IndexElement(row, xProtectRange);
-                }
-            }
-
-            var usedProtectRanges = new HashSet<XElement>();
-            var externalFilesTable = tables["ExternalFiles"];
-            if (null != externalFilesTable)
-            {
-                foreach (var row in externalFilesTable.Rows)
-                {
-                    if (this.DecompilerHelper.TryGetIndexedElement(row, out var xExternalFile)
-                        && this.DecompilerHelper.TryGetIndexedElement("FamilyFileRanges", row.FieldAsString(0), row.FieldAsString(0), out var xProtectRange))
-                    {
-                        xExternalFile.Add(xProtectRange);
-                        usedProtectRanges.Add(xProtectRange);
-                    }
-                }
-            }
-
-            var targetFiles_OptionalDataTable = tables["TargetFiles_OptionalData"];
-            if (null != targetFiles_OptionalDataTable)
-            {
-                var targetImagesTable = tables["TargetImages"];
-                var targetImageRows = targetImagesTable?.Rows.ToDictionary(row => row.FieldAsString(0));
-
-                var upgradedImagesTable = tables["UpgradedImages"];
-                var upgradedImagesRows = upgradedImagesTable?.Rows.ToDictionary(row => row.FieldAsString(0));
-
-                foreach (var row in targetFiles_OptionalDataTable.Rows)
-                {
-                    var xTargetFile = this.PatchTargetFiles[row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter)];
-
-                    if (!targetImageRows.TryGetValue(row.FieldAsString(0), out var targetImageRow))
-                    {
-                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, targetFiles_OptionalDataTable.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Target", row.FieldAsString(0), "TargetImages"));
-                        continue;
-                    }
-
-                    if (!upgradedImagesRows.TryGetValue(row.FieldAsString(3), out var upgradedImagesRow))
-                    {
-                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(targetImageRow.SourceLineNumbers, targetImageRow.Table.Name, targetImageRow.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Upgraded", row.FieldAsString(3), "UpgradedImages"));
-                        continue;
-                    }
-
-                    if (this.DecompilerHelper.TryGetIndexedElement("FamilyFileRanges", upgradedImagesRow.FieldAsString(4), row.FieldAsString(1), out var xProtectRange))
-                    {
-                        xTargetFile.Add(xProtectRange);
-                        usedProtectRanges.Add(xProtectRange);
-                    }
-                }
-            }
-
-            if (null != familyFileRangesTable)
-            {
-                foreach (var row in familyFileRangesTable.Rows)
-                {
-                    var xProtectRange = this.DecompilerHelper.GetIndexedElement(row);
-
-                    if (!usedProtectRanges.Contains(xProtectRange))
-                    {
-                        var xProtectFile = new XElement(Names.ProtectFileElement, new XAttribute("File", row.FieldAsString(1)));
-                        xProtectFile.Add(xProtectRange);
-
-                        this.AddChildToParent("ImageFamilies", xProtectFile, row, 0);
                     }
                 }
             }
@@ -2640,12 +2510,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     case "Extension":
                         this.DecompileExtensionTable(table);
                         break;
-                    case "ExternalFiles":
-                        this.DecompileExternalFilesTable(table);
-                        break;
-                    case "FamilyFileRanges":
-                        // handled in FinalizeFamilyFileRangesTable
-                        break;
                     case "Feature":
                         this.DecompileFeatureTable(table);
                         break;
@@ -2663,9 +2527,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         break;
                     case "Icon":
                         this.DecompileIconTable(table);
-                        break;
-                    case "ImageFamilies":
-                        this.DecompileImageFamiliesTable(table);
                         break;
                     case "IniFile":
                         this.DecompileIniFileTable(table);
@@ -2764,12 +2625,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     case "ODBCTranslator":
                         this.DecompileODBCTranslatorTable(table);
                         break;
-                    case "PatchMetadata":
-                        this.DecompilePatchMetadataTable(table);
-                        break;
-                    case "PatchSequence":
-                        this.DecompilePatchSequenceTable(table);
-                        break;
                     case "ProgId":
                         this.DecompileProgIdTable(table);
                         break;
@@ -2821,12 +2676,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     case "Signature":
                         this.DecompileSignatureTable(table);
                         break;
-                    case "TargetFiles_OptionalData":
-                        this.DecompileTargetFiles_OptionalDataTable(table);
-                        break;
-                    case "TargetImages":
-                        this.DecompileTargetImagesTable(table);
-                        break;
                     case "TextStyle":
                         this.DecompileTextStyleTable(table);
                         break;
@@ -2835,15 +2684,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         break;
                     case "Upgrade":
                         this.DecompileUpgradeTable(table);
-                        break;
-                    case "UpgradedFiles_OptionalData":
-                        this.DecompileUpgradedFiles_OptionalDataTable(table);
-                        break;
-                    case "UpgradedFilesToIgnore":
-                        this.DecompileUpgradedFilesToIgnoreTable(table);
-                        break;
-                    case "UpgradedImages":
-                        this.DecompileUpgradedImagesTable(table);
                         break;
                     case "UIText":
                         this.DecompileUITextTable(table);
@@ -2924,15 +2764,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 case "UpgradedFiles_OptionalData":
                 case "UpgradedFilesToIgnore":
                 case "UpgradedImages":
-                    if (OutputType.PatchCreation != output.Type)
-                    {
-                        this.Messaging.Write(WarningMessages.SkippingPatchCreationTable(output.SourceLineNumbers, tableName));
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
+                    return false;
                 case "MsiPatchHeaders":
                 case "MsiPatchMetadata":
                 case "MsiPatchOldAssemblyName":
@@ -2948,16 +2780,8 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 case "MsiAssemblyName":
                 case "MsiFileHash":
                     return false;
-                default: // all other tables are allowed in any output except for a patch creation package
-                    if (OutputType.PatchCreation == output.Type)
-                    {
-                        this.Messaging.Write(WarningMessages.IllegalPatchCreationTable(output.SourceLineNumbers, tableName));
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
+                default: // all other tables are allowed in any output.
+                    return true;
             }
         }
 
@@ -4590,74 +4414,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         }
 
         /// <summary>
-        /// Decompile the ExternalFiles table.
-        /// </summary>
-        /// <param name="table">The table to decompile.</param>
-        private void DecompileExternalFilesTable(Table table)
-        {
-            foreach (var row in table.Rows)
-            {
-                var xExternalFile = new XElement(Names.ExternalFileElement,
-                    new XAttribute("File", row.FieldAsString(1)),
-                    new XAttribute("Source", row.FieldAsString(2)));
-
-                AddSymbolPaths(row, 3, xExternalFile);
-
-                if (!row.IsColumnNull(4) && !row.IsColumnNull(5))
-                {
-                    var ignoreOffsets = row.FieldAsString(4).Split(',');
-                    var ignoreLengths = row.FieldAsString(5).Split(',');
-
-                    if (ignoreOffsets.Length == ignoreLengths.Length)
-                    {
-                        for (var i = 0; i < ignoreOffsets.Length; i++)
-                        {
-                            var xIgnoreRange = new XElement(Names.IgnoreRangeElement);
-
-                            if (ignoreOffsets[i].StartsWith("0x", StringComparison.Ordinal))
-                            {
-                                xIgnoreRange.SetAttributeValue("Offset", Convert.ToInt32(ignoreOffsets[i].Substring(2), 16));
-                            }
-                            else
-                            {
-                                xIgnoreRange.SetAttributeValue("Offset", Convert.ToInt32(ignoreOffsets[i], CultureInfo.InvariantCulture));
-                            }
-
-                            if (ignoreLengths[i].StartsWith("0x", StringComparison.Ordinal))
-                            {
-                                xIgnoreRange.SetAttributeValue("Length", Convert.ToInt32(ignoreLengths[i].Substring(2), 16));
-                            }
-                            else
-                            {
-                                xIgnoreRange.SetAttributeValue("Length", Convert.ToInt32(ignoreLengths[i], CultureInfo.InvariantCulture));
-                            }
-
-                            xExternalFile.Add(xIgnoreRange);
-                        }
-                    }
-                    else
-                    {
-                        // TODO: warn
-                    }
-                }
-                else if (!row.IsColumnNull(4) || !row.IsColumnNull(5))
-                {
-                    // TODO: warn about mismatch between columns
-                }
-
-                // the RetainOffsets column is handled in FinalizeFamilyFileRangesTable
-
-                if (!row.IsColumnNull(7))
-                {
-                    xExternalFile.SetAttributeValue("Order", row.FieldAsInteger(7));
-                }
-
-                this.AddChildToParent("ImageFamilies", xExternalFile, row, 0);
-                this.DecompilerHelper.IndexElement(row, xExternalFile);
-            }
-        }
-
-        /// <summary>
         /// Decompile the Feature table.
         /// </summary>
         /// <param name="table">The table to decompile.</param>
@@ -4884,27 +4640,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     new XAttribute("SourceFile", row.FieldAsString(1)));
 
                 this.DecompilerHelper.AddElementToRoot(icon);
-            }
-        }
-
-        /// <summary>
-        /// Decompile the ImageFamilies table.
-        /// </summary>
-        /// <param name="table">The table to decompile.</param>
-        private void DecompileImageFamiliesTable(Table table)
-        {
-            foreach (var row in table.Rows)
-            {
-                var family = new XElement(Names.FamilyElement,
-                    new XAttribute("Name", row.FieldAsString(0)),
-                    row.IsColumnNull(1) ? null : new XAttribute("MediaSrcProp", row.FieldAsString(1)),
-                    row.IsColumnNull(2) ? null : new XAttribute("DiskId", row.FieldAsString(2)),
-                    row.IsColumnNull(3) ? null : new XAttribute("SequenceStart", row.FieldAsString(3)),
-                    row.IsColumnNull(4) ? null : new XAttribute("DiskPrompt", row.FieldAsString(4)),
-                    row.IsColumnNull(5) ? null : new XAttribute("VolumeLabel", row.FieldAsString(5)));
-
-                this.DecompilerHelper.AddElementToRoot(family);
-                this.DecompilerHelper.IndexElement(row, family);
             }
         }
 
@@ -5871,156 +5606,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     XAttributeIfNotNull("SetupFile", row, 4));
 
                 this.AddChildToParent("Component", xOdbcTranslator, row, 1);
-            }
-        }
-
-        /// <summary>
-        /// Decompile the PatchMetadata table.
-        /// </summary>
-        /// <param name="table">The table to decompile.</param>
-        private void DecompilePatchMetadataTable(Table table)
-        {
-            if (0 < table.Rows.Count)
-            {
-                var xPatchMetadata = new XElement(Names.PatchMetadataElement);
-
-                foreach (var row in table.Rows)
-                {
-                    var value = row.FieldAsString(2);
-
-                    switch (row.FieldAsString(1))
-                    {
-                        case "AllowRemoval":
-                            if ("1" == value)
-                            {
-                                xPatchMetadata.SetAttributeValue("AllowRemoval", "yes");
-                            }
-                            break;
-                        case "Classification":
-                            if (null != value)
-                            {
-                                xPatchMetadata.SetAttributeValue("Classification", value);
-                            }
-                            break;
-                        case "CreationTimeUTC":
-                            if (null != value)
-                            {
-                                xPatchMetadata.SetAttributeValue("CreationTimeUTC", value);
-                            }
-                            break;
-                        case "Description":
-                            if (null != value)
-                            {
-                                xPatchMetadata.SetAttributeValue("Description", value);
-                            }
-                            break;
-                        case "DisplayName":
-                            if (null != value)
-                            {
-                                xPatchMetadata.SetAttributeValue("DisplayName", value);
-                            }
-                            break;
-                        case "ManufacturerName":
-                            if (null != value)
-                            {
-                                xPatchMetadata.SetAttributeValue("ManufacturerName", value);
-                            }
-                            break;
-                        case "MinorUpdateTargetRTM":
-                            if (null != value)
-                            {
-                                xPatchMetadata.SetAttributeValue("MinorUpdateTargetRTM", value);
-                            }
-                            break;
-                        case "MoreInfoURL":
-                            if (null != value)
-                            {
-                                xPatchMetadata.SetAttributeValue("MoreInfoURL", value);
-                            }
-                            break;
-                        case "OptimizeCA":
-                            var xOptimizeCustomActions = new XElement(Names.OptimizeCustomActionsElement);
-                            var optimizeCA = Int32.Parse(value, CultureInfo.InvariantCulture);
-                            if (0 != (Convert.ToInt32(OptimizeCAFlags.SkipAssignment) & optimizeCA))
-                            {
-                                xOptimizeCustomActions.SetAttributeValue("SkipAssignment", "yes");
-                            }
-
-                            if (0 != (Convert.ToInt32(OptimizeCAFlags.SkipImmediate) & optimizeCA))
-                            {
-                                xOptimizeCustomActions.SetAttributeValue("SkipImmediate", "yes");
-                            }
-
-                            if (0 != (Convert.ToInt32(OptimizeCAFlags.SkipDeferred) & optimizeCA))
-                            {
-                                xOptimizeCustomActions.SetAttributeValue("SkipDeferred", "yes");
-                            }
-
-                            xPatchMetadata.Add(xOptimizeCustomActions);
-                            break;
-                        case "OptimizedInstallMode":
-                            if ("1" == value)
-                            {
-                                xPatchMetadata.SetAttributeValue("OptimizedInstallMode", "yes");
-                            }
-                            break;
-                        case "TargetProductName":
-                            if (null != value)
-                            {
-                                xPatchMetadata.SetAttributeValue("TargetProductName", value);
-                            }
-                            break;
-                        default:
-                            var xCustomProperty = new XElement(Names.CustomPropertyElement,
-                                XAttributeIfNotNull("Company", row, 0),
-                                XAttributeIfNotNull("Property", row, 1),
-                                XAttributeIfNotNull("Value", row, 2));
-
-                            xPatchMetadata.Add(xCustomProperty);
-                            break;
-                    }
-                }
-
-                this.DecompilerHelper.AddElementToRoot(xPatchMetadata);
-            }
-        }
-
-        /// <summary>
-        /// Decompile the PatchSequence table.
-        /// </summary>
-        /// <param name="table">The table to decompile.</param>
-        private void DecompilePatchSequenceTable(Table table)
-        {
-            foreach (var row in table.Rows)
-            {
-                var patchSequence = new XElement(Names.PatchSequenceElement,
-                    new XAttribute("PatchFamily", row.FieldAsString(0)));
-
-                if (!row.IsColumnNull(1))
-                {
-                    try
-                    {
-                        var guid = new Guid(row.FieldAsString(1));
-
-                        patchSequence.SetAttributeValue("ProductCode", row.FieldAsString(1));
-                    }
-                    catch // non-guid value
-                    {
-                        patchSequence.SetAttributeValue("TargetImage", row.FieldAsString(1));
-                    }
-                }
-
-                if (!row.IsColumnNull(2))
-                {
-                    patchSequence.SetAttributeValue("Sequence", row.FieldAsString(2));
-                }
-
-                if (!row.IsColumnNull(3) && 0x1 == row.FieldAsInteger(3))
-                {
-                    patchSequence.SetAttributeValue("Supersede", "yes");
-                }
-
-                this.DecompilerHelper.AddElementToRoot(patchSequence);
             }
         }
 
@@ -7072,105 +6657,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         }
 
         /// <summary>
-        /// Decompile the TargetFiles_OptionalData table.
-        /// </summary>
-        /// <param name="table">The table to decompile.</param>
-        private void DecompileTargetFiles_OptionalDataTable(Table table)
-        {
-            foreach (var row in table.Rows)
-            {
-                if (!this.PatchTargetFiles.TryGetValue(row.FieldAsString(0), out var xPatchTargetFile))
-                {
-                    xPatchTargetFile = new XElement(Names.TargetFileElement,
-                        new XAttribute("Id", row.FieldAsString(1)));
-
-                    if (this.DecompilerHelper.TryGetIndexedElement("TargetImages", row.FieldAsString(0), out var xTargetImage))
-                    {
-                        xTargetImage.Add(xPatchTargetFile);
-                    }
-                    else
-                    {
-                        this.Messaging.Write(WarningMessages.ExpectedForeignRow(row.SourceLineNumbers, table.Name, row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), "Target", row.FieldAsString(0), "TargetImages"));
-                    }
-
-                    this.PatchTargetFiles.Add(row.GetPrimaryKey(DecompilerConstants.PrimaryKeyDelimiter), xPatchTargetFile);
-                }
-
-                AddSymbolPaths(row, 2, xPatchTargetFile);
-
-                if (!row.IsColumnNull(3) && !row.IsColumnNull(4))
-                {
-                    var ignoreOffsets = row.FieldAsString(3).Split(',');
-                    var ignoreLengths = row.FieldAsString(4).Split(',');
-
-                    if (ignoreOffsets.Length == ignoreLengths.Length)
-                    {
-                        for (var i = 0; i < ignoreOffsets.Length; i++)
-                        {
-                            var xIgnoreRange = new XElement(Names.IgnoreRangeElement);
-
-                            if (ignoreOffsets[i].StartsWith("0x", StringComparison.Ordinal))
-                            {
-                                xIgnoreRange.SetAttributeValue("Offset", Convert.ToInt32(ignoreOffsets[i].Substring(2), 16));
-                            }
-                            else
-                            {
-                                xIgnoreRange.SetAttributeValue("Offset", Convert.ToInt32(ignoreOffsets[i], CultureInfo.InvariantCulture));
-                            }
-
-                            if (ignoreLengths[i].StartsWith("0x", StringComparison.Ordinal))
-                            {
-                                xIgnoreRange.SetAttributeValue("Length", Convert.ToInt32(ignoreLengths[i].Substring(2), 16));
-                            }
-                            else
-                            {
-                                xIgnoreRange.SetAttributeValue("Length", Convert.ToInt32(ignoreLengths[i], CultureInfo.InvariantCulture));
-                            }
-
-                            xPatchTargetFile.Add(xIgnoreRange);
-                        }
-                    }
-                    else
-                    {
-                        // TODO: warn
-                    }
-                }
-                else if (!row.IsColumnNull(3) || !row.IsColumnNull(4))
-                {
-                    // TODO: warn about mismatch between columns
-                }
-
-                // the RetainOffsets column is handled in FinalizeFamilyFileRangesTable
-            }
-        }
-
-        /// <summary>
-        /// Decompile the TargetImages table.
-        /// </summary>
-        /// <param name="table">The table to decompile.</param>
-        private void DecompileTargetImagesTable(Table table)
-        {
-            foreach (var row in table.Rows)
-            {
-                var xTargetImage = new XElement(Names.TargetImageElement,
-                    new XAttribute("Id", row.FieldAsString(0)),
-                    new XAttribute("SourceFile", row.FieldAsString(1)),
-                    new XAttribute("Order", row.FieldAsInteger(4)),
-                    XAttributeIfNotNull("Validation", row, 5));
-
-                AddSymbolPaths(row, 2, xTargetImage);
-
-                if (0 != row.FieldAsInteger(6))
-                {
-                    xTargetImage.SetAttributeValue("IgnoreMissingFiles", "yes");
-                }
-
-                this.AddChildToParent("UpgradedImages", xTargetImage, row, 3);
-                this.DecompilerHelper.IndexElement(row, xTargetImage);
-            }
-        }
-
-        /// <summary>
         /// Decompile the TextStyle table.
         /// </summary>
         /// <param name="table">The table to decompile.</param>
@@ -7339,77 +6825,6 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
 
                 xUpgrade.Add(xUpgradeVersion);
-            }
-        }
-
-        /// <summary>
-        /// Decompile the UpgradedFiles_OptionalData table.
-        /// </summary>
-        /// <param name="table">The table to decompile.</param>
-        private void DecompileUpgradedFiles_OptionalDataTable(Table table)
-        {
-            foreach (var row in table.Rows)
-            {
-                var xUpgradeFile = new XElement(Names.UpgradeFileElement,
-                    new XAttribute("File", row.FieldAsString(1)),
-                    new XAttribute("Ignore", "no"));
-
-                AddSymbolPaths(row, 2, xUpgradeFile);
-
-                if (!row.IsColumnNull(3) && 1 == row.FieldAsInteger(3))
-                {
-                    xUpgradeFile.SetAttributeValue("AllowIgnoreOnError", "yes");
-                }
-
-                if (!row.IsColumnNull(4) && 0 != row.FieldAsInteger(4))
-                {
-                    xUpgradeFile.SetAttributeValue("WholeFile", "yes");
-                }
-
-                this.AddChildToParent("UpgradedImages", xUpgradeFile, row, 0);
-            }
-        }
-
-        /// <summary>
-        /// Decompile the UpgradedFilesToIgnore table.
-        /// </summary>
-        /// <param name="table">The table to decompile.</param>
-        private void DecompileUpgradedFilesToIgnoreTable(Table table)
-        {
-            foreach (var row in table.Rows)
-            {
-                if ("*" != row.FieldAsString(0))
-                {
-                    var xUpgradeFile = new XElement(Names.UpgradeFileElement,
-                        new XAttribute("File", row.FieldAsString(1)),
-                        new XAttribute("Ignore", "yes"));
-
-                    this.AddChildToParent("UpgradedImages", xUpgradeFile, row, 0);
-                }
-                else
-                {
-                    this.Messaging.Write(WarningMessages.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, row.Fields[0].Column.Name, row[0]));
-                }
-            }
-        }
-
-        /// <summary>
-        /// Decompile the UpgradedImages table.
-        /// </summary>
-        /// <param name="table">The table to decompile.</param>
-        private void DecompileUpgradedImagesTable(Table table)
-        {
-            foreach (var row in table.Rows)
-            {
-                var xUpgradeImage = new XElement(Names.UpgradeImageElement,
-                        new XAttribute("Id", row.FieldAsString(0)),
-                        new XAttribute("SourceFile", row.FieldAsString(1)),
-                        XAttributeIfNotNull("SourcePatch", row, 2));
-
-                AddSymbolPaths(row, 3, xUpgradeImage);
-
-                this.AddChildToParent("ImageFamilies", xUpgradeImage, row, 4);
-                this.DecompilerHelper.IndexElement(row, xUpgradeImage);
             }
         }
 

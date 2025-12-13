@@ -2,10 +2,12 @@
 
 namespace WixToolset.Data
 {
+    using System;
     using WixToolset.Data.Symbols;
 
     public static partial class SymbolDefinitions
     {
+        [Obsolete]
         public static readonly IntermediateSymbolDefinition UpgradedImages = new IntermediateSymbolDefinition(
             SymbolDefinitionType.UpgradedImages,
             new[]
@@ -22,6 +24,9 @@ namespace WixToolset.Data
 
 namespace WixToolset.Data.Symbols
 {
+    using System;
+
+    [Obsolete]
     public enum UpgradedImagesSymbolFields
     {
         Upgraded,
@@ -31,6 +36,7 @@ namespace WixToolset.Data.Symbols
         Family,
     }
 
+    [Obsolete]
     public class UpgradedImagesSymbol : IntermediateSymbol
     {
         public UpgradedImagesSymbol() : base(SymbolDefinitions.UpgradedImages, null, null)

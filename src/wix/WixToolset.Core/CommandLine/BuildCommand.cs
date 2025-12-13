@@ -450,8 +450,6 @@ namespace WixToolset.Core.CommandLine
                     return ".msm";
                 case SectionType.Package:
                     return ".msi";
-                case SectionType.PatchCreation:
-                    return ".pcp";
                 case SectionType.Patch:
                     return ".msp";
                 case SectionType.Fragment:
@@ -473,8 +471,6 @@ namespace WixToolset.Core.CommandLine
                     return ".msm";
                 case OutputType.Patch:
                     return ".msp";
-                case OutputType.PatchCreation:
-                    return ".pcp";
                 case OutputType.Package:
                     return ".msi";
                 case OutputType.Transform:
@@ -785,9 +781,6 @@ namespace WixToolset.Core.CommandLine
                     case "patch":
                     case ".msp":
                         return Data.OutputType.Patch;
-
-                    case ".pcp":
-                        return Data.OutputType.PatchCreation;
 
                     case "product":
                     case "package":

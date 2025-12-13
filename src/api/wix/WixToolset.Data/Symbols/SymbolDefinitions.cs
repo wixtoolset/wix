@@ -4,6 +4,7 @@ namespace WixToolset.Data
 {
     using System;
 
+#pragma warning disable CS0612 // includes some obsolete symbol definitions
     public enum SymbolDefinitionType
     {
         SummaryInformation,
@@ -34,7 +35,9 @@ namespace WixToolset.Data
         Error,
         EventMapping,
         Extension,
+        [Obsolete]
         ExternalFiles,
+        [Obsolete]
         FamilyFileRanges,
         Feature,
         FeatureComponents,
@@ -86,8 +89,10 @@ namespace WixToolset.Data
         ODBCSourceAttribute,
         ODBCTranslator,
         Patch,
+        [Obsolete]
         PatchMetadata,
         PatchPackage,
+        [Obsolete]
         PatchSequence,
         ProgId,
         Properties,
@@ -106,14 +111,19 @@ namespace WixToolset.Data
         Shortcut,
         Signature,
         SoftwareIdentificationTag,
+        [Obsolete]
         TargetFilesOptionalData,
+        [Obsolete]
         TargetImages,
         TextStyle,
         TypeLib,
         UIText,
         Upgrade,
+        [Obsolete]
         UpgradedFilesOptionalData,
+        [Obsolete]
         UpgradedFilesToIgnore,
+        [Obsolete]
         UpgradedImages,
         Verb,
         WixAction,

@@ -1376,29 +1376,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     this.Data.EnsureTable(this.TableDefinitions["ModuleSignature"]);
                     break;
 
-                case OutputType.PatchCreation:
-                    var imageFamiliesCount = this.Data.Tables["ImageFamilies"]?.Rows.Count ?? 0;
-                    var targetImagesCount = this.Data.Tables["TargetImages"]?.Rows.Count ?? 0;
-                    var upgradedImagesCount = this.Data.Tables["UpgradedImages"]?.Rows.Count ?? 0;
-
-                    if (imageFamiliesCount < 1)
-                    {
-                        this.Messaging.Write(ErrorMessages.ExpectedRowInPatchCreationPackage("ImageFamilies"));
-                    }
-
-                    if (targetImagesCount < 1)
-                    {
-                        this.Messaging.Write(ErrorMessages.ExpectedRowInPatchCreationPackage("TargetImages"));
-                    }
-
-                    if (upgradedImagesCount < 1)
-                    {
-                        this.Messaging.Write(ErrorMessages.ExpectedRowInPatchCreationPackage("UpgradedImages"));
-                    }
-
-                    this.Data.EnsureTable(this.TableDefinitions["Properties"]);
-                    break;
-
                 case OutputType.Package:
                     this.Data.EnsureTable(this.TableDefinitions["File"]);
                     this.Data.EnsureTable(this.TableDefinitions["Media"]);
@@ -1452,28 +1429,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             foreach (var row in table.Rows)
                             {
                                 this.Messaging.Write(ErrorMessages.OverlengthTableNameInProductOrMergeModule(row.SourceLineNumbers, table.Name));
-                            }
-                        }
-                        break;
-
-                    case OutputType.PatchCreation:
-                        if (!table.Definition.Unreal &&
-                            "_SummaryInformation" != table.Name &&
-                            "ExternalFiles" != table.Name &&
-                            "FamilyFileRanges" != table.Name &&
-                            "ImageFamilies" != table.Name &&
-                            "PatchMetadata" != table.Name &&
-                            "PatchSequence" != table.Name &&
-                            "Properties" != table.Name &&
-                            "TargetFiles_OptionalData" != table.Name &&
-                            "TargetImages" != table.Name &&
-                            "UpgradedFiles_OptionalData" != table.Name &&
-                            "UpgradedFilesToIgnore" != table.Name &&
-                            "UpgradedImages" != table.Name)
-                        {
-                            foreach (var row in table.Rows)
-                            {
-                                this.Messaging.Write(ErrorMessages.UnexpectedTableInPatchCreationPackage(row.SourceLineNumbers, table.Name));
                             }
                         }
                         break;
@@ -1607,8 +1562,6 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     return OutputType.Module;
                 case SectionType.Package:
                     return OutputType.Package;
-                case SectionType.PatchCreation:
-                    return OutputType.PatchCreation;
                 case SectionType.Patch:
                     return OutputType.Patch;
 
