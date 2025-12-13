@@ -1346,7 +1346,10 @@
             </xs:enumeration>
             <xs:enumeration value="exists">
               <xs:annotation>
-                <xs:documentation>Saves true if a matching product entry is found; false otherwise.</xs:documentation>
+                <xs:documentation>
+                  [WiX v7 and later]
+                  Saves true if a matching product entry is found (non-absent); false otherwise.
+                </xs:documentation>
               </xs:annotation>
             </xs:enumeration>
           </xs:restriction>
