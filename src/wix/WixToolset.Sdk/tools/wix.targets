@@ -31,11 +31,6 @@
     <WixTasksPath Condition=" '$(WixTasksPath)' == '' ">$(WixBinDir)WixToolset.BuildTasks.dll</WixTasksPath>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(EnableDefaultItems)' == 'true' ">
-    <Compile Include="**/*.wxs" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
-    <EmbeddedResource Include="**/*.wxl" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" Condition=" '$(EnableDefaultEmbeddedResourceItems)' == 'true' " />
-  </ItemGroup>
-
   <ItemGroup>
     <AvailableItemName Include="BindPath;BindVariable;WixLibrary;WixExtension" />
   </ItemGroup>
