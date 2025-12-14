@@ -25,6 +25,18 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
   </PropertyGroup>
 
+  <!-- Default items -->
+  <ItemGroup Condition=" '$(EnableDefaultItems)' == 'true' ">
+    <Compile Include="**/*.wxs" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <EmbeddedResource Include="**/*.wxl" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" Condition=" '$(EnableDefaultEmbeddedResourceItems)' == 'true' " />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(EnableDefaultItems)' == 'true' And '$(EnableDefaultNoneItems)' == 'true' ">
+    <None Include="**/*" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
+    <None Remove="**/*.wxs" />
+    <None Remove="**/*.wxl" />
+    <None Remove="**/*.wxi" />
+  </ItemGroup>
+
   <PropertyGroup>
     <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
     <DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>

@@ -586,6 +586,68 @@ namespace WixToolsetTest.Sdk
         [DataRow(BuildSystem.DotNetCoreSdk)]
         [DataRow(BuildSystem.MSBuild)]
         [DataRow(BuildSystem.MSBuild64)]
+        public void CanBuildWixlibOnlyGoodFiles(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "Wixlib", "WithBadFiles");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "OnlyGoodFiles.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                });
+                result.AssertSuccess();
+
+                var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem);
+                WixAssert.Single(wixBuildCommands);
+
+                var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .Single();
+                WixAssert.StringEqual(@"bin\Release\OnlyGoodFiles.wixlib", path);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
+        public void CanBuildWixlibSkippingBadFiles(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "Wixlib", "WithBadFiles");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "SkipBadFiles.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                });
+                result.AssertSuccess();
+
+                var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem);
+                WixAssert.Single(wixBuildCommands);
+
+                var path = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .Single();
+                WixAssert.StringEqual(@"bin\Release\SkipBadFiles.wixlib", path);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildPackageIncludingSimpleWixlib(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "Wixlib");

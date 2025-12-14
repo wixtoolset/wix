@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Import Project="$(WixMSBuildProps)" />
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Library.wxs" />
+  </ItemGroup>
+
+  <Import Project="$(WixTargetsPath)" />
+</Project>
