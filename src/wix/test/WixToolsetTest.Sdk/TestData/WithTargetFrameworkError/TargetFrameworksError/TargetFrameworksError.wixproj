@@ -1,0 +1,9 @@
+<Project>
+  <Import Project="$(WixMSBuildProps)" />
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <Import Project="$(WixTargetsPath)" />
+</Project>

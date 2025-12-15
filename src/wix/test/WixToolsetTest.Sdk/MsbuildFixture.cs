@@ -850,6 +850,64 @@ namespace WixToolsetTest.Sdk
         [DataRow(BuildSystem.DotNetCoreSdk)]
         [DataRow(BuildSystem.MSBuild)]
         [DataRow(BuildSystem.MSBuild64)]
+        public void CannotBuildWithTargetFrameworks(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "WithTargetFrameworkError");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = Path.Combine(fs.BaseFolder, "TargetFrameworkError");
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var filesFolder = Path.Combine(binFolder, "Release", @"PFiles\");
+                var projectPath = Path.Combine(baseFolder, "TargetFrameworkError.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, [
+                    "-Restore",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                    ]);
+
+                var errors = GetDistinctErrorMessages(result.Output, baseFolder);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"<basefolder>\TargetFrameworkError.wixproj : error WIX9002: The TargetFramework property is not supported by the WiX Toolset. Remove the TargetFramework property from your project and try building again. TargetFramework = net472",
+                }, errors);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
+        public void CannotBuildWithTargetFramework(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "WithTargetFrameworkError");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = Path.Combine(fs.BaseFolder, "TargetFrameworksError");
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var filesFolder = Path.Combine(binFolder, "Release", @"PFiles\");
+                var projectPath = Path.Combine(baseFolder, "TargetFrameworksError.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, [
+                    "-Restore",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                    ]);
+
+                var errors = GetDistinctErrorMessages(result.Output, baseFolder);
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"<basefolder>\TargetFrameworksError.wixproj : error WIX9001: The TargetFrameworks property is not supported by the WiX Toolset. Remove the TargetFrameworks property from your project and try building again. TargetFrameworks = net8.0",
+                }, errors);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildWithWarningWhenExtensionIsMissing(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "WixlibMissingExtension");
