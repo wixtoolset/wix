@@ -178,6 +178,32 @@
     <BindVariable Include="$(WixVariables)"  Condition=" '$(WixVariables)' != '' " />
   </ItemGroup>
 
+
+  <!--
+    ***********************************************************************************************
+    ***********************************************************************************************
+                                                                Restore Section
+    ***********************************************************************************************
+    ***********************************************************************************************
+    -->
+  <Target
+    Name="WixTargetFrameworkCheck"
+    BeforeTargets="_LoadRestoreGraphEntryPoints;CollectPackageReferences;Restore"
+    Condition=" ('$(TargetFrameworks)' != '' and '$(TargetFrameworks)' != 'native') or '$(TargetFramework)' != 'native' ">
+
+    <Error
+      Text="The TargetFrameworks property is not supported by the WiX Toolset. Remove the TargetFrameworks property from your project and try building again. TargetFrameworks = $(TargetFrameworks)"
+      File="$(MSBuildProjectFullPath)"
+      Code="WIX9001"
+      Condition=" '$(TargetFrameworks)' != '' " />
+
+    <Error
+      Text="The TargetFramework property is not supported by the WiX Toolset. Remove the TargetFramework property from your project and try building again. TargetFramework = $(TargetFramework)"
+      File="$(MSBuildProjectFullPath)"
+      Code="WIX9002"
+      Condition=" '$(TargetFramework)' != 'native' " />
+  </Target>
+
   <!--
     ***********************************************************************************************
     ***********************************************************************************************

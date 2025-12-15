@@ -1,0 +1,9 @@
+<Project>
+  <Import Project="$(WixMSBuildProps)" />
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+
+  <Import Project="$(WixTargetsPath)" />
+</Project>
