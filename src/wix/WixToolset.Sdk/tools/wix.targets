@@ -40,6 +40,7 @@
   <UsingTask TaskName="CreateProjectReferenceDefineConstantsAndBindPaths" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="WixAssignCulture" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="ReadTracking" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="ResolveInstallerPlatform" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="ResolveWixReferences" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="WixBuild" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="WindowsInstallerValidation" AssemblyFile="$(WixTasksPath)" />
@@ -165,6 +166,7 @@
 
   <!-- Default Compiler properties. -->
   <PropertyGroup>
+    <_InitialInstallerPlatform>$(InstallerPlatform)</_InitialInstallerPlatform>
     <InstallerPlatform Condition=" '$(InstallerPlatform)' == '' and ('$(Platform)' == '' or '$(Platform)' == 'Win32' or '$(Platform)' == 'AnyCPU' or '$(Platform)' == 'Any CPU') ">x86</InstallerPlatform>
     <InstallerPlatform Condition=" '$(InstallerPlatform)' == '' ">$(Platform)</InstallerPlatform>
   </PropertyGroup>
@@ -202,6 +204,60 @@
       File="$(MSBuildProjectFullPath)"
       Code="WIX9002"
       Condition=" '$(TargetFramework)' != 'native' " />
+  </Target>
+
+  <!--
+    ***********************************************************************************************
+    ***********************************************************************************************
+                                                                Prepare For Build Section
+    ***********************************************************************************************
+    ***********************************************************************************************
+    -->
+  <PropertyGroup>
+    <PrepareForBuildDependsOn>
+      ResolveInstallerPlatform;
+      $(PrepareForBuildDependsOn)
+    </PrepareForBuildDependsOn>
+  </PropertyGroup>
+
+  <!--
+    ================================================================================================
+                                        ResolveInstallerPlatform
+
+    Uses the RuntimeIdentifier to validate and update the InstallerPlatform. If the RuntimeIdentifier is
+    not provided, the InstallerPlatform will continue to mirror the Platform.
+
+    [IN]
+    $(_InitialInstallerPlatform) - Set if InstallerPlatform was explcitly defined in project.
+    $(InstallerPlatform) - InstallerPlatform calculated from initial value of Platform.
+    $(RuntimeIdentfier) - Optional runtime identifier for output.
+    $(Platform) - Optional platform for output.
+
+    [OUT]
+    $(InstallerPlatform) - InstallerPlatform resolved based on the inputs.
+    $(PlatformName) - Potentially updates Platform name if Platform is generic and the RuntimeIdentifier
+                      changes the InstallerPlatform.
+    ================================================================================================
+    -->
+  <Target
+    Name="ResolveInstallerPlatform"
+    Returns="$(InstallerPlatform)">
+
+    <ResolveInstallerPlatform
+        RuntimeIdentifier="$(RuntimeIdentifier)"
+        InitialInstallerPlatform="$(_InitialInstallerPlatform)"
+        InstallerPlatform="$(InstallerPlatform)"
+        Platform="$(Platform)">
+      <Output TaskParameter="ResolvedInstallerPlatform"
+              PropertyName="_ResolvedInstallerPlatform" />
+      <Output TaskParameter="ResolvedPlatform"
+              PropertyName="_ResolvedPlatform" />
+    </ResolveInstallerPlatform>
+
+    <PropertyGroup>
+      <InstallerPlatform>$(_ResolvedInstallerPlatform)</InstallerPlatform>
+      <PlatformName Condition=" '$(_ResolvedPlatform)' != '' and '$(PlatformName)' == '$(Platform)' ">$(_ResolvedPlatform)</PlatformName>
+    </PropertyGroup>
   </Target>
 
   <!--

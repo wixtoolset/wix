@@ -2,7 +2,9 @@
   <Settings>
     <HiddenComponentWarnings />
     <IgnoredTests>
-      <AllTestsSelector />
+      <FixtureTestSelector>
+        <FixtureName>WixToolsetTest.BuildTasks.WixBuildTaskFixture</FixtureName>
+      </FixtureTestSelector>
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>

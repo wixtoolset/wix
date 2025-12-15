@@ -7,9 +7,9 @@
     </StandardDirectory>
 
     <Feature Id='Main' Title='WpfApp'>
-      <Component Directory='ApplicationFolder'>
-        <File Source='CsprojWpfNetCore.exe' />
-      </Component>
+      <Files Directory='ApplicationFolder' Include='!(bindpath.CsprojWpfNetCore)\**'>
+        <Exclude Files="**\*.pdb" />
+      </Files>
     </Feature>
   </Package>
 </Wix>

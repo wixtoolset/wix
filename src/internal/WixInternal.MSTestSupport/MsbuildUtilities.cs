@@ -30,7 +30,8 @@ namespace WixInternal.MSTestSupport
 
             if (binlog)
             {
-                MsbuildUtilities.GetQuotedSwitch(buildSystem, "bl", Path.ChangeExtension(projectPath, ".binlog"));
+                var binlogSwitch = MsbuildUtilities.GetQuotedSwitch(buildSystem, "bl", Path.ChangeExtension(projectPath, ".binlog"));
+                allArgs.Add(binlogSwitch);
             }
 
             if (arguments != null)

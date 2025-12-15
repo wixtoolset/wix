@@ -12,6 +12,9 @@ namespace WixToolsetTest.Sdk
     using System.Linq;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using WixInternal.MSTestSupport;
+    using WixToolset.Data;
+    using WixToolset.Data.Symbols;
+    using WixToolset.Data.WindowsInstaller.Rows;
 
     [TestClass]
     public class MsbuildFixture
@@ -641,6 +644,42 @@ namespace WixToolsetTest.Sdk
                     .Select(s => s.Substring(baseFolder.Length + 1))
                     .Single();
                 WixAssert.StringEqual(@"bin\Release\SkipBadFiles.wixlib", path);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
+        public void CanBuildWixlibWithRid(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "Wixlib", "WithBadFiles");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var projectPath = Path.Combine(baseFolder, "SkipBadFiles.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    "-p:RuntimeIdentifier=win-arm64",
+                });
+                result.AssertSuccess();
+
+                var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem);
+                WixAssert.Single(wixBuildCommands);
+
+                var wixlib = Intermediate.Load(Path.Combine(binFolder, "Release", "SkipBadFiles.wixlib"));
+                var properties = wixlib.Sections.SelectMany(s => s.Symbols).OfType<PropertySymbol>().ToList();
+                WixAssert.CompareLineByLine(
+                [
+                    "Property sysBUILDARCH=arm64",
+                    "Property Platform=arm64",
+                    "Property InstallerPlatform=arm64"
+                ], [.. properties.Select(p => $"Property {p.Id.Id}={p.Value}")]);
             }
         }
 
