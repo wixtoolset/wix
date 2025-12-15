@@ -364,7 +364,26 @@ namespace WixToolset.BuildTasks
                     }
                 }
 
-                return new ProjectReferenceFacade(projectReference, configurations, null, platforms, null, targetFrameworks, null, runtimeIdentifiersValue.Values, null, publishBaseDir);
+                // If the Properties metadata is specified MSBuild will not use TargetFramework inference and require explicit declaration of
+                // our expansions (Configurations, Platforms, TargetFrameworks, RuntimeIdentifiers). Rather that try to interoperate, we'll
+                // warn the user that we're disabling our expansion behavior.
+                var propertiesValue = projectReference.GetMetadata("Properties");
+
+                if (!String.IsNullOrWhiteSpace(propertiesValue) && (configurationsValue.HadValue || platformsValue.HadValue || targetFrameworksValue.HadValue || runtimeIdentifiersValue.HadValue))
+                {
+                    logger.LogWarning(
+                        "ProjectReference '{0}' specifies 'Properties' metadata. " +
+                        "That overrides ProjectReference expansion so the 'Configurations', 'Platforms', 'TargetFrameworks', and 'RuntimeIdentifiers' metadata was ignored. " +
+                        "Instead, use the 'AdditionalProperties' metadata to pass properties to the referenced project without disabling ProjectReference expansion.",
+                        projectReference.ItemSpec);
+
+                    // Return a facade that does not participate in expansion.
+                    return new ProjectReferenceFacade(projectReference, Array.Empty<string>(), null, Array.Empty<string>(), null, Array.Empty<string>(), null, Array.Empty<string>(), null, publishBaseDir);
+                }
+                else
+                {
+                    return new ProjectReferenceFacade(projectReference, configurations, null, platforms, null, targetFrameworks, null, runtimeIdentifiersValue.Values, null, publishBaseDir);
+                }
             }
 
             public string CalculatePublishDir()

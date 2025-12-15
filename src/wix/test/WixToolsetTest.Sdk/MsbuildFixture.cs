@@ -14,7 +14,6 @@ namespace WixToolsetTest.Sdk
     using WixInternal.MSTestSupport;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
-    using WixToolset.Data.WindowsInstaller.Rows;
 
     [TestClass]
     public class MsbuildFixture
@@ -811,6 +810,36 @@ namespace WixToolsetTest.Sdk
                     @"net8_x64\e_sqlite3.dll - 1601536",
                     @"net8_x86\e_sqlite3.dll - 1207296",
                 }, releaseFileSizes);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
+        public void CanBuildUsingExplicitProperties(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "MultiTargetingWixlib");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = Path.Combine(fs.BaseFolder, "PackageUsingExplicitProperties");
+                var binFolder = Path.Combine(baseFolder, @"bin\");
+                var filesFolder = Path.Combine(binFolder, "Release", @"PFiles\");
+                var projectPath = Path.Combine(baseFolder, "PackageUsingExplicitProperties.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, [
+                    "-Restore",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath)
+                    ]);
+                result.AssertSuccess();
+
+                var warnings = result.Output.Where(line => line.Contains(": warning")).Select(line => ExtractWarningFromMessage(line, baseFolder)).Distinct().ToArray();
+                WixAssert.CompareLineByLine(
+                [
+                    @": ProjectReference '..\TestExe\TestExe.csproj' specifies 'Properties' metadata. That overrides ProjectReference expansion so the 'Configurations', 'Platforms', 'TargetFrameworks', and 'RuntimeIdentifiers' metadata was ignored. Instead, use the 'AdditionalProperties' metadata to pass properties to the referenced project without disabling ProjectReference expansion.",
+                ], warnings);
             }
         }
 
