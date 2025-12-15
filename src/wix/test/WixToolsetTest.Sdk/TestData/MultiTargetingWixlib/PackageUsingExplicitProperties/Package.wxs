@@ -1,0 +1,15 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Name="Test Package" Manufacturer="~Test" Version="0" Compressed="false" UpgradeCode="11111111-1111-1111-1111-111111111111">
+        <Feature Id="Main">
+            <ComponentGroupRef Id="Stuff"/>
+        </Feature>
+    </Package>
+
+    <Fragment>
+        <ComponentGroup Id="Stuff" Directory="ProgramFilesFolder">
+            <Component Subdirectory="net8_x64">
+                <File Id="net8_x64" Source="!(bindpath.TestExe)\e_sqlite3.dll" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
