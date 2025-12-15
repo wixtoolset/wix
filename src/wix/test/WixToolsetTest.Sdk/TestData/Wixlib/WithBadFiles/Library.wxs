@@ -1,7 +1,7 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>
-      <StandardDirectory Id="ProgramFilesFolder">
-          <Directory Id="WixLibFolder" />
-      </StandardDirectory>
+    <Property Id="sysBUILDARCH" Value="$(sys.BUILDARCH)" />
+    <Property Id="Platform" Value="$(Platform)" />
+    <Property Id="InstallerPlatform" Value="$(InstallerPlatform)" />
   </Fragment>
 </Wix>
