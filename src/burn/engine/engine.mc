@@ -1282,3 +1282,10 @@ Language=English
 Skipping MSI property '%1!ls!' because condition '%2!ls!' evaluates to %3!hs!.
 .
 
+
+MessageId=701
+Severity=Warning
+SymbolicName=MSG_DEPENDENCY_PACKAGE_DEPENDENTS_OVERRIDDEN
+Language=English
+BA requested to uninstall package: %1!ls!, despite dependents:
+.
