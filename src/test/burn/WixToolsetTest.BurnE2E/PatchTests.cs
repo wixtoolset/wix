@@ -19,11 +19,41 @@ namespace WixToolsetTest.BurnE2E
             var testBAController = this.CreateTestBAController();
             testBAController.SetRedetectCount(1);
 
-            this.CanInstallBundleWithPatchThenRemoveIt();
+            this.CanInstallBundleThenPatchThenRemovePatch();
         }
 
         [RuntimeFact]
-        public void CanInstallBundleWithPatchThenRemoveIt()
+        public void CanInstallBundleThenPatchThenRemoveBase()
+        {
+            var originalVersion = "1.0.0.0";
+            var patchedVersion = "1.0.1.0";
+            var testRegistryValue = "PackageA";
+
+            var packageAv1 = this.CreatePackageInstaller("PackageAv1");
+            var bundleA = this.CreateBundleInstaller("BundleA");
+            var bundlePatchA = this.CreateBundleInstaller("BundlePatchA");
+
+            bundleA.Install();
+            bundleA.VerifyRegisteredAndInPackageCache();
+
+            packageAv1.VerifyInstalled(true);
+            packageAv1.VerifyTestRegistryValue(testRegistryValue, originalVersion);
+
+            bundlePatchA.Install();
+            bundlePatchA.VerifyRegisteredAndInPackageCache();
+
+            packageAv1.VerifyTestRegistryValue(testRegistryValue, patchedVersion);
+
+            bundleA.Uninstall();
+            bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
+            bundlePatchA.VerifyUnregisteredAndRemovedFromPackageCache();
+
+            packageAv1.VerifyInstalled(false);
+            packageAv1.VerifyTestRegistryRootDeleted();
+        }
+
+        [RuntimeFact]
+        public void CanInstallBundleThenPatchThenRemovePatch()
         {
             var originalVersion = "1.0.0.0";
             var patchedVersion = "1.0.1.0";
