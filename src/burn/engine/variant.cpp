@@ -10,6 +10,9 @@ static HRESULT GetVersionInternal(
     __in BOOL fSilent,
     __out VERUTIL_VERSION** ppValue
     );
+static void FreeVariantValue(
+    __in BURN_VARIANT* pVariant
+    );
 
 // function definitions
 
@@ -17,12 +20,7 @@ extern "C" void BVariantUninitialize(
     __in BURN_VARIANT* pVariant
     )
 {
-    if (BURN_VARIANT_TYPE_FORMATTED == pVariant->Type ||
-        BURN_VARIANT_TYPE_STRING == pVariant->Type)
-    {
-        StrSecureZeroFreeString(pVariant->sczValue);
-    }
-    SecureZeroMemory(pVariant, sizeof(BURN_VARIANT));
+    FreeVariantValue(pVariant);
 }
 
 extern "C" HRESULT BVariantGetNumeric(
@@ -164,12 +162,8 @@ extern "C" HRESULT BVariantSetNumeric(
 {
     HRESULT hr = S_OK;
 
-    if (BURN_VARIANT_TYPE_FORMATTED == pVariant->Type ||
-        BURN_VARIANT_TYPE_STRING == pVariant->Type)
-    {
-        StrSecureZeroFreeString(pVariant->sczValue);
-    }
-    memset(pVariant, 0, sizeof(BURN_VARIANT));
+    FreeVariantValue(pVariant);
+
     pVariant->llValue = llValue;
     pVariant->Type = BURN_VARIANT_TYPE_NUMERIC;
 
@@ -194,7 +188,7 @@ extern "C" HRESULT BVariantSetString(
         if (BURN_VARIANT_TYPE_FORMATTED != pVariant->Type &&
             BURN_VARIANT_TYPE_STRING != pVariant->Type)
         {
-            memset(pVariant, 0, sizeof(BURN_VARIANT));
+            FreeVariantValue(pVariant);
         }
 
         hr = StrAllocStringSecure(&pVariant->sczValue, wzValue, cchValue);
@@ -220,12 +214,8 @@ extern "C" HRESULT BVariantSetVersion(
     }
     else // assign the value.
     {
-        if (BURN_VARIANT_TYPE_FORMATTED == pVariant->Type ||
-            BURN_VARIANT_TYPE_STRING == pVariant->Type)
-        {
-            StrSecureZeroFreeString(pVariant->sczValue);
-        }
-        memset(pVariant, 0, sizeof(BURN_VARIANT));
+        FreeVariantValue(pVariant);
+
         hr = VerCopyVersion(pValue, &pVariant->pValue);
         pVariant->Type = BURN_VARIANT_TYPE_VERSION;
     }
@@ -318,4 +308,21 @@ extern "C" HRESULT BVariantChangeType(
 
 LExit:
     return hr;
+}
+
+static void FreeVariantValue(
+    __in BURN_VARIANT* pVariant
+    )
+{
+    if ((BURN_VARIANT_TYPE_FORMATTED == pVariant->Type || BURN_VARIANT_TYPE_STRING == pVariant->Type) && 
+        pVariant->sczValue)
+    {
+        StrSecureZeroFreeString(pVariant->sczValue);
+    }
+    else if (BURN_VARIANT_TYPE_VERSION == pVariant->Type && pVariant->pValue)
+    {
+        VerFreeVersion(pVariant->pValue);
+    }
+
+    SecureZeroMemory(pVariant, sizeof(BURN_VARIANT));
 }
