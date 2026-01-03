@@ -1508,7 +1508,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
     for (DWORD i = 0; i < pPlan->cExecuteActions; ++i)
     {
         BOOTSTRAPPER_ACTION_STATE packageAction = BOOTSTRAPPER_ACTION_STATE_NONE;
-        BURN_PACKAGE* pPackage = &pPlan->rgExecuteActions[i].relatedBundle.pRelatedBundle->package;
+        BURN_PACKAGE* pPackage = NULL;
         BOOL fBundle = FALSE;
 
         switch (pPlan->rgExecuteActions[i].type)
@@ -1540,7 +1540,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
 
         if (fBundle && BOOTSTRAPPER_ACTION_STATE_NONE != packageAction)
         {
-            if (pPackage->cDependencyProviders)
+            if (pPackage && pPackage->cDependencyProviders)
             {
                 // Bundles only support a single provider key.
                 const BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders;
@@ -2013,6 +2013,7 @@ extern "C" HRESULT PlanRollbackBoundaryComplete(
 
     // Add checkpoints.
     hr = PlanExecuteCheckpoint(pPlan);
+    ExitOnFailure(hr, "Failed to append execute checkpoint for rollback boundary complete.");
 
     // Add complete rollback boundary to execute plan.
     hr = PlanAppendExecuteAction(pPlan, &pExecuteAction);
@@ -2948,9 +2949,9 @@ static void ExecuteActionLog(
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
         LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_DEPENDENCY package id: %ls, bundle provider key: %ls", wzBase, iAction, pAction->packageDependency.pPackage->sczId, pAction->packageDependency.sczBundleProviderKey);
-        for (DWORD j = 0; j < pAction->packageProvider.pPackage->cDependencyProviders; ++j)
+        for (DWORD j = 0; j < pAction->packageDependency.pPackage->cDependencyProviders; ++j)
         {
-            const BURN_DEPENDENCY_PROVIDER* pProvider = pAction->packageProvider.pPackage->rgDependencyProviders + j;
+            const BURN_DEPENDENCY_PROVIDER* pProvider = pAction->packageDependency.pPackage->rgDependencyProviders + j;
             LogStringLine(PlanDumpLevel, "      Provider[%u]: key: %ls, action: %hs", j, pProvider->sczKey, LoggingDependencyActionToString(fRollback ? pProvider->dependentRollback : pProvider->dependentExecute));
         }
         break;

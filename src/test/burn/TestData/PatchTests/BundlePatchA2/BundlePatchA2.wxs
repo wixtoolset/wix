@@ -2,6 +2,8 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Fragment>    
+    <RelatedBundle Code="1fb1f910-dd59-4348-9bfe-5822b5a64108" Action="patch" />
+
     <PackageGroup Id="BundlePackages">
       <MspPackage Id="PatchA" SourceFile="$(var.PatchA.TargetPath)" PerMachine="yes" />
       <MspPackage Id="PatchA2" SourceFile="$(var.PatchA2.TargetPath)" PerMachine="yes" />

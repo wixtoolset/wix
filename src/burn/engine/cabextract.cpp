@@ -833,9 +833,13 @@ static UINT FAR DIAMONDAPI CabWrite(
 
     case BURN_CAB_OPERATION_STREAM_TO_BUFFER:
         // copy to target buffer
-        memcpy_s(pContext->Cabinet.pbTargetBuffer + pContext->Cabinet.iTargetBuffer, pContext->Cabinet.cbTargetBuffer - pContext->Cabinet.iTargetBuffer, pv, cb);
-        pContext->Cabinet.iTargetBuffer += cb;
+        if (memcpy_s(pContext->Cabinet.pbTargetBuffer + pContext->Cabinet.iTargetBuffer, pContext->Cabinet.cbTargetBuffer - pContext->Cabinet.iTargetBuffer, pv, cb))
+        {
+            hr = E_INSUFFICIENT_BUFFER;
+            ExitOnRootFailure(hr, "Failed to copy data to target buffer during cabinet extraction.");
+        }
 
+        pContext->Cabinet.iTargetBuffer += cb;
         cbWrite = cb;
         break;
 

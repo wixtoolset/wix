@@ -449,7 +449,7 @@ extern "C" HRESULT ExeEngineExecutePackage(
 
     if (BURN_EXE_DETECTION_TYPE_ARP == pPackage->Exe.detectionType &&
         (BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->exePackage.action ||
-        BOOTSTRAPPER_ACTION_STATE_INSTALL == pExecuteAction->exePackage.action && fRollback))
+         (BOOTSTRAPPER_ACTION_STATE_INSTALL == pExecuteAction->exePackage.action && fRollback)))
     {
         hr = DetectArpEntry(pPackage, &applyState, &sczArpUninstallString);
         ExitOnFailure(hr, "Failed to query ArpEntry for %hs.", BOOTSTRAPPER_ACTION_STATE_UNINSTALL == pExecuteAction->exePackage.action ? "uninstall" : "install");

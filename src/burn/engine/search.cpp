@@ -334,7 +334,7 @@ extern "C" HRESULT SearchesParseFromXml(
             {
                 pSearch->MsiProductSearch.Type = BURN_MSI_PRODUCT_SEARCH_TYPE_ASSIGNMENT;
             }
-            else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, 0, scz, -1, L"exists", -1))
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"exists", -1, FALSE))
             {
                 pSearch->MsiProductSearch.Type = BURN_MSI_PRODUCT_SEARCH_TYPE_EXISTS;
             }

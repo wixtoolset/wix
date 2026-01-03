@@ -1232,8 +1232,11 @@ HRESULT CoreAppendLogToCommandLine(
     hr = StrAllocConcat(psczCommandLine, szLogArgFormatted, 0);
     ExitOnFailure(hr, "Failed concatenating '-log' to command line");
 
-    hr = StrAllocConcat(psczObfuscatedCommandLine, szLogArgFormatted, 0);
-    ExitOnFailure(hr, "Failed concatenating '-log' to obfuscated command line");
+    if (psczObfuscatedCommandLine)
+    {
+        hr = StrAllocConcat(psczObfuscatedCommandLine, szLogArgFormatted, 0);
+        ExitOnFailure(hr, "Failed concatenating '-log' to obfuscated command line");
+    }
 
 LExit:
     if (rgszArgs)
