@@ -17,8 +17,8 @@
     <String Id="AdvancedWelcomeEulaDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
     <String Id="AdvancedWelcomeEulaDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Ознайомтеся з ліцензійною угодою для програми [ProductName]" />
     <String Id="AdvancedWelcomeEulaDlgLicenseAcceptedCheckBox" Overridable="yes" Value="Я &amp;приймаю умови ліцензійної угоди" />
-    <String Id="AdvancedWelcomeEulaDlgDescriptionPerMachine" Overridable="yes" Value="Щоб інсталювати продукт із параметрами за промовчанням для всіх користувачів, натисніть кнопку &quot;Інсталювати&quot;. Щоб змінити параметри інсталяції, натисніть кнопку &quot;Додатково&quot;." />
-    <String Id="AdvancedWelcomeEulaDlgDescriptionPerUser" Overridable="yes" Value="Щоб інсталювати продукт із параметрами за промовчанням для всіх користувачів, натисніть кнопку &quot;Інсталювати&quot;. Щоб змінити параметри інсталяції, натисніть кнопку &quot;Додатково&quot;." />
+    <String Id="AdvancedWelcomeEulaDlgDescriptionPerMachine" Overridable="yes" Value="Щоб інсталювати продукт із параметрами за замовчуванням для всіх користувачів, натисніть кнопку &quot;Інсталювати&quot;. Щоб змінити параметри інсталяції, натисніть кнопку &quot;Додатково&quot;." />
+    <String Id="AdvancedWelcomeEulaDlgDescriptionPerUser" Overridable="yes" Value="Щоб інсталювати продукт із параметрами за замовчуванням для всіх користувачів, натисніть кнопку &quot;Інсталювати&quot;. Щоб змінити параметри інсталяції, натисніть кнопку &quot;Додатково&quot;." />
     <String Id="AdvancedWelcomeEulaDlgInstall" Overridable="yes" Value="&amp;Інсталювати" />
     <String Id="AdvancedWelcomeEulaDlgAdvanced" Overridable="yes" Value="Д&amp;одатково" />
     <String Id="Advanced_Font_Normal_Size" Overridable="yes" Value="8" />
@@ -49,8 +49,8 @@
     <String Id="CustomizeDlgReset" Overridable="yes" Value="&amp;Скидання" />
     <String Id="CustomizeDlgDiskCost" Overridable="yes" Value="Використання &amp;дискового простору" />
     <String Id="CustomizeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
-    <String Id="CustomizeDlgText" Overridable="yes" Value="Спосіб інсталяції компонентів можна змінити, клацаючи піктограми в дереві нижче." />
-    <String Id="CustomizeDlgDescription" Overridable="yes" Value="Виберіть спосіб інсталяції компонентів." />
+    <String Id="CustomizeDlgText" Overridable="yes" Value="Спосіб інсталяції компонентів можна змінити, натискаючи піктограми в дереві нижче." />
+    <String Id="CustomizeDlgDescription" Overridable="yes" Value="Оберіть спосіб інсталяції компонентів." />
     <String Id="CustomizeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Вибіркова інсталяція" />
     <String Id="CustomizeDlgItemDescription" Overridable="yes" Value="CustomizeDlgItemDescription-CustomizeDlgItemDescription" />
     <String Id="CustomizeDlgItemSize" Overridable="yes" Value="CustomizeDlgItemSize-CustomizeDlgItemSize" />
@@ -59,8 +59,8 @@
 
     <String Id="DiskCostDlg_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
     <String Id="DiskCostDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
-    <String Id="DiskCostDlgText" Overridable="yes" Value="У виділених томах бракує дискового простору для інсталяції вибраних компонентів. Можна видалити з виділених томів кілька файлів, інсталювати менше компонентів або вибрати інші диски призначення." />
-    <String Id="DiskCostDlgDescription" Overridable="yes" Value="Дисковий простір, необхідний для інсталяції вибраних компонентів." />
+    <String Id="DiskCostDlgText" Overridable="yes" Value="У виділених томах бракує дискового простору для інсталяції обраних компонентів. Можна видалити з виділених томів кілька файлів, інсталювати менше компонентів або вибрати інші диски призначення." />
+    <String Id="DiskCostDlgDescription" Overridable="yes" Value="Дисковий простір, необхідний для інсталяції обраних компонентів." />
     <String Id="DiskCostDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Вимоги до дискового простору" />
     <String Id="DiskCostDlgVolumeList" Overridable="yes" Value="{120}{70}{70}{70}{70}" />
 
@@ -83,7 +83,7 @@
     <String Id="FeaturesDlg_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
     <String Id="FeaturesDlgTree" Overridable="yes" Value="Компоненти продукту" />
     <String Id="FeaturesDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
-    <String Id="FeaturesDlgDescription" Overridable="yes" Value="Виберіть спосіб інсталяції компонентів." />
+    <String Id="FeaturesDlgDescription" Overridable="yes" Value="Оберіть спосіб інсталяції компонентів." />
     <String Id="FeaturesDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Компоненти продукту" />
     <String Id="FeaturesDlgItemDescription" Overridable="yes" Value="FeaturesDlgItemDescription" />
     <String Id="FeaturesDlgItemSize" Overridable="yes" Value="FeaturesDlgItemSize" />
@@ -93,14 +93,14 @@
     <String Id="FilesInUse_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
     <String Id="FilesInUseExit" Overridable="yes" Value="Ви&amp;хід" />
     <String Id="FilesInUseBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
-    <String Id="FilesInUseText" Overridable="yes" Value="Наведені нижче застосунки використовують файли, які підлягають оновленню під час цієї інсталяції. Закривши ці застосунки, натисніть кнопку &quot;&amp;Повторити&quot;, щоб продовжити інсталяцію, або кнопку &quot;Закрити&quot;, щоб припинити її." />
+    <String Id="FilesInUseText" Overridable="yes" Value="Наведені нижче додатки використовують файли, що підлягають оновленню під час інсталяції. Закривши ці додатки, натисніть кнопку &quot;&amp;Повторити&quot;, щоб продовжити інсталяцію, або кнопку &quot;Закрити&quot;, щоб припинити її." />
     <String Id="FilesInUseDescription" Overridable="yes" Value="Деякі файли, що підлягають оновленню, зараз використовуються." />
     <String Id="FilesInUseTitle" Overridable="yes" Value="{\WixUI_Font_Title}Файли, які використовуються" />
 
     <String Id="InstallDirDlg_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
     <String Id="InstallDirDlgChange" Overridable="yes" Value="&amp;Змінити..." />
     <String Id="InstallDirDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Папка призначення" />
-    <String Id="InstallDirDlgDescription" Overridable="yes" Value="Для інсталяції в папку за промовчанням натисніть кнопку &quot;Далі&quot;; щоб вибрати іншу папку, натисніть кнопку &quot;Змінити&quot;." />
+    <String Id="InstallDirDlgDescription" Overridable="yes" Value="Для інсталяції в папку за замовчуванням натисніть кнопку &quot;Далі&quot;; щоб вибрати іншу папку, натисніть кнопку &quot;Змінити&quot;." />
     <String Id="InstallDirDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
     <String Id="InstallDirDlgFolderLabel" Overridable="yes" Value="Папка для інсталяції програми [ProductName]:" />
 
@@ -108,16 +108,16 @@
     <String Id="InstallScopeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
     <String Id="InstallScopeDlgDescription" Overridable="yes" Value="Вибір типу й папки для інсталяції" />
     <String Id="InstallScopeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Тип інсталяції" />
-    <String Id="InstallScopeDlgPerUser" Overridable="yes" Value="{\WixUI_Font_Emphasized}Інсталювати &amp;лише для себе ([LogonUser])" />
+    <String Id="InstallScopeDlgPerUser" Overridable="yes" Value="{\WixUI_Font_Emphasized}Інсталювати &amp;для поточного користувача ([LogonUser])" />
     <String Id="InstallScopeDlgPerUserDescription" Overridable="yes" Value="[ProductName] буде інстальовано в папку на рівні користувача; доступ буде можливий лише з вашого облікового запису користувача. Права локального адміністратора не потрібні." />
     <String Id="InstallScopeDlgNoPerUserDescription" Overridable="yes" Value="[ProductName] не підтримує інсталяції на рівні користувача." />
-    <String Id="InstallScopeDlgPerMachine" Overridable="yes" Value="{\WixUI_Font_Emphasized}Інсталювати для всіх користувачів цього &amp;комп’ютера" />
-    <String Id="InstallScopeDlgPerMachineDescription" Overridable="yes" Value="[ProductName] буде інстальовано в папку за промовчанням на рівні комп’ютера; доступ буде можливий для всіх користувачів. Папку за промовчанням для інсталяції можна змінити. Вам необхідні права локального адміністратора." />
+    <String Id="InstallScopeDlgPerMachine" Overridable="yes" Value="{\WixUI_Font_Emphasized}Інсталювати для всіх користувачів цього &amp;комп’ютеру" />
+    <String Id="InstallScopeDlgPerMachineDescription" Overridable="yes" Value="[ProductName] буде інстальовано в папку за замовчуванням на рівні комп’ютеру; доступ буде можливий для всіх користувачів. Папку за замовчуванням для інсталяції можна змінити. Вам необхідні права локального адміністратора." />
     <String Id="InstallScopeDlgFolderLabel" Overridable="yes" Value="&amp;Папка для інсталяції:" />
     <String Id="InstallScopeDlgChange" Overridable="yes" Value="&amp;Змінити..." />
 
     <String Id="InvalidDirDlg_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
-    <String Id="InvalidDirDlgText" Overridable="yes" Value="Каталог для інсталяції має міститися на локальному жорсткому диску." />
+    <String Id="InvalidDirDlgText" Overridable="yes" Value="Каталог для інсталяції має міститись на локальному жорсткому диску." />
     <String Id="InvalidDirDlgIcon" Overridable="yes" Value="WixUI_Ico_Info" />
     <String Id="InvalidDirDlgIconTooltip" Overridable="yes" Value="Піктограма відомостей" />
 
@@ -135,10 +135,10 @@
     <String Id="MaintenanceTypeDlgRemoveButton" Overridable="yes" Value="&amp;Видалити" />
     <String Id="MaintenanceTypeDlgRemoveButtonTooltip" Overridable="yes" Value="Видалити інсталяцію" />
     <String Id="MaintenanceTypeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
-    <String Id="MaintenanceTypeDlgDescription" Overridable="yes" Value="Виберіть операцію, яку потрібно виконати." />
+    <String Id="MaintenanceTypeDlgDescription" Overridable="yes" Value="Оберіть операцію, яку потрібно виконати." />
     <String Id="MaintenanceTypeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Змінити, відновити або видалити інсталяцію" />
     <String Id="MaintenanceTypeDlgChangeText" Overridable="yes" Value="Дає змогу змінити спосіб інсталяції компонентів." />
-    <String Id="MaintenanceTypeDlgChangeDisabledText" Overridable="yes" Value="Для програми [ProductName] немає компонентів, які можна вибрати окремо." />
+    <String Id="MaintenanceTypeDlgChangeDisabledText" Overridable="yes" Value="Для програми [ProductName] немає компонентів, які можна обрати окремо." />
     <String Id="MaintenanceTypeDlgRemoveText" Overridable="yes" Value="Видаляє [ProductName] з комп’ютера." />
     <String Id="MaintenanceTypeDlgRemoveDisabledText" Overridable="yes" Value="Не можна видалити програму [ProductName]." />
     <String Id="MaintenanceTypeDlgRepairText" Overridable="yes" Value="Виправляє помилки останньої інсталяції, відновлюючи втрачені або пошкоджені файли, ярлики й записи реєстру." />
@@ -151,26 +151,26 @@
 
     <String Id="MsiRMFilesInUse_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
     <String Id="MsiRMFilesInUseBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
-    <String Id="MsiRMFilesInUseText" Overridable="yes" Value="Наведені нижче застосунки використовують файли, які підлягають оновленню під час цієї інсталяції. Можна дозволити майстру інсталяції закрити та спробувати перезапустити їх або перезавантажити комп’ютер пізніше." />
+    <String Id="MsiRMFilesInUseText" Overridable="yes" Value="Наведені нижче додатки використовують файли, що підлягають оновленню під час цієї інсталяції. Можна дозволити майстру інсталяції закрити та спробувати перезапустити їх або перезавантажити комп’ютер пізніше." />
     <String Id="MsiRMFilesInUseDescription" Overridable="yes" Value="Деякі файли, що підлягають оновленню, зараз використовуються." />
     <String Id="MsiRMFilesInUseTitle" Overridable="yes" Value="{\WixUI_Font_Title}Файли, які використовуються" />
-    <String Id="MsiRMFilesInUseUseRM" Overridable="yes" Value="&amp;Закрийте ці застосунки та спробуйте їх перезапустити." />
-    <String Id="MsiRMFilesInUseDontUseRM" Overridable="yes" Value="&amp;Не закривати застосунки. Потрібно буде перезавантажити комп’ютер." />
+    <String Id="MsiRMFilesInUseUseRM" Overridable="yes" Value="&amp;Закрийте ці додатки та спробуйте їх перезапустити." />
+    <String Id="MsiRMFilesInUseDontUseRM" Overridable="yes" Value="&amp;Не закривати додатки. Потрібно буде перезавантажити комп’ютер." />
 
     <String Id="OutOfDiskDlg_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
     <String Id="OutOfDiskDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
-    <String Id="OutOfDiskDlgText" Overridable="yes" Value="У виділених томах бракує дискового простору для інсталяції вибраних компонентів. Можна видалити з виділених томів кілька файлів, інсталювати менше компонентів або вибрати інший диск призначення." />
+    <String Id="OutOfDiskDlgText" Overridable="yes" Value="У виділених томах бракує дискового простору для інсталяції обраних компонентів. Можна видалити з виділених томів кілька файлів, інсталювати менше компонентів або обрати інший диск призначення." />
     <String Id="OutOfDiskDlgDescription" Overridable="yes" Value="Обсяг, необхідний для інсталяції, перевищує обсяг вільного дискового простору." />
     <String Id="OutOfDiskDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Бракує дискового простору" />
     <String Id="OutOfDiskDlgVolumeList" Overridable="yes" Value="{120}{70}{70}{70}{70}" />
 
     <String Id="OutOfRbDiskDlg_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
     <String Id="OutOfRbDiskDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
-    <String Id="OutOfRbDiskDlgText" Overridable="yes" Value="У виділених томах бракує дискового простору для інсталяції вибраних компонентів. Можна видалити з виділених томів кілька файлів, інсталювати менше компонентів або вибрати інший диск призначення." />
+    <String Id="OutOfRbDiskDlgText" Overridable="yes" Value="У виділених томах бракує дискового простору для інсталяції обраних компонентів. Можна видалити з виділених томів кілька файлів, інсталювати менше компонентів або обрати інший диск призначення." />
     <String Id="OutOfRbDiskDlgDescription" Overridable="yes" Value="Обсяг, необхідний для інсталяції, перевищує обсяг вільного дискового простору." />
     <String Id="OutOfRbDiskDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Бракує дискового простору" />
     <String Id="OutOfRbDiskDlgVolumeList" Overridable="yes" Value="{120}{70}{70}{70}{70}" />
-    <String Id="OutOfRbDiskDlgText2" Overridable="yes" Value="Інший варіант – вимкнути в інсталяторі функцію відкочування. У такому разі інсталятор не зможе відновити вихідний стан комп’ютера після переривання процесу інсталяції. Щоб погодитися на цей ризик і вимкнути функцію відкочування, натисніть кнопку &quot;Так&quot;." />
+    <String Id="OutOfRbDiskDlgText2" Overridable="yes" Value="Інший варіант – вимкнути в інсталяторі функцію відкочування. У такому разі інсталятор не зможе відновити вихідний стан комп’ютеру після переривання процесу інсталяції. Щоб погодитися на цей ризик і вимкнути функцію відкочування, натисніть кнопку &quot;Так&quot;." />
 
     <String Id="PrepareDlg_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
     <String Id="PrepareDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
@@ -189,7 +189,7 @@
     <String Id="ProgressDlgTitleRemoving" Overridable="yes" Value="{\WixUI_Font_Title}Видалення програми [ProductName]" />
     <String Id="ProgressDlgTextUpdating" Overridable="yes" Value="Зачекайте, доки майстер інсталяції оновить програму [ProductName]." />
     <String Id="ProgressDlgTitleUpdating" Overridable="yes" Value="{\WixUI_Font_Title}Оновлення програми [ProductName]" />
-    <String Id="ProgressDlgProgressBar" Overridable="yes" Value="Перебіг виконання" />
+    <String Id="ProgressDlgProgressBar" Overridable="yes" Value="Виконано" />
     <String Id="ProgressDlgStatusLabel" Overridable="yes" Value="Стан:" />
 
     <String Id="ResumeDlg_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
@@ -207,9 +207,9 @@
     <String Id="SetupTypeDlgCompleteButtonTooltip" Overridable="yes" Value="Повна інсталяція" />
     <String Id="SetupTypeDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
     <String Id="SetupTypeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Title}Вибір типу інсталяції" />
-    <String Id="SetupTypeDlgDescription" Overridable="yes" Value="Виберіть потрібний тип інсталяції" />
+    <String Id="SetupTypeDlgDescription" Overridable="yes" Value="Оберіть потрібний тип інсталяції" />
     <String Id="SetupTypeDlgTypicalText" Overridable="yes" Value="Інсталяція найпоширеніших компонентів програми (рекомендовано для більшості користувачів)." />
-    <String Id="SetupTypeDlgCustomText" Overridable="yes" Value="Можливість вибрати компоненти програми та місце їх інсталяції (рекомендовано для досвідчених користувачів)." />
+    <String Id="SetupTypeDlgCustomText" Overridable="yes" Value="Можливість обрати компоненти програми та місце їх інсталяції (рекомендовано для досвідчених користувачів)." />
     <String Id="SetupTypeDlgCompleteText" Overridable="yes" Value="Інсталяція усіх програмних компонентів (найбільші вимоги до дискового простору)." />
 
     <String Id="UserExit_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
@@ -221,19 +221,19 @@
     <String Id="VerifyReadyDlg_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
     <String Id="VerifyReadyDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
     <String Id="VerifyReadyDlgInstall" Overridable="yes" Value="&amp;Інсталювати" />
-    <String Id="VerifyReadyDlgInstallText" Overridable="yes" Value="Щоб розпочати інсталяцію, натисніть кнопку &quot;Інсталювати&quot;. Щоб перевірити або змінити будь-які настройки інсталяції, натисніть кнопку &quot;Назад&quot;. Щоб закрити майстер, натисніть кнопку &quot;Скасувати&quot;." />
+    <String Id="VerifyReadyDlgInstallText" Overridable="yes" Value="Щоб розпочати інсталяцію, натисніть кнопку &quot;Інсталювати&quot;. Щоб перевірити або змінити будь-які налаштування інсталяції, натисніть кнопку &quot;Назад&quot;. Щоб закрити майстер, натисніть кнопку &quot;Скасувати&quot;." />
     <String Id="VerifyReadyDlgInstallTitle" Overridable="yes" Value="{\WixUI_Font_Title}Усе готово до інсталяції програми [ProductName]" />
     <String Id="VerifyReadyDlgChange" Overridable="yes" Value="&amp;Змінити" />
-    <String Id="VerifyReadyDlgChangeText" Overridable="yes" Value="Щоб розпочати інсталяцію, натисніть кнопку &quot;Змінити&quot;. Щоб перевірити або змінити будь-які настройки інсталяції, натисніть кнопку &quot;Назад&quot;. Щоб закрити майстер, натисніть кнопку &quot;Скасувати&quot;." />
+    <String Id="VerifyReadyDlgChangeText" Overridable="yes" Value="Щоб розпочати інсталяцію, натисніть кнопку &quot;Змінити&quot;. Щоб перевірити або змінити будь-які налаштування інсталяції, натисніть кнопку &quot;Назад&quot;. Щоб закрити майстер, натисніть кнопку &quot;Скасувати&quot;." />
     <String Id="VerifyReadyDlgChangeTitle" Overridable="yes" Value="{\WixUI_Font_Title}Усе готово до змінення програми [ProductName]" />
     <String Id="VerifyReadyDlgRepair" Overridable="yes" Value="Відно&amp;вити" />
-    <String Id="VerifyReadyDlgRepairText" Overridable="yes" Value="Щоб відновити інсталяцію програми [ProductName], натисніть кнопку &quot;Відновити&quot;. Щоб перевірити або змінити будь-які настройки інсталяції, натисніть кнопку &quot;Назад&quot;. Щоб закрити майстер, натисніть кнопку &quot;Скасувати&quot;." />
+    <String Id="VerifyReadyDlgRepairText" Overridable="yes" Value="Щоб відновити інсталяцію програми [ProductName], натисніть кнопку &quot;Відновити&quot;. Щоб перевірити або змінити будь-які налаштування інсталяції, натисніть кнопку &quot;Назад&quot;. Щоб закрити майстер, натисніть кнопку &quot;Скасувати&quot;." />
     <String Id="VerifyReadyDlgRepairTitle" Overridable="yes" Value="{\WixUI_Font_Title}Усе готово до відновлення програми [ProductName]" />
     <String Id="VerifyReadyDlgRemove" Overridable="yes" Value="&amp;Видалити" />
-    <String Id="VerifyReadyDlgRemoveText" Overridable="yes" Value="Щоб видалити програму [ProductName] з цього комп’ютера, натисніть кнопку &quot;Видалити&quot;. Щоб перевірити або змінити будь-які настройки інсталяції, натисніть кнопку &quot;Назад&quot;. Щоб закрити майстер, натисніть кнопку &quot;Скасувати&quot;." />
+    <String Id="VerifyReadyDlgRemoveText" Overridable="yes" Value="Щоб видалити програму [ProductName] з цього комп’ютера, натисніть кнопку &quot;Видалити&quot;. Щоб перевірити або змінити будь-які налаштування інсталяції, натисніть кнопку &quot;Назад&quot;. Щоб закрити майстер, натисніть кнопку &quot;Скасувати&quot;." />
     <String Id="VerifyReadyDlgRemoveTitle" Overridable="yes" Value="{\WixUI_Font_Title}Усе готово до видалення програми [ProductName]" />
     <String Id="VerifyReadyDlgUpdate" Overridable="yes" Value="&amp;Оновити" />
-    <String Id="VerifyReadyDlgUpdateText" Overridable="yes" Value="Щоб оновити програму [ProductName] зі свого комп’ютера, натисніть кнопку &quot;Оновити&quot;. Щоб перевірити або змінити будь-які настройки інсталяції, натисніть кнопку &quot;Назад&quot;. Щоб закрити майстер, натисніть кнопку &quot;Скасувати&quot;." />
+    <String Id="VerifyReadyDlgUpdateText" Overridable="yes" Value="Щоб оновити програму [ProductName] зі свого комп’ютера, натисніть кнопку &quot;Оновити&quot;. Щоб перевірити або змінити будь-які налаштування інсталяції, натисніть кнопку &quot;Назад&quot;. Щоб закрити майстер, натисніть кнопку &quot;Скасувати&quot;." />
     <String Id="VerifyReadyDlgUpdateTitle" Overridable="yes" Value="{\WixUI_Font_Title}Усе готово до оновлення програми [ProductName]" />
 
     <String Id="WaitForCostingDlg_Title" Overridable="yes" Value="Інсталяція програми [ProductName]" />
@@ -258,7 +258,7 @@
     <String Id="ProgressTextInstallValidate" Overridable="yes" Value="Перевірка інсталяції" />
     <String Id="ProgressTextInstallFiles" Overridable="yes" Value="Копіювання нових файлів" />
     <String Id="ProgressTextInstallFilesTemplate" Overridable="yes" Value="Файл: [1], каталог: [9], розмір: [6]" />
-    <String Id="ProgressTextInstallAdminPackage" Overridable="yes" Value="Копіювання файлів мережної інсталяції" />
+    <String Id="ProgressTextInstallAdminPackage" Overridable="yes" Value="Копіювання файлів мережевої інсталяції" />
     <String Id="ProgressTextInstallAdminPackageTemplate" Overridable="yes" Value="Файл: [1], каталог: [9], розмір: [6]" />
     <String Id="ProgressTextFileCost" Overridable="yes" Value="Обчислення потрібного дискового простору" />
     <String Id="ProgressTextCostInitialize" Overridable="yes" Value="Обчислення потрібного дискового простору" />
@@ -266,7 +266,7 @@
     <String Id="ProgressTextCreateShortcuts" Overridable="yes" Value="Створення ярликів" />
     <String Id="ProgressTextCreateShortcutsTemplate" Overridable="yes" Value="Ярлик: [1]" />
     <String Id="ProgressTextPublishComponents" Overridable="yes" Value="Публікація придатних компонентів" />
-    <String Id="ProgressTextPublishComponentsTemplate" Overridable="yes" Value="Ідентифікатор компонента: [1], кваліфікатор: [2]" />
+    <String Id="ProgressTextPublishComponentsTemplate" Overridable="yes" Value="Ідентифікатор компоненту: [1], кваліфікатор: [2]" />
     <String Id="ProgressTextPublishFeatures" Overridable="yes" Value="Публікація функцій продукту" />
     <String Id="ProgressTextPublishFeaturesTemplate" Overridable="yes" Value="Функція: [1]" />
     <String Id="ProgressTextPublishProduct" Overridable="yes" Value="Публікація відомостей про продукт" />
@@ -280,7 +280,7 @@
     <String Id="ProgressTextRegisterProgIdInfoTemplate" Overridable="yes" Value="Ідентифікатор програми: [1]" />
     <String Id="ProgressTextAllocateRegistrySpace" Overridable="yes" Value="Виділення місця в реєстрі" />
     <String Id="ProgressTextAllocateRegistrySpaceTemplate" Overridable="yes" Value="Вільне місце: [1]" />
-    <String Id="ProgressTextAppSearch" Overridable="yes" Value="Пошук інстальованих застосунків" />
+    <String Id="ProgressTextAppSearch" Overridable="yes" Value="Пошук інстальованих додатків" />
     <String Id="ProgressTextAppSearchTemplate" Overridable="yes" Value="Властивість: [1]. Підпис: [2]" />
     <String Id="ProgressTextBindImage" Overridable="yes" Value="Зв’язування виконуваних файлів" />
     <String Id="ProgressTextBindImageTemplate" Overridable="yes" Value="Файл: [1]" />
@@ -291,21 +291,21 @@
     <String Id="ProgressTextDeleteServicesTemplate" Overridable="yes" Value="Служба: [1]" />
     <String Id="ProgressTextDuplicateFiles" Overridable="yes" Value="Створення копій файлів" />
     <String Id="ProgressTextDuplicateFilesTemplate" Overridable="yes" Value="Файл: [1], каталог: [9], розмір: [6]" />
-    <String Id="ProgressTextFindRelatedProducts" Overridable="yes" Value="Пошук пов’язаних застосунків" />
-    <String Id="ProgressTextFindRelatedProductsTemplate" Overridable="yes" Value="Знайдено застосунок: [1]" />
+    <String Id="ProgressTextFindRelatedProducts" Overridable="yes" Value="Пошук пов’язаних додатків" />
+    <String Id="ProgressTextFindRelatedProductsTemplate" Overridable="yes" Value="Знайдено додаток: [1]" />
     <String Id="ProgressTextInstallODBC" Overridable="yes" Value="Інсталяція компонентів ODBC" />
     <String Id="ProgressTextInstallServices" Overridable="yes" Value="Інсталяція нових служб" />
     <String Id="ProgressTextInstallServicesTemplate" Overridable="yes" Value="Служба: [2]" />
     <String Id="ProgressTextLaunchConditions" Overridable="yes" Value="Перевірка умов запуску" />
-    <String Id="ProgressTextMigrateFeatureStates" Overridable="yes" Value="Міграція параметрів компонентів із пов’язаних застосунків" />
+    <String Id="ProgressTextMigrateFeatureStates" Overridable="yes" Value="Міграція параметрів компонентів із пов’язаних додатків" />
     <String Id="ProgressTextMigrateFeatureStatesTemplate" Overridable="yes" Value="Застосунок: [1]" />
     <String Id="ProgressTextMoveFiles" Overridable="yes" Value="Переміщення файлів" />
     <String Id="ProgressTextMoveFilesTemplate" Overridable="yes" Value="Файл: [1], каталог: [9], розмір: [6]" />
     <String Id="ProgressTextPatchFiles" Overridable="yes" Value="Виправлення файлів" />
     <String Id="ProgressTextPatchFilesTemplate" Overridable="yes" Value="Файл: [1], каталог: [2], розмір: [3]" />
     <String Id="ProgressTextProcessComponents" Overridable="yes" Value="Оновлення реєстрації компонентів" />
-    <String Id="ProgressTextRegisterComPlus" Overridable="yes" Value="Реєстрація застосунків і компонентів COM+" />
-    <String Id="ProgressTextRegisterComPlusTemplate" Overridable="yes" Value="Ідентифікатор застосунку: [1]{{, тип застосунку: [2], користувачі: [3], RSN: [4]}}" />
+    <String Id="ProgressTextRegisterComPlus" Overridable="yes" Value="Реєстрація додатків і компонентів COM+" />
+    <String Id="ProgressTextRegisterComPlusTemplate" Overridable="yes" Value="Ідентифікатор додатку: [1]{{, тип застосунку: [2], користувачі: [3], RSN: [4]}}" />
     <String Id="ProgressTextRegisterFonts" Overridable="yes" Value="Реєстрація шрифтів" />
     <String Id="ProgressTextRegisterFontsTemplate" Overridable="yes" Value="Шрифт: [1]" />
     <String Id="ProgressTextRegisterProduct" Overridable="yes" Value="Реєстрація продукту" />
@@ -318,8 +318,8 @@
     <String Id="ProgressTextRemoveDuplicateFilesTemplate" Overridable="yes" Value="Файл: [1], каталог: [9]" />
     <String Id="ProgressTextRemoveEnvironmentStrings" Overridable="yes" Value="Оновлення рядків оточення" />
     <String Id="ProgressTextRemoveEnvironmentStringsTemplate" Overridable="yes" Value="Ім’я: [1], значення: [2], дія [3]" />
-    <String Id="ProgressTextRemoveExistingProducts" Overridable="yes" Value="Видалення застосунків" />
-    <String Id="ProgressTextRemoveExistingProductsTemplate" Overridable="yes" Value="Застосунок: [1], командний рядок: [2]" />
+    <String Id="ProgressTextRemoveExistingProducts" Overridable="yes" Value="Видалення додатків" />
+    <String Id="ProgressTextRemoveExistingProductsTemplate" Overridable="yes" Value="Додаток: [1], командний рядок: [2]" />
     <String Id="ProgressTextRemoveFiles" Overridable="yes" Value="Видалення файлів" />
     <String Id="ProgressTextRemoveFilesTemplate" Overridable="yes" Value="Файл: [1], каталог: [9]" />
     <String Id="ProgressTextRemoveFolders" Overridable="yes" Value="Видалення папок" />
@@ -339,16 +339,16 @@
     <String Id="ProgressTextSetODBCFolders" Overridable="yes" Value="Ініціалізація каталогів ODBC" />
     <String Id="ProgressTextStartServices" Overridable="yes" Value="Запуск служб" />
     <String Id="ProgressTextStartServicesTemplate" Overridable="yes" Value="Служба: [1]" />
-    <String Id="ProgressTextStopServices" Overridable="yes" Value="Зупинення служб" />
+    <String Id="ProgressTextStopServices" Overridable="yes" Value="Зупинка служб" />
     <String Id="ProgressTextStopServicesTemplate" Overridable="yes" Value="Служба: [1]" />
     <String Id="ProgressTextUnpublishComponents" Overridable="yes" Value="Скасування публікації придатних компонентів" />
-    <String Id="ProgressTextUnpublishComponentsTemplate" Overridable="yes" Value="Ідентифікатор компонента: [1], кваліфікатор: [2]" />
+    <String Id="ProgressTextUnpublishComponentsTemplate" Overridable="yes" Value="Ідентифікатор компоненту: [1], кваліфікатор: [2]" />
     <String Id="ProgressTextUnpublishFeatures" Overridable="yes" Value="Скасування публікації функцій продукту" />
     <String Id="ProgressTextUnpublishFeaturesTemplate" Overridable="yes" Value="Функція: [1]" />
     <String Id="ProgressTextUnregisterClassInfo" Overridable="yes" Value="Скасування реєстрації серверів класів" />
     <String Id="ProgressTextUnregisterClassInfoTemplate" Overridable="yes" Value="Ідентифікатор класу: [1]" />
-    <String Id="ProgressTextUnregisterComPlus" Overridable="yes" Value="Скасування реєстрації застосунків і компонентів COM+" />
-    <String Id="ProgressTextUnregisterComPlusTemplate" Overridable="yes" Value="Ідентифікатор застосунку: [1]{{, тип застосунку: [2]}}" />
+    <String Id="ProgressTextUnregisterComPlus" Overridable="yes" Value="Скасування реєстрації додаткыв і компонентів COM+" />
+    <String Id="ProgressTextUnregisterComPlusTemplate" Overridable="yes" Value="Ідентифікатор додатку: [1]{{, тип додатку: [2]}}" />
     <String Id="ProgressTextUnregisterExtensionInfo" Overridable="yes" Value="Скасування реєстрації серверів розширень" />
     <String Id="ProgressTextUnregisterExtensionInfoTemplate" Overridable="yes" Value="Розширення: [1]" />
     <String Id="ProgressTextUnregisterFonts" Overridable="yes" Value="Скасування реєстрації шрифтів" />
@@ -365,15 +365,15 @@
     <String Id="ProgressTextWriteIniValuesTemplate" Overridable="yes" Value="Файл: [1], розділ: [2], ключ: [3], значення: [4]" />
     <String Id="ProgressTextWriteRegistryValues" Overridable="yes" Value="Запис значень до системного реєстру" />
     <String Id="ProgressTextWriteRegistryValuesTemplate" Overridable="yes" Value="Розділ: [1], ім’я: [2], значення: [3]" />
-    <String Id="ProgressTextAdvertise" Overridable="yes" Value="Поширення відомостей про застосунок" />
+    <String Id="ProgressTextAdvertise" Overridable="yes" Value="Поширення відомостей про додаток" />
     <String Id="ProgressTextGenerateScript" Overridable="yes" Value="Створення операцій сценарію для дії:" />
     <String Id="ProgressTextGenerateScriptTemplate" Overridable="yes" Value="[1]" />
     <String Id="ProgressTextInstallSFPCatalogFile" Overridable="yes" Value="Інсталяція системного каталогу" />
     <String Id="ProgressTextInstallSFPCatalogFileTemplate" Overridable="yes" Value="Файл: [1], залежності: [2]" />
     <String Id="ProgressTextMsiPublishAssemblies" Overridable="yes" Value="Публікація відомостей про складання" />
-    <String Id="ProgressTextMsiPublishAssembliesTemplate" Overridable="yes" Value="Контекст застосунку:[1], ім’я складання:[2]" />
+    <String Id="ProgressTextMsiPublishAssembliesTemplate" Overridable="yes" Value="Контекст додатку:[1], ім’я складання:[2]" />
     <String Id="ProgressTextMsiUnpublishAssemblies" Overridable="yes" Value="Скасування публікації відомостей про складання" />
-    <String Id="ProgressTextMsiUnpublishAssembliesTemplate" Overridable="yes" Value="Контекст застосунку:[1], ім’я складання:[2]" />
+    <String Id="ProgressTextMsiUnpublishAssembliesTemplate" Overridable="yes" Value="Контекст додатку:[1], ім’я складання:[2]" />
     <String Id="ProgressTextRollback" Overridable="yes" Value="Відкочування дії:" />
     <String Id="ProgressTextRollbackTemplate" Overridable="yes" Value="[1]" />
     <String Id="ProgressTextRollbackCleanup" Overridable="yes" Value="Видалення резервних файлів" />
@@ -386,7 +386,7 @@
     <String Id="Error1" Overridable="yes" Value="{{Помилка [1]. }}" />
     <String Id="Error2" Overridable="yes" Value="Попередження [1]." />
     <String Id="Error4" Overridable="yes" Value="Повідомлення [1]." />
-    <String Id="Error5" Overridable="yes" Value="Під час інсталяції цього пакета сталася неочікувана помилка інсталятора. Можливо, це вказує на проблему з пакетом. Код помилки – [1]. {{Аргументи: [2], [3], [4]}}" />
+    <String Id="Error5" Overridable="yes" Value="Під час інсталяції цього пакета сталась неочікувана помилка інсталятора. Можливо, це вказує на проблему з пакетом. Код помилки – [1]. {{Аргументи: [2], [3], [4]}}" />
     <String Id="Error7" Overridable="yes" Value="{{Немає місця на диску: }}" />
     <String Id="Error8" Overridable="yes" Value="Дія [Time]: [1]. [2]" />
     <String Id="Error9" Overridable="yes" Value="[ProductName]" />
@@ -397,152 +397,152 @@
     <String Id="Error14" Overridable="yes" Value="Дію почато [Time]: [1]." />
     <String Id="Error15" Overridable="yes" Value="Дію завершено [Time]: [1]. Повернено значення [2]." />
     <String Id="Error16" Overridable="yes" Value="Залишилося часу: {[1] хв. }{[2] сек.}" />
-    <String Id="Error17" Overridable="yes" Value="Бракує пам’яті. Закрийте інші застосунки та повторіть спробу." />
+    <String Id="Error17" Overridable="yes" Value="Бракує пам’яті. Закрийте інші додатки та повторіть спробу." />
     <String Id="Error18" Overridable="yes" Value="Інсталятор не відповідає." />
     <String Id="Error19" Overridable="yes" Value="Інсталятор передчасно припинив роботу." />
-    <String Id="Error20" Overridable="yes" Value="Зачекайте: система Windows настроює програму [ProductName]" />
-    <String Id="Error21" Overridable="yes" Value="Триває збирання потрібних даних..." />
-    <String Id="Error22" Overridable="yes" Value="Триває видалення попередніх версій цього застосунку..." />
-    <String Id="Error23" Overridable="yes" Value="Підготовка до видалення попередніх версій цього застосунку..." />
+    <String Id="Error20" Overridable="yes" Value="Зачекайте: система Windows налаштовує програму [ProductName]" />
+    <String Id="Error21" Overridable="yes" Value="Триває збір потрібних даних..." />
+    <String Id="Error22" Overridable="yes" Value="Триває видалення попередніх версій цього додатку..." />
+    <String Id="Error23" Overridable="yes" Value="Підготовка до видалення попередніх версій цього додатку..." />
     <String Id="Error32" Overridable="yes" Value="Роботу програми інсталяції {[ProductName]} успішно завершено." />
     <String Id="Error33" Overridable="yes" Value="Помилка програми інсталяції {[ProductName]}." />
-    <String Id="Error1101" Overridable="yes" Value="Сталася помилка під час читання з файлу: [2]. {{ Системна помилка [3].}} Переконайтеся, що цей файл існує та доступний." />
-    <String Id="Error1301" Overridable="yes" Value="Не вдалося створити файл &quot;[2]&quot;. Каталог із таким іменем уже існує. Скасуйте інсталяцію та виберіть інше розташування." />
+    <String Id="Error1101" Overridable="yes" Value="Сталась помилка під час читання з файлу: [2]. {{ Системна помилка [3].}} Переконайтеся, що цей файл існує та доступний." />
+    <String Id="Error1301" Overridable="yes" Value="Не вдалось створити файл &quot;[2]&quot;. Каталог з таким іменем уже існує. Скасуйте інсталяцію та оберіть інше розташування." />
     <String Id="Error1302" Overridable="yes" Value="Вставте диск: [2]" />
-    <String Id="Error1303" Overridable="yes" Value="Інсталятор не має належних прав доступу до цього каталогу: [2]. Продовження інсталяції неможливе. Ввійдіть до системи як адміністратор або зверніться до системного адміністратора." />
-    <String Id="Error1304" Overridable="yes" Value="Помилка під час записування до файлу: [2]. Переконайтеся, що маєте доступ до цього каталогу." />
-    <String Id="Error1305" Overridable="yes" Value="Сталася помилка під час читання з файлу [2]. {{ Системна помилка [3].}} Переконайтеся, що цей файл існує та доступний." />
-    <String Id="Error1306" Overridable="yes" Value="Файл &quot;[2]&quot; відкрито в режимі монопольного доступу в іншому застосунку. Закрийте всі інші застосунки й натисніть кнопку &quot;Повторити&quot;." />
+    <String Id="Error1303" Overridable="yes" Value="Інсталятор не має належних прав доступу до цього каталогу: [2]. Продовження інсталяції неможливе. Увійдіть до системи як адміністратор або зверніться до системного адміністратора." />
+    <String Id="Error1304" Overridable="yes" Value="Помилка під час записування до файлу: [2]. Переконайтесь, що маєте доступ до цього каталогу." />
+    <String Id="Error1305" Overridable="yes" Value="Сталась помилка під час читання з файлу [2]. {{ Системна помилка [3].}} Переконайтесь, що цей файл існує та доступний." />
+    <String Id="Error1306" Overridable="yes" Value="Файл &quot;[2]&quot; відкрито в режимі монопольного доступу в іншому додатку. Закрийте всі інші додатки й натисніть кнопку &quot;Повторити&quot;." />
     <String Id="Error1307" Overridable="yes" Value="Недостатньо місця на диску для інсталяції файлу: [2]. Звільніть місце й натисніть кнопку &quot;Повторити&quot; або натисніть кнопку &quot;Скасувати&quot;, щоб вийти." />
-    <String Id="Error1308" Overridable="yes" Value="Вихідний файл не знайдено: [2]. Переконайтеся, що цей файл існує та доступний." />
-    <String Id="Error1309" Overridable="yes" Value="Сталася помилка під час читання з файлу: [3]. {{ Системна помилка [2].}} Переконайтеся, що цей файл існує та доступний." />
-    <String Id="Error1310" Overridable="yes" Value="Помилка під час записування до файлу: [3]. {{ Системна помилка [2].}} Переконайтеся, що маєте доступ до цього каталогу." />
-    <String Id="Error1311" Overridable="yes" Value="Вихідний файл не знайдено{{(CAB-файл)}}: [2]. Переконайтеся, що цей файл існує та доступний." />
-    <String Id="Error1312" Overridable="yes" Value="Не вдалося створити каталог &quot;[2]&quot;. Файл із таким іменем уже існує. Перейменуйте або видаліть цей файл і натисніть кнопку &quot;Повторити&quot;. Щоб вийти, натисніть кнопку &quot;Скасувати&quot;." />
-    <String Id="Error1313" Overridable="yes" Value="Том [2] зараз недоступний. Виберіть інший." />
-    <String Id="Error1314" Overridable="yes" Value="Указаний шлях &quot;[2]&quot; недоступний." />
-    <String Id="Error1315" Overridable="yes" Value="Не вдалося записати до вказаної папки: [2]." />
-    <String Id="Error1316" Overridable="yes" Value="Сталася мережна помилка під час спроби читання файлу: [2]" />
-    <String Id="Error1317" Overridable="yes" Value="Сталася помилка під час спроби створення каталогу: [2]" />
-    <String Id="Error1318" Overridable="yes" Value="Сталася мережна помилка під час спроби створення каталогу: [2]" />
-    <String Id="Error1319" Overridable="yes" Value="Сталася мережна помилка під час спроби відкрити CAB-файл із вихідними файлами: [2]" />
-    <String Id="Error1320" Overridable="yes" Value="Указано задовгий шлях: [2]" />
+    <String Id="Error1308" Overridable="yes" Value="Вихідний файл не знайдено: [2]. Переконайтесь, що цей файл існує та доступний." />
+    <String Id="Error1309" Overridable="yes" Value="Сталась помилка під час читання з файлу: [3]. {{ Системна помилка [2].}} Переконайтесь, що цей файл існує та доступний." />
+    <String Id="Error1310" Overridable="yes" Value="Помилка під час записування до файлу: [3]. {{ Системна помилка [2].}} Переконайтесь, що маєте доступ до цього каталогу." />
+    <String Id="Error1311" Overridable="yes" Value="Вихідний файл не знайдено{{(CAB-файл)}}: [2]. Переконайтесь, що цей файл існує та доступний." />
+    <String Id="Error1312" Overridable="yes" Value="Не вдалось створити каталог &quot;[2]&quot;. Файл із таким іменем уже існує. Перейменуйте або видаліть цей файл і натисніть кнопку &quot;Повторити&quot;. Щоб вийти, натисніть кнопку &quot;Скасувати&quot;." />
+    <String Id="Error1313" Overridable="yes" Value="Том [2] зараз недоступний. Оберіть інший." />
+    <String Id="Error1314" Overridable="yes" Value="Вказаний шлях &quot;[2]&quot; недоступний." />
+    <String Id="Error1315" Overridable="yes" Value="Не вдалось записати до вказаної папки: [2]." />
+    <String Id="Error1316" Overridable="yes" Value="Сталась мережева помилка під час спроби читання файлу: [2]" />
+    <String Id="Error1317" Overridable="yes" Value="Сталась помилка під час спроби створення каталогу: [2]" />
+    <String Id="Error1318" Overridable="yes" Value="Сталась мережева помилка під час спроби створення каталогу: [2]" />
+    <String Id="Error1319" Overridable="yes" Value="Сталась мережева помилка під час спроби відкрити CAB-файл із вихідними файлами: [2]" />
+    <String Id="Error1320" Overridable="yes" Value="Вказано задовгий шлях: [2]" />
     <String Id="Error1321" Overridable="yes" Value="Інсталятор не має належних прав для змінення цього файлу: [2]." />
     <String Id="Error1322" Overridable="yes" Value="Частина шляху до папки &quot;[2]&quot; неприпустима: пуста або перевищує дозволену в системі довжину." />
     <String Id="Error1323" Overridable="yes" Value="Шлях до папки &quot;[2]&quot; містить неприпустимі для шляху слова." />
     <String Id="Error1324" Overridable="yes" Value="Шлях до папки &quot;[2]&quot; містить неприпустимий символ." />
-    <String Id="Error1325" Overridable="yes" Value="&quot;[2]&quot; не є припустимим коротким іменем файлу." />
+    <String Id="Error1325" Overridable="yes" Value="&quot;[2]&quot; не є припустимим коротким ім'ям файлу." />
     <String Id="Error1326" Overridable="yes" Value="Помилка під час отримання атрибутів безпеки файлу: [3] GetLastError: [2]" />
     <String Id="Error1327" Overridable="yes" Value="Неправильний пристрій: [2]" />
     <String Id="Error1328" Overridable="yes" Value="Помилка застосування виправлення до файлу [2]. Можливо, файл було оновлено в інший спосіб, і це виправлення вже не може його змінити. Для отримання докладніших відомостей зверніться до постачальника виправлення. {{Системна помилка: [3]}}" />
-    <String Id="Error1329" Overridable="yes" Value="Не вдалося інсталювати потрібний файл, оскільки в CAB-файлі [2] немає цифрового підпису. Це може свідчити про пошкодження CAB-файлу." />
-    <String Id="Error1330" Overridable="yes" Value="Не вдалося інсталювати потрібний файл, оскільки CAB-файл [2] містить недійсний цифровий підпис. Це може свідчити про пошкодження CAB-файлу.{{ Функція WinVerifyTrust повернула помилку [3].}}" />
-    <String Id="Error1331" Overridable="yes" Value="Не вдалося належно скопіювати файл [2]: помилка CRC." />
-    <String Id="Error1332" Overridable="yes" Value="Не вдалося належно перемістити файл [2]: помилка CRC." />
-    <String Id="Error1333" Overridable="yes" Value="Не вдалося належно виправити файл [2]: помилка CRC." />
-    <String Id="Error1334" Overridable="yes" Value="Не вдалося інсталювати файл &quot;[2]&quot;, оскільки його немає в CAB-файлі &quot;[3]&quot;. Це може свідчити про помилку мережі, помилку читання компакт-диска або проблему з пакетом." />
+    <String Id="Error1329" Overridable="yes" Value="Не вдалось інсталювати потрібний файл, оскільки в CAB-файлі [2] немає цифрового підпису. Це може свідчити про пошкодження CAB-файлу." />
+    <String Id="Error1330" Overridable="yes" Value="Не вдалось інсталювати потрібний файл, оскільки CAB-файл [2] містить недійсний цифровий підпис. Це може свідчити про пошкодження CAB-файлу.{{ Функція WinVerifyTrust повернула помилку [3].}}" />
+    <String Id="Error1331" Overridable="yes" Value="Не вдалось належно скопіювати файл [2]: помилка CRC." />
+    <String Id="Error1332" Overridable="yes" Value="Не вдалось належно перемістити файл [2]: помилка CRC." />
+    <String Id="Error1333" Overridable="yes" Value="Не вдалось належно виправити файл [2]: помилка CRC." />
+    <String Id="Error1334" Overridable="yes" Value="Не вдалось інсталювати файл &quot;[2]&quot;, оскільки його немає в CAB-файлі &quot;[3]&quot;. Це може свідчити про помилку мережі, помилку читання компакт-диску або проблему з пакетом." />
     <String Id="Error1335" Overridable="yes" Value="Потрібний для інсталяції CAB-файл &quot;[2]&quot; пошкоджений і непридатний для використання. Це може свідчити про помилку мережі, помилку читання компакт-диска або проблему з пакетом." />
-    <String Id="Error1336" Overridable="yes" Value="Сталася помилка під час створення тимчасового файлу, потрібного для завершення інсталяції.{{ Папка: [3]. Код системної помилки: [2]}}" />
-    <String Id="Error1401" Overridable="yes" Value="Не вдалося створити розділ: [2]. {{ Системна помилка [3].}} Переконайтеся, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
-    <String Id="Error1402" Overridable="yes" Value="Не вдалося відкрити розділ: [2]. {{ Системна помилка [3].}} Переконайтеся, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
-    <String Id="Error1403" Overridable="yes" Value="Не вдалося видалити значення [2] з розділу [3]. {{ Системна помилка [4].}} Переконайтеся, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
-    <String Id="Error1404" Overridable="yes" Value="Не вдалося видалити розділ [2]. {{ Системна помилка [3].}} Переконайтеся, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
-    <String Id="Error1405" Overridable="yes" Value="Не вдалося прочитати значення [2] з розділу [3]. {{ Системна помилка [4].}} Переконайтеся, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
-    <String Id="Error1406" Overridable="yes" Value="Не вдалося записати значення [2] до розділу [3]. {{ Системна помилка [4].}} Переконайтеся, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
-    <String Id="Error1407" Overridable="yes" Value="Не вдалося отримати імена значень для розділу [2]. {{ Системна помилка [3].}} Переконайтеся, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
-    <String Id="Error1408" Overridable="yes" Value="Не вдалося отримати імена підрозділів для розділу [2]. {{ Системна помилка [3].}} Переконайтеся, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
-    <String Id="Error1409" Overridable="yes" Value="Не вдалося прочитати відомості про безпеку для розділу [2]. {{ Системна помилка [3].}} Переконайтеся, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
-    <String Id="Error1410" Overridable="yes" Value="Не вдалося збільшити обсяг вільного місця в реєстрі. Для інсталяції цього застосунку в реєстрі має бути [2] КБ вільного місця." />
+    <String Id="Error1336" Overridable="yes" Value="Сталась помилка під час створення тимчасового файлу, потрібного для завершення інсталяції.{{ Папка: [3]. Код системної помилки: [2]}}" />
+    <String Id="Error1401" Overridable="yes" Value="Не вдалось створити розділ: [2]. {{ Системна помилка [3].}} Переконайтесь, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
+    <String Id="Error1402" Overridable="yes" Value="Не вдалось відкрити розділ: [2]. {{ Системна помилка [3].}} Переконайтесь, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
+    <String Id="Error1403" Overridable="yes" Value="Не вдалось видалити значення [2] з розділу [3]. {{ Системна помилка [4].}} Переконайтесь, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
+    <String Id="Error1404" Overridable="yes" Value="Не вдалось видалити розділ [2]. {{ Системна помилка [3].}} Переконайтесь, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
+    <String Id="Error1405" Overridable="yes" Value="Не вдалось прочитати значення [2] з розділу [3]. {{ Системна помилка [4].}} Переконайтесь, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
+    <String Id="Error1406" Overridable="yes" Value="Не вдалось записати значення [2] до розділу [3]. {{ Системна помилка [4].}} Переконайтесь, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
+    <String Id="Error1407" Overridable="yes" Value="Не вдалось отримати імена значень для розділу [2]. {{ Системна помилка [3].}} Переконайтесь, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
+    <String Id="Error1408" Overridable="yes" Value="Не вдалось отримати імена підрозділів для розділу [2]. {{ Системна помилка [3].}} Переконайтесь, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
+    <String Id="Error1409" Overridable="yes" Value="Не вдалось прочитати відомості про безпеку для розділу [2]. {{ Системна помилка [3].}} Переконайтесь, що у вас достатньо прав для доступу до цього розділу, або зверніться до служби підтримки." />
+    <String Id="Error1410" Overridable="yes" Value="Не вдалось збільшити обсяг вільного місця в реєстрі. Для інсталяції цього додатку в реєстрі має бути [2] КБ вільного місця." />
     <String Id="Error1500" Overridable="yes" Value="Одночасно триває інший процес інсталяції. Необхідно завершити його, перш ніж продовжити цю інсталяцію." />
-    <String Id="Error1501" Overridable="yes" Value="Помилка доступу до захищених даних. Переконайтеся, що інсталятор Windows настроєно правильно, і повторіть інсталяцію." />
-    <String Id="Error1502" Overridable="yes" Value="Користувач &quot;[2]&quot; раніше вже починав інсталяцію продукту &quot;[3]&quot;. Йому доведеться повторити свій процес інсталяції, щоб мати змогу користуватися продуктом. Зараз продовжиться ваш поточний процес інсталяції." />
+    <String Id="Error1501" Overridable="yes" Value="Помилка доступу до захищених даних. Переконайтесь, що інсталятор Windows налаштован вірно, і повторіть інсталяцію." />
+    <String Id="Error1502" Overridable="yes" Value="Користувач &quot;[2]&quot; раніше вже починав інсталяцію продукту &quot;[3]&quot;. Йому доведеться повторити свій процес інсталяції, щоб мати змогу користуватись продуктом. Зараз продовжиться ваш поточний процес інсталяції." />
     <String Id="Error1503" Overridable="yes" Value="Користувач &quot;[2]&quot; раніше вже починав інсталяцію продукту &quot;[3]&quot;. Йому доведеться повторити свій процес інсталяції, щоб мати змогу користуватися продуктом." />
     <String Id="Error1601" Overridable="yes" Value="Бракує місця на диску. Том: &quot;[2]&quot;; потрібно: [3] КБ; доступно: [4] КБ. Звільніть місце на диску й повторіть спробу." />
     <String Id="Error1602" Overridable="yes" Value="Справді скасувати?" />
-    <String Id="Error1603" Overridable="yes" Value="Файл [2][3] зараз використовується{ в такому процесі: ім’я: [4], ідентифікатор: [5], заголовок вікна: &quot;[6]&quot;}. Закрийте цей застосунок і повторіть спробу." />
+    <String Id="Error1603" Overridable="yes" Value="Файл [2][3] зараз використовується{ в такому процесі: ім’я: [4], ідентифікатор: [5], заголовок вікна: &quot;[6]&quot;}. Закрийте цей додаток і повторіть спробу." />
     <String Id="Error1604" Overridable="yes" Value="Уже інстальовано продукт &quot;[2]&quot;, несумісний із цим продуктом." />
     <String Id="Error1605" Overridable="yes" Value="У томі &quot;[2]&quot; бракує вільного місця для продовження інсталяції з увімкнутим відновленням. Потрібно [3] КБ, доступно лише [4] КБ. Щоб продовжити інсталяцію без збереження відомостей про відновлення, натисніть кнопку &quot;Пропустити&quot;. Щоб знову перевірити обсяг вільного дискового простору, натисніть кнопку &quot;Повторити&quot;. Щоб вийти із програми інсталяції, натисніть кнопку &quot;Скасувати&quot;." />
-    <String Id="Error1606" Overridable="yes" Value="Мережна папка &quot;[2]&quot; недоступна." />
-    <String Id="Error1607" Overridable="yes" Value="Для продовження інсталяції необхідно закрити такі застосунки:" />
-    <String Id="Error1608" Overridable="yes" Value="Не вдалося знайти інстальовані на комп’ютері сумісні продукти для інсталяції цього продукту." />
-    <String Id="Error1609" Overridable="yes" Value="Сталася помилка під час застосування настройок безпеки. [2] є неприпустимим користувачем або групою. Можливо, сталася помилка пакета або помилка підключення до контролера домену мережі. Перевірте підключення до мережі й натисніть кнопку &quot;Повторити&quot;. Щоб завершити інсталяцію, натисніть кнопку &quot;Скасувати&quot;. {{Не вдалося знайти ідентифікатор SID користувача; системна помилка [3]}}" />
-    <String Id="Error1701" Overridable="yes" Value="Розділ &quot;[2]&quot; неприпустимий. Переконайтеся, що введено правильний розділ." />
-    <String Id="Error1702" Overridable="yes" Value="Перед продовженням настроювання [2] інсталятору необхідно перезавантажити систему. Для негайного перезавантаження натисніть кнопку &quot;Так&quot;. Щоб пізніше перезавантажити систему вручну, натисніть кнопку &quot;Ні&quot;." />
+    <String Id="Error1606" Overridable="yes" Value="Мережева папка &quot;[2]&quot; недоступна." />
+    <String Id="Error1607" Overridable="yes" Value="Для продовження інсталяції необхідно закрити такі додатки:" />
+    <String Id="Error1608" Overridable="yes" Value="Не вдалось знайти інстальовані на комп’ютері сумісні продукти для інсталяції цього продукту." />
+    <String Id="Error1609" Overridable="yes" Value="Сталась помилка під час застосування налаштувань безпеки. [2] є неприпустимим користувачем або групою. Можливо, сталась помилка пакету або помилка підключення до контролеру домену мережі. Перевірте підключення до мережі й натисніть кнопку &quot;Повторити&quot;. Щоб завершити інсталяцію, натисніть кнопку &quot;Скасувати&quot;. {{Не вдалось знайти ідентифікатор SID користувача; системна помилка [3]}}" />
+    <String Id="Error1701" Overridable="yes" Value="Розділ &quot;[2]&quot; неприпустимий. Переконайтесь, що введено правильний розділ." />
+    <String Id="Error1702" Overridable="yes" Value="Перед продовженням налаштування [2] інсталятору необхідно перезавантажити систему. Для негайного перезавантаження натисніть кнопку &quot;Так&quot;. Щоб пізніше перезавантажити систему вручну, натисніть кнопку &quot;Ні&quot;." />
     <String Id="Error1703" Overridable="yes" Value="Щоб внесені до конфігурації [2] зміни набрали сили, необхідно перезавантажити систему. Для негайного перезавантаження натисніть кнопку &quot;Так&quot;. Щоб пізніше перезавантажити систему вручну, натисніть кнопку &quot;Ні&quot;." />
     <String Id="Error1704" Overridable="yes" Value="Інсталяцію програми [2] наразі призупинено. Щоб продовжити, необхідно скасувати зміни, внесені під час цієї інсталяції. Скасувати ці зміни?" />
     <String Id="Error1705" Overridable="yes" Value="Не завершено попередню інсталяцію програми. Щоб продовжити, необхідно скасувати зміни, внесені під час цієї інсталяції. Скасувати ці зміни?" />
-    <String Id="Error1706" Overridable="yes" Value="Не вдалося знайти пакет інсталяції для продукту [2]. Повторіть інсталяцію за допомогою дійсної копії пакета інсталяції &quot;[3]&quot;." />
+    <String Id="Error1706" Overridable="yes" Value="Не вдалось знайти пакет інсталяції для продукту [2]. Повторіть інсталяцію за допомогою дійсної копії пакету інсталяції &quot;[3]&quot;." />
     <String Id="Error1707" Overridable="yes" Value="Інсталяцію успішно завершено." />
     <String Id="Error1708" Overridable="yes" Value="Помилка інсталяції." />
     <String Id="Error1709" Overridable="yes" Value="Продукт: [2] -- [3]" />
     <String Id="Error1710" Overridable="yes" Value="Можна повернути комп’ютер до попереднього стану або продовжити інсталяцію згодом. Відновити попередній стан?" />
-    <String Id="Error1711" Overridable="yes" Value="Сталася помилка під час записування на диск відомостей про інсталяцію. Перевірте, чи достатньо місця на диску, і натисніть кнопку &quot;Повторити&quot;, або натисніть кнопку &quot;Скасувати&quot;, щоб завершити інсталяцію." />
-    <String Id="Error1712" Overridable="yes" Value="Не вдалося знайти принаймні один файл, необхідний для відновлення попереднього стану комп’ютера. Відновлення неможливе." />
-    <String Id="Error1713" Overridable="yes" Value="[2] не вдалося інсталювати один із потрібних продуктів. Зверніться до групи технічної підтримки. {{Системна помилка: [3].}}" />
+    <String Id="Error1711" Overridable="yes" Value="Сталась помилка під час записування на диск відомостей про інсталяцію. Перевірте, чи достатньо місця на диску, і натисніть кнопку &quot;Повторити&quot;, або натисніть кнопку &quot;Скасувати&quot;, щоб завершити інсталяцію." />
+    <String Id="Error1712" Overridable="yes" Value="Не вдалось знайти принаймні один файл, необхідний для відновлення попереднього стану комп’ютера. Відновлення неможливе." />
+    <String Id="Error1713" Overridable="yes" Value="[2] не вдалось інсталювати один із потрібних продуктів. Зверніться до групи технічної підтримки. {{Системна помилка: [3].}}" />
     <String Id="Error1714" Overridable="yes" Value="Стару версію [2] не можна видалити. Зверніться до групи технічної підтримки. {{Системна помилка [3].}}" />
     <String Id="Error1715" Overridable="yes" Value="Інстальовано [2]" />
-    <String Id="Error1716" Overridable="yes" Value="Настроєно [2]" />
+    <String Id="Error1716" Overridable="yes" Value="Налаштовано [2]" />
     <String Id="Error1717" Overridable="yes" Value="Видалено [2]" />
     <String Id="Error1718" Overridable="yes" Value="Файл [2] відхилено за політикою цифрового підпису." />
-    <String Id="Error1719" Overridable="yes" Value="Служба інсталятора Windows недоступна. Це може статися, якщо Windows запущено в безпечному режимі або інсталятор Windows інстальовано неправильно. Зверніться по допомогу до служби підтримки." />
-    <String Id="Error1720" Overridable="yes" Value="Сталася помилка пакета інсталятора Windows. Не вдалося запустити сценарій, потрібний для завершення цієї інсталяції. Зверніться до служби підтримки або постачальника пакета. {{Додаткова дія [2], помилка сценарію [3], [4]: [5] рядок [6], стовпець [7], [8] }}" />
-    <String Id="Error1721" Overridable="yes" Value="Сталася помилка пакета інсталятора Windows. Не вдалося запустити програму, потрібну для завершення цієї інсталяції. Зверніться до служби підтримки або постачальника пакета. {{Дія: [2], розташування: [3], команда: [4] }}" />
-    <String Id="Error1722" Overridable="yes" Value="Сталася помилка пакета інсталятора Windows. Програма, запущена у складі програми інсталяції, неправильно завершила роботу. Зверніться до служби підтримки або постачальника пакета. {{Дія [2], розташування: [3], команда: [4] }}" />
-    <String Id="Error1723" Overridable="yes" Value="Сталася помилка пакета інсталятора Windows. Не вдалося запустити бібліотеку DLL, потрібну для завершення цієї інсталяції. Зверніться до служби підтримки або постачальника пакета. {{Дія [2], елемент: [3], бібліотека: [4] }}" />
+    <String Id="Error1719" Overridable="yes" Value="Служба інсталятора Windows недоступна. Це може статися, якщо Windows запущено в безпечному режимі або інсталятор Windows інстальовано невірно. Зверніться по допомогу до служби підтримки." />
+    <String Id="Error1720" Overridable="yes" Value="Сталась помилка пакету інсталятора Windows. Не вдалось запустити сценарій, потрібний для завершення цієї інсталяції. Зверніться до служби підтримки або постачальника пакету. {{Додаткова дія [2], помилка сценарію [3], [4]: [5] рядок [6], стовпчик [7], [8] }}" />
+    <String Id="Error1721" Overridable="yes" Value="Сталась помилка пакета інсталятора Windows. Не вдалось запустити програму, потрібну для завершення цієї інсталяції. Зверніться до служби підтримки або постачальника пакету. {{Дія: [2], розташування: [3], команда: [4] }}" />
+    <String Id="Error1722" Overridable="yes" Value="Сталась помилка пакета інсталятора Windows. Програма, запущена у складі програми інсталяції, неправильно завершила роботу. Зверніться до служби підтримки або постачальника пакету. {{Дія [2], розташування: [3], команда: [4] }}" />
+    <String Id="Error1723" Overridable="yes" Value="Сталась помилка пакета інсталятора Windows. Не вдалось запустити бібліотеку DLL, потрібну для завершення цієї інсталяції. Зверніться до служби підтримки або постачальника пакету. {{Дія [2], елемент: [3], бібліотека: [4] }}" />
     <String Id="Error1724" Overridable="yes" Value="Видалення успішно виконано." />
     <String Id="Error1725" Overridable="yes" Value="Помилка видалення." />
     <String Id="Error1726" Overridable="yes" Value="Оголошення успішно завершено." />
     <String Id="Error1727" Overridable="yes" Value="Помилка оголошення." />
-    <String Id="Error1728" Overridable="yes" Value="Настроювання успішно завершено." />
-    <String Id="Error1729" Overridable="yes" Value="Помилка настроювання." />
-    <String Id="Error1730" Overridable="yes" Value="Для видалення цього застосунку необхідні права адміністратора. Щоб видалити цей застосунок, ввійдіть до системи із правами адміністратора або зверніться по допомогу до групи технічної підтримки." />
-    <String Id="Error1731" Overridable="yes" Value="Вихідний пакет інсталяції для продукту [2] не синхронізовано з пакетом клієнта. Повторіть інсталяцію за допомогою дійсної копії пакета інсталяції &quot;[3]&quot;." />
+    <String Id="Error1728" Overridable="yes" Value="Налаштування успішно завершено." />
+    <String Id="Error1729" Overridable="yes" Value="Помилка налаштування." />
+    <String Id="Error1730" Overridable="yes" Value="Для видалення цього додатку необхідні права адміністратора. Щоб видалити цей додаток, увійдіть до системи із правами адміністратора або зверніться по допомогу до групи технічної підтримки." />
+    <String Id="Error1731" Overridable="yes" Value="Вихідний пакет інсталяції для продукту [2] не синхронізовано з пакетом клієнта. Повторіть інсталяцію за допомогою дійсної копії пакету інсталяції &quot;[3]&quot;." />
     <String Id="Error1732" Overridable="yes" Value="Щоб завершити інсталяцію [2], необхідно перезавантажити комп’ютер. Інші користувачі не вишли із системи, і внаслідок перезавантаження вони можуть втратити результати своєї роботи. Перезавантажити зараз?" />
-    <String Id="Error1801" Overridable="yes" Value="Неприпустимий шлях &quot;[2]&quot;. Укажіть правильний шлях." />
-    <String Id="Error1802" Overridable="yes" Value="Бракує пам’яті. Закрийте інші застосунки та повторіть спробу." />
-    <String Id="Error1803" Overridable="yes" Value="У пристрої [2] немає диска. Вставте диск і натисніть кнопку &quot;Повторити&quot; або натисніть кнопку &quot;Скасувати&quot;, щоб повернутися до вибраного раніше тому." />
-    <String Id="Error1804" Overridable="yes" Value="У пристрої [2] немає диска. Вставте диск і натисніть кнопку &quot;Повторити&quot; або натисніть кнопку &quot;Скасувати&quot;, щоб повернутися до вікна перегляду папок і вибрати інший том." />
+    <String Id="Error1801" Overridable="yes" Value="Неприпустимий шлях &quot;[2]&quot;. Вкажіть вірний шлях." />
+    <String Id="Error1802" Overridable="yes" Value="Бракує пам’яті. Закрийте інші додатки та повторіть спробу." />
+    <String Id="Error1803" Overridable="yes" Value="У пристрої [2] немає диску. Вставте диск і натисніть кнопку &quot;Повторити&quot; або натисніть кнопку &quot;Скасувати&quot;, щоб повернутися до обраного раніше тому." />
+    <String Id="Error1804" Overridable="yes" Value="У пристрої [2] немає диску. Вставте диск і натисніть кнопку &quot;Повторити&quot; або натисніть кнопку &quot;Скасувати&quot;, щоб повернутись до вікна перегляду папок і обрати інший том." />
     <String Id="Error1805" Overridable="yes" Value="Папка &quot;[2]&quot; не існує. Введіть шлях до наявної папки." />
     <String Id="Error1806" Overridable="yes" Value="У вас недостатньо прав для читання цієї папки." />
     <String Id="Error1807" Overridable="yes" Value="Не вдалося визначити припустиму папку призначення для інсталяції." />
-    <String Id="Error1901" Overridable="yes" Value="Сталася помилка під час спроби читання з вихідної бази даних інсталяції: [2]." />
+    <String Id="Error1901" Overridable="yes" Value="Сталась помилка під час спроби читання з вихідної бази даних інсталяції: [2]." />
     <String Id="Error1902" Overridable="yes" Value="Планування операції перезавантаження: перейменування файлу [2] на [3]. Для завершення операції потрібне перезавантаження." />
     <String Id="Error1903" Overridable="yes" Value="Планування операції перезавантаження: видалення файлу [2]. Для завершення операції потрібне перезавантаження." />
-    <String Id="Error1904" Overridable="yes" Value="Не вдалося зареєструвати модуль [2]. HRESULT [3]. Зверніться до служби підтримки." />
-    <String Id="Error1905" Overridable="yes" Value="Не вдалося скасувати реєстрацію модуля [2]. HRESULT [3]. Зверніться до служби підтримки." />
-    <String Id="Error1906" Overridable="yes" Value="Не вдалося виконати кешування пакета [2]. Помилка: [3]. Зверніться до служби підтримки." />
-    <String Id="Error1907" Overridable="yes" Value="Не вдалося зареєструвати шрифт &quot;[2]&quot;. Переконайтеся, що ви маєте достатні дозволи на інсталяцію шрифтів, а система підтримує цей шрифт." />
-    <String Id="Error1908" Overridable="yes" Value="Не вдалося скасувати реєстрацію шрифту &quot;[2]&quot;. Переконайтеся, що ви маєте достатні дозволи на видалення шрифтів." />
-    <String Id="Error1909" Overridable="yes" Value="Не вдалося створити ярлик [2]. Переконайтеся, що папка призначення існує та доступна." />
-    <String Id="Error1910" Overridable="yes" Value="Не вдалося видалити ярлик &quot;[2]&quot;. Переконайтеся, що файл ярлика існує та доступний." />
-    <String Id="Error1911" Overridable="yes" Value="Не вдалося зареєструвати бібліотеку типів для файлу [2]. Зверніться до служби підтримки." />
-    <String Id="Error1912" Overridable="yes" Value="Не вдалося скасувати реєстрацію бібліотеки типів для файлу [2]. Зверніться до служби підтримки." />
-    <String Id="Error1913" Overridable="yes" Value="Не вдалося оновити файл INI [2][3]. Переконайтеся, що цей файл існує та доступний." />
-    <String Id="Error1914" Overridable="yes" Value="Не вдалося запланувати заміщення файлу [3] файлом [2] під час перезавантаження. Переконайтеся, що у вас є дозвіл на записування до файлу [3]." />
-    <String Id="Error1915" Overridable="yes" Value="Не вдалося видалити диспетчер драйверів ODBC; помилка ODBC [2]: [3]. Зверніться до служби підтримки." />
-    <String Id="Error1916" Overridable="yes" Value="Не вдалося інсталювати диспетчер драйверів ODBC; помилка ODBC [2]: [3]. Зверніться до служби підтримки." />
-    <String Id="Error1917" Overridable="yes" Value="Не вдалося видалити драйвер ODBC: [4]; помилка ODBC [2]: [3]. Переконайтеся, що у вас достатньо прав для видалення драйверів ODBC." />
-    <String Id="Error1918" Overridable="yes" Value="Не вдалося інсталювати драйвер ODBC: [4]; помилка ODBC [2]: [3]. Переконайтеся, що файл [4] існує та доступний." />
-    <String Id="Error1919" Overridable="yes" Value="Не вдалося настроїти джерело даних ODBC: [4]; помилка ODBC [2]: [3]. Переконайтеся, що файл &quot;[4]&quot; існує та доступний." />
-    <String Id="Error1920" Overridable="yes" Value="Не вдалося запустити службу &quot;[2]&quot; ([3]). Переконайтеся, що у вас достатньо прав для запуску системних служб." />
-    <String Id="Error1921" Overridable="yes" Value="Не вдалося зупинити службу &quot;[2]&quot; ([3]). Переконайтеся, що у вас достатньо прав для зупинення системних служб." />
-    <String Id="Error1922" Overridable="yes" Value="Не вдалося видалити службу &quot;[2]&quot; ([3]). Переконайтеся, що у вас достатньо прав для видалення системних служб." />
-    <String Id="Error1923" Overridable="yes" Value="Не вдалося інсталювати службу &quot;[2]&quot; ([3]). Переконайтеся, що у вас достатньо прав для інсталяції системних служб." />
-    <String Id="Error1924" Overridable="yes" Value="Не вдалося оновити змінну оточення &quot;[2]&quot;. Переконайтеся, що у вас достатньо прав для модифікації змінних оточення." />
-    <String Id="Error1925" Overridable="yes" Value="У вас недостатньо прав, щоб завершити цю інсталяцію для всіх користувачів комп’ютера. Ввійдіть до системи як адміністратор і повторіть спробу." />
-    <String Id="Error1926" Overridable="yes" Value="Не вдалося встановити захист для файлу &quot;[3]&quot;. Помилка: [2]. Переконайтеся, що у вас достатньо прав для змінення дозволів безпеки для цього файлу." />
+    <String Id="Error1904" Overridable="yes" Value="Не вдалось зареєструвати модуль [2]. HRESULT [3]. Зверніться до служби підтримки." />
+    <String Id="Error1905" Overridable="yes" Value="Не вдалось скасувати реєстрацію модуля [2]. HRESULT [3]. Зверніться до служби підтримки." />
+    <String Id="Error1906" Overridable="yes" Value="Не вдалось виконати кешування пакету [2]. Помилка: [3]. Зверніться до служби підтримки." />
+    <String Id="Error1907" Overridable="yes" Value="Не вдалось зареєструвати шрифт &quot;[2]&quot;. Переконайтесь, що ви маєте достатні дозволи на інсталяцію шрифтів, а система підтримує цей шрифт." />
+    <String Id="Error1908" Overridable="yes" Value="Не вдалось скасувати реєстрацію шрифту &quot;[2]&quot;. Переконайтеся, що ви маєте достатні дозволи на видалення шрифтів." />
+    <String Id="Error1909" Overridable="yes" Value="Не вдалось створити ярлик [2]. Переконайтесь, що папка призначення існує та доступна." />
+    <String Id="Error1910" Overridable="yes" Value="Не вдалось видалити ярлик &quot;[2]&quot;. Переконайтеся, що файл ярлика існує та доступний." />
+    <String Id="Error1911" Overridable="yes" Value="Не вдалось зареєструвати бібліотеку типів для файлу [2]. Зверніться до служби підтримки." />
+    <String Id="Error1912" Overridable="yes" Value="Не вдалось скасувати реєстрацію бібліотеки типів для файлу [2]. Зверніться до служби підтримки." />
+    <String Id="Error1913" Overridable="yes" Value="Не вдалось оновити файл INI [2][3]. Переконайтесь, що цей файл існує та доступний." />
+    <String Id="Error1914" Overridable="yes" Value="Не вдалось запланувати заміщення файлу [3] файлом [2] під час перезавантаження. Переконайтесь, що у вас є дозвіл на записування до файлу [3]." />
+    <String Id="Error1915" Overridable="yes" Value="Не вдалось видалити диспетчер драйверів ODBC; помилка ODBC [2]: [3]. Зверніться до служби підтримки." />
+    <String Id="Error1916" Overridable="yes" Value="Не вдалось інсталювати диспетчер драйверів ODBC; помилка ODBC [2]: [3]. Зверніться до служби підтримки." />
+    <String Id="Error1917" Overridable="yes" Value="Не вдалось видалити драйвер ODBC: [4]; помилка ODBC [2]: [3]. Переконайтесь, що у вас достатньо прав для видалення драйверів ODBC." />
+    <String Id="Error1918" Overridable="yes" Value="Не вдалось інсталювати драйвер ODBC: [4]; помилка ODBC [2]: [3]. Переконайтесь, що файл [4] існує та доступний." />
+    <String Id="Error1919" Overridable="yes" Value="Не вдалось налаштувати джерело даних ODBC: [4]; помилка ODBC [2]: [3]. Переконайтесь, що файл &quot;[4]&quot; існує та доступний." />
+    <String Id="Error1920" Overridable="yes" Value="Не вдалось запустити службу &quot;[2]&quot; ([3]). Переконайтесь, що у вас достатньо прав для запуску системних служб." />
+    <String Id="Error1921" Overridable="yes" Value="Не вдалось зупинити службу &quot;[2]&quot; ([3]). Переконайтесь, що у вас достатньо прав для зупинення системних служб." />
+    <String Id="Error1922" Overridable="yes" Value="Не вдалось видалити службу &quot;[2]&quot; ([3]). Переконайтесь, що у вас достатньо прав для видалення системних служб." />
+    <String Id="Error1923" Overridable="yes" Value="Не вдалось інсталювати службу &quot;[2]&quot; ([3]). Переконайтесь, що у вас достатньо прав для інсталяції системних служб." />
+    <String Id="Error1924" Overridable="yes" Value="Не вдалось оновити змінну оточення &quot;[2]&quot;. Переконайтеся, що у вас достатньо прав для модифікації змінних оточення." />
+    <String Id="Error1925" Overridable="yes" Value="У вас недостатньо прав, щоб завершити цю інсталяцію для всіх користувачів комп’ютера. Увійдіть до системи як адміністратор і повторіть спробу." />
+    <String Id="Error1926" Overridable="yes" Value="Не вдалось встановити захист для файлу &quot;[3]&quot;. Помилка: [2]. Переконайтесь, що у вас достатньо прав для змінення дозволів безпеки для цього файлу." />
     <String Id="Error1927" Overridable="yes" Value="Служби компонентів (COM+ 1.0) не інстальовано на цьому комп’ютері. Для успішного завершення цієї інсталяції потрібні служби компонентів. Служби компонентів доступні в системі Windows 2000." />
     <String Id="Error1928" Overridable="yes" Value="Помилка реєстрації застосунку COM+. Для отримання додаткових відомостей зверніться до служби підтримки." />
     <String Id="Error1929" Overridable="yes" Value="Помилка скасування реєстрації застосунку COM+. Для отримання додаткових відомостей зверніться до служби підтримки." />
-    <String Id="Error1930" Overridable="yes" Value="Не вдалося змінити опис для служби &quot;[2]&quot; ([3])." />
-    <String Id="Error1931" Overridable="yes" Value="Інсталятору Windows не вдалося оновити системний файл [2], оскільки його захищає система Windows. Можливо, для належної роботи програми слід оновити операційну систему. {{Версія пакета: [3], захищена операційною системою версія: [4]}}" />
-    <String Id="Error1932" Overridable="yes" Value="Інсталятору Windows не вдалося оновити файл [2], захищений системою Windows. {{Версія пакета: [3], захищена операційною системою версія: [4], помилка SFP: [5]}}" />
-    <String Id="Error1933" Overridable="yes" Value="Інсталятору Windows не вдалося оновити принаймні один файл, захищений системою Windows. {{Помилка SFP: [2]. Перелік захищених файлів:\r\n[3]}}" />
+    <String Id="Error1930" Overridable="yes" Value="Не вдалось змінити опис для служби &quot;[2]&quot; ([3])." />
+    <String Id="Error1931" Overridable="yes" Value="Інсталятору Windows не вдалось оновити системний файл [2], оскільки його захищає система Windows. Можливо, для належної роботи програми слід оновити операційну систему. {{Версія пакета: [3], захищена операційною системою версія: [4]}}" />
+    <String Id="Error1932" Overridable="yes" Value="Інсталятору Windows не вдалось оновити файл [2], захищений системою Windows. {{Версія пакета: [3], захищена операційною системою версія: [4], помилка SFP: [5]}}" />
+    <String Id="Error1933" Overridable="yes" Value="Інсталятору Windows не вдалось оновити принаймні один файл, захищений системою Windows. {{Помилка SFP: [2]. Перелік захищених файлів:\r\n[3]}}" />
     <String Id="Error1934" Overridable="yes" Value="Інсталяції користувачів заборонено за політикою цього комп’ютера." />
-    <String Id="Error1935" Overridable="yes" Value="Під час інсталяції складання &quot;[6]&quot; сталася помилка. Для отримання додаткових відомостей зверніться до довідки та служби підтримки. HRESULT: [3]. {{інтерфейс складання: [4], функція: [5], компонент: [2]}}" />
-    <String Id="Error1936" Overridable="yes" Value="Під час інсталяції складання &quot;[6]&quot; сталася помилка. Складання не має належного імені або не підписане ключем мінімальної довжини. HRESULT: [3]. {{інтерфейс складання: [4], функція: [5], компонент: [2]}}" />
-    <String Id="Error1937" Overridable="yes" Value="Під час інсталяції складання &quot;[6]&quot; сталася помилка. Підпис або каталог неприпустимі, чи їх не вдалося перевірити. HRESULT: [3]. {{інтерфейс складання: [4], функція: [5], компонент: [2]}}" />
-    <String Id="Error1938" Overridable="yes" Value="Під час інсталяції складання &quot;[6]&quot; сталася помилка. Не вдалося знайти принаймні один модуль складання. HRESULT: [3]. {{інтерфейс складання: [4], функція: [5], компонент: [2]}}" />
+    <String Id="Error1935" Overridable="yes" Value="Під час інсталяції складання &quot;[6]&quot; сталась помилка. Для отримання додаткових відомостей зверніться до довідки та служби підтримки. HRESULT: [3]. {{інтерфейс складання: [4], функція: [5], компонент: [2]}}" />
+    <String Id="Error1936" Overridable="yes" Value="Під час інсталяції складання &quot;[6]&quot; сталась помилка. Складання не має належного імені або не підписане ключем мінімальної довжини. HRESULT: [3]. {{інтерфейс складання: [4], функція: [5], компонент: [2]}}" />
+    <String Id="Error1937" Overridable="yes" Value="Під час інсталяції складання &quot;[6]&quot; сталась помилка. Підпис або каталог неприпустимі, чи їх не вдалось перевірити. HRESULT: [3]. {{інтерфейс складання: [4], функція: [5], компонент: [2]}}" />
+    <String Id="Error1938" Overridable="yes" Value="Під час інсталяції складання &quot;[6]&quot; сталась помилка. Не вдалось знайти принаймні один модуль складання. HRESULT: [3]. {{інтерфейс складання: [4], функція: [5], компонент: [2]}}" />
 
     <String Id="UITextbytes" Overridable="yes" Value="байт" />
     <String Id="UITextGB" Overridable="yes" Value="ГБ" />
@@ -557,9 +557,9 @@
     <String Id="UITextMenuLocal" Overridable="yes" Value="Буде інстальовано на локальний жорсткий диск" />
     <String Id="UITextMenuNetwork" Overridable="yes" Value="Буде інстальовано для запуску з мережі" />
     <String Id="UITextNewFolder" Overridable="yes" Value="Папка|Нова папка" />
-    <String Id="UITextScriptInProgress" Overridable="yes" Value="Триває збирання потрібних даних..." />
+    <String Id="UITextScriptInProgress" Overridable="yes" Value="Триває збір потрібних даних..." />
     <String Id="UITextSelAbsentAbsent" Overridable="yes" Value="Цей компонент не буде інстальовано" />
-    <String Id="UITextSelAbsentAdvertise" Overridable="yes" Value="Цей компонент буде настроєно для інсталяції в разі потреби" />
+    <String Id="UITextSelAbsentAdvertise" Overridable="yes" Value="Цей компонент буде налаштовано для інсталяції в разі потреби" />
     <String Id="UITextSelAbsentCD" Overridable="yes" Value="Цей компонент буде інстальовано для запуску з компакт-диска" />
     <String Id="UITextSelAbsentLocal" Overridable="yes" Value="Цей компонент буде інстальовано на локальний жорсткий диск" />
     <String Id="UITextSelAbsentNetwork" Overridable="yes" Value="Цей компонент буде інстальовано для запуску з мережі" />
@@ -576,7 +576,7 @@
     <String Id="UITextSelChildCostPos" Overridable="yes" Value="Для цього компонента потрібно [1] на жорсткому диску." />
     <String Id="UITextSelCostPending" Overridable="yes" Value="Триває обчислення місця для компонента..." />
     <String Id="UITextSelLocalAbsent" Overridable="yes" Value="Цей компонент буде повністю видалено" />
-    <String Id="UITextSelLocalAdvertise" Overridable="yes" Value="Цей компонент буде видалено з локального жорсткого диска, але настроєно для інсталяції в разі потреби" />
+    <String Id="UITextSelLocalAdvertise" Overridable="yes" Value="Цей компонент буде видалено з локального жорсткого диска, але налаштовано для інсталяції в разі потреби" />
     <String Id="UITextSelLocalCD" Overridable="yes" Value="Компонент буде видалено з локального жорсткого диска, але він залишиться доступним для запуску з компакт-диска" />
     <String Id="UITextSelLocalLocal" Overridable="yes" Value="Цей компонент залишиться на локальному жорсткому диску" />
     <String Id="UITextSelLocalNetwork" Overridable="yes" Value="Компонент буде видалено з локального жорсткого диска, але він залишиться доступним для запуску з мережі" />
@@ -585,7 +585,7 @@
     <String Id="UITextSelNetworkLocal" Overridable="yes" Value="Для цього компонента запуск із мережі буде замінено на інсталяцію на локальний жорсткий диск" />
     <String Id="UITextSelNetworkNetwork" Overridable="yes" Value="Цей компонент залишиться доступний для запуску з мережі" />
     <String Id="UITextSelParentCostNegNeg" Overridable="yes" Value="Цей компонент звільняє [1] на жорсткому диску. Вибрано [2] з [3] його частин. Ці частини звільняють [4] на жорсткому диску." />
-    <String Id="UITextSelParentCostNegPos" Overridable="yes" Value="Компонент звільняє [1] на жорсткому диску. Вибрано [2] з [3] його частин. Разом вони потребують [4] на жорсткому диску." />
+    <String Id="UITextSelParentCostNegPos" Overridable="yes" Value="Компонент звільняє [1] на жорсткому диску. Обрано [2] з [3] його частин. Разом вони потребують [4] на жорсткому диску." />
     <String Id="UITextSelParentCostPosNeg" Overridable="yes" Value="Для цього компонента потрібно [1] на жорсткому диску. Вибрано [2] з [3] його частин. Разом вони звільнять [4] на жорсткому диску." />
     <String Id="UITextSelParentCostPosPos" Overridable="yes" Value="Для цього компонента потрібно [1] на жорсткому диску. Вибрано [2] з [3] його частин. Разом вони потребують [4] на жорсткому диску." />
     <String Id="UITextTimeRemaining" Overridable="yes" Value="Залишилось часу: {[1] хв. }{[2] сек.}" />
