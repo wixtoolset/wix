@@ -62,7 +62,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private void AddSectionToData()
         {
-            var cellsByTableAndRowId = new Dictionary<string, List<WixCustomTableCellSymbol>>();
+            var directoryRowsById = new Dictionary<string, Row>(StringComparer.Ordinal);
+            var cellsByTableAndRowId = new Dictionary<string, List<WixCustomTableCellSymbol>>(StringComparer.Ordinal);
 
             foreach (var symbol in this.Section.Symbols)
             {
@@ -107,7 +108,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         break;
 
                     case SymbolDefinitionType.Directory:
-                        this.AddDirectorySymbol((DirectorySymbol)symbol);
+                        this.AddDirectorySymbol((DirectorySymbol)symbol, directoryRowsById);
                         break;
 
                     case SymbolDefinitionType.DuplicateFile:
@@ -497,9 +498,9 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.Data.EnsureTable(this.TableDefinitions["ListBox"]);
         }
 
-        private void AddDirectorySymbol(DirectorySymbol symbol)
+        private void AddDirectorySymbol(DirectorySymbol symbol, Dictionary<string, Row> directoryRowsById)
         {
-            (var name, var parentDir) = this.AddDirectorySubdirectories(symbol);
+            (var name, var parentDir) = this.AddDirectorySubdirectories(symbol, directoryRowsById);
 
             var shortName = symbol.ShortName;
             var sourceShortname = symbol.SourceShortName;
@@ -524,10 +525,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var defaultDir = String.IsNullOrEmpty(sourceName) || sourceName == targetName ? targetName : targetName + ":" + sourceName;
 
-            var row = this.CreateRow(symbol, "Directory");
-            row[0] = symbol.Id.Id;
-            row[1] = parentDir;
-            row[2] = defaultDir;
+            this.CreateOrAddDirectoryRow(directoryRowsById, symbol, symbol.Id.Id, parentDir, defaultDir);
 
             if (OutputType.Module == this.Data.Type)
             {
@@ -1146,7 +1144,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 else
                 {
-                    var after = (null == symbol.Before);
+                    var after = null == symbol.Before;
                     row[2] = after ? symbol.After : symbol.Before;
                     row[3] = after ? 1 : 0;
                 }
@@ -1271,7 +1269,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private void AddWixPackageSymbol(WixPackageSymbol symbol)
+        private void AddWixPackageSymbol(WixPackageSymbol _)
         {
             // TODO: Remove the following from the compiler and do it here instead.
             //this.AddProperty(sourceLineNumbers, new Identifier(AccessModifier.Global, "Manufacturer"), manufacturer, false, false, false, true);
@@ -1319,11 +1317,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
         }
 
-        private (string, string) AddDirectorySubdirectories(DirectorySymbol symbol)
+        private (string, string) AddDirectorySubdirectories(DirectorySymbol symbol, Dictionary<string, Row> directoryRowsById)
         {
             var directory = symbol.Name.Trim(PathSeparatorChars);
             var parentDir = symbol.ParentDirectoryRef ?? (symbol.Id.Id == "TARGETDIR" ? null : "TARGETDIR");
-            var directoryRows = this.Data.TryGetTable("Directory", out var table) ? table.Rows.ToDictionary(row => row.FieldAsString(0)) : new Dictionary<string, Row>();
 
             var start = 0;
             var end = directory.IndexOfAny(PathSeparatorChars);
@@ -1337,18 +1334,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     path = Path.Combine(path, subdirectoryName);
 
-                    var id = this.BackendHelper.GenerateIdentifier("d", symbol.ParentDirectoryRef, path);
+                    var id = this.BackendHelper.GenerateIdentifier("d", symbol.ParentDirectoryRef, path, /*shortName:*/ null, /*sourceName:*/ null, /*shortSourceName:*/ null);
                     var shortnameSubdirectory = this.BackendHelper.IsValidShortFilename(subdirectoryName, false) ? null : this.CreateShortName(subdirectoryName, false, "Directory", symbol.ParentDirectoryRef);
+                    var defaultDir = CreateMsiFilename(shortnameSubdirectory, subdirectoryName);
 
-                    if (!directoryRows.ContainsKey(id))
-                    {
-                        var subdirectoryRow = this.CreateRow(symbol, "Directory");
-                        subdirectoryRow[0] = id;
-                        subdirectoryRow[1] = parentDir;
-                        subdirectoryRow[2] = CreateMsiFilename(shortnameSubdirectory, subdirectoryName);
-
-                        directoryRows.Add(id, subdirectoryRow);
-                    }
+                    this.CreateOrAddDirectoryRow(directoryRowsById, symbol, id, parentDir, defaultDir);
 
                     parentDir = id;
                 }
@@ -1360,6 +1350,25 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             var name = (start == 0) ? directory : directory.Substring(start);
 
             return (name, parentDir);
+        }
+
+        private Row CreateOrAddDirectoryRow(Dictionary<string, Row> directoryRowsById, DirectorySymbol symbol, string id, string parentDir, string defaultDir)
+        {
+            if (!directoryRowsById.TryGetValue(id, out var directoryRow))
+            {
+                directoryRow = this.CreateRow(symbol, "Directory");
+                directoryRow[0] = id;
+                directoryRow[1] = parentDir;
+                directoryRow[2] = defaultDir;
+
+                directoryRowsById.Add(id, directoryRow);
+            }
+            else if (directoryRow.FieldAsString(1) != parentDir || directoryRow.FieldAsString(2) != defaultDir)
+            {
+                throw new WixException(WindowsInstallerBackendErrors.UnexpectedAnonymousDirectoryCollision(symbol.SourceLineNumbers, symbol.Id.Id, parentDir, defaultDir, directoryRow.SourceLineNumbers, directoryRow.FieldAsString(1), directoryRow.FieldAsString(2)));
+            }
+
+            return directoryRow;
         }
 
         private void EnsureRequiredTables()
@@ -1412,7 +1421,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             "Upgrade" == table.Name ||
                             "WixMerge" == table.Name)
                         {
-                            foreach (Row row in table.Rows)
+                            foreach (var row in table.Rows)
                             {
                                 this.Messaging.Write(ErrorMessages.UnexpectedTableInMergeModule(row.SourceLineNumbers, table.Name));
                             }
@@ -1609,8 +1618,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             longName = longName.ToLowerInvariant();
 
             // collect all the data
-            var strings = new List<string>(1 + args.Length);
-            strings.Add(longName);
+            var strings = new List<string>(1 + args.Length)
+            {
+                longName
+            };
             strings.AddRange(args);
 
             // prepare for hashing
@@ -1625,8 +1636,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             // generate the short file/directory name without an extension
-            var shortName = new StringBuilder(Convert.ToBase64String(hash));
-            shortName.Length = 8;
+            var shortName = new StringBuilder(Convert.ToBase64String(hash))
+            {
+                Length = 8
+            };
             shortName.Replace('+', '-').Replace('/', '_');
 
             if (keepExtension)

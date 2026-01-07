@@ -163,6 +163,45 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanGetAnonymousDirectories()
+        {
+            var folder = TestData.Get("TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var wixlibPath = Path.Combine(baseFolder, "bin", "test.msi");
+
+                var result = WixRunner.Execute(
+                [
+                    "build",
+                    "-arch", "x64",
+                    Path.Combine(folder, "Directory", "AnonymousDirectories.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", wixlibPath
+                ]);
+
+                result.AssertSuccess();
+
+                var pdb = WindowsInstallerData.Load(Path.Combine(baseFolder, "bin", "test.wixpdb"));
+                var directoryRows = pdb.Tables["Directory"].Rows;
+
+                var dirs = directoryRows.Select(d => d.ToString()).OrderBy(s => s).ToArray();
+                WixAssert.CompareLineByLine(
+                [
+                    @"DesktopFolder/TARGETDIR/Desktop",
+                    @"dHKac23vLoBC5fFrqxqAIybMFOj0/DesktopFolder/a",
+                    @"dKom2ks4onBH9RsYLDhjge71s7s8/dlvpu0ovv8DWWVrdCVSYzDfsibzg/c",
+                    @"dlvpu0ovv8DWWVrdCVSYzDfsibzg/dHKac23vLoBC5fFrqxqAIybMFOj0/b",
+                    @"SomeFolder/TARGETDIR/fef2brvc|Some Folder",
+                    @"TARGETDIR//SourceDir"
+                ], dirs);
+            }
+        }
+
+        [Fact]
         public void CanGetDefaultName()
         {
             var folder = TestData.Get(@"TestData");
@@ -293,9 +332,9 @@ namespace WixToolsetTest.CoreIntegration
                 var directoryRows = data.Tables["Directory"].Rows;
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "d4EceYatXTyy8HXPt5B6DT9Rj.wE:ProgramFilesFolder:u7-b4gch|Example Corporation",
-                    "dSJ1pgiASlW7kJTu0wqsGBklJsS0:d4EceYatXTyy8HXPt5B6DT9Rj.wE:vjj-gxay|Test Product",
-                    "BinFolder:dSJ1pgiASlW7kJTu0wqsGBklJsS0:bin",
+                    "dwGveZhe5wcMbbRyRAkRwm2sqnE4:ProgramFilesFolder:u7-b4gch|Example Corporation",
+                    "d8kPFuRMPxdOxfpYS0O8azlhLUpY:dwGveZhe5wcMbbRyRAkRwm2sqnE4:vjj-gxay|Test Product",
+                    "BinFolder:d8kPFuRMPxdOxfpYS0O8azlhLUpY:bin",
                     "ProgramFilesFolder:TARGETDIR:PFiles",
                     "TARGETDIR::SourceDir"
                 }, directoryRows.Select(r => r.FieldAsString(0) + ":" + r.FieldAsString(1) + ":" + r.FieldAsString(2)).ToArray());
@@ -386,9 +425,9 @@ namespace WixToolsetTest.CoreIntegration
                 var directoryRows = data.Tables["Directory"].Rows;
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"d1nVb5_zcCwRCz7i2YXNAofGRmfc:ProgramFilesFolder:a",
-                    @"dijlG.bNicFgvj1_DujiGg9EBGrQ:d1nVb5_zcCwRCz7i2YXNAofGRmfc:b",
-                    @"dKO7wPCF.XLmq6KnqybHHgcBBqtU:dijlG.bNicFgvj1_DujiGg9EBGrQ:c",
+                    @"dKO7wPCF.XLmq6KnqybHHgcBBqtU:dvFwapipzsdDBjHbM5DUi_2llN.k:c",
+                    @"dvFwapipzsdDBjHbM5DUi_2llN.k:dyJuT.V6E4sWuHVv3CZiBNvrX2Lo:b",
+                    @"dyJuT.V6E4sWuHVv3CZiBNvrX2Lo:ProgramFilesFolder:a",
                     "ProgramFilesFolder:TARGETDIR:PFiles",
                     "TARGETDIR::SourceDir"
                 }, directoryRows.Select(r => r.FieldAsString(0) + ":" + r.FieldAsString(1) + ":" + r.FieldAsString(2)).OrderBy(s => s).ToArray());

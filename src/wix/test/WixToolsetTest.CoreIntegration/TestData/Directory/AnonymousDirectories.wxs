@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Id="WixToolsetTest.TestPackage" Name="~RedundantSubdirectories" Version="1.0.0.0" Manufacturer="Example Corporation" Compressed="no">
+        <ComponentGroupRef Id="Files" />
+
+        <Directory Id="SomeFolder" Name="Some Folder" />
+    </Package>
+
+    <Fragment>
+        <ComponentGroup Id="Files">
+            <Component Directory="SomeFolder">
+                <File Source="test.txt" KeyPath="yes">
+                    <Shortcut Id="Shortcut1" Name="Test Shortcut" Directory="DesktopFolder" Subdirectory="a\b\c" Advertise="yes" />
+                </File>
+
+                <RemoveFolder Id="RemoveAFolder" Directory="DesktopFolder" Subdirectory="a" On="uninstall" />
+                <RemoveFolder Id="RemoveBFolder" Directory="DesktopFolder" Subdirectory="a\b" On="uninstall" />
+                <RemoveFolder Id="RemoveCFolder" Directory="DesktopFolder" Subdirectory="a\b\c" On="uninstall" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

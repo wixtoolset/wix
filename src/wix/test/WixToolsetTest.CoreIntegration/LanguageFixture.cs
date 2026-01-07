@@ -56,13 +56,13 @@ namespace WixToolsetTest.CoreIntegration
 
                 var data = WindowsInstallerData.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
                 var directoryRows = data.Tables["Directory"].Rows;
-                WixAssert.CompareLineByLine(new[]
-                {
-                    "d4EceYatXTyy8HXPt5B6DT9Rj.wE:u7-b4gch|Example Corporation",
-                    "INSTALLFOLDER:oekcr5lq|MsiPackage",
-                    "ProgramFilesFolder:PFiles",
-                    "TARGETDIR:SourceDir"
-                }, directoryRows.Select(r => r.FieldAsString(0) + ":" + r.FieldAsString(2)).ToArray());
+                WixAssert.CompareLineByLine(
+                [
+                    "dwGveZhe5wcMbbRyRAkRwm2sqnE4:ProgramFilesFolder:u7-b4gch|Example Corporation",
+                    "INSTALLFOLDER:dwGveZhe5wcMbbRyRAkRwm2sqnE4:oekcr5lq|MsiPackage",
+                    "ProgramFilesFolder:TARGETDIR:PFiles",
+                    "TARGETDIR::SourceDir"
+                ], [.. directoryRows.Select(r => r.FieldAsString(0) + ":" + r.FieldAsString(1) + ":" + r.FieldAsString(2))]);
             }
         }
 
