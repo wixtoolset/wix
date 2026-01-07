@@ -185,12 +185,12 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "RequiredVersion":
-                        requiredVersion = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "RequiredVersion":
+                            requiredVersion = this.Core.GetAttributeVersionValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -210,27 +210,27 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "Bundle":
-                        this.ParseBundleElement(child);
-                        break;
-                    case "Fragment":
-                        this.ParseFragmentElement(child);
-                        break;
-                    case "Module":
-                        this.ParseModuleElement(child);
-                        break;
-                    case "PatchCreation":
-                        this.Core.Write(CompilerWarnings.PatchCreationDeprecated(sourceLineNumbers));
-                        break;
-                    case "Package":
-                        this.ParsePackageElement(child);
-                        break;
-                    case "Patch":
-                        this.ParsePatchElement(child);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "Bundle":
+                            this.ParseBundleElement(child);
+                            break;
+                        case "Fragment":
+                            this.ParseFragmentElement(child);
+                            break;
+                        case "Module":
+                            this.ParseModuleElement(child);
+                            break;
+                        case "PatchCreation":
+                            this.Core.Write(CompilerWarnings.PatchCreationDeprecated(sourceLineNumbers));
+                            break;
+                        case "Package":
+                            this.ParsePackageElement(child);
+                            break;
+                        case "Patch":
+                            this.ParsePatchElement(child);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -472,36 +472,36 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        appId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "ActivateAtStorage":
-                        activateAtStorage = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Advertise":
-                        appIdAdvertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DllSurrogate":
-                        dllSurrogate = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "LocalService":
-                        localService = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "RemoteServerName":
-                        remoteServerName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "RunAsInteractiveUser":
-                        runAsInteractiveUser = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ServiceParameters":
-                        serviceParameters = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            appId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "ActivateAtStorage":
+                            activateAtStorage = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Advertise":
+                            appIdAdvertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Description":
+                            description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "DllSurrogate":
+                            dllSurrogate = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            break;
+                        case "LocalService":
+                            localService = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "RemoteServerName":
+                            remoteServerName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "RunAsInteractiveUser":
+                            runAsInteractiveUser = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ServiceParameters":
+                            serviceParameters = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -536,12 +536,12 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "Class":
-                        this.ParseClassElement(child, componentId, advertise, fileServer, typeLibId, typeLibVersion, appId);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "Class":
+                            this.ParseClassElement(child, componentId, advertise, fileServer, typeLibId, typeLibVersion, appId);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -631,15 +631,15 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Value":
+                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -684,18 +684,18 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SuppressModularization":
-                        suppressModularization = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "SourceFile":
+                            sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "SuppressModularization":
+                            suppressModularization = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -767,15 +767,15 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "SourceFile":
+                            sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -837,13 +837,13 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Property":
-                        property = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, property);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Property":
+                            property = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, property);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -864,12 +864,12 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "Instance":
-                        this.ParseInstanceElement(child, property);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "Instance":
+                            this.ParseInstanceElement(child, property);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -898,21 +898,21 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "ProductCode":
-                        productCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, true);
-                        break;
-                    case "ProductName":
-                        productName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "UpgradeCode":
-                        upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "ProductCode":
+                            productCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, true);
+                            break;
+                        case "ProductName":
+                            productName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "UpgradeCode":
+                            upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -964,22 +964,22 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "AppData":
-                        appData = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Feature":
-                        feature = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Feature, feature);
-                        break;
-                    case "Qualifier":
-                        qualifier = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "AppData":
+                            appData = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Feature":
+                            feature = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Feature, feature);
+                            break;
+                        case "Qualifier":
+                            qualifier = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1059,71 +1059,71 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        classId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Advertise":
-                        classAdvertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "AppId":
-                        appId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Argument":
-                        argument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Context":
-                        contexts = this.Core.GetAttributeValue(sourceLineNumbers, attrib).Split("\r\n\t ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-                        break;
-                    case "Control":
-                        control = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Handler":
-                        defaultInprocHandler = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Icon":
-                        icon = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "IconIndex":
-                        iconIndex = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int16.MinValue + 1, Int16.MaxValue);
-                        break;
-                    case "RelativePath":
-                        relativePath = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
+                        case "Id":
+                            classId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Advertise":
+                            classAdvertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "AppId":
+                            appId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Argument":
+                            argument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Context":
+                            contexts = this.Core.GetAttributeValue(sourceLineNumbers, attrib).Split("\r\n\t ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                            break;
+                        case "Control":
+                            control = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Description":
+                            description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Handler":
+                            defaultInprocHandler = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Icon":
+                            icon = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        case "IconIndex":
+                            iconIndex = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Int16.MinValue + 1, Int16.MaxValue);
+                            break;
+                        case "RelativePath":
+                            relativePath = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
 
-                    // The following attributes result in rows always added to the Registry table rather than the Class table
-                    case "Insertable":
-                        insertable = (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? "Insertable" : "NotInsertable";
-                        break;
-                    case "Programmable":
-                        programmable = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SafeForInitializing":
-                        safeForInit = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SafeForScripting":
-                        safeForScripting = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ForeignServer":
-                        foreignServer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Server":
-                        localFileServer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ShortPath":
-                        shortServerPath = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ThreadingModel":
-                        threadingModel = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Version":
-                        version = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        // The following attributes result in rows always added to the Registry table rather than the Class table
+                        case "Insertable":
+                            insertable = (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib)) ? "Insertable" : "NotInsertable";
+                            break;
+                        case "Programmable":
+                            programmable = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "SafeForInitializing":
+                            safeForInit = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "SafeForScripting":
+                            safeForScripting = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ForeignServer":
+                            foreignServer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Server":
+                            localFileServer = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ShortPath":
+                            shortServerPath = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ThreadingModel":
+                            threadingModel = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Version":
+                            version = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1199,35 +1199,35 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "FileTypeMask":
-                        if (YesNoType.Yes == advertise)
+                        case "FileTypeMask":
+                            if (YesNoType.Yes == advertise)
+                            {
+                                fileTypeMask = String.Concat(fileTypeMask, null == fileTypeMask ? String.Empty : ";", this.ParseFileTypeMaskElement(child));
+                            }
+                            else if (YesNoType.No == advertise)
+                            {
+                                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                                this.Core.CreateRegistryStringSymbol(childSourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("FileType\\", classId, "\\", fileTypeMaskIndex.ToString()), String.Empty, this.ParseFileTypeMaskElement(child), componentId);
+                                fileTypeMaskIndex++;
+                            }
+                            break;
+                        case "Interface":
+                            this.ParseInterfaceElement(child, componentId, class16bit ? classId : null, class32bit ? classId : null, typeLibId, typeLibVersion);
+                            break;
+                        case "ProgId":
                         {
-                            fileTypeMask = String.Concat(fileTypeMask, null == fileTypeMask ? String.Empty : ";", this.ParseFileTypeMaskElement(child));
-                        }
-                        else if (YesNoType.No == advertise)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.CreateRegistryStringSymbol(childSourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("FileType\\", classId, "\\", fileTypeMaskIndex.ToString()), String.Empty, this.ParseFileTypeMaskElement(child), componentId);
-                            fileTypeMaskIndex++;
+                            var foundExtension = false;
+                            var progId = this.ParseProgIdElement(child, componentId, advertise, classId, description, null, ref foundExtension, firstProgIdForClass);
+                            if (null == defaultProgId)
+                            {
+                                defaultProgId = progId;
+                            }
+                            firstProgIdForClass = YesNoType.No;
                         }
                         break;
-                    case "Interface":
-                        this.ParseInterfaceElement(child, componentId, class16bit ? classId : null, class32bit ? classId : null, typeLibId, typeLibVersion);
-                        break;
-                    case "ProgId":
-                    {
-                        var foundExtension = false;
-                        var progId = this.ParseProgIdElement(child, componentId, advertise, classId, description, null, ref foundExtension, firstProgIdForClass);
-                        if (null == defaultProgId)
-                        {
-                            defaultProgId = progId;
-                        }
-                        firstProgIdForClass = YesNoType.No;
-                    }
-                    break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -1394,19 +1394,19 @@ namespace WixToolset.Core
                 {
                     switch (defaultInprocHandler) // ClassId Default Inproc Handler
                     {
-                    case "1":
-                        this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler"), String.Empty, "ole2.dll", componentId);
-                        break;
-                    case "2":
-                        this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, "ole32.dll", componentId);
-                        break;
-                    case "3":
-                        this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler"), String.Empty, "ole2.dll", componentId);
-                        this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, "ole32.dll", componentId);
-                        break;
-                    default:
-                        this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, defaultInprocHandler, componentId);
-                        break;
+                        case "1":
+                            this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler"), String.Empty, "ole2.dll", componentId);
+                            break;
+                        case "2":
+                            this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, "ole32.dll", componentId);
+                            break;
+                        case "3":
+                            this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler"), String.Empty, "ole2.dll", componentId);
+                            this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, "ole32.dll", componentId);
+                            break;
+                        default:
+                            this.Core.CreateRegistryStringSymbol(sourceLineNumbers, RegistryRootType.ClassesRoot, String.Concat("CLSID\\", classId, "\\InprocHandler32"), String.Empty, defaultInprocHandler, componentId);
+                            break;
                     }
                 }
 
@@ -1490,30 +1490,30 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        interfaceId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "BaseInterface":
-                        baseInterface = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "NumMethods":
-                        numMethods = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "ProxyStubClassId":
-                        proxyId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ProxyStubClassId32":
-                        proxyId32 = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Versioned":
-                        versioned = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            interfaceId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "BaseInterface":
+                            baseInterface = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Name":
+                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "NumMethods":
+                            numMethods = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
+                            break;
+                        case "ProxyStubClassId":
+                            proxyId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ProxyStubClassId32":
+                            proxyId32 = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Versioned":
+                            versioned = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1584,18 +1584,18 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Mask":
-                        mask = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Offset":
-                        offset = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Mask":
+                            mask = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Offset":
+                            offset = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
+                            break;
+                        case "Value":
+                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1658,30 +1658,30 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "ExcludeLanguages":
-                        excludeLanguages = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "IncludeMaximum":
-                        maxInclusive = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "IncludeMinimum":
-                        minInclusive = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Language":
-                        language = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Minimum":
-                        minimum = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Maximum":
-                        maximum = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "UpgradeCode":
-                        upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "ExcludeLanguages":
+                            excludeLanguages = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "IncludeMaximum":
+                            maxInclusive = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "IncludeMinimum":
+                            minInclusive = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Language":
+                            language = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Minimum":
+                            minimum = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Maximum":
+                            maximum = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "UpgradeCode":
+                            upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1735,59 +1735,59 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Bitness":
-                        var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (bitnessValue)
-                        {
-                        case "always32":
-                            search64bit = false;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
-                        case "always64":
-                            search64bit = true;
+                        case "Bitness":
+                            var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (bitnessValue)
+                            {
+                                case "always32":
+                                    search64bit = false;
+                                    break;
+                                case "always64":
+                                    search64bit = true;
+                                    break;
+                                case "default":
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                                    break;
+                            }
                             break;
-                        case "default":
-                        case "":
+                        case "Key":
+                            key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Name":
+                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Root":
+                            root = this.Core.GetAttributeRegistryRootValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Type":
+                            var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (typeValue)
+                            {
+                                case "directory":
+                                    type = RegLocatorType.Directory;
+                                    break;
+                                case "file":
+                                    type = RegLocatorType.FileName;
+                                    break;
+                                case "raw":
+                                    type = RegLocatorType.Raw;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "raw"));
+                                    break;
+                            }
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    case "Key":
-                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Root":
-                        root = this.Core.GetAttributeRegistryRootValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Type":
-                        var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (typeValue)
-                        {
-                        case "directory":
-                            type = RegLocatorType.Directory;
-                            break;
-                        case "file":
-                            type = RegLocatorType.FileName;
-                            break;
-                        case "raw":
-                            type = RegLocatorType.Raw;
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "raw"));
-                            break;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
@@ -1824,46 +1824,46 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "DirectorySearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
+                        case "DirectorySearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
 
-                        // directorysearch parentage should work like directory element, not the rest of the signature type because of the DrLocator.Parent column
-                        signature = this.ParseDirectorySearchElement(child, id.Id);
-                        break;
-                    case "DirectorySearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseDirectorySearchRefElement(child, id.Id);
-                        break;
-                    case "FileSearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
-                        id = new Identifier(AccessModifier.Section, signature); // FileSearch signatures override parent signatures
-                        break;
-                    case "FileSearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
-                        id = new Identifier(AccessModifier.Section, newId);
-                        signature = null;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                            // directorysearch parentage should work like directory element, not the rest of the signature type because of the DrLocator.Parent column
+                            signature = this.ParseDirectorySearchElement(child, id.Id);
+                            break;
+                        case "DirectorySearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseDirectorySearchRefElement(child, id.Id);
+                            break;
+                        case "FileSearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
+                            id = new Identifier(AccessModifier.Section, signature); // FileSearch signatures override parent signatures
+                            break;
+                        case "FileSearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
+                            id = new Identifier(AccessModifier.Section, newId);
+                            signature = null;
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -1903,13 +1903,13 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.RegLocator, id);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.RegLocator, id);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -1944,33 +1944,33 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "ComplianceDrive":
-                        signature = this.ParseComplianceDriveElement(child);
-                        break;
-                    case "ComponentSearch":
-                        signature = this.ParseComponentSearchElement(child);
-                        break;
-                    case "DirectorySearch":
-                        signature = this.ParseDirectorySearchElement(child, null);
-                        break;
-                    case "DirectorySearchRef":
-                        signature = this.ParseDirectorySearchRefElement(child, null);
-                        break;
-                    case "IniFileSearch":
-                        signature = this.ParseIniFileSearchElement(child);
-                        break;
-                    case "ProductSearch":
-                        // handled in ParsePropertyElement
-                        break;
-                    case "RegistrySearch":
-                        signature = this.ParseRegistrySearchElement(child);
-                        break;
-                    case "RegistrySearchRef":
-                        signature = this.ParseRegistrySearchRefElement(child);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "ComplianceDrive":
+                            signature = this.ParseComplianceDriveElement(child);
+                            break;
+                        case "ComponentSearch":
+                            signature = this.ParseComponentSearchElement(child);
+                            break;
+                        case "DirectorySearch":
+                            signature = this.ParseDirectorySearchElement(child, null);
+                            break;
+                        case "DirectorySearchRef":
+                            signature = this.ParseDirectorySearchRefElement(child, null);
+                            break;
+                        case "IniFileSearch":
+                            signature = this.ParseIniFileSearchElement(child);
+                            break;
+                        case "ProductSearch":
+                            // handled in ParsePropertyElement
+                            break;
+                        case "RegistrySearch":
+                            signature = this.ParseRegistrySearchElement(child);
+                            break;
+                        case "RegistrySearchRef":
+                            signature = this.ParseRegistrySearchRefElement(child);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -2006,25 +2006,25 @@ namespace WixToolset.Core
                     var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(node);
                     switch (child.Name.LocalName)
                     {
-                    case "DirectorySearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseDirectorySearchElement(child, "CCP_DRIVE");
-                        break;
-                    case "DirectorySearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseDirectorySearchRefElement(child, "CCP_DRIVE");
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "DirectorySearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseDirectorySearchElement(child, "CCP_DRIVE");
+                            break;
+                        case "DirectorySearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseDirectorySearchRefElement(child, "CCP_DRIVE");
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -2055,9 +2055,9 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -2143,103 +2143,103 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Bitness":
-                        var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (bitnessValue)
-                        {
-                        case "always32":
-                            win64 = false;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
-                        case "always64":
-                            win64 = true;
+                        case "Bitness":
+                            var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (bitnessValue)
+                            {
+                                case "always32":
+                                    win64 = false;
+                                    break;
+                                case "always64":
+                                    win64 = true;
+                                    break;
+                                case "default":
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                                    break;
+                            }
                             break;
-                        case "default":
-                        case "":
+                        case "ComPlusFlags":
+                            comPlusBits = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
+                            break;
+                        case "DisableRegistryReflection":
+                            disableRegistryReflection = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Condition":
+                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Directory":
+                            directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                            break;
+                        case "Subdirectory":
+                            subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                            break;
+                        case "DiskId":
+                            diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
+                            break;
+                        case "Feature":
+                            feature = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Guid":
+                            guid = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, true, true);
+                            break;
+                        case "KeyPath":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                keyFound = true;
+                                keyPath = null;
+                            }
+                            break;
+                        case "Location":
+                            var locationValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (locationValue)
+                            {
+                                case "either":
+                                    location = ComponentLocation.Either;
+                                    break;
+                                case "local": // this is the default
+                                    location = ComponentLocation.LocalOnly;
+                                    break;
+                                case "source":
+                                    location = ComponentLocation.SourceOnly;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, locationValue, "either", "local", "source"));
+                                    break;
+                            }
+                            break;
+                        case "MultiInstance":
+                            multiInstance = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "NeverOverwrite":
+                            neverOverwrite = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Permanent":
+                            permanent = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Shared":
+                            shared = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "SharedDllRefCount":
+                            sharedDllRefCount = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Transitive":
+                            transitive = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "UninstallWhenSuperseded":
+                            uninstallWhenSuperseded = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    case "ComPlusFlags":
-                        comPlusBits = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "DisableRegistryReflection":
-                        disableRegistryReflection = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Directory":
-                        directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
-                        break;
-                    case "Subdirectory":
-                        subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
-                        break;
-                    case "DiskId":
-                        diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        break;
-                    case "Feature":
-                        feature = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Guid":
-                        guid = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, true, true);
-                        break;
-                    case "KeyPath":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            keyFound = true;
-                            keyPath = null;
-                        }
-                        break;
-                    case "Location":
-                        var locationValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (locationValue)
-                        {
-                        case "either":
-                            location = ComponentLocation.Either;
-                            break;
-                        case "local": // this is the default
-                            location = ComponentLocation.LocalOnly;
-                            break;
-                        case "source":
-                            location = ComponentLocation.SourceOnly;
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, locationValue, "either", "local", "source"));
-                            break;
-                        }
-                        break;
-                    case "MultiInstance":
-                        multiInstance = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "NeverOverwrite":
-                        neverOverwrite = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Permanent":
-                        permanent = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Shared":
-                        shared = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SharedDllRefCount":
-                        sharedDllRefCount = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Transitive":
-                        transitive = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "UninstallWhenSuperseded":
-                        uninstallWhenSuperseded = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
@@ -2305,113 +2305,113 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "AppId":
-                        this.ParseAppIdElement(child, id.Id, YesNoType.NotSet, null, null, null);
-                        break;
-                    case "Category":
-                        this.ParseCategoryElement(child, id.Id);
-                        break;
-                    case "Class":
-                        this.ParseClassElement(child, id.Id, YesNoType.NotSet, null, null, null, null);
-                        break;
-                    case "CopyFile":
-                        this.ParseCopyFileElement(child, id.Id, null);
-                        break;
-                    case "CreateFolder":
-                        var createdFolder = this.ParseCreateFolderElement(child, id.Id, directoryId, win64);
-                        break;
-                    case "Environment":
-                        this.ParseEnvironmentElement(child, id.Id);
-                        break;
-                    case "Extension":
-                        this.ParseExtensionElement(child, id.Id, YesNoType.NotSet, null);
-                        break;
-                    case "File":
-                        keyPathSet = this.ParseFileElement(child, id.Id, directoryId, diskId, srcPath, out keyPossible, win64, guid);
-                        keyBit = ComponentKeyPathType.File;
-                        files++;
-                        break;
-                    case "IniFile":
-                        this.ParseIniFileElement(child, id.Id);
-                        break;
-                    case "Interface":
-                        this.ParseInterfaceElement(child, id.Id, null, null, null, null);
-                        break;
-                    case "IsolateComponent":
-                        this.ParseIsolateComponentElement(child, id.Id);
-                        break;
-                    case "ODBCDataSource":
-                        keyPathSet = this.ParseODBCDataSource(child, id.Id, null, out keyPossible);
-                        keyBit = ComponentKeyPathType.OdbcDataSource;
-                        encounteredODBCDataSource = true;
-                        break;
-                    case "ODBCDriver":
-                        this.ParseODBCDriverOrTranslator(child, id.Id, null, SymbolDefinitionType.ODBCDriver);
-                        break;
-                    case "ODBCTranslator":
-                        this.ParseODBCDriverOrTranslator(child, id.Id, null, SymbolDefinitionType.ODBCTranslator);
-                        break;
-                    case "ProgId":
-                        var foundExtension = false;
-                        this.ParseProgIdElement(child, id.Id, YesNoType.NotSet, null, null, null, ref foundExtension, YesNoType.NotSet);
-                        break;
-                    case "Provides":
-                        if (win64)
-                        {
-                            this.Messaging.Write(CompilerWarnings.Win64Component(sourceLineNumbers, id.Id));
-                        }
+                        case "AppId":
+                            this.ParseAppIdElement(child, id.Id, YesNoType.NotSet, null, null, null);
+                            break;
+                        case "Category":
+                            this.ParseCategoryElement(child, id.Id);
+                            break;
+                        case "Class":
+                            this.ParseClassElement(child, id.Id, YesNoType.NotSet, null, null, null, null);
+                            break;
+                        case "CopyFile":
+                            this.ParseCopyFileElement(child, id.Id, null);
+                            break;
+                        case "CreateFolder":
+                            var createdFolder = this.ParseCreateFolderElement(child, id.Id, directoryId, win64);
+                            break;
+                        case "Environment":
+                            this.ParseEnvironmentElement(child, id.Id);
+                            break;
+                        case "Extension":
+                            this.ParseExtensionElement(child, id.Id, YesNoType.NotSet, null);
+                            break;
+                        case "File":
+                            keyPathSet = this.ParseFileElement(child, id.Id, directoryId, diskId, srcPath, out keyPossible, win64, guid);
+                            keyBit = ComponentKeyPathType.File;
+                            files++;
+                            break;
+                        case "IniFile":
+                            this.ParseIniFileElement(child, id.Id);
+                            break;
+                        case "Interface":
+                            this.ParseInterfaceElement(child, id.Id, null, null, null, null);
+                            break;
+                        case "IsolateComponent":
+                            this.ParseIsolateComponentElement(child, id.Id);
+                            break;
+                        case "ODBCDataSource":
+                            keyPathSet = this.ParseODBCDataSource(child, id.Id, null, out keyPossible);
+                            keyBit = ComponentKeyPathType.OdbcDataSource;
+                            encounteredODBCDataSource = true;
+                            break;
+                        case "ODBCDriver":
+                            this.ParseODBCDriverOrTranslator(child, id.Id, null, SymbolDefinitionType.ODBCDriver);
+                            break;
+                        case "ODBCTranslator":
+                            this.ParseODBCDriverOrTranslator(child, id.Id, null, SymbolDefinitionType.ODBCTranslator);
+                            break;
+                        case "ProgId":
+                            var foundExtension = false;
+                            this.ParseProgIdElement(child, id.Id, YesNoType.NotSet, null, null, null, ref foundExtension, YesNoType.NotSet);
+                            break;
+                        case "Provides":
+                            if (win64)
+                            {
+                                this.Messaging.Write(CompilerWarnings.Win64Component(sourceLineNumbers, id.Id));
+                            }
 
-                        keyPathSet = this.ParseProvidesElement(child, null, id.Id, out keyPossible);
-                        keyBit = ComponentKeyPathType.Registry;
-                        break;
+                            keyPathSet = this.ParseProvidesElement(child, null, id.Id, out keyPossible);
+                            keyBit = ComponentKeyPathType.Registry;
+                            break;
 
-                    case "RegistryKey":
-                        keyPathSet = this.ParseRegistryKeyElement(child, id.Id, null, null, win64, out keyPossible);
-                        keyBit = ComponentKeyPathType.Registry;
-                        break;
-                    case "RegistryValue":
-                        keyPathSet = this.ParseRegistryValueElement(child, id.Id, null, null, win64, out keyPossible);
-                        keyBit = ComponentKeyPathType.Registry;
-                        break;
-                    case "RemoveFile":
-                        this.ParseRemoveFileElement(child, id.Id, directoryId);
-                        break;
-                    case "RemoveFolder":
-                        this.ParseRemoveFolderElement(child, id.Id, directoryId);
-                        break;
-                    case "RemoveRegistryKey":
-                        this.ParseRemoveRegistryKeyElement(child, id.Id);
-                        break;
-                    case "RemoveRegistryValue":
-                        this.ParseRemoveRegistryValueElement(child, id.Id);
-                        break;
-                    case "ReserveCost":
-                        this.ParseReserveCostElement(child, id.Id, directoryId);
-                        break;
-                    case "ServiceConfig":
-                        this.ParseServiceConfigElement(child, id.Id, null);
-                        break;
-                    case "ServiceConfigFailureActions":
-                        this.ParseServiceConfigFailureActionsElement(child, id.Id, null);
-                        break;
-                    case "ServiceControl":
-                        this.ParseServiceControlElement(child, id.Id);
-                        break;
-                    case "ServiceInstall":
-                        this.ParseServiceInstallElement(child, id.Id, win64);
-                        break;
-                    case "Shortcut":
-                        this.ParseShortcutElement(child, id.Id, node.Name.LocalName, directoryId, YesNoType.No);
-                        break;
-                    case "SymbolPath":
-                        symbols.Add(this.ParseSymbolPathElement(child));
-                        break;
-                    case "TypeLib":
-                        this.ParseTypeLibElement(child, id.Id, null, win64);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "RegistryKey":
+                            keyPathSet = this.ParseRegistryKeyElement(child, id.Id, null, null, win64, out keyPossible);
+                            keyBit = ComponentKeyPathType.Registry;
+                            break;
+                        case "RegistryValue":
+                            keyPathSet = this.ParseRegistryValueElement(child, id.Id, null, null, win64, out keyPossible);
+                            keyBit = ComponentKeyPathType.Registry;
+                            break;
+                        case "RemoveFile":
+                            this.ParseRemoveFileElement(child, id.Id, directoryId);
+                            break;
+                        case "RemoveFolder":
+                            this.ParseRemoveFolderElement(child, id.Id, directoryId);
+                            break;
+                        case "RemoveRegistryKey":
+                            this.ParseRemoveRegistryKeyElement(child, id.Id);
+                            break;
+                        case "RemoveRegistryValue":
+                            this.ParseRemoveRegistryValueElement(child, id.Id);
+                            break;
+                        case "ReserveCost":
+                            this.ParseReserveCostElement(child, id.Id, directoryId);
+                            break;
+                        case "ServiceConfig":
+                            this.ParseServiceConfigElement(child, id.Id, null);
+                            break;
+                        case "ServiceConfigFailureActions":
+                            this.ParseServiceConfigFailureActionsElement(child, id.Id, null);
+                            break;
+                        case "ServiceControl":
+                            this.ParseServiceControlElement(child, id.Id);
+                            break;
+                        case "ServiceInstall":
+                            this.ParseServiceInstallElement(child, id.Id, win64);
+                            break;
+                        case "Shortcut":
+                            this.ParseShortcutElement(child, id.Id, node.Name.LocalName, directoryId, YesNoType.No);
+                            break;
+                        case "SymbolPath":
+                            symbols.Add(this.ParseSymbolPathElement(child));
+                            break;
+                        case "TypeLib":
+                            this.ParseTypeLibElement(child, id.Id, null, win64);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -2605,22 +2605,22 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Directory":
-                        directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
-                        break;
-                    case "Subdirectory":
-                        subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
-                        break;
-                    case "Source":
-                        source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Directory":
+                            directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                            break;
+                        case "Subdirectory":
+                            subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                            break;
+                        case "Source":
+                            source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -2648,24 +2648,24 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "ComponentGroupRef":
-                        this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, null);
-                        break;
-                    case "ComponentRef":
-                        this.ParseComponentRefElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, null);
-                        break;
-                    case "Component":
-                        this.ParseComponentElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, null, CompilerConstants.IntegerNotSet, directoryId, source);
-                        break;
-                    case "File":
-                        this.ParseNakedFileElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, directoryId, source);
-                        break;
-                    case "Files":
-                        this.ParseFilesElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, directoryId, source);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "ComponentGroupRef":
+                            this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, null);
+                            break;
+                        case "ComponentRef":
+                            this.ParseComponentRefElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, null);
+                            break;
+                        case "Component":
+                            this.ParseComponentElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, null, CompilerConstants.IntegerNotSet, directoryId, source);
+                            break;
+                        case "File":
+                            this.ParseNakedFileElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, directoryId, source);
+                            break;
+                        case "Files":
+                            this.ParseFilesElement(child, ComplexReferenceParentType.ComponentGroup, id.Id, directoryId, source);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -2707,16 +2707,16 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixComponentGroup, id);
-                        break;
-                    case "Primary":
-                        primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixComponentGroup, id);
+                            break;
+                        case "Primary":
+                            primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -2756,16 +2756,16 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Component, id);
-                        break;
-                    case "Primary":
-                        primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Component, id);
+                            break;
+                        case "Primary":
+                            primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -2802,32 +2802,32 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Guid":
-                        componentId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Type":
-                        var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (typeValue)
-                        {
-                        case "directory":
-                            type = LocatorType.Directory;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
-                        case "file":
-                            type = LocatorType.Filename;
+                        case "Guid":
+                            componentId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
                             break;
-                        case "":
+                        case "Type":
+                            var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (typeValue)
+                            {
+                                case "directory":
+                                    type = LocatorType.Directory;
+                                    break;
+                                case "file":
+                                    type = LocatorType.Filename;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue, "directory", "file"));
+                                    break;
+                            }
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue, "directory", "file"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
@@ -2849,46 +2849,46 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "DirectorySearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
+                        case "DirectorySearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
 
-                        // directorysearch parentage should work like directory element, not the rest of the signature type because of the DrLocator.Parent column
-                        signature = this.ParseDirectorySearchElement(child, id.Id);
-                        break;
-                    case "DirectorySearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseDirectorySearchRefElement(child, id.Id);
-                        break;
-                    case "FileSearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
-                        id = new Identifier(AccessModifier.Section, signature); // FileSearch signatures override parent signatures
-                        break;
-                    case "FileSearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
-                        id = new Identifier(AccessModifier.Section, newId);
-                        signature = null;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                            // directorysearch parentage should work like directory element, not the rest of the signature type because of the DrLocator.Parent column
+                            signature = this.ParseDirectorySearchElement(child, id.Id);
+                            break;
+                        case "DirectorySearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseDirectorySearchRefElement(child, id.Id);
+                            break;
+                        case "FileSearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
+                            id = new Identifier(AccessModifier.Section, signature); // FileSearch signatures override parent signatures
+                            break;
+                        case "FileSearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
+                            id = new Identifier(AccessModifier.Section, newId);
+                            signature = null;
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -3016,52 +3016,52 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Delete":
-                        delete = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DestinationDirectory":
-                        destinationDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, destinationDirectory);
-                        break;
-                    case "DestinationSubdirectory":
-                        destinationSubdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
-                        break;
-                    case "DestinationName":
-                        destinationName = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib);
-                        break;
-                    case "DestinationProperty":
-                        destinationProperty = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DestinationShortName":
-                        destinationShortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib);
-                        break;
-                    case "FileId":
-                        if (null != fileId)
-                        {
-                            this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
-                        }
-                        fileId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, fileId);
-                        break;
-                    case "SourceDirectory":
-                        sourceDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, sourceDirectory);
-                        break;
-                    case "SourceSubdirectory":
-                        sourceSubdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
-                        break;
-                    case "SourceName":
-                        sourceName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "SourceProperty":
-                        sourceProperty = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Delete":
+                            delete = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "DestinationDirectory":
+                            destinationDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, destinationDirectory);
+                            break;
+                        case "DestinationSubdirectory":
+                            destinationSubdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                            break;
+                        case "DestinationName":
+                            destinationName = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib);
+                            break;
+                        case "DestinationProperty":
+                            destinationProperty = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        case "DestinationShortName":
+                            destinationShortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib);
+                            break;
+                        case "FileId":
+                            if (null != fileId)
+                            {
+                                this.Core.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, node.Parent.Name.LocalName));
+                            }
+                            fileId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, fileId);
+                            break;
+                        case "SourceDirectory":
+                            sourceDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, sourceDirectory);
+                            break;
+                        case "SourceSubdirectory":
+                            sourceSubdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                            break;
+                        case "SourceName":
+                            sourceName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "SourceProperty":
+                            sourceProperty = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -3203,233 +3203,233 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "BinaryRef":
-                        if (null != source)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
-                        }
-                        source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        sourceType = CustomActionSourceType.Binary;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Binary, source); // add a reference to the appropriate Binary
-                        break;
-                    case "Bitness":
-                        var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (bitnessValue)
-                        {
-                        case "always32":
-                            explicitWin64 = true;
-                            win64 = false;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
-                        case "always64":
-                            explicitWin64 = true;
-                            win64 = true;
+                        case "BinaryRef":
+                            if (null != source)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
+                            }
+                            source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            sourceType = CustomActionSourceType.Binary;
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Binary, source); // add a reference to the appropriate Binary
                             break;
-                        case "default":
-                        case "":
+                        case "Bitness":
+                            var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (bitnessValue)
+                            {
+                                case "always32":
+                                    explicitWin64 = true;
+                                    win64 = false;
+                                    break;
+                                case "always64":
+                                    explicitWin64 = true;
+                                    win64 = true;
+                                    break;
+                                case "default":
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                                    break;
+                            }
                             break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
-                            break;
-                        }
-                        break;
-                    case "Directory":
-                        if (null != source)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileRef", "Property", "Script"));
-                        }
-                        source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        sourceType = CustomActionSourceType.Directory;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, source);
-                        break;
-                    case "DllEntry":
-                        if (null != target)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
-                        }
-                        target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        targetType = CustomActionTargetType.Dll;
-                        break;
-                    case "Error":
-                        if (null != target)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
-                        }
-                        target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        sourceType = CustomActionSourceType.File;
-                        targetType = CustomActionTargetType.TextData;
-
-                        // The target can be either a formatted error string or a literal
-                        // error number. Try to convert to error number to determine whether
-                        // to add a reference. No need to look at the value.
-                        if (Int32.TryParse(target, out var ignored))
-                        {
-                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Error, target);
-                        }
-                        break;
-                    case "ExeCommand":
-                        if (null != target)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
-                        }
-                        target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        targetType = CustomActionTargetType.Exe;
-                        break;
-                    case "Execute":
-                        var execute = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (execute)
-                        {
-                        case "commit":
-                            executionType = CustomActionExecutionType.Commit;
-                            break;
-                        case "deferred":
-                            executionType = CustomActionExecutionType.Deferred;
-                            break;
-                        case "firstSequence":
-                            executionType = CustomActionExecutionType.FirstSequence;
-                            break;
-                        case "immediate":
-                            executionType = CustomActionExecutionType.Immediate;
-                            break;
-                        case "oncePerProcess":
-                            executionType = CustomActionExecutionType.OncePerProcess;
-                            break;
-                        case "rollback":
-                            executionType = CustomActionExecutionType.Rollback;
-                            break;
-                        case "secondSequence":
-                            executionType = CustomActionExecutionType.ClientRepeat;
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, execute, "commit", "deferred", "firstSequence", "immediate", "oncePerProcess", "rollback", "secondSequence"));
-                            break;
-                        }
-                        break;
-                    case "FileRef":
-                        if (null != source)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
-                        }
-                        source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        sourceType = CustomActionSourceType.File;
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, source); // add a reference to the appropriate File
-                        break;
-                    case "HideTarget":
-                        hidden = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Impersonate":
-                        impersonate = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "JScriptCall":
-                        if (null != target)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
-                        }
-                        target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        targetType = CustomActionTargetType.JScript;
-                        break;
-                    case "PatchUninstall":
-                        patchUninstall = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Property":
-                        if (null != source)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
-                        }
-                        source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        sourceType = CustomActionSourceType.Property;
-                        break;
-                    case "Return":
-                        var returnValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (returnValue)
-                        {
-                        case "asyncNoWait":
-                            async = true;
-                            ignoreResult = true;
-                            break;
-                        case "asyncWait":
-                            async = true;
-                            break;
-                        case "check":
-                            break;
-                        case "ignore":
-                            ignoreResult = true;
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, returnValue, "asyncNoWait", "asyncWait", "check", "ignore"));
-                            break;
-                        }
-                        break;
-                    case "Script":
-                        if (null != source)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
-                        }
-
-                        if (null != target)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
-                        }
-
-                        // set the source and target to empty string for error messages when the user sets multiple sources or targets
-                        source = String.Empty;
-                        target = String.Empty;
-
-                        inlineScript = true;
-
-                        var script = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (script)
-                        {
-                        case "jscript":
+                        case "Directory":
+                            if (null != source)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryKey", "Directory", "FileRef", "Property", "Script"));
+                            }
+                            source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                             sourceType = CustomActionSourceType.Directory;
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, source);
+                            break;
+                        case "DllEntry":
+                            if (null != target)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                            }
+                            target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            targetType = CustomActionTargetType.Dll;
+                            break;
+                        case "Error":
+                            if (null != target)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                            }
+                            target = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            sourceType = CustomActionSourceType.File;
+                            targetType = CustomActionTargetType.TextData;
+
+                            // The target can be either a formatted error string or a literal
+                            // error number. Try to convert to error number to determine whether
+                            // to add a reference. No need to look at the value.
+                            if (Int32.TryParse(target, out var ignored))
+                            {
+                                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Error, target);
+                            }
+                            break;
+                        case "ExeCommand":
+                            if (null != target)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                            }
+                            target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
+                            targetType = CustomActionTargetType.Exe;
+                            break;
+                        case "Execute":
+                            var execute = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (execute)
+                            {
+                                case "commit":
+                                    executionType = CustomActionExecutionType.Commit;
+                                    break;
+                                case "deferred":
+                                    executionType = CustomActionExecutionType.Deferred;
+                                    break;
+                                case "firstSequence":
+                                    executionType = CustomActionExecutionType.FirstSequence;
+                                    break;
+                                case "immediate":
+                                    executionType = CustomActionExecutionType.Immediate;
+                                    break;
+                                case "oncePerProcess":
+                                    executionType = CustomActionExecutionType.OncePerProcess;
+                                    break;
+                                case "rollback":
+                                    executionType = CustomActionExecutionType.Rollback;
+                                    break;
+                                case "secondSequence":
+                                    executionType = CustomActionExecutionType.ClientRepeat;
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, execute, "commit", "deferred", "firstSequence", "immediate", "oncePerProcess", "rollback", "secondSequence"));
+                                    break;
+                            }
+                            break;
+                        case "FileRef":
+                            if (null != source)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
+                            }
+                            source = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            sourceType = CustomActionSourceType.File;
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, source); // add a reference to the appropriate File
+                            break;
+                        case "HideTarget":
+                            hidden = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Impersonate":
+                            impersonate = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "JScriptCall":
+                            if (null != target)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                            }
+                            target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
                             targetType = CustomActionTargetType.JScript;
                             break;
-                        case "vbscript":
-                            sourceType = CustomActionSourceType.Directory;
+                        case "PatchUninstall":
+                            patchUninstall = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Property":
+                            if (null != source)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
+                            }
+                            source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            sourceType = CustomActionSourceType.Property;
+                            break;
+                        case "Return":
+                            var returnValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (returnValue)
+                            {
+                                case "asyncNoWait":
+                                    async = true;
+                                    ignoreResult = true;
+                                    break;
+                                case "asyncWait":
+                                    async = true;
+                                    break;
+                                case "check":
+                                    break;
+                                case "ignore":
+                                    ignoreResult = true;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, returnValue, "asyncNoWait", "asyncWait", "check", "ignore"));
+                                    break;
+                            }
+                            break;
+                        case "Script":
+                            if (null != source)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleSources(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "BinaryRef", "Directory", "FileRef", "Property", "Script"));
+                            }
+
+                            if (null != target)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                            }
+
+                            // set the source and target to empty string for error messages when the user sets multiple sources or targets
+                            source = String.Empty;
+                            target = String.Empty;
+
+                            inlineScript = true;
+
+                            var script = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (script)
+                            {
+                                case "jscript":
+                                    sourceType = CustomActionSourceType.Directory;
+                                    targetType = CustomActionTargetType.JScript;
+                                    break;
+                                case "vbscript":
+                                    sourceType = CustomActionSourceType.Directory;
+                                    targetType = CustomActionTargetType.VBScript;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, script, "jscript", "vbscript"));
+                                    break;
+                            }
+                            break;
+                        case "ScriptSourceFile":
+                            scriptFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Subdirectory":
+                            subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                            break;
+                        case "SuppressModularization":
+                            suppressModularization = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "TerminalServerAware":
+                            tsAware = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Value":
+                            if (null != target)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                            }
+                            target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
+                            targetType = CustomActionTargetType.TextData;
+                            break;
+                        case "VBScriptCall":
+                            if (null != target)
+                            {
+                                this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
+                            }
+                            target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
                             targetType = CustomActionTargetType.VBScript;
                             break;
-                        case "":
-                            break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, script, "jscript", "vbscript"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    case "ScriptSourceFile":
-                        scriptFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Subdirectory":
-                        subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
-                        break;
-                    case "SuppressModularization":
-                        suppressModularization = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "TerminalServerAware":
-                        tsAware = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        if (null != target)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
-                        }
-                        target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        targetType = CustomActionTargetType.TextData;
-                        break;
-                    case "VBScriptCall":
-                        if (null != target)
-                        {
-                            this.Core.Write(ErrorMessages.CustomActionMultipleTargets(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, "DllEntry", "Error", "ExeCommand", "JScriptCall", "Script", "Value", "VBScriptCall"));
-                        }
-                        target = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty); // one of the few cases where an empty string value is valid
-                        targetType = CustomActionTargetType.VBScript;
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
@@ -3600,13 +3600,13 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, symbolDefinition.Name, id);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, symbolDefinition.Name, id);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -3643,15 +3643,15 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        primaryKeys[0] = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ProductCode":
-                        primaryKeys[1] = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            primaryKeys[0] = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ProductCode":
+                            primaryKeys[1] = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -3690,12 +3690,12 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -3744,49 +3744,49 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "ComponentGuidGenerationSeed":
-                        componentGuidGenerationSeed = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "DiskId":
-                        diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        break;
-                    case "FileSource":
-                        fileSource = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        fileSourceAttribSet = true;
-                        break;
-                    case "Name":
-                        if ("." == attrib.Value)
-                        {
-                            name = attrib.Value;
-                        }
-                        else
-                        {
-                            name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
-                        }
-                        nameAttribute = attrib;
-                        break;
-                    case "ShortName":
-                        shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "ShortSourceName":
-                        shortSourceName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "SourceName":
-                        if ("." == attrib.Value)
-                        {
-                            sourceName = attrib.Value;
-                        }
-                        else
-                        {
-                            sourceName = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "ComponentGuidGenerationSeed":
+                            componentGuidGenerationSeed = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "DiskId":
+                            diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
+                            break;
+                        case "FileSource":
+                            fileSource = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            fileSourceAttribSet = true;
+                            break;
+                        case "Name":
+                            if ("." == attrib.Value)
+                            {
+                                name = attrib.Value;
+                            }
+                            else
+                            {
+                                name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                            }
+                            nameAttribute = attrib;
+                            break;
+                        case "ShortName":
+                            shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
+                            break;
+                        case "ShortSourceName":
+                            shortSourceName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
+                            break;
+                        case "SourceName":
+                            if ("." == attrib.Value)
+                            {
+                                sourceName = attrib.Value;
+                            }
+                            else
+                            {
+                                sourceName = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -3880,34 +3880,34 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "Component":
-                        this.ParseComponentElement(child, ComplexReferenceParentType.Unknown, null, null, diskId, id.Id, fileSource);
-                        break;
-                    case "Directory":
-                        this.ParseDirectoryElement(child, id.Id, diskId, fileSource);
-                        break;
-                    case "File":
-                        this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, id.Id, fileSource);
-                        break;
-                    case "Files":
-                        this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, id.Id, fileSource);
-                        break;
-                    case "Merge":
-                        this.ParseMergeElement(child, id.Id, diskId);
-                        break;
-                    case "SymbolPath":
-                        if (null != symbols)
-                        {
-                            symbols += ";" + this.ParseSymbolPathElement(child);
-                        }
-                        else
-                        {
-                            symbols = this.ParseSymbolPathElement(child);
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "Component":
+                            this.ParseComponentElement(child, ComplexReferenceParentType.Unknown, null, null, diskId, id.Id, fileSource);
+                            break;
+                        case "Directory":
+                            this.ParseDirectoryElement(child, id.Id, diskId, fileSource);
+                            break;
+                        case "File":
+                            this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, id.Id, fileSource);
+                            break;
+                        case "Files":
+                            this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, id.Id, fileSource);
+                            break;
+                        case "Merge":
+                            this.ParseMergeElement(child, id.Id, diskId);
+                            break;
+                        case "SymbolPath":
+                            if (null != symbols)
+                            {
+                                symbols += ";" + this.ParseSymbolPathElement(child);
+                            }
+                            else
+                            {
+                                symbols = this.ParseSymbolPathElement(child);
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -3957,19 +3957,19 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, id);
-                        break;
-                    case "DiskId":
-                        diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        break;
-                    case "FileSource":
-                        fileSource = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, id);
+                            break;
+                        case "DiskId":
+                            diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
+                            break;
+                        case "FileSource":
+                            fileSource = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -4002,24 +4002,24 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "Component":
-                        this.ParseComponentElement(child, ComplexReferenceParentType.Unknown, null, null, diskId, id, fileSource);
-                        break;
-                    case "Directory":
-                        this.ParseDirectoryElement(child, id, diskId, fileSource);
-                        break;
-                    case "File":
-                        this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, id, fileSource);
-                        break;
-                    case "Files":
-                        this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, id, fileSource);
-                        break;
-                    case "Merge":
-                        this.ParseMergeElement(child, id, diskId);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "Component":
+                            this.ParseComponentElement(child, ComplexReferenceParentType.Unknown, null, null, diskId, id, fileSource);
+                            break;
+                        case "Directory":
+                            this.ParseDirectoryElement(child, id, diskId, fileSource);
+                            break;
+                        case "File":
+                            this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, id, fileSource);
+                            break;
+                        case "Files":
+                            this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, id, fileSource);
+                            break;
+                        case "Merge":
+                            this.ParseMergeElement(child, id, diskId);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -4049,21 +4049,21 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Depth":
-                        depth = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Path":
-                        path = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "AssignToProperty":
-                        assignToProperty = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Depth":
+                            depth = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
+                            break;
+                        case "Path":
+                            path = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "AssignToProperty":
+                            assignToProperty = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -4088,42 +4088,42 @@ namespace WixToolset.Core
                     var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
-                    case "DirectorySearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseDirectorySearchElement(child, id.Id);
-                        break;
-                    case "DirectorySearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseDirectorySearchRefElement(child, id.Id);
-                        break;
-                    case "FileSearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        hasFileSearch = true;
-                        signature = this.ParseFileSearchElement(child, id.Id, assignToProperty, depth);
-                        break;
-                    case "FileSearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "DirectorySearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseDirectorySearchElement(child, id.Id);
+                            break;
+                        case "DirectorySearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseDirectorySearchRefElement(child, id.Id);
+                            break;
+                        case "FileSearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            hasFileSearch = true;
+                            signature = this.ParseFileSearchElement(child, id.Id, assignToProperty, depth);
+                            break;
+                        case "FileSearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
 
                     // If AssignToProperty is set, only a FileSearch
@@ -4199,18 +4199,18 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Parent":
-                        parent = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Path":
-                        path = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Parent":
+                            parent = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Path":
+                            path = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -4246,41 +4246,41 @@ namespace WixToolset.Core
                     var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
-                    case "DirectorySearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseDirectorySearchElement(child, id.Id);
-                        break;
-                    case "DirectorySearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseDirectorySearchRefElement(child, id.Id);
-                        break;
-                    case "FileSearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
-                        break;
-                    case "FileSearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "DirectorySearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseDirectorySearchElement(child, id.Id);
+                            break;
+                        case "DirectorySearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseDirectorySearchRefElement(child, id.Id);
+                            break;
+                        case "FileSearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
+                            break;
+                        case "FileSearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -4324,80 +4324,80 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "AllowAbsent":
-                        disallowAbsent = (this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.No);
-                        break;
-                    case "AllowAdvertise":
-                        disallowAdvertise = (this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.No);
-                        break;
-                    case "ConfigurableDirectory":
-                        configurableDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, configurableDirectory);
-                        break;
-                    case "Description":
-                        description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Display":
-                        displayValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "InstallDefault":
-                        var installDefaultValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (installDefaultValue)
-                        {
-                        case "followParent":
-                            if (ComplexReferenceParentType.Product == parentType)
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "AllowAbsent":
+                            disallowAbsent = (this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.No);
+                            break;
+                        case "AllowAdvertise":
+                            disallowAdvertise = (this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.No);
+                            break;
+                        case "ConfigurableDirectory":
+                            configurableDirectory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, configurableDirectory);
+                            break;
+                        case "Description":
+                            description = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Display":
+                            displayValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "InstallDefault":
+                            var installDefaultValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (installDefaultValue)
                             {
-                                this.Core.Write(ErrorMessages.RootFeatureCannotFollowParent(sourceLineNumbers));
+                                case "followParent":
+                                    if (ComplexReferenceParentType.Product == parentType)
+                                    {
+                                        this.Core.Write(ErrorMessages.RootFeatureCannotFollowParent(sourceLineNumbers));
+                                    }
+                                    //bits = bits | MsiInterop.MsidbFeatureAttributesFollowParent;
+                                    installDefault = FeatureInstallDefault.FollowParent;
+                                    break;
+                                case "local": // this is the default
+                                    installDefault = FeatureInstallDefault.Local;
+                                    break;
+                                case "source":
+                                    //bits = bits | MsiInterop.MsidbFeatureAttributesFavorSource;
+                                    installDefault = FeatureInstallDefault.Source;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installDefaultValue, "followParent", "local", "source"));
+                                    break;
                             }
-                            //bits = bits | MsiInterop.MsidbFeatureAttributesFollowParent;
-                            installDefault = FeatureInstallDefault.FollowParent;
                             break;
-                        case "local": // this is the default
-                            installDefault = FeatureInstallDefault.Local;
+                        case "Level":
+                            level = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
                             break;
-                        case "source":
-                            //bits = bits | MsiInterop.MsidbFeatureAttributesFavorSource;
-                            installDefault = FeatureInstallDefault.Source;
+                        case "Title":
+                            title = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            if ("PUT-FEATURE-TITLE-HERE" == title)
+                            {
+                                this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, title));
+                            }
                             break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installDefaultValue, "followParent", "local", "source"));
-                            break;
-                        }
-                        break;
-                    case "Level":
-                        level = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Title":
-                        title = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if ("PUT-FEATURE-TITLE-HERE" == title)
-                        {
-                            this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, title));
-                        }
-                        break;
-                    case "TypicalDefault":
-                        var typicalValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (typicalValue)
-                        {
-                        case "advertise":
-                            //bits |= MsiInterop.MsidbFeatureAttributesFavorAdvertise;
-                            typicalDefault = FeatureTypicalDefault.Advertise;
-                            break;
-                        case "install": // this is the default
-                            typicalDefault = FeatureTypicalDefault.Install;
+                        case "TypicalDefault":
+                            var typicalValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (typicalValue)
+                            {
+                                case "advertise":
+                                    //bits |= MsiInterop.MsidbFeatureAttributesFavorAdvertise;
+                                    typicalDefault = FeatureTypicalDefault.Advertise;
+                                    break;
+                                case "install": // this is the default
+                                    typicalDefault = FeatureTypicalDefault.Install;
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typicalValue, "advertise", "install"));
+                                    break;
+                            }
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typicalValue, "advertise", "install"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
@@ -4433,39 +4433,39 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "ComponentGroupRef":
-                        this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.Feature, id.Id, null);
-                        break;
-                    case "ComponentRef":
-                        this.ParseComponentRefElement(child, ComplexReferenceParentType.Feature, id.Id, null);
-                        break;
-                    case "Component":
-                        this.ParseComponentElement(child, ComplexReferenceParentType.Feature, id.Id, null, CompilerConstants.IntegerNotSet, null, null);
-                        break;
-                    case "Feature":
-                        this.ParseFeatureElement(child, ComplexReferenceParentType.Feature, id.Id, ref childDisplay);
-                        break;
-                    case "FeatureGroupRef":
-                        this.ParseFeatureGroupRefElement(child, ComplexReferenceParentType.Feature, id.Id);
-                        break;
-                    case "FeatureRef":
-                        this.ParseFeatureRefElement(child, ComplexReferenceParentType.Feature, id.Id);
-                        break;
-                    case "File":
-                        this.ParseNakedFileElement(child, ComplexReferenceParentType.Feature, id.Id, null, null);
-                        break;
-                    case "Files":
-                        this.ParseFilesElement(child, ComplexReferenceParentType.Feature, id.Id, null, null);
-                        break;
-                    case "Level":
-                        this.ParseLevelElement(child, id.Id);
-                        break;
-                    case "MergeRef":
-                        this.ParseMergeRefElement(child, ComplexReferenceParentType.Feature, id.Id);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "ComponentGroupRef":
+                            this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.Feature, id.Id, null);
+                            break;
+                        case "ComponentRef":
+                            this.ParseComponentRefElement(child, ComplexReferenceParentType.Feature, id.Id, null);
+                            break;
+                        case "Component":
+                            this.ParseComponentElement(child, ComplexReferenceParentType.Feature, id.Id, null, CompilerConstants.IntegerNotSet, null, null);
+                            break;
+                        case "Feature":
+                            this.ParseFeatureElement(child, ComplexReferenceParentType.Feature, id.Id, ref childDisplay);
+                            break;
+                        case "FeatureGroupRef":
+                            this.ParseFeatureGroupRefElement(child, ComplexReferenceParentType.Feature, id.Id);
+                            break;
+                        case "FeatureRef":
+                            this.ParseFeatureRefElement(child, ComplexReferenceParentType.Feature, id.Id);
+                            break;
+                        case "File":
+                            this.ParseNakedFileElement(child, ComplexReferenceParentType.Feature, id.Id, null, null);
+                            break;
+                        case "Files":
+                            this.ParseFilesElement(child, ComplexReferenceParentType.Feature, id.Id, null, null);
+                            break;
+                        case "Level":
+                            this.ParseLevelElement(child, id.Id);
+                            break;
+                        case "MergeRef":
+                            this.ParseMergeRefElement(child, ComplexReferenceParentType.Feature, id.Id);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -4477,31 +4477,31 @@ namespace WixToolset.Core
             int display;
             switch (displayValue)
             {
-            case "collapse":
-                lastDisplay = (lastDisplay | 1) + 1;
-                display = lastDisplay;
-                break;
-            case "expand":
-                lastDisplay = (lastDisplay + 1) | 1;
-                display = lastDisplay;
-                break;
-            case "hidden":
-                display = 0;
-                break;
-            default:
-                if (!Int32.TryParse(displayValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out display))
-                {
-                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Display", displayValue, "collapse", "expand", "hidden"));
-                }
-                else
-                {
-                    // Save the display value (if its not hidden) for subsequent rows
-                    if (0 != display)
+                case "collapse":
+                    lastDisplay = (lastDisplay | 1) + 1;
+                    display = lastDisplay;
+                    break;
+                case "expand":
+                    lastDisplay = (lastDisplay + 1) | 1;
+                    display = lastDisplay;
+                    break;
+                case "hidden":
+                    display = 0;
+                    break;
+                default:
+                    if (!Int32.TryParse(displayValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out display))
                     {
-                        lastDisplay = display;
+                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Display", displayValue, "collapse", "expand", "hidden"));
                     }
-                }
-                break;
+                    else
+                    {
+                        // Save the display value (if its not hidden) for subsequent rows
+                        if (0 != display)
+                        {
+                            lastDisplay = display;
+                        }
+                    }
+                    break;
             }
 
             if (!this.Core.EncounteredError)
@@ -4545,16 +4545,16 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Feature, id);
-                        break;
-                    case "IgnoreParent":
-                        ignoreParent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Feature, id);
+                            break;
+                        case "IgnoreParent":
+                            ignoreParent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -4576,39 +4576,39 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "ComponentGroupRef":
-                        this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.Feature, id, null);
-                        break;
-                    case "ComponentRef":
-                        this.ParseComponentRefElement(child, ComplexReferenceParentType.Feature, id, null);
-                        break;
-                    case "Component":
-                        this.ParseComponentElement(child, ComplexReferenceParentType.Feature, id, null, CompilerConstants.IntegerNotSet, null, null);
-                        break;
-                    case "Feature":
-                        this.ParseFeatureElement(child, ComplexReferenceParentType.Feature, id, ref lastDisplay);
-                        break;
-                    case "FeatureGroup":
-                        this.ParseFeatureGroupElement(child, ComplexReferenceParentType.Feature, id);
-                        break;
-                    case "FeatureGroupRef":
-                        this.ParseFeatureGroupRefElement(child, ComplexReferenceParentType.Feature, id);
-                        break;
-                    case "FeatureRef":
-                        this.ParseFeatureRefElement(child, ComplexReferenceParentType.Feature, id);
-                        break;
-                    case "File":
-                        this.ParseNakedFileElement(child, ComplexReferenceParentType.Feature, id, null, null);
-                        break;
-                    case "Files":
-                        this.ParseFilesElement(child, ComplexReferenceParentType.Feature, id, null, null);
-                        break;
-                    case "MergeRef":
-                        this.ParseMergeRefElement(child, ComplexReferenceParentType.Feature, id);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "ComponentGroupRef":
+                            this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.Feature, id, null);
+                            break;
+                        case "ComponentRef":
+                            this.ParseComponentRefElement(child, ComplexReferenceParentType.Feature, id, null);
+                            break;
+                        case "Component":
+                            this.ParseComponentElement(child, ComplexReferenceParentType.Feature, id, null, CompilerConstants.IntegerNotSet, null, null);
+                            break;
+                        case "Feature":
+                            this.ParseFeatureElement(child, ComplexReferenceParentType.Feature, id, ref lastDisplay);
+                            break;
+                        case "FeatureGroup":
+                            this.ParseFeatureGroupElement(child, ComplexReferenceParentType.Feature, id);
+                            break;
+                        case "FeatureGroupRef":
+                            this.ParseFeatureGroupRefElement(child, ComplexReferenceParentType.Feature, id);
+                            break;
+                        case "FeatureRef":
+                            this.ParseFeatureRefElement(child, ComplexReferenceParentType.Feature, id);
+                            break;
+                        case "File":
+                            this.ParseNakedFileElement(child, ComplexReferenceParentType.Feature, id, null, null);
+                            break;
+                        case "Files":
+                            this.ParseFilesElement(child, ComplexReferenceParentType.Feature, id, null, null);
+                            break;
+                        case "MergeRef":
+                            this.ParseMergeRefElement(child, ComplexReferenceParentType.Feature, id);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -4643,12 +4643,12 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -4670,36 +4670,36 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "ComponentGroupRef":
-                        this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, null);
-                        break;
-                    case "ComponentRef":
-                        this.ParseComponentRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, null);
-                        break;
-                    case "Component":
-                        this.ParseComponentElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, null, CompilerConstants.IntegerNotSet, null, null);
-                        break;
-                    case "Feature":
-                        this.ParseFeatureElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, ref lastDisplay);
-                        break;
-                    case "FeatureGroupRef":
-                        this.ParseFeatureGroupRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id);
-                        break;
-                    case "FeatureRef":
-                        this.ParseFeatureRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id);
-                        break;
-                    case "File":
-                        this.ParseNakedFileElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, null, null);
-                        break;
-                    case "Files":
-                        this.ParseFilesElement(child, ComplexReferenceParentType.Feature, id.Id, null, null);
-                        break;
-                    case "MergeRef":
-                        this.ParseMergeRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "ComponentGroupRef":
+                            this.ParseComponentGroupRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, null);
+                            break;
+                        case "ComponentRef":
+                            this.ParseComponentRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, null);
+                            break;
+                        case "Component":
+                            this.ParseComponentElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, null, CompilerConstants.IntegerNotSet, null, null);
+                            break;
+                        case "Feature":
+                            this.ParseFeatureElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, ref lastDisplay);
+                            break;
+                        case "FeatureGroupRef":
+                            this.ParseFeatureGroupRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id);
+                            break;
+                        case "FeatureRef":
+                            this.ParseFeatureRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id);
+                            break;
+                        case "File":
+                            this.ParseNakedFileElement(child, ComplexReferenceParentType.FeatureGroup, id.Id, null, null);
+                            break;
+                        case "Files":
+                            this.ParseFilesElement(child, ComplexReferenceParentType.Feature, id.Id, null, null);
+                            break;
+                        case "MergeRef":
+                            this.ParseMergeRefElement(child, ComplexReferenceParentType.FeatureGroup, id.Id);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -4738,19 +4738,19 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixFeatureGroup, id);
-                        break;
-                    case "IgnoreParent":
-                        ignoreParent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Primary":
-                        primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixFeatureGroup, id);
+                            break;
+                        case "IgnoreParent":
+                            ignoreParent = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Primary":
+                            primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -4798,65 +4798,65 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Action":
-                        var actionValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (actionValue)
-                        {
-                        case "create":
-                            action = EnvironmentActionType.Create;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
-                        case "set":
-                            action = EnvironmentActionType.Set;
+                        case "Action":
+                            var actionValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (actionValue)
+                            {
+                                case "create":
+                                    action = EnvironmentActionType.Create;
+                                    break;
+                                case "set":
+                                    action = EnvironmentActionType.Set;
+                                    break;
+                                case "remove":
+                                    action = EnvironmentActionType.Remove;
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "create", "set", "remove"));
+                                    break;
+                            }
                             break;
-                        case "remove":
-                            action = EnvironmentActionType.Remove;
+                        case "Name":
+                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Part":
+                            var partValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (partValue)
+                            {
+                                case "all":
+                                    part = EnvironmentPartType.All;
+                                    break;
+                                case "first":
+                                    part = EnvironmentPartType.First;
+                                    break;
+                                case "last":
+                                    part = EnvironmentPartType.Last;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Part", partValue, "all", "first", "last"));
+                                    break;
+                            }
+                            break;
+                        case "Permanent":
+                            permanent = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Separator":
+                            separator = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "System":
+                            system = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Value":
+                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, value, "create", "set", "remove"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Part":
-                        var partValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (partValue)
-                        {
-                        case "all":
-                            part = EnvironmentPartType.All;
-                            break;
-                        case "first":
-                            part = EnvironmentPartType.First;
-                            break;
-                        case "last":
-                            part = EnvironmentPartType.Last;
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Part", partValue, "all", "first", "last"));
-                            break;
-                        }
-                        break;
-                    case "Permanent":
-                        permanent = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Separator":
-                        separator = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "System":
-                        system = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
@@ -4939,15 +4939,15 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Message":
-                        message = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
+                            break;
+                        case "Message":
+                            message = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -4992,23 +4992,23 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        extension = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Advertise":
-                        var extensionAdvertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if ((YesNoType.No == advertise && YesNoType.Yes == extensionAdvertise) || (YesNoType.Yes == advertise && YesNoType.No == extensionAdvertise))
-                        {
-                            this.Core.Write(ErrorMessages.AdvertiseStateMustMatch(sourceLineNumbers, extensionAdvertise.ToString(), advertise.ToString()));
-                        }
-                        advertise = extensionAdvertise;
-                        break;
-                    case "ContentType":
-                        mime = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            extension = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Advertise":
+                            var extensionAdvertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            if ((YesNoType.No == advertise && YesNoType.Yes == extensionAdvertise) || (YesNoType.Yes == advertise && YesNoType.No == extensionAdvertise))
+                            {
+                                this.Core.Write(ErrorMessages.AdvertiseStateMustMatch(sourceLineNumbers, extensionAdvertise.ToString(), advertise.ToString()));
+                            }
+                            advertise = extensionAdvertise;
+                            break;
+                        case "ContentType":
+                            mime = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -5029,19 +5029,19 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "Verb":
-                        this.ParseVerbElement(child, extension, progId, componentId, advertise);
-                        break;
-                    case "MIME":
-                        var newMime = this.ParseMIMEElement(child, extension, componentId, advertise);
-                        if (null != newMime && null == mime)
-                        {
-                            mime = newMime;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "Verb":
+                            this.ParseVerbElement(child, extension, progId, componentId, advertise);
+                            break;
+                        case "MIME":
+                            var newMime = this.ParseMIMEElement(child, extension, componentId, advertise);
+                            if (null != newMime && null == mime)
+                            {
+                                mime = newMime;
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -5207,175 +5207,175 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                    case "Name":
-                    case "ShortName":
-                    case "Source":
+                        case "Id":
+                        case "Name":
+                        case "ShortName":
+                        case "Source":
                             // Handled in ParseFileNamingAttributes
                             break;
 
-                    case "Bitness":
-                    case "Condition":
-                    case "Directory":
-                    case "Subdirectory":
-                        // Naked files handle their attributes in ParseNakedFileElement.
-                        if (!isNakedFile)
-                        {
-                            this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, attrib.Name.LocalName));
-                        }
-                        break;
-                    case "Assembly":
-                        var assemblyValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (assemblyValue)
-                        {
-                        case ".net":
-                            assemblyType = AssemblyType.DotNetAssembly;
+                        case "Bitness":
+                        case "Condition":
+                        case "Directory":
+                        case "Subdirectory":
+                            // Naked files handle their attributes in ParseNakedFileElement.
+                            if (!isNakedFile)
+                            {
+                                this.Messaging.Write(ErrorMessages.IllegalAttributeWhenNested(sourceLineNumbers, attrib.Name.LocalName));
+                            }
                             break;
-                        case "no":
-                            assemblyType = AssemblyType.NotAnAssembly;
+                        case "Assembly":
+                            var assemblyValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (assemblyValue)
+                            {
+                                case ".net":
+                                    assemblyType = AssemblyType.DotNetAssembly;
+                                    break;
+                                case "no":
+                                    assemblyType = AssemblyType.NotAnAssembly;
+                                    break;
+                                case "win32":
+                                    assemblyType = AssemblyType.Win32Assembly;
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "Assembly", assemblyValue, "no", "win32", ".net"));
+                                    break;
+                            }
                             break;
-                        case "win32":
-                            assemblyType = AssemblyType.Win32Assembly;
+                        case "AssemblyApplication":
+                            assemblyApplication = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, assemblyApplication);
+                            break;
+                        case "AssemblyManifest":
+                            assemblyManifest = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, assemblyManifest);
+                            break;
+                        case "BindPath":
+                            bindPath = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            break;
+                        case "Checksum":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                checksum = true;
+                                //bits |= MsiInterop.MsidbFileAttributesChecksum;
+                            }
+                            break;
+                        case "CompanionFile":
+                            companionFile = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, companionFile);
+                            break;
+                        case "Compressed":
+                            var compressedValue = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
+                            if (YesNoDefaultType.Yes == compressedValue)
+                            {
+                                compressed = true;
+                                //bits |= MsiInterop.MsidbFileAttributesCompressed;
+                            }
+                            else if (YesNoDefaultType.No == compressedValue)
+                            {
+                                compressed = false;
+                                //bits |= MsiInterop.MsidbFileAttributesNoncompressed;
+                            }
+                            break;
+                        case "DefaultLanguage":
+                            defaultLanguage = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "DefaultSize":
+                            defaultSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
+                            break;
+                        case "DefaultVersion":
+                            defaultVersion = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "DiskId":
+                            diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
+                            break;
+                        case "FontTitle":
+                            fontTitle = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Hidden":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                hidden = true;
+                                //bits |= MsiInterop.MsidbFileAttributesHidden;
+                            }
+                            break;
+                        case "KeyPath":
+                            keyPath = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "PatchGroup":
+                            patchGroup = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int32.MaxValue);
+                            break;
+                        case "PatchIgnore":
+                            patchIgnore = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "PatchWholeFile":
+                            patchIncludeWholeFile = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "PatchAllowIgnoreOnError":
+                            patchAllowIgnoreOnError = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ProcessorArchitecture":
+                            var procArchValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (procArchValue)
+                            {
+                                case "msil":
+                                    procArch = "MSIL";
+                                    break;
+                                case "x86":
+                                    procArch = "x86";
+                                    break;
+                                case "x64":
+                                    procArch = "amd64";
+                                    break;
+                                case "arm64":
+                                    procArch = "arm64";
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "ProcessorArchitecture", procArchValue, "msil", "x86", "x64"));
+                                    break;
+                            }
+                            break;
+                        case "ReadOnly":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                readOnly = true;
+                                //bits |= MsiInterop.MsidbFileAttributesReadOnly;
+                            }
+                            break;
+                        case "SelfRegCost":
+                            selfRegCost = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
+                            break;
+                        case "System":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                system = true;
+                                //bits |= MsiInterop.MsidbFileAttributesSystem;
+                            }
+                            break;
+                        case "TrueType":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                fontTitle = String.Empty;
+                            }
+                            break;
+                        case "Vital":
+                            var isVital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            if (YesNoType.Yes == isVital)
+                            {
+                                vital = true;
+                                //bits |= MsiInterop.MsidbFileAttributesVital;
+                            }
+                            else if (YesNoType.No == isVital)
+                            {
+                                vital = false;
+                                //bits &= ~MsiInterop.MsidbFileAttributesVital;
+                            }
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "Assembly", assemblyValue, "no", "win32", ".net"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    case "AssemblyApplication":
-                        assemblyApplication = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, assemblyApplication);
-                        break;
-                    case "AssemblyManifest":
-                        assemblyManifest = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, assemblyManifest);
-                        break;
-                    case "BindPath":
-                        bindPath = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        break;
-                    case "Checksum":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            checksum = true;
-                            //bits |= MsiInterop.MsidbFileAttributesChecksum;
-                        }
-                        break;
-                    case "CompanionFile":
-                        companionFile = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.File, companionFile);
-                        break;
-                    case "Compressed":
-                        var compressedValue = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
-                        if (YesNoDefaultType.Yes == compressedValue)
-                        {
-                            compressed = true;
-                            //bits |= MsiInterop.MsidbFileAttributesCompressed;
-                        }
-                        else if (YesNoDefaultType.No == compressedValue)
-                        {
-                            compressed = false;
-                            //bits |= MsiInterop.MsidbFileAttributesNoncompressed;
-                        }
-                        break;
-                    case "DefaultLanguage":
-                        defaultLanguage = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DefaultSize":
-                        defaultSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "DefaultVersion":
-                        defaultVersion = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DiskId":
-                        diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        break;
-                    case "FontTitle":
-                        fontTitle = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Hidden":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            hidden = true;
-                            //bits |= MsiInterop.MsidbFileAttributesHidden;
-                        }
-                        break;
-                    case "KeyPath":
-                        keyPath = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "PatchGroup":
-                        patchGroup = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int32.MaxValue);
-                        break;
-                    case "PatchIgnore":
-                        patchIgnore = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "PatchWholeFile":
-                        patchIncludeWholeFile = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "PatchAllowIgnoreOnError":
-                        patchAllowIgnoreOnError = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ProcessorArchitecture":
-                        var procArchValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (procArchValue)
-                        {
-                        case "msil":
-                            procArch = "MSIL";
-                            break;
-                        case "x86":
-                            procArch = "x86";
-                            break;
-                        case "x64":
-                            procArch = "amd64";
-                            break;
-                        case "arm64":
-                            procArch = "arm64";
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, "File", "ProcessorArchitecture", procArchValue, "msil", "x86", "x64"));
-                            break;
-                        }
-                        break;
-                    case "ReadOnly":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            readOnly = true;
-                            //bits |= MsiInterop.MsidbFileAttributesReadOnly;
-                        }
-                        break;
-                    case "SelfRegCost":
-                        selfRegCost = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "System":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            system = true;
-                            //bits |= MsiInterop.MsidbFileAttributesSystem;
-                        }
-                        break;
-                    case "TrueType":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            fontTitle = String.Empty;
-                        }
-                        break;
-                    case "Vital":
-                        var isVital = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        if (YesNoType.Yes == isVital)
-                        {
-                            vital = true;
-                            //bits |= MsiInterop.MsidbFileAttributesVital;
-                        }
-                        else if (YesNoType.No == isVital)
-                        {
-                            vital = false;
-                            //bits &= ~MsiInterop.MsidbFileAttributesVital;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
@@ -5528,55 +5528,55 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "AppId":
-                        this.ParseAppIdElement(child, componentId, YesNoType.NotSet, id.Id, null, null);
-                        break;
-                    case "AssemblyName":
-                        this.ParseAssemblyName(child, componentId);
-                        break;
-                    case "Class":
-                        this.ParseClassElement(child, componentId, YesNoType.NotSet, id.Id, null, null, null);
-                        break;
-                    case "CopyFile":
-                        this.ParseCopyFileElement(child, componentId, id.Id);
-                        break;
-                    case "IgnoreRange":
-                        this.ParseRangeElement(child, ref ignoreOffsets, ref ignoreLengths);
-                        break;
-                    case "ODBCDriver":
-                        this.ParseODBCDriverOrTranslator(child, componentId, id.Id, SymbolDefinitionType.ODBCDriver);
-                        break;
-                    case "ODBCTranslator":
-                        this.ParseODBCDriverOrTranslator(child, componentId, id.Id, SymbolDefinitionType.ODBCTranslator);
-                        break;
-                    case "Permission":
-                        this.ParsePermissionElement(child, id.Id, "File");
-                        break;
-                    case "PermissionEx":
-                        this.ParsePermissionExElement(child, id.Id, "File");
-                        break;
-                    case "ProtectRange":
-                        this.ParseRangeElement(child, ref protectOffsets, ref protectLengths);
-                        break;
-                    case "Shortcut":
-                        this.ParseShortcutElement(child, componentId, node.Name.LocalName, id.Id, keyPath);
-                        break;
-                    case "SymbolPath":
-                        if (null != symbols)
-                        {
-                            symbols += ";" + this.ParseSymbolPathElement(child);
-                        }
-                        else
-                        {
-                            symbols = this.ParseSymbolPathElement(child);
-                        }
-                        break;
-                    case "TypeLib":
-                        this.ParseTypeLibElement(child, componentId, id.Id, win64Component);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "AppId":
+                            this.ParseAppIdElement(child, componentId, YesNoType.NotSet, id.Id, null, null);
+                            break;
+                        case "AssemblyName":
+                            this.ParseAssemblyName(child, componentId);
+                            break;
+                        case "Class":
+                            this.ParseClassElement(child, componentId, YesNoType.NotSet, id.Id, null, null, null);
+                            break;
+                        case "CopyFile":
+                            this.ParseCopyFileElement(child, componentId, id.Id);
+                            break;
+                        case "IgnoreRange":
+                            this.ParseRangeElement(child, ref ignoreOffsets, ref ignoreLengths);
+                            break;
+                        case "ODBCDriver":
+                            this.ParseODBCDriverOrTranslator(child, componentId, id.Id, SymbolDefinitionType.ODBCDriver);
+                            break;
+                        case "ODBCTranslator":
+                            this.ParseODBCDriverOrTranslator(child, componentId, id.Id, SymbolDefinitionType.ODBCTranslator);
+                            break;
+                        case "Permission":
+                            this.ParsePermissionElement(child, id.Id, "File");
+                            break;
+                        case "PermissionEx":
+                            this.ParsePermissionExElement(child, id.Id, "File");
+                            break;
+                        case "ProtectRange":
+                            this.ParseRangeElement(child, ref protectOffsets, ref protectLengths);
+                            break;
+                        case "Shortcut":
+                            this.ParseShortcutElement(child, componentId, node.Name.LocalName, id.Id, keyPath);
+                            break;
+                        case "SymbolPath":
+                            if (null != symbols)
+                            {
+                                symbols += ";" + this.ParseSymbolPathElement(child);
+                            }
+                            else
+                            {
+                                symbols = this.ParseSymbolPathElement(child);
+                            }
+                            break;
+                        case "TypeLib":
+                            this.ParseTypeLibElement(child, componentId, id.Id, win64Component);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -5652,34 +5652,34 @@ namespace WixToolset.Core
                     {
                         switch (attrib.Name.LocalName)
                         {
-                        case "Bitness":
-                            var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            switch (bitnessValue)
-                            {
-                                case "always32":
-                                    win64 = false;
-                                    break;
-                                case "always64":
-                                    win64 = true;
-                                    break;
-                                case "default":
-                                case "":
-                                    break;
-                                default:
-                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
-                                    break;
-                            }
-                            break;
-                        case "Condition":
-                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            break;
-                        case "Directory":
-                            directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
-                            break;
-                        case "Subdirectory":
-                            subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
-                            break;
+                            case "Bitness":
+                                var bitnessValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                                switch (bitnessValue)
+                                {
+                                    case "always32":
+                                        win64 = false;
+                                        break;
+                                    case "always64":
+                                        win64 = true;
+                                        break;
+                                    case "default":
+                                    case "":
+                                        break;
+                                    default:
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, bitnessValue, "default", "always32", "always64"));
+                                        break;
+                                }
+                                break;
+                            case "Condition":
+                                condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                                break;
+                            case "Directory":
+                                directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                                this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Directory, directoryId);
+                                break;
+                            case "Subdirectory":
+                                subdirectory = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, allowRelative: true);
+                                break;
                         }
                     }
                 }
@@ -5700,42 +5700,45 @@ namespace WixToolset.Core
 
                 this.ParseFileElementOtherAttributes(node, id.Id, directoryId, diskId: CompilerConstants.IntegerNotSet, id, name, shortName, source, out var _, componentGuid: "*", isNakedFile: true, fileSymbol: out var fileSymbol, assemblySymbol: out var assemblySymbol);
 
-                this.Core.AddSymbol(fileSymbol);
-
-                this.Core.AddSymbol(new ComponentSymbol(sourceLineNumbers, id)
+                if (!this.Core.EncounteredError)
                 {
-                    ComponentId = "*",
-                    DirectoryRef = directoryId,
-                    Location = ComponentLocation.LocalOnly,
-                    Condition = condition,
-                    KeyPath = id.Id,
-                    KeyPathType = ComponentKeyPathType.File,
-                    DisableRegistryReflection = false,
-                    NeverOverwrite = false,
-                    Permanent = false,
-                    SharedDllRefCount = false,
-                    Shared = false,
-                    Transitive = false,
-                    UninstallWhenSuperseded = false,
-                    Win64 = win64,
-                });
+                    this.Core.AddSymbol(fileSymbol);
 
-                if (assemblySymbol != null)
-                {
-                    this.Core.AddSymbol(assemblySymbol);
-                }
+                    this.Core.AddSymbol(new ComponentSymbol(sourceLineNumbers, id)
+                    {
+                        ComponentId = "*",
+                        DirectoryRef = directoryId,
+                        Location = ComponentLocation.LocalOnly,
+                        Condition = condition,
+                        KeyPath = id.Id,
+                        KeyPathType = ComponentKeyPathType.File,
+                        DisableRegistryReflection = false,
+                        NeverOverwrite = false,
+                        Permanent = false,
+                        SharedDllRefCount = false,
+                        Shared = false,
+                        Transitive = false,
+                        UninstallWhenSuperseded = false,
+                        Win64 = win64,
+                    });
 
-                this.ParseFileElementChildren(node, fileSymbol, keyPath: YesNoType.Yes, win64);
+                    if (assemblySymbol != null)
+                    {
+                        this.Core.AddSymbol(assemblySymbol);
+                    }
 
-                // if this is a module, automatically add this component to the references to ensure it gets in the ModuleComponents table
-                if (this.compilingModule)
-                {
-                    this.Core.CreateComplexReference(sourceLineNumbers, ComplexReferenceParentType.Module, this.activeName, this.activeLanguage, ComplexReferenceChildType.Component, fileSymbol.Id.Id, false);
-                }
-                else if (ComplexReferenceParentType.Unknown != parentType && null != parentId) // if parent was provided, add a complex reference to that.
-                {
-                    // If the naked file's component is defined directly under a feature, then mark the complex reference primary.
-                    this.Core.CreateComplexReference(sourceLineNumbers, parentType, parentId, null, ComplexReferenceChildType.Component, id.Id, ComplexReferenceParentType.Feature == parentType);
+                    this.ParseFileElementChildren(node, fileSymbol, keyPath: YesNoType.Yes, win64);
+
+                    // if this is a module, automatically add this component to the references to ensure it gets in the ModuleComponents table
+                    if (this.compilingModule)
+                    {
+                        this.Core.CreateComplexReference(sourceLineNumbers, ComplexReferenceParentType.Module, this.activeName, this.activeLanguage, ComplexReferenceChildType.Component, fileSymbol.Id.Id, false);
+                    }
+                    else if (ComplexReferenceParentType.Unknown != parentType && null != parentId) // if parent was provided, add a complex reference to that.
+                    {
+                        // If the naked file's component is defined directly under a feature, then mark the complex reference primary.
+                        this.Core.CreateComplexReference(sourceLineNumbers, parentType, parentId, null, ComplexReferenceChildType.Component, id.Id, ComplexReferenceParentType.Feature == parentType);
+                    }
                 }
             }
         }
@@ -5892,39 +5895,39 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "MinVersion":
-                        minVersion = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "MaxVersion":
-                        maxVersion = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "MinSize":
-                        minSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "MaxSize":
-                        maxSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
-                        break;
-                    case "MinDate":
-                        minDate = this.Core.GetAttributeDateTimeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "MaxDate":
-                        maxDate = this.Core.GetAttributeDateTimeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Languages":
-                        languages = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ShortName":
-                        shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Name":
+                            name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
+                            break;
+                        case "MinVersion":
+                            minVersion = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "MaxVersion":
+                            maxVersion = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "MinSize":
+                            minSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
+                            break;
+                        case "MaxSize":
+                            maxSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
+                            break;
+                        case "MinDate":
+                            minDate = this.Core.GetAttributeDateTimeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "MaxDate":
+                            maxDate = this.Core.GetAttributeDateTimeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Languages":
+                            languages = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ShortName":
+                            shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -6067,12 +6070,12 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -6092,181 +6095,181 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "_locDefinition":
-                        break;
-                    case "AdminExecuteSequence":
-                        this.ParseSequenceElement(child, SequenceTable.AdminExecuteSequence);
-                        break;
-                    case "AdminUISequence":
-                        this.ParseSequenceElement(child, SequenceTable.AdminUISequence);
-                        break;
-                    case "AdvertiseExecuteSequence":
-                        this.ParseSequenceElement(child, SequenceTable.AdvertiseExecuteSequence);
-                        break;
-                    case "InstallExecuteSequence":
-                        this.ParseSequenceElement(child, SequenceTable.InstallExecuteSequence);
-                        break;
-                    case "InstallUISequence":
-                        this.ParseSequenceElement(child, SequenceTable.InstallUISequence);
-                        break;
-                    case "AppId":
-                        this.ParseAppIdElement(child, null, YesNoType.Yes, null, null, null);
-                        break;
-                    case "Binary":
-                        this.ParseBinaryElement(child);
-                        break;
-                    case "BootstrapperApplication":
-                        this.ParseBootstrapperApplicationElement(child);
-                        break;
-                    case "BootstrapperApplicationRef":
-                        this.ParseBootstrapperApplicationRefElement(child);
-                        break;
-                    case "BundleCustomData":
-                        this.ParseBundleCustomDataElement(child);
-                        break;
-                    case "BundleCustomDataRef":
-                        this.ParseBundleCustomDataRefElement(child);
-                        break;
-                    case "BootstrapperExtension":
-                        this.ParseBootstrapperExtensionElement(child);
-                        break;
-                    case "BootstrapperExtensionRef":
-                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixBootstrapperExtension);
-                        break;
-                    case "ComplianceCheck":
-                        this.ParseComplianceCheckElement(child);
-                        break;
-                    case "Component":
-                        this.ParseComponentElement(child, ComplexReferenceParentType.Unknown, null, null, CompilerConstants.IntegerNotSet, null, null);
-                        break;
-                    case "ComponentGroup":
-                        this.ParseComponentGroupElement(child, ComplexReferenceParentType.Unknown, id?.Id);
-                        break;
-                    case "Container":
-                        this.ParseContainerElement(child);
-                        break;
-                    case "CustomAction":
-                        this.ParseCustomActionElement(child);
-                        break;
-                    case "CustomActionRef":
-                        this.ParseSimpleRefElement(child, SymbolDefinitions.CustomAction);
-                        break;
-                    case "CustomTable":
-                        this.ParseCustomTableElement(child);
-                        break;
-                    case "CustomTableRef":
-                        this.ParseCustomTableRefElement(child);
-                        break;
-                    case "Directory":
-                        this.ParseDirectoryElement(child, null, CompilerConstants.IntegerNotSet, String.Empty);
-                        break;
-                    case "DirectoryRef":
-                        this.ParseDirectoryRefElement(child);
-                        break;
-                    case "EmbeddedChainer":
-                        this.ParseEmbeddedChainerElement(child);
-                        break;
-                    case "EmbeddedChainerRef":
-                        this.ParseSimpleRefElement(child, SymbolDefinitions.MsiEmbeddedChainer);
-                        break;
-                    case "EnsureTable":
-                        this.ParseEnsureTableElement(child);
-                        break;
-                    case "Feature":
-                        this.ParseFeatureElement(child, ComplexReferenceParentType.Unknown, null, ref featureDisplay);
-                        break;
-                    case "FeatureGroup":
-                        this.ParseFeatureGroupElement(child, ComplexReferenceParentType.Unknown, id?.Id);
-                        break;
-                    case "FeatureRef":
-                        this.ParseFeatureRefElement(child, ComplexReferenceParentType.Unknown, null);
-                        break;
-                    case "File":
-                        this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, null, null);
-                        break;
-                    case "Files":
-                        this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, null, null);
-                        break;
-                    case "Icon":
-                        this.ParseIconElement(child);
-                        break;
-                    case "Media":
-                        this.ParseMediaElement(child, null);
-                        break;
-                    case "MediaTemplate":
-                        this.ParseMediaTemplateElement(child, null);
-                        break;
-                    case "Launch":
-                        this.ParseLaunchElement(child);
-                        break;
-                    case "PackageGroup":
-                        this.ParsePackageGroupElement(child);
-                        break;
-                    case "PackageCertificates":
-                    case "PatchCertificates":
-                        this.ParseCertificatesElement(child);
-                        break;
-                    case "PatchFamily":
-                        this.ParsePatchFamilyElement(child, ComplexReferenceParentType.Unknown, id?.Id);
-                        break;
-                    case "PatchFamilyGroup":
-                        this.ParsePatchFamilyGroupElement(child, ComplexReferenceParentType.Unknown, id?.Id);
-                        break;
-                    case "PatchFamilyGroupRef":
-                        this.ParsePatchFamilyGroupRefElement(child, ComplexReferenceParentType.Unknown, id?.Id);
-                        break;
-                    case "PayloadGroup":
-                        this.ParsePayloadGroupElement(child, ComplexReferenceParentType.Unknown, null);
-                        break;
-                    case "Property":
-                        this.ParsePropertyElement(child);
-                        break;
-                    case "PropertyRef":
-                        this.ParseSimpleRefElement(child, SymbolDefinitions.Property);
-                        break;
-                    case "RelatedBundle":
-                        this.ParseRelatedBundleElement(child);
-                        break;
-                    case "Requires":
-                        this.ParseRequiresElement(child, null);
-                        break;
-                    case "SetDirectory":
-                        this.ParseSetDirectoryElement(child);
-                        break;
-                    case "SetProperty":
-                        this.ParseSetPropertyElement(child);
-                        break;
-                    case "SetVariable":
-                        this.ParseSetVariableElement(child);
-                        break;
-                    case "SetVariableRef":
-                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixSetVariable);
-                        break;
-                    case "SFPCatalog":
-                        string parentName = null;
-                        this.ParseSFPCatalogElement(child, ref parentName);
-                        break;
-                    case "StandardDirectory":
-                        this.ParseStandardDirectoryElement(child);
-                        break;
-                    case "UI":
-                        this.ParseUIElement(child);
-                        break;
-                    case "UIRef":
-                        this.ParseSimpleRefElement(child, SymbolDefinitions.WixUI);
-                        break;
-                    case "Upgrade":
-                        this.ParseUpgradeElement(child);
-                        break;
-                    case "Variable":
-                        this.ParseVariableElement(child);
-                        break;
-                    case "WixVariable":
-                        this.ParseWixVariableElement(child);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "_locDefinition":
+                            break;
+                        case "AdminExecuteSequence":
+                            this.ParseSequenceElement(child, SequenceTable.AdminExecuteSequence);
+                            break;
+                        case "AdminUISequence":
+                            this.ParseSequenceElement(child, SequenceTable.AdminUISequence);
+                            break;
+                        case "AdvertiseExecuteSequence":
+                            this.ParseSequenceElement(child, SequenceTable.AdvertiseExecuteSequence);
+                            break;
+                        case "InstallExecuteSequence":
+                            this.ParseSequenceElement(child, SequenceTable.InstallExecuteSequence);
+                            break;
+                        case "InstallUISequence":
+                            this.ParseSequenceElement(child, SequenceTable.InstallUISequence);
+                            break;
+                        case "AppId":
+                            this.ParseAppIdElement(child, null, YesNoType.Yes, null, null, null);
+                            break;
+                        case "Binary":
+                            this.ParseBinaryElement(child);
+                            break;
+                        case "BootstrapperApplication":
+                            this.ParseBootstrapperApplicationElement(child);
+                            break;
+                        case "BootstrapperApplicationRef":
+                            this.ParseBootstrapperApplicationRefElement(child);
+                            break;
+                        case "BundleCustomData":
+                            this.ParseBundleCustomDataElement(child);
+                            break;
+                        case "BundleCustomDataRef":
+                            this.ParseBundleCustomDataRefElement(child);
+                            break;
+                        case "BootstrapperExtension":
+                            this.ParseBootstrapperExtensionElement(child);
+                            break;
+                        case "BootstrapperExtensionRef":
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.WixBootstrapperExtension);
+                            break;
+                        case "ComplianceCheck":
+                            this.ParseComplianceCheckElement(child);
+                            break;
+                        case "Component":
+                            this.ParseComponentElement(child, ComplexReferenceParentType.Unknown, null, null, CompilerConstants.IntegerNotSet, null, null);
+                            break;
+                        case "ComponentGroup":
+                            this.ParseComponentGroupElement(child, ComplexReferenceParentType.Unknown, id?.Id);
+                            break;
+                        case "Container":
+                            this.ParseContainerElement(child);
+                            break;
+                        case "CustomAction":
+                            this.ParseCustomActionElement(child);
+                            break;
+                        case "CustomActionRef":
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.CustomAction);
+                            break;
+                        case "CustomTable":
+                            this.ParseCustomTableElement(child);
+                            break;
+                        case "CustomTableRef":
+                            this.ParseCustomTableRefElement(child);
+                            break;
+                        case "Directory":
+                            this.ParseDirectoryElement(child, null, CompilerConstants.IntegerNotSet, String.Empty);
+                            break;
+                        case "DirectoryRef":
+                            this.ParseDirectoryRefElement(child);
+                            break;
+                        case "EmbeddedChainer":
+                            this.ParseEmbeddedChainerElement(child);
+                            break;
+                        case "EmbeddedChainerRef":
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.MsiEmbeddedChainer);
+                            break;
+                        case "EnsureTable":
+                            this.ParseEnsureTableElement(child);
+                            break;
+                        case "Feature":
+                            this.ParseFeatureElement(child, ComplexReferenceParentType.Unknown, null, ref featureDisplay);
+                            break;
+                        case "FeatureGroup":
+                            this.ParseFeatureGroupElement(child, ComplexReferenceParentType.Unknown, id?.Id);
+                            break;
+                        case "FeatureRef":
+                            this.ParseFeatureRefElement(child, ComplexReferenceParentType.Unknown, null);
+                            break;
+                        case "File":
+                            this.ParseNakedFileElement(child, ComplexReferenceParentType.Unknown, null, null, null);
+                            break;
+                        case "Files":
+                            this.ParseFilesElement(child, ComplexReferenceParentType.Unknown, null, null, null);
+                            break;
+                        case "Icon":
+                            this.ParseIconElement(child);
+                            break;
+                        case "Media":
+                            this.ParseMediaElement(child, null);
+                            break;
+                        case "MediaTemplate":
+                            this.ParseMediaTemplateElement(child, null);
+                            break;
+                        case "Launch":
+                            this.ParseLaunchElement(child);
+                            break;
+                        case "PackageGroup":
+                            this.ParsePackageGroupElement(child);
+                            break;
+                        case "PackageCertificates":
+                        case "PatchCertificates":
+                            this.ParseCertificatesElement(child);
+                            break;
+                        case "PatchFamily":
+                            this.ParsePatchFamilyElement(child, ComplexReferenceParentType.Unknown, id?.Id);
+                            break;
+                        case "PatchFamilyGroup":
+                            this.ParsePatchFamilyGroupElement(child, ComplexReferenceParentType.Unknown, id?.Id);
+                            break;
+                        case "PatchFamilyGroupRef":
+                            this.ParsePatchFamilyGroupRefElement(child, ComplexReferenceParentType.Unknown, id?.Id);
+                            break;
+                        case "PayloadGroup":
+                            this.ParsePayloadGroupElement(child, ComplexReferenceParentType.Unknown, null);
+                            break;
+                        case "Property":
+                            this.ParsePropertyElement(child);
+                            break;
+                        case "PropertyRef":
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.Property);
+                            break;
+                        case "RelatedBundle":
+                            this.ParseRelatedBundleElement(child);
+                            break;
+                        case "Requires":
+                            this.ParseRequiresElement(child, null);
+                            break;
+                        case "SetDirectory":
+                            this.ParseSetDirectoryElement(child);
+                            break;
+                        case "SetProperty":
+                            this.ParseSetPropertyElement(child);
+                            break;
+                        case "SetVariable":
+                            this.ParseSetVariableElement(child);
+                            break;
+                        case "SetVariableRef":
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.WixSetVariable);
+                            break;
+                        case "SFPCatalog":
+                            string parentName = null;
+                            this.ParseSFPCatalogElement(child, ref parentName);
+                            break;
+                        case "StandardDirectory":
+                            this.ParseStandardDirectoryElement(child);
+                            break;
+                        case "UI":
+                            this.ParseUIElement(child);
+                            break;
+                        case "UIRef":
+                            this.ParseSimpleRefElement(child, SymbolDefinitions.WixUI);
+                            break;
+                        case "Upgrade":
+                            this.ParseUpgradeElement(child);
+                            break;
+                        case "Variable":
+                            this.ParseVariableElement(child);
+                            break;
+                        case "WixVariable":
+                            this.ParseWixVariableElement(child);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -6359,56 +6362,56 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Action":
-                        var actionValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (actionValue)
-                        {
-                            case "addLine":
-                                action = IniFileActionType.AddLine;
-                                break;
-                            case "addTag":
-                                action = IniFileActionType.AddTag;
-                                break;
-                            case "createLine":
-                                action = IniFileActionType.CreateLine;
-                                break;
-                            case "removeLine":
-                                action = IniFileActionType.RemoveLine;
-                                break;
-                            case "removeTag":
-                                action = IniFileActionType.RemoveTag;
-                                break;
-                            case "": // error case handled by GetAttributeValue()
-                                break;
-                            default:
-                                this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", actionValue, "addLine", "addTag", "createLine", "removeLine", "removeTag"));
-                                break;
-                        }
-                        break;
-                    case "Directory":
-                        directory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Key":
-                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Section":
-                        section = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ShortName":
-                        shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "Action":
+                            var actionValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (actionValue)
+                            {
+                                case "addLine":
+                                    action = IniFileActionType.AddLine;
+                                    break;
+                                case "addTag":
+                                    action = IniFileActionType.AddTag;
+                                    break;
+                                case "createLine":
+                                    action = IniFileActionType.CreateLine;
+                                    break;
+                                case "removeLine":
+                                    action = IniFileActionType.RemoveLine;
+                                    break;
+                                case "removeTag":
+                                    action = IniFileActionType.RemoveTag;
+                                    break;
+                                case "": // error case handled by GetAttributeValue()
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Action", actionValue, "addLine", "addTag", "createLine", "removeLine", "removeTag"));
+                                    break;
+                            }
+                            break;
+                        case "Directory":
+                            directory = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Key":
+                            key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Name":
+                            name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Section":
+                            section = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ShortName":
+                            shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Value":
+                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -6489,47 +6492,47 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "Field":
-                        field = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "Key":
-                        key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Name":
-                        name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Section":
-                        section = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "ShortName":
-                        shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
-                        break;
-                    case "Type":
-                        var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        switch (typeValue)
-                        {
-                        case "directory":
-                            type = 0;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                             break;
-                        case "file":
-                            type = 1;
+                        case "Field":
+                            field = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
                             break;
-                        case "raw":
-                            type = 2;
+                        case "Key":
+                            key = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
-                        case "":
+                        case "Name":
+                            name = this.Core.GetAttributeLongFilename(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Section":
+                            section = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ShortName":
+                            shortName = this.Core.GetAttributeShortFilename(sourceLineNumbers, attrib, false);
+                            break;
+                        case "Type":
+                            var typeValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            switch (typeValue)
+                            {
+                                case "directory":
+                                    type = 0;
+                                    break;
+                                case "file":
+                                    type = 1;
+                                    break;
+                                case "raw":
+                                    type = 2;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "registry"));
+                                    break;
+                            }
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Type", typeValue, "directory", "file", "registry"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
@@ -6568,46 +6571,46 @@ namespace WixToolset.Core
                     var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
                     switch (child.Name.LocalName)
                     {
-                    case "DirectorySearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
+                        case "DirectorySearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
 
-                        // directorysearch parentage should work like directory element, not the rest of the signature type because of the DrLocator.Parent column
-                        signature = this.ParseDirectorySearchElement(child, id.Id);
-                        break;
-                    case "DirectorySearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseDirectorySearchRefElement(child, id.Id);
-                        break;
-                    case "FileSearch":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
-                        id = new Identifier(AccessModifier.Section, signature); // FileSearch signatures override parent signatures
-                        break;
-                    case "FileSearchRef":
-                        if (oneChild)
-                        {
-                            this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
-                        }
-                        oneChild = true;
-                        var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
-                        id = new Identifier(AccessModifier.Section, newId);
-                        signature = null;
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                            // directorysearch parentage should work like directory element, not the rest of the signature type because of the DrLocator.Parent column
+                            signature = this.ParseDirectorySearchElement(child, id.Id);
+                            break;
+                        case "DirectorySearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(childSourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseDirectorySearchRefElement(child, id.Id);
+                            break;
+                        case "FileSearch":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            signature = this.ParseFileSearchElement(child, id.Id, false, CompilerConstants.IntegerNotSet);
+                            id = new Identifier(AccessModifier.Section, signature); // FileSearch signatures override parent signatures
+                            break;
+                        case "FileSearchRef":
+                            if (oneChild)
+                            {
+                                this.Core.Write(ErrorMessages.TooManySearchElements(sourceLineNumbers, node.Name.LocalName));
+                            }
+                            oneChild = true;
+                            var newId = this.ParseSimpleRefElement(child, SymbolDefinitions.Signature); // FileSearch signatures override parent signatures
+                            id = new Identifier(AccessModifier.Section, newId);
+                            signature = null;
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -6652,13 +6655,13 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Shared":
-                        shared = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Component, shared);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Shared":
+                            shared = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Component, shared);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -6711,32 +6714,32 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "DigitalCertificate":
-                        var name = this.ParseDigitalCertificateElement(child);
+                        case "DigitalCertificate":
+                            var name = this.ParseDigitalCertificateElement(child);
 
-                        if (!this.Core.EncounteredError)
-                        {
-                            if ("PatchCertificates" == node.Name.LocalName)
+                            if (!this.Core.EncounteredError)
                             {
-                                this.Core.AddSymbol(new MsiPatchCertificateSymbol(sourceLineNumbers)
+                                if ("PatchCertificates" == node.Name.LocalName)
                                 {
-                                    PatchCertificate = name,
-                                    DigitalCertificateRef = name,
-                                });
-                            }
-                            else
-                            {
-                                this.Core.AddSymbol(new MsiPackageCertificateSymbol(sourceLineNumbers)
+                                    this.Core.AddSymbol(new MsiPatchCertificateSymbol(sourceLineNumbers)
+                                    {
+                                        PatchCertificate = name,
+                                        DigitalCertificateRef = name,
+                                    });
+                                }
+                                else
                                 {
-                                    PackageCertificate = name,
-                                    DigitalCertificateRef = name,
-                                });
+                                    this.Core.AddSymbol(new MsiPackageCertificateSymbol(sourceLineNumbers)
+                                    {
+                                        PackageCertificate = name,
+                                        DigitalCertificateRef = name,
+                                    });
+                                }
                             }
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -6763,15 +6766,15 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "SourceFile":
+                            sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -6828,12 +6831,12 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "SourceFile":
+                            sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -6854,12 +6857,12 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "DigitalCertificate":
-                        certificateId = this.ParseDigitalCertificateElement(child);
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "DigitalCertificate":
+                            certificateId = this.ParseDigitalCertificateElement(child);
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -6923,42 +6926,42 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "AllowDowngrades":
-                        allowDowngrades = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "AllowSameVersionUpgrades":
-                        allowSameVersionUpgrades = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Disallow":
-                        blockUpgrades = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DowngradeErrorMessage":
-                        downgradeErrorMessage = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "DisallowUpgradeErrorMessage":
-                        disallowUpgradeErrorMessage = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "MigrateFeatures":
-                        migrateFeatures = (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib));
-                        break;
-                    case "IgnoreLanguage":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            productLanguage = null;
-                        }
-                        break;
-                    case "IgnoreRemoveFailure":
-                        ignoreRemoveFailure = (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib));
-                        break;
-                    case "RemoveFeatures":
-                        removeFeatures = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Schedule":
-                        schedule = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "AllowDowngrades":
+                            allowDowngrades = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "AllowSameVersionUpgrades":
+                            allowSameVersionUpgrades = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Disallow":
+                            blockUpgrades = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "DowngradeErrorMessage":
+                            downgradeErrorMessage = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "DisallowUpgradeErrorMessage":
+                            disallowUpgradeErrorMessage = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "MigrateFeatures":
+                            migrateFeatures = (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib));
+                            break;
+                        case "IgnoreLanguage":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                productLanguage = null;
+                            }
+                            break;
+                        case "IgnoreRemoveFailure":
+                            ignoreRemoveFailure = (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib));
+                            break;
+                        case "RemoveFeatures":
+                            removeFeatures = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Schedule":
+                            schedule = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -7101,34 +7104,34 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        break;
-                    case "Cabinet":
-                        cabinet = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "CompressionLevel":
-                        compressionLevel = this.ParseCompressionLevel(sourceLineNumbers, attrib);
-                        break;
-                    case "DiskPrompt":
-                        diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
-                        break;
-                    case "EmbedCab":
-                        embedCab = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Layout":
-                        layout = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "VolumeLabel":
-                        volumeLabel = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Source":
-                        source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
+                            break;
+                        case "Cabinet":
+                            cabinet = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "CompressionLevel":
+                            compressionLevel = this.ParseCompressionLevel(sourceLineNumbers, attrib);
+                            break;
+                        case "DiskPrompt":
+                            diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
+                            break;
+                        case "EmbedCab":
+                            embedCab = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Layout":
+                            layout = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "VolumeLabel":
+                            volumeLabel = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Source":
+                            source = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -7192,43 +7195,43 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "DigitalSignature":
-                        if (YesNoType.Yes == embedCab)
-                        {
-                            this.Core.Write(ErrorMessages.SignedEmbeddedCabinet(childSourceLineNumbers));
-                        }
-                        else if (null == cabinet)
-                        {
-                            this.Core.Write(ErrorMessages.ExpectedSignedCabinetName(childSourceLineNumbers));
-                        }
-                        else
-                        {
-                            this.ParseDigitalSignatureElement(child, id.ToString(CultureInfo.InvariantCulture.NumberFormat));
-                        }
-                        break;
-                    case "PatchBaseline":
-                        if (patch)
-                        {
-                            this.ParsePatchBaselineElement(child, id);
-                        }
-                        else
-                        {
+                        case "DigitalSignature":
+                            if (YesNoType.Yes == embedCab)
+                            {
+                                this.Core.Write(ErrorMessages.SignedEmbeddedCabinet(childSourceLineNumbers));
+                            }
+                            else if (null == cabinet)
+                            {
+                                this.Core.Write(ErrorMessages.ExpectedSignedCabinetName(childSourceLineNumbers));
+                            }
+                            else
+                            {
+                                this.ParseDigitalSignatureElement(child, id.ToString(CultureInfo.InvariantCulture.NumberFormat));
+                            }
+                            break;
+                        case "PatchBaseline":
+                            if (patch)
+                            {
+                                this.ParsePatchBaselineElement(child, id);
+                            }
+                            else
+                            {
+                                this.Core.UnexpectedElement(node, child);
+                            }
+                            break;
+                        case "SymbolPath":
+                            if (null != symbols)
+                            {
+                                symbols += "" + this.ParseSymbolPathElement(child);
+                            }
+                            else
+                            {
+                                symbols = this.ParseSymbolPathElement(child);
+                            }
+                            break;
+                        default:
                             this.Core.UnexpectedElement(node, child);
-                        }
-                        break;
-                    case "SymbolPath":
-                        if (null != symbols)
-                        {
-                            symbols += "" + this.ParseSymbolPathElement(child);
-                        }
-                        else
-                        {
-                            symbols = this.ParseSymbolPathElement(child);
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                            break;
                     }
                 }
                 else
@@ -7287,53 +7290,53 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "CabinetTemplate":
-                        var authoredCabinetTemplateValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
-                        if (!String.IsNullOrEmpty(authoredCabinetTemplateValue))
-                        {
-                            cabinetTemplate = authoredCabinetTemplateValue;
-                        }
+                        case "CabinetTemplate":
+                            var authoredCabinetTemplateValue = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
+                            if (!String.IsNullOrEmpty(authoredCabinetTemplateValue))
+                            {
+                                cabinetTemplate = authoredCabinetTemplateValue;
+                            }
 
-                        // Create an example cabinet name using the maximum number of cabinets supported, 999.
-                        var exampleCabinetName = String.Format(cabinetTemplate, "###");
-                        if (!this.Core.IsValidLocIdentifier(exampleCabinetName))
-                        {
-                            // The example name should not match the authored template since that would nullify the
-                            // reason for having multiple cabinets. External cabinet files must also be valid file names.
-                            if (exampleCabinetName.Equals(authoredCabinetTemplateValue, StringComparison.OrdinalIgnoreCase) || !this.Core.IsValidLongFilename(exampleCabinetName, false))
+                            // Create an example cabinet name using the maximum number of cabinets supported, 999.
+                            var exampleCabinetName = String.Format(cabinetTemplate, "###");
+                            if (!this.Core.IsValidLocIdentifier(exampleCabinetName))
                             {
-                                this.Core.Write(ErrorMessages.InvalidCabinetTemplate(sourceLineNumbers, cabinetTemplate));
+                                // The example name should not match the authored template since that would nullify the
+                                // reason for having multiple cabinets. External cabinet files must also be valid file names.
+                                if (exampleCabinetName.Equals(authoredCabinetTemplateValue, StringComparison.OrdinalIgnoreCase) || !this.Core.IsValidLongFilename(exampleCabinetName, false))
+                                {
+                                    this.Core.Write(ErrorMessages.InvalidCabinetTemplate(sourceLineNumbers, cabinetTemplate));
+                                }
+                                else if (!this.Core.IsValidLongFilename(exampleCabinetName) && !Common.ContainsValidBinderVariable(exampleCabinetName)) // ignore short names with wix variables because it rarely works out.
+                                {
+                                    this.Core.Write(WarningMessages.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "CabinetTemplate", cabinetTemplate));
+                                }
                             }
-                            else if (!this.Core.IsValidLongFilename(exampleCabinetName) && !Common.ContainsValidBinderVariable(exampleCabinetName)) // ignore short names with wix variables because it rarely works out.
-                            {
-                                this.Core.Write(WarningMessages.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "CabinetTemplate", cabinetTemplate));
-                            }
-                        }
-                        break;
-                    case "CompressionLevel":
-                        compressionLevel = this.ParseCompressionLevel(sourceLineNumbers, attrib);
-                        break;
-                    case "DiskPrompt":
-                        diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
-                        this.Core.Write(WarningMessages.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
-                        break;
-                    case "EmbedCab":
-                        embedCab = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "VolumeLabel":
-                        volumeLabel = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        this.Core.Write(WarningMessages.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
-                        break;
-                    case "MaximumUncompressedMediaSize":
-                        maximumUncompressedMediaSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int32.MaxValue);
-                        break;
-                    case "MaximumCabinetSizeForLargeFileSplitting":
-                        maximumCabinetSizeForLargeFileSplitting = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Compiler.MinValueOfMaxCabSizeForLargeFileSplitting, Compiler.MaxValueOfMaxCabSizeForLargeFileSplitting);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                            break;
+                        case "CompressionLevel":
+                            compressionLevel = this.ParseCompressionLevel(sourceLineNumbers, attrib);
+                            break;
+                        case "DiskPrompt":
+                            diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
+                            this.Core.Write(WarningMessages.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            break;
+                        case "EmbedCab":
+                            embedCab = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "VolumeLabel":
+                            volumeLabel = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            this.Core.Write(WarningMessages.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            break;
+                        case "MaximumUncompressedMediaSize":
+                            maximumUncompressedMediaSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int32.MaxValue);
+                            break;
+                        case "MaximumCabinetSizeForLargeFileSplitting":
+                            maximumCabinetSizeForLargeFileSplitting = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, Compiler.MinValueOfMaxCabSizeForLargeFileSplitting, Compiler.MaxValueOfMaxCabSizeForLargeFileSplitting);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -7397,27 +7400,27 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "DiskId":
-                        diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
-                        break;
-                    case "FileCompression":
-                        var compress = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        attributes |= compress == YesNoType.Yes ? FileSymbolAttributes.Compressed : 0;
-                        attributes |= compress == YesNoType.No ? FileSymbolAttributes.Uncompressed : 0;
-                        break;
-                    case "Language":
-                        language = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
-                        break;
-                    case "SourceFile":
-                        sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "DiskId":
+                            diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Media, diskId.ToString(CultureInfo.InvariantCulture.NumberFormat));
+                            break;
+                        case "FileCompression":
+                            var compress = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            attributes |= compress == YesNoType.Yes ? FileSymbolAttributes.Compressed : 0;
+                            attributes |= compress == YesNoType.No ? FileSymbolAttributes.Uncompressed : 0;
+                            break;
+                        case "Language":
+                            language = this.Core.GetAttributeLocalizableIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);
+                            break;
+                        case "SourceFile":
+                            sourceFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -7447,19 +7450,19 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "ConfigurationData":
-                        if (0 == configData.Length)
-                        {
-                            configData = this.ParseConfigurationDataElement(child);
-                        }
-                        else
-                        {
-                            configData = String.Concat(configData, ",", this.ParseConfigurationDataElement(child));
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "ConfigurationData":
+                            if (0 == configData.Length)
+                            {
+                                configData = this.ParseConfigurationDataElement(child);
+                            }
+                            else
+                            {
+                                configData = String.Concat(configData, ",", this.ParseConfigurationDataElement(child));
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -7577,15 +7580,15 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Name":
+                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Value":
+                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -7705,16 +7708,16 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
-                        this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixMerge, id);
-                        break;
-                    case "Primary":
-                        primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
+                            this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.WixMerge, id);
+                            break;
+                        case "Primary":
+                            primary = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -7755,21 +7758,21 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Advertise":
-                        advertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Class":
-                        classId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    case "ContentType":
-                        contentType = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Default":
-                        returnContentType = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Advertise":
+                            advertise = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Class":
+                            classId = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        case "ContentType":
+                            contentType = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Default":
+                            returnContentType = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -7843,19 +7846,19 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                    case "Name":
-                        name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Company":
-                        company = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Value":
-                        value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                        case "Name":
+                            name = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Company":
+                            company = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Value":
+                            value = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -7929,16 +7932,16 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        if (id.Length > 0 && "*" != id)
-                        {
-                            id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            if (id.Length > 0 && "*" != id)
+                            {
+                                id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -7973,12 +7976,12 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib, false);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -8013,12 +8016,12 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Path":
-                        path = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Path":
+                            path = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -8057,21 +8060,21 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Id":
-                        id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
-                        break;
-                    case "DiskId":
-                        diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
-                        break;
-                    case "BaselineFile":
-                        baselineFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "UpdateFile":
-                        updateFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Id":
+                            id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
+                            break;
+                        case "DiskId":
+                            diskId = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int16.MaxValue);
+                            break;
+                        case "BaselineFile":
+                            baselineFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "UpdateFile":
+                            updateFile = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -8102,21 +8105,21 @@ namespace WixToolset.Core
                 {
                     switch (child.Name.LocalName)
                     {
-                    case "Validate":
-                        if (parsedValidate)
-                        {
-                            var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
-                        }
-                        else
-                        {
-                            this.ParseValidateElement(child, ref validationFlags);
-                            parsedValidate = true;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedElement(node, child);
-                        break;
+                        case "Validate":
+                            if (parsedValidate)
+                            {
+                                var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
+                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                            }
+                            else
+                            {
+                                this.ParseValidateElement(child, ref validationFlags);
+                                parsedValidate = true;
+                            }
+                            break;
+                        default:
+                            this.Core.UnexpectedElement(node, child);
+                            break;
                     }
                 }
                 else
@@ -8155,15 +8158,15 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "Length":
-                        length = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    case "Offset":
-                        offset = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
+                        case "Length":
+                            length = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Offset":
+                            offset = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        default:
+                            this.Core.UnexpectedAttribute(node, attrib);
+                            break;
                     }
                 }
                 else
@@ -8218,155 +8221,155 @@ namespace WixToolset.Core
                 {
                     switch (attrib.Name.LocalName)
                     {
-                    case "ProductId":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            validationFlags |= TransformFlags.ValidateProduct;
-                        }
-                        else
-                        {
-                            validationFlags &= ~TransformFlags.ValidateProduct;
-                        }
-                        break;
-                    case "ProductLanguage":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            validationFlags |= TransformFlags.ValidateLanguage;
-                        }
-                        else
-                        {
-                            validationFlags &= ~TransformFlags.ValidateLanguage;
-                        }
-                        break;
-                    case "ProductVersion":
-                        var check = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        validationFlags &= ~TransformFlags.ProductVersionMask;
-                        switch (check)
-                        {
-                        case "Major":
-                        case "major":
-                            validationFlags |= TransformFlags.ValidateMajorVersion;
+                        case "ProductId":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                validationFlags |= TransformFlags.ValidateProduct;
+                            }
+                            else
+                            {
+                                validationFlags &= ~TransformFlags.ValidateProduct;
+                            }
                             break;
-                        case "Minor":
-                        case "minor":
-                            validationFlags |= TransformFlags.ValidateMinorVersion;
+                        case "ProductLanguage":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                validationFlags |= TransformFlags.ValidateLanguage;
+                            }
+                            else
+                            {
+                                validationFlags &= ~TransformFlags.ValidateLanguage;
+                            }
                             break;
-                        case "Update":
-                        case "update":
-                            validationFlags |= TransformFlags.ValidateUpdateVersion;
+                        case "ProductVersion":
+                            var check = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            validationFlags &= ~TransformFlags.ProductVersionMask;
+                            switch (check)
+                            {
+                                case "Major":
+                                case "major":
+                                    validationFlags |= TransformFlags.ValidateMajorVersion;
+                                    break;
+                                case "Minor":
+                                case "minor":
+                                    validationFlags |= TransformFlags.ValidateMinorVersion;
+                                    break;
+                                case "Update":
+                                case "update":
+                                    validationFlags |= TransformFlags.ValidateUpdateVersion;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Version", check, "Major", "Minor", "Update"));
+                                    break;
+                            }
                             break;
-                        case "":
+                        case "ProductVersionOperator":
+                            var op = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            validationFlags &= ~TransformFlags.ProductVersionOperatorMask;
+                            switch (op)
+                            {
+                                case "Lesser":
+                                case "lesser":
+                                    validationFlags |= TransformFlags.ValidateNewLessBaseVersion;
+                                    break;
+                                case "LesserOrEqual":
+                                case "lesserOrEqual":
+                                    validationFlags |= TransformFlags.ValidateNewLessEqualBaseVersion;
+                                    break;
+                                case "Equal":
+                                case "equal":
+                                    validationFlags |= TransformFlags.ValidateNewEqualBaseVersion;
+                                    break;
+                                case "GreaterOrEqual":
+                                case "greaterOrEqual":
+                                    validationFlags |= TransformFlags.ValidateNewGreaterEqualBaseVersion;
+                                    break;
+                                case "Greater":
+                                case "greater":
+                                    validationFlags |= TransformFlags.ValidateNewGreaterBaseVersion;
+                                    break;
+                                case "":
+                                    break;
+                                default:
+                                    this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Operator", op, "Lesser", "LesserOrEqual", "Equal", "GreaterOrEqual", "Greater"));
+                                    break;
+                            }
+                            break;
+                        case "UpgradeCode":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                validationFlags |= TransformFlags.ValidateUpgradeCode;
+                            }
+                            else
+                            {
+                                validationFlags &= ~TransformFlags.ValidateUpgradeCode;
+                            }
+                            break;
+                        case "IgnoreAddExistingRow":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                validationFlags |= TransformFlags.ErrorAddExistingRow;
+                            }
+                            else
+                            {
+                                validationFlags &= ~TransformFlags.ErrorAddExistingRow;
+                            }
+                            break;
+                        case "IgnoreAddExistingTable":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                validationFlags |= TransformFlags.ErrorAddExistingTable;
+                            }
+                            else
+                            {
+                                validationFlags &= ~TransformFlags.ErrorAddExistingTable;
+                            }
+                            break;
+                        case "IgnoreDeleteMissingRow":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                validationFlags |= TransformFlags.ErrorDeleteMissingRow;
+                            }
+                            else
+                            {
+                                validationFlags &= ~TransformFlags.ErrorDeleteMissingRow;
+                            }
+                            break;
+                        case "IgnoreDeleteMissingTable":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                validationFlags |= TransformFlags.ErrorDeleteMissingTable;
+                            }
+                            else
+                            {
+                                validationFlags &= ~TransformFlags.ErrorDeleteMissingTable;
+                            }
+                            break;
+                        case "IgnoreUpdateMissingRow":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                validationFlags |= TransformFlags.ErrorUpdateMissingRow;
+                            }
+                            else
+                            {
+                                validationFlags &= ~TransformFlags.ErrorUpdateMissingRow;
+                            }
+                            break;
+                        case "IgnoreChangingCodePage":
+                            if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
+                            {
+                                validationFlags |= TransformFlags.ErrorChangeCodePage;
+                            }
+                            else
+                            {
+                                validationFlags &= ~TransformFlags.ErrorChangeCodePage;
+                            }
                             break;
                         default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Version", check, "Major", "Minor", "Update"));
+                            this.Core.UnexpectedAttribute(node, attrib);
                             break;
-                        }
-                        break;
-                    case "ProductVersionOperator":
-                        var op = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                        validationFlags &= ~TransformFlags.ProductVersionOperatorMask;
-                        switch (op)
-                        {
-                        case "Lesser":
-                        case "lesser":
-                            validationFlags |= TransformFlags.ValidateNewLessBaseVersion;
-                            break;
-                        case "LesserOrEqual":
-                        case "lesserOrEqual":
-                            validationFlags |= TransformFlags.ValidateNewLessEqualBaseVersion;
-                            break;
-                        case "Equal":
-                        case "equal":
-                            validationFlags |= TransformFlags.ValidateNewEqualBaseVersion;
-                            break;
-                        case "GreaterOrEqual":
-                        case "greaterOrEqual":
-                            validationFlags |= TransformFlags.ValidateNewGreaterEqualBaseVersion;
-                            break;
-                        case "Greater":
-                        case "greater":
-                            validationFlags |= TransformFlags.ValidateNewGreaterBaseVersion;
-                            break;
-                        case "":
-                            break;
-                        default:
-                            this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, "Operator", op, "Lesser", "LesserOrEqual", "Equal", "GreaterOrEqual", "Greater"));
-                            break;
-                        }
-                        break;
-                    case "UpgradeCode":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            validationFlags |= TransformFlags.ValidateUpgradeCode;
-                        }
-                        else
-                        {
-                            validationFlags &= ~TransformFlags.ValidateUpgradeCode;
-                        }
-                        break;
-                    case "IgnoreAddExistingRow":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            validationFlags |= TransformFlags.ErrorAddExistingRow;
-                        }
-                        else
-                        {
-                            validationFlags &= ~TransformFlags.ErrorAddExistingRow;
-                        }
-                        break;
-                    case "IgnoreAddExistingTable":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            validationFlags |= TransformFlags.ErrorAddExistingTable;
-                        }
-                        else
-                        {
-                            validationFlags &= ~TransformFlags.ErrorAddExistingTable;
-                        }
-                        break;
-                    case "IgnoreDeleteMissingRow":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            validationFlags |= TransformFlags.ErrorDeleteMissingRow;
-                        }
-                        else
-                        {
-                            validationFlags &= ~TransformFlags.ErrorDeleteMissingRow;
-                        }
-                        break;
-                    case "IgnoreDeleteMissingTable":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            validationFlags |= TransformFlags.ErrorDeleteMissingTable;
-                        }
-                        else
-                        {
-                            validationFlags &= ~TransformFlags.ErrorDeleteMissingTable;
-                        }
-                        break;
-                    case "IgnoreUpdateMissingRow":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            validationFlags |= TransformFlags.ErrorUpdateMissingRow;
-                        }
-                        else
-                        {
-                            validationFlags &= ~TransformFlags.ErrorUpdateMissingRow;
-                        }
-                        break;
-                    case "IgnoreChangingCodePage":
-                        if (YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib))
-                        {
-                            validationFlags |= TransformFlags.ErrorChangeCodePage;
-                        }
-                        else
-                        {
-                            validationFlags &= ~TransformFlags.ErrorChangeCodePage;
-                        }
-                        break;
-                    default:
-                        this.Core.UnexpectedAttribute(node, attrib);
-                        break;
                     }
                 }
                 else
