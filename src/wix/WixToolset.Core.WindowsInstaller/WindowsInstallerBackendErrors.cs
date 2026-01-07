@@ -39,6 +39,11 @@ namespace WixToolset.Core.WindowsInstaller
             return Message(null, Ids.InvalidWindowsInstallerWixpdbForValidation, "The validation .wixpdb file: {0} was not from a Windows Installer database build (.msi or .msm). Verify that the output type was actually an MSI Package or Merge Module.", wixpdbPath);
         }
 
+        public static Message UnexpectedAnonymousDirectoryCollision(SourceLineNumber sourceLineNumbers, string id, string parentDir, string defaultDir, SourceLineNumber existingSourceLineNumbers, string existingParentDir, string existingDefaultDir)
+        {
+            return Message(sourceLineNumbers, Ids.UnexpectedAnonymousDirectoryCollision, "This should not happen. The first directory id '{0}' uses parent directory '{1}' with DefaultDir '{2}'. The colliding directory uses parent directory '{3}' with DefaultDir '{4}' from line: {5}", id, parentDir, defaultDir, existingParentDir, existingDefaultDir, existingSourceLineNumbers.ToString());
+        }
+
         public static Message UnknownDecompileType(string decompileType, string filePath)
         {
             return Message(null, Ids.UnknownDecompileType, "Unknown decompile type '{0}' from input: {1}", decompileType, filePath);
@@ -65,6 +70,7 @@ namespace WixToolset.Core.WindowsInstaller
             UnknownDecompileType = 7504,
             UnknownValidationTargetFileExtension = 7505,
             InvalidWindowsInstallerWixpdbForValidation = 7506,
+            UnexpectedAnonymousDirectoryCollision = 7507,
         } // last available is 7999. 8000 is BurnBackendErrors.
     }
 }
