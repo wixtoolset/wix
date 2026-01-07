@@ -78,7 +78,7 @@ namespace WixToolsetTest.CoreIntegration
         [Fact]
         public void CanBuildSimpleBundle()
         {
-            var folder = TestData.Get(@"TestData\SimpleBundle");
+            var folder = TestData.Get(@"TestData", "SimpleBundle");
 
             using (var fs = new DisposableFileSystem())
             {
@@ -96,6 +96,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-bindpath", Path.Combine(folder, "data"),
                     "-o", exePath,
                 });
 
@@ -172,6 +173,12 @@ namespace WixToolsetTest.CoreIntegration
                     }, registrationElements);
 
                     var ignoreAttributesByElementName = new Dictionary<string, List<string>>() { { "Payload", new List<string> { "FileSize", "Hash" } } };
+                    var iconPayloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:UX/burn:Payload[@Id='WixBundle.ico']", ignoreAttributesByElementName);
+                    WixAssert.CompareLineByLine(
+                    [
+                        "<Payload Id='WixBundle.ico' FilePath='WixBundle.ico' SourcePath='u1' />",
+                    ], iconPayloads);
+
                     var msiPayloads = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Payload[@Id='test.msi']", ignoreAttributesByElementName);
                     WixAssert.CompareLineByLine(new[]
                     {

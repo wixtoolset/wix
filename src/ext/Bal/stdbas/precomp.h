@@ -42,3 +42,9 @@
 
 #include "stdbas.messages.h"
 #include "WixStandardBootstrapperApplication.h"
+
+HRESULT LoadBundleIcon(
+    __in HMODULE hModule,
+    __out HICON* phIcon,
+    __out HICON* phSmallIcon
+);

@@ -466,6 +466,20 @@ namespace WixToolset.Core
                     Name = "bundle-attached.cab",
                     Type = ContainerType.Attached,
                 });
+
+                if (!String.IsNullOrEmpty(iconSourceFile))
+                {
+                    var compilerPayload = new CompilerPayload(this.Core, sourceLineNumbers, node)
+                    {
+                        Id = new Identifier(AccessModifier.Section, "WixBundle.ico"),
+                        Name = "WixBundle.ico",
+                        SourceFile = iconSourceFile,
+                    };
+
+                    compilerPayload.FinishCompilingPayload(Compiler.BurnUXContainerId.Id);
+
+                    compilerPayload.CreatePayloadSymbol(ComplexReferenceParentType.Container, Compiler.BurnUXContainerId.Id);
+                }
             }
         }
 

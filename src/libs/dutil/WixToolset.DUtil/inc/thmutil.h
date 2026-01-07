@@ -567,6 +567,19 @@ void DAPI ThemeInitializeWindowClass(
     );
 
 /********************************************************************
+ ThemeInitializeWindowClassEx - sets defaults for the window class
+                                from the given theme.
+
+*******************************************************************/
+void DAPI ThemeInitializeWindowClassEx(
+    __in THEME* pTheme,
+    __in WNDCLASSEXW* pWndClass,
+    __in WNDPROC pfnWndProc,
+    __in HINSTANCE hInstance,
+    __in LPCWSTR wzClassName
+    );
+
+/********************************************************************
  ThemeCreateParentWindow - creates a parent window for the theme.
 
 *******************************************************************/
