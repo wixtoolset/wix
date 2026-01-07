@@ -39,7 +39,7 @@
 
   <Fragment>
     <Component Id="FileComponent" Guid="12345678-9ABC-DEF0-1234-567890000000" Directory="INSTALLFOLDER">
-      <File Id="CAFile" Name="CustomActionFail.exe" Source="$(sys.SOURCEFILEDIR)\CustomActionFail.exe" />
+      <File Id="CAFile" Source="CustomActionFail.exe" />
     </Component>
 
     <CustomAction Id="CaFail" FileRef="CAFile" Execute="immediate" Return="check" ExeCommand="" />
