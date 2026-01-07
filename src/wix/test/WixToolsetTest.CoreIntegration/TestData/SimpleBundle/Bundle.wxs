@@ -1,5 +1,6 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Bundle Name="!(loc.BundleName)" InProgressName="!(loc.BundleInProgressName)" Version="!(bind.packageVersion.test.msi)" Manufacturer="Example Corporation" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a">
+  <Bundle Name="!(loc.BundleName)" Manufacturer="Example Corporation" Version="!(bind.packageVersion.test.msi)" UpgradeCode="047730a5-30fe-4a62-a520-da9381b8226a"
+          InProgressName="!(loc.BundleInProgressName)" IconSourceFile="test.ico">
     <BootstrapperApplication SourceFile="fakeba.dll" />
 
     <Chain>

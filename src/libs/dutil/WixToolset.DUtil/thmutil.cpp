@@ -856,6 +856,28 @@ DAPI_(void) ThemeInitializeWindowClass(
 }
 
 
+DAPI_(void) ThemeInitializeWindowClassEx(
+    __in THEME* pTheme,
+    __in WNDCLASSEXW* pWndClass,
+    __in WNDPROC pfnWndProc,
+    __in HINSTANCE hInstance,
+    __in LPCWSTR wzClassName
+    )
+{
+    pWndClass->cbSize = sizeof(WNDCLASSEXW);
+    pWndClass->style = CS_HREDRAW | CS_VREDRAW;
+    pWndClass->cbWndExtra = DLGWINDOWEXTRA;
+    pWndClass->hCursor = ::LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
+
+    pWndClass->lpfnWndProc = pfnWndProc;
+    pWndClass->hInstance = hInstance;
+    pWndClass->lpszClassName = wzClassName;
+
+    pWndClass->hIcon = reinterpret_cast<HICON>(pTheme->hIcon);
+    pWndClass->hbrBackground = pTheme->rgFonts[pTheme->dwFontId].hBackground;
+}
+
+
 DAPI_(HRESULT) ThemeCreateParentWindow(
     __in THEME* pTheme,
     __in DWORD dwExStyle,

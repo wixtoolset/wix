@@ -24,7 +24,8 @@ namespace WixToolsetTest.BootstrapperApplications
             {
                 var baseFolder = fs.GetFolder();
                 var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
-                var bundleSourceFolder = TestData.Get(@"TestData\WixStdBa");
+                var bundleSourceFolder = TestData.Get(@"TestData", "WixStdBa");
+                var dataFolder = TestData.Get(@"TestData", ".Data");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
@@ -36,6 +37,7 @@ namespace WixToolsetTest.BootstrapperApplications
                     "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-bindpath", Path.Combine(bundleSourceFolder, "data"),
+                    "-bindpath", dataFolder,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
@@ -62,7 +64,8 @@ namespace WixToolsetTest.BootstrapperApplications
             {
                 var baseFolder = fs.GetFolder();
                 var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
-                var bundleSourceFolder = TestData.Get(@"TestData\WixStdBa");
+                var bundleSourceFolder = TestData.Get(@"TestData", "WixStdBa");
+                var dataFolder = TestData.Get(@"TestData", ".Data");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
@@ -74,6 +77,7 @@ namespace WixToolsetTest.BootstrapperApplications
                     "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-bindpath", Path.Combine(bundleSourceFolder, "data"),
+                    "-bindpath", dataFolder,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
@@ -101,6 +105,7 @@ namespace WixToolsetTest.BootstrapperApplications
                 var baseFolder = fs.GetFolder();
                 var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
                 var bundleSourceFolder = TestData.Get("TestData", "WixStdBa");
+                var dataFolder = TestData.Get(@"TestData", ".Data");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
@@ -112,6 +117,7 @@ namespace WixToolsetTest.BootstrapperApplications
                     "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
                     "-bindpath", Path.Combine(bundleSourceFolder, "data"),
+                    "-bindpath", dataFolder,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
@@ -141,7 +147,8 @@ namespace WixToolsetTest.BootstrapperApplications
             {
                 var baseFolder = fs.GetFolder();
                 var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
-                var bundleSourceFolder = TestData.Get(@"TestData\Overridable");
+                var bundleSourceFolder = TestData.Get(@"TestData", "Overridable");
+                var dataFolder = TestData.Get(@"TestData", ".Data");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
                 var baFolderPath = Path.Combine(baseFolder, "ba");
                 var extractFolderPath = Path.Combine(baseFolder, "extract");
@@ -152,6 +159,7 @@ namespace WixToolsetTest.BootstrapperApplications
                     Path.Combine(bundleSourceFolder, "Bundle.wxs"),
                     "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
+                    "-bindpath", dataFolder,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
@@ -182,7 +190,8 @@ namespace WixToolsetTest.BootstrapperApplications
             {
                 var baseFolder = fs.GetFolder();
                 var bundleFile = Path.Combine(baseFolder, "bin", "test.exe");
-                var bundleSourceFolder = TestData.Get(@"TestData\WixStdBa");
+                var bundleSourceFolder = TestData.Get(@"TestData", "WixStdBa");
+                var dataFolder = TestData.Get(@"TestData", ".Data");
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
 
                 var compileResult = WixRunner.Execute(new[]
@@ -191,6 +200,7 @@ namespace WixToolsetTest.BootstrapperApplications
                     Path.Combine(bundleSourceFolder, "Bundle.wxs"),
                     "-ext", TestData.Get(@"WixToolset.BootstrapperApplications.wixext.dll"),
                     "-intermediateFolder", intermediateFolder,
+                    "-bindpath", dataFolder,
                     "-o", bundleFile,
                 });
                 compileResult.AssertSuccess();
