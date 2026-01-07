@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Templates\Product.wxs" Link="Product.wxs" />
+    <ProjectReference Include="..\..\CustomActionFail\CustomActionFail.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.UI.wixext" />

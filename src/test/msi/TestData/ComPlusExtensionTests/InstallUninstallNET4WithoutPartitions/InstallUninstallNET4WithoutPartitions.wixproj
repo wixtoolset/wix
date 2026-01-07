@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\Templates\Product.wxs" Link="Product.wxs" />
+    <ProjectReference Include="..\..\CustomActionFail\CustomActionFail.csproj" />
     <ProjectReference Include="..\Components\TestComponentNET4\TestComponentNET4.csproj" />
   </ItemGroup>
   <ItemGroup>
