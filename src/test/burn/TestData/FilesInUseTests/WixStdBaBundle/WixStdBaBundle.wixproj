@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\WixStdBaTests\BundleA\Bundle.wxs" Link="Bundle.wxs" />
+    <BindPath Include="..\..\WixStdBaTests\BundleA" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PackageA\PackageA.wixproj" />

@@ -60,6 +60,7 @@
     <ClCompile Include="precomp.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="stdbas.cpp" />
     <ClCompile Include="WixInternalUIBootstrapperApplication.cpp" />
     <ClCompile Include="WixStandardBootstrapperApplication.cpp" />
   </ItemGroup>

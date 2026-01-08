@@ -3301,26 +3301,24 @@ private:
     HRESULT CreateMainWindow()
     {
         HRESULT hr = S_OK;
-        WNDCLASSW wc = { };
+        WNDCLASSEXW wc = { sizeof(WNDCLASSEXW)};
         DWORD dwWindowStyle = 0;
         int x = CW_USEDEFAULT;
         int y = CW_USEDEFAULT;
         POINT ptCursor = { };
 
-        ThemeInitializeWindowClass(m_pTheme, &wc, CWixStandardBootstrapperApplication::WndProc, m_hModule, WIXSTDBA_WINDOW_CLASS);
+        ThemeInitializeWindowClassEx(m_pTheme, &wc, CWixStandardBootstrapperApplication::WndProc, m_hModule, WIXSTDBA_WINDOW_CLASS);
 
-        // If the theme did not provide an icon, try using the icon from the bundle engine.
+        // If the theme did not provide an icon, try using the icon from the bundle then fallback to the bundle engine.
         if (!wc.hIcon)
         {
-            HMODULE hBootstrapperEngine = ::GetModuleHandleW(NULL);
-            if (hBootstrapperEngine)
-            {
-                wc.hIcon = ::LoadIconW(hBootstrapperEngine, MAKEINTRESOURCEW(1));
-            }
+            LoadBundleIcon(m_hModule, &m_hIcon, &m_hSmallIcon);
+            wc.hIcon = m_hIcon;
+            wc.hIconSm = m_hSmallIcon;
         }
 
         // Register the window class and create the window.
-        if (!::RegisterClassW(&wc))
+        if (!::RegisterClassExW(&wc))
         {
             ExitWithLastError(hr, "Failed to register window.");
         }
@@ -3357,7 +3355,6 @@ private:
     LExit:
         return hr;
     }
-
 
     //
     // InitializeTaskbarButton - initializes taskbar button for progress.
@@ -3396,6 +3393,18 @@ private:
         {
             ::UnregisterClassW(WIXSTDBA_WINDOW_CLASS, m_hModule);
             m_fRegistered = FALSE;
+        }
+
+        if (m_hIcon)
+        {
+            ::DestroyIcon(m_hIcon);
+            m_hIcon = NULL;
+        }
+
+        if (m_hSmallIcon)
+        {
+            ::DestroyIcon(m_hSmallIcon);
+            m_hSmallIcon = NULL;
         }
     }
 
@@ -4822,6 +4831,8 @@ public:
         m_pTheme = NULL;
         memset(m_rgdwPageIds, 0, sizeof(m_rgdwPageIds));
         m_hUiThread = NULL;
+        m_hIcon = NULL;
+        m_hSmallIcon = NULL;
         m_fRegistered = FALSE;
         m_hWnd = NULL;
 
@@ -5110,6 +5121,8 @@ private:
     THEME_ASSIGN_CONTROL_ID m_rgInitControls[LAST_WIXSTDBA_CONTROL - WIXSTDBA_FIRST_ASSIGN_CONTROL_ID];
     DWORD m_rgdwPageIds[countof(vrgwzPageNames)];
     HANDLE m_hUiThread;
+    HICON m_hIcon;
+    HICON m_hSmallIcon;
     BOOL m_fRegistered;
     HWND m_hWnd;
 

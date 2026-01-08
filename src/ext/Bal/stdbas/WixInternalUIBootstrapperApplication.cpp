@@ -557,14 +557,19 @@ private:
     HRESULT CreateMainWindow()
     {
         HRESULT hr = S_OK;
-        WNDCLASSW wc = { };
+        WNDCLASSEXW wc = { };
         DWORD dwWindowStyle = WS_POPUP;
 
+        LoadBundleIcon(m_hModule, &m_hIcon, &m_hSmallIcon);
+
+        wc.cbSize = sizeof(WNDCLASSEXW);
         wc.lpfnWndProc = CWixInternalUIBootstrapperApplication::WndProc;
         wc.hInstance = m_hModule;
         wc.lpszClassName = WIXIUIBA_WINDOW_CLASS;
+        wc.hIcon = m_hIcon;
+        wc.hIconSm = m_hSmallIcon;
 
-        if (!::RegisterClassW(&wc))
+        if (!::RegisterClassExW(&wc))
         {
             ExitWithLastError(hr, "Failed to register window.");
         }
@@ -600,6 +605,18 @@ private:
         {
             ::UnregisterClassW(WIXIUIBA_WINDOW_CLASS, m_hModule);
             m_fRegistered = FALSE;
+        }
+
+        if (m_hIcon)
+        {
+            ::DestroyIcon(m_hIcon);
+            m_hIcon = NULL;
+        }
+
+        if (m_hSmallIcon)
+        {
+            ::DestroyIcon(m_hSmallIcon);
+            m_hSmallIcon = NULL;
         }
     }
 
@@ -807,6 +824,8 @@ public:
         m_sczFailedMessage = NULL;
 
         m_hUiThread = NULL;
+        m_hIcon = NULL;
+        m_hSmallIcon = NULL;
         m_fRegistered = FALSE;
         m_hWnd = NULL;
 
@@ -847,6 +866,8 @@ private:
     LPWSTR m_sczConfirmCloseMessage;
 
     HANDLE m_hUiThread;
+    HICON m_hIcon;
+    HICON m_hSmallIcon;
     BOOL m_fRegistered;
     HWND m_hWnd;
 
