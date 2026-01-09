@@ -446,11 +446,11 @@ extern "C" HRESULT BurnPipeChildConnect(
 
     // Try to connect to the parent.
     hr = PipeClientConnect(pConnection->sczName, &pConnection->hPipe);
-    ExitOnRootFailure(hr, "Failed to open parent pipe: %ls", sczPipeName)
+    ExitOnRootFailure(hr, "Failed to open parent pipe: %ls", pConnection->sczName)
 
     // Verify the parent and notify it that the child connected.
     hr = ChildPipeConnected(pConnection->hPipe, pConnection->sczSecret, &pConnection->dwProcessId);
-    ExitOnFailure(hr, "Failed to verify parent pipe: %ls", sczPipeName);
+    ExitOnFailure(hr, "Failed to verify parent pipe: %ls", pConnection->sczName);
 
     if (fCompanion)
     {
@@ -511,7 +511,7 @@ static HRESULT ChildPipeConnected(
     hr = StrAlloc(&sczVerificationSecret, cbVerificationSecret / sizeof(WCHAR) + 1);
     ExitOnFailure(hr, "Failed to allocate buffer for verification secret.");
 
-    FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(sczVerificationSecret), cbVerificationSecret);
+    hr = FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(sczVerificationSecret), cbVerificationSecret);
     ExitOnFailure(hr, "Failed to read verification secret from parent pipe.");
 
     // Verify the secrets match.
