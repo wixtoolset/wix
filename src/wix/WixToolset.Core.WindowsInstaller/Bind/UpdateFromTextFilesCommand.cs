@@ -56,15 +56,15 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (DirectoryNotFoundException e)
             {
-                this.Messaging.Write(ErrorMessages.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
+                this.Messaging.Write(WindowsInstallerBackendErrors.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
             }
             catch (FileNotFoundException e)
             {
-                this.Messaging.Write(ErrorMessages.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
+                this.Messaging.Write(WindowsInstallerBackendErrors.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
             }
             catch (IOException e)
             {
-                this.Messaging.Write(ErrorMessages.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
+                this.Messaging.Write(WindowsInstallerBackendErrors.BinderFileManagerMissingFile(sourceLineNumbers, e.Message));
             }
             catch (NotSupportedException)
             {

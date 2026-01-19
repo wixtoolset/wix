@@ -1227,7 +1227,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.UnexpectedCustomTableColumn(cell.SourceLineNumbers, cell.ColumnRef));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.UnexpectedCustomTableColumn(cell.SourceLineNumbers, cell.ColumnRef));
                     }
                 }
 
@@ -1235,7 +1235,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     if (!customTableDefinition.Columns[i].Nullable && (null == customRow.Fields[i].Data || 0 == customRow.Fields[i].Data.ToString().Length))
                     {
-                        this.Messaging.Write(ErrorMessages.NoDataForColumn(firstCellSymbol.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.NoDataForColumn(firstCellSymbol.SourceLineNumbers, customTableDefinition.Columns[i].Name, customTableDefinition.Name));
                     }
                 }
             }
@@ -1423,7 +1423,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             foreach (var row in table.Rows)
                             {
-                                this.Messaging.Write(ErrorMessages.UnexpectedTableInMergeModule(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WindowsInstallerBackendErrors.UnexpectedTableInMergeModule(row.SourceLineNumbers, table.Name));
                             }
                         }
                         else if ("Error" == table.Name)
@@ -1437,7 +1437,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             foreach (var row in table.Rows)
                             {
-                                this.Messaging.Write(ErrorMessages.OverlengthTableNameInProductOrMergeModule(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WindowsInstallerBackendErrors.OverlengthTableNameInProductOrMergeModule(row.SourceLineNumbers, table.Name));
                             }
                         }
                         break;
@@ -1452,7 +1452,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             foreach (var row in table.Rows)
                             {
-                                this.Messaging.Write(ErrorMessages.UnexpectedTableInPatch(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WindowsInstallerBackendErrors.UnexpectedTableInPatch(row.SourceLineNumbers, table.Name));
                             }
                         }
                         break;
@@ -1481,7 +1481,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             foreach (var row in table.Rows)
                             {
-                                this.Messaging.Write(ErrorMessages.OverlengthTableNameInProductOrMergeModule(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WindowsInstallerBackendErrors.OverlengthTableNameInProductOrMergeModule(row.SourceLineNumbers, table.Name));
                             }
                         }
                         break;
@@ -1504,7 +1504,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                             if (keyColumnIndex <= 0 || keyColumnIndex > keyTableDefinition.Columns.Length)
                             {
-                                this.Messaging.Write(ErrorMessages.InvalidKeyColumn(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, keyColumnIndex));
+                                this.Messaging.Write(WindowsInstallerBackendErrors.InvalidKeyColumn(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, keyColumnIndex));
                             }
                             else if (keyTableDefinition.Columns[keyColumnIndex - 1].ModularizeType != columnDefinition.ModularizeType && ColumnModularizeType.CompanionFile != columnDefinition.ModularizeType)
                             {

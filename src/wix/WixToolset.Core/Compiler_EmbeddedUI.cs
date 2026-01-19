@@ -295,7 +295,7 @@ namespace WixToolset.Core
 
             if (!name.Contains("."))
             {
-                this.Core.Write(ErrorMessages.InvalidEmbeddedUIFileName(sourceLineNumbers, name));
+                this.Core.Write(CoreErrors.InvalidEmbeddedUIFileName(sourceLineNumbers, name));
             }
 
             foreach (var child in node.Elements())

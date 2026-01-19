@@ -36,6 +36,7 @@ namespace WixToolset.Firewall
         {
             return Message(sourceLineNumbers, Ids.IllegalInterfaceTypeWithInterfaceTypeAll, "The InterfaceType element cannot be specified because its parent FirewallException contains another InterfaceType element with value 'All'.");
         }
+
         public static Message IllegalLocalAddressWithLocalScopeAttribute(SourceLineNumber sourceLineNumbers)
         {
             return Message(sourceLineNumbers, Ids.IllegalLocalAddressWithLocalScopeAttribute, "The LocalAddress element cannot be specified because its parent FirewallException already specified the LocalScope attribute. To use LocalAddress elements, omit the LocalScope attribute.");

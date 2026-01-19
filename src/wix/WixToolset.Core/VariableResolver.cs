@@ -40,7 +40,7 @@ namespace WixToolset.Core
             {
                 if (!TryAddWixVariable(this.locVariables, variable))
                 {
-                    this.Messaging.Write(ErrorMessages.DuplicateLocalizationIdentifier(variable.SourceLineNumbers, variable.Id));
+                    this.Messaging.Write(CoreErrors.DuplicateLocalizationIdentifier(variable.SourceLineNumbers, variable.Id));
                 }
             }
 
@@ -59,7 +59,7 @@ namespace WixToolset.Core
 
             if (!TryAddWixVariable(this.wixVariables, bindVariable))
             {
-                this.Messaging.Write(ErrorMessages.BindVariableCollision(sourceLineNumber, name));
+                this.Messaging.Write(CoreErrors.BindVariableCollision(sourceLineNumber, name));
             }
         }
 
@@ -107,7 +107,7 @@ namespace WixToolset.Core
                     // localization variables do not support inline default values
                     if (variableDefaultValue != null)
                     {
-                        this.Messaging.Write(ErrorMessages.IllegalInlineLocVariable(sourceLineNumbers, variableId, variableDefaultValue));
+                        this.Messaging.Write(CoreErrors.IllegalInlineLocVariable(sourceLineNumbers, variableId, variableDefaultValue));
                         continue;
                     }
 
@@ -159,11 +159,11 @@ namespace WixToolset.Core
                     {
                         if ("loc" == variableNamespace && errorOnUnknown) // unresolved loc variable
                         {
-                            this.Messaging.Write(ErrorMessages.LocalizationVariableUnknown(sourceLineNumbers, variableId));
+                            this.Messaging.Write(CoreErrors.LocalizationVariableUnknown(sourceLineNumbers, variableId));
                         }
                         else if ("wix" == variableNamespace && errorOnUnknown) // unresolved wix variable
                         {
-                            this.Messaging.Write(ErrorMessages.BindVariableUnknown(sourceLineNumbers, variableId));
+                            this.Messaging.Write(CoreErrors.BindVariableUnknown(sourceLineNumbers, variableId));
                         }
 
                         start = parsed.Index + parsed.Length;

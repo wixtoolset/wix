@@ -5,6 +5,7 @@ namespace WixToolset.Core.Link
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
@@ -53,7 +54,7 @@ namespace WixToolset.Core.Link
                 }
                 else if (!newVariable.Overridable)
                 {
-                    this.Messaging.Write(ErrorMessages.DuplicateLocalizationIdentifier(newVariable.SourceLineNumbers, newVariable.Id));
+                    this.Messaging.Write(CoreErrors.DuplicateLocalizationIdentifier(newVariable.SourceLineNumbers, newVariable.Id));
                 }
             }
 

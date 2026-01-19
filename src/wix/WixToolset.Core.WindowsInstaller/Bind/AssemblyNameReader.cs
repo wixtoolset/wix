@@ -56,7 +56,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (Exception e) when (e is FileNotFoundException || e is BadImageFormatException || e is InvalidOperationException)
             {
-                throw new WixException(ErrorMessages.InvalidAssemblyFile(sourceLineNumbers, assemblyPath, $"{e.GetType().Name}: {e.Message}"));
+                throw new WixException(WindowsInstallerBackendErrors.InvalidAssemblyFile(sourceLineNumbers, assemblyPath, $"{e.GetType().Name}: {e.Message}"));
             }
         }
 
@@ -97,7 +97,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         if (!hasNextSibling)
                         {
-                            throw new WixException(ErrorMessages.InvalidManifestContent(sourceLineNumbers, manifestPath));
+                            throw new WixException(WindowsInstallerBackendErrors.InvalidManifestContent(sourceLineNumbers, manifestPath));
                         }
 
                         if (nav.MoveToAttribute("type", String.Empty))

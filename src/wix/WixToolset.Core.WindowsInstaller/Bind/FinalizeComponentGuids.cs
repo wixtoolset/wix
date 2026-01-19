@@ -156,13 +156,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             path.StartsWith(@"StartMenuFolder\programs", StringComparison.Ordinal) ||
                             path.StartsWith(@"WindowsFolder\fonts", StringComparison.Ordinal))
                         {
-                            this.Messaging.Write(ErrorMessages.IllegalPathForGeneratedComponentGuid(componentSymbol.SourceLineNumbers, fileSymbol.ComponentRef, path));
+                            this.Messaging.Write(WindowsInstallerBackendErrors.IllegalPathForGeneratedComponentGuid(componentSymbol.SourceLineNumbers, fileSymbol.ComponentRef, path));
                         }
 
                         // if component has more than one file, the key path must be versioned
                         if (1 < numFilesInComponent && String.IsNullOrEmpty(fileSymbol.Version))
                         {
-                            this.Messaging.Write(ErrorMessages.IllegalGeneratedGuidComponentUnversionedKeypath(componentSymbol.SourceLineNumbers));
+                            this.Messaging.Write(WindowsInstallerBackendErrors.IllegalGeneratedGuidComponentUnversionedKeypath(componentSymbol.SourceLineNumbers));
                         }
                     }
                     else
@@ -170,7 +170,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // not a key path, so it must be an unversioned file if component has more than one file
                         if (1 < numFilesInComponent && !String.IsNullOrEmpty(fileSymbol.Version))
                         {
-                            this.Messaging.Write(ErrorMessages.IllegalGeneratedGuidComponentVersionedNonkeypath(componentSymbol.SourceLineNumbers));
+                            this.Messaging.Write(WindowsInstallerBackendErrors.IllegalGeneratedGuidComponentVersionedNonkeypath(componentSymbol.SourceLineNumbers));
                         }
                     }
                 }
@@ -234,7 +234,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.DuplicateComponentGuids(componentSymbol.SourceLineNumbers, componentSymbol.Id.Id, componentSymbol.ComponentId, type, path));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.DuplicateComponentGuids(componentSymbol.SourceLineNumbers, componentSymbol.Id.Id, componentSymbol.ComponentId, type, path));
                     }
                 }
             }

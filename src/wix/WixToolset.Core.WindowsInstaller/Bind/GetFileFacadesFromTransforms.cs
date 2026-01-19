@@ -154,7 +154,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // make sure Source is same. Otherwise we are silently ignoring a file.
                         if (0 != String.Compare(patchFileRow.Source, mainFileRow.Source, StringComparison.OrdinalIgnoreCase))
                         {
-                            this.Messaging.Write(ErrorMessages.SameFileIdDifferentSource(mainFileRow.SourceLineNumbers, mainFileId, patchFileRow.Source, mainFileRow.Source));
+                            this.Messaging.Write(WindowsInstallerBackendErrors.SameFileIdDifferentSource(mainFileRow.SourceLineNumbers, mainFileId, patchFileRow.Source, mainFileRow.Source));
                         }
 
 #if TODO_PATCHING_DELTA

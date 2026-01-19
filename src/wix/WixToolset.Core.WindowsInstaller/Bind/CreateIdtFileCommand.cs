@@ -55,7 +55,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (TableDefinition.MaxColumnsInRealTable < table.Definition.Columns.Length)
             {
-                throw new WixException(ErrorMessages.TooManyColumnsInRealTable(table.Definition.Name, table.Definition.Columns.Length, TableDefinition.MaxColumnsInRealTable));
+                throw new WixException(WindowsInstallerBackendErrors.TooManyColumnsInRealTable(table.Definition.Name, table.Definition.Columns.Length, TableDefinition.MaxColumnsInRealTable));
             }
 
             // Tack on the table header, and flush before we start writing bytes directly to the stream.
@@ -81,7 +81,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     catch (EncoderFallbackException)
                     {
-                        this.Messaging.Write(ErrorMessages.InvalidStringForCodepage(row.SourceLineNumbers, Convert.ToString(writer.Encoding.CodePage, CultureInfo.InvariantCulture)));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.InvalidStringForCodepage(row.SourceLineNumbers, Convert.ToString(writer.Encoding.CodePage, CultureInfo.InvariantCulture)));
 
                         rowBytes = convertEncoding.GetBytes(rowString);
                     }

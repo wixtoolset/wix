@@ -301,14 +301,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (duplicateFilesSequence < installFilesSequence)
                         {
-                            throw new WixException(ErrorMessages.InsertInvalidSequenceActionOrder(mainFileRow.SourceLineNumbers, tableName, "InstallFiles", "DuplicateFiles", patchFilesActionSymbol.Action));
+                            throw new WixException(WindowsInstallerBackendErrors.InsertInvalidSequenceActionOrder(mainFileRow.SourceLineNumbers, tableName, "InstallFiles", "DuplicateFiles", patchFilesActionSymbol.Action));
                         }
                         else
                         {
                             sequence = (duplicateFilesSequence + installFilesSequence) / 2;
                             if (installFilesSequence == sequence || duplicateFilesSequence == sequence)
                             {
-                                throw new WixException(ErrorMessages.InsertSequenceNoSpace(mainFileRow.SourceLineNumbers, tableName, "InstallFiles", "DuplicateFiles", patchFilesActionSymbol.Action));
+                                throw new WixException(WindowsInstallerBackendErrors.InsertSequenceNoSpace(mainFileRow.SourceLineNumbers, tableName, "InstallFiles", "DuplicateFiles", patchFilesActionSymbol.Action));
                             }
                         }
                     }

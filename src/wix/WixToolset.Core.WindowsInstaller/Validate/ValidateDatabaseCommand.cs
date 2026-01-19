@@ -116,7 +116,7 @@ namespace WixToolset.Core.WindowsInstaller.Validate
             {
                 case ValidationMessageType.InternalFailure:
                 case ValidationMessageType.Error:
-                    this.Messaging.Write(ErrorMessages.ValidationError(messageSourceLineNumbers, message.IceName, message.Description));
+                    this.Messaging.Write(WindowsInstallerBackendErrors.ValidationError(messageSourceLineNumbers, message.IceName, message.Description));
                     break;
                 case ValidationMessageType.Warning:
                     this.Messaging.Write(WarningMessages.ValidationWarning(messageSourceLineNumbers, message.IceName, message.Description));

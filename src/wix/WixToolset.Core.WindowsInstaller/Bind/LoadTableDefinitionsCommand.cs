@@ -47,7 +47,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     if (tableDefinitions.Contains(tableDefinition.Name))
                     {
-                        this.Messaging.Write(ErrorMessages.DuplicateExtensionTable(backendExtension.GetType().Assembly.Location, tableDefinition.Name));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.DuplicateExtensionTable(backendExtension.GetType().Assembly.Location, tableDefinition.Name));
                     }
 
                     tableDefinitions.Add(tableDefinition);

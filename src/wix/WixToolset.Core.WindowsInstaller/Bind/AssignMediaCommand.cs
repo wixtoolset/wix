@@ -56,7 +56,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             // If both symbols are authored, it is an error.
             if (mediaTemplateSymbols.Count > 0 && mediaSymbols.Count > 1)
             {
-                throw new WixException(ErrorMessages.MediaTableCollision(null));
+                throw new WixException(WindowsInstallerBackendErrors.MediaTableCollision(null));
             }
 
             // If neither symbol is authored, default to a media template.
@@ -157,7 +157,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
             catch (OverflowException)
             {
-                throw new WixException(ErrorMessages.MaximumUncompressedMediaSizeTooLarge(null, maxPreCabSizeInMB));
+                throw new WixException(WindowsInstallerBackendErrors.MaximumUncompressedMediaSizeTooLarge(null, maxPreCabSizeInMB));
             }
 
             var mediaSymbolsByDiskId = new Dictionary<int, MediaSymbol>();
@@ -238,8 +238,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (cabinetMediaSymbols.TryGetValue(mediaSymbol.Cabinet, out var existingRow))
                         {
-                            this.Messaging.Write(ErrorMessages.DuplicateCabinetName(mediaSymbol.SourceLineNumbers, mediaSymbol.Cabinet));
-                            this.Messaging.Write(ErrorMessages.DuplicateCabinetName2(existingRow.SourceLineNumbers, existingRow.Cabinet));
+                            this.Messaging.Write(WindowsInstallerBackendErrors.DuplicateCabinetName(mediaSymbol.SourceLineNumbers, mediaSymbol.Cabinet));
+                            this.Messaging.Write(WindowsInstallerBackendErrors.DuplicateCabinetName2(existingRow.SourceLineNumbers, existingRow.Cabinet));
                         }
                         else
                         {
@@ -257,7 +257,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 if (!mediaSymbolsByDiskId.TryGetValue(facade.DiskId, out var mediaSymbol))
                 {
-                    this.Messaging.Write(ErrorMessages.MissingMedia(facade.SourceLineNumber, facade.DiskId));
+                    this.Messaging.Write(WindowsInstallerBackendErrors.MissingMedia(facade.SourceLineNumber, facade.DiskId));
                     continue;
                 }
 
@@ -277,7 +277,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.ExpectedMediaCabinet(facade.SourceLineNumber, facade.Id, facade.DiskId));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.ExpectedMediaCabinet(facade.SourceLineNumber, facade.Id, facade.DiskId));
                     }
                 }
             }

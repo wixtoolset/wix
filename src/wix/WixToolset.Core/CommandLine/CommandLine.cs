@@ -4,7 +4,7 @@ namespace WixToolset.Core.CommandLine
 {
     using System;
     using System.Collections.Generic;
-    using WixToolset.Data;
+    using WixToolset.Core;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -252,7 +252,7 @@ namespace WixToolset.Core.CommandLine
             }
             else
             {
-                parser.ReportErrorArgument(parameter, ErrorMessages.IllegalSuppressWarningId(paramArg));
+                parser.ReportErrorArgument(parameter, CoreErrors.IllegalSuppressWarningId(paramArg));
             }
         }
 
@@ -269,7 +269,7 @@ namespace WixToolset.Core.CommandLine
             }
             else
             {
-                parser.ReportErrorArgument(parameter, ErrorMessages.IllegalWarningIdAsError(paramArg));
+                parser.ReportErrorArgument(parameter, CoreErrors.IllegalWarningIdAsError(paramArg));
             }
         }
     }

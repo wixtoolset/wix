@@ -82,7 +82,7 @@ namespace WixToolset.Core
                         if (0 < embeddedUICount) // there can be only one embedded UI
                         {
                             var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                            this.Core.Write(CoreErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
                         }
                         this.ParseEmbeddedUIElement(child);
                         ++embeddedUICount;
@@ -108,7 +108,7 @@ namespace WixToolset.Core
                         if (RadioButtonType.Bitmap == radioButtonType || RadioButtonType.Icon == radioButtonType)
                         {
                             var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.RadioButtonBitmapAndIconDisallowed(childSourceLineNumbers));
+                            this.Core.Write(CoreErrors.RadioButtonBitmapAndIconDisallowed(childSourceLineNumbers));
                         }
                         break;
                     case "TextStyle":
@@ -639,7 +639,7 @@ namespace WixToolset.Core
                         else if (groupType != type)
                         {
                             var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.RadioButtonTypeInconsistent(childSourceLineNumbers));
+                            this.Core.Write(CoreErrors.RadioButtonTypeInconsistent(childSourceLineNumbers));
                         }
                         break;
                     default:
@@ -1009,7 +1009,7 @@ namespace WixToolset.Core
 
             if (null == firstControl)
             {
-                this.Core.Write(ErrorMessages.NoFirstControlSpecified(sourceLineNumbers, id.Id));
+                this.Core.Write(CoreErrors.NoFirstControlSpecified(sourceLineNumbers, id.Id));
             }
 
             if (!this.Core.EncounteredError)
@@ -1611,7 +1611,7 @@ namespace WixToolset.Core
                 }
                 else if (symbol != null)
                 {
-                    this.Core.Write(ErrorMessages.TabbableControlNotAllowedInBillboard(sourceLineNumbers, node.Name.LocalName, controlType));
+                    this.Core.Write(CoreErrors.TabbableControlNotAllowedInBillboard(sourceLineNumbers, node.Name.LocalName, controlType));
                 }
 
                 if (null == firstControl)

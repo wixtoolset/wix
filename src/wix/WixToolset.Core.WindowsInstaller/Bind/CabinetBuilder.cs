@@ -215,10 +215,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 switch (win32Exception.NativeErrorCode)
                 {
                     case 0x4005:
-                        this.Messaging.Write(ErrorMessages.CreateCabAddFileFailed());
+                        this.Messaging.Write(WindowsInstallerBackendErrors.CreateCabAddFileFailed());
                         return null;
                     case 0x0070:
-                        this.Messaging.Write(ErrorMessages.CreateCabInsufficientDiskSpace());
+                        this.Messaging.Write(WindowsInstallerBackendErrors.CreateCabInsufficientDiskSpace());
                         return null;
                     default:
                         throw;

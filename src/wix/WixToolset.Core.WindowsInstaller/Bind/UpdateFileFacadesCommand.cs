@@ -191,7 +191,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (!fileInfo.Exists)
                 {
-                    this.Messaging.Write(ErrorMessages.CannotFindFile(facade.SourceLineNumber, facade.Id, facade.FileName, facade.SourcePath));
+                    this.Messaging.Write(WindowsInstallerBackendErrors.CannotFindFile(facade.SourceLineNumber, facade.Id, facade.FileName, facade.SourcePath));
                     return;
                 }
 
@@ -199,7 +199,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     if (Int32.MaxValue < fileStream.Length)
                     {
-                        throw new WixException(ErrorMessages.FileTooLarge(facade.SourceLineNumber, facade.SourcePath));
+                        throw new WixException(WindowsInstallerBackendErrors.FileTooLarge(facade.SourceLineNumber, facade.SourcePath));
                     }
 
                     facade.FileSize = Convert.ToInt32(fileStream.Length, CultureInfo.InvariantCulture);
@@ -348,7 +348,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             }
                             else if (assemblySymbol.ApplicationFileRef == null)
                             {
-                                throw new WixException(ErrorMessages.GacAssemblyNoStrongName(facade.SourceLineNumber, fileInfo.FullName, facade.ComponentRef));
+                                throw new WixException(WindowsInstallerBackendErrors.GacAssemblyNoStrongName(facade.SourceLineNumber, fileInfo.FullName, facade.ComponentRef));
                             }
 
                             if (!String.IsNullOrEmpty(assemblyName.FileVersion))
@@ -375,7 +375,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         var fileManifest = this.AllFileFacades.FirstOrDefault(r => r.Id.Equals(assemblySymbol.ManifestFileRef, StringComparison.Ordinal));
                         if (null == fileManifest)
                         {
-                            this.Messaging.Write(ErrorMessages.MissingManifestForWin32Assembly(facade.SourceLineNumber, facade.Id, assemblySymbol.ManifestFileRef));
+                            this.Messaging.Write(WindowsInstallerBackendErrors.MissingManifestForWin32Assembly(facade.SourceLineNumber, facade.Id, assemblySymbol.ManifestFileRef));
                         }
 
                         try
@@ -429,7 +429,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         String.IsNullOrEmpty(assemblySymbol.ApplicationFileRef) &&
                         !String.Equals(Path.GetFileNameWithoutExtension(facade.FileName), value, StringComparison.OrdinalIgnoreCase))
                     {
-                        this.Messaging.Write(ErrorMessages.GACAssemblyIdentityWarning(facade.SourceLineNumber, Path.GetFileNameWithoutExtension(facade.FileName), value));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.GACAssemblyIdentityWarning(facade.SourceLineNumber, Path.GetFileNameWithoutExtension(facade.FileName), value));
                     }
 
                     // Override directly authored value, otherwise remember the gathered information on the facade for use later.

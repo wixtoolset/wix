@@ -6,6 +6,7 @@ namespace WixToolset.Core.CommandLine
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
@@ -61,7 +62,7 @@ namespace WixToolset.Core.CommandLine
                 return argument;
             }
 
-            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            this.Messaging.Write(CoreErrors.ExpectedArgument(commandLineSwitch));
             return null;
         }
 
@@ -73,7 +74,7 @@ namespace WixToolset.Core.CommandLine
                 return true;
             }
 
-            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            this.Messaging.Write(CoreErrors.ExpectedArgument(commandLineSwitch));
             return false;
         }
 
@@ -84,7 +85,7 @@ namespace WixToolset.Core.CommandLine
                 return directory;
             }
 
-            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            this.Messaging.Write(CoreErrors.ExpectedArgument(commandLineSwitch));
             return null;
         }
 
@@ -96,7 +97,7 @@ namespace WixToolset.Core.CommandLine
                 return true;
             }
 
-            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            this.Messaging.Write(CoreErrors.ExpectedArgument(commandLineSwitch));
             return false;
         }
 
@@ -107,7 +108,7 @@ namespace WixToolset.Core.CommandLine
                 return path;
             }
 
-            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            this.Messaging.Write(CoreErrors.ExpectedArgument(commandLineSwitch));
             return null;
         }
 
@@ -123,13 +124,13 @@ namespace WixToolset.Core.CommandLine
                 return true;
             }
 
-            this.Messaging.Write(ErrorMessages.ExpectedArgument(commandLineSwitch));
+            this.Messaging.Write(CoreErrors.ExpectedArgument(commandLineSwitch));
             return false;
         }
 
         public void ReportErrorArgument(string argument, Message message = null)
         {
-            this.Messaging.Write(message ?? ErrorMessages.AdditionalArgumentUnexpected(argument));
+            this.Messaging.Write(message ?? CoreErrors.AdditionalArgumentUnexpected(argument));
             this.ErrorArgument = argument;
         }
 
@@ -181,7 +182,7 @@ namespace WixToolset.Core.CommandLine
 
             if (File.Exists(arg))
             {
-                this.Messaging.Write(ErrorMessages.ExpectedDirectoryGotFile(commandlineSwitch, arg));
+                this.Messaging.Write(CoreErrors.ExpectedDirectoryGotFile(commandlineSwitch, arg));
                 return false;
             }
 
@@ -199,7 +200,7 @@ namespace WixToolset.Core.CommandLine
             }
             else if (Directory.Exists(arg))
             {
-                this.Messaging.Write(ErrorMessages.ExpectedFileGotDirectory(commandlineSwitch, arg));
+                this.Messaging.Write(CoreErrors.ExpectedFileGotDirectory(commandlineSwitch, arg));
             }
             else
             {
@@ -272,7 +273,7 @@ namespace WixToolset.Core.CommandLine
 
             if (0 <= path.IndexOf('\"'))
             {
-                this.Messaging.Write(ErrorMessages.PathCannotContainQuote(path));
+                this.Messaging.Write(CoreErrors.PathCannotContainQuote(path));
                 return null;
             }
 
@@ -282,7 +283,7 @@ namespace WixToolset.Core.CommandLine
             }
             catch (Exception e)
             {
-                this.Messaging.Write(ErrorMessages.InvalidCommandLineFileName(path, e.Message));
+                this.Messaging.Write(CoreErrors.InvalidCommandLineFileName(path, e.Message));
                 return null;
             }
 

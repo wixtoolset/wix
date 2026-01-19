@@ -80,8 +80,8 @@ namespace WixToolset.Core.Burn.Bundles
                         {
                             if (facade.PackageSymbol.Type != WixBundlePackageType.Msi && facade.PackageSymbol.Type != WixBundlePackageType.Msp)
                             {
-                                this.Messaging.Write(ErrorMessages.MsiTransactionInvalidPackage(facade.PackageSymbol.SourceLineNumbers, facade.PackageId, facade.PackageSymbol.Type.ToString()));
-                                this.Messaging.Write(ErrorMessages.MsiTransactionInvalidPackage2(lastRollbackBoundary.SourceLineNumbers));
+                                this.Messaging.Write(BurnBackendErrors.MsiTransactionInvalidPackage(facade.PackageSymbol.SourceLineNumbers, facade.PackageId, facade.PackageSymbol.Type.ToString()));
+                                this.Messaging.Write(BurnBackendErrors.MsiTransactionInvalidPackage2(lastRollbackBoundary.SourceLineNumbers));
                             }
                             // Not possible to tell the bitness of Msp.
                             else if (facade.PackageSymbol.Type == WixBundlePackageType.Msi)
@@ -93,8 +93,8 @@ namespace WixToolset.Core.Burn.Bundles
                                 // Error if MSI transaction has x86 package preceding x64 packages
                                 else if (msiTransactionX86Package != null && facade.PackageSymbol.Win64)
                                 {
-                                    this.Messaging.Write(ErrorMessages.MsiTransactionX86BeforeX64Package(facade.PackageSymbol.SourceLineNumbers, facade.PackageId, msiTransactionX86Package.PackageId));
-                                    this.Messaging.Write(ErrorMessages.MsiTransactionX86BeforeX64Package2(msiTransactionX86Package.PackageSymbol.SourceLineNumbers));
+                                    this.Messaging.Write(BurnBackendErrors.MsiTransactionX86BeforeX64Package(facade.PackageSymbol.SourceLineNumbers, facade.PackageId, msiTransactionX86Package.PackageId));
+                                    this.Messaging.Write(BurnBackendErrors.MsiTransactionX86BeforeX64Package2(msiTransactionX86Package.PackageSymbol.SourceLineNumbers));
                                 }
                             }
                         }

@@ -119,7 +119,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
             catch (MsiException e)
             {
-                this.Messaging.Write(ErrorMessages.UnableToReadPackageInformation(this.PackagePayload.SourceLineNumbers, sourcePath, e.Message));
+                this.Messaging.Write(BurnBackendErrors.UnableToReadPackageInformation(this.PackagePayload.SourceLineNumbers, sourcePath, e.Message));
                 return null;
             }
 

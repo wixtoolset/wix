@@ -135,7 +135,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             if (!this.Intermediate.HasLevel(Data.IntermediateLevels.Linked) || !this.Intermediate.HasLevel(Data.IntermediateLevels.Resolved))
             {
-                this.Messaging.Write(ErrorMessages.IntermediatesMustBeResolved(this.Intermediate.Id));
+                this.Messaging.Write(WindowsInstallerBackendErrors.IntermediatesMustBeResolved(this.Intermediate.Id));
             }
 
             var section = this.Intermediate.Sections.Single();

@@ -118,6 +118,121 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.BundleMissingBootstrapperApplicationContainer, "Bundle is invalid. The BootstrapperApplication attached container is missing from the file: {0}", path);
         }
 
+        public static Message CircularSearchReference(string chain)
+        {
+            return Message(null, Ids.CircularSearchReference, "A circular reference of search ordering constraints was detected: {0}. Search ordering references must form a directed acyclic graph.", chain);
+        }
+
+        public static Message DuplicateProviderDependencyKey(string providerKey, string packageId)
+        {
+            return Message(null, Ids.DuplicateProviderDependencyKey, "The provider dependency key '{0}' was already imported from the package with Id '{1}'. Please remove the Provides element with the key '{0}' from the package authoring.", providerKey, packageId);
+        }
+
+        public static Message InsecureBundleFilename(string filename)
+        {
+            return Message(null, Ids.InsecureBundleFilename, "The file name '{0}' creates an insecure bundle. Windows will load unnecessary compatibility shims into a bundle with that file name. These compatibility shims can be DLL hijacked allowing attackers to compromise your customers' computer. Choose a different bundle file name.", filename);
+        }
+
+        public static Message InvalidBundle(string bundleExecutable)
+        {
+            return Message(null, Ids.InvalidBundle, "Unable to read bundle executable '{0}'. This is not a valid WiX bundle.", bundleExecutable);
+        }
+
+        public static Message InvalidStubExe(string filename)
+        {
+            return Message(null, Ids.InvalidStubExe, "Stub executable '{0}' is not a valid Win32 executable.", filename);
+        }
+
+        public static Message MissingBundleInformation(string friendlyName)
+        {
+            return Message(null, Ids.MissingBundleInformation, "The Bundle is missing {0} data, and cannot continue.", friendlyName);
+        }
+
+        public static Message MissingBundleSearch(SourceLineNumber sourceLineNumbers, string searchId)
+        {
+            return Message(sourceLineNumbers, Ids.MissingBundleSearch, "Bundle Search with id '{0}' has no corresponding implementation symbol.", searchId);
+        }
+
+        public static Message MissingDependencyVersion(string packageId)
+        {
+            return Message(null, Ids.MissingDependencyVersion, "The provider dependency version was not authored for the package with Id '{0}'. Please author the Provides/@Version attribute for this package.", packageId);
+        }
+
+        public static Message MissingPackagePayload(SourceLineNumber sourceLineNumbers, string packageId, string packageType)
+        {
+            return Message(sourceLineNumbers, Ids.MissingPackagePayload, "There is no payload defined for package '{0}'. This is specified on the {1}Package element or a child {1}PackagePayload element.", packageId, packageType);
+        }
+
+        public static Message MsiTransactionInvalidPackage(SourceLineNumber sourceLineNumbers, string packageId, string packageType)
+        {
+            return Message(sourceLineNumbers, Ids.MsiTransactionInvalidPackage, "Invalid package '{0}' in MSI transaction. It is type '{1}' but must be Msi or Msp.", packageId, packageType);
+        }
+
+        public static Message MsiTransactionInvalidPackage2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MsiTransactionInvalidPackage2, "Location of rollback boundary related to previous error.");
+        }
+
+        public static Message MsiTransactionX86BeforeX64Package(SourceLineNumber sourceLineNumbers, string x64PackageId, string x86PackageId)
+        {
+            return Message(sourceLineNumbers, Ids.MsiTransactionX86BeforeX64Package, "Package '{0}' is x64 but Package '{1}' is x86. MSI transactions must install all x64 packages before any x86 package.", x64PackageId, x86PackageId);
+        }
+
+        public static Message MsiTransactionX86BeforeX64Package2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MsiTransactionX86BeforeX64Package2, "Location of x86 package related to previous error.");
+        }
+
+        public static Message MultiplePackagePayloads(SourceLineNumber sourceLineNumbers, string packageId, string packagePayloadId1, string packagePayloadId2)
+        {
+            return Message(sourceLineNumbers, Ids.MultiplePackagePayloads, "The package '{0}' has multiple PackagePayloads: '{1}' and '{2}'. This normally happens when the payload is defined on the package element and a child PackagePayload element.", packageId, packagePayloadId1, packagePayloadId2);
+        }
+
+        public static Message MultiplePackagePayloads2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MultiplePackagePayloads2, "The location of the package payload related to previous error.");
+        }
+
+        public static Message MultiplePackagePayloads3(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.MultiplePackagePayloads3, "The location of the package related to previous error.");
+        }
+
+        public static Message PackagePayloadUnsupported(SourceLineNumber sourceLineNumbers, string packageType)
+        {
+            return Message(sourceLineNumbers, Ids.PackagePayloadUnsupported, "The {0}PackagePayload element can only be used for {0}Packages.", packageType);
+        }
+
+        public static Message PackagePayloadUnsupported2(SourceLineNumber sourceLineNumbers)
+        {
+            return Message(sourceLineNumbers, Ids.PackagePayloadUnsupported2, "The location of the package related to previous error.");
+        }
+
+        public static Message PerUserButAllUsersEquals1(SourceLineNumber sourceLineNumbers, string path)
+        {
+            return Message(sourceLineNumbers, Ids.PerUserButAllUsersEquals1, "The MSI '{0}' is explicitly marked to not elevate so it must be a per-user package but the ALLUSERS Property is set to '1' creating a per-machine package. Remove the Property with Id='ALLUSERS' and use Package/@Scope attribute to be explicit instead.", path);
+        }
+
+        public static Message StubMissingWixburnSection(string filename)
+        {
+            return Message(null, Ids.StubMissingWixburnSection, "Stub executable '{0}' does not contain a .wixburn data section.", filename);
+        }
+
+        public static Message StubWixburnSectionTooSmall(string filename)
+        {
+            return Message(null, Ids.StubWixburnSectionTooSmall, "Stub executable '{0}' .wixburn data section is too small to store the Burn container header.", filename);
+        }
+
+        public static Message UnableToReadPackageInformation(SourceLineNumber sourceLineNumbers, string packagePath, string detailedErrorMessage)
+        {
+            return Message(sourceLineNumbers, Ids.UnableToReadPackageInformation, "Unable to read package '{0}'. {1}", packagePath, detailedErrorMessage);
+        }
+
+        public static Message UnsupportedAllUsersValue(SourceLineNumber sourceLineNumbers, string path, string value)
+        {
+            return Message(sourceLineNumbers, Ids.UnsupportedAllUsersValue, "The MSI '{0}' set the ALLUSERS Property to '{0}' which is not supported. Remove the Property with Id='ALLUSERS' and use Package/@Scope attribute instead.", path, value);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -125,6 +240,29 @@ namespace WixToolset.Core.Burn
 
         public enum Ids
         {
+            InvalidStubExe = 338,
+            StubMissingWixburnSection = 339,
+            StubWixburnSectionTooSmall = 340,
+            MissingBundleInformation = 341,
+            UnableToReadPackageInformation = 352,
+            InvalidBundle = 354,
+            PerUserButAllUsersEquals1 = 363,
+            UnsupportedAllUsersValue = 364,
+            DuplicateProviderDependencyKey = 370,
+            MissingDependencyVersion = 371,
+            InsecureBundleFilename = 388,
+            MsiTransactionX86BeforeX64Package = 390,
+            MissingBundleSearch = 397,
+            CircularSearchReference = 398,
+            PackagePayloadUnsupported = 402,
+            PackagePayloadUnsupported2 = 403,
+            MultiplePackagePayloads = 404,
+            MultiplePackagePayloads2 = 405,
+            MultiplePackagePayloads3 = 406,
+            MissingPackagePayload = 407,
+            MsiTransactionX86BeforeX64Package2 = 410,
+            MsiTransactionInvalidPackage = 411,
+            MsiTransactionInvalidPackage2 = 412,
             DuplicateCacheIds = 8000,
             DuplicateCacheIds2 = 8001,
             BAContainerPayloadCollision = 8002,

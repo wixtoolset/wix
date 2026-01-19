@@ -199,7 +199,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.DuplicateExtensionTable(extension.GetType().ToString(), tableDefinition.Name));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.DuplicateExtensionTable(extension.GetType().ToString(), tableDefinition.Name));
                     }
                 }
             }

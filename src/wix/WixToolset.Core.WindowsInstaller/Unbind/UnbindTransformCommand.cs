@@ -290,7 +290,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
                     // this commonly happens when the transform was built
                     // against a database schema different from the internal
                     // table definitions
-                    throw new WixException(ErrorMessages.TransformSchemaMismatch());
+                    throw new WixException(WindowsInstallerBackendErrors.TransformSchemaMismatch());
                 }
             }
 

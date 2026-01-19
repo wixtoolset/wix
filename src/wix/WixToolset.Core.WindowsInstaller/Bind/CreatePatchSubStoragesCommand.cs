@@ -80,7 +80,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (this.Transforms == null || !this.Transforms.Any())
             {
-                this.Messaging.Write(ErrorMessages.PatchWithoutTransforms());
+                this.Messaging.Write(WindowsInstallerBackendErrors.PatchWithoutTransforms());
                 return subStorages;
             }
 
@@ -95,13 +95,13 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (String.IsNullOrEmpty(patchSymbol.Id?.Id))
             {
-                this.Messaging.Write(ErrorMessages.ExpectedPatchIdInWixMsp());
+                this.Messaging.Write(WindowsInstallerBackendErrors.ExpectedPatchIdInWixMsp());
                 return subStorages;
             }
 
             if (String.IsNullOrEmpty(patchSymbol.ClientPatchId))
             {
-                this.Messaging.Write(ErrorMessages.ExpectedClientPatchIdInWixMsp());
+                this.Messaging.Write(WindowsInstallerBackendErrors.ExpectedClientPatchIdInWixMsp());
                 return subStorages;
             }
 
@@ -110,7 +110,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (patchMediaByDiskId.Count == 0)
             {
-                this.Messaging.Write(ErrorMessages.ExpectedMediaRowsInWixMsp());
+                this.Messaging.Write(WindowsInstallerBackendErrors.ExpectedMediaRowsInWixMsp());
                 return subStorages;
             }
 
@@ -186,7 +186,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (validTransform.Count == 0)
             {
-                this.Messaging.Write(ErrorMessages.PatchWithoutValidTransforms());
+                this.Messaging.Write(WindowsInstallerBackendErrors.PatchWithoutValidTransforms());
                 return subStorages;
             }
 
@@ -202,7 +202,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                 if (!uninstallable)
                 {
-                    this.Messaging.Write(ErrorMessages.PatchNotRemovable());
+                    this.Messaging.Write(WindowsInstallerBackendErrors.PatchNotRemovable());
                     return subStorages;
                 }
             }
@@ -364,7 +364,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                         var primaryKey = row.GetPrimaryKey('/') ?? String.Empty;
 
-                        this.Messaging.Write(ErrorMessages.NewRowAddedInTable(row.SourceLineNumbers, productCode, table.Name, primaryKey));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.NewRowAddedInTable(row.SourceLineNumbers, productCode, table.Name, primaryKey));
                     }
                 }
             }
@@ -432,7 +432,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     // If the keypath is modified its an error
                     if (row.Fields[5].Modified)
                     {
-                        this.Messaging.Write(ErrorMessages.InvalidKeypathChange(row.SourceLineNumbers, id, transformPath));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.InvalidKeypathChange(row.SourceLineNumbers, id, transformPath));
                     }
                 }
             }
@@ -457,7 +457,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         if (row.Fields[2].Modified)
                         {
                             // You can't change the filename of a file that is the keypath of a component.
-                            this.Messaging.Write(ErrorMessages.InvalidKeypathChange(row.SourceLineNumbers, componentId, transformPath));
+                            this.Messaging.Write(WindowsInstallerBackendErrors.InvalidKeypathChange(row.SourceLineNumbers, componentId, transformPath));
                         }
 
                         if (!componentWithChangedKeyPath.ContainsKey(componentId))
@@ -546,7 +546,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             if (!featureOps.TryGetValue(featureId, out var op) || op != RowOperation.Delete)
                             {
                                 // The feature was not deleted.
-                                this.Messaging.Write(ErrorMessages.InvalidRemoveComponent(((Row)entry.Value).SourceLineNumbers, entry.Key.ToString(), featureId, transformPath));
+                                this.Messaging.Write(WindowsInstallerBackendErrors.InvalidRemoveComponent(((Row)entry.Value).SourceLineNumbers, entry.Key.ToString(), featureId, transformPath));
                             }
                         }
                     }
@@ -639,7 +639,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             if (productCode == null)
             {
-                this.Messaging.Write(ErrorMessages.CouldNotDetermineProductCodeFromTransformSummaryInfo());
+                this.Messaging.Write(WindowsInstallerBackendErrors.CouldNotDetermineProductCodeFromTransformSummaryInfo());
                 return null;
             }
 

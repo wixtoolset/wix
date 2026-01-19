@@ -309,7 +309,7 @@ namespace WixToolset.Core.Burn
                 if (0 == uxPayloadIndex)
                 {
                     // If we didn't get any UX payloads, it's an error!
-                    throw new WixException(ErrorMessages.MissingBundleInformation("bootstrapper application"));
+                    throw new WixException(BurnBackendErrors.MissingBundleInformation("bootstrapper application"));
                 }
 
                 // Give the embedded payloads without an embedded id yet an embedded id.
@@ -642,7 +642,7 @@ namespace WixToolset.Core.Burn
 
             if (0 == symbols.Count)
             {
-                throw new WixException(ErrorMessages.MissingBundleInformation(typeof(T).Name));
+                throw new WixException(BurnBackendErrors.MissingBundleInformation(typeof(T).Name));
             }
 
             return symbols;
@@ -654,7 +654,7 @@ namespace WixToolset.Core.Burn
 
             if (0 == symbols.Count)
             {
-                throw new WixException(ErrorMessages.MissingBundleInformation(elementName));
+                throw new WixException(BurnBackendErrors.MissingBundleInformation(elementName));
             }
             else if (1 < symbols.Count)
             {
