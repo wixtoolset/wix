@@ -715,7 +715,7 @@ namespace WixToolset.Core
             this.Core.ParseForExtensionElements(node);
 
             // Always warn when using the All element.
-            this.Core.Write(WarningMessages.AllChangesIncludedInPatch(sourceLineNumbers));
+            this.Core.Write(CompilerWarnings.AllChangesIncludedInPatch(sourceLineNumbers));
 
             if (!this.Core.EncounteredError)
             {

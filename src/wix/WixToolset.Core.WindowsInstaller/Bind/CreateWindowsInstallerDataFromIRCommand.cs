@@ -553,7 +553,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (directoryId.StartsWith(standardDirectoryId, StringComparison.Ordinal))
                         {
-                            this.Messaging.Write(WarningMessages.StandardDirectoryConflictInMergeModule(symbol.SourceLineNumbers, directoryId, standardDirectoryId));
+                            this.Messaging.Write(WindowsInstallerBackendWarnings.StandardDirectoryConflictInMergeModule(symbol.SourceLineNumbers, directoryId, standardDirectoryId));
                         }
                     }
                 }
@@ -1396,10 +1396,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         {
             foreach (var conflicts in this.GeneratedShortNames.Values.Where(l => l.Count > 1))
             {
-                this.Messaging.Write(WarningMessages.GeneratedShortFileNameConflict(conflicts[0].SourceLineNumbers, conflicts[0].ShortName));
+                this.Messaging.Write(WindowsInstallerBackendWarnings.GeneratedShortFileNameConflict(conflicts[0].SourceLineNumbers, conflicts[0].ShortName));
                 for (var i = 1; i < conflicts.Count; ++i)
                 {
-                    this.Messaging.Write(WarningMessages.GeneratedShortFileNameConflict2(conflicts[i].SourceLineNumbers));
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.GeneratedShortFileNameConflict2(conflicts[i].SourceLineNumbers));
                 }
             }
         }
@@ -1430,7 +1430,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             foreach (var row in table.Rows)
                             {
-                                this.Messaging.Write(WarningMessages.DangerousTableInMergeModule(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WindowsInstallerBackendWarnings.DangerousTableInMergeModule(row.SourceLineNumbers, table.Name));
                             }
                         }
                         else if (31 < table.Name.Length)
@@ -1474,7 +1474,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             foreach (var row in table.Rows)
                             {
-                                this.Messaging.Write(WarningMessages.UnexpectedTableInProduct(row.SourceLineNumbers, table.Name));
+                                this.Messaging.Write(WindowsInstallerBackendWarnings.UnexpectedTableInProduct(row.SourceLineNumbers, table.Name));
                             }
                         }
                         else if (31 < table.Name.Length)
@@ -1508,7 +1508,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             }
                             else if (keyTableDefinition.Columns[keyColumnIndex - 1].ModularizeType != columnDefinition.ModularizeType && ColumnModularizeType.CompanionFile != columnDefinition.ModularizeType)
                             {
-                                this.Messaging.Write(WarningMessages.CollidingModularizationTypes(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, keyColumnIndex, columnDefinition.ModularizeType.ToString(), keyTableDefinition.Columns[keyColumnIndex - 1].ModularizeType.ToString()));
+                                this.Messaging.Write(WindowsInstallerBackendWarnings.CollidingModularizationTypes(tableDefinition.Name, columnDefinition.Name, columnDefinition.KeyTable, keyColumnIndex, columnDefinition.ModularizeType.ToString(), keyTableDefinition.Columns[keyColumnIndex - 1].ModularizeType.ToString()));
                             }
                         }
                         // else - ignore missing table definitions as that error is caught in other places
@@ -1540,7 +1540,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     foreach (var row in isolatedComponentTable.Rows)
                     {
-                        this.Messaging.Write(WarningMessages.TableIncompatibleWithInstallerVersion(row.SourceLineNumbers, "IsolatedComponent", outputInstallerVersion));
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.TableIncompatibleWithInstallerVersion(row.SourceLineNumbers, "IsolatedComponent", outputInstallerVersion));
                     }
                 }
             }
@@ -1554,7 +1554,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         if (null != row[12] || null != row[13] || null != row[14] || null != row[15])
                         {
-                            this.Messaging.Write(WarningMessages.ColumnsIncompatibleWithInstallerVersion(row.SourceLineNumbers, "Shortcut", outputInstallerVersion));
+                            this.Messaging.Write(WindowsInstallerBackendWarnings.ColumnsIncompatibleWithInstallerVersion(row.SourceLineNumbers, "Shortcut", outputInstallerVersion));
                         }
                     }
                 }

@@ -162,7 +162,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     var canonicalizedPath = normalizedPath.Substring(root.Length);
                     if (canonicalizedPath != relativePath)
                     {
-                        this.Messaging.Write(WarningMessages.PathCanonicalized(sourceLineNumbers, elementName, attributeName, relativePath, canonicalizedPath));
+                        this.Messaging.Write(CompilerWarnings.PathCanonicalized(sourceLineNumbers, elementName, attributeName, relativePath, canonicalizedPath));
                     }
                     return canonicalizedPath;
                 }
@@ -341,7 +341,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 if (condition.Contains(variableName))
                 {
                     var illegalValues = CreateValueList(ValueListKind.Or, unavailableVariables);
-                    this.Messaging.Write(WarningMessages.UnavailableBundleConditionVariable(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
+                    this.Messaging.Write(CompilerWarnings.UnavailableBundleConditionVariable(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
 
                     return false;
                 }

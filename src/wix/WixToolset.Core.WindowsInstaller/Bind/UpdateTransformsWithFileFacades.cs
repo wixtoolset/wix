@@ -440,7 +440,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // Make sure all changes to non keypath files also had a change in the keypath.
                 if (!componentWithChangedKeyPath.ContainsKey(componentFile.Key) && componentKeyPath.TryGetValue(componentFile.Key, out var keyPath))
                 {
-                    this.Messaging.Write(WarningMessages.UpdateOfNonKeyPathFile(componentFile.Value, componentFile.Key, keyPath));
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.UpdateOfNonKeyPathFile(componentFile.Value, componentFile.Key, keyPath));
                 }
             }
         }

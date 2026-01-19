@@ -241,14 +241,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // for unversioned file. That's allowed but generally a dangerous thing to do so let's point that out to the user.
                         if (!this.AllFileFacades.Any(r => facade.Version.Equals(r.Id, StringComparison.Ordinal)))
                         {
-                            this.Messaging.Write(WarningMessages.DefaultVersionUsedForUnversionedFile(facade.SourceLineNumber, facade.Version, facade.Id));
+                            this.Messaging.Write(WindowsInstallerBackendWarnings.DefaultVersionUsedForUnversionedFile(facade.SourceLineNumber, facade.Version, facade.Id));
                         }
                     }
                     else
                     {
                         if (null != facade.Language)
                         {
-                            this.Messaging.Write(WarningMessages.DefaultLanguageUsedForUnversionedFile(facade.SourceLineNumber, facade.Language, facade.Id));
+                            this.Messaging.Write(WindowsInstallerBackendWarnings.DefaultLanguageUsedForUnversionedFile(facade.SourceLineNumber, facade.Language, facade.Id));
                         }
 
                         int[] hash;
@@ -303,7 +303,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (!String.IsNullOrEmpty(facade.Language) && String.IsNullOrEmpty(language))
                     {
-                        this.Messaging.Write(WarningMessages.DefaultLanguageUsedForVersionedFile(facade.SourceLineNumber, facade.Language, facade.Id));
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.DefaultLanguageUsedForVersionedFile(facade.SourceLineNumber, facade.Language, facade.Id));
                     }
                     else // override the default provided by the user (usually nothing) with the actual language from the file itself.
                     {
@@ -420,7 +420,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 // check for null value (this can occur when grabbing the file version from an assembly without one)
                 if (String.IsNullOrEmpty(value))
                 {
-                    this.Messaging.Write(WarningMessages.NullMsiAssemblyNameValue(facade.SourceLineNumber, facade.ComponentRef, name));
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.NullMsiAssemblyNameValue(facade.SourceLineNumber, facade.ComponentRef, name));
                 }
                 else
                 {

@@ -2518,7 +2518,7 @@ namespace WixToolset.Core
                     }
                     else
                     {
-                        this.Core.Write(WarningMessages.ExePackageDetectInformationRecommended(sourceLineNumbers));
+                        this.Core.Write(CompilerWarnings.ExePackageDetectInformationRecommended(sourceLineNumbers));
                     }
                 }
 
@@ -2536,17 +2536,17 @@ namespace WixToolset.Core
                         {
                             if (null == installArguments || -1 == installArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
                             {
-                                this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "InstallArguments", installArguments, expectedArgument, "Protocol", "netfx4"));
+                                this.Core.Write(CompilerWarnings.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "InstallArguments", installArguments, expectedArgument, "Protocol", "netfx4"));
                             }
 
                             if (!String.IsNullOrEmpty(repairArguments) && -1 == repairArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
                             {
-                                this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "RepairArguments", repairArguments, expectedArgument, "Protocol", "netfx4"));
+                                this.Core.Write(CompilerWarnings.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "RepairArguments", repairArguments, expectedArgument, "Protocol", "netfx4"));
                             }
 
                             if (!String.IsNullOrEmpty(uninstallArguments) && -1 == uninstallArguments.IndexOf(expectedArgument, StringComparison.OrdinalIgnoreCase))
                             {
-                                this.Core.Write(WarningMessages.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", uninstallArguments, expectedArgument, "Protocol", "netfx4"));
+                                this.Core.Write(CompilerWarnings.AttributeShouldContain(sourceLineNumbers, node.Name.LocalName, "UninstallArguments", uninstallArguments, expectedArgument, "Protocol", "netfx4"));
                             }
                         }
 
@@ -2578,7 +2578,7 @@ namespace WixToolset.Core
                 // Detect condition is recommended for Msu packages.
                 if (String.IsNullOrEmpty(detectCondition))
                 {
-                    this.Core.Write(WarningMessages.DetectConditionRecommended(sourceLineNumbers, node.Name.LocalName));
+                    this.Core.Write(CompilerWarnings.DetectConditionRecommended(sourceLineNumbers, node.Name.LocalName));
                 }
             }
 

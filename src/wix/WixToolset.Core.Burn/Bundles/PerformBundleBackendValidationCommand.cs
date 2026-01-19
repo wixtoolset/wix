@@ -117,7 +117,7 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     if (!this.BackendHelper.IsValidWixVersion(symbol.ArpDisplayVersion))
                     {
-                        this.Messaging.Write(WarningMessages.InvalidWixVersion(symbol.SourceLineNumbers, symbol.ArpDisplayVersion, "ArpEntry", "Version"));
+                        this.Messaging.Write(BurnBackendWarnings.InvalidWixVersion(symbol.SourceLineNumbers, symbol.ArpDisplayVersion, "ArpEntry", "Version"));
                     }
                 }
             }

@@ -53,7 +53,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-o", wixlibPath,
                 });
 
-                Assert.Equal((int)WarningMessages.Ids.PathCanonicalized, result.ExitCode);
+                Assert.Equal(1152, result.ExitCode);  // CompilerWarnings.PathCanonicalized
 
                 var message = Assert.Single(result.Messages);
                 Assert.Equal(MessageLevel.Error, message.Level);

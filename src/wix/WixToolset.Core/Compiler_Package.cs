@@ -73,14 +73,14 @@ namespace WixToolset.Core
                         manufacturer = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.MustHaveNonWhitespaceCharacters);
                         if ("PUT-COMPANY-NAME-HERE" == manufacturer)
                         {
-                            this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, manufacturer));
+                            this.Core.Write(CompilerWarnings.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, manufacturer));
                         }
                         break;
                     case "Name":
                         this.activeName = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.MustHaveNonWhitespaceCharacters);
                         if ("PUT-PRODUCT-NAME-HERE" == this.activeName)
                         {
-                            this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
+                            this.Core.Write(CompilerWarnings.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
                         }
                         break;
                     case "ProductCode":
@@ -165,7 +165,7 @@ namespace WixToolset.Core
             {
                 if (id is null)
                 {
-                    this.Core.Write(WarningMessages.MissingUpgradeCode(sourceLineNumbers));
+                    this.Core.Write(CompilerWarnings.MissingUpgradeCode(sourceLineNumbers));
                 }
                 else
                 {
@@ -510,13 +510,13 @@ namespace WixToolset.Core
             if (String.Equals(platform, "X64", StringComparison.OrdinalIgnoreCase) && 200 > msiVersion)
             {
                 msiVersion = 200;
-                this.Core.Write(WarningMessages.RequiresMsi200for64bitPackage(sourceLineNumbers));
+                this.Core.Write(CompilerWarnings.RequiresMsi200for64bitPackage(sourceLineNumbers));
             }
 
             if (String.Equals(platform, "Arm64", StringComparison.OrdinalIgnoreCase) && 500 > msiVersion)
             {
                 msiVersion = 500;
-                this.Core.Write(WarningMessages.RequiresMsi500forArmPackage(sourceLineNumbers));
+                this.Core.Write(CompilerWarnings.RequiresMsi500forArmPackage(sourceLineNumbers));
             }
 
             this.Core.AddSymbol(new SummaryInformationSymbol(sourceLineNumbers)
@@ -871,7 +871,7 @@ namespace WixToolset.Core
                         packageAuthor = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         if ("PUT-COMPANY-NAME-HERE" == packageAuthor)
                         {
-                            this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, packageAuthor));
+                            this.Core.Write(CompilerWarnings.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, packageAuthor));
                         }
                         break;
                     default:
@@ -1443,7 +1443,7 @@ namespace WixToolset.Core
             // raise an error for an orphaned ProgId
             if (YesNoType.Yes == advertise && !foundExtension && null == parent && null == classId)
             {
-                this.Core.Write(WarningMessages.OrphanedProgId(sourceLineNumbers, progId));
+                this.Core.Write(CompilerWarnings.OrphanedProgId(sourceLineNumbers, progId));
             }
 
             return progId;
@@ -1509,7 +1509,7 @@ namespace WixToolset.Core
             }
             else if ("ProductID" == id.Id)
             {
-                this.Core.Write(WarningMessages.ProductIdAuthored(sourceLineNumbers));
+                this.Core.Write(CompilerWarnings.ProductIdAuthored(sourceLineNumbers));
             }
             else if ("SecureCustomProperties" == id.Id || "AdminProperties" == id.Id || "MsiHiddenProperties" == id.Id)
             {
@@ -1572,7 +1572,7 @@ namespace WixToolset.Core
                 // the element.
                 if (String.IsNullOrEmpty(value) && !admin && !secure && !hidden)
                 {
-                    this.Core.Write(WarningMessages.PropertyUseless(sourceLineNumbers, id.Id));
+                    this.Core.Write(CompilerWarnings.PropertyUseless(sourceLineNumbers, id.Id));
                 }
                 else // there is a value and/or a flag set, do that.
                 {
@@ -1582,7 +1582,7 @@ namespace WixToolset.Core
 
             if (!this.Core.EncounteredError && YesNoType.Yes == suppressModularization)
             {
-                this.Core.Write(WarningMessages.PropertyModularizationSuppressed(sourceLineNumbers));
+                this.Core.Write(CompilerWarnings.PropertyModularizationSuppressed(sourceLineNumbers));
 
                 this.Core.AddSymbol(new WixSuppressModularizationSymbol(sourceLineNumbers)
                 {
@@ -2758,7 +2758,7 @@ namespace WixToolset.Core
             string requiredPrivileges = null;
             string sid = null;
 
-            this.Core.Write(WarningMessages.ServiceConfigFamilyNotSupported(sourceLineNumbers, node.Name.LocalName));
+            this.Core.Write(CompilerWarnings.ServiceConfigFamilyNotSupported(sourceLineNumbers, node.Name.LocalName));
 
             foreach (var attrib in node.Attributes())
             {
@@ -3140,7 +3140,7 @@ namespace WixToolset.Core
             string actions = null;
             string actionsDelays = null;
 
-            this.Core.Write(WarningMessages.ServiceConfigFamilyNotSupported(sourceLineNumbers, node.Name.LocalName));
+            this.Core.Write(CompilerWarnings.ServiceConfigFamilyNotSupported(sourceLineNumbers, node.Name.LocalName));
 
             foreach (var attrib in node.Attributes())
             {
@@ -4331,7 +4331,7 @@ namespace WixToolset.Core
                 {
                     if (YesNoType.Yes != parentKeyPath && "Component" != parentElementLocalName)
                     {
-                        this.Core.Write(WarningMessages.UnclearShortcut(sourceLineNumbers, id.Id, componentId, defaultTarget));
+                        this.Core.Write(CompilerWarnings.UnclearShortcut(sourceLineNumbers, id.Id, componentId, defaultTarget));
                     }
 
                     target = Guid.Empty.ToString("B");
@@ -4738,7 +4738,7 @@ namespace WixToolset.Core
                     {
                     case "Property":
                         this.ParsePropertyElement(child);
-                        this.Core.Write(WarningMessages.DeprecatedUpgradeProperty(childSourceLineNumbers));
+                        this.Core.Write(CompilerWarnings.DeprecatedUpgradeProperty(childSourceLineNumbers));
                         break;
                     case "UpgradeVersion":
                         this.ParseUpgradeVersionElement(child, id);

@@ -73,7 +73,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                Assert.Single(result.Messages, m => m.Id == (int)WarningMessages.Ids.PathCanonicalized);
+                Assert.Single(result.Messages, m => m.Id == 1152); // CompilerWarnings.PathCanonicalized
 
                 var intermediate = Intermediate.Load(wixlibPath);
                 var allSymbols = intermediate.Sections.SelectMany(s => s.Symbols);

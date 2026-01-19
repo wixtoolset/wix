@@ -179,7 +179,7 @@ namespace WixToolset.Core
 
                     if (YesNoDefaultType.Yes == this.Compressed)
                     {
-                        this.Core.Write(WarningMessages.RemotePayloadsMustNotAlsoBeCompressed(this.SourceLineNumbers, this.Element.Name.LocalName));
+                        this.Core.Write(CompilerWarnings.RemotePayloadsMustNotAlsoBeCompressed(this.SourceLineNumbers, this.Element.Name.LocalName));
                     }
 
                     this.Compressed = YesNoDefaultType.No;
@@ -195,7 +195,7 @@ namespace WixToolset.Core
             {
                 if (this.Compressed == YesNoDefaultType.No)
                 {
-                    this.Core.Write(WarningMessages.UxPayloadsOnlySupportEmbedding(this.SourceLineNumbers, this.SourceFile));
+                    this.Core.Write(CompilerWarnings.UxPayloadsOnlySupportEmbedding(this.SourceLineNumbers, this.SourceFile));
                 }
 
                 if (!String.IsNullOrEmpty(this.DownloadUrl))

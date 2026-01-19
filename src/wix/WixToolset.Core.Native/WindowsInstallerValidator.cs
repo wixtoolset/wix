@@ -258,7 +258,7 @@ namespace WixToolset.Core.Native
                     }
                     else if (0x659 == e.NativeErrorCode)
                     {
-                        this.Callback.WriteMessage(WarningMessages.ValidationFailedDueToSystemPolicy());
+                        this.Callback.WriteMessage(NativeWarnings.ValidationFailedDueToSystemPolicy());
                     }
                     else
                     {

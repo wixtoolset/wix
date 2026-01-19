@@ -51,7 +51,7 @@ namespace WixToolset.Core.Burn.Bind
                 {
                     if (!String.IsNullOrEmpty(container.DownloadUrl))
                     {
-                        this.Messaging.Write(WarningMessages.DownloadUrlNotSupportedForAttachedContainers(container.SourceLineNumbers, container.Id.Id));
+                        this.Messaging.Write(BurnBackendWarnings.DownloadUrlNotSupportedForAttachedContainers(container.SourceLineNumbers, container.Id.Id));
                     }
                 }
             }

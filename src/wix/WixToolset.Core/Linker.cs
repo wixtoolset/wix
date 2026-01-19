@@ -906,7 +906,7 @@ namespace WixToolset.Core
                         {
                             if (!multipleFeatureComponents.Contains(connectionId))
                             {
-                                this.Messaging.Write(WarningMessages.ImplicitComponentPrimaryFeature(connectionId));
+                                this.Messaging.Write(LinkerWarnings.ImplicitComponentPrimaryFeature(connectionId));
 
                                 // remember this component so only one warning is generated for it
                                 multipleFeatureComponents[connectionId] = null;
@@ -914,7 +914,7 @@ namespace WixToolset.Core
                         }
                         else
                         {
-                            this.Messaging.Write(WarningMessages.ImplicitMergeModulePrimaryFeature(connectionId));
+                            this.Messaging.Write(LinkerWarnings.ImplicitMergeModulePrimaryFeature(connectionId));
                         }
                     }
 

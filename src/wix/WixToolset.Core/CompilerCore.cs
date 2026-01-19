@@ -716,7 +716,7 @@ namespace WixToolset.Core
                 }
                 else if (CompilerCore.IsAmbiguousFilename(value))
                 {
-                    this.Write(WarningMessages.AmbiguousFileOrDirectoryName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Write(CompilerWarnings.AmbiguousFileOrDirectoryName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
             }
 

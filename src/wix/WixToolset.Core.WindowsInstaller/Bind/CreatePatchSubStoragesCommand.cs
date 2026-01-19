@@ -386,7 +386,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     if (RowOperation.Modify == row.Operation &&
                         "ProductCode".Equals(row.FieldAsString(0), StringComparison.Ordinal))
                     {
-                        this.Messaging.Write(WarningMessages.MajorUpgradePatchNotRecommended());
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.MajorUpgradePatchNotRecommended());
                     }
                 }
             }
@@ -506,7 +506,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                             if (!foundRemoveFileEntry)
                             {
-                                this.Messaging.Write(WarningMessages.InvalidRemoveFile(row.SourceLineNumbers, fileId, componentId));
+                                this.Messaging.Write(WindowsInstallerBackendWarnings.InvalidRemoveFile(row.SourceLineNumbers, fileId, componentId));
                             }
                         }
                     }
@@ -567,7 +567,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         // Features may not be present if not referenced
                         if (!featureOps.ContainsKey(feature_) || RowOperation.Add != (RowOperation)featureOps[feature_])
                         {
-                            this.Messaging.Write(WarningMessages.NewComponentAddedToExistingFeature(row.SourceLineNumbers, component_, feature_, transformPath));
+                            this.Messaging.Write(WindowsInstallerBackendWarnings.NewComponentAddedToExistingFeature(row.SourceLineNumbers, component_, feature_, transformPath));
                         }
                     }
                 }

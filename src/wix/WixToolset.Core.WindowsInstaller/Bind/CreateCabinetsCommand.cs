@@ -133,7 +133,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 var cabinetName = mediaSymbol.Cabinet.TrimStart('#');
 
                 // If building a patch, remind them to run -p for torch.
-                this.Messaging.Write(WarningMessages.EmptyCabinet(mediaSymbol.SourceLineNumbers, cabinetName, OutputType.Patch == data.Type));
+                this.Messaging.Write(WindowsInstallerBackendWarnings.EmptyCabinet(mediaSymbol.SourceLineNumbers, cabinetName, OutputType.Patch == data.Type));
             }
 
             var resolvedCabinet = this.cabinetResolver.ResolveCabinet(intermediateCabinetPath, fileFacades);
@@ -160,7 +160,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (Exception e)
                 {
-                    this.Messaging.Write(WarningMessages.CannotUpdateCabCache(mediaSymbol.SourceLineNumbers, resolvedCabinet.Path, e.Message));
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.CannotUpdateCabCache(mediaSymbol.SourceLineNumbers, resolvedCabinet.Path, e.Message));
                 }
             }
 

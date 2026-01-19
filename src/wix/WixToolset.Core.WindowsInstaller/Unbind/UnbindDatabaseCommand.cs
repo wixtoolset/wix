@@ -195,7 +195,7 @@ namespace WixToolset.Core.WindowsInstaller.Unbind
 
                                                 if (!success)
                                                 {
-                                                    this.Messaging.Write(WarningMessages.BadColumnDataIgnored(row.SourceLineNumbers, Convert.ToString(intValue, CultureInfo.InvariantCulture), tableName, row.Fields[i].Column.Name));
+                                                    this.Messaging.Write(WindowsInstallerBackendWarnings.BadColumnDataIgnored(row.SourceLineNumbers, Convert.ToString(intValue, CultureInfo.InvariantCulture), tableName, row.Fields[i].Column.Name));
                                                 }
                                                 break;
                                             case ColumnType.Object:

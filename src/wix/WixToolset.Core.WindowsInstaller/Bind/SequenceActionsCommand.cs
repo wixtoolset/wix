@@ -145,10 +145,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     if (requiredActionSymbol.Overridable || requiredActionSymbol.Id.Access == AccessModifier.Virtual)
                     {
-                        this.Messaging.Write(WarningMessages.SuppressAction(suppressActionSymbol.SourceLineNumbers, suppressActionSymbol.Action, suppressActionSymbol.SequenceTable.ToString()));
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.SuppressAction(suppressActionSymbol.SourceLineNumbers, suppressActionSymbol.Action, suppressActionSymbol.SequenceTable.ToString()));
                         if (null != requiredActionSymbol.SourceLineNumbers)
                         {
-                            this.Messaging.Write(WarningMessages.SuppressAction2(requiredActionSymbol.SourceLineNumbers));
+                            this.Messaging.Write(WindowsInstallerBackendWarnings.SuppressAction2(requiredActionSymbol.SourceLineNumbers));
                         }
 
                         requiredActionSymbols.Remove(key);
@@ -258,10 +258,10 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             if (sequenceScheduledActionSymbol.Sequence == actionSymbol.Sequence)
                             {
-                                this.Messaging.Write(WarningMessages.ActionSequenceCollision(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action, sequenceScheduledActionSymbol.Action, actionSymbol.Sequence ?? 0));
+                                this.Messaging.Write(WindowsInstallerBackendWarnings.ActionSequenceCollision(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action, sequenceScheduledActionSymbol.Action, actionSymbol.Sequence ?? 0));
                                 if (null != sequenceScheduledActionSymbol.SourceLineNumbers)
                                 {
-                                    this.Messaging.Write(WarningMessages.ActionSequenceCollision2(sequenceScheduledActionSymbol.SourceLineNumbers));
+                                    this.Messaging.Write(WindowsInstallerBackendWarnings.ActionSequenceCollision2(sequenceScheduledActionSymbol.SourceLineNumbers));
                                 }
                             }
                         }
