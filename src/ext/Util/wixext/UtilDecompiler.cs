@@ -292,7 +292,7 @@ namespace WixToolset.Util
                         break;
 
                     default:
-                        this.Messaging.Write(WarningMessages.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "InstallMode", installMode));
+                        this.Messaging.Write(UtilWarnings.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "InstallMode", installMode));
                         break;
                 }
 
@@ -347,7 +347,7 @@ namespace WixToolset.Util
                         break;
 
                     default:
-                        this.Messaging.Write(WarningMessages.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "Attributes", attributes));
+                        this.Messaging.Write(UtilWarnings.UnrepresentableColumnValue(row.SourceLineNumbers, table.Name, "Attributes", attributes));
                         break;
                 }
 

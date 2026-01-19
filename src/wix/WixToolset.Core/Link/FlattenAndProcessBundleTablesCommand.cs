@@ -183,7 +183,7 @@ namespace WixToolset.Core.Link
                                 }
                                 else if (PackagingType.Embedded != payloadSymbol.Packaging)
                                 {
-                                    this.Messaging.Write(WarningMessages.UxPayloadsOnlySupportEmbedding(payloadSymbol.SourceLineNumbers, payloadSymbol.SourceFile.Path));
+                                    this.Messaging.Write(CompilerWarnings.UxPayloadsOnlySupportEmbedding(payloadSymbol.SourceLineNumbers, payloadSymbol.SourceFile.Path));
                                     payloadSymbol.Packaging = PackagingType.Embedded;
                                 }
                             }

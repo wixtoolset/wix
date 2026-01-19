@@ -270,7 +270,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                 // If we did find external cabs but not all of them were signed, give a warning
                 if (foundUnsignedExternals)
                 {
-                    this.Messaging.Write(WarningMessages.ExternalCabsAreNotSigned(this.InputPath));
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.ExternalCabsAreNotSigned(this.InputPath));
                 }
 
                 if (shouldCommit)

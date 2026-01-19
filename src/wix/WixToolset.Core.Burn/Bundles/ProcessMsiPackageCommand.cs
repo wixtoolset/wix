@@ -294,7 +294,7 @@ namespace WixToolset.Core.Burn.Bundles
             {
                 if (!perMachine)
                 {
-                    this.Messaging.Write(WarningMessages.PerUserButForcingPerMachine(this.PackagePayload.SourceLineNumbers, this.PackageId));
+                    this.Messaging.Write(BurnBackendWarnings.PerUserButForcingPerMachine(this.PackagePayload.SourceLineNumbers, this.PackageId));
                     this.ChainPackage.PerMachine = true; // ensure that we think the package is per-machine.
                 }
 
@@ -308,7 +308,7 @@ namespace WixToolset.Core.Burn.Bundles
                     // Not forced per-machine and no ALLUSERS property, flip back to per-user.
                     if (perMachine)
                     {
-                        this.Messaging.Write(WarningMessages.ImplicitlyPerUser(this.ChainPackage.SourceLineNumbers, this.PackageId));
+                        this.Messaging.Write(BurnBackendWarnings.ImplicitlyPerUser(this.ChainPackage.SourceLineNumbers, this.PackageId));
                         this.ChainPackage.PerMachine = false;
                     }
                 }
@@ -321,7 +321,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
                 else if (allusers.Equals("2", StringComparison.Ordinal))
                 {
-                    this.Messaging.Write(WarningMessages.DiscouragedAllUsersValue(this.ChainPackage.SourceLineNumbers, this.PackageId, perMachine ? "machine" : "user"));
+                    this.Messaging.Write(BurnBackendWarnings.DiscouragedAllUsersValue(this.ChainPackage.SourceLineNumbers, this.PackageId, perMachine ? "machine" : "user"));
                 }
                 else
                 {

@@ -373,7 +373,7 @@ namespace WixToolset.Core
                     var id = value.Substring(start + 1, end - start - 1);
                     if (Common.IsIdentifier(id))
                     {
-                        this.Core.Write(WarningMessages.PropertyValueContainsPropertyReference(sourceLineNumbers, propertyId.Id, id));
+                        this.Core.Write(CompilerWarnings.PropertyValueContainsPropertyReference(sourceLineNumbers, propertyId.Id, id));
                     }
 
                     start = (end < value.Length) ? value.IndexOf('[', end + 1) : -1;
@@ -719,7 +719,7 @@ namespace WixToolset.Core
                 {
                     if (18 < id.Id.Length)
                     {
-                        this.Core.Write(WarningMessages.IdentifierCannotBeModularized(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 18));
+                        this.Core.Write(CompilerWarnings.IdentifierCannotBeModularized(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 18));
                     }
                 }
             }
@@ -799,7 +799,7 @@ namespace WixToolset.Core
                 {
                     if (20 < id.Id.Length)
                     {
-                        this.Core.Write(WarningMessages.IdentifierCannotBeModularized(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 20));
+                        this.Core.Write(CompilerWarnings.IdentifierCannotBeModularized(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 20));
                     }
                 }
             }
@@ -3152,7 +3152,7 @@ namespace WixToolset.Core
 
                 if (null == destinationName && null == destinationDirectory && null == destinationProperty)
                 {
-                    this.Core.Write(WarningMessages.CopyFileFileIdUseless(sourceLineNumbers));
+                    this.Core.Write(CompilerWarnings.CopyFileFileIdUseless(sourceLineNumbers));
                 }
 
                 if (!this.Core.EncounteredError)
@@ -3463,7 +3463,7 @@ namespace WixToolset.Core
 
             if (targetType == CustomActionTargetType.VBScript)
             {
-                this.Core.Write(WarningMessages.VBScriptIsDeprecated(sourceLineNumbers));
+                this.Core.Write(CompilerWarnings.VBScriptIsDeprecated(sourceLineNumbers));
             }
 
             // if we have an in-lined Script CustomAction ensure no source or target attributes were provided
@@ -3813,7 +3813,7 @@ namespace WixToolset.Core
                 }
                 else if (name.Equals(shortName, StringComparison.OrdinalIgnoreCase))
                 {
-                    this.Core.Write(WarningMessages.DirectoryRedundantNames(sourceLineNumbers, node.Name.LocalName, "Name", "ShortName", name));
+                    this.Core.Write(CompilerWarnings.DirectoryRedundantNames(sourceLineNumbers, node.Name.LocalName, "Name", "ShortName", name));
                 }
             }
 
@@ -3835,7 +3835,7 @@ namespace WixToolset.Core
                 }
                 else if (sourceName.Equals(shortSourceName, StringComparison.OrdinalIgnoreCase))
                 {
-                    this.Core.Write(WarningMessages.DirectoryRedundantNames(sourceLineNumbers, node.Name.LocalName, "SourceName", "ShortSourceName", sourceName));
+                    this.Core.Write(CompilerWarnings.DirectoryRedundantNames(sourceLineNumbers, node.Name.LocalName, "SourceName", "ShortSourceName", sourceName));
                 }
             }
 
@@ -4376,7 +4376,7 @@ namespace WixToolset.Core
                             title = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             if ("PUT-FEATURE-TITLE-HERE" == title)
                             {
-                                this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, title));
+                                this.Core.Write(CompilerWarnings.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, title));
                             }
                             break;
                         case "TypicalDefault":
@@ -5939,7 +5939,7 @@ namespace WixToolset.Core
             // Using both ShortName and Name will not always work due to a Windows Installer bug.
             if (null != shortName && null != name)
             {
-                this.Core.Write(WarningMessages.FileSearchFileNameIssue(sourceLineNumbers, node.Name.LocalName, "ShortName", "Name"));
+                this.Core.Write(CompilerWarnings.FileSearchFileNameIssue(sourceLineNumbers, node.Name.LocalName, "ShortName", "Name"));
             }
             else if (null == shortName && null == name) // at least one name must be specified.
             {
@@ -7169,7 +7169,7 @@ namespace WixToolset.Core
                     // external cabinet files must use 8.3 filenames
                     if (!String.IsNullOrEmpty(cabinet) && !this.Core.IsValidLongFilename(cabinet) && !Common.ContainsValidBinderVariable(cabinet))
                     {
-                        this.Core.Write(WarningMessages.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "Cabinet", cabinet));
+                        this.Core.Write(CompilerWarnings.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "Cabinet", cabinet));
                     }
                 }
             }
@@ -7309,7 +7309,7 @@ namespace WixToolset.Core
                                 }
                                 else if (!this.Core.IsValidLongFilename(exampleCabinetName) && !Common.ContainsValidBinderVariable(exampleCabinetName)) // ignore short names with wix variables because it rarely works out.
                                 {
-                                    this.Core.Write(WarningMessages.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "CabinetTemplate", cabinetTemplate));
+                                    this.Core.Write(CompilerWarnings.MediaExternalCabinetFilenameIllegal(sourceLineNumbers, node.Name.LocalName, "CabinetTemplate", cabinetTemplate));
                                 }
                             }
                             break;
@@ -7319,14 +7319,14 @@ namespace WixToolset.Core
                         case "DiskPrompt":
                             diskPrompt = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             this.Core.CreateSimpleReference(sourceLineNumbers, SymbolDefinitions.Property, "DiskPrompt"); // ensure the output has a DiskPrompt Property defined
-                            this.Core.Write(WarningMessages.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(CompilerWarnings.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "EmbedCab":
                             embedCab = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         case "VolumeLabel":
                             volumeLabel = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
-                            this.Core.Write(WarningMessages.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
+                            this.Core.Write(CompilerWarnings.ReservedAttribute(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName));
                             break;
                         case "MaximumUncompressedMediaSize":
                             maximumUncompressedMediaSize = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 1, Int32.MaxValue);

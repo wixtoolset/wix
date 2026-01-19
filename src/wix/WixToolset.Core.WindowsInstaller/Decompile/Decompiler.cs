@@ -387,7 +387,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 }
                 catch (ArgumentException) // action/dialog is not valid for this sequence
                 {
-                    this.Messaging.Write(WarningMessages.IllegalActionInSequence(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.IllegalActionInSequence(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
                 }
             }
         }
@@ -500,7 +500,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                     return xStandardAction;
 
                 default:
-                    this.Messaging.Write(WarningMessages.UnknownAction(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.UnknownAction(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
                     return null;
             }
 
@@ -523,7 +523,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
             if ((null != actionSymbol.Before || null != actionSymbol.After) && 0 == actionSymbol.Sequence)
             {
-                this.Messaging.Write(WarningMessages.DecompiledStandardActionRelativelyScheduledInModule(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
+                this.Messaging.Write(WindowsInstallerBackendWarnings.DecompiledStandardActionRelativelyScheduledInModule(actionSymbol.SourceLineNumbers, actionSymbol.SequenceTable.ToString(), actionSymbol.Action));
             }
             else if (actionSymbol.Sequence.HasValue)
             {
@@ -694,7 +694,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                             }
                             else
                             {
-                                this.Messaging.Write(WarningMessages.IllegalRegistryKeyPath(row.SourceLineNumbers, "Component", keyPath));
+                                this.Messaging.Write(WindowsInstallerBackendWarnings.IllegalRegistryKeyPath(row.SourceLineNumbers, "Component", keyPath));
                             }
                         }
                         else
@@ -1191,7 +1191,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 {
                     if (addedProgIds.TryGetValue(xProgId, out var progid))
                     {
-                        this.Messaging.Write(WarningMessages.TooManyProgIds(row.SourceLineNumbers, row.FieldAsString(0), row.FieldAsString(3), progid));
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.TooManyProgIds(row.SourceLineNumbers, row.FieldAsString(0), row.FieldAsString(3), progid));
                     }
                     else
                     {
@@ -2427,7 +2427,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         this.DecompileActionTextTable(table);
                         break;
                     case "AdvtUISequence":
-                        this.Messaging.Write(WarningMessages.DeprecatedTable(table.Name));
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.DeprecatedTable(table.Name));
                         break;
                     case "AppId":
                         this.DecompileAppIdTable(table);
@@ -2556,7 +2556,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         this.DecompileMIMETable(table);
                         break;
                     case "ModuleAdvtUISequence":
-                        this.Messaging.Write(WarningMessages.DeprecatedTable(table.Name));
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.DeprecatedTable(table.Name));
                         break;
                     case "ModuleComponents":
                         // handled by DecompileComponentTable (since the ModuleComponents table
@@ -2746,7 +2746,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 case "ModuleSubstitution":
                     if (OutputType.Module != output.Type)
                     {
-                        this.Messaging.Write(WarningMessages.SkippingMergeModuleTable(output.SourceLineNumbers, tableName));
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.SkippingMergeModuleTable(output.SourceLineNumbers, tableName));
                         return false;
                     }
                     else
@@ -2772,7 +2772,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 case "MsiPatchSequence":
                 case "Patch":
                 case "PatchPackage":
-                    this.Messaging.Write(WarningMessages.PatchTable(output.SourceLineNumbers, tableName));
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.PatchTable(output.SourceLineNumbers, tableName));
                     return false;
                 case "_SummaryInformation":
                     return true;
@@ -3549,7 +3549,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
         {
             if (0 < table.Rows.Count || this.SuppressDroppingEmptyTables)
             {
-                this.Messaging.Write(WarningMessages.DecompilingAsCustomTable(table.Rows[0].SourceLineNumbers, table.Name));
+                this.Messaging.Write(WindowsInstallerBackendWarnings.DecompilingAsCustomTable(table.Rows[0].SourceLineNumbers, table.Name));
 
                 var xCustomTable = new XElement(Names.CustomTableElement,
                     new XAttribute("Id", table.Name));
@@ -3896,7 +3896,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                         }
                         break;
                     case WindowsInstallerConstants.MsidbCustomActionTypeInstall:
-                        this.Messaging.Write(WarningMessages.NestedInstall(row.SourceLineNumbers, table.Name, row.Fields[1].Column.Name, row[1]));
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.NestedInstall(row.SourceLineNumbers, table.Name, row.Fields[1].Column.Name, row[1]));
                         continue;
                     default:
                         this.Messaging.Write(WarningMessages.IllegalColumnValue(row.SourceLineNumbers, table.Name, row.Fields[1].Column.Name, row[1]));
@@ -4121,7 +4121,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
                     if (id == "TARGETDIR" && names[0] != "SourceDir")
                     {
-                        this.Messaging.Write(WarningMessages.TargetDirCorrectedDefaultDir());
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.TargetDirCorrectedDefaultDir());
                         xDirectory.SetAttributeValue("Name", "SourceDir");
                     }
                     else
@@ -4471,7 +4471,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
                 if (WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise) &&
                     WindowsInstallerConstants.MsidbFeatureAttributesNoUnsupportedAdvertise == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesNoUnsupportedAdvertise))
                 {
-                    this.Messaging.Write(WarningMessages.InvalidAttributeCombination(row.SourceLineNumbers, "msidbFeatureAttributesDisallowAdvertise", "msidbFeatureAttributesNoUnsupportedAdvertise", "Feature.AllowAdvertiseType", "no"));
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.InvalidAttributeCombination(row.SourceLineNumbers, "msidbFeatureAttributesDisallowAdvertise", "msidbFeatureAttributesNoUnsupportedAdvertise", "Feature.AllowAdvertiseType", "no"));
                     feature.SetAttributeValue("AllowAdvertise", "no");
                 }
                 else if (WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise == (attributes & WindowsInstallerConstants.MsidbFeatureAttributesDisallowAdvertise))
@@ -6729,7 +6729,7 @@ namespace WixToolset.Core.WindowsInstaller.Decompile
 
                     if (65536 == version)
                     {
-                        this.Messaging.Write(WarningMessages.PossiblyIncorrectTypelibVersion(row.SourceLineNumbers, id));
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.PossiblyIncorrectTypelibVersion(row.SourceLineNumbers, id));
                     }
 
                     xTypeLib.SetAttributeValue("MajorVersion", (version & 0xFFFF00) >> 8);

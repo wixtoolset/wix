@@ -444,7 +444,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
             else if (72 < value.Length)
             {
-                this.Messaging.Write(WarningMessages.IdentifierTooLong(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                this.Messaging.Write(CompilerWarnings.IdentifierTooLong(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
             }
 
             return new Identifier(access, value);
@@ -488,7 +488,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
                 else if (CompilerCore.IsAmbiguousFilename(value))
                 {
-                    this.Messaging.Write(WarningMessages.AmbiguousFileOrDirectoryName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(CompilerWarnings.AmbiguousFileOrDirectoryName(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
             }
 

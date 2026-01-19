@@ -117,7 +117,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             {
                 processorCount = 1;
 
-                this.Messaging.Write(WarningMessages.InvalidEnvironmentVariable("NUMBER_OF_PROCESSORS", Environment.ProcessorCount.ToString(), processorCount.ToString()));
+                this.Messaging.Write(WindowsInstallerBackendWarnings.InvalidEnvironmentVariable("NUMBER_OF_PROCESSORS", Environment.ProcessorCount.ToString(), processorCount.ToString()));
             }
 
             // If the cabbing thread count was provided, and it isn't more than double the number of processors, use it.

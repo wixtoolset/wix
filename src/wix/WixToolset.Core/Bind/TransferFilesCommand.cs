@@ -166,7 +166,7 @@ namespace WixToolset.Core.Bind
                 }
                 catch (Exception e)
                 {
-                    this.Messaging.Write(WarningMessages.UnableToResetAcls(e.Message));
+                    this.Messaging.Write(CompilerWarnings.UnableToResetAcls(e.Message));
                 }
             }
         }

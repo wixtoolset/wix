@@ -568,7 +568,7 @@ namespace WixToolset.Core
             // Resolve other variables in the warning message.
             warningMessage = state.Helper.PreprocessString(state.Context, warningMessage);
 
-            this.Messaging.Write(WarningMessages.PreprocessorWarning(state.Context.CurrentSourceLineNumber, warningMessage));
+            this.Messaging.Write(CompilerWarnings.PreprocessorWarning(state.Context.CurrentSourceLineNumber, warningMessage));
         }
 
         /// <summary>

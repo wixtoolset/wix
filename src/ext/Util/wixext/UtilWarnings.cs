@@ -18,6 +18,11 @@ namespace WixToolset.Util
             return Message(sourceLineNumbers, Ids.RequiredAttributeForWindowsXP, "The {0}/@{1} attribute must be specified to successfully install on Windows XP.  You can ignore this warning if this installation does not install on Windows XP.", elementName, attributeName);
         }
 
+        public static Message UnrepresentableColumnValue(SourceLineNumber sourceLineNumbers, string tableName, string columnName, object value)
+        {
+            return Message(sourceLineNumbers, Ids.UnrepresentableColumnValue, "The {0}.{1} column's value, '{2}', cannot currently be represented in the WiX schema.", tableName, columnName, value);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -30,6 +35,7 @@ namespace WixToolset.Util
 
         public enum Ids
         {
+            UnrepresentableColumnValue = 1064,
             DeprecatedPerfCounterElement = 5153,
             RequiredAttributeForWindowsXP = 5154,
         }

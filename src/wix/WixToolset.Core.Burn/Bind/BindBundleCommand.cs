@@ -613,7 +613,7 @@ namespace WixToolset.Core.Burn
                     !facade.PackageSymbol.Permanent &&
                     dependencySymbolsById.ContainsKey(facade.PackageId))
                 {
-                    this.Messaging.Write(WarningMessages.NoPerMachineDependencies(facade.PackageSymbol.SourceLineNumbers, facade.PackageId));
+                    this.Messaging.Write(BurnBackendWarnings.NoPerMachineDependencies(facade.PackageSymbol.SourceLineNumbers, facade.PackageId));
                 }
             }
         }

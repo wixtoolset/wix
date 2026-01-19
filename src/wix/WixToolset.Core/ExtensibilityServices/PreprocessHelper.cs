@@ -48,7 +48,7 @@ namespace WixToolset.Core.ExtensibilityServices
             {
                 if (showWarning && value != currentValue)
                 {
-                    this.Messaging.Write(WarningMessages.VariableDeclarationCollision(context.CurrentSourceLineNumber, name, value, currentValue));
+                    this.Messaging.Write(CompilerWarnings.VariableDeclarationCollision(context.CurrentSourceLineNumber, name, value, currentValue));
                 }
 
                 context.Variables[name] = value;
@@ -226,7 +226,7 @@ namespace WixToolset.Core.ExtensibilityServices
                             return context.CurrentSourceLineNumber.FileName;
 
                         case "PLATFORM":
-                            this.Messaging.Write(WarningMessages.DeprecatedPreProcVariable(context.CurrentSourceLineNumber, "$(sys.PLATFORM)", "$(sys.BUILDARCH)"));
+                            this.Messaging.Write(CompilerWarnings.DeprecatedPreProcVariable(context.CurrentSourceLineNumber, "$(sys.PLATFORM)", "$(sys.BUILDARCH)"));
 
                             goto case "BUILDARCH";
 
@@ -320,7 +320,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         // Add any core defined pragmas here
                         default:
-                            this.Messaging.Write(WarningMessages.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
+                            this.Messaging.Write(CompilerWarnings.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
                             break;
                     }
                     break;
@@ -331,7 +331,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     {
                         if (!extension.ProcessPragma(prefix, pragma, args, parent))
                         {
-                            this.Messaging.Write(WarningMessages.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
+                            this.Messaging.Write(CompilerWarnings.PreprocessorUnknownPragma(context.CurrentSourceLineNumber, pragmaName));
                         }
                     }
                     break;

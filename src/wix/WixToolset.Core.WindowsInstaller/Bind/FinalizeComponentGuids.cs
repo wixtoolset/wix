@@ -230,7 +230,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
                     if (allComponentsHaveConditions)
                     {
-                        this.Messaging.Write(WarningMessages.DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions(componentSymbol.SourceLineNumbers, componentSymbol.Id.Id, componentSymbol.ComponentId, type, path));
+                        this.Messaging.Write(WindowsInstallerBackendWarnings.DuplicateComponentGuidsMustHaveMutuallyExclusiveConditions(componentSymbol.SourceLineNumbers, componentSymbol.Id.Id, componentSymbol.ComponentId, type, path));
                     }
                     else
                     {

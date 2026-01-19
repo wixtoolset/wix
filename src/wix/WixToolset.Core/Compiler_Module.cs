@@ -45,7 +45,7 @@ namespace WixToolset.Core
                         this.activeName = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         if ("PUT-MODULE-NAME-HERE" == this.activeName)
                         {
-                            this.Core.Write(WarningMessages.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
+                            this.Core.Write(CompilerWarnings.PlaceholderValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, this.activeName));
                         }
                         else
                         {

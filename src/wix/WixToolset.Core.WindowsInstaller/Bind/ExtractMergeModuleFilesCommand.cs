@@ -151,7 +151,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             var moduleInstallerVersion = Convert.ToInt32(moduleInstallerVersionString, CultureInfo.InvariantCulture);
                             if (moduleInstallerVersion > this.OutputInstallerVersion)
                             {
-                                this.Messaging.Write(WarningMessages.InvalidHigherInstallerVersionInModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, moduleInstallerVersion, this.OutputInstallerVersion));
+                                this.Messaging.Write(WindowsInstallerBackendWarnings.InvalidHigherInstallerVersionInModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, moduleInstallerVersion, this.OutputInstallerVersion));
                             }
                         }
                         catch (FormatException)

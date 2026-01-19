@@ -583,7 +583,7 @@ namespace WixToolset.Core
             {
                 if (72 < value.Length)
                 {
-                    messaging.Write(WarningMessages.IdentifierTooLong(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    messaging.Write(CompilerWarnings.IdentifierTooLong(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
 
                 return value;

@@ -69,7 +69,7 @@ namespace WixToolset.Core.Link
                 {
                     if (SectionType.Unknown != expectedEntrySectionType && section.Type != expectedEntrySectionType)
                     {
-                        this.Messaging.Write(WarningMessages.UnexpectedEntrySection(section.Symbols.FirstOrDefault()?.SourceLineNumbers, section.Type.ToString(), expectedEntrySectionType.ToString()));
+                        this.Messaging.Write(LinkerWarnings.UnexpectedEntrySection(section.Symbols.FirstOrDefault()?.SourceLineNumbers, section.Type.ToString(), expectedEntrySectionType.ToString()));
                     }
 
                     if (null == this.EntrySection)

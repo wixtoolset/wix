@@ -119,7 +119,7 @@ namespace WixToolset.Core.WindowsInstaller.Validate
                     this.Messaging.Write(WindowsInstallerBackendErrors.ValidationError(messageSourceLineNumbers, message.IceName, message.Description));
                     break;
                 case ValidationMessageType.Warning:
-                    this.Messaging.Write(WarningMessages.ValidationWarning(messageSourceLineNumbers, message.IceName, message.Description));
+                    this.Messaging.Write(WindowsInstallerBackendWarnings.ValidationWarning(messageSourceLineNumbers, message.IceName, message.Description));
                     break;
                 case ValidationMessageType.Info:
                     this.Messaging.Write(VerboseMessages.ValidationInfo(message.IceName, message.Description));
@@ -184,7 +184,7 @@ namespace WixToolset.Core.WindowsInstaller.Validate
                             }
                             catch (ArgumentException)
                             {
-                                this.Messaging.Write(WarningMessages.DuplicatePrimaryKey(row.SourceLineNumbers, primaryKey, table.Name));
+                                this.Messaging.Write(WindowsInstallerBackendWarnings.DuplicatePrimaryKey(row.SourceLineNumbers, primaryKey, table.Name));
                             }
                         }
                     }

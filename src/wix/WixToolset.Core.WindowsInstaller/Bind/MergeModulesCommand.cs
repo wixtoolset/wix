@@ -175,12 +175,12 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     this.Messaging.Write(WindowsInstallerBackendErrors.MergeLanguageUnsupported(wixMergeRow.SourceLineNumbers, mergeError.Language, wixMergeRow.SourceFile));
                                     break;
                                 case MsmErrorType.msmErrorResequenceMerge:
-                                    this.Messaging.Write(WarningMessages.MergeRescheduledAction(wixMergeRow.SourceLineNumbers, mergeError.DatabaseTable, databaseKeys.ToString(), wixMergeRow.SourceFile));
+                                    this.Messaging.Write(WindowsInstallerBackendWarnings.MergeRescheduledAction(wixMergeRow.SourceLineNumbers, mergeError.DatabaseTable, databaseKeys.ToString(), wixMergeRow.SourceFile));
                                     break;
                                 case MsmErrorType.msmErrorTableMerge:
                                     if ("_Validation" != mergeError.DatabaseTable) // ignore merge errors in the _Validation table
                                     {
-                                        this.Messaging.Write(WarningMessages.MergeTableFailed(wixMergeRow.SourceLineNumbers, mergeError.DatabaseTable, databaseKeys.ToString(), wixMergeRow.SourceFile));
+                                        this.Messaging.Write(WindowsInstallerBackendWarnings.MergeTableFailed(wixMergeRow.SourceLineNumbers, mergeError.DatabaseTable, databaseKeys.ToString(), wixMergeRow.SourceFile));
                                     }
                                     break;
                                 case MsmErrorType.msmErrorPlatformMismatch:
@@ -238,7 +238,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         {
                             if (null != record)
                             {
-                                this.Messaging.Write(WarningMessages.SuppressMergedAction(suppressAction.Action, tableName));
+                                this.Messaging.Write(WindowsInstallerBackendWarnings.SuppressMergedAction(suppressAction.Action, tableName));
                                 view.Modify(ModifyView.Delete, record);
                             }
                         }
@@ -257,7 +257,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     {
                         foreach (var resultRecord in view.Records)
                         {
-                            this.Messaging.Write(WarningMessages.SuppressMergedAction(resultRecord.GetString(1), tableName));
+                            this.Messaging.Write(WindowsInstallerBackendWarnings.SuppressMergedAction(resultRecord.GetString(1), tableName));
                         }
                     }
 

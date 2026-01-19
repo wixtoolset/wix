@@ -719,7 +719,7 @@ namespace WixToolset.Core.CommandLine
                             {
                                 if (value.Equals("embedded", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    this.Messaging.Write(WarningMessages.UnsupportedCommandLineArgumentValue(arg, value, "full"));
+                                    this.Messaging.Write(CompilerWarnings.UnsupportedCommandLineArgumentValue(arg, value, "full"));
 
                                     this.PdbType = PdbType.Full;
                                 }

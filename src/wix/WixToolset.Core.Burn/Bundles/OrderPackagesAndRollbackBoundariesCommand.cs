@@ -67,7 +67,7 @@ namespace WixToolset.Core.Burn.Bundles
                             if (insideMsiTransaction && !warnedMsiTransaction)
                             {
                                 warnedMsiTransaction = true;
-                                this.Messaging.Write(WarningMessages.MsiTransactionLimitations(pendingRollbackBoundary.SourceLineNumbers));
+                                this.Messaging.Write(BurnBackendWarnings.MsiTransactionLimitations(pendingRollbackBoundary.SourceLineNumbers));
                             }
 
                             usedBoundaries.Add(pendingRollbackBoundary);
@@ -107,8 +107,8 @@ namespace WixToolset.Core.Burn.Bundles
                         var nextRollbackBoundary = boundariesById[groupSymbol.ChildId];
                         if (null != pendingRollbackBoundary && pendingRollbackBoundary.Id.Id != BurnConstants.BundleDefaultBoundaryId)
                         {
-                            this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary(nextRollbackBoundary.SourceLineNumbers, nextRollbackBoundary.Id.Id));
-                            this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary2(lastRollbackBoundary.SourceLineNumbers));
+                            this.Messaging.Write(BurnBackendWarnings.DiscardedRollbackBoundary(nextRollbackBoundary.SourceLineNumbers, nextRollbackBoundary.Id.Id));
+                            this.Messaging.Write(BurnBackendWarnings.DiscardedRollbackBoundary2(lastRollbackBoundary.SourceLineNumbers));
                         }
                         else
                         {
@@ -120,7 +120,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if (null != pendingRollbackBoundary)
             {
-                this.Messaging.Write(WarningMessages.DiscardedRollbackBoundary(pendingRollbackBoundary.SourceLineNumbers, pendingRollbackBoundary.Id.Id));
+                this.Messaging.Write(BurnBackendWarnings.DiscardedRollbackBoundary(pendingRollbackBoundary.SourceLineNumbers, pendingRollbackBoundary.Id.Id));
             }
 
             // With the forward rollback boundaries assigned, we can now go
