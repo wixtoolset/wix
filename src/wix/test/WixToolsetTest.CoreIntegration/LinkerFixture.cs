@@ -41,7 +41,7 @@ namespace WixToolsetTest.CoreIntegration
             var linker = serviceProvider.GetService<ILinker>();
             linker.Link(context);
 
-            Assert.Equal((int)ErrorMessages.Ids.IntermediatesMustBeCompiled, messaging.LastErrorNumber);
+            Assert.Equal(395, messaging.LastErrorNumber); // CoreErrors.ValidationFailedToOpenDatabase
             Assert.Single(listener.Messages);
             Assert.EndsWith("TestIntermediate1, TestIntermediate2", listener.Messages[0].ToString());
         }

@@ -3,16 +3,16 @@
 namespace WixToolset.Core.Link
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
     using System.Text;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
-    using WixToolset.Data.Burn;
 
     /// <summary>
     /// Grouping and Ordering class of the WiX toolset.
@@ -291,7 +291,7 @@ namespace WixToolset.Core.Link
                 if (this.FindCircularGroupReference(item, item, itemsSeen, out circularReference))
                 {
                     itemsInKnownLoops.Add(itemsSeen);
-                    this.Messaging.Write(ErrorMessages.ReferenceLoopDetected(item.Row.SourceLineNumbers, circularReference));
+                    this.Messaging.Write(CoreErrors.ReferenceLoopDetected(item.Row.SourceLineNumbers, circularReference));
                 }
             }
         }
@@ -581,7 +581,7 @@ namespace WixToolset.Core.Link
                     // have lost some distinction between authored and propagated ordering.
                     string circularReference = String.Format(CultureInfo.InvariantCulture, "{0}:{1} -> {2}:{3} -> {0}:{1}",
                         this.Type, this.Id, after.Type, after.Id);
-                    messageHandler.Write(ErrorMessages.OrderingReferenceLoopDetected(after.Row.SourceLineNumbers, circularReference));
+                    messageHandler.Write(CoreErrors.OrderingReferenceLoopDetected(after.Row.SourceLineNumbers, circularReference));
                     return;
                 }
 

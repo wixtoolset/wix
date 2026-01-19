@@ -220,7 +220,7 @@ namespace WixToolset.Core.Burn.Bundles
             var uint32 = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_MAGIC);
             if (BURN_SECTION_MAGIC != uint32)
             {
-                this.Messaging.Write(ErrorMessages.InvalidBundle(this.fileExe));
+                this.Messaging.Write(BurnBackendErrors.InvalidBundle(this.fileExe));
                 return false;
             }
 
@@ -234,7 +234,7 @@ namespace WixToolset.Core.Burn.Bundles
             uint32 = BurnCommon.ReadUInt32(bytes, BURN_SECTION_OFFSET_FORMAT); // We only know how to deal with CABs right now
             if (1 != uint32)
             {
-                this.Messaging.Write(ErrorMessages.InvalidBundle(this.fileExe));
+                this.Messaging.Write(BurnBackendErrors.InvalidBundle(this.fileExe));
                 return false;
             }
 
@@ -248,7 +248,7 @@ namespace WixToolset.Core.Burn.Bundles
             uint uxSize = 0;
             if (this.wixburnMaxContainers < containerCount)
             {
-                this.Messaging.Write(ErrorMessages.InvalidBundle(this.fileExe));
+                this.Messaging.Write(BurnBackendErrors.InvalidBundle(this.fileExe));
                 return false;
             }
             else if (containerCount > 0)
@@ -314,7 +314,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 if (UInt32.MaxValue == wixburnSectionOffset)
                 {
-                    this.Messaging.Write(ErrorMessages.StubMissingWixburnSection(this.fileExe));
+                    this.Messaging.Write(BurnBackendErrors.StubMissingWixburnSection(this.fileExe));
                     return false;
                 }
 
@@ -324,7 +324,7 @@ namespace WixToolset.Core.Burn.Bundles
                 // the smallest alignment (512 bytes), but just to be paranoid...
                 if (BURN_SECTION_MIN_SIZE > this.wixburnRawDataSize)
                 {
-                    this.Messaging.Write(ErrorMessages.StubWixburnSectionTooSmall(this.fileExe));
+                    this.Messaging.Write(BurnBackendErrors.StubWixburnSectionTooSmall(this.fileExe));
                     return false;
                 }
 
@@ -354,7 +354,7 @@ namespace WixToolset.Core.Burn.Bundles
                 // Verify the NT signature...
                 if (IMAGE_NT_SIGNATURE != BurnCommon.ReadUInt32(bytes, IMAGE_NT_HEADER_OFFSET_SIGNATURE))
                 {
-                    this.Messaging.Write(ErrorMessages.InvalidStubExe(this.fileExe));
+                    this.Messaging.Write(BurnBackendErrors.InvalidStubExe(this.fileExe));
                     return false;
                 }
 
@@ -391,7 +391,7 @@ namespace WixToolset.Core.Burn.Bundles
                 // Verify the DOS 'MZ' signature.
                 if (IMAGE_DOS_SIGNATURE != BurnCommon.ReadUInt16(bytes, IMAGE_DOS_HEADER_OFFSET_MAGIC))
                 {
-                    this.Messaging.Write(ErrorMessages.InvalidStubExe(this.fileExe));
+                    this.Messaging.Write(BurnBackendErrors.InvalidStubExe(this.fileExe));
                     return false;
                 }
 

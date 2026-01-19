@@ -61,7 +61,7 @@ namespace WixToolset.Core.Burn.Bundles
 
             if ("setup.exe".Equals(bundleFilename, StringComparison.OrdinalIgnoreCase))
             {
-                this.Messaging.Write(ErrorMessages.InsecureBundleFilename(bundleFilename));
+                this.Messaging.Write(BurnBackendErrors.InsecureBundleFilename(bundleFilename));
             }
 
             this.Transfer = this.BackendHelper.CreateFileTransfer(bundleTempPath, this.OutputPath, true, this.BundleSymbol.SourceLineNumbers);

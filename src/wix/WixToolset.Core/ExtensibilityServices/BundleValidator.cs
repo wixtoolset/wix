@@ -7,6 +7,7 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.Diagnostics;
     using System.IO;
     using System.Text;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -188,7 +189,7 @@ namespace WixToolset.Core.ExtensibilityServices
             else if (BuiltinBundleVariables.Contains(variableName))
             {
                 var illegalValues = CreateValueList(ValueListKind.Or, BuiltinBundleVariables);
-                this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
+                this.Messaging.Write(CoreErrors.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
 
                 return false;
             }
@@ -218,7 +219,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 if (!allowed)
                 {
                     var illegalValues = CreateValueList(ValueListKind.Or, BuiltinBundleVariables);
-                    this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
+                    this.Messaging.Write(CoreErrors.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
                 }
 
                 return allowed;
@@ -231,7 +232,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 if (!allowed)
                 {
                     var illegalValues = CreateValueList(ValueListKind.Or, WellKnownBundleVariables);
-                    this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
+                    this.Messaging.Write(CoreErrors.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
                 }
 
                 return allowed;
@@ -259,7 +260,7 @@ namespace WixToolset.Core.ExtensibilityServices
             else if (BuiltinBundleVariables.Contains(variableName))
             {
                 var illegalValues = CreateValueList(ValueListKind.Or, BuiltinBundleVariables);
-                this.Messaging.Write(ErrorMessages.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
+                this.Messaging.Write(CoreErrors.IllegalAttributeValueWithIllegalList(sourceLineNumbers, elementName, attributeName, variableName, illegalValues));
 
                 return false;
             }
@@ -292,7 +293,7 @@ namespace WixToolset.Core.ExtensibilityServices
             else if (DisallowedMsiProperties.Contains(propertyName))
             {
                 var illegalValues = CreateValueList(ValueListKind.Or, DisallowedMsiProperties);
-                this.Messaging.Write(ErrorMessages.DisallowedMsiProperty(sourceLineNumbers, propertyName, illegalValues));
+                this.Messaging.Write(CoreErrors.DisallowedMsiProperty(sourceLineNumbers, propertyName, illegalValues));
 
                 return false;
             }
@@ -360,7 +361,7 @@ namespace WixToolset.Core.ExtensibilityServices
             //TODO: Actually parse the condition to definitively tell which Variables are referenced.
             else if (condition.Trim() == "=")
             {
-                this.Messaging.Write(ErrorMessages.InvalidBundleCondition(sourceLineNumbers, elementName, attributeName, condition));
+                this.Messaging.Write(CoreErrors.InvalidBundleCondition(sourceLineNumbers, elementName, attributeName, condition));
                 return false;
             }
             else

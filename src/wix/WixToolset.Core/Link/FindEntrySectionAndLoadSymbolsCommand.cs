@@ -5,6 +5,7 @@ namespace WixToolset.Core.Link
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 
@@ -77,8 +78,8 @@ namespace WixToolset.Core.Link
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.MultipleEntrySections(this.EntrySection.Symbols.FirstOrDefault()?.SourceLineNumbers, this.EntrySection.Id, section.Id));
-                        this.Messaging.Write(ErrorMessages.MultipleEntrySections2(section.Symbols.FirstOrDefault()?.SourceLineNumbers));
+                        this.Messaging.Write(CoreErrors.MultipleEntrySections(this.EntrySection.Symbols.FirstOrDefault()?.SourceLineNumbers, this.EntrySection.Id, section.Id));
+                        this.Messaging.Write(CoreErrors.MultipleEntrySections2(section.Symbols.FirstOrDefault()?.SourceLineNumbers));
                     }
                 }
 

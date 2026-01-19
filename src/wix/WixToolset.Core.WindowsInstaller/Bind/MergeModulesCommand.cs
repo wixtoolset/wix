@@ -93,7 +93,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                         }
                         catch (FormatException)
                         {
-                            this.Messaging.Write(ErrorMessages.InvalidMergeLanguage(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, wixMergeRow.Language.ToString()));
+                            this.Messaging.Write(WindowsInstallerBackendErrors.InvalidMergeLanguage(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, wixMergeRow.Language.ToString()));
                             continue;
                         }
 
@@ -163,16 +163,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             switch (mergeError.Type)
                             {
                                 case MsmErrorType.msmErrorExclusion:
-                                    this.Messaging.Write(ErrorMessages.MergeExcludedModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, moduleKeys.ToString()));
+                                    this.Messaging.Write(WindowsInstallerBackendErrors.MergeExcludedModule(wixMergeRow.SourceLineNumbers, wixMergeRow.Id.Id, moduleKeys.ToString()));
                                     break;
                                 case MsmErrorType.msmErrorFeatureRequired:
-                                    this.Messaging.Write(ErrorMessages.MergeFeatureRequired(wixMergeRow.SourceLineNumbers, mergeError.ModuleTable, moduleKeys.ToString(), wixMergeRow.SourceFile, wixMergeRow.Id.Id));
+                                    this.Messaging.Write(WindowsInstallerBackendErrors.MergeFeatureRequired(wixMergeRow.SourceLineNumbers, mergeError.ModuleTable, moduleKeys.ToString(), wixMergeRow.SourceFile, wixMergeRow.Id.Id));
                                     break;
                                 case MsmErrorType.msmErrorLanguageFailed:
-                                    this.Messaging.Write(ErrorMessages.MergeLanguageFailed(wixMergeRow.SourceLineNumbers, mergeError.Language, wixMergeRow.SourceFile));
+                                    this.Messaging.Write(WindowsInstallerBackendErrors.MergeLanguageFailed(wixMergeRow.SourceLineNumbers, mergeError.Language, wixMergeRow.SourceFile));
                                     break;
                                 case MsmErrorType.msmErrorLanguageUnsupported:
-                                    this.Messaging.Write(ErrorMessages.MergeLanguageUnsupported(wixMergeRow.SourceLineNumbers, mergeError.Language, wixMergeRow.SourceFile));
+                                    this.Messaging.Write(WindowsInstallerBackendErrors.MergeLanguageUnsupported(wixMergeRow.SourceLineNumbers, mergeError.Language, wixMergeRow.SourceFile));
                                     break;
                                 case MsmErrorType.msmErrorResequenceMerge:
                                     this.Messaging.Write(WarningMessages.MergeRescheduledAction(wixMergeRow.SourceLineNumbers, mergeError.DatabaseTable, databaseKeys.ToString(), wixMergeRow.SourceFile));
@@ -184,7 +184,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                                     }
                                     break;
                                 case MsmErrorType.msmErrorPlatformMismatch:
-                                    this.Messaging.Write(ErrorMessages.MergePlatformMismatch(wixMergeRow.SourceLineNumbers, wixMergeRow.SourceFile));
+                                    this.Messaging.Write(WindowsInstallerBackendErrors.MergePlatformMismatch(wixMergeRow.SourceLineNumbers, wixMergeRow.SourceFile));
                                     break;
                                 default:
                                     this.Messaging.Write(ErrorMessages.UnexpectedException(String.Format(CultureInfo.CurrentUICulture, "Encountered an unexpected merge error of type '{0}' for which there is currently no error message to display.  More information about the merge and the failure can be found in the merge log: '{1}'", Enum.GetName(typeof(MsmErrorType), mergeError.Type), logPath), "InvalidOperationException", Environment.StackTrace));

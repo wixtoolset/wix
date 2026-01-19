@@ -7,6 +7,7 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.IO;
     using System.Runtime.InteropServices;
     using System.Threading;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility.Services;
 

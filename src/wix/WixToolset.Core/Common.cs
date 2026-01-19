@@ -5,7 +5,6 @@ namespace WixToolset.Core
     using System;
     using System.Diagnostics;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
@@ -76,7 +75,7 @@ namespace WixToolset.Core
                     codePage = encoding.CodePage;
                     if (0 > codePage || Int16.MaxValue < codePage)
                     {
-                        throw new WixException(ErrorMessages.InvalidSummaryInfoCodePage(sourceLineNumbers, codePage));
+                        throw new WixException(CoreErrors.InvalidSummaryInfoCodePage(sourceLineNumbers, codePage));
                     }
                 }
 
@@ -593,7 +592,7 @@ namespace WixToolset.Core
             {
                 if (value.StartsWith("[", StringComparison.Ordinal) && value.EndsWith("]", StringComparison.Ordinal))
                 {
-                    messaging.Write(ErrorMessages.IllegalIdentifierLooksLikeFormatted(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    messaging.Write(CoreErrors.IllegalIdentifierLooksLikeFormatted(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
                 else
                 {
@@ -717,11 +716,11 @@ namespace WixToolset.Core
                 var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
                 if (attributeName == null)
                 {
-                    messaging.Write(ErrorMessages.IllegalInnerText(sourceLineNumbers, element.Name.LocalName, innerText));
+                    messaging.Write(CoreErrors.IllegalInnerText(sourceLineNumbers, element.Name.LocalName, innerText));
                 }
                 else
                 {
-                    messaging.Write(ErrorMessages.IllegalInnerText(sourceLineNumbers, element.Name.LocalName, innerText, attributeName));
+                    messaging.Write(CoreErrors.IllegalInnerText(sourceLineNumbers, element.Name.LocalName, innerText, attributeName));
                 }
             }
         }
@@ -834,7 +833,7 @@ namespace WixToolset.Core
             if (!((String.IsNullOrEmpty(extensionAttribute.Name.NamespaceName) && extensionAttribute.Name.LocalName.Equals("xmlns", StringComparison.Ordinal)) ||
                    extensionAttribute.Name.NamespaceName.StartsWith(CompilerCore.W3SchemaPrefix.NamespaceName, StringComparison.Ordinal)))
             {
-                messaging.Write(ErrorMessages.UnsupportedExtensionAttribute(sourceLineNumbers, extensionAttribute.Parent.Name.LocalName, extensionAttribute.Name.LocalName));
+                messaging.Write(CoreErrors.UnsupportedExtensionAttribute(sourceLineNumbers, extensionAttribute.Parent.Name.LocalName, extensionAttribute.Name.LocalName));
             }
         }
 

@@ -109,7 +109,7 @@ namespace WixToolset.Core.Burn.Bundles
                     // We will show a separate message for every ID that's in
                     // the loop. We could bail after the first one, but then
                     // we wouldn't catch disjoint loops in a single run.
-                    this.Messaging.Write(ErrorMessages.CircularSearchReference(chain));
+                    this.Messaging.Write(BurnBackendErrors.CircularSearchReference(chain));
                 }
             }
         }
@@ -357,7 +357,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
                 else
                 {
-                    this.Messaging.Write(ErrorMessages.MissingBundleSearch(searchSymbol.SourceLineNumbers, searchId));
+                    this.Messaging.Write(BurnBackendErrors.MissingBundleSearch(searchSymbol.SourceLineNumbers, searchId));
                 }
             }
 

@@ -6,9 +6,8 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
-    using System.Linq;
-    using System.Xml;
     using System.Xml.Linq;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
@@ -379,7 +378,7 @@ namespace WixToolset.Core.ExtensibilityServices
                 if (value.StartsWith("PUT-GUID-", StringComparison.OrdinalIgnoreCase) ||
                     value.StartsWith("{PUT-GUID-", StringComparison.OrdinalIgnoreCase))
                 {
-                    this.Messaging.Write(ErrorMessages.ExampleGuid(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(CoreErrors.ExampleGuid(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
                 else
                 {
@@ -522,11 +521,11 @@ namespace WixToolset.Core.ExtensibilityServices
                 }
                 catch (FormatException)
                 {
-                    this.Messaging.Write(ErrorMessages.IllegalLongValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(CoreErrors.IllegalLongValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
                 catch (OverflowException)
                 {
-                    this.Messaging.Write(ErrorMessages.IllegalLongValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(CoreErrors.IllegalLongValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
             }
 
@@ -621,7 +620,7 @@ namespace WixToolset.Core.ExtensibilityServices
                     return YesNoDefaultType.Default;
 
                 default:
-                    this.Messaging.Write(ErrorMessages.IllegalYesNoDefaultValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Messaging.Write(CoreErrors.IllegalYesNoDefaultValue(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     return YesNoDefaultType.IllegalValue;
             }
         }
@@ -711,7 +710,7 @@ namespace WixToolset.Core.ExtensibilityServices
             else
             {
                 var sourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-                this.Messaging.Write(ErrorMessages.UnhandledExtensionAttribute(sourceLineNumbers, element.Name.LocalName, attribute.Name.LocalName, attribute.Name.NamespaceName));
+                this.Messaging.Write(CoreErrors.UnhandledExtensionAttribute(sourceLineNumbers, element.Name.LocalName, attribute.Name.LocalName, attribute.Name.NamespaceName));
             }
         }
 
@@ -724,7 +723,7 @@ namespace WixToolset.Core.ExtensibilityServices
             else
             {
                 var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-                this.Messaging.Write(ErrorMessages.UnhandledExtensionElement(childSourceLineNumbers, parentElement.Name.LocalName, element.Name.LocalName, element.Name.NamespaceName));
+                this.Messaging.Write(CoreErrors.UnhandledExtensionElement(childSourceLineNumbers, parentElement.Name.LocalName, element.Name.LocalName, element.Name.NamespaceName));
             }
         }
 
@@ -739,7 +738,7 @@ namespace WixToolset.Core.ExtensibilityServices
             else
             {
                 var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(element);
-                this.Messaging.Write(ErrorMessages.UnhandledExtensionElement(childSourceLineNumbers, parentElement.Name.LocalName, element.Name.LocalName, element.Name.NamespaceName));
+                this.Messaging.Write(CoreErrors.UnhandledExtensionElement(childSourceLineNumbers, parentElement.Name.LocalName, element.Name.LocalName, element.Name.NamespaceName));
             }
 
             return keyPath;

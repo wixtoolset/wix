@@ -85,7 +85,7 @@ namespace WixToolset.Core.Burn.Bind
                     // If the version is still missing, a version could not be gathered from the package and was not authored.
                     if (String.IsNullOrEmpty(dependency.Version))
                     {
-                        this.Messaging.Write(ErrorMessages.MissingDependencyVersion(facade.PackageId));
+                        this.Messaging.Write(BurnBackendErrors.MissingDependencyVersion(facade.PackageId));
                     }
 
                     if (String.IsNullOrEmpty(dependency.DisplayName))
@@ -138,7 +138,7 @@ namespace WixToolset.Core.Burn.Bind
                         dependency.Version != collision.Version ||
                         dependency.DisplayName != collision.DisplayName)
                     {
-                        this.Messaging.Write(ErrorMessages.DuplicateProviderDependencyKey(dependency.ProviderKey, dependency.ParentRef));
+                        this.Messaging.Write(BurnBackendErrors.DuplicateProviderDependencyKey(dependency.ProviderKey, dependency.ParentRef));
                     }
                 }
                 else

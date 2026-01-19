@@ -74,7 +74,7 @@ namespace WixToolset.Core
             }
             else if (!wixVariableRow.Overridable)
             {
-                messaging.Write(ErrorMessages.DuplicateLocalizationIdentifier(wixVariableRow.SourceLineNumbers, wixVariableRow.Id));
+                messaging.Write(CoreErrors.DuplicateLocalizationIdentifier(wixVariableRow.SourceLineNumbers, wixVariableRow.Id));
             }
         }
 
@@ -151,7 +151,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    messaging.Write(ErrorMessages.UnsupportedExtensionElement(sourceLineNumbers, node.Name.ToString(), child.Name.ToString()));
+                    messaging.Write(CoreErrors.UnsupportedExtensionElement(sourceLineNumbers, node.Name.ToString(), child.Name.ToString()));
                 }
             }
 
@@ -196,7 +196,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    messaging.Write(ErrorMessages.UnsupportedExtensionAttribute(sourceLineNumbers, attrib.Parent.Name.ToString(), attrib.Name.ToString()));
+                    messaging.Write(CoreErrors.UnsupportedExtensionAttribute(sourceLineNumbers, attrib.Parent.Name.ToString(), attrib.Name.ToString()));
                 }
             }
 
@@ -325,11 +325,11 @@ namespace WixToolset.Core
                 {
                     if (String.IsNullOrEmpty(localizedControl.Control))
                     {
-                        messaging.Write(ErrorMessages.DuplicatedUiLocalization(sourceLineNumbers, localizedControl.Dialog));
+                        messaging.Write(CoreErrors.DuplicatedUiLocalization(sourceLineNumbers, localizedControl.Dialog));
                     }
                     else
                     {
-                        messaging.Write(ErrorMessages.DuplicatedUiLocalization(sourceLineNumbers, localizedControl.Dialog, localizedControl.Control));
+                        messaging.Write(CoreErrors.DuplicatedUiLocalization(sourceLineNumbers, localizedControl.Dialog, localizedControl.Control));
                     }
                 }
                 else

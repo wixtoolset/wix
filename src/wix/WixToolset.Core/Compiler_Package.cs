@@ -1310,7 +1310,7 @@ namespace WixToolset.Core
 
             if ((YesNoType.No == advertise && YesNoType.Yes == progIdAdvertise) || (YesNoType.Yes == advertise && YesNoType.No == progIdAdvertise))
             {
-                this.Core.Write(ErrorMessages.AdvertiseStateMustMatch(sourceLineNumbers, advertise.ToString(), progIdAdvertise.ToString()));
+                this.Core.Write(CoreErrors.AdvertiseStateMustMatch(sourceLineNumbers, advertise.ToString(), progIdAdvertise.ToString()));
             }
             else if (YesNoType.NotSet != progIdAdvertise)
             {
@@ -1324,7 +1324,7 @@ namespace WixToolset.Core
 
             if (null != parent && (null != icon || CompilerConstants.IntegerNotSet != iconIndex))
             {
-                this.Core.Write(ErrorMessages.VersionIndependentProgIdsCannotHaveIcons(sourceLineNumbers));
+                this.Core.Write(CoreErrors.VersionIndependentProgIdsCannotHaveIcons(sourceLineNumbers));
             }
 
             var firstProgIdForNestedClass = YesNoType.Yes;
@@ -1356,7 +1356,7 @@ namespace WixToolset.Core
                         else
                         {
                             var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                            this.Core.Write(ErrorMessages.ProgIdNestedTooDeep(childSourceLineNumbers));
+                            this.Core.Write(CoreErrors.ProgIdNestedTooDeep(childSourceLineNumbers));
                         }
                         break;
                     default:
@@ -1513,7 +1513,7 @@ namespace WixToolset.Core
             }
             else if ("SecureCustomProperties" == id.Id || "AdminProperties" == id.Id || "MsiHiddenProperties" == id.Id)
             {
-                this.Core.Write(ErrorMessages.CannotAuthorSpecialProperties(sourceLineNumbers, id.Id));
+                this.Core.Write(CoreErrors.CannotAuthorSpecialProperties(sourceLineNumbers, id.Id));
             }
 
             if ("ErrorDialog" == id.Id)
@@ -1548,7 +1548,7 @@ namespace WixToolset.Core
             // If we're doing CCP then there must be a signature.
             if (complianceCheck && 0 == signatures.Count)
             {
-                this.Core.Write(ErrorMessages.SearchElementRequiredWithAttribute(sourceLineNumbers, node.Name.LocalName, "ComplianceCheck", "yes"));
+                this.Core.Write(CoreErrors.SearchElementRequiredWithAttribute(sourceLineNumbers, node.Name.LocalName, "ComplianceCheck", "yes"));
             }
 
             foreach (var sig in signatures)
@@ -1638,7 +1638,7 @@ namespace WixToolset.Core
                     case "Root":
                         if (root.HasValue)
                         {
-                            this.Core.Write(ErrorMessages.RegistryRootInvalid(sourceLineNumbers));
+                            this.Core.Write(CoreErrors.RegistryRootInvalid(sourceLineNumbers));
                         }
 
                         root = this.Core.GetAttributeRegistryRootValue(sourceLineNumbers, attrib, true);
@@ -1696,7 +1696,7 @@ namespace WixToolset.Core
                         {
                             if (YesNoType.Yes == keyPath)
                             {
-                                this.Core.Write(ErrorMessages.ComponentMultipleKeyPaths(sourceLineNumbers, child.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
+                                this.Core.Write(CoreErrors.ComponentMultipleKeyPaths(sourceLineNumbers, child.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
                             }
 
                             possibleKeyPath = possibleChildKeyPath; // the child is the key path
@@ -1712,7 +1712,7 @@ namespace WixToolset.Core
                         {
                             if (YesNoType.Yes == keyPath)
                             {
-                                this.Core.Write(ErrorMessages.ComponentMultipleKeyPaths(sourceLineNumbers, child.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
+                                this.Core.Write(CoreErrors.ComponentMultipleKeyPaths(sourceLineNumbers, child.Name.LocalName, "KeyPath", "yes", "File", "RegistryValue", "ODBCDataSource"));
                             }
 
                             possibleKeyPath = possibleChildKeyPath; // the child is the key path
@@ -1839,7 +1839,7 @@ namespace WixToolset.Core
                     case "Root":
                         if (root.HasValue)
                         {
-                            this.Core.Write(ErrorMessages.RegistryRootInvalid(sourceLineNumbers));
+                            this.Core.Write(CoreErrors.RegistryRootInvalid(sourceLineNumbers));
                         }
 
                         root = this.Core.GetAttributeRegistryRootValue(sourceLineNumbers, attrib, true);
@@ -1915,7 +1915,7 @@ namespace WixToolset.Core
                     case "MultiStringValue":
                         if (RegistryValueType.MultiString != valueType && null != value)
                         {
-                            this.Core.Write(ErrorMessages.RegistryMultipleValuesWithoutMultiString(sourceLineNumbers, node.Name.LocalName, "Value", child.Name.LocalName, "Type"));
+                            this.Core.Write(CoreErrors.RegistryMultipleValuesWithoutMultiString(sourceLineNumbers, node.Name.LocalName, "Value", child.Name.LocalName, "Type"));
                         }
                         else
                         {
@@ -1985,7 +1985,7 @@ namespace WixToolset.Core
             }
             else if (0 == value?.Length && ("+" == name || "-" == name || "*" == name)) // prevent accidental authoring of special name values
             {
-                this.Core.Write(ErrorMessages.RegistryNameValueIncorrect(sourceLineNumbers, node.Name.LocalName, "Name", name));
+                this.Core.Write(CoreErrors.RegistryNameValueIncorrect(sourceLineNumbers, node.Name.LocalName, "Name", name));
             }
 
             if (!this.Core.EncounteredError)
@@ -2662,17 +2662,17 @@ namespace WixToolset.Core
                 }
                 else if ((customAction || showDialog || specialAction) && !suppress && CompilerConstants.IntegerNotSet == sequence && null == beforeAction && null == afterAction)
                 {
-                    this.Core.Write(ErrorMessages.NeedSequenceBeforeOrAfter(childSourceLineNumbers, child.Name.LocalName));
+                    this.Core.Write(CoreErrors.NeedSequenceBeforeOrAfter(childSourceLineNumbers, child.Name.LocalName));
                 }
 
                 // action that is scheduled to occur before/after itself
                 if (beforeAction == actionName)
                 {
-                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(childSourceLineNumbers, child.Name.LocalName, "Before", beforeAction));
+                    this.Core.Write(CoreErrors.ActionScheduledRelativeToItself(childSourceLineNumbers, child.Name.LocalName, "Before", beforeAction));
                 }
                 else if (afterAction == actionName)
                 {
-                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(childSourceLineNumbers, child.Name.LocalName, "After", afterAction));
+                    this.Core.Write(CoreErrors.ActionScheduledRelativeToItself(childSourceLineNumbers, child.Name.LocalName, "After", afterAction));
                 }
 
                 // normal standard actions cannot be set overridable by the user (since they are overridable by default)
@@ -3622,7 +3622,7 @@ namespace WixToolset.Core
                             break;
                         case "boot":
                         case "system":
-                            this.Core.Write(ErrorMessages.ValueNotSupported(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, startValue));
+                            this.Core.Write(CoreErrors.ValueNotSupported(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, startValue));
                             break;
                         case "":
                             break;
@@ -3643,7 +3643,7 @@ namespace WixToolset.Core
                                 break;
                             case "kernelDriver":
                             case "systemDriver":
-                                this.Core.Write(ErrorMessages.ValueNotSupported(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue));
+                                this.Core.Write(CoreErrors.ValueNotSupported(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, typeValue));
                                 break;
                             case "":
                                 break;
@@ -3947,11 +3947,11 @@ namespace WixToolset.Core
                 // action that is scheduled to occur before/after itself
                 if (beforeAction == actionName)
                 {
-                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "Before", beforeAction));
+                    this.Core.Write(CoreErrors.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "Before", beforeAction));
                 }
                 else if (afterAction == actionName)
                 {
-                    this.Core.Write(ErrorMessages.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "After", afterAction));
+                    this.Core.Write(CoreErrors.ActionScheduledRelativeToItself(sourceLineNumbers, node.Name.LocalName, "After", afterAction));
                 }
 
                 this.Core.AddSymbol(new CustomActionSymbol(sourceLineNumbers, new Identifier(AccessModifier.Global, actionName))
@@ -4605,7 +4605,7 @@ namespace WixToolset.Core
             {
                 if (CompilerConstants.LongNotSet != resourceId)
                 {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "ResourceId"));
+                    this.Core.Write(CoreErrors.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "ResourceId"));
                 }
 
                 if (0 != flags)
@@ -4663,7 +4663,7 @@ namespace WixToolset.Core
 
                 if (null == fileServer)
                 {
-                    this.Core.Write(ErrorMessages.MissingTypeLibFile(sourceLineNumbers, node.Name.LocalName, "File"));
+                    this.Core.Write(CoreErrors.MissingTypeLibFile(sourceLineNumbers, node.Name.LocalName, "File"));
                 }
 
                 if (null == registryVersion)
@@ -4834,7 +4834,7 @@ namespace WixToolset.Core
             }
             else if (actionProperty.ToUpper(CultureInfo.InvariantCulture) != actionProperty)
             {
-                this.Core.Write(ErrorMessages.SecurePropertyNotUppercase(sourceLineNumbers, node.Name.LocalName, "Property", actionProperty));
+                this.Core.Write(CoreErrors.SecurePropertyNotUppercase(sourceLineNumbers, node.Name.LocalName, "Property", actionProperty));
             }
 
             if (null == minimum && null == maximum)
@@ -4941,12 +4941,12 @@ namespace WixToolset.Core
             {
                 if (null != targetFile)
                 {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetFile"));
+                    this.Core.Write(CoreErrors.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetFile"));
                 }
 
                 if (null != targetProperty)
                 {
-                    this.Core.Write(ErrorMessages.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetProperty"));
+                    this.Core.Write(CoreErrors.IllegalAttributeWhenAdvertised(sourceLineNumbers, node.Name.LocalName, "TargetProperty"));
                 }
 
                 if (!this.Core.EncounteredError)
@@ -5085,7 +5085,7 @@ namespace WixToolset.Core
             case "":
                 break;
             default:
-                this.Core.Write(ErrorMessages.IllegalCompressionLevel(sourceLineNumbers, compressionLevel));
+                this.Core.Write(CoreErrors.IllegalCompressionLevel(sourceLineNumbers, compressionLevel));
                 break;
             }
 

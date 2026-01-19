@@ -217,7 +217,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (OverflowException)
                 {
-                    throw new WixException(ErrorMessages.MaximumCabinetSizeForLargeFileSplittingTooLarge(null, maxCabSizeForLargeFileInMB, MaxValueOfMaxCabSizeForLargeFileSplitting));
+                    throw new WixException(WindowsInstallerBackendErrors.MaximumCabinetSizeForLargeFileSplittingTooLarge(null, maxCabSizeForLargeFileInMB, MaxValueOfMaxCabSizeForLargeFileSplitting));
                 }
 
                 var maxPreCompressedSizeInMB = 0;
@@ -235,7 +235,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
                 catch (OverflowException)
                 {
-                    throw new WixException(ErrorMessages.MaximumUncompressedMediaSizeTooLarge(null, maxPreCompressedSizeInMB));
+                    throw new WixException(WindowsInstallerBackendErrors.MaximumUncompressedMediaSizeTooLarge(null, maxPreCompressedSizeInMB));
                 }
             }
             else
@@ -271,7 +271,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 if (!fileTransfersByName.TryGetValue(cabinet.CabinetName, out var transfer) ||
                     !mediaRowsByOriginalDiskId.TryGetValue(completedCabinetSpanned.DiskId, out var mediaRow))
                 {
-                    throw new WixException(ErrorMessages.SplitCabinetCopyRegistrationFailed(spannedCabinets.First().CabinetName, cabinet.CabinetName));
+                    throw new WixException(WindowsInstallerBackendErrors.SplitCabinetCopyRegistrationFailed(spannedCabinets.First().CabinetName, cabinet.CabinetName));
                 }
 
                 var lastDiskId = mediaRow.DiskId;

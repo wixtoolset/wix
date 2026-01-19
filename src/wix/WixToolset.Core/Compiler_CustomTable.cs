@@ -56,7 +56,7 @@ namespace WixToolset.Core
             }
             else if (31 < tableId.Length)
             {
-                this.Core.Write(ErrorMessages.CustomTableNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", tableId));
+                this.Core.Write(CoreErrors.CustomTableNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", tableId));
             }
 
             foreach (var child in node.Elements())
@@ -93,7 +93,7 @@ namespace WixToolset.Core
             {
                 if (!columns.Where(c => c.PrimaryKey).Any())
                 {
-                    this.Core.Write(ErrorMessages.CustomTableMissingPrimaryKey(sourceLineNumbers));
+                    this.Core.Write(CoreErrors.CustomTableMissingPrimaryKey(sourceLineNumbers));
                 }
 
                 if (!this.Core.EncounteredError)
@@ -407,7 +407,7 @@ namespace WixToolset.Core
             {
                 if (2 != width && 4 != width)
                 {
-                    this.Core.Write(ErrorMessages.CustomTableIllegalColumnWidth(childSourceLineNumbers, child.Name.LocalName, "Width", width));
+                    this.Core.Write(CoreErrors.CustomTableIllegalColumnWidth(childSourceLineNumbers, child.Name.LocalName, "Width", width));
                 }
             }
             else if (columnType == IntermediateFieldType.Path)
@@ -418,7 +418,7 @@ namespace WixToolset.Core
                 }
                 else if (category != WixCustomTableColumnCategoryType.Binary)
                 {
-                    this.Core.Write(ErrorMessages.ExpectedBinaryCategory(childSourceLineNumbers));
+                    this.Core.Write(CoreErrors.ExpectedBinaryCategory(childSourceLineNumbers));
                 }
             }
 

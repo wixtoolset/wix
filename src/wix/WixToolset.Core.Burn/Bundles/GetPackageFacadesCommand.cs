@@ -60,8 +60,8 @@ namespace WixToolset.Core.Burn.Bundles
                             }
                             else
                             {
-                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported(bundlePackagePayload.SourceLineNumbers, "Bundle"));
-                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported2(package.SourceLineNumbers));
+                                this.Messaging.Write(BurnBackendErrors.PackagePayloadUnsupported(bundlePackagePayload.SourceLineNumbers, "Bundle"));
+                                this.Messaging.Write(BurnBackendErrors.PackagePayloadUnsupported2(package.SourceLineNumbers));
                             }
                         }
                         else if (exePackagePayloads.TryGetValue(wixGroup.ChildId, out var exePackagePayload))
@@ -72,8 +72,8 @@ namespace WixToolset.Core.Burn.Bundles
                             }
                             else
                             {
-                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported(exePackagePayload.SourceLineNumbers, "Exe"));
-                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported2(package.SourceLineNumbers));
+                                this.Messaging.Write(BurnBackendErrors.PackagePayloadUnsupported(exePackagePayload.SourceLineNumbers, "Exe"));
+                                this.Messaging.Write(BurnBackendErrors.PackagePayloadUnsupported2(package.SourceLineNumbers));
                             }
                         }
                         else if (msiPackagePayloads.TryGetValue(wixGroup.ChildId, out var msiPackagePayload))
@@ -84,8 +84,8 @@ namespace WixToolset.Core.Burn.Bundles
                             }
                             else
                             {
-                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported(msiPackagePayload.SourceLineNumbers, "Msi"));
-                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported2(package.SourceLineNumbers));
+                                this.Messaging.Write(BurnBackendErrors.PackagePayloadUnsupported(msiPackagePayload.SourceLineNumbers, "Msi"));
+                                this.Messaging.Write(BurnBackendErrors.PackagePayloadUnsupported2(package.SourceLineNumbers));
                             }
                         }
                         else if (mspPackagePayloads.TryGetValue(wixGroup.ChildId, out var mspPackagePayload))
@@ -96,8 +96,8 @@ namespace WixToolset.Core.Burn.Bundles
                             }
                             else
                             {
-                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported(mspPackagePayload.SourceLineNumbers, "Msp"));
-                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported2(package.SourceLineNumbers));
+                                this.Messaging.Write(BurnBackendErrors.PackagePayloadUnsupported(mspPackagePayload.SourceLineNumbers, "Msp"));
+                                this.Messaging.Write(BurnBackendErrors.PackagePayloadUnsupported2(package.SourceLineNumbers));
                             }
                         }
                         else if (msuPackagePayloads.TryGetValue(wixGroup.ChildId, out var msuPackagePayload))
@@ -108,8 +108,8 @@ namespace WixToolset.Core.Burn.Bundles
                             }
                             else
                             {
-                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported(msuPackagePayload.SourceLineNumbers, "Msu"));
-                                this.Messaging.Write(ErrorMessages.PackagePayloadUnsupported2(package.SourceLineNumbers));
+                                this.Messaging.Write(BurnBackendErrors.PackagePayloadUnsupported(msuPackagePayload.SourceLineNumbers, "Msu"));
+                                this.Messaging.Write(BurnBackendErrors.PackagePayloadUnsupported2(package.SourceLineNumbers));
                             }
                         }
                         else
@@ -125,9 +125,9 @@ namespace WixToolset.Core.Burn.Bundles
                             }
                             else
                             {
-                                this.Messaging.Write(ErrorMessages.MultiplePackagePayloads(tempPackagePayload.SourceLineNumbers, id, packagePayload.Id.Id, tempPackagePayload.Id.Id));
-                                this.Messaging.Write(ErrorMessages.MultiplePackagePayloads2(packagePayload.SourceLineNumbers));
-                                this.Messaging.Write(ErrorMessages.MultiplePackagePayloads3(package.SourceLineNumbers));
+                                this.Messaging.Write(BurnBackendErrors.MultiplePackagePayloads(tempPackagePayload.SourceLineNumbers, id, packagePayload.Id.Id, tempPackagePayload.Id.Id));
+                                this.Messaging.Write(BurnBackendErrors.MultiplePackagePayloads2(packagePayload.SourceLineNumbers));
+                                this.Messaging.Write(BurnBackendErrors.MultiplePackagePayloads3(package.SourceLineNumbers));
                             }
                         }
                     }
@@ -135,7 +135,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 if (packagePayload == null)
                 {
-                    this.Messaging.Write(ErrorMessages.MissingPackagePayload(package.SourceLineNumbers, id, package.Type.ToString()));
+                    this.Messaging.Write(BurnBackendErrors.MissingPackagePayload(package.SourceLineNumbers, id, package.Type.ToString()));
                     continue;
                 }
                 else

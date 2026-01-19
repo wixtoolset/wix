@@ -6,6 +6,7 @@ namespace WixToolset.Core.Bind
     using System.Collections.Generic;
     using System.IO;
     using System.Security.AccessControl;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -101,7 +102,7 @@ namespace WixToolset.Core.Bind
                             }
                             catch (ArgumentException) // thrown for unauthorized access errors
                             {
-                                throw new WixException(ErrorMessages.UnauthorizedAccess(fileTransfer.Destination));
+                                throw new WixException(CoreErrors.UnauthorizedAccess(fileTransfer.Destination));
                             }
 
                             // try to delete the file
@@ -111,7 +112,7 @@ namespace WixToolset.Core.Bind
                             }
                             catch (IOException)
                             {
-                                throw new WixException(ErrorMessages.FileInUse(null, fileTransfer.Destination));
+                                throw new WixException(CoreErrors.FileInUse(null, fileTransfer.Destination));
                             }
 
                             retry = true;
@@ -142,7 +143,7 @@ namespace WixToolset.Core.Bind
                             }
                             catch (IOException)
                             {
-                                throw new WixException(ErrorMessages.FileInUse(null, fileTransfer.Destination));
+                                throw new WixException(CoreErrors.FileInUse(null, fileTransfer.Destination));
                             }
 
                             retry = true;

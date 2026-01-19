@@ -6,6 +6,7 @@ namespace WixToolset.Core.Bind
     using System.Collections.Generic;
     using System.Globalization;
     using System.Text;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -148,7 +149,7 @@ namespace WixToolset.Core.Bind
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.UnresolvedBindReference(sourceLineNumbers, value));
+                        this.Messaging.Write(CoreErrors.UnresolvedBindReference(sourceLineNumbers, value));
                         break;
                     }
                 }

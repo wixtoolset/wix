@@ -217,7 +217,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             if (((int)TransformFlags.ValidateUpgradeCode & transformFlags) != 0 &&
                 (String.IsNullOrEmpty(targetUpgradeCode) || String.IsNullOrEmpty(updatedUpgradeCode)))
             {
-                this.Messaging.Write(ErrorMessages.BothUpgradeCodesRequired());
+                this.Messaging.Write(WindowsInstallerBackendErrors.BothUpgradeCodesRequired());
             }
 
             string emptyFile = null;
@@ -297,7 +297,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                             {
                                 if (RowOperation.Add == fileRow.Operation)
                                 {
-                                    this.Messaging.Write(ErrorMessages.InvalidAddedFileRowWithoutSequence(fileRow.SourceLineNumbers, (string)fileRow[0]));
+                                    this.Messaging.Write(WindowsInstallerBackendErrors.InvalidAddedFileRowWithoutSequence(fileRow.SourceLineNumbers, (string)fileRow[0]));
                                     break;
                                 }
 
@@ -427,7 +427,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.NoDifferencesInTransform(this.Transform.SourceLineNumbers));
+                        this.Messaging.Write(WindowsInstallerBackendErrors.NoDifferencesInTransform(this.Transform.SourceLineNumbers));
                     }
                 }
             }

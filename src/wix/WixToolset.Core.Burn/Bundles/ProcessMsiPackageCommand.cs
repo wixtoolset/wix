@@ -223,7 +223,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
             catch (MsiException e)
             {
-                this.Messaging.Write(ErrorMessages.UnableToReadPackageInformation(this.PackagePayload.SourceLineNumbers, sourcePath, e.Message));
+                this.Messaging.Write(BurnBackendErrors.UnableToReadPackageInformation(this.PackagePayload.SourceLineNumbers, sourcePath, e.Message));
                 return null;
             }
 
@@ -316,7 +316,7 @@ namespace WixToolset.Core.Burn.Bundles
                 {
                     if (!perMachine)
                     {
-                        this.Messaging.Write(ErrorMessages.PerUserButAllUsersEquals1(this.ChainPackage.SourceLineNumbers, this.PackageId));
+                        this.Messaging.Write(BurnBackendErrors.PerUserButAllUsersEquals1(this.ChainPackage.SourceLineNumbers, this.PackageId));
                     }
                 }
                 else if (allusers.Equals("2", StringComparison.Ordinal))
@@ -325,7 +325,7 @@ namespace WixToolset.Core.Burn.Bundles
                 }
                 else
                 {
-                    this.Messaging.Write(ErrorMessages.UnsupportedAllUsersValue(this.ChainPackage.SourceLineNumbers, this.PackageId, allusers));
+                    this.Messaging.Write(BurnBackendErrors.UnsupportedAllUsersValue(this.ChainPackage.SourceLineNumbers, this.PackageId, allusers));
                 }
             }
         }

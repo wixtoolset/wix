@@ -5,6 +5,7 @@ namespace WixToolset.Core.Link
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
@@ -90,7 +91,7 @@ namespace WixToolset.Core.Link
                     }
                     else if (accessible.Count == 0)
                     {
-                        this.Messaging.Write(ErrorMessages.UnresolvedReference(reference.SourceLineNumbers, reference.SymbolicName, symbolWithSection.Access));
+                        this.Messaging.Write(CoreErrors.UnresolvedReference(reference.SourceLineNumbers, reference.SymbolicName, symbolWithSection.Access));
                     }
                     else // multiple accessible symbols referenced creates conflicting symbols.
                     {
@@ -117,7 +118,7 @@ namespace WixToolset.Core.Link
                 }
                 else
                 {
-                    this.Messaging.Write(ErrorMessages.UnresolvedReference(reference.SourceLineNumbers, reference.SymbolicName));
+                    this.Messaging.Write(CoreErrors.UnresolvedReference(reference.SourceLineNumbers, reference.SymbolicName));
                 }
             }
         }

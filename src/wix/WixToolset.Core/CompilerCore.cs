@@ -446,7 +446,7 @@ namespace WixToolset.Core
             }
             catch (NotSupportedException)
             {
-                this.Write(ErrorMessages.IllegalCodepageAttribute(sourceLineNumbers, value, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
+                this.Write(CoreErrors.IllegalCodepageAttribute(sourceLineNumbers, value, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
             }
 
             return CompilerConstants.IllegalInteger;
@@ -482,7 +482,7 @@ namespace WixToolset.Core
             catch (NotSupportedException)
             {
                 // Not a valid windows code page.
-                this.messaging.Write(ErrorMessages.IllegalCodepageAttribute(sourceLineNumbers, value, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
+                this.messaging.Write(CoreErrors.IllegalCodepageAttribute(sourceLineNumbers, value, attribute.Parent.Name.LocalName, attribute.Name.LocalName));
             }
             catch (WixException e)
             {
@@ -552,7 +552,7 @@ namespace WixToolset.Core
 
                     if (date.Year < 1980 || date.Year > 2043)
                     {
-                        this.Write(ErrorMessages.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                        this.Write(CoreErrors.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                     }
 
                     return ((((date.Year - 1980) * 512) + (date.Month * 32 + date.Day)) * 65536) +
@@ -560,15 +560,15 @@ namespace WixToolset.Core
                 }
                 catch (ArgumentOutOfRangeException)
                 {
-                    this.Write(ErrorMessages.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Write(CoreErrors.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
                 catch (FormatException)
                 {
-                    this.Write(ErrorMessages.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Write(CoreErrors.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
                 catch (OverflowException)
                 {
-                    this.Write(ErrorMessages.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Write(CoreErrors.InvalidDateTimeFormat(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
             }
 
@@ -712,7 +712,7 @@ namespace WixToolset.Core
                     && !Common.ContainsValidBinderVariable(value)
                     && !this.IsValidLocIdentifier(value))
                 {
-                    this.Write(ErrorMessages.IllegalShortFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
+                    this.Write(CoreErrors.IllegalShortFilename(sourceLineNumbers, attribute.Parent.Name.LocalName, attribute.Name.LocalName, value));
                 }
                 else if (CompilerCore.IsAmbiguousFilename(value))
                 {
@@ -917,11 +917,11 @@ namespace WixToolset.Core
                 {
                     if (this.GetType().Assembly.Equals(caller))
                     {
-                        this.Write(ErrorMessages.InsufficientVersion(sourceLineNumbers, versionCurrent, versionRequired));
+                        this.Write(CoreErrors.InsufficientVersion(sourceLineNumbers, versionCurrent, versionRequired));
                     }
                     else
                     {
-                        this.Write(ErrorMessages.InsufficientVersion(sourceLineNumbers, versionCurrent, versionRequired, name.Name));
+                        this.Write(CoreErrors.InsufficientVersion(sourceLineNumbers, versionCurrent, versionRequired, name.Name));
                     }
                 }
             }

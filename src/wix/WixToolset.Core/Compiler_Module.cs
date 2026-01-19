@@ -420,7 +420,7 @@ namespace WixToolset.Core
 
             if (CompilerConstants.IntegerNotSet != excludeExceptLanguage && CompilerConstants.IntegerNotSet != excludeLanguage)
             {
-                this.Core.Write(ErrorMessages.IllegalModuleExclusionLanguageAttributes(sourceLineNumbers));
+                this.Core.Write(CoreErrors.IllegalModuleExclusionLanguageAttributes(sourceLineNumbers));
             }
             else if (CompilerConstants.IntegerNotSet != excludeExceptLanguage)
             {

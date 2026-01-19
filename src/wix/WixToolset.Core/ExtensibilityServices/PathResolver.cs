@@ -5,6 +5,7 @@ namespace WixToolset.Core.ExtensibilityServices
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Data.WindowsInstaller;
     using WixToolset.Extensibility.Data;
@@ -16,7 +17,7 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             if (!directories.TryGetValue(directory, out var resolvedDirectory))
             {
-                throw new WixException(ErrorMessages.ExpectedDirectory(directory));
+                throw new WixException(CoreErrors.ExpectedDirectory(directory));
             }
 
             if (null == resolvedDirectory.Path)
@@ -60,7 +61,7 @@ namespace WixToolset.Core.ExtensibilityServices
         {
             if (!directories.TryGetValue(directory, out var resolvedDirectory))
             {
-                throw new WixException(ErrorMessages.ExpectedDirectory(directory));
+                throw new WixException(CoreErrors.ExpectedDirectory(directory));
             }
 
             if (null == resolvedDirectory.Path)

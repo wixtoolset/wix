@@ -69,7 +69,7 @@ namespace WixToolset.Core
             var invalidIntermediates = this.Context.Intermediates.Where(i => !i.HasLevel(Data.IntermediateLevels.Compiled));
             if (invalidIntermediates.Any())
             {
-                this.Messaging.Write(ErrorMessages.IntermediatesMustBeCompiled(String.Join(", ", invalidIntermediates.Select(i => i.Id))));
+                this.Messaging.Write(CoreErrors.IntermediatesMustBeCompiled(String.Join(", ", invalidIntermediates.Select(i => i.Id))));
             }
 
             Intermediate intermediate = null;
@@ -123,11 +123,11 @@ namespace WixToolset.Core
                 {
                     if (this.Context.ExpectedOutputType == OutputType.IntermediatePostLink || this.Context.ExpectedOutputType == OutputType.Unknown)
                     {
-                        throw new WixException(ErrorMessages.MissingEntrySection());
+                        throw new WixException(CoreErrors.MissingEntrySection());
                     }
                     else
                     {
-                        throw new WixException(ErrorMessages.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
+                        throw new WixException(CoreErrors.MissingEntrySection(this.Context.ExpectedOutputType.ToString()));
                     }
                 }
 
@@ -186,7 +186,7 @@ namespace WixToolset.Core
                 {
                     if (!referencedComponents.Contains(component.Id.Id))
                     {
-                        this.Messaging.Write(ErrorMessages.OrphanedComponent(component.SourceLineNumbers, component.Id.Id));
+                        this.Messaging.Write(CoreErrors.OrphanedComponent(component.SourceLineNumbers, component.Id.Id));
                     }
                 }
 
@@ -367,7 +367,7 @@ namespace WixToolset.Core
                 }
                 else if (!symbol.Overridable || (collidingSymbol.Overridable && symbol.Overridable))
                 {
-                    this.Messaging.Write(ErrorMessages.BindVariableCollision(symbol.SourceLineNumbers, id));
+                    this.Messaging.Write(CoreErrors.BindVariableCollision(symbol.SourceLineNumbers, id));
                 }
             }
             else
@@ -411,7 +411,7 @@ namespace WixToolset.Core
                                     {
                                         if (connection.IsExplicitPrimaryFeature)
                                         {
-                                            this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), connection.PrimaryFeature ?? resolvedSection.Id));
+                                            this.Messaging.Write(CoreErrors.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), connection.PrimaryFeature ?? resolvedSection.Id));
                                             continue;
                                         }
                                         else
@@ -442,7 +442,7 @@ namespace WixToolset.Core
                                     connection = featuresToFeatures[wixComplexReferenceRow.Child];
                                     if (null != connection)
                                     {
-                                        this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), connection.PrimaryFeature ?? resolvedSection.Id));
+                                        this.Messaging.Write(CoreErrors.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), connection.PrimaryFeature ?? resolvedSection.Id));
                                         continue;
                                     }
 
@@ -459,7 +459,7 @@ namespace WixToolset.Core
                                     {
                                         if (connection.IsExplicitPrimaryFeature)
                                         {
-                                            this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), connection.PrimaryFeature ?? resolvedSection.Id));
+                                            this.Messaging.Write(CoreErrors.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), connection.PrimaryFeature ?? resolvedSection.Id));
                                             continue;
                                         }
                                         else
@@ -486,7 +486,7 @@ namespace WixToolset.Core
                                 case ComplexReferenceChildType.Component:
                                     if (componentsToModules.ContainsKey(wixComplexReferenceRow.Child))
                                     {
-                                        this.Messaging.Write(ErrorMessages.ComponentReferencedTwice(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.Child));
+                                        this.Messaging.Write(CoreErrors.ComponentReferencedTwice(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.Child));
                                         continue;
                                     }
                                     else
@@ -531,7 +531,7 @@ namespace WixToolset.Core
                                     connection = featuresToFeatures[wixComplexReferenceRow.Child];
                                     if (null != connection)
                                     {
-                                        this.Messaging.Write(ErrorMessages.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), connection.PrimaryFeature ?? resolvedSection.Id));
+                                        this.Messaging.Write(CoreErrors.MultiplePrimaryReferences(wixComplexReferenceRow.SourceLineNumbers, wixComplexReferenceRow.ChildType.ToString(), wixComplexReferenceRow.Child, wixComplexReferenceRow.ParentType.ToString(), wixComplexReferenceRow.Parent, (null != connection.PrimaryFeature ? "Feature" : "Package"), connection.PrimaryFeature ?? resolvedSection.Id));
                                         continue;
                                     }
 
@@ -721,7 +721,7 @@ namespace WixToolset.Core
                         // way up to present the loop as a directed graph.
                         var loop = String.Join(" -> ", loopDetector);
 
-                        this.Messaging.Write(ErrorMessages.ReferenceLoopDetected(wixComplexReferenceRow?.SourceLineNumbers, loop));
+                        this.Messaging.Write(CoreErrors.ReferenceLoopDetected(wixComplexReferenceRow?.SourceLineNumbers, loop));
 
                         // Cleanup the parentGroupsNeedingProcessing and the loopDetector just like the
                         // exit of this method does at the end because we are exiting early.
@@ -887,11 +887,11 @@ namespace WixToolset.Core
                     // display an error for the component or merge module as appropriate
                     if (null != multipleFeatureComponents)
                     {
-                        this.Messaging.Write(ErrorMessages.ComponentExpectedFeature(symbol.SourceLineNumbers, connectionId, symbol.Definition.Name, symbol.Id.Id));
+                        this.Messaging.Write(CoreErrors.ComponentExpectedFeature(symbol.SourceLineNumbers, connectionId, symbol.Definition.Name, symbol.Id.Id));
                     }
                     else
                     {
-                        this.Messaging.Write(ErrorMessages.MergeModuleExpectedFeature(symbol.SourceLineNumbers, connectionId));
+                        this.Messaging.Write(CoreErrors.MergeModuleExpectedFeature(symbol.SourceLineNumbers, connectionId));
                     }
                 }
                 else

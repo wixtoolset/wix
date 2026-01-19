@@ -99,7 +99,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-intermediateFolder", intermediateFolder,
                     "-o", Path.Combine(baseFolder, @"bin\test.msi")
                 });
-                Assert.Equal((int)ErrorMessages.Ids.WixiplSourceFileIsExclusive, result.ExitCode);
+                Assert.Equal(392, result.ExitCode); // CoreErrors.WixiplSourceFileIsExclusive
             }
         }
 

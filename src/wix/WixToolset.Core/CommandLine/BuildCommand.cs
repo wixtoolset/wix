@@ -9,6 +9,7 @@ namespace WixToolset.Core.CommandLine
     using System.Threading;
     using System.Threading.Tasks;
     using System.Xml.Linq;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -836,7 +837,7 @@ namespace WixToolset.Core.CommandLine
 
                     if (variables.ContainsKey(value[0]))
                     {
-                        this.Messaging.Write(ErrorMessages.DuplicateVariableDefinition(value[0], (1 == value.Length) ? String.Empty : value[1], variables[value[0]]));
+                        this.Messaging.Write(CoreErrors.DuplicateVariableDefinition(value[0], (1 == value.Length) ? String.Empty : value[1], variables[value[0]]));
                         continue;
                     }
 
@@ -903,12 +904,12 @@ namespace WixToolset.Core.CommandLine
                 {
                     if (wixipls.Count > 1 || codePaths.Count > 0 || libraryPaths.Count > 0)
                     {
-                        this.Messaging.Write(ErrorMessages.WixiplSourceFileIsExclusive());
+                        this.Messaging.Write(CoreErrors.WixiplSourceFileIsExclusive());
                     }
                 }
                 else if (codePaths.Count == 0 && libraryPaths.Count == 0)
                 {
-                    this.Messaging.Write(ErrorMessages.NoSourceFiles());
+                    this.Messaging.Write(CoreErrors.NoSourceFiles());
                 }
 
                 if (!this.Messaging.EncounteredError && String.IsNullOrEmpty(outputPath))
@@ -917,7 +918,7 @@ namespace WixToolset.Core.CommandLine
 
                     if (String.IsNullOrEmpty(singleInputPath))
                     {
-                        this.Messaging.Write(ErrorMessages.MustSpecifyOutputWithMoreThanOneInput());
+                        this.Messaging.Write(CoreErrors.MustSpecifyOutputWithMoreThanOneInput());
                     }
                     else
                     {
@@ -947,7 +948,7 @@ namespace WixToolset.Core.CommandLine
 
                 if (File.Exists(bp.Path))
                 {
-                    this.Messaging.Write(ErrorMessages.ExpectedDirectoryGotFile(argument, bp.Path));
+                    this.Messaging.Write(CoreErrors.ExpectedDirectoryGotFile(argument, bp.Path));
                     return false;
                 }
 

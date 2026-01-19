@@ -325,7 +325,7 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
                 if (null == transform.Tables || 0 >= transform.Tables.Count)
                 {
-                    this.Messaging.Write(ErrorMessages.NoDifferencesInTransform(new SourceLineNumber(this.OutputPath)));
+                    this.Messaging.Write(WindowsInstallerBackendErrors.NoDifferencesInTransform(new SourceLineNumber(this.OutputPath)));
                 }
             }
 

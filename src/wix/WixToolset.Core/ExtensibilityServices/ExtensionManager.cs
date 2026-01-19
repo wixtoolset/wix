@@ -7,6 +7,7 @@ namespace WixToolset.Core.ExtensibilityServices
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility;
     using WixToolset.Extensibility.Data;
@@ -41,7 +42,7 @@ namespace WixToolset.Core.ExtensibilityServices
             if (!factories.Any())
             {
                 var path = Path.GetFullPath(new Uri(extensionAssembly.CodeBase).LocalPath);
-                throw new WixException(ErrorMessages.InvalidExtension(path, "The extension does not implement IExtensionFactory. All extensions must have at least one implementation of IExtensionFactory."));
+                throw new WixException(CoreErrors.InvalidExtension(path, "The extension does not implement IExtensionFactory. All extensions must have at least one implementation of IExtensionFactory."));
             }
 
             this.extensionFactories.AddRange(factories);
@@ -86,14 +87,14 @@ namespace WixToolset.Core.ExtensibilityServices
 
                 if (assembly == null)
                 {
-                    throw new WixException(ErrorMessages.CouldNotFindExtensionInPaths(extensionPath, checkedPaths));
+                    throw new WixException(CoreErrors.CouldNotFindExtensionInPaths(extensionPath, checkedPaths));
                 }
 
                 this.Add(assembly);
             }
             catch (ReflectionTypeLoadException rtle)
             {
-                throw new WixException(ErrorMessages.InvalidExtension(checkPath, String.Join(Environment.NewLine, rtle.LoaderExceptions.Select(le => le.ToString()))));
+                throw new WixException(CoreErrors.InvalidExtension(checkPath, String.Join(Environment.NewLine, rtle.LoaderExceptions.Select(le => le.ToString()))));
             }
             catch (WixException)
             {
@@ -101,7 +102,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
             catch (Exception e)
             {
-                throw new WixException(ErrorMessages.InvalidExtension(checkPath, e.Message), e);
+                throw new WixException(CoreErrors.InvalidExtension(checkPath, e.Message), e);
             }
         }
 

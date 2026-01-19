@@ -338,7 +338,7 @@ namespace WixToolset.Core
                             if (chainSeen)
                             {
                                 var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Chain"));
+                                this.Core.Write(CoreErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Chain"));
                             }
                             this.ParseChainElement(child);
                             chainSeen = true;
@@ -353,7 +353,7 @@ namespace WixToolset.Core
                             if (logSeen)
                             {
                                 var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Log"));
+                                this.Core.Write(CoreErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Log"));
                             }
                             logVariablePrefixAndExtension = this.ParseLogElement(child, fileSystemSafeBundleName);
                             logSeen = true;
@@ -386,7 +386,7 @@ namespace WixToolset.Core
                             if (updateSeen)
                             {
                                 var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Update"));
+                                this.Core.Write(CoreErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "Update"));
                             }
                             this.ParseUpdateElement(child);
                             updateSeen = true;
@@ -2310,7 +2310,7 @@ namespace WixToolset.Core
 
                 if (childCompilerPackagePayload != null)
                 {
-                    this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
+                    this.Core.Write(CoreErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, child.Name.LocalName));
                 }
                 else if (hasPayloadInfo)
                 {
@@ -2832,7 +2832,7 @@ namespace WixToolset.Core
                                 if (remoteBundleSeen)
                                 {
                                     var childSourceLineNumbers = Preprocessor.GetSourceLineNumbers(child);
-                                    this.Core.Write(ErrorMessages.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "RemoteBundle"));
+                                    this.Core.Write(CoreErrors.TooManyChildren(childSourceLineNumbers, node.Name.LocalName, "RemoteBundle"));
                                 }
 
                                 this.ParseRemoteBundleElement(child, compilerPayload.Id.Id);

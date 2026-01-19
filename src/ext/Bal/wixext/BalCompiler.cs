@@ -433,7 +433,7 @@ namespace WixToolset.BootstrapperApplications
             // Error check the values.
             if (String.IsNullOrEmpty(condition))
             {
-                this.Messaging.Write(ErrorMessages.ConditionExpected(sourceLineNumbers, node.Name.LocalName));
+                this.Messaging.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Condition"));
             }
 
             if (null == message)

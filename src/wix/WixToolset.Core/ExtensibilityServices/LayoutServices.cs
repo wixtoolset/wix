@@ -4,6 +4,7 @@ namespace WixToolset.Core.ExtensibilityServices
 {
     using System;
     using System.IO;
+    using WixToolset.Core;
     using WixToolset.Data;
     using WixToolset.Extensibility.Data;
     using WixToolset.Extensibility.Services;
@@ -65,7 +66,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
             catch (PathTooLongException)
             {
-                this.Messaging.Write(ErrorMessages.PathTooLong(sourceLineNumbers, path));
+                this.Messaging.Write(CoreErrors.PathTooLong(sourceLineNumbers, path));
             }
 
             return null;

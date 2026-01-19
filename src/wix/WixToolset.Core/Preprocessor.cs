@@ -344,12 +344,12 @@ namespace WixToolset.Core
                         case "elseif":
                             if (0 == ifStack.Count)
                             {
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
+                                throw new WixException(CoreErrors.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
                             }
 
                             if (IfState.If != ifContext.IfState && IfState.ElseIf != ifContext.IfState)
                             {
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
+                                throw new WixException(CoreErrors.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "elseif"));
                             }
 
                             ifContext.IfState = IfState.ElseIf;   // we're now in an elseif
@@ -367,12 +367,12 @@ namespace WixToolset.Core
                         case "else":
                             if (0 == ifStack.Count)
                             {
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
+                                throw new WixException(CoreErrors.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
                             }
 
                             if (IfState.If != ifContext.IfState && IfState.ElseIf != ifContext.IfState)
                             {
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
+                                throw new WixException(CoreErrors.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "else"));
                             }
 
                             ifContext.IfState = IfState.Else;   // we're now in an else
@@ -383,7 +383,7 @@ namespace WixToolset.Core
                         case "endif":
                             if (0 == ifStack.Count)
                             {
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "endif"));
+                                throw new WixException(CoreErrors.UnmatchedPreprocessorInstruction(sourceLineNumbers, "if", "endif"));
                             }
 
                             ifContext = ifStack.Pop();
@@ -461,7 +461,7 @@ namespace WixToolset.Core
                                 break;
 
                             case "endforeach": // endforeach is handled in PreprocessForeach, so seeing it here is an error
-                                throw new WixException(ErrorMessages.UnmatchedPreprocessorInstruction(sourceLineNumbers, "foreach", "endforeach"));
+                                throw new WixException(CoreErrors.UnmatchedPreprocessorInstruction(sourceLineNumbers, "foreach", "endforeach"));
 
                             case "pragma":
                                 this.PreprocessPragma(state, reader.Value, currentContainer);
@@ -535,13 +535,13 @@ namespace WixToolset.Core
 
             if (0 != ifStack.Count)
             {
-                throw new WixException(ErrorMessages.NonterminatedPreprocessorInstruction(state.Context.CurrentSourceLineNumber, "if", "endif"));
+                throw new WixException(CoreErrors.NonterminatedPreprocessorInstruction(state.Context.CurrentSourceLineNumber, "if", "endif"));
             }
 
             // TODO: can this actually happen?
             if (0 != containerStack.Count)
             {
-                throw new WixException(ErrorMessages.NonterminatedPreprocessorInstruction(state.Context.CurrentSourceLineNumber, "nodes", "nodes"));
+                throw new WixException(CoreErrors.NonterminatedPreprocessorInstruction(state.Context.CurrentSourceLineNumber, "nodes", "nodes"));
             }
         }
 
@@ -555,7 +555,7 @@ namespace WixToolset.Core
             // Resolve other variables in the error message.
             errorMessage = state.Helper.PreprocessString(state.Context, errorMessage);
 
-            throw new WixException(ErrorMessages.PreprocessorError(state.Context.CurrentSourceLineNumber, errorMessage));
+            throw new WixException(CoreErrors.PreprocessorError(state.Context.CurrentSourceLineNumber, errorMessage));
         }
 
         /// <summary>
@@ -582,7 +582,7 @@ namespace WixToolset.Core
 
             if (!match.Success)
             {
-                throw new WixException(ErrorMessages.IllegalDefineStatement(state.Context.CurrentSourceLineNumber, originalDefine));
+                throw new WixException(CoreErrors.IllegalDefineStatement(state.Context.CurrentSourceLineNumber, originalDefine));
             }
 
             var defineName = match.Groups["varName"].Value;
@@ -688,7 +688,7 @@ namespace WixToolset.Core
             var indexOfInToken = reader.Value.IndexOf(" in ", StringComparison.Ordinal);
             if (0 > indexOfInToken)
             {
-                throw new WixException(ErrorMessages.IllegalForeach(state.Context.CurrentSourceLineNumber, reader.Value));
+                throw new WixException(CoreErrors.IllegalForeach(state.Context.CurrentSourceLineNumber, reader.Value));
             }
 
             // parse out the variable name
@@ -699,7 +699,7 @@ namespace WixToolset.Core
             {
                 if (!varValuesString.EndsWith("\"", StringComparison.Ordinal))
                 {
-                    throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, varValuesString));
+                    throw new WixException(CoreErrors.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, varValuesString));
                 }
 
                 // cut the quotes off the string
@@ -767,7 +767,7 @@ namespace WixToolset.Core
                 }
                 else if (reader.NodeType == XmlNodeType.None)
                 {
-                    throw new WixException(ErrorMessages.ExpectedEndforeach(state.Context.CurrentSourceLineNumber));
+                    throw new WixException(CoreErrors.ExpectedEndforeach(state.Context.CurrentSourceLineNumber));
                 }
 
                 reader.Read();
@@ -811,7 +811,7 @@ namespace WixToolset.Core
 
             if (!match.Success)
             {
-                throw new WixException(ErrorMessages.InvalidPreprocessorPragma(state.Context.CurrentSourceLineNumber, pragmaText));
+                throw new WixException(CoreErrors.InvalidPreprocessorPragma(state.Context.CurrentSourceLineNumber, pragmaText));
             }
 
             // resolve other variables in the pragma argument(s)
@@ -823,7 +823,7 @@ namespace WixToolset.Core
             }
             catch (Exception e)
             {
-                throw new WixException(ErrorMessages.PreprocessorExtensionPragmaFailed(state.Context.CurrentSourceLineNumber, pragmaText, e.Message));
+                throw new WixException(CoreErrors.PreprocessorExtensionPragmaFailed(state.Context.CurrentSourceLineNumber, pragmaText, e.Message));
             }
         }
 
@@ -851,7 +851,7 @@ namespace WixToolset.Core
                 var endingQuotes = expression.IndexOf('\"', 1);
                 if (-1 == endingQuotes)
                 {
-                    throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(CoreErrors.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
 
                 // cut the quotes off the string
@@ -885,7 +885,7 @@ namespace WixToolset.Core
 
                 if (-1 == endingParen)
                 {
-                    throw new WixException(ErrorMessages.UnmatchedParenthesisInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(CoreErrors.UnmatchedParenthesisInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
                 token = expression.Substring(0, endingParen + 1);
 
@@ -1009,12 +1009,12 @@ namespace WixToolset.Core
             else if (variable.IndexOf("(", StringComparison.Ordinal) != -1 || variable.IndexOf(")", StringComparison.Ordinal) != -1)
             {
                 // make sure it doesn't contain parenthesis
-                throw new WixException(ErrorMessages.UnmatchedParenthesisInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
+                throw new WixException(CoreErrors.UnmatchedParenthesisInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
             }
             else if (variable.IndexOf("\"", StringComparison.Ordinal) != -1)
             {
                 // shouldn't contain quotes
-                throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
+                throw new WixException(CoreErrors.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
             }
 
             return varValue;
@@ -1045,7 +1045,7 @@ namespace WixToolset.Core
             {
                 if (stringLiteral)
                 {
-                    throw new WixException(ErrorMessages.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(CoreErrors.UnmatchedQuotesInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
 
                 rightValue = this.GetNextToken(state, originalExpression, ref expression, out stringLiteral);
@@ -1093,7 +1093,7 @@ namespace WixToolset.Core
             {
                 if (operation.Length > 0)
                 {
-                    throw new WixException(ErrorMessages.ExpectedVariable(state.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(CoreErrors.ExpectedVariable(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
 
                 // false expression
@@ -1108,7 +1108,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    throw new WixException(ErrorMessages.UnexpectedLiteral(state.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(CoreErrors.UnexpectedLiteral(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
             }
             else
@@ -1148,11 +1148,11 @@ namespace WixToolset.Core
                     }
                     catch (FormatException)
                     {
-                        throw new WixException(ErrorMessages.IllegalIntegerInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
+                        throw new WixException(CoreErrors.IllegalIntegerInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                     }
                     catch (OverflowException)
                     {
-                        throw new WixException(ErrorMessages.IllegalIntegerInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
+                        throw new WixException(CoreErrors.IllegalIntegerInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                     }
 
                     // Compare the numbers
@@ -1195,7 +1195,7 @@ namespace WixToolset.Core
                 closeParenIndex = expression.IndexOf(')', closeParenIndex);
                 if (closeParenIndex == -1)
                 {
-                    throw new WixException(ErrorMessages.UnmatchedParenthesisInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
+                    throw new WixException(CoreErrors.UnmatchedParenthesisInExpression(state.Context.CurrentSourceLineNumber, originalExpression));
                 }
 
                 if (InsideQuotes(expression, closeParenIndex))
@@ -1245,7 +1245,7 @@ namespace WixToolset.Core
                     currentValue = !currentValue;
                     break;
                 default:
-                    throw new WixException(ErrorMessages.UnexpectedPreprocessorOperator(state.Context.CurrentSourceLineNumber, operation.ToString()));
+                    throw new WixException(CoreErrors.UnexpectedPreprocessorOperator(state.Context.CurrentSourceLineNumber, operation.ToString()));
             }
         }
 
@@ -1296,7 +1296,7 @@ namespace WixToolset.Core
             expression = expression.Trim();
             if (expression.Length == 0)
             {
-                throw new WixException(ErrorMessages.UnexpectedEmptySubexpression(state.Context.CurrentSourceLineNumber, originalExpression));
+                throw new WixException(CoreErrors.UnexpectedEmptySubexpression(state.Context.CurrentSourceLineNumber, originalExpression));
             }
 
             // If the expression starts with parenthesis, evaluate it
@@ -1316,7 +1316,7 @@ namespace WixToolset.Core
                     expression = expression.Substring(3).Trim();
                     if (expression.Length == 0)
                     {
-                        throw new WixException(ErrorMessages.ExpectedExpressionAfterNot(state.Context.CurrentSourceLineNumber, originalExpression));
+                        throw new WixException(CoreErrors.ExpectedExpressionAfterNot(state.Context.CurrentSourceLineNumber, originalExpression));
                     }
 
                     expressionValue = this.EvaluateExpressionRecurse(state, originalExpression, ref expression, PreprocessorOperation.Not, true);
@@ -1345,7 +1345,7 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    throw new WixException(ErrorMessages.InvalidSubExpression(state.Context.CurrentSourceLineNumber, expression, originalExpression));
+                    throw new WixException(CoreErrors.InvalidSubExpression(state.Context.CurrentSourceLineNumber, expression, originalExpression));
                 }
             }
 
@@ -1380,7 +1380,7 @@ namespace WixToolset.Core
         {
             if (1023 < state.CurrentFileStack.Count)
             {
-                throw new WixException(ErrorMessages.TooDeeplyIncluded(state.Context.CurrentSourceLineNumber, state.CurrentFileStack.Count));
+                throw new WixException(CoreErrors.TooDeeplyIncluded(state.Context.CurrentSourceLineNumber, state.CurrentFileStack.Count));
             }
 
             var path = Path.GetFullPath(fileName);
@@ -1480,7 +1480,7 @@ namespace WixToolset.Core
                         }
                         else
                         {
-                            this.Messaging.Write(ErrorMessages.DuplicateExtensionPreprocessorType(extension.GetType().ToString(), prefix, collidingExtension.GetType().ToString()));
+                            this.Messaging.Write(CoreErrors.DuplicateExtensionPreprocessorType(extension.GetType().ToString(), prefix, collidingExtension.GetType().ToString()));
                         }
                     }
                 }

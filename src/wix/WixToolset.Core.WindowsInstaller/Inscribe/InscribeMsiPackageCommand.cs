@@ -57,7 +57,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
             var attributes = File.GetAttributes(databasePath);
             if (FileAttributes.ReadOnly == (attributes & FileAttributes.ReadOnly))
             {
-                this.Messaging.Write(ErrorMessages.ReadOnlyOutputFile(databasePath));
+                this.Messaging.Write(WindowsInstallerBackendErrors.ReadOnlyOutputFile(databasePath));
                 return shouldCommit;
             }
 
@@ -175,7 +175,7 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                         // If the cabs aren't there, throw an error but continue to catch the other errors
                         if (!File.Exists(cabPath))
                         {
-                            this.Messaging.Write(ErrorMessages.WixFileNotFound(cabPath));
+                            this.Messaging.Write(WindowsInstallerBackendErrors.WixFileNotFound(cabPath));
                             continue;
                         }
 
@@ -201,11 +201,11 @@ namespace WixToolset.Core.WindowsInstaller.Inscribe
                             if ((5 == Environment.OSVersion.Version.Major && 2 == Environment.OSVersion.Version.Minor) || // W2K3
                                 (5 == Environment.OSVersion.Version.Major && 1 == Environment.OSVersion.Version.Minor)) // XP
                             {
-                                this.Messaging.Write(ErrorMessages.UnableToGetAuthenticodeCertOfFileDownlevelOS(cabPath, String.Format(CultureInfo.InvariantCulture, "HRESULT: 0x{0:x8}", HResult)));
+                                this.Messaging.Write(WindowsInstallerBackendErrors.UnableToGetAuthenticodeCertOfFileDownlevelOS(cabPath, String.Format(CultureInfo.InvariantCulture, "HRESULT: 0x{0:x8}", HResult)));
                             }
                             else // otherwise, generic error
                             {
-                                this.Messaging.Write(ErrorMessages.UnableToGetAuthenticodeCertOfFile(cabPath, String.Format(CultureInfo.InvariantCulture, "HRESULT: 0x{0:x8}", HResult)));
+                                this.Messaging.Write(WindowsInstallerBackendErrors.UnableToGetAuthenticodeCertOfFile(cabPath, String.Format(CultureInfo.InvariantCulture, "HRESULT: 0x{0:x8}", HResult)));
                             }
                         }
 
