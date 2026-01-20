@@ -43,6 +43,7 @@
   <UsingTask TaskName="ResolveInstallerPlatform" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="ResolveWixReferences" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="WixBuild" AssemblyFile="$(WixTasksPath)" />
+  <UsingTask TaskName="WixAcceptEula" AssemblyFile="$(WixTasksPath)" />
   <UsingTask TaskName="WindowsInstallerValidation" AssemblyFile="$(WixTasksPath)" />
 
   <!--
@@ -180,6 +181,46 @@
     <BindVariable Include="$(WixVariables)"  Condition=" '$(WixVariables)' != '' " />
   </ItemGroup>
 
+  <!--
+    ***********************************************************************************************
+    ***********************************************************************************************
+                                                                EULA Section
+    ***********************************************************************************************
+    ***********************************************************************************************
+    -->
+
+  <Target
+    Name="AcceptEula">
+
+    <PropertyGroup>
+      <_AcceptEulaVersion Condition="'$(AcceptEulaVersion)' != ''">$(AcceptEulaVersion)</_AcceptEulaVersion>
+      <_AcceptEulaVersion Condition="'$(_AcceptEulaVersion)' == '' and '$(AcceptEula)' != ''">$(AcceptEula)</_AcceptEulaVersion>
+      <_AcceptEulaVersion Condition="'$(_AcceptEulaVersion)' == ''">$(WixEulaVersion)</_AcceptEulaVersion>
+    </PropertyGroup>
+
+    <WixAcceptEula
+        EulaVersion="$(_AcceptEulaVersion)"
+        NoLogo="true"
+        ToolExe="$(WixToolExe)"
+        ToolPath="$(WixToolDir)" />
+  </Target>
+
+  <Target
+    Name="CheckLicenseAcceptance"
+    BeforeTargets="CoreCompile"
+    Condition=" '$(AcceptEula)' == '' ">
+
+    <PropertyGroup>
+      <WixEulaFile>$(USERPROFILE)\.wix\wix$(WixToolsetMajorVersion)-osmf-eula.txt</WixEulaFile>
+    </PropertyGroup>
+
+    <Error
+      Text="You must accept the Open Source Maintenance Fee (OSMF) EULA to use WiX Toolset v$(WixToolsetMajorVersion). For instructions, see https://wixtoolset.org/osmf/"
+      Code="WIX7015"
+      File="$(MSBuildProjectFile)"
+      HelpLink="https://wixtoolset.org/osmf"
+      Condition=" !Exists('$(WixEulaFile)') " />
+  </Target>
 
   <!--
     ***********************************************************************************************
@@ -215,6 +256,7 @@
     -->
   <PropertyGroup>
     <PrepareForBuildDependsOn>
+      CheckLicenseAcceptance;
       ResolveInstallerPlatform;
       $(PrepareForBuildDependsOn)
     </PrepareForBuildDependsOn>
@@ -689,6 +731,7 @@
         CabinetCachePath="$(_WixBuildCabinetCachePath)"
         CabinetCreationThreadCount="$(CabinetCreationThreadCount)"
         DefaultCompressionLevel="$(DefaultCompressionLevel)"
+        AcceptEula="$(AcceptEula)"
 
         SuppressAllWarnings="$(SuppressAllWarnings)"
         SuppressSpecificWarnings="$(SuppressSpecificWarnings)"
@@ -718,6 +761,7 @@
           Ices="$(Ices)"
           SuppressIces="$(SuppressIces)"
           CubeFiles="$(AdditionalCub)"
+          AcceptEula="$(AcceptEula)"
 
           AdditionalOptions="$(ValidationAdditionalOptions)"
 

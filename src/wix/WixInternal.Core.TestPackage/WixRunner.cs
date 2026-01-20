@@ -23,11 +23,12 @@ namespace WixInternal.Core.TestPackage
         /// <param name="args"></param>
         /// <param name="messages"></param>
         /// <param name="warningsAsErrors"></param>
+        /// <param name="skipAcceptEula"></param>
         /// <returns></returns>
-        public static int Execute(string[] args, out List<Message> messages, bool warningsAsErrors = true)
+        public static int Execute(string[] args, out List<Message> messages, bool warningsAsErrors = true, bool skipAcceptEula = false)
         {
             var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
-            var task = Execute(args, serviceProvider, out messages, warningsAsErrors: warningsAsErrors);
+            var task = Execute(args, serviceProvider, out messages, warningsAsErrors: warningsAsErrors, skipAcceptEula);
             return task.Result;
         }
 
@@ -62,8 +63,9 @@ namespace WixInternal.Core.TestPackage
         /// <param name="coreProvider"></param>
         /// <param name="messages"></param>
         /// <param name="warningsAsErrors"></param>
+        /// <param name="skipAcceptEula"></param>
         /// <returns></returns>
-        public static Task<int> Execute(string[] args, IWixToolsetCoreServiceProvider coreProvider, out List<Message> messages, bool warningsAsErrors = true)
+        public static Task<int> Execute(string[] args, IWixToolsetCoreServiceProvider coreProvider, out List<Message> messages, bool warningsAsErrors = true, bool skipAcceptEula = false)
         {
             coreProvider.AddWindowsInstallerBackend()
                         .AddBundleBackend()
@@ -77,6 +79,12 @@ namespace WixInternal.Core.TestPackage
             messaging.SetListener(listener);
 
             var arguments = new List<string>(args);
+            if (!skipAcceptEula && !arguments.Contains("-acceptEula"))
+            {
+                arguments.Add("-acceptEula");
+                arguments.Add("wix" + SomeVerInfo.Major);
+            }
+
             if (warningsAsErrors)
             {
                 arguments.Add("-wx");

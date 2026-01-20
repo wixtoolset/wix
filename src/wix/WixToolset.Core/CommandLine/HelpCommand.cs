@@ -37,10 +37,12 @@ namespace WixToolset.Core.CommandLine
                     new CommandLineHelpSwitch("--help", "-h", "Show command line help."),
                     new CommandLineHelpSwitch("--version", "Display WiX Toolset version in use."),
                     new CommandLineHelpSwitch("--nologo", "Suppress displaying the logo information."),
+                    new CommandLineHelpSwitch("--acceptEula", "Accept the EULA for this invocation without creating an acceptance file."),
                 },
                 Commands = new[]
                 {
-                    new CommandLineHelpCommand("build", "Build a wixlib, package, or bundle.")
+                    new CommandLineHelpCommand("build", "Build a wixlib, package, or bundle."),
+                    new CommandLineHelpCommand("eula", "Accept the WiX Toolset EULA.")
                 },
                 Notes = "Run 'wix [command] -h' for more information on a command."
             };

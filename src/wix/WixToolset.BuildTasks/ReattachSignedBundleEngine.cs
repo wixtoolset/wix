@@ -11,6 +11,11 @@ namespace WixToolset.BuildTasks
     public sealed partial class ReattachSignedBundleEngine : WixExeBaseTask
     {
         /// <summary>
+        /// Optional EULA acceptance.
+        /// </summary>
+        public string AcceptEula { get; set; }
+
+        /// <summary>
         /// The bundle to which to attach the bundle engine.
         /// </summary>
         [Required]
@@ -47,6 +52,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-engine ", this.BundleEngineFile);
             commandLineBuilder.AppendSwitchIfNotNull("-out ", this.OutputFile);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
+            commandLineBuilder.AppendSwitchIfNotNull("-acceptEula ", this.AcceptEula);
 
             base.BuildCommandLine(commandLineBuilder);
         }

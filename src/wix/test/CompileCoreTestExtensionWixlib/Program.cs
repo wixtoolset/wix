@@ -15,13 +15,14 @@ namespace CompileCoreTestExtensionWixlib
             var intermediateFolder = args[0];
             var wixlibPath = args[1];
 
-            var buildArgs = new List<string>();
-            buildArgs.Add("build");
-            buildArgs.Add("-bindfiles");
-            buildArgs.Add("-intermediateFolder");
-            buildArgs.Add(intermediateFolder);
-            buildArgs.Add("-o");
-            buildArgs.Add(wixlibPath);
+            var buildArgs = new List<string>
+            {
+              "build",
+              "-acceptEula", "wix" + SomeVerInfo.Major,
+              "-bindfiles",
+              "-intermediateFolder", intermediateFolder,
+              "-o", wixlibPath
+            };
 
             foreach (var path in args[2].Split(';'))
             {

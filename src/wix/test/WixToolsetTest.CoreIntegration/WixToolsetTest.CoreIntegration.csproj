@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <RequiresNativeWixAssets>true</RequiresNativeWixAssets>
+    <IncludeSomeVerInfo>true</IncludeSomeVerInfo>
     <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
 

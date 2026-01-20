@@ -10,6 +10,11 @@ namespace WixToolset.BuildTasks
     /// </summary>
     public sealed partial class InscribeMsiWithCabinetSignatures : WixExeBaseTask
     {
+        /// <summary>
+        /// Optional EULA acceptance.
+        /// </summary>
+        public string AcceptEula { get; set; }
+
         [Required]
         public ITaskItem DatabaseFile { get; set; }
 
@@ -25,6 +30,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendFileNameIfNotNull(this.DatabaseFile);
             commandLineBuilder.AppendSwitchIfNotNull("-out ", this.OutputFile);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
+            commandLineBuilder.AppendSwitchIfNotNull("-acceptEula ", this.AcceptEula);
 
             base.BuildCommandLine(commandLineBuilder);
         }

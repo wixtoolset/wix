@@ -9,6 +9,7 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <CreateDocumentationFile>true</CreateDocumentationFile>
     <SignOutput>false</SignOutput>
+    <IncludeSomeVerInfo>true</IncludeSomeVerInfo>
     <IsWixTestSupportProject>true</IsWixTestSupportProject>
   </PropertyGroup>
 

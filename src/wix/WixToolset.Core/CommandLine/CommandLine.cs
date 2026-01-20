@@ -15,6 +15,7 @@ namespace WixToolset.Core.CommandLine
         {
             this.ServiceProvider = serviceProvider;
             this.Messaging = serviceProvider.GetService<IMessaging>();
+            this.AcceptedEulaValues = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         }
 
         private IServiceProvider ServiceProvider { get; }
@@ -24,6 +25,8 @@ namespace WixToolset.Core.CommandLine
         private bool ShowHelp { get; set; }
 
         private bool SuppressLogo { get; set; }
+
+        private HashSet<string> AcceptedEulaValues { get; }
 
         public ICommandLineCommand CreateCommand(string[] args)
         {
@@ -93,7 +96,7 @@ namespace WixToolset.Core.CommandLine
                 // If we don't have a command yet, try to parse for a command or a global switch.
                 if (command == null)
                 {
-                    if (this.TryParseCommand(arg, parser, extensions, out command))
+                    if (this.TryParseCommandOrPreCommandSwitch(arg, parser, extensions, out command))
                     {
                         // Found our command, all good.
                     }
@@ -125,6 +128,12 @@ namespace WixToolset.Core.CommandLine
                 extension.PostParse();
             }
 
+            if (command != null && this.RequiresEulaAcceptance(command) && !EulaCommand.IsAccepted(this.AcceptedEulaValues))
+            {
+                parser.ReportErrorArgument("eula", CoreErrors.AcceptEulaRequired());
+                command = null;
+            }
+
             // If we hit an error, do not return a command.
             if (!String.IsNullOrEmpty(parser.ErrorArgument))
             {
@@ -139,7 +148,7 @@ namespace WixToolset.Core.CommandLine
             return command;
         }
 
-        private bool TryParseCommand(string arg, ICommandLineParser parser, IEnumerable<IExtensionCommandLine> extensions, out ICommandLineCommand command)
+        private bool TryParseCommandOrPreCommandSwitch(string arg, ICommandLineParser parser, IEnumerable<IExtensionCommandLine> extensions, out ICommandLineCommand command)
         {
             command = null;
 
@@ -160,23 +169,38 @@ namespace WixToolset.Core.CommandLine
                     case "-version":
                         command = new VersionCommand();
                         break;
+
+                    case "accepteula":
+                    case "-accepteula":
+                    {
+                        var value = parser.GetNextArgumentOrError(arg);
+                        this.AcceptedEulaValues.Add(value);
+                        return true;
+                    }
                 }
             }
             else
             {
-                if ("build".Equals(arg, StringComparison.OrdinalIgnoreCase))
+                switch (arg.ToLowerInvariant())
                 {
-                    command = new BuildCommand(this.ServiceProvider);
-                }
-                else
-                {
-                    foreach (var extension in extensions)
-                    {
-                        if (extension.TryParseCommand(parser, arg, out command))
+                    case "build":
+                        command = new BuildCommand(this.ServiceProvider);
+                        break;
+
+                    case "eula":
+                        command = new EulaCommand(this.ServiceProvider);
+                        break;
+
+                    default:
+                        foreach (var extension in extensions)
                         {
-                            break;
+                            if (extension.TryParseCommand(parser, arg, out command))
+                            {
+                                break;
+                            }
                         }
-                    }
+
+                        break;
                 }
             }
 
@@ -218,6 +242,14 @@ namespace WixToolset.Core.CommandLine
                 case "verbose":
                     this.Messaging.ShowVerboseMessages = true;
                     return true;
+
+                case "accepteula":
+                case "-accepteula":
+                {
+                    var value = parser.GetNextArgumentOrError(arg);
+                    this.AcceptedEulaValues.Add(value);
+                    return true;
+                }
             }
 
             if (parameter.StartsWith("sw"))
@@ -237,6 +269,13 @@ namespace WixToolset.Core.CommandLine
             }
 
             return false;
+        }
+
+        private bool RequiresEulaAcceptance(ICommandLineCommand command)
+        {
+            return !(command is HelpCommand) &&
+                   !(command is VersionCommand) &&
+                   !(command is EulaCommand);
         }
 
         private void ParseSuppressWarning(string parameter, int offset, ICommandLineParser parser)
