@@ -2,6 +2,10 @@
 <Project>
   <Import Project="$(WixMSBuildProps)" />
 
+  <PropertyGroup>
+    <AcceptEula>wix7</AcceptEula>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\TestExe\TestExe.csproj" Publish="true" TargetFrameworks="net8.0,net472|win-x64" RuntimeIdentifiers="win-x86,win-x64" />
   </ItemGroup>

@@ -2,6 +2,7 @@
 
 <Project>
   <PropertyGroup>
+    <LangVersion Condition=" '$(TargetFrameworkVersion)'=='' ">14.0</LangVersion>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)wix.snk))</AssemblyOriginatorKeyFile>

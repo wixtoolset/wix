@@ -38,6 +38,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -65,13 +66,14 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
+                    "-o", Path.Combine(baseFolder, "bin", "test.exe")
                 });
 
                 result.AssertSuccess();
 
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.exe")));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, "bin", "test.exe")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, "bin", "test.wixpdb")));
             }
         }
 
@@ -97,6 +99,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-bindpath", Path.Combine(folder, "data"),
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -236,6 +239,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var result = WixRunner.Execute(new[]
                 {
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "build",
                     "-arch", "x64",
                     Path.Combine(folder, "Bundle.wxs"),
@@ -317,6 +321,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-ext", ExtensionPaths.ExampleExtensionPath,
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", Path.Combine(baseFolder, @"bin\test.exe")
                 });
 
@@ -347,6 +352,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
                     "-bindpath", dataFolder,
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -383,6 +389,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -411,6 +418,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "BundleWithPackageGroupRef", "Bundle.wxs"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -449,6 +457,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "BundleWithMissingSource", "BundleMissingMsiSource.wxs"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", Path.Combine(baseFolder, @"bin\test.exe")
                 });
 
@@ -476,6 +485,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "BundleWithMissingSource", "BundleMissingMsuSource.wxs"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", Path.Combine(baseFolder, @"bin\test.exe")
                 });
 
@@ -504,6 +514,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", Path.Combine(baseFolder, @"bin\test.exe")
                 });
 
@@ -527,13 +538,15 @@ namespace WixToolsetTest.CoreIntegration
 
                 var result = WixRunner.Execute(new[]
                 {
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "build",
                     Path.Combine(folder, "BundleLocalized", "BundleWithLocalizedUpgradeCode.wxs"),
                     "-loc", Path.Combine(folder, "BundleLocalized", "BundleWithInvalidUpgradeCode.wxl"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
+                    "-o", Path.Combine(baseFolder, "bin", "test.exe")
                 });
 
                 var message = result.Messages.Where(m => m.Level == MessageLevel.Error).Select(m => m.ToString().Replace(folder, "<testdata>")).ToArray();
@@ -560,9 +573,11 @@ namespace WixToolsetTest.CoreIntegration
                 {
                     "build",
                     Path.Combine(folder, "BundleUncompressed", "UncompressedBundle.wxs"),
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                     "-trackingFile", trackingFile
                 });
@@ -605,6 +620,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -631,6 +647,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -675,6 +692,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -702,6 +720,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -729,6 +748,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -757,6 +777,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -783,6 +804,7 @@ namespace WixToolsetTest.CoreIntegration
                     "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -807,6 +829,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "BundleWithInvalid", "BundleWithMissingBA.wxs"),
                     "-bindpath", Path.Combine(folder, ".Data"),
                     "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-o", exePath,
                 });
 
@@ -836,13 +859,14 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Bundle.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
+                    "-o", Path.Combine(baseFolder, "bin", "test.exe")
                 });
 
                 result.AssertSuccess();
 
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.exe")));
-                Assert.True(File.Exists(Path.Combine(baseFolder, @"bin\test.wixpdb")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, "bin", "test.exe")));
+                Assert.True(File.Exists(Path.Combine(baseFolder, "bin", "test.wixpdb")));
             }
         }
     }

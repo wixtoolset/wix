@@ -6,6 +6,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <DefaultItemExcludes>TestData\**;$(DefaultItemExcludes)</DefaultItemExcludes>
     <RequiresNativeWixAssets>true</RequiresNativeWixAssets>
+    <IncludeSomeVerInfo>true</IncludeSomeVerInfo>
     <IsWixMSTestProject>true</IsWixMSTestProject>
   </PropertyGroup>
 

@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <RequiresNativeWixAssets>true</RequiresNativeWixAssets>
+    <IncludeSomeVerInfo>true</IncludeSomeVerInfo>
     <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
 

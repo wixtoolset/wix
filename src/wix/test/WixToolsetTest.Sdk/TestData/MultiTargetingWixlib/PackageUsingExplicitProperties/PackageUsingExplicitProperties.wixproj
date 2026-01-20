@@ -2,6 +2,10 @@
 <Project>
   <Import Project="$(WixMSBuildProps)" />
 
+  <PropertyGroup>
+    <AcceptEula>foo;wix7;bar</AcceptEula>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\TestExe\TestExe.csproj" Publish="true" TargetFrameworks="net472" RuntimeIdentifiers="win-x86">
       <!-- Not recommended, these disable the values on the ProjectReference -->

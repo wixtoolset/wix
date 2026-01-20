@@ -77,6 +77,12 @@ namespace WixInternal.Core.MSTestPackage
             messaging.SetListener(listener);
 
             var arguments = new List<string>(args);
+            if (!arguments.Contains("-acceptEula"))
+            {
+                arguments.Add("-acceptEula");
+                arguments.Add("wix" + SomeVerInfo.Major);
+            }
+
             if (warningsAsErrors)
             {
                 arguments.Add("-wx");

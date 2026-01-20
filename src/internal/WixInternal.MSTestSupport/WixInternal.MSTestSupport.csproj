@@ -11,6 +11,7 @@
     <CreateDocumentationFile>true</CreateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <SignOutput>false</SignOutput>
+    <IncludeSomeVerInfo>true</IncludeSomeVerInfo>
     <IsWixTestSupportProject>true</IsWixTestSupportProject>
   </PropertyGroup>
 

@@ -11,6 +11,11 @@ namespace WixToolset.BuildTasks
     public sealed partial class DetachBundleEngineForSigning : WixExeBaseTask
     {
         /// <summary>
+        /// Optional EULA acceptance.
+        /// </summary>
+        public string AcceptEula { get; set; }
+
+        /// <summary>
         /// The bundle from which to detach the bundle engine.
         /// </summary>
         [Required]
@@ -40,6 +45,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendFileNameIfNotNull(this.BundleFile);
             commandLineBuilder.AppendSwitchIfNotNull("-engine ", this.OutputFile);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
+            commandLineBuilder.AppendSwitchIfNotNull("-acceptEula ", this.AcceptEula);
 
             base.BuildCommandLine(commandLineBuilder);
         }

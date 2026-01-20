@@ -6,4 +6,8 @@
     This file prevents the import of WiX standard Directory.Build.props
     from the root src directory
   -->
+
+  <PropertyGroup>
+    <AcceptEula>wix7</AcceptEula>
+  </PropertyGroup>
 </Project>

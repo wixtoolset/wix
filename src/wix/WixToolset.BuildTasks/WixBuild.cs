@@ -12,6 +12,11 @@ namespace WixToolset.BuildTasks
     /// </summary>
     public sealed class WixBuild : WixExeBaseTask
     {
+        /// <summary>
+        /// Optional EULA acceptance.
+        /// </summary>
+        public string AcceptEula { get; set; }
+
         public string[] Cultures { get; set; }
 
         public string[] DefineConstants { get; set; }
@@ -74,6 +79,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
             commandLineBuilder.AppendSwitchIfNotNull("-trackingfile ", this.BindTrackingFile);
             commandLineBuilder.AppendSwitchIfNotNull("-defaultcompressionlevel ", this.DefaultCompressionLevel);
+            commandLineBuilder.AppendSwitchIfNotNull("-acceptEula ", this.AcceptEula);
 
             base.BuildCommandLine(commandLineBuilder);
 

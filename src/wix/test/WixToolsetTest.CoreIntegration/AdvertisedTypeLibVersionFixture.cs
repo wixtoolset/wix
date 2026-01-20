@@ -23,6 +23,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var result = WixRunner.Execute(new[]
                 {
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "build",
                     Path.Combine(folder, "AdvertisedTypeLib", "MajorVersion16Bit.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
@@ -50,6 +51,7 @@ namespace WixToolsetTest.CoreIntegration
                     Path.Combine(folder, "AdvertisedTypeLib", "MajorVersion17Bit.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-intermediateFolder", intermediateFolder,
                     "-o", msiPath
                 });
@@ -71,6 +73,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var result = WixRunner.Execute(new[]
                 {
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "build",
                     Path.Combine(folder, "AdvertisedTypeLib", "MinorVersion8Bit.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
@@ -99,6 +102,7 @@ namespace WixToolsetTest.CoreIntegration
                     "build",
                     Path.Combine(folder, "AdvertisedTypeLib", "MinorVersion9Bit.wxs"),
                     Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
                     "-bindpath", Path.Combine(folder, "SingleFile", "data"),
                     "-intermediateFolder", intermediateFolder,
                     "-o", msiPath

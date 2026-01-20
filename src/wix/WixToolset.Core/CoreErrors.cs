@@ -8,6 +8,16 @@ namespace WixToolset.Core
 
     internal static class CoreErrors
     {
+        public static Message AcceptEulaRequired()
+        {
+            return Message(null, Ids.AcceptEulaRequired, "You must accept the Open Source Maintenance Fee (OSMF) EULA to use WiX Toolset v{0}. For instructions, see https://wixtoolset.org/osmf/", SomeVerInfo.Major);
+        }
+
+        public static Message InvalidEulaAcceptanceValue(ISet<string> eulaIds)
+        {
+            return Message(null, Ids.InvalidEulaAcceptanceValue, "Unknown EULA identifier: '{0}'. For details about the Open Source Maintenance Fee (OSMF) EULA and acceptance instructions, see https://wixtoolset.org/osmf/", String.Join(", ", eulaIds));
+        }
+
         public static Message UnableToCopyFile(SourceLineNumber sourceLineNumbers, string source, string destination, string detail)
         {
             return Message(sourceLineNumbers, Ids.UnableToCopyFile, "Unable to copy file from: {0}, to: {1}. Error detail: {2}", source, destination, detail);
@@ -918,6 +928,8 @@ namespace WixToolset.Core
             UnableToMoveFile = 7012,
             UnableToOpenFile = 7013,
             BackendNotFound = 7014,
+            AcceptEulaRequired = 7015,
+            InvalidEulaAcceptanceValue = 7016,
         } // last available is 7099. 7100 is WindowsInstallerBackendWarnings.
     }
 }
