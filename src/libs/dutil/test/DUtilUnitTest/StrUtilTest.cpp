@@ -80,7 +80,217 @@ namespace DutilTests
             TestStrAnsiAllocString(b, 0, "abCd");
         }
 
+        [Fact]
+        void StrUtilMultiSzLenNullTest()
+        {
+            HRESULT hr = S_OK;
+            SIZE_T cchMultiSz = 7;
+
+            DutilInitialize(&DutilTestTraceError);
+
+            try
+            {
+                hr = MultiSzLen(NULL, &cchMultiSz);
+                NativeAssert::Succeeded(hr, "Failed to get MULTISZ length for null.");
+                NativeAssert::Equal<SIZE_T>(0, cchMultiSz);
+            }
+            finally
+            {
+                DutilUninitialize();
+            }
+        }
+
+        [Fact]
+        void StrUtilMultiSzPrependEmptyTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczMultiSz = NULL;
+            SIZE_T cchMultiSz = 0;
+            const WCHAR expected[] = { L'f', L'i', L'r', L's', L't', L'\0', L'\0' };
+
+            DutilInitialize(&DutilTestTraceError);
+
+            try
+            {
+                hr = MultiSzPrepend(&sczMultiSz, &cchMultiSz, L"first");
+                NativeAssert::Succeeded(hr, "Failed to prepend into empty MULTISZ.");
+                VerifyMultiSz(sczMultiSz, expected, sizeof(expected) / sizeof(expected[0]));
+                NativeAssert::Equal<SIZE_T>(sizeof(expected) / sizeof(expected[0]), cchMultiSz);
+            }
+            finally
+            {
+                ReleaseNullStr(sczMultiSz);
+                DutilUninitialize();
+            }
+        }
+
+        [Fact]
+        void StrUtilMultiSzInsertEmptyTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczMultiSz = NULL;
+            SIZE_T cchMultiSz = 0;
+            const WCHAR expected[] = { L'i', L'n', L's', L'e', L'r', L't', L'\0', L'\0' };
+
+            DutilInitialize(&DutilTestTraceError);
+
+            try
+            {
+                hr = MultiSzInsertString(&sczMultiSz, &cchMultiSz, 0, L"insert");
+                NativeAssert::Succeeded(hr, "Failed to insert into empty MULTISZ.");
+                VerifyMultiSz(sczMultiSz, expected, sizeof(expected) / sizeof(expected[0]));
+                NativeAssert::Equal<SIZE_T>(sizeof(expected) / sizeof(expected[0]), cchMultiSz);
+            }
+            finally
+            {
+                ReleaseNullStr(sczMultiSz);
+                DutilUninitialize();
+            }
+        }
+
+        [Fact]
+        void StrUtilMultiSzFindTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczMultiSz = NULL;
+            DWORD_PTR dwIndex = 0;
+            LPCWSTR wzFound = NULL;
+            const WCHAR source[] = { L'o', L'n', L'e', L'\0', L't', L'w', L'o', L'\0', L't', L'h', L'r', L'e', L'e', L'\0', L'\0' };
+
+            DutilInitialize(&DutilTestTraceError);
+
+            try
+            {
+                CreateMultiSz(&sczMultiSz, source, sizeof(source) / sizeof(source[0]));
+
+                hr = MultiSzFindString(sczMultiSz, L"two", &dwIndex, &wzFound);
+                NativeAssert::Succeeded(hr, "Failed to find string in MULTISZ.");
+                NativeAssert::Equal<DWORD_PTR>(1, dwIndex);
+                NativeAssert::StringEqual(L"two", wzFound);
+
+                hr = MultiSzFindSubstring(sczMultiSz, L"re", &dwIndex, &wzFound);
+                NativeAssert::Succeeded(hr, "Failed to find substring in MULTISZ.");
+                NativeAssert::Equal<DWORD_PTR>(2, dwIndex);
+                NativeAssert::StringEqual(L"three", wzFound);
+
+                hr = MultiSzFindString(sczMultiSz, L"missing", &dwIndex, &wzFound);
+                NativeAssert::SpecificReturnCode(S_FALSE, hr, "Expected not found for missing string.");
+
+                hr = MultiSzFindSubstring(sczMultiSz, L"zzz", &dwIndex, &wzFound);
+                NativeAssert::SpecificReturnCode(S_FALSE, hr, "Expected not found for missing substring.");
+            }
+            finally
+            {
+                ReleaseNullStr(sczMultiSz);
+                DutilUninitialize();
+            }
+        }
+
+        [Fact]
+        void StrUtilMultiSzRemoveTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczMultiSz = NULL;
+            const WCHAR source[] = { L'o', L'n', L'e', L'\0', L't', L'w', L'o', L'\0', L't', L'h', L'r', L'e', L'e', L'\0', L'\0' };
+            const WCHAR expected[] = { L'o', L'n', L'e', L'\0', L't', L'h', L'r', L'e', L'e', L'\0', L'\0' };
+
+            DutilInitialize(&DutilTestTraceError);
+
+            try
+            {
+                CreateMultiSz(&sczMultiSz, source, sizeof(source) / sizeof(source[0]));
+
+                hr = MultiSzRemoveString(&sczMultiSz, 1);
+                NativeAssert::Succeeded(hr, "Failed to remove string from MULTISZ.");
+                VerifyMultiSz(sczMultiSz, expected, sizeof(expected) / sizeof(expected[0]));
+
+                hr = MultiSzRemoveString(&sczMultiSz, 10);
+                NativeAssert::SpecificReturnCode(S_FALSE, hr, "Expected S_FALSE when removing out of range.");
+            }
+            finally
+            {
+                ReleaseNullStr(sczMultiSz);
+                DutilUninitialize();
+            }
+        }
+
+        [Fact]
+        void StrUtilMultiSzInsertTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczMultiSz = NULL;
+            SIZE_T cchMultiSz = 0;
+            const WCHAR source[] = { L'o', L'n', L'e', L'\0', L't', L'w', L'o', L'\0', L'\0' };
+            const WCHAR expected[] = { L'o', L'n', L'e', L'\0', L't', L'h', L'r', L'e', L'e', L'\0', L't', L'w', L'o', L'\0', L'\0' };
+
+            DutilInitialize(&DutilTestTraceError);
+
+            try
+            {
+                CreateMultiSz(&sczMultiSz, source, sizeof(source) / sizeof(source[0]));
+                cchMultiSz = sizeof(source) / sizeof(source[0]);
+
+                hr = MultiSzInsertString(&sczMultiSz, &cchMultiSz, 1, L"three");
+                NativeAssert::Succeeded(hr, "Failed to insert string into MULTISZ.");
+                VerifyMultiSz(sczMultiSz, expected, sizeof(expected) / sizeof(expected[0]));
+                NativeAssert::Equal<SIZE_T>(sizeof(expected) / sizeof(expected[0]), cchMultiSz);
+
+                hr = MultiSzInsertString(&sczMultiSz, &cchMultiSz, 10, L"bad");
+                NativeAssert::SpecificReturnCode(HRESULT_FROM_WIN32(ERROR_OBJECT_NOT_FOUND), hr, "Expected insert to fail for invalid index.");
+            }
+            finally
+            {
+                ReleaseNullStr(sczMultiSz);
+                DutilUninitialize();
+            }
+        }
+
+        [Fact]
+        void StrUtilMultiSzReplaceTest()
+        {
+            HRESULT hr = S_OK;
+            LPWSTR sczMultiSz = NULL;
+            const WCHAR source[] = { L'o', L'n', L'e', L'\0', L't', L'w', L'o', L'\0', L't', L'h', L'r', L'e', L'e', L'\0', L'\0' };
+            const WCHAR expected[] = { L'o', L'n', L'e', L'\0', L't', L'w', L'o', L'\0', L'f', L'o', L'u', L'r', L'\0', L'\0' };
+
+            DutilInitialize(&DutilTestTraceError);
+
+            try
+            {
+                CreateMultiSz(&sczMultiSz, source, sizeof(source) / sizeof(source[0]));
+
+                hr = MultiSzReplaceString(&sczMultiSz, 2, L"four");
+                NativeAssert::Succeeded(hr, "Failed to replace string in MULTISZ.");
+                VerifyMultiSz(sczMultiSz, expected, sizeof(expected) / sizeof(expected[0]));
+            }
+            finally
+            {
+                ReleaseNullStr(sczMultiSz);
+                DutilUninitialize();
+            }
+        }
+
     private:
+        void CreateMultiSz(LPWSTR* ppwzMultiSz, const WCHAR* pwzSource, SIZE_T cchSource)
+        {
+            HRESULT hr = S_OK;
+
+            hr = StrAlloc(ppwzMultiSz, cchSource);
+            NativeAssert::Succeeded(hr, "Failed to allocate MULTISZ.");
+            ::CopyMemory(*ppwzMultiSz, pwzSource, cchSource * sizeof(WCHAR));
+        }
+
+        void VerifyMultiSz(LPCWSTR wzMultiSz, const WCHAR* pwzExpected, SIZE_T cchExpected)
+        {
+            HRESULT hr = S_OK;
+            SIZE_T cchMultiSz = 0;
+
+            hr = MultiSzLen(wzMultiSz, &cchMultiSz);
+            NativeAssert::Succeeded(hr, "Failed to get MULTISZ length.");
+            NativeAssert::Equal<SIZE_T>(cchExpected, cchMultiSz);
+            NativeAssert::True(0 == ::memcmp(wzMultiSz, pwzExpected, cchExpected * sizeof(WCHAR)));
+        }
+
         void TestTrim(LPCWSTR wzInput, LPCWSTR wzExpectedResult)
         {
             HRESULT hr = S_OK;
