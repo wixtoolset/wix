@@ -764,6 +764,7 @@ extern "C" UINT __stdcall CreateUser(
     WCA_CASCRIPT_HANDLE hRollbackScript = NULL;
     int iOriginalAttributes = 0;
     int iRollbackAttributes = 0;
+    LPCWSTR wzOriginalComment = NULL;
 
     USER_INFO_1 userInfo1;
     USER_INFO_1* pUserInfo1 = NULL;
@@ -885,13 +886,15 @@ extern "C" UINT __stdcall CreateUser(
                                 }
                             }
 
-                            hr = WcaCaScriptWriteString(hRollbackScript, pUserInfo1->usri1_comment);
-                            ExitOnFailure(hr, "Failed to add rollback comment to rollback script.");
-
-                            if (!pUserInfo1->usri1_comment || !*pUserInfo1->usri1_comment)
+                            wzOriginalComment = pUserInfo1->usri1_comment;
+                            if (!wzOriginalComment || !*wzOriginalComment)
                             {
                                 iRollbackAttributes |= SCAU_REMOVE_COMMENT;
+                                wzOriginalComment = L"";
                             }
+
+                            hr = WcaCaScriptWriteString(hRollbackScript, wzOriginalComment);
+                            ExitOnFailure(hr, "Failed to add rollback comment to rollback script.");
 
                             hr = WcaCaScriptWriteNumber(hRollbackScript, iRollbackAttributes);
                             ExitOnFailure(hr, "Failed to add rollback attributes to rollback script.");
@@ -1247,6 +1250,7 @@ extern "C" UINT __stdcall CreateGroup(
 
     WCA_CASCRIPT_HANDLE hRollbackScript = NULL;
     int iRollbackAttributes = 0;
+    LPCWSTR wzOriginalComment = NULL;
 
     DWORD dw;
     LPWSTR pwzServerName = NULL;
@@ -1338,13 +1342,15 @@ extern "C" UINT __stdcall CreateGroup(
 
                             iRollbackAttributes = 0;
 
-                            hr = WcaCaScriptWriteString(hRollbackScript, pGroupInfo1->lgrpi1_comment);
-                            ExitOnFailure(hr, "Failed to add rollback comment to rollback script.");
-
-                            if (!pGroupInfo1->lgrpi1_comment || !*pGroupInfo1->lgrpi1_comment)
+                            wzOriginalComment = pGroupInfo1->lgrpi1_comment;
+                            if (!wzOriginalComment || !*wzOriginalComment)
                             {
                                 iRollbackAttributes |= SCAG_REMOVE_COMMENT;
+                                wzOriginalComment = L"";
                             }
+
+                            hr = WcaCaScriptWriteString(hRollbackScript, wzOriginalComment);
+                            ExitOnFailure(hr, "Failed to add rollback comment to rollback script.");
 
                             hr = WcaCaScriptWriteNumber(hRollbackScript, iRollbackAttributes);
                             ExitOnFailure(hr, "Failed to add rollback attributes to rollback script.");
