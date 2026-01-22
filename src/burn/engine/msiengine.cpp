@@ -50,7 +50,9 @@ static void RegisterSourceDirectory(
     __in BURN_PACKAGE* pPackage,
     __in_z LPCWSTR wzCacheDirectory
     );
-
+static BOOL PackageHasAppliedPatch(
+    __in BURN_PACKAGE* pPackage
+    );
 
 // function definitions
 
@@ -904,7 +906,22 @@ extern "C" HRESULT MsiEnginePlanCalculatePackage(
         else if ((BOOTSTRAPPER_REQUEST_STATE_ABSENT == pPackage->requested || BOOTSTRAPPER_REQUEST_STATE_CACHE == pPackage->requested) &&
                  !pPackage->fPermanent) // removing a package that should be removed.
         {
-            execute = BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED == pPackage->currentState ? BOOTSTRAPPER_ACTION_STATE_NONE : BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+            if (BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED == pPackage->currentState)
+            {
+                // If the package is superseded, check to see if there's a patch installed.
+                // A minor upgrade patch could be (usually is) the cause of the
+                // supersedence. In that case, we should ignore the supersedence that would
+                // normally prevent the uninstall. There is a gap in this logic: If a minor
+                // upgrade package were installed without a bundle, then a small update patch
+                // (which by definition doesn't change the version number) were installed,
+                // this check would allow the uninstall. If the minor upgrade were installed
+                // by a bundle, dependencies would keep the package installed.
+                execute = PackageHasAppliedPatch(pPackage) ? BOOTSTRAPPER_ACTION_STATE_UNINSTALL : BOOTSTRAPPER_ACTION_STATE_NONE;
+            }
+            else
+            {
+                execute = BOOTSTRAPPER_ACTION_STATE_UNINSTALL;
+            }
         }
         else if (BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT == pPackage->requested)
         {
@@ -2265,6 +2282,7 @@ LExit:
     ReleaseStr(sczMspPath);
     ReleaseStr(sczCachedDirectory);
     ReleaseStr(sczPatches);
+
     return hr;
 }
 
@@ -2289,6 +2307,47 @@ static void RegisterSourceDirectory(
 
 LExit:
     ReleaseStr(sczMsiDirectory);
+}
 
-    return;
+static BOOL PackageHasAppliedPatch(
+    __in BURN_PACKAGE* pPackage
+)
+{
+    HRESULT hr = S_OK;
+    BOOL fPatched = FALSE;
+    UINT er = ERROR_SUCCESS;
+    DWORD iPatch = 0;
+    WCHAR wzPatchCode[MAX_GUID_CHARS + 1] = {};
+    WCHAR wzTransforms[MAX_PATH] = {};
+    DWORD cchTransforms = countof(wzTransforms);
+    WCHAR wzPatchState[2] = {};
+    DWORD cchPatchState = countof(wzPatchState);
+
+    for (;;)
+    {
+        er = ::MsiEnumPatchesW(pPackage->Msi.sczProductCode, iPatch, wzPatchCode, wzTransforms, &cchTransforms);
+
+        if (ERROR_NO_MORE_ITEMS == er)
+        {
+            ExitFunction();
+        }
+        ExitOnWin32Error(er, hr, "Failed to enumerate patches for package %ls, product code %ls.", pPackage->sczId, pPackage->Msi.sczProductCode);
+
+        er = ::MsiGetPatchInfoExW(wzPatchCode, pPackage->Msi.sczProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED
+            , INSTALLPROPERTY_PATCHSTATE, wzPatchState, &cchPatchState);
+        ExitOnWin32Error(er, hr, "Failed to get patch info for patch %ls.", wzPatchCode);
+
+        if ('1' == wzPatchState[0])
+        {
+            fPatched = TRUE;
+
+            ExitFunction();
+        }
+
+        ++iPatch;
+    }
+
+LExit:
+    return fPatched;
+
 }

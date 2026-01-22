@@ -5,6 +5,11 @@
             <SandboxFolder>C:\build</SandboxFolder>
             <ReadOnly>true</ReadOnly>
         </MappedFolder>
+        <MappedFolder>
+            <HostFolder>..\..\..\build\logs</HostFolder>
+            <SandboxFolder>C:\logs</SandboxFolder>
+            <ReadOnly>false</ReadOnly>
+        </MappedFolder>
 		<MappedFolder>
             <HostFolder>.\</HostFolder>
             <SandboxFolder>C:\sandbox</SandboxFolder>
