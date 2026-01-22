@@ -18,12 +18,34 @@ namespace WixToolsetTest.BurnE2E
         private const string V101 = "1.0.1.0";
 
         [RuntimeFact]
-        public void CanInstallBundleWithSlipstreamedPatchThenRemoveIt()
+        public void CanInstallBundleWithSlipstreamedSmallUpdatePatchThenRemoveIt()
         {
             var testRegistryValue = "PackageA";
 
             var packageAv1 = this.CreatePackageInstaller("PackageAv1");
             var bundleA = this.CreateBundleInstaller("BundleA");
+
+            var packageAv1SourceCodeInstalled = packageAv1.GetInstalledFilePath("Package.wxs");
+            Assert.False(File.Exists(packageAv1SourceCodeInstalled), $"PackageAv1 payload should not be there on test start: {packageAv1SourceCodeInstalled}");
+
+            bundleA.Install();
+            bundleA.VerifyRegisteredAndInPackageCache();
+            Assert.True(File.Exists(packageAv1SourceCodeInstalled), String.Concat("Should have found PackageAv1 payload installed at: ", packageAv1SourceCodeInstalled));
+            packageAv1.VerifyTestRegistryValue(testRegistryValue, V101);
+
+            bundleA.Uninstall();
+            bundleA.VerifyUnregisteredAndRemovedFromPackageCache();
+            Assert.False(File.Exists(packageAv1SourceCodeInstalled), String.Concat("PackageAv1 payload should have been removed by uninstall from: ", packageAv1SourceCodeInstalled));
+            packageAv1.VerifyTestRegistryRootDeleted();
+        }
+
+        [RuntimeFact]
+        public void CanInstallBundleWithSlipstreamedMinorUpgradePatchThenRemoveIt()
+        {
+            var testRegistryValue = "PackageA";
+
+            var packageAv1 = this.CreatePackageInstaller("PackageAv1");
+            var bundleA = this.CreateBundleInstaller("BundleAv1_0_1");
 
             var packageAv1SourceCodeInstalled = packageAv1.GetInstalledFilePath("Package.wxs");
             Assert.False(File.Exists(packageAv1SourceCodeInstalled), $"PackageAv1 payload should not be there on test start: {packageAv1SourceCodeInstalled}");

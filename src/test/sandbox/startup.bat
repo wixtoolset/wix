@@ -1,5 +1,13 @@
 @setlocal
 @echo off
+
+
+::// Fix Sandbox glacial perf (24H2-???)
+:://
+REG ADD HKLM\SYSTEM\CurrentControlSet\Control\CI\Policy /v VerifiedAndReputablePolicyState /t REG_DWORD /d 0 /f
+CITOOL -r -j
+
+
 SET DOTNET_VERSION=8.0
 SET SANDBOX_FILES=C:\sandbox
 
