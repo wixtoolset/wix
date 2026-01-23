@@ -376,20 +376,6 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
             break;
         }
     }
-    else if (BOOTSTRAPPER_RELATION_PATCH == relationType && BURN_PACKAGE_TYPE_MSP == packageType)
-    {
-        // For patch related bundles, only install a patch if currently absent during install, modify, or repair.
-        if (BOOTSTRAPPER_PACKAGE_STATE_ABSENT != currentState)
-        {
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
-        }
-        else if (BOOTSTRAPPER_ACTION_INSTALL == action ||
-                 BOOTSTRAPPER_ACTION_MODIFY == action ||
-                 BOOTSTRAPPER_ACTION_REPAIR == action)
-        {
-            *pRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
-        }
-    }
     else // pick the best option for the action state and install condition.
     {
         hr = GetActionDefaultRequestState(action, currentState, &defaultRequestState);
@@ -397,12 +383,28 @@ extern "C" HRESULT PlanDefaultPackageRequestState(
 
         if (BOOTSTRAPPER_ACTION_UNINSTALL != action && BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL != action)
         {
+            // For patch related bundles, only install a patch if currently absent during install, modify, or repair.
+            if (BOOTSTRAPPER_RELATION_PATCH == relationType && BURN_PACKAGE_TYPE_MSP == packageType)
+            {
+                if (BOOTSTRAPPER_PACKAGE_STATE_ABSENT != currentState)
+                {
+                    defaultRequestState = BOOTSTRAPPER_REQUEST_STATE_NONE;
+                }
+                else if (BOOTSTRAPPER_ACTION_INSTALL == action ||
+                    BOOTSTRAPPER_ACTION_MODIFY == action ||
+                    BOOTSTRAPPER_ACTION_REPAIR == action)
+                {
+                    defaultRequestState = BOOTSTRAPPER_REQUEST_STATE_PRESENT;
+                }
+            }
+
             // If we're not doing an uninstall, use the install condition
             // to determine whether to use the default request state or make the package absent.
             if (BOOTSTRAPPER_PACKAGE_CONDITION_FALSE == installCondition)
             {
                 defaultRequestState = BOOTSTRAPPER_REQUEST_STATE_ABSENT;
             }
+
             // Obsolete means the package is not on the machine and should not be installed,
             // *except* patches can be obsolete and present.
             // Superseded means the package is on the machine but not active, so only uninstall operations are allowed.
@@ -1554,7 +1556,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
 
     for (DWORD i = 0; i < pRegistration->relatedBundles.cRelatedBundles; ++i)
     {
-        DWORD *pdwInsertIndex = NULL;
+        DWORD* pdwInsertIndex = NULL;
         BURN_RELATED_BUNDLE* pRelatedBundle = pRegistration->relatedBundles.rgpPlanSortedRelatedBundles[i];
         BOOL fDependent = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_ADDON == pRelatedBundle->planRelationType ||
                           BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_DEPENDENT_PATCH == pRelatedBundle->planRelationType;
