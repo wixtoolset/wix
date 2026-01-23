@@ -674,7 +674,7 @@ static HRESULT VerifyPipeSecret(
     hr = StrAlloc(&sczVerificationSecret, cbVerificationSecret / sizeof(WCHAR) + 1);
     ExitOnFailure(hr, "Failed to allocate buffer for bootstrapper application verification secret.");
 
-    FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(sczVerificationSecret), cbVerificationSecret);
+    hr = FileReadHandle(hPipe, reinterpret_cast<LPBYTE>(sczVerificationSecret), cbVerificationSecret);
     ExitOnFailure(hr, "Failed to read verification secret from bootstrapper application pipe.");
 
     // Verify the secrets match.

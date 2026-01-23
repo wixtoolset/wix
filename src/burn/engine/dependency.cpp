@@ -601,8 +601,8 @@ extern "C" HRESULT DependencyPlanPackageBegin(
             pProvider->dependentExecute = BURN_DEPENDENCY_ACTION_NONE;
         }
 
-        if (BURN_DEPENDENCY_ACTION_UNREGISTER == pProvider->dependentRollback && pProvider->fBundleRegisteredAsDependent ||
-            BURN_DEPENDENCY_ACTION_REGISTER == pProvider->dependentRollback && !pProvider->fBundleRegisteredAsDependent)
+        if ((BURN_DEPENDENCY_ACTION_UNREGISTER == pProvider->dependentRollback && pProvider->fBundleRegisteredAsDependent) ||
+            (BURN_DEPENDENCY_ACTION_REGISTER == pProvider->dependentRollback && !pProvider->fBundleRegisteredAsDependent))
         {
             pProvider->dependentRollback = BURN_DEPENDENCY_ACTION_NONE;
         }
