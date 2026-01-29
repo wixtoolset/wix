@@ -143,6 +143,33 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanHarvestFilesWithCaseInsensitiveExcludeSubdirectory()
+        {
+            var expected = new[]
+            {
+                @"flsYgiwrDUkZnBEK6iUMkxxaJlD8yQ=PFiles\MsiPackage\test1.txt",
+                @"flslrDWblm4pE.4i4jR58_XyYMmR8I=PFiles\MsiPackage\files1_sub1\files1_sub2\test120.txt",
+                @"flsj.cb0sFWqIPHPFSKJSEEaPDuAQ4=PFiles\MsiPackage\test2.txt",
+            };
+
+            Build("CaseInsensitiveExcludeSubdir.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected));
+        }
+
+        [Fact]
+        public void CanHarvestFilesWithCaseInsensitiveIncludeExclude()
+        {
+            var expected = new[]
+            {
+                @"flsaFu0CvigRX6Psea0ic6ZWevzLmI=PFiles\MsiPackage\test3.txt",
+                @"flsJBy_HKCNejalUyud4HisGqhd72E=PFiles\MsiPackage\test4.txt",
+                @"fls05.yw49T0FVAq3Wvq2ihNp3KWfI=PFiles\MsiPackage\files2_sub2\test20.txt",
+                @"flsf0falU_gCTJjtbSCNiFpJQ1d8EM=PFiles\MsiPackage\files2_sub2\test21.txt",
+            };
+
+            Build("CaseInsensitiveIncludeExclude.wxs", (msiPath, _) => AssertFileIdsAndTargetPaths(msiPath, expected));
+        }
+
+        [Fact]
         public void CanHarvestFilesInDirectoryRef()
         {
             var expected = new[]

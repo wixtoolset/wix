@@ -14,6 +14,7 @@ namespace WixToolset.Core
     internal class HarvestFilesAndPayloadsCommand
     {
         private const string BindPathOpenString = "!(bindpath.";
+        private static readonly char[] SplitSemicolons = { ';' };
 
         public HarvestFilesAndPayloadsCommand(IOptimizeContext context)
         {
@@ -54,8 +55,8 @@ namespace WixToolset.Core
         {
             var unusedSectionCachedInlinedDirectoryIds = new Dictionary<string, string>();
 
-            var inclusions = harvestFile.Inclusions.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-            var exclusions = harvestFile.Exclusions.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            var inclusions = harvestFile.Inclusions.Split(SplitSemicolons, StringSplitOptions.RemoveEmptyEntries);
+            var exclusions = harvestFile.Exclusions.Split(SplitSemicolons, StringSplitOptions.RemoveEmptyEntries);
 
             var comparer = new WildcardFileComparer();
 
@@ -312,12 +313,12 @@ namespace WixToolset.Core
         {
             public bool Equals(WildcardFile x, WildcardFile y)
             {
-                return x?.Path == y?.Path;
+                return StringComparer.OrdinalIgnoreCase.Equals(x?.Path, y?.Path);
             }
 
             public int GetHashCode(WildcardFile obj)
             {
-                return obj?.Path?.GetHashCode() ?? 0;
+                return obj?.Path is null ? 0 : StringComparer.OrdinalIgnoreCase.GetHashCode(obj.Path);
             }
         }
     }

@@ -1,0 +1,11 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Package Id="WixTest.MsiPackage" Name="MsiPackage" Version="1.0.0.0" Manufacturer="Example Corporation">
+        <StandardDirectory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLFOLDER" Name="MsiPackage" FileSource="$(sys.SOURCEFILEDIR)">
+                <Files Include="FILES2\**\*.TXT">
+                    <Exclude Files="files2\NOTATEST.txt" />
+                </Files>
+            </Directory>
+        </StandardDirectory>
+    </Package>
+</Wix>
