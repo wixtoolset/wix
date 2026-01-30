@@ -2951,9 +2951,9 @@ static void ExecuteActionLog(
 
     case BURN_EXECUTE_ACTION_TYPE_PACKAGE_DEPENDENCY:
         LogStringLine(PlanDumpLevel, "%ls action[%u]: PACKAGE_DEPENDENCY package id: %ls, bundle provider key: %ls", wzBase, iAction, pAction->packageDependency.pPackage->sczId, pAction->packageDependency.sczBundleProviderKey);
-        for (DWORD j = 0; j < pAction->packageProvider.pPackage->cDependencyProviders; ++j)
+        for (DWORD j = 0; j < pAction->packageDependency.pPackage->cDependencyProviders; ++j)
         {
-            const BURN_DEPENDENCY_PROVIDER* pProvider = pAction->packageProvider.pPackage->rgDependencyProviders + j;
+            const BURN_DEPENDENCY_PROVIDER* pProvider = pAction->packageDependency.pPackage->rgDependencyProviders + j;
             LogStringLine(PlanDumpLevel, "      Provider[%u]: key: %ls, action: %hs", j, pProvider->sczKey, LoggingDependencyActionToString(fRollback ? pProvider->dependentRollback : pProvider->dependentExecute));
         }
         break;
