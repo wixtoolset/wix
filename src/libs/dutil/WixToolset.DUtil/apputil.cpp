@@ -19,10 +19,15 @@
 
 typedef BOOL(WINAPI *LPFN_SETDEFAULTDLLDIRECTORIES)(DWORD);
 typedef BOOL(WINAPI *LPFN_SETDLLDIRECTORYW)(LPCWSTR);
+typedef BOOL(WINAPI *LPFN_SETPROCESSMITIGATIONPOLICY)(PROCESS_MITIGATION_POLICY, PVOID, SIZE_T);
 
 static BOOL vfInitialized = FALSE;
 static LPFN_SETDEFAULTDLLDIRECTORIES vpfnSetDefaultDllDirectories = NULL;
 static LPFN_SETDLLDIRECTORYW vpfnSetDllDirectory = NULL;
+static LPFN_SETPROCESSMITIGATIONPOLICY vpfnSetProcessMitigationPolicy = NULL;
+
+static const DWORD APP_MITIGATION_POLICY_DISABLED = 0;
+static const DWORD APP_MITIGATION_POLICY_ENABLED = 1;
 
 /********************************************************************
 EscapeCommandLineArgument - encodes wzArgument such that
@@ -50,6 +55,7 @@ static void Initialize()
 
     vpfnSetDefaultDllDirectories = (LPFN_SETDEFAULTDLLDIRECTORIES)::GetProcAddress(hKernel32, "SetDefaultDllDirectories");
     vpfnSetDllDirectory = (LPFN_SETDLLDIRECTORYW)::GetProcAddress(hKernel32, "SetDllDirectoryW");
+    vpfnSetProcessMitigationPolicy = (LPFN_SETPROCESSMITIGATIONPOLICY)::GetProcAddress(hKernel32, "SetProcessMitigationPolicy");
 
     vfInitialized = TRUE;
 
@@ -188,6 +194,100 @@ DAPI_(void) AppInitialize(
 DAPI_(void) AppInitializeUnsafe()
 {
     ::HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
+}
+
+DAPI_(HRESULT) AppSetDefaultProcessMitigationPolicy(
+    __in_z LPCWSTR wzPolicyPath
+    )
+{
+    HRESULT hr = S_OK;
+    HRESULT hrPolicy = S_OK;
+    DWORD dwPolicy = APP_MITIGATION_POLICY_DISABLED;
+    BOOL fApplied = FALSE;
+    PROCESS_MITIGATION_REDIRECTION_TRUST_POLICY redirectionTrustPolicy = { };
+    PROCESS_MITIGATION_DYNAMIC_CODE_POLICY dynamicCodePolicy = { };
+    PROCESS_MITIGATION_FONT_DISABLE_POLICY fontDisablePolicy = { };
+
+    Initialize();
+
+    if (!vpfnSetProcessMitigationPolicy)
+    {
+        ExitFunction1(hr = S_FALSE);
+    }
+
+    hrPolicy = PolcReadNumber(wzPolicyPath, L"RedirectionGuard", APP_MITIGATION_POLICY_ENABLED, &dwPolicy);
+    if (FAILED(hrPolicy))
+    {
+        TraceError(hrPolicy, "Failed to read mitigation policy setting: RedirectionGuard.");
+        dwPolicy = APP_MITIGATION_POLICY_ENABLED;
+    }
+
+    if (APP_MITIGATION_POLICY_ENABLED == dwPolicy)
+    {
+        redirectionTrustPolicy.EnforceRedirectionTrust = 1;
+
+        if (!vpfnSetProcessMitigationPolicy(ProcessRedirectionTrustPolicy, &redirectionTrustPolicy, sizeof(redirectionTrustPolicy)))
+        {
+            hr = HRESULT_FROM_WIN32(::GetLastError());
+            TraceError(hr, "Failed to set RedirectionGuard mitigation policy.");
+        }
+        else
+        {
+            fApplied = TRUE;
+        }
+    }
+
+    hrPolicy = PolcReadNumber(wzPolicyPath, L"DynamicCode", APP_MITIGATION_POLICY_DISABLED, &dwPolicy);
+    if (FAILED(hrPolicy))
+    {
+        TraceError(hrPolicy, "Failed to read mitigation policy setting: DynamicCode.");
+        dwPolicy = APP_MITIGATION_POLICY_DISABLED;
+    }
+
+    if (APP_MITIGATION_POLICY_ENABLED == dwPolicy)
+    {
+        dynamicCodePolicy.ProhibitDynamicCode = 1;
+
+        if (!vpfnSetProcessMitigationPolicy(ProcessDynamicCodePolicy, &dynamicCodePolicy, sizeof(dynamicCodePolicy)))
+        {
+            hr = HRESULT_FROM_WIN32(::GetLastError());
+            TraceError(hr, "Failed to set DynamicCode mitigation policy.");
+        }
+        else
+        {
+            fApplied = TRUE;
+        }
+    }
+
+    hrPolicy = PolcReadNumber(wzPolicyPath, L"FontDisable", APP_MITIGATION_POLICY_DISABLED, &dwPolicy);
+    if (FAILED(hrPolicy))
+    {
+        TraceError(hrPolicy, "Failed to read mitigation policy setting: FontDisable.");
+        dwPolicy = APP_MITIGATION_POLICY_DISABLED;
+    }
+
+    if (APP_MITIGATION_POLICY_ENABLED == dwPolicy)
+    {
+        fontDisablePolicy.DisableNonSystemFonts = 1;
+
+        if (!vpfnSetProcessMitigationPolicy(ProcessFontDisablePolicy, &fontDisablePolicy, sizeof(fontDisablePolicy)))
+        {
+            hr = HRESULT_FROM_WIN32(::GetLastError());
+            TraceError(hr, "Failed to set FontDisable mitigation policy.");
+        }
+        else
+        {
+            fApplied = TRUE;
+        }
+    }
+
+LExit:
+    if (SUCCEEDED(hr) && !fApplied)
+    {
+        hr = S_FALSE;
+    }
+
+    return hr;
 }
 
 DAPI_(HRESULT) AppAppendCommandLineArgument(

@@ -34,6 +34,16 @@ AppInitializeUnsafe - initializes without the full standard safety
 void DAPI AppInitializeUnsafe();
 
 /********************************************************************
+AppSetDefaultProcessMitigationPolicy - enables default process
+    mitigations, with per-mitigation policy overrides.
+
+NOTE: Best effort. S_FALSE indicates not supported or disabled.
+********************************************************************/
+HRESULT DAPI AppSetDefaultProcessMitigationPolicy(
+    __in_z LPCWSTR wzPolicyPath
+    );
+
+/********************************************************************
 AppParseCommandLine - parses the command line using CommandLineToArgvW.
                       The caller must free the value of pArgv on success
                       by calling AppFreeCommandLineArgs.

@@ -34,6 +34,8 @@ int WINAPI wWinMain(
         L"feclient.dll", // unsafely loaded by DecryptFile().
     };
 
+    AppSetDefaultProcessMitigationPolicy(POLICY_BURN_REGISTRY_PATH);
+
     // Best effort attempt to get our file handle as soon as possible.
     hr = PathForCurrentProcess(&sczPath, NULL);
     if (SUCCEEDED(hr))
