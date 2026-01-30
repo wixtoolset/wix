@@ -1452,9 +1452,9 @@ extern "C" HRESULT ElevationExecutePackageDependencyAction(
     ExitOnFailure(hr, "Failed to write bundle dependency key to message buffer.");
 
     // Dependent actions.
-    for (DWORD i = 0; i < pExecuteAction->packageProvider.pPackage->cDependencyProviders; ++i)
+    for (DWORD i = 0; i < pExecuteAction->packageDependency.pPackage->cDependencyProviders; ++i)
     {
-        BURN_DEPENDENCY_PROVIDER* pProvider = pExecuteAction->packageProvider.pPackage->rgDependencyProviders + i;
+        BURN_DEPENDENCY_PROVIDER* pProvider = pExecuteAction->packageDependency.pPackage->rgDependencyProviders + i;
         BURN_DEPENDENCY_ACTION* pAction = fRollback ? &pProvider->dependentRollback : &pProvider->dependentExecute;
         hr = BuffWriteNumber(&pbData, &cbData, (DWORD)*pAction);
         ExitOnFailure(hr, "Failed to write dependent action to message buffer.");
@@ -3486,9 +3486,9 @@ static HRESULT OnExecutePackageDependencyAction(
     ExitOnFailure(hr, "Failed to read bundle dependency key from message buffer.");
 
     // Read dependent actions.
-    for (DWORD i = 0; i < executeAction.packageProvider.pPackage->cDependencyProviders; ++i)
+    for (DWORD i = 0; i < executeAction.packageDependency.pPackage->cDependencyProviders; ++i)
     {
-        BURN_DEPENDENCY_PROVIDER* pProvider = executeAction.packageProvider.pPackage->rgDependencyProviders + i;
+        BURN_DEPENDENCY_PROVIDER* pProvider = executeAction.packageDependency.pPackage->rgDependencyProviders + i;
         BURN_DEPENDENCY_ACTION* pAction = fRollback ? &pProvider->dependentRollback : &pProvider->dependentExecute;
         hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)pAction);
         ExitOnFailure(hr, "Failed to read dependent action.");
