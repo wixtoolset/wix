@@ -168,41 +168,40 @@ extern "C" HRESULT DAPI RmuAddProcessById(
     DWORD cbPrevPriv = 0;
     DWORD er = ERROR_SUCCESS;
     BOOL fAdjustedPrivileges = FALSE;
-    BOOL fElevated = FALSE;
-    ProcElevated(::GetCurrentProcess(), &fElevated);
 
-    // Must be elevated to adjust process privileges
-    if (fElevated) {
-        // Adding SeDebugPrivilege in the event that the process targeted by ::OpenProcess() is in a another user context.
-        if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES, &hToken))
-        {
-            RmExitWithLastError(hr, "Failed to get process token.");
-        }
-
+    // Best-effort attempt to enable SeDebugPrivilege in case the target process is in another user context.
+    if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES, &hToken))
+    {
         priv.PrivilegeCount = 1;
         priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if (!::LookupPrivilegeValueW(NULL, L"SeDebugPrivilege", &priv.Privileges[0].Luid))
+        if (::LookupPrivilegeValueW(NULL, L"SeDebugPrivilege", &priv.Privileges[0].Luid))
         {
-            RmExitWithLastError(hr, "Failed to get debug privilege LUID.");
-        }
-
-        cbPrevPriv = sizeof(TOKEN_PRIVILEGES);
-        pPrevPriv = static_cast<TOKEN_PRIVILEGES*>(MemAlloc(cbPrevPriv, TRUE));
-        RmExitOnNull(pPrevPriv, hr, E_OUTOFMEMORY, "Failed to allocate memory for empty previous privileges.");
-
-        if (!::AdjustTokenPrivileges(hToken, FALSE, &priv, cbPrevPriv, pPrevPriv, &cbPrevPriv))
-        {
-            LPVOID pv = MemReAlloc(pPrevPriv, cbPrevPriv, TRUE);
-            RmExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for previous privileges.");
-            pPrevPriv = static_cast<TOKEN_PRIVILEGES*>(pv);
-
-            if (!::AdjustTokenPrivileges(hToken, FALSE, &priv, cbPrevPriv, pPrevPriv, &cbPrevPriv))
+            cbPrevPriv = sizeof(TOKEN_PRIVILEGES);
+            pPrevPriv = static_cast<TOKEN_PRIVILEGES*>(MemAlloc(cbPrevPriv, TRUE));
+            if (pPrevPriv)
             {
-                RmExitWithLastError(hr, "Failed to get debug privilege LUID.");
+                fAdjustedPrivileges = ::AdjustTokenPrivileges(hToken, FALSE, &priv, cbPrevPriv, pPrevPriv, &cbPrevPriv);
+                er = ::GetLastError(); // AdjustTokenPrivileges may succeed but still return ERROR_NOT_ALL_ASSIGNED.
+
+                if (!fAdjustedPrivileges && ERROR_INSUFFICIENT_BUFFER == er)
+                {
+                    LPVOID pv = MemReAlloc(pPrevPriv, cbPrevPriv, TRUE);
+                    pPrevPriv = static_cast<TOKEN_PRIVILEGES*>(pv);
+
+                    if (pPrevPriv)
+                    {
+                        fAdjustedPrivileges = ::AdjustTokenPrivileges(hToken, FALSE, &priv, cbPrevPriv, pPrevPriv, &cbPrevPriv);
+                        er = ::GetLastError(); // AdjustTokenPrivileges may succeed but still return ERROR_NOT_ALL_ASSIGNED.
+                    }
+                }
+
+                // We actually only adjusted privileges if the privilege was assigned AND *succeeded*.
+                if (ERROR_SUCCESS != er)
+                {
+                    fAdjustedPrivileges = FALSE;
+                }
             }
         }
-
-        fAdjustedPrivileges = TRUE;
     }
 
     hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
