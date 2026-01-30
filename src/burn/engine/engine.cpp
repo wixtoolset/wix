@@ -379,7 +379,8 @@ static HRESULT InitializeEngineState(
     BurnPipeConnectionInitialize(&pEngineState->embeddedConnection);
 
     // Retain whether bundle was initially run elevated.
-    ProcElevated(::GetCurrentProcess(), &pEngineState->internalCommand.fInitiallyElevated);
+    hr = ProcIsHighIntegrity(::GetCurrentProcess(), &pEngineState->internalCommand.fInitiallyElevated);
+    ExitOnFailure(hr, "Failed to determine if process is running elevated.");
 
     // Parse command line.
     hr = CoreParseCommandLine(&pEngineState->internalCommand, &pEngineState->command, &pEngineState->companionConnection, &pEngineState->embeddedConnection, &hSectionFile, &hSourceEngineFile);
