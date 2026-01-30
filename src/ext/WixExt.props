@@ -6,7 +6,7 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <NoWarn>NU5100</NoWarn>
-    <WixExtensionPackageFolder>wixext6</WixExtensionPackageFolder>
+    <WixExtensionPackageFolder>wixext7</WixExtensionPackageFolder>
     <PackageTags>$(PackageTags) wixext CustomActions</PackageTags>
     <IsWixExtension>true</IsWixExtension>
   </PropertyGroup>

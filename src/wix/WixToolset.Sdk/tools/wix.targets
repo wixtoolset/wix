@@ -697,7 +697,10 @@
       <_WixBuildCabinetCachePath Condition=" '$(CabinetCachePath)'!='' ">$([MSBuild]::NormalizeDirectory($(CabinetCachePath), %(CultureGroup.OutputFolder)))</_WixBuildCabinetCachePath>
     </PropertyGroup>
 
-    <Warning Text="@(UnsupportedWixExtension->'%(Identity)') does not have support for WiX Toolset v$(WixToolsetVersion)."
+    <Warning
+        Text="The WiX Extension '%(UnsupportedWixExtension.Identity)' does not support WiX Toolset v$(WixToolsetVersion). Check the Version of the PackageReference for '%(UnsupportedWixExtension.Identity)' in your project and ensure it supports WiX v$(WixToolsetVersion)."
+        Code="WIX1031"
+        File="$(MSBuildProjectFile)"
         Condition=" '@(UnsupportedWixExtension)' != '' "/>
 
     <WixBuild
