@@ -76,6 +76,26 @@ namespace WixToolset.BaseBuildTasks
         }
 
         /// <summary>
+        /// Append a switch to the command-line for each value in a split text.
+        /// </summary>
+        /// <param name="switchName">Switch to append.</param>
+        /// <param name="values">Text to split and append.</param>
+        /// <param name="split">Character to use to split the string</param>
+        public void AppendTextAsArray(string switchName, string values, char splitter = ';')
+        {
+            if (!String.IsNullOrEmpty(values))
+            {
+                foreach (string value in values.Split([ splitter ], StringSplitOptions.RemoveEmptyEntries))
+                {
+                    if (!String.IsNullOrWhiteSpace(value))
+                    {
+                        this.AppendSwitchIfNotNull(switchName, value.Trim());
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Append arbitrary text to the command-line if specified.
         /// </summary>
         /// <param name="textToAppend">Text to append.</param>

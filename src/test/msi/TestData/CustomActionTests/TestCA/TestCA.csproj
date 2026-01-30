@@ -3,6 +3,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
+
+    <!-- Add some random EULA Ids for testing purposes. -->
+    <AcceptEula>foo;wix7;bar</AcceptEula>
   </PropertyGroup>
 
   <ItemGroup>

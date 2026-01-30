@@ -5,6 +5,8 @@
 
   <Import Project="$(CustomBeforeWixCATargets)" Condition=" '$(CustomBeforeWixCATargets)' != '' and Exists('$(CustomBeforeWixCATargets)')" />
 
+  <Import Project="CheckLicenseAcceptance.targets" />
+
   <PropertyGroup>
     <WixCATargetsImported>true</WixCATargetsImported>
 

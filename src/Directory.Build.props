@@ -41,6 +41,7 @@
 
     <PackageEulaSource>$(RootFolder)OSMFEULA.txt</PackageEulaSource>
     <PackageLicenseFile>OSMFEULA.txt</PackageLicenseFile>
+    <PackageLicenseAcceptanceTargets>$(MSBuildThisFileDirectory)internal\targets\CheckLicenseAcceptance.targets</PackageLicenseAcceptanceTargets>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
     <Product Condition=" '$(WixOfficialBuild)'!='true' ">WiX Dev Build</Product>

@@ -45,7 +45,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendFileNameIfNotNull(this.BundleFile);
             commandLineBuilder.AppendSwitchIfNotNull("-engine ", this.OutputFile);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
-            commandLineBuilder.AppendSwitchIfNotNull("-acceptEula ", this.AcceptEula);
+            commandLineBuilder.AppendTextAsArray("-acceptEula ", this.AcceptEula);
 
             base.BuildCommandLine(commandLineBuilder);
         }

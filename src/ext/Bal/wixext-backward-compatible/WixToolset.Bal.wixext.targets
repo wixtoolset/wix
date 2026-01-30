@@ -8,4 +8,6 @@
     <UnsupportedWixExtension Include="WixToolset.BootstrapperApplications.wixext"
       Condition=" !Exists('$(MSBuildThisFileDirectory)..\$(WixToolsetExtensionPackageFolder)\WixToolset.BootstrapperApplications.wixext.dll') " />
   </ItemGroup>
+
+  <Import Project="CheckLicenseAcceptance.targets" />
 </Project>
