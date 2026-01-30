@@ -13,6 +13,7 @@
 #include <strutil.h>
 #include <fileutil.h>
 #include <pathutil.h>
+#include <polcutil.h>
 #include <logutil.h>
 
 #include "engine.h"
