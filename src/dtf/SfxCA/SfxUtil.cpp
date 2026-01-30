@@ -163,24 +163,70 @@ static HRESULT CreateGuid(
         return hr;
 }
 
-static HRESULT ProcessElevated()
+static HRESULT LogLastError(__in MSIHANDLE hSession, __in_z const wchar_t* wzMessage)
 {
-        HRESULT hr = S_OK;
-        HANDLE hToken = NULL;
-        TOKEN_ELEVATION tokenElevated = {};
-        DWORD cbToken = 0;
+    HRESULT hr = HRESULT_FROM_WIN32(::GetLastError());
 
-        if (::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &hToken) &&
-            ::GetTokenInformation(hToken, TokenElevation, &tokenElevated, sizeof(TOKEN_ELEVATION), &cbToken))
-        {
-                hr = (0 != tokenElevated.TokenIsElevated) ? S_OK : S_FALSE;
-        }
-        else
-        {
-                hr = HRESULT_FROM_WIN32(::GetLastError());
-        }
+    Log(hSession, L"%ls. Error code 0x%08X", wzMessage, hr);
 
-        return hr;
+    return hr;
+}
+
+static HRESULT HighIntegrityProcess(__in MSIHANDLE hSession, __out BOOL* pfHighIntegrity)
+{
+    HRESULT hr = S_OK;
+    HANDLE hToken = NULL;
+    DWORD dwTokenLength = 0;
+    DWORD cbToken = 0;
+    PTOKEN_MANDATORY_LABEL pTokenMandatoryLabel = NULL;
+    DWORD rid = 0;
+
+    *pfHighIntegrity = FALSE;
+
+    if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY, &hToken))
+    {
+        hr = LogLastError(hSession, L"Failed to open process token");
+        goto LExit;
+    }
+
+    if (!::GetTokenInformation(hToken, TokenIntegrityLevel, NULL, 0, &dwTokenLength))
+    {
+        DWORD er = ::GetLastError();
+        if (er != ERROR_INSUFFICIENT_BUFFER)
+        {
+            hr = LogLastError(hSession, L"Failed to get token integrity information length");
+            goto LExit;
+        }
+    }
+
+    pTokenMandatoryLabel = reinterpret_cast<PTOKEN_MANDATORY_LABEL>(::HeapAlloc(::GetProcessHeap(), HEAP_ZERO_MEMORY, dwTokenLength));
+    if (!pTokenMandatoryLabel)
+    {
+        hr = LogLastError(hSession, L"Failed to allocate memory for token integrity information");
+        goto LExit;
+    }
+
+    if (!::GetTokenInformation(hToken, TokenIntegrityLevel, pTokenMandatoryLabel, dwTokenLength, &cbToken))
+    {
+        hr = LogLastError(hSession, L"Failed to get token integrity information");
+        goto LExit;
+    }
+
+    rid = *::GetSidSubAuthority(pTokenMandatoryLabel->Label.Sid, *::GetSidSubAuthorityCount(pTokenMandatoryLabel->Label.Sid) - 1);
+    *pfHighIntegrity = (SECURITY_MANDATORY_HIGH_RID <= rid);
+
+LExit:
+    if (pTokenMandatoryLabel)
+    {
+        ::HeapFree(::GetProcessHeap(), 0, pTokenMandatoryLabel);
+    }
+
+    if (hToken)
+    {
+        ::CloseHandle(hToken);
+    }
+
+    return hr;
 }
 
 /// <summary>
@@ -203,6 +249,7 @@ bool ExtractToTempDirectory(__in MSIHANDLE hSession, __in HMODULE hModule,
         HRESULT hr = S_OK;
         wchar_t szModule[MAX_PATH] = {};
         wchar_t szGuid[GUID_STRING_LENGTH] = {};
+        BOOL fHighIntegrity = FALSE;
 
         DWORD cchCopied = ::GetModuleFileName(hModule, szModule, MAX_PATH - 1);
         if (cchCopied == 0 || cchCopied == MAX_PATH - 1)
@@ -224,9 +271,15 @@ bool ExtractToTempDirectory(__in MSIHANDLE hSession, __in HMODULE hModule,
                 goto LExit;
         }
 
-        // Unelevated we use the user's temp directory.
-        hr = ProcessElevated();
-        if (S_FALSE == hr)
+        // Non-high-integrity we use the user's temp directory.
+        hr = HighIntegrityProcess(hSession, &fHighIntegrity);
+        if (FAILED(hr))
+        {
+                Log(hSession, L"Failed to determine if process is high integrity. Assuming high integrity. Error code 0x%x", hr);
+                fHighIntegrity = TRUE;
+        }
+
+        if (!fHighIntegrity)
         {
                 // Temp path is documented to be returned with a trailing backslash.
                 cchCopied = ::GetTempPath(cchTempDirBuf, szTempDir);
@@ -242,7 +295,7 @@ bool ExtractToTempDirectory(__in MSIHANDLE hSession, __in HMODULE hModule,
                         goto LExit;
                 }
         }
-        else // elevated or we couldn't check (in the latter case, assume we're elevated since it's safer to use)
+        else // high integrity or we couldn't check (in the latter case, assume high integrity since it's safer to use because if we're not elevated we'll fail safely).
         {
                 // Windows directory will not contain a trailing backslash, so we add it next.
                 cchCopied = ::GetWindowsDirectoryW(szTempDir, cchTempDirBuf);
@@ -261,7 +314,7 @@ bool ExtractToTempDirectory(__in MSIHANDLE hSession, __in HMODULE hModule,
                 hr = ::StringCchCat(szTempDir, cchTempDirBuf, L"\\Installer\\");
                 if (FAILED(hr))
                 {
-                        Log(hSession, L"Failed append 'Installer' to Windows directory. Error code 0x%x", hr);
+                        Log(hSession, L"Failed to append 'Installer' to Windows directory '%ls'. Error code 0x%x", szTempDir, hr);
                         goto LExit;
                 }
         }
@@ -269,14 +322,14 @@ bool ExtractToTempDirectory(__in MSIHANDLE hSession, __in HMODULE hModule,
         hr = ::StringCchCat(szTempDir, cchTempDirBuf, szGuid);
         if (FAILED(hr))
         {
-                Log(hSession, L"Failed append GUID to temp path. Error code 0x%x", hr);
+                Log(hSession, L"Failed append GUID to temp path '%ls'. Error code 0x%x", szTempDir, hr);
                 goto LExit;
         }
 
         if (!::CreateDirectory(szTempDir, NULL))
         {
                 hr = HRESULT_FROM_WIN32(::GetLastError());
-                Log(hSession, L"Failed to create temp directory. Error code 0x%x", hr);
+                Log(hSession, L"Failed to create temp directory '%ls'. Error code 0x%x", szTempDir, hr);
                 goto LExit;
         }
 
