@@ -17,7 +17,7 @@ namespace WixToolset.Core.ExtensibilityServices
     internal class ExtensionManager : IExtensionManager
     {
         // This value needs to stay in sync with the Property in "wix.props" with the same name.
-        private const string WixToolsetExtensionPackageFolder = "wixext6";
+        private const string WixToolsetExtensionPackageFolder = "wixext7";
 
         private const string UserWixFolderName = ".wix";
         private const string MachineWixFolderName = "WixToolset";
