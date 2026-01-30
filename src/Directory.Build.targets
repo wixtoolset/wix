@@ -48,7 +48,7 @@
       <NuspecProperties>$(NuspecProperties);Copyright=$(Copyright);Description=$(Description);Title=$(Title)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);RepositoryType=$(RepositoryType);RepositoryCommit=$(RepositoryCommit);RepositoryUrl=$(RepositoryUrl)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);PackageTags=$(PackageTags)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);ProjectUrl=$(ProjectUrl);ProjectFolder=$(MSBuildProjectDirectory);RootFolder=$(RootFolder);EulaTxt=$(PackageEulaSource);IconPng=$(PackageIconSource)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);ProjectUrl=$(ProjectUrl);ProjectFolder=$(MSBuildProjectDirectory);RootFolder=$(RootFolder);EulaTxt=$(PackageEulaSource);IconPng=$(PackageIconSource);LicenseAcceptanceTargets=$(PackageLicenseAcceptanceTargets)</NuspecProperties>
     </PropertyGroup>
   </Target>
 

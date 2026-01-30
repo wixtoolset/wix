@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<Project>
+
+  <Target
+    Name="CheckWix7LicenseAcceptance"
+    BeforeTargets="CoreCompile">
+
+    <ItemGroup>
+      <_AcceptEula Include="$(AcceptEula)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <_Wix7EulaFile>$(USERPROFILE)\.wix\wix7-osmf-eula.txt</_Wix7EulaFile>
+    </PropertyGroup>
+
+    <FindInList List="@(_AcceptEula)" ItemSpecToFind="wix7">
+      <Output TaskParameter="ItemFound" ItemName="_Wix7LicenseAccepted" />
+    </FindInList>
+
+    <Error
+      Text="You must accept the Open Source Maintenance Fee (OSMF) EULA to use WiX Toolset v7. For instructions, see https://wixtoolset.org/osmf/"
+      Code="WIX7015"
+      File="$(MSBuildProjectFile)"
+      HelpLink="https://wixtoolset.org/osmf"
+      Condition=" '@(_Wix7LicenseAccepted)' == '' and !Exists('$(_Wix7EulaFile)')" />
+  </Target>
+
+</Project>

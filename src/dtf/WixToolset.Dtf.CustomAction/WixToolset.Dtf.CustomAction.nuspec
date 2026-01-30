@@ -24,6 +24,7 @@
     <file src="$iconPng$" />
     <file src="$projectFolder$\README.md" />
     <file src="$projectFolder$\$id$.targets" target="build" />
+    <file src="$licenseAcceptanceTargets$" target="build" />
     <file src="net472\WixToolset.Dtf.MakeSfxCA.exe" target="tools" />
     <file src="net472\WixToolset.Dtf.MakeSfxCA.exe.config" target="tools" />
     <file src="net472\WixToolset.Dtf.Compression.dll" target="tools" />

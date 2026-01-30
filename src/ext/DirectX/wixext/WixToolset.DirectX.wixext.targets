@@ -8,4 +8,6 @@
     <UnsupportedWixExtension Include="$(MSBuildThisFileName)"
       Condition=" !Exists('$(MSBuildThisFileDirectory)..\$(WixToolsetExtensionPackageFolder)\$(MSBuildThisFileName).dll') " />
   </ItemGroup>
+
+  <Import Project="CheckLicenseAcceptance.targets" />
 </Project>

@@ -11,8 +11,7 @@
     <DebugType Condition=" '$(DebugType)'=='' ">embedded</DebugType>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(IsWixTestProject)'!='true' ">
-    <Content Include="$(PackageEulaSource)" Pack="true" PackagePath="/" />
-    <Content Include="$(PackageIconSource)" Pack="true" PackagePath="/" />
-  </ItemGroup>
+  <PropertyGroup>
+    <AcceptEula>abc;wix7;xyz;123</AcceptEula>
+  </PropertyGroup>
 </Project>

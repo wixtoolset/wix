@@ -56,7 +56,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendArrayIfNotNull("-cub ", this.CubeFiles);
             commandLineBuilder.AppendArrayIfNotNull("-ice ", this.Ices);
             commandLineBuilder.AppendArrayIfNotNull("-sice ", this.SuppressIces);
-            commandLineBuilder.AppendSwitchIfNotNull("-acceptEula ", this.AcceptEula);
+            commandLineBuilder.AppendTextAsArray("-acceptEula ", this.AcceptEula);
 
             base.BuildCommandLine(commandLineBuilder);
         }

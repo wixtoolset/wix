@@ -4,6 +4,9 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <SignOutput>true</SignOutput>
+
+    <!-- Add some random EULA Ids for testing purposes. -->
+    <AcceptEula>abc;xyz;123;wix7</AcceptEula>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,6 +15,7 @@
     <ProjectReference Include="..\WixprojModuleCsprojWinFormsNetFx\WixprojModuleCsprojWinFormsNetFx.wixproj" />
 
     <PackageReference Include="Wixtoolset.UI.wixext" />
+    <PackageReference Include="Wixtoolset.Util.wixext" />
   </ItemGroup>
 
   <Target Name="SignMsi">

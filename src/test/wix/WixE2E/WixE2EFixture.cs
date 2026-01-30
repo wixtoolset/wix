@@ -71,7 +71,7 @@ namespace WixE2E
                                                 .ToArray();
             WixAssert.CompareLineByLine(new[]
             {
-                @"<projectFolder>\WixprojPackageVcxprojWindowsApp.wixproj(18,5): warning : SignMsi = obj\<configuration>\en-US\WixprojPackageVcxprojWindowsApp.msi;obj\<configuration>\ja-JP\WixprojPackageVcxprojWindowsApp.msi"
+                @"<projectFolder>\WixprojPackageVcxprojWindowsApp.wixproj(22,5): warning : SignMsi = obj\<configuration>\en-US\WixprojPackageVcxprojWindowsApp.msi;obj\<configuration>\ja-JP\WixprojPackageVcxprojWindowsApp.msi"
             }, signingStatement);
         }
 

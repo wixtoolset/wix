@@ -30,7 +30,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendFileNameIfNotNull(this.DatabaseFile);
             commandLineBuilder.AppendSwitchIfNotNull("-out ", this.OutputFile);
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
-            commandLineBuilder.AppendSwitchIfNotNull("-acceptEula ", this.AcceptEula);
+            commandLineBuilder.AppendTextAsArray("-acceptEula ", this.AcceptEula);
 
             base.BuildCommandLine(commandLineBuilder);
         }

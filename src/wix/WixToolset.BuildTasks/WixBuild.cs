@@ -79,7 +79,7 @@ namespace WixToolset.BuildTasks
             commandLineBuilder.AppendSwitchIfNotNull("-intermediatefolder ", this.IntermediateDirectory);
             commandLineBuilder.AppendSwitchIfNotNull("-trackingfile ", this.BindTrackingFile);
             commandLineBuilder.AppendSwitchIfNotNull("-defaultcompressionlevel ", this.DefaultCompressionLevel);
-            commandLineBuilder.AppendSwitchIfNotNull("-acceptEula ", this.AcceptEula);
+            commandLineBuilder.AppendTextAsArray("-acceptEula ", this.AcceptEula);
 
             base.BuildCommandLine(commandLineBuilder);
 

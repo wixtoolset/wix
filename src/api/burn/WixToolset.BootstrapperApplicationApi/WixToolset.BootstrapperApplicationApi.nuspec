@@ -29,6 +29,7 @@
     <file src="$projectFolder$\README.md" />
 
     <file src="$projectFolder$\build\WixToolset.BootstrapperApplicationApi.props" target="build\" />
+    <file src="$licenseAcceptanceTargets$" target="build\$id$.targets" />
 
     <file src="$projectFolder$\build\_._" target="lib\native" />
     <file src="net462\$id$.dll" target="lib\net462" />

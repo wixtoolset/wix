@@ -8,10 +8,12 @@
     <NoWarn>NU5100</NoWarn>
     <WixExtensionPackageFolder>wixext6</WixExtensionPackageFolder>
     <PackageTags>$(PackageTags) wixext CustomActions</PackageTags>
+    <IsWixExtension>true</IsWixExtension>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="$(MSBuildProjectName).targets" PackagePath="build" />
+    <Content Include="$(PackageLicenseAcceptanceTargets)" Pack="true" PackagePath="build/CheckLicenseAcceptance.targets" />
     <Content Include="$(TargetPath)" PackagePath="$(WixExtensionPackageFolder)" />
 
     <PackageReference Include="WixToolset.Extensibility" PrivateAssets="all" />
