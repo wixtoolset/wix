@@ -127,8 +127,8 @@ extern "C" HRESULT PseudoBundleInitializePassthrough(
     ExitOnFailure(hr, "Failed to copy cache id for passthrough pseudo bundle.");
 
     // Log variables - best effort
-    StrAllocFormatted(&pPackage->sczLogPathVariable, L"WixBundleLog_%ls", pPackage->sczId);
-    StrAllocFormatted(&pPackage->sczRollbackLogPathVariable, L"WixBundleRollbackLog_%ls", pPackage->sczId);
+    StrAllocFormatted(&pPassthroughPackage->sczLogPathVariable, L"WixBundleLog_%ls", pPackage->sczId);
+    StrAllocFormatted(&pPassthroughPackage->sczRollbackLogPathVariable, L"WixBundleRollbackLog_%ls", pPackage->sczId);
 
     hr = CoreCreatePassthroughBundleCommandLine(&sczArguments, pInternalCommand, pCommand);
     ExitOnFailure(hr, "Failed to create command-line arguments.");
@@ -155,6 +155,8 @@ extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
 {
     HRESULT hr = S_OK;
     BURN_PAYLOAD* pPayload = NULL;
+    BYTE* rgbHash = NULL;
+    DWORD cbHash = 0;
 
     // Initialize the single payload, and fill out all the necessary fields
     pPackage->payloads.rgItems = (BURN_PAYLOAD_GROUP_ITEM*)MemAlloc(sizeof(BURN_PAYLOAD_GROUP_ITEM), TRUE);
@@ -185,9 +187,6 @@ extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
 
     if (wzHash && *wzHash)
     {
-        BYTE* rgbHash = NULL;
-        DWORD cbHash = 0;
-
         hr = StrAllocHexDecode(wzHash, &rgbHash, &cbHash);
         ExitOnFailure(hr, "Failed to decode hash string: %ls.", wzHash);
 
@@ -223,5 +222,7 @@ extern "C" HRESULT PseudoBundleInitializeUpdateBundle(
     ExitOnFailure(hr, "Failed to copy install arguments for update bundle package");
 
 LExit:
+    ReleaseStr(rgbHash);
+
     return hr;
 }

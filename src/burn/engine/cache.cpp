@@ -363,6 +363,8 @@ extern "C" HRESULT CacheEnsureBaseWorkingFolder(
             }
 
             pWorkingFolderAcl = reinterpret_cast<LPSECURITY_ATTRIBUTES>(MemAlloc(sizeof(SECURITY_ATTRIBUTES), TRUE));
+            ExitOnNull(pWorkingFolderAcl, hr, E_OUTOFMEMORY, "Failed to allocate security attributes.");
+
             pWorkingFolderAcl->nLength = sizeof(SECURITY_ATTRIBUTES);
             pWorkingFolderAcl->lpSecurityDescriptor = psd;
             pWorkingFolderAcl->bInheritHandle = FALSE;
@@ -857,6 +859,7 @@ extern "C" HRESULT CacheSendProgressCallback(
         case PROGRESS_STOP:
             hr = HRESULT_FROM_WIN32(ERROR_INSTALL_USEREXIT);
             ExitOnRootFailure(hr, "UX aborted on download progress.");
+            break;
 
         case PROGRESS_QUIET: // Not actually an error, just an indication to the caller to stop requesting progress.
             pCallback->pfnProgress = NULL;
@@ -866,6 +869,7 @@ extern "C" HRESULT CacheSendProgressCallback(
         default:
             hr = E_UNEXPECTED;
             ExitOnRootFailure(hr, "Invalid return code from progress routine.");
+            break;
         }
     }
 
@@ -1435,8 +1439,8 @@ extern "C" void CacheUninitialize(
     ReleaseStr(pCache->sczBaseWorkingFolder);
     ReleaseStr(pCache->sczAcquisitionFolder);
     ReleaseStr(pCache->sczSourceProcessFolder);
-    ReleaseStr(pCache->sczBundleEngineWorkingPath)
-    ReleaseFileHandle(pCache->hBundleEngineWorkingFile)
+    ReleaseStr(pCache->sczBundleEngineWorkingPath);
+    ReleaseFileHandle(pCache->hBundleEngineWorkingFile);
 
     memset(pCache, 0, sizeof(BURN_CACHE));
 }
