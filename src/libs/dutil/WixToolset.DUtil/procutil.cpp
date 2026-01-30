@@ -34,7 +34,6 @@ static BOOL CALLBACK CloseWindowEnumCallback(
     __in LPARAM lParam
     );
 
-
 extern "C" HRESULT DAPI ProcElevated(
     __in HANDLE hProcess,
     __out BOOL* pfElevated
@@ -137,6 +136,30 @@ extern "C" HRESULT DAPI ProcGetTokenInformation(
 LExit:
     ReleaseMem(pvTokenInformation);
     ReleaseHandle(hToken);
+
+    return hr;
+}
+
+extern "C" HRESULT DAPI ProcIsHighIntegrity(
+    __in HANDLE hProcess,
+    __out BOOL* pfHighIntegrity
+    )
+{
+    HRESULT hr = S_OK;
+    TOKEN_MANDATORY_LABEL* pTokenMandatoryLabel = NULL;
+    DWORD integrityRid = 0;
+
+    *pfHighIntegrity = FALSE;
+
+    hr = ProcGetTokenInformation(hProcess, TokenIntegrityLevel, reinterpret_cast<LPVOID*>(&pTokenMandatoryLabel));
+    ProcExitOnFailure(hr, "Failed to get token mandatory label.");
+
+    integrityRid = *::GetSidSubAuthority(pTokenMandatoryLabel->Label.Sid, *::GetSidSubAuthorityCount(pTokenMandatoryLabel->Label.Sid) - 1);
+
+    *pfHighIntegrity = (SECURITY_MANDATORY_HIGH_RID <= integrityRid);
+
+LExit:
+    ReleaseMem(pTokenMandatoryLabel);
 
     return hr;
 }

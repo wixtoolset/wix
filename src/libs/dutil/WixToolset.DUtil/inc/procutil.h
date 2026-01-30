@@ -28,7 +28,10 @@ HRESULT DAPI ProcGetTokenInformation(
     __in TOKEN_INFORMATION_CLASS tokenInformationClass,
     __out LPVOID* ppvTokenInformation
     );
-
+HRESULT DAPI ProcIsHighIntegrity(
+    __in HANDLE hProcess,
+    __out BOOL* pfHighIntegrity
+    );
 HRESULT DAPI ProcHasPrivilege(
     __in HANDLE hProcess,
     __in LPCWSTR wzPrivilegeName,
