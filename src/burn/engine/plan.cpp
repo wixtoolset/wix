@@ -1542,7 +1542,7 @@ extern "C" HRESULT PlanRelatedBundlesComplete(
 
         if (fBundle && BOOTSTRAPPER_ACTION_STATE_NONE != packageAction)
         {
-            if (pPackage->cDependencyProviders)
+            if (pPackage && pPackage->cDependencyProviders)
             {
                 // Bundles only support a single provider key.
                 const BURN_DEPENDENCY_PROVIDER* pProvider = pPackage->rgDependencyProviders;
@@ -2015,6 +2015,7 @@ extern "C" HRESULT PlanRollbackBoundaryComplete(
 
     // Add checkpoints.
     hr = PlanExecuteCheckpoint(pPlan);
+    ExitOnFailure(hr, "Failed to append execute checkpoint for rollback boundary complete.");
 
     // Add complete rollback boundary to execute plan.
     hr = PlanAppendExecuteAction(pPlan, &pExecuteAction);

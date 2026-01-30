@@ -2824,7 +2824,7 @@ LExit:
     // TODO: do the right thing here.
     //DependencyUninitializeRegistrationAction(&action);
     ReleaseStr(action.sczDependentProviderKey);
-    ReleaseStr(action.sczBundleCode)
+    ReleaseStr(action.sczBundleCode);
 
     return hr;
 }

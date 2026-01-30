@@ -322,15 +322,17 @@ extern "C" HRESULT LoggingSetPackageVariable(
         ExitFunction();
     }
 
-    // For burn packages we'll add logging even it it wasn't explictly specified
+    // For burn packages we'll add logging even it it wasn't explictly specified.
     if (BURN_PACKAGE_TYPE_BUNDLE == pPackage->type || (BURN_PACKAGE_TYPE_EXE == pPackage->type && BURN_EXE_PROTOCOL_TYPE_BURN == pPackage->Exe.protocol))
     {
         if (!fRollback && (!pPackage->sczLogPathVariable || !*pPackage->sczLogPathVariable))
         {
+            // Best effort, no need to fail if we can't set the logging path.
             StrAllocFormatted(&pPackage->sczLogPathVariable, L"WixBundleLog_%ls", pPackage->sczId);
         }
         else if (fRollback && (!pPackage->sczRollbackLogPathVariable || !*pPackage->sczRollbackLogPathVariable))
         {
+            // Best effort, no need to fail if we can't set the logging path.
             StrAllocFormatted(&pPackage->sczRollbackLogPathVariable, L"WixBundleRollbackLog_%ls", pPackage->sczId);
         }
     }
@@ -1052,7 +1054,8 @@ static HRESULT GetNonSessionSpecificTempFolder(
         hr = ::StringCchLengthW(sczSessionId, STRSAFE_MAX_CCH, reinterpret_cast<size_t*>(&cchSessionId));
         ExitOnFailure(hr, "Failed to get length of session id string.");
 
-        if (CSTR_EQUAL == ::CompareStringOrdinal(sczTempFolder + cchTempFolder - cchSessionId, static_cast<DWORD>(cchSessionId), sczSessionId, static_cast<DWORD>(cchSessionId), FALSE))
+        if (cchTempFolder >= cchSessionId &&
+            CSTR_EQUAL == ::CompareStringOrdinal(sczTempFolder + cchTempFolder - cchSessionId, static_cast<DWORD>(cchSessionId), sczSessionId, static_cast<DWORD>(cchSessionId), FALSE))
         {
             cchTempFolder -= cchSessionId;
         }

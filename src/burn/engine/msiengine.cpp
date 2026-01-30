@@ -2158,7 +2158,7 @@ static HRESULT ConcatFeatureActionProperties(
 
     if (sczAddLocal)
     {
-        hr = StrAllocFormatted(&scz, L" ADDLOCAL=\"%s\"", sczAddLocal, 0);
+        hr = StrAllocFormatted(&scz, L" ADDLOCAL=\"%s\"", sczAddLocal);
         ExitOnFailure(hr, "Failed to format ADDLOCAL string.");
 
         hr = StrAllocConcatSecure(psczArguments, scz, 0);
@@ -2167,7 +2167,7 @@ static HRESULT ConcatFeatureActionProperties(
 
     if (sczAddSource)
     {
-        hr = StrAllocFormatted(&scz, L" ADDSOURCE=\"%s\"", sczAddSource, 0);
+        hr = StrAllocFormatted(&scz, L" ADDSOURCE=\"%s\"", sczAddSource);
         ExitOnFailure(hr, "Failed to format ADDSOURCE string.");
 
         hr = StrAllocConcatSecure(psczArguments, scz, 0);
@@ -2176,7 +2176,7 @@ static HRESULT ConcatFeatureActionProperties(
 
     if (sczAddDefault)
     {
-        hr = StrAllocFormatted(&scz, L" ADDDEFAULT=\"%s\"", sczAddDefault, 0);
+        hr = StrAllocFormatted(&scz, L" ADDDEFAULT=\"%s\"", sczAddDefault);
         ExitOnFailure(hr, "Failed to format ADDDEFAULT string.");
 
         hr = StrAllocConcatSecure(psczArguments, scz, 0);
@@ -2185,7 +2185,7 @@ static HRESULT ConcatFeatureActionProperties(
 
     if (sczReinstall)
     {
-        hr = StrAllocFormatted(&scz, L" REINSTALL=\"%s\"", sczReinstall, 0);
+        hr = StrAllocFormatted(&scz, L" REINSTALL=\"%s\"", sczReinstall);
         ExitOnFailure(hr, "Failed to format REINSTALL string.");
 
         hr = StrAllocConcatSecure(psczArguments, scz, 0);
@@ -2194,7 +2194,7 @@ static HRESULT ConcatFeatureActionProperties(
 
     if (sczAdvertise)
     {
-        hr = StrAllocFormatted(&scz, L" ADVERTISE=\"%s\"", sczAdvertise, 0);
+        hr = StrAllocFormatted(&scz, L" ADVERTISE=\"%s\"", sczAdvertise);
         ExitOnFailure(hr, "Failed to format ADVERTISE string.");
 
         hr = StrAllocConcatSecure(psczArguments, scz, 0);
@@ -2203,7 +2203,7 @@ static HRESULT ConcatFeatureActionProperties(
 
     if (sczRemove)
     {
-        hr = StrAllocFormatted(&scz, L" REMOVE=\"%s\"", sczRemove, 0);
+        hr = StrAllocFormatted(&scz, L" REMOVE=\"%s\"", sczRemove);
         ExitOnFailure(hr, "Failed to format REMOVE string.");
 
         hr = StrAllocConcatSecure(psczArguments, scz, 0);
