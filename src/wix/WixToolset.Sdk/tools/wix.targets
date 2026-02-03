@@ -192,14 +192,14 @@
   <Target
     Name="AcceptEula">
 
-    <PropertyGroup>
-      <_AcceptEulaVersion Condition="'$(AcceptEulaVersion)' != ''">$(AcceptEulaVersion)</_AcceptEulaVersion>
-      <_AcceptEulaVersion Condition="'$(_AcceptEulaVersion)' == '' and '$(AcceptEula)' != ''">$(AcceptEula)</_AcceptEulaVersion>
-      <_AcceptEulaVersion Condition="'$(_AcceptEulaVersion)' == ''">$(WixEulaVersion)</_AcceptEulaVersion>
-    </PropertyGroup>
+    <Error
+      Text="The 'EulaId' property is required. Add '-p:EulaId={eulaId}' to your command-line. For instructions, see https://wixtoolset.org/osmf/"
+      File="$(MSBuildProjectFile)"
+      HelpLink="https://wixtoolset.org/osmf"
+      Condition=" '$(EulaId)' == '' " />
 
     <WixAcceptEula
-        EulaVersion="$(_AcceptEulaVersion)"
+        EulaId="$(EulaId)"
         NoLogo="true"
         ToolExe="$(WixToolExe)"
         ToolPath="$(WixToolDir)" />
