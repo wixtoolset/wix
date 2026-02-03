@@ -14,16 +14,16 @@ namespace WixToolset.BuildTasks
     public sealed class WixAcceptEula : WixExeBaseTask
     {
         [Required]
-        public string EulaVersion { get; set; }
+        public string EulaId { get; set; }
 
         protected override void BuildCommandLine(WixCommandLineBuilder commandLineBuilder)
         {
             commandLineBuilder.AppendTextUnquoted("eula");
-            commandLineBuilder.AppendTextUnquoted("accept");
+            commandLineBuilder.AppendTextUnquoted(" accept");
 
-            foreach (var version in SplitEulaVersions(this.EulaVersion))
+            foreach (var eulaId in SplitEulaVersions(this.EulaId))
             {
-                commandLineBuilder.AppendTextUnquoted(version);
+                commandLineBuilder.AppendTextQuotedIfNotWhitespace(eulaId);
             }
 
             base.BuildCommandLine(commandLineBuilder);

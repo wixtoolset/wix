@@ -120,5 +120,18 @@ namespace WixToolset.BaseBuildTasks
                 this.AppendTextUnquoted(textToAppend);
             }
         }
+
+        /// <summary>
+        /// Append arbitrary text to the command-line if specified quoted if needed.
+        /// </summary>
+        /// <param name="textToAppend">Text to append.</param>
+        public void AppendTextQuotedIfNotWhitespace(string textToAppend)
+        {
+            if (!String.IsNullOrWhiteSpace(textToAppend))
+            {
+                this.AppendSpaceIfNotEmpty();
+                this.AppendTextWithQuoting(textToAppend);
+            }
+        }
     }
 }
