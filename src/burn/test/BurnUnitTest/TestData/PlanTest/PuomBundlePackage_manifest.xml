@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BurnManifest EngineVersion="7.0.0.54" ProtocolVersion="1" Win64="no" xmlns="http://wixtoolset.org/schemas/v4/2008/Burn">
+  <Log PathVariable="WixBundleLog" Prefix="AllPuomBundle" Extension="log" />
+  <RelatedBundle Code="{689DDFCE-6492-596F-92DC-341CCDF59ABB}" Action="Upgrade" />
+  <UX PrimaryPayloadId="WixStandardBootstrapperApplication_X86">
+    <Payload Id="payberKyKpNVb0s10isnONgjD92jYc" FilePath="thm.xml" SourcePath="u0" />
+    <Payload Id="payXE.1bvyKgymWAWeJwB8BL4ifPGo" FilePath="thm.wxl" SourcePath="u1" />
+    <Payload Id="pay8cUoxSucOqsVErqhu1LEW8wSG1s" FilePath="logo.png" SourcePath="u2" />
+    <Payload Id="WixStandardBootstrapperApplication_X86" FilePath="wixstdba.exe" SourcePath="u3" />
+    <Payload Id="uxTxMXPVMXwQrPTMIGa5WGt93w0Ns" FilePath="BootstrapperApplicationData.xml" SourcePath="u4" />
+    <Payload Id="uxmKgAFS4cS31ZH_Myfqo5J4kHixQ" FilePath="BootstrapperExtensionData.xml" SourcePath="u5" />
+  </UX>
+  <Container Id="WixAttachedContainer" FileSize="6212364" Hash="62B3BCE91659C71B4382EBE5699FDB0D9A903D5293EB6EC9211D401590C72F9A0C755F28F88D0A70BB7716710457B5480A8EBC9FEC6E103A30F2A03A301AFD10" FilePath="PuomBundlePackage.exe" AttachedIndex="1" Attached="yes" Primary="yes" />
+  <Payload Id="AllPuomBundle.exe" FilePath="AllPuomBundle.exe" FileSize="6210781" Hash="99C28419B07FDFC7C89AAB483FE7B2BB35102556959E9F2169CAB8A25FCFF2583F7B1079A69CB902ACDD3EE390E890AC9C9D54A108D70BFBB4AF26EC61AB4929" Packaging="embedded" SourcePath="a0" Container="WixAttachedContainer" />
+  <RollbackBoundary Id="WixDefaultBoundary" Vital="yes" Transaction="no" />
+  <Registration BundleId="AllPuomBundle" Code="{AF0B0375-34C0-4BEF-9411-ACD15D2084CB}" ExecutableName="PuomBundlePackage.exe" Scope="perUserOrMachine" Tag="" Version="1.0.0.0" ProviderKey="{AF0B0375-34C0-4BEF-9411-ACD15D2084CB}">
+    <Arp DisplayName="AllPuomBundle" DisplayVersion="1.0.0.0" Publisher="Acme" />
+  </Registration>
+  <Chain>
+    <BundlePackage Id="AllPuomBundle.exe" Cache="keep" CacheId="{37A6F602-178E-4A32-B766-EDC2CB81274B}v1.0.0.0" InstallSize="558" Size="6210781" Scope="perUserOrMachine" Permanent="no" Vital="yes" RollbackBoundaryForward="WixDefaultBoundary" RollbackBoundaryBackward="WixDefaultBoundary" LogPathVariable="WixBundleLog_AllPuomBundle.exe" RollbackLogPathVariable="WixBundleRollbackLog_AllPuomBundle.exe" BundleCode="{37A6F602-178E-4A32-B766-EDC2CB81274B}" Version="1.0.0.0" InstallArguments="" UninstallArguments="" RepairArguments="" SupportsBurnProtocol="yes" Win64="no" HideARP="yes">
+      <Provides Key="{37A6F602-178E-4A32-B766-EDC2CB81274B}" Version="1.0.0.0" DisplayName="AllPuomBundle" Imported="yes" />
+      <RelatedBundle Code="{689DDFCE-6492-596F-92DC-341CCDF59ABB}" Action="Upgrade" />
+      <PayloadRef Id="AllPuomBundle.exe" />
+    </BundlePackage>
+  </Chain>
+</BurnManifest>

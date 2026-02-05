@@ -16,11 +16,6 @@ static HRESULT InitializeEngineState(
 static void UninitializeEngineState(
     __in BURN_ENGINE_STATE* pEngineState
     );
-#if 0
-static HRESULT RunUntrusted(
-    __in BURN_ENGINE_STATE* pEngineState
-    );
-#endif
 static HRESULT RunNormal(
     __in HINSTANCE hInstance,
     __in BURN_ENGINE_STATE* pEngineState
@@ -812,7 +807,7 @@ static HRESULT ProcessMessage(
         break;
 
     case WM_BURN_PLAN:
-        hr = CorePlan(pEngineState, pAction->plan.action);
+        hr = CorePlan(pEngineState, pAction->plan.action, pAction->plan.plannedScope);
         break;
 
     case WM_BURN_ELEVATE:

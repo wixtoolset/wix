@@ -438,7 +438,23 @@ namespace WixToolset.Core.Burn.CommandLine
 
                 bundleElement.Add(new XAttribute("InstallSize", command.HarvestedBundlePackage.InstallSize));
                 bundleElement.Add(new XAttribute("ManifestNamespace", command.HarvestedBundlePackage.ManifestNamespace));
-                bundleElement.Add(new XAttribute("PerMachine", command.HarvestedBundlePackage.PerMachine ? "yes" : "no"));
+
+                switch (command.HarvestedBundlePackage.Scope)
+                {
+                    case WixBundleScopeType.PerMachine:
+                        bundleElement.Add(new XAttribute("Scope", "perMachine"));
+                        break;
+                    case WixBundleScopeType.PerUser:
+                        bundleElement.Add(new XAttribute("Scope", "perUser"));
+                        break;
+                    case WixBundleScopeType.PerUserOrMachine:
+                        bundleElement.Add(new XAttribute("Scope", "perUserOrMachine"));
+                        break;
+                    case WixBundleScopeType.PerMachineOrUser:
+                        bundleElement.Add(new XAttribute("Scope", "perMachineOrUser"));
+                        break;
+                }
+
                 bundleElement.Add(new XAttribute("ProviderKey", command.HarvestedDependencyProvider.ProviderKey));
                 bundleElement.Add(new XAttribute("ProtocolVersion", command.HarvestedBundlePackage.ProtocolVersion));
 

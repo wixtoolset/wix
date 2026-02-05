@@ -33,11 +33,7 @@ using namespace System;
 using namespace Xunit;
 using namespace Microsoft::Win32;
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -592,8 +588,6 @@ namespace Bootstrapper
             }
         }
     };
-}
-}
 }
 }
 }

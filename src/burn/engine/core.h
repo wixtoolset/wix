@@ -45,7 +45,9 @@ const LPCWSTR BURN_BUNDLE_EXECUTE_PACKAGE_ACTION = L"WixBundleExecutePackageActi
 const LPCWSTR BURN_BUNDLE_FORCED_RESTART_PACKAGE = L"WixBundleForcedRestartPackage";
 const LPCWSTR BURN_BUNDLE_INSTALLED = L"WixBundleInstalled";
 const LPCWSTR BURN_BUNDLE_ELEVATED = L"WixBundleElevated";
+const LPCWSTR BURN_BUNDLE_PLANNED_SCOPE = L"WixBundlePlannedScope";
 const LPCWSTR BURN_BUNDLE_PROVIDER_KEY = L"WixBundleProviderKey";
+const LPCWSTR BURN_BUNDLE_SCOPE = L"WixBundleScope";
 const LPCWSTR BURN_BUNDLE_SOURCE_PROCESS_PATH = L"WixBundleSourceProcessPath";
 const LPCWSTR BURN_BUNDLE_SOURCE_PROCESS_FOLDER = L"WixBundleSourceProcessFolder";
 const LPCWSTR BURN_BUNDLE_TAG = L"WixBundleTag";
@@ -243,7 +245,8 @@ HRESULT CoreDetect(
     );
 HRESULT CorePlan(
     __in BURN_ENGINE_STATE* pEngineState,
-    __in BOOTSTRAPPER_ACTION action
+    __in BOOTSTRAPPER_ACTION action,
+    __in BOOTSTRAPPER_SCOPE scope
     );
 HRESULT CoreElevate(
     __in BURN_ENGINE_STATE* pEngineState,

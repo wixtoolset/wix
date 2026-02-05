@@ -309,10 +309,10 @@ HRESULT DAPI StrSplitAllocArray(
     );
 
 HRESULT DAPI StrSecureZeroString(
-    __in LPWSTR pwz
+    __in_z_opt LPWSTR pwz
     );
 HRESULT DAPI StrSecureZeroFreeString(
-    __in LPWSTR pwz
+    __in_z_opt LPWSTR pwz
     );
 
 #ifdef __cplusplus

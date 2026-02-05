@@ -3,11 +3,7 @@
 #include "precomp.h"
 
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -49,7 +45,7 @@ namespace Bootstrapper
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' />"
                     L"    </UX>"
                     L"    <RelatedBundle Code='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Action='Upgrade' />"
-                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='yes'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -63,7 +59,7 @@ namespace Bootstrapper
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
 
-                RelatedBundlesInitializeForScope(registration.fPerMachine, &registration, &relatedBundles);
+                RelatedBundlesInitializeForScope(/*registration.fPlannedPerMachineScope*/TRUE, &registration, &relatedBundles);
 
                 Assert::Equal(1lu, relatedBundles.cRelatedBundles);
 
@@ -101,7 +97,7 @@ namespace Bootstrapper
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' />"
                     L"    </UX>"
                     L"    <RelatedBundle Code='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Action='Upgrade' />"
-                    L"    <Registration Code='{3DB49D3D-1FB8-4147-A465-BBE8BFD0DAD0}' Tag='foo' ProviderKey='foo' Version='4.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{3DB49D3D-1FB8-4147-A465-BBE8BFD0DAD0}' Tag='foo' ProviderKey='foo' Version='4.0.0.0' ExecutableName='setup.exe'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='4.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -192,8 +188,6 @@ namespace Bootstrapper
             }
         }
     };
-}
-}
 }
 }
 }

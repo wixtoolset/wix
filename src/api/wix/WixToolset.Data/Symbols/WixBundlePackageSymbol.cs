@@ -17,7 +17,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.RepairCondition), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Cache), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.CacheId), IntermediateFieldType.String),
-                new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.PerMachine), IntermediateFieldType.Bool),
+                new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Scope), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.LogPathVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.RollbackLogPathVariable), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundlePackageSymbolFields.Size), IntermediateFieldType.LargeNumber),
@@ -46,7 +46,7 @@ namespace WixToolset.Data.Symbols
         RepairCondition,
         Cache,
         CacheId,
-        PerMachine,
+        Scope,
         LogPathVariable,
         RollbackLogPathVariable,
         Size,
@@ -144,10 +144,32 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundlePackageSymbolFields.CacheId, value);
         }
 
-        public bool? PerMachine
+        public WixBundleScopeType? Scope
         {
-            get => (bool?)this.Fields[(int)WixBundlePackageSymbolFields.PerMachine];
-            set => this.Set((int)WixBundlePackageSymbolFields.PerMachine, value);
+            get => (WixBundleScopeType?)this.Fields[(int)WixBundlePackageSymbolFields.Scope].AsNullableNumber();
+            set => this.Set((int)WixBundlePackageSymbolFields.Scope, (int)value);
+        }
+
+        public string ScopeAsString
+        {
+            get
+            {
+                var value = (WixBundleScopeType?)this.Fields[(int)WixBundlePackageSymbolFields.Scope].AsNullableNumber();
+
+                switch (value)
+                {
+                    case WixBundleScopeType.PerMachine:
+                        return "perMachine";
+                    case WixBundleScopeType.PerUser:
+                        return "perUser";
+                    case WixBundleScopeType.PerUserOrMachine:
+                        return "perUserOrMachine";
+                    case WixBundleScopeType.PerMachineOrUser:
+                        return "perMachineOrUser";
+                    default:
+                        return null;
+                }
+            }
         }
 
         public string LogPathVariable

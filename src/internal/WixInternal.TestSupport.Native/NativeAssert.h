@@ -43,6 +43,16 @@ namespace TestSupport {
             WixAssert::StringEqual(NativeAssert::LPWSTRToString(expected), NativeAssert::LPWSTRToString(actual), ignoreCase);
         }
 
+        static void StringEqual(LPCSTR expected, LPCSTR actual)
+        {
+            NativeAssert::StringEqual(expected, actual, FALSE);
+        }
+
+        static void StringEqual(LPCSTR expected, LPCSTR actual, BOOL ignoreCase)
+        {
+            WixAssert::StringEqual(NativeAssert::LPSTRToString(expected), NativeAssert::LPSTRToString(actual), ignoreCase);
+        }
+
         static void Succeeded(HRESULT hr, LPCSTR zFormat, LPCSTR zArg, ... array<LPCSTR>^ zArgs)
         {
             array<Object^>^ formatArgs = gcnew array<Object^, 1>(zArgs->Length + 1);
@@ -91,10 +101,11 @@ namespace TestSupport {
         }
 
     private:
-        static String^ LPSTRToString(LPCSTR z)
+        static String^ LPSTRToString(LPCSTR sz)
         {
-            return z ? gcnew String(z) : nullptr;
+            return sz ? gcnew String(sz) : nullptr;
         }
+
         static String^ LPWSTRToString(LPCWSTR wz)
         {
             return wz ? gcnew String(wz) : nullptr;

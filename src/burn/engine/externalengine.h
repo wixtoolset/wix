@@ -146,8 +146,9 @@ HRESULT ExternalEngineDetect(
 
 HRESULT ExternalEnginePlan(
     __in BAENGINE_CONTEXT* pEngineContext,
-    __in const BOOTSTRAPPER_ACTION action
-    );
+    __in const BOOTSTRAPPER_ACTION action,
+    __in const BOOTSTRAPPER_SCOPE plannedScope
+);
 
 HRESULT ExternalEngineElevate(
     __in BAENGINE_CONTEXT* pEngineContext,

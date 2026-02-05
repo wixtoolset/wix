@@ -47,7 +47,7 @@ namespace WixToolsetTest.CoreIntegration
                 var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage");
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964' InstallSize='463360' Size='463360' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='-repair' Repairable='yes' DetectionType='arp' ArpId='id' ArpDisplayVersion='1.0.0.0'>" +
+                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964' InstallSize='463360' Size='463360' Scope='perMachine' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='-repair' Repairable='yes' DetectionType='arp' ArpId='id' ArpDisplayVersion='1.0.0.0'>" +
                       "<PayloadRef Id='burn.exe' />" +
                     "</ExePackage>",
                 }, exePackages);
@@ -89,7 +89,7 @@ namespace WixToolsetTest.CoreIntegration
                 var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage");
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964' InstallSize='463360' Size='463360' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='-repair' Repairable='yes' DetectionType='condition' DetectCondition='detect' UninstallArguments='-uninstall' Uninstallable='yes'>" +
+                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='F6E722518AC3AB7E31C70099368D5770788C179AA23226110DCF07319B1E1964' InstallSize='463360' Size='463360' Scope='perMachine' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='-repair' Repairable='yes' DetectionType='condition' DetectCondition='detect' UninstallArguments='-uninstall' Uninstallable='yes'>" +
                       "<ExitCode Code='0' Type='2' />" +
                       "<ExitCode Code='3' Type='3' />" +
                       "<ExitCode Code='4' Type='4' />" +
@@ -159,7 +159,7 @@ namespace WixToolsetTest.CoreIntegration
                 var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributes);
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='' Repairable='no' DetectionType='arp' ArpId='id' ArpDisplayVersion='1.0.0.abc'>" +
+                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' Scope='perMachine' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='' Repairable='no' DetectionType='arp' ArpId='id' ArpDisplayVersion='1.0.0.abc'>" +
                       "<PayloadRef Id='burn.exe' />" +
                     "</ExePackage>",
                 }, exePackages);
@@ -209,7 +209,7 @@ namespace WixToolsetTest.CoreIntegration
                 var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributes);
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='' Repairable='no' DetectionType='none'>" +
+                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' Scope='perMachine' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='' Repairable='no' DetectionType='none'>" +
                       "<PayloadRef Id='burn.exe' />" +
                     "</ExePackage>",
                 }, exePackages);
@@ -255,7 +255,7 @@ namespace WixToolsetTest.CoreIntegration
                 var exePackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributes);
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='' Repairable='no' DetectionType='none'>" +
+                    "<ExePackage Id='burn.exe' Cache='keep' CacheId='*' InstallSize='463360' Size='*' Scope='perMachine' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_burn.exe' RollbackLogPathVariable='WixBundleRollbackLog_burn.exe' InstallArguments='-install' RepairArguments='' Repairable='no' DetectionType='none'>" +
                       "<PayloadRef Id='burn.exe' />" +
                     "</ExePackage>",
                 }, exePackages);

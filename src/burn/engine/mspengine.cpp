@@ -676,10 +676,10 @@ extern "C" HRESULT MspEngineExecutePackage(
     }
 
     // Always add Burn properties last.
-    hr = MsiEngineConcatBurnProperties(pExecuteAction->mspTarget.action, pExecuteAction->mspTarget.actionMsiProperty, pExecuteAction->mspTarget.fileVersioning, FALSE, FALSE, &sczProperties);
+    hr = MsiEngineConcatBurnProperties(pExecuteAction->mspTarget.action, pExecuteAction->mspTarget.actionMsiProperty, pExecuteAction->mspTarget.fileVersioning, FALSE, FALSE, pExecuteAction->mspTarget.pPackage->scope, pExecuteAction->mspTarget.pPackage->fPerMachine, &sczProperties);
     ExitOnFailure(hr, "Failed to add action property to argument string.");
 
-    hr = MsiEngineConcatBurnProperties(pExecuteAction->mspTarget.action, pExecuteAction->mspTarget.actionMsiProperty, pExecuteAction->mspTarget.fileVersioning, FALSE, FALSE, &sczObfuscatedProperties);
+    hr = MsiEngineConcatBurnProperties(pExecuteAction->mspTarget.action, pExecuteAction->mspTarget.actionMsiProperty, pExecuteAction->mspTarget.fileVersioning, FALSE, FALSE, pExecuteAction->mspTarget.pPackage->scope, pExecuteAction->mspTarget.pPackage->fPerMachine, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add action property to obfuscated argument string.");
 
     LogId(REPORT_STANDARD, MSG_APPLYING_PATCH_PACKAGE, pExecuteAction->mspTarget.pPackage->sczId, LoggingActionStateToString(pExecuteAction->mspTarget.action), sczPatches, sczObfuscatedProperties, pExecuteAction->mspTarget.sczTargetProductCode);

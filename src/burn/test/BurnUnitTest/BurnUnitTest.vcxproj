@@ -22,7 +22,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-
   <PropertyGroup Label="Globals">
     <ProjectTypes>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}</ProjectTypes>
     <ProjectGuid>{9D1F1BA3-9393-4833-87A3-D5F1FC08EF67}</ProjectGuid>
@@ -34,15 +33,12 @@
     <SignOutput>false</SignOutput>
     <IsWixTestProject>true</IsWixTestProject>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>$(ProjectAdditionalIncludeDirectories);$(BurnGeneratedHeaderDirectory);..\..\engine;..\..\..\api\burn\inc;..\..\..\libs\dutil\WixToolset.Dutil\inc</ProjectAdditionalIncludeDirectories>
     <ProjectAdditionalLinkLibraries>cabinet.lib;crypt32.lib;msi.lib;rpcrt4.lib;shlwapi.lib;userenv.lib;wininet.lib;wintrust.lib;$(RootBuildFolder)libs\$(Configuration)\$(WixNativeSdkLibraryToolset)\$(PlatformTarget)\dutil.lib;engine.res</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
-
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="ApprovedExeTest.cpp" />
@@ -76,11 +72,9 @@
     <ClInclude Include="TestRegistryFixture.h" />
     <ClInclude Include="VariableHelpers.h" />
   </ItemGroup>
-
   <ItemGroup>
     <ResourceCompile Include="BurnUnitTest.rc" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="TestData\CacheTest\CacheSignatureTest.File" CopyToOutputDirectory="PreserveNewest" />
     <None Include="TestData\PlanTest\BasicFunctionality_BundleA_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
@@ -91,14 +85,23 @@
     <None Include="TestData\PlanTest\MsuPackageFixture_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
     <None Include="TestData\PlanTest\Slipstream_BundleA_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
     <None Include="TestData\PlanTest\Slipstream_BundleA_modified_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\AllPmouBundle_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\AllPuomBundle_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\PerUserBundle_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\PerMachineBundle_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\PuPmouBundle_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\PuPuomBundle_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\PmPuomBundle_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\PmPmouBundle_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\PmPuPmouBundle_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\PmPuPuomBundle_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="TestData\PlanTest\PuomBundlePackage_manifest.xml" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\engine\engine.vcxproj">
       <Project>{8119537D-E1D9-6591-D51A-49770A2F9C37}</Project>
     </ProjectReference>
   </ItemGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="..\..\..\internal\WixInternal.TestSupport.Native\build\WixInternal.TestSupport.Native.targets" />
 </Project>

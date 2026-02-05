@@ -12,6 +12,7 @@ const LPCWSTR vcszIgnoreDependenciesDelim = L";";
 
 static HRESULT DetectPackageDependents(
     __in BURN_PACKAGE* pPackage,
+    __in BOOL fPackagePerMachine,
     __in const BURN_REGISTRATION* pRegistration
     );
 
@@ -249,7 +250,22 @@ extern "C" HRESULT DependencyDetectProviderKeyBundleCode(
 {
     HRESULT hr = S_OK;
 
-    hr = DepGetProviderInformation(pRegistration->hkRoot, pRegistration->sczProviderKey, &pRegistration->sczDetectedProviderKeyBundleCode, NULL, NULL);
+    // For configurable packages, check both scopes because until planning,
+    // we can't know their planned scope.
+    if (pRegistration->hkRoot)
+    {
+        hr = DepGetProviderInformation(pRegistration->hkRoot, pRegistration->sczProviderKey, &pRegistration->sczDetectedProviderKeyBundleCode, NULL, NULL);
+    }
+    else
+    {
+        hr = DepGetProviderInformation(HKEY_LOCAL_MACHINE, pRegistration->sczProviderKey, &pRegistration->sczDetectedProviderKeyBundleCode, NULL, NULL);
+
+        if (E_NOTFOUND == hr)
+        {
+            hr = DepGetProviderInformation(HKEY_CURRENT_USER, pRegistration->sczProviderKey, &pRegistration->sczDetectedProviderKeyBundleCode, NULL, NULL);
+        }
+    }
+
     if (E_NOTFOUND == hr)
     {
         ReleaseNullStr(pRegistration->sczDetectedProviderKeyBundleCode);
@@ -284,7 +300,21 @@ extern "C" HRESULT DependencyDetectBundle(
     hr = DependencyDetectProviderKeyBundleCode(pRegistration);
     ExitOnFailure(hr, "Failed to detect provider key bundle code.");
 
-    hr = DepCheckDependents(pRegistration->hkRoot, pRegistration->sczProviderKey, 0, NULL, &pRegistration->rgDependents, &pRegistration->cDependents);
+    // For configurable packages, check both scopes because until planning,
+    // we can't know their planned scope.
+    if (pRegistration->hkRoot)
+    {
+        hr = DepCheckDependents(pRegistration->hkRoot, pRegistration->sczProviderKey, 0, NULL, &pRegistration->rgDependents, &pRegistration->cDependents);
+    }
+    else
+    {
+        hr = DepCheckDependents(HKEY_LOCAL_MACHINE, pRegistration->sczProviderKey, 0, NULL, &pRegistration->rgDependents, &pRegistration->cDependents);
+
+        if (E_NOTFOUND == hr)
+        {
+            hr = DepCheckDependents(HKEY_CURRENT_USER, pRegistration->sczProviderKey, 0, NULL, &pRegistration->rgDependents, &pRegistration->cDependents);
+        }
+    }
     ExitOnPathFailure(hr, fExists, "Failed dependents check on bundle.");
 
     if (pDependencies->fSelfDependent || pDependencies->fActiveParent)
@@ -292,13 +322,13 @@ extern "C" HRESULT DependencyDetectBundle(
         for (DWORD i = 0; i < pRegistration->cDependents; ++i)
         {
             DEPENDENCY* pDependent = pRegistration->rgDependents + i;
-
-            if (pDependencies->fActiveParent && CSTR_EQUAL == ::CompareStringOrdinal(pDependencies->wzActiveParent, -1, pDependent->sczKey, -1, TRUE))
+            
+            if (pDependent && pDependencies->fActiveParent && CSTR_EQUAL == ::CompareStringOrdinal(pDependencies->wzActiveParent, -1, pDependent->sczKey, -1, TRUE))
             {
                 pRegistration->fParentRegisteredAsDependent = TRUE;
             }
 
-            if (pDependencies->fSelfDependent && CSTR_EQUAL == ::CompareStringOrdinal(pDependencies->wzSelfDependent, -1, pDependent->sczKey, -1, TRUE))
+            if (pDependent && pDependencies->fSelfDependent && CSTR_EQUAL == ::CompareStringOrdinal(pDependencies->wzSelfDependent, -1, pDependent->sczKey, -1, TRUE))
             {
                 pRegistration->fSelfRegisteredAsDependent = TRUE;
             }
@@ -316,11 +346,24 @@ extern "C" HRESULT DependencyDetectChainPackage(
 {
     HRESULT hr = S_OK;
 
-    hr = DetectPackageDependents(pPackage, pRegistration);
-    ExitOnFailure(hr, "Failed to detect dependents for package '%ls'", pPackage->sczId);
+    if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == pPackage->scope || BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == pPackage->scope)
+    {
+        // For configurable packages, check both scopes because until planning,
+        // we can't know their planned scope.
+        hr = DetectPackageDependents(pPackage, /*fPerMachine*/TRUE, pRegistration);
+        ExitOnFailure(hr, "Failed to detect per-machine dependents for configurable package '%ls'", pPackage->sczId);
+
+        hr = DetectPackageDependents(pPackage, /*fPerMachine*/FALSE, pRegistration);
+        ExitOnFailure(hr, "Failed to detect per-user dependents for configurable package '%ls'", pPackage->sczId);
+    }
+    else
+    {
+        hr = DetectPackageDependents(pPackage, pPackage->fPerMachine, pRegistration);
+        ExitOnFailure(hr, "Failed to detect dependents for %hs package '%ls'", LoggingInstallScopeToString(pPackage->fPerMachine), pPackage->sczId);
+    }
 
     hr = DependencyDetectCompatibleEntry(pPackage, pRegistration);
-    ExitOnFailure(hr, "Failed to detect compatible package for package '%ls'", pPackage->sczId);
+    ExitOnFailure(hr, "Failed to detect compatible package for %hs package '%ls'", LoggingInstallScopeToString(pPackage->fPerMachine), pPackage->sczId);
 
 LExit:
     return hr;
@@ -336,7 +379,7 @@ extern "C" HRESULT DependencyDetectRelatedBundle(
 
     if (pRelatedBundle->fPlannable)
     {
-        hr = DetectPackageDependents(pPackage, pRegistration);
+        hr = DetectPackageDependents(pPackage, pPackage->fPerMachine, pRegistration);
         ExitOnFailure(hr, "Failed to detect dependents for related bundle '%ls'", pPackage->sczId);
     }
 
@@ -626,7 +669,7 @@ LExit:
 }
 
 extern "C" HRESULT DependencyPlanPackage(
-    __in_opt DWORD *pdwInsertSequence,
+    __in_opt DWORD* pdwInsertSequence,
     __in const BURN_PACKAGE* pPackage,
     __in BURN_PLAN* pPlan
     )
@@ -946,18 +989,19 @@ LExit:
 
 static HRESULT DetectPackageDependents(
     __in BURN_PACKAGE* pPackage,
+    __in BOOL fPackagePerMachine,
     __in const BURN_REGISTRATION* pRegistration
     )
 {
     HRESULT hr = S_OK;
-    HKEY hkHive = pPackage->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+    HKEY hkHive = fPackagePerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
     BOOL fCanIgnorePresence = pPackage->fCanAffectRegistration && 0 < pPackage->cDependencyProviders &&
                               (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->cacheRegistrationState || BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->installRegistrationState);
     BOOL fBundleRegisteredAsDependent = FALSE;
 
     // There's currently no point in getting the dependents if the scope doesn't match,
     // because they will just get ignored.
-    if (pRegistration->fPerMachine != pPackage->fPerMachine)
+    if (pRegistration->fPerMachine != fPackagePerMachine)
     {
         ExitFunction();
     }
@@ -979,7 +1023,7 @@ static HRESULT DetectPackageDependents(
         {
             DEPENDENCY* pDependent = pProvider->rgDependents + iDependent;
 
-            if (CSTR_EQUAL == ::CompareStringOrdinal(pRegistration->sczCode, -1, pDependent->sczKey, -1, TRUE))
+            if (pDependent && CSTR_EQUAL == ::CompareStringOrdinal(pRegistration->sczCode, -1, pDependent->sczKey, -1, TRUE))
             {
                 pProvider->fBundleRegisteredAsDependent = TRUE;
                 fBundleRegisteredAsDependent = TRUE;
@@ -994,10 +1038,12 @@ static HRESULT DetectPackageDependents(
         {
             pPackage->cacheRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
         }
+
         if (BURN_PACKAGE_REGISTRATION_STATE_PRESENT == pPackage->installRegistrationState)
         {
             pPackage->installRegistrationState = BURN_PACKAGE_REGISTRATION_STATE_IGNORED;
         }
+
         if (BURN_PACKAGE_TYPE_MSP == pPackage->type)
         {
             for (DWORD i = 0; i < pPackage->Msp.cTargetProductCodes; ++i)

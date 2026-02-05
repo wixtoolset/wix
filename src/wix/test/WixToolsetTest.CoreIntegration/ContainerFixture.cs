@@ -149,7 +149,7 @@ namespace WixToolsetTest.CoreIntegration
                 var msiPackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsiPackage", ignoreAttributes);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<MsiPackage Id='FirstX86.msi' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_FirstX86.msi' RollbackLogPathVariable='WixBundleRollbackLog_FirstX86.msi' ProductCode='*' Language='1033' Version='1.0.0.0' UpgradeCode='{C00D7E9A-1276-51ED-B782-A20AB34D4070}'>" +
+                    "<MsiPackage Id='FirstX86.msi' Cache='keep' CacheId='*' InstallSize='*' Size='*' Scope='perMachine' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_FirstX86.msi' RollbackLogPathVariable='WixBundleRollbackLog_FirstX86.msi' ProductCode='*' Language='1033' Version='1.0.0.0' UpgradeCode='{C00D7E9A-1276-51ED-B782-A20AB34D4070}'>" +
                       "<MsiProperty Id='MSIFASTINSTALL' Value='1' />" +
                       "<MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' />" +
                      $"<Provides Key='{GetProductCodeFromMsiPdb(pdbPaths[0])}_v1.0.0.0' Version='1.0.0.0' DisplayName='MsiPackage' />" +
@@ -158,7 +158,7 @@ namespace WixToolsetTest.CoreIntegration
                       "<PayloadRef Id='FirstX86.msi' />" +
                       "<PayloadRef Id='fk1m38Cf9RZ2Bx_ipinRY6BftelU' />" +
                     "</MsiPackage>",
-                    "<MsiPackage Id='FirstX64.msi' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_FirstX64.msi' RollbackLogPathVariable='WixBundleRollbackLog_FirstX64.msi' ProductCode='*' Language='1033' Version='1.0.0.0' UpgradeCode='{C00D7E9A-1276-51ED-B782-A20AB34D4070}'>" +
+                    "<MsiPackage Id='FirstX64.msi' Cache='keep' CacheId='*' InstallSize='*' Size='*' Scope='perMachine' Permanent='no' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_FirstX64.msi' RollbackLogPathVariable='WixBundleRollbackLog_FirstX64.msi' ProductCode='*' Language='1033' Version='1.0.0.0' UpgradeCode='{C00D7E9A-1276-51ED-B782-A20AB34D4070}'>" +
                       "<MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' />" +
                       "<MsiProperty Id='MSIFASTINSTALL' Value='7' />" +
                      $"<Provides Key='{GetProductCodeFromMsiPdb(pdbPaths[1])}_v1.0.0.0' Version='1.0.0.0' DisplayName='MsiPackage' />" +

@@ -61,10 +61,10 @@ namespace WixToolset.Core.Burn.Bundles
             string engineVersion;
             int protocolVersion;
             string manifestNamespace;
-            bool perMachine;
             string version;
             string displayName;
             long installSize;
+            WixBundleScopeType scope;
 
             var sourcePath = this.PackagePayload.SourceFile.Path;
             var sourceLineNumbers = this.PackagePayload.SourceLineNumbers;
@@ -113,7 +113,21 @@ namespace WixToolset.Core.Burn.Bundles
                     var registrationElement = document.SelectSingleNode("/burn:BurnManifest/burn:Registration", namespaceManager) as XmlElement;
                     var arpElement = document.SelectSingleNode("/burn:BurnManifest/burn:Registration/burn:Arp", namespaceManager) as XmlElement;
 
-                    perMachine = registrationElement.GetAttribute("PerMachine") == "yes";
+                    var bundleScope = registrationElement.GetAttribute("Scope");
+                    if (!Enum.TryParse(bundleScope, ignoreCase: true, out scope))
+                    {
+                        // No Scope attribute means it's a <v6.0 bundle, so fall back to PerMachine.
+                        var perMachine = registrationElement.GetAttribute("PerMachine");
+
+                        if (!String.IsNullOrEmpty(perMachine))
+                        {
+                            scope = perMachine == "yes" ? WixBundleScopeType.PerMachine : WixBundleScopeType.PerUser;
+                        }
+                        else
+                        {
+                            this.Messaging.Write(BurnBackendErrors.InvalidBundleManifest(sourceLineNumbers, sourcePath, $"Expected bundle scope but got '{bundleScope}'."));
+                        }
+                    }
 
                     version = registrationElement.GetAttribute("Version");
 
@@ -148,7 +162,7 @@ namespace WixToolset.Core.Burn.Bundles
                 EngineVersion = engineVersion,
                 ManifestNamespace = manifestNamespace,
                 ProtocolVersion = protocolVersion,
-                PerMachine = perMachine,
+                Scope = scope,
                 Version = version,
                 DisplayName = displayName,
                 InstallSize = installSize,

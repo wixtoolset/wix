@@ -1134,12 +1134,15 @@ static HRESULT BAEnginePlan(
     hr = BuffReaderReadNumber(pReaderArgs, reinterpret_cast<DWORD*>(&args.action));
     ExitOnFailure(hr, "Failed to read plan action of BAEnginePlan args.");
 
+    hr = BuffReaderReadNumber(pReaderArgs, reinterpret_cast<DWORD*>(&args.plannedScope));
+    ExitOnFailure(hr, "Failed to read plan scope of BAEnginePlan args.");
+
     // Read results.
     hr = BuffReaderReadNumber(pReaderResults, &results.dwApiVersion);
     ExitOnFailure(hr, "Failed to read API version of BAEnginePlan results.");
 
     // Execute.
-    hr = ExternalEnginePlan(pContext, args.action);
+    hr = ExternalEnginePlan(pContext, args.action, args.plannedScope);
     ExitOnFailure(hr, "Failed to plan in the engine.");
 
     // Pack result.

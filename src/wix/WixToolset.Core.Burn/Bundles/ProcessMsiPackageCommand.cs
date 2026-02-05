@@ -89,7 +89,6 @@ namespace WixToolset.Core.Burn.Bundles
                 });
             }
 
-            this.ChainPackage.PerMachine = harvestedMsiPackage.PerMachine;
             this.ChainPackage.Win64 = harvestedMsiPackage.Win64;
 
             this.MsiPackage.ProductCode = harvestedMsiPackage.ProductCode;
@@ -123,7 +122,7 @@ namespace WixToolset.Core.Burn.Bundles
                 this.Messaging.Write(WarningMessages.InvalidMsiProductVersion(this.PackagePayload.SourceLineNumbers, this.MsiPackage.ProductVersion, this.PackageId));
             }
 
-            this.SetPerMachineAppropriately(harvestedMsiPackage.AllUsers);
+            this.DeterminePackageScope(harvestedMsiPackage.PerMachine, harvestedMsiPackage.AllUsers, harvestedMsiPackage.MsiInstallPerUser);
 
             var msiPropertyNames = this.GetMsiPropertyNames();
 
@@ -146,6 +145,7 @@ namespace WixToolset.Core.Burn.Bundles
             string productName;
             string arpComments;
             string allUsers;
+            string msiInstallPerUser;
             string msiFastInstall;
             string arpSystemComponent;
             string productCode;
@@ -194,6 +194,7 @@ namespace WixToolset.Core.Burn.Bundles
                         productName = ProcessMsiPackageCommand.GetProperty(view, "ProductName");
                         arpComments = ProcessMsiPackageCommand.GetProperty(view, "ARPCOMMENTS");
                         allUsers = ProcessMsiPackageCommand.GetProperty(view, "ALLUSERS");
+                        msiInstallPerUser = ProcessMsiPackageCommand.GetProperty(view, "MSIINSTALLPERUSER");
                         msiFastInstall = ProcessMsiPackageCommand.GetProperty(view, "MSIFASTINSTALL");
                         arpSystemComponent = ProcessMsiPackageCommand.GetProperty(view, "ARPSYSTEMCOMPONENT");
 
@@ -234,6 +235,7 @@ namespace WixToolset.Core.Burn.Bundles
                 ProductName = productName,
                 ArpComments = arpComments,
                 AllUsers = allUsers,
+                MsiInstallPerUser = msiInstallPerUser,
                 MsiFastInstall = msiFastInstall,
                 ArpSystemComponent = arpSystemComponent,
                 ProductCode = productCode,
@@ -284,18 +286,17 @@ namespace WixToolset.Core.Burn.Bundles
             }
         }
 
-        private void SetPerMachineAppropriately(string allusers)
+        private void DeterminePackageScope(bool perMachine, string allusers, string msiInstallPerUser)
         {
-            Debug.Assert(this.ChainPackage.PerMachine.HasValue);
-            var perMachine = this.ChainPackage.PerMachine.Value;
-
             // Can ignore ALLUSERS from MsiProperties because it is not allowed there.
             if (this.MsiPackage.ForcePerMachine)
             {
+                this.ChainPackage.Scope = WixBundleScopeType.PerMachine; // ensure that we think the package is per-machine.
+
                 if (!perMachine)
                 {
                     this.Messaging.Write(BurnBackendWarnings.PerUserButForcingPerMachine(this.PackagePayload.SourceLineNumbers, this.PackageId));
-                    this.ChainPackage.PerMachine = true; // ensure that we think the package is per-machine.
+                    this.ChainPackage.Scope = WixBundleScopeType.PerMachine; // ensure that we think the package is per-machine.
                 }
 
                 // Force ALLUSERS=1 via the MSI command-line.
@@ -306,14 +307,17 @@ namespace WixToolset.Core.Burn.Bundles
                 if (String.IsNullOrEmpty(allusers))
                 {
                     // Not forced per-machine and no ALLUSERS property, flip back to per-user.
+                    this.ChainPackage.Scope = WixBundleScopeType.PerUser;
+
                     if (perMachine)
                     {
                         this.Messaging.Write(BurnBackendWarnings.ImplicitlyPerUser(this.ChainPackage.SourceLineNumbers, this.PackageId));
-                        this.ChainPackage.PerMachine = false;
                     }
                 }
                 else if (allusers.Equals("1", StringComparison.Ordinal))
                 {
+                    this.ChainPackage.Scope = WixBundleScopeType.PerMachine; // ensure that we think the package is per-machine.
+
                     if (!perMachine)
                     {
                         this.Messaging.Write(BurnBackendErrors.PerUserButAllUsersEquals1(this.ChainPackage.SourceLineNumbers, this.PackageId));
@@ -321,7 +325,14 @@ namespace WixToolset.Core.Burn.Bundles
                 }
                 else if (allusers.Equals("2", StringComparison.Ordinal))
                 {
-                    this.Messaging.Write(BurnBackendWarnings.DiscouragedAllUsersValue(this.ChainPackage.SourceLineNumbers, this.PackageId, perMachine ? "machine" : "user"));
+                    if (msiInstallPerUser?.Equals("1", StringComparison.Ordinal) == true)
+                    {
+                        this.ChainPackage.Scope = WixBundleScopeType.PerUserOrMachine;
+                    }
+                    else
+                    {
+                        this.ChainPackage.Scope = WixBundleScopeType.PerMachineOrUser;
+                    }
                 }
                 else
                 {

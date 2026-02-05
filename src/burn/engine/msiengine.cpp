@@ -454,7 +454,18 @@ extern "C" HRESULT MsiEngineDetectPackage(
 
     // detect self by product code
     // TODO: what to do about MSIINSTALLCONTEXT_USERMANAGED?
-    hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
+    if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == pPackage->scope || BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == pPackage->scope)
+    {
+        hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, MSIINSTALLCONTEXT_MACHINE, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
+        if (FAILED(hr))
+        {
+            hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
+        }
+    }
+    else
+    {
+        hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, pPackage->scope == BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
+    }
     if (SUCCEEDED(hr))
     {
         fDetectFeatures = TRUE;
@@ -777,7 +788,18 @@ extern "C" HRESULT MsiEngineDetectCompatiblePackage(
         ExitFunction();
     }
 
-    hr = WiuGetProductInfoEx(wzCompatibleProductCode, NULL, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczVersion);
+    if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == pPackage->scope || BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == pPackage->scope)
+    {
+        hr = WiuGetProductInfoEx(wzCompatibleProductCode, NULL, MSIINSTALLCONTEXT_MACHINE, INSTALLPROPERTY_VERSIONSTRING, &sczVersion);
+        if (FAILED(hr))
+        {
+            hr = WiuGetProductInfoEx(wzCompatibleProductCode, NULL, MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczVersion);
+        }
+    }
+    else
+    {
+        hr = WiuGetProductInfoEx(wzCompatibleProductCode, NULL, pPackage->scope == BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczVersion);
+    }
     if (HRESULT_FROM_WIN32(ERROR_UNKNOWN_PRODUCT) == hr || HRESULT_FROM_WIN32(ERROR_UNKNOWN_PROPERTY) == hr || E_INVALIDARG == hr)
     {
         ExitFunction1(hr = S_OK);
@@ -1336,10 +1358,10 @@ extern "C" HRESULT MsiEngineExecutePackage(
     hr = ConcatPatchProperty(pCache, pPackage, fRollback, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add patch properties to obfuscated argument string.");
 
-    hr = MsiEngineConcatBurnProperties(pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.actionMsiProperty, pExecuteAction->msiPackage.fileVersioning, TRUE, 0 != pPackage->Msi.cFeatures, &sczProperties);
+    hr = MsiEngineConcatBurnProperties(pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.actionMsiProperty, pExecuteAction->msiPackage.fileVersioning, TRUE, 0 != pPackage->Msi.cFeatures, pExecuteAction->msiPackage.pPackage->scope, pExecuteAction->msiPackage.pPackage->fPerMachine, &sczProperties);
     ExitOnFailure(hr, "Failed to add action property to argument string.");
 
-    hr = MsiEngineConcatBurnProperties(pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.actionMsiProperty, pExecuteAction->msiPackage.fileVersioning, TRUE, 0 != pPackage->Msi.cFeatures, &sczObfuscatedProperties);
+    hr = MsiEngineConcatBurnProperties(pExecuteAction->msiPackage.action, pExecuteAction->msiPackage.actionMsiProperty, pExecuteAction->msiPackage.fileVersioning, TRUE, 0 != pPackage->Msi.cFeatures, pPackage->scope, pPackage->fPerMachine, &sczObfuscatedProperties);
     ExitOnFailure(hr, "Failed to add action property to obfuscated argument string.");
 
     LogId(REPORT_STANDARD, MSG_APPLYING_PACKAGE, LoggingRollbackOrExecute(fRollback), pPackage->sczId, LoggingActionStateToString(pExecuteAction->msiPackage.action), sczMsiPath, sczObfuscatedProperties ? sczObfuscatedProperties : L"");
@@ -1449,7 +1471,7 @@ extern "C" HRESULT MsiEngineUninstallCompatiblePackage(
         ExitOnFailure(hr, "Failed to enable logging for compatible package: %ls to: %ls", pCompatibleEntry->sczId, pExecuteAction->uninstallMsiCompatiblePackage.sczLogPath);
     }
 
-    hr = MsiEngineConcatBurnProperties(action, burnMsiProperty, fileVersioning, TRUE, FALSE, &sczProperties);
+    hr = MsiEngineConcatBurnProperties(action, burnMsiProperty, fileVersioning, TRUE, FALSE, pParentPackage->scope, pParentPackage->fPerMachine, &sczProperties);
     ExitOnFailure(hr, "Failed to add action property to argument string.");
 
     LogId(REPORT_STANDARD, MSG_APPLYING_ORPHAN_COMPATIBLE_PACKAGE, LoggingRollbackOrExecute(fRollback), pCompatibleEntry->sczId, pParentPackage->sczId, LoggingActionStateToString(action), sczProperties ? sczProperties : L"");
@@ -1491,6 +1513,8 @@ extern "C" HRESULT MsiEngineConcatBurnProperties(
     __in BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning,
     __in BOOL fMsiPackage,
     __in BOOL fFeatureSelectionEnabled,
+    __in BOOTSTRAPPER_PACKAGE_SCOPE scope,
+    __in BOOL fPlannedPerMachineScope,
     __deref_out_z LPWSTR* psczProperties
     )
 {
@@ -1534,6 +1558,7 @@ extern "C" HRESULT MsiEngineConcatBurnProperties(
         break;
     }
 
+    // Append properties used by WixUI (and usable otherwise) to adjust internal UI behavior.
     switch (actionMsiProperty)
     {
     case BURN_MSI_PROPERTY_INSTALL:
@@ -1579,6 +1604,20 @@ extern "C" HRESULT MsiEngineConcatBurnProperties(
 
         hr = StrAllocConcatFormattedSecure(psczProperties, L" REINSTALLMODE=\"%ls%ls\"", wzReinstallModeOptions, wzFileVersioning);
         ExitOnFailure(hr, "Failed to add reinstall mode.");
+    }
+
+    if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == scope || BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == scope)
+    {
+        if (fPlannedPerMachineScope)
+        {
+            hr = StrAllocConcatFormattedSecure(psczProperties, L" MSIINSTALLPERUSER=\"\"");
+            ExitOnFailure(hr, "Failed to add per-machine scope properties.");
+        }
+        else
+        {
+            hr = StrAllocConcatFormattedSecure(psczProperties, L" MSIINSTALLPERUSER=\"1\"");
+            ExitOnFailure(hr, "Failed to add per-user scope properties.");
+        }
     }
 
     hr = StrAllocConcatSecure(psczProperties, L" REBOOT=ReallySuppress", 0);

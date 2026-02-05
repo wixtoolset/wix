@@ -2,11 +2,7 @@
 
 #include "precomp.h"
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -61,8 +57,6 @@ namespace Bootstrapper
             }
         }
     };
-}
-}
 }
 }
 }

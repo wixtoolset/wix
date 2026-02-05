@@ -82,14 +82,32 @@ namespace WixTestTools
             return MsiUtilities.IsProductInstalledWithVersion(productCode, prodVersion);
         }
 
-        public void VerifyInstalled(bool installed)
+        public void VerifyInstalled(bool installed = true)
         {
-            Assert.Equal(installed, this.IsInstalled());
+            var isInstalled = this.IsInstalled();
+
+            if (installed)
+            {
+                Assert.True(isInstalled);
+            }
+            else
+            {
+                Assert.False(isInstalled);
+            }
         }
 
-        public void VerifyInstalledWithVersion(bool installed)
+        public void VerifyInstalledWithVersion(bool installed = true)
         {
-            Assert.Equal(installed, this.IsInstalledWithVersion());
+            var isInstalled = this.IsInstalledWithVersion();
+
+            if (installed)
+            {
+                Assert.True(isInstalled);
+            }
+            else
+            {
+                Assert.False(isInstalled);
+            }
         }
 
         public void DeleteTestRegistryValue(string name)

@@ -2774,7 +2774,7 @@ don't remain in memory.
 
 ****************************************************************************/
 extern "C" DAPI_(HRESULT) StrSecureZeroString(
-    __in LPWSTR pwz
+    __in_z_opt LPWSTR pwz
     )
 {
     HRESULT hr = S_OK;
@@ -2798,7 +2798,7 @@ don't remain in memory, then frees the string.
 
 ****************************************************************************/
 extern "C" DAPI_(HRESULT) StrSecureZeroFreeString(
-    __in LPWSTR pwz
+    __in_z_opt LPWSTR pwz
     )
 {
     HRESULT hr = S_OK;

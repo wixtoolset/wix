@@ -1,0 +1,20 @@
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Bundle Id="PmPuomBundle$(BA)" Name="PmPuomBundle$(BA)" Manufacturer="Acme" Version="1.0.0.0">
+    <?if $(BA) = "WixStdBA"?>
+    <BootstrapperApplication>
+      <bal:WixStandardBootstrapperApplication LicenseUrl="https://www.example.com/license" Theme="hyperlinkLicense" />
+    </BootstrapperApplication>
+    <?endif?>
+
+    <Variable Name="TestGroupName" Value="ConfigurableScopeTests" />
+
+    <Chain>
+      <?if $(BA) = "TestBA"?>
+      <PackageGroupRef Id="TestBA" />
+      <?endif?>
+      <MsiPackage SourceFile="PerMachinePkg.msi" />
+      <MsiPackage SourceFile="PuomPkg1.msi" />
+      <MsiPackage SourceFile="PuomPkg2.msi" />
+    </Chain>
+  </Bundle>
+</Wix>

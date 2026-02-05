@@ -2,12 +2,20 @@
 
 #include "precomp.h"
 
+#if TODO_REIMPLEMENT
 static HRESULT WINAPI PlanTestBAProc(
     __in BOOTSTRAPPER_APPLICATION_MESSAGE message,
     __in const LPVOID pvArgs,
     __inout LPVOID pvResults,
     __in_opt LPVOID pvContext
     );
+#endif
+
+struct REDIRECTED_LOGGING_CONTEXT
+{
+    LPSTR pszBuffer;
+};
+
 
 static LPCWSTR wzArpEntryExeManifestFileName = L"ExePackage_PerUserArpEntry_manifest.xml";
 static LPCWSTR wzMsiTransactionManifestFileName = L"MsiTransaction_BundleAv1_manifest.xml";
@@ -28,11 +36,7 @@ static BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE vRelatedBundlePlanType = BOOTSTRAPP
 static BURN_DEPENDENCY_ACTION registerActions1[] = { BURN_DEPENDENCY_ACTION_REGISTER };
 static BURN_DEPENDENCY_ACTION unregisterActions1[] = { BURN_DEPENDENCY_ACTION_UNREGISTER };
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -43,9 +47,311 @@ namespace Bootstrapper
 
     public ref class PlanTest : BurnUnitTest
     {
+    private:
+        void ScopeTest(
+            LPCWSTR wzManifestFileName,
+            BOOL fDefaultPlanPerMachine,
+            BOOL fDefaultRegistrationPerMachine,
+            BOOL fPerUserPlanPerMachine,
+            BOOL fPerUserRegistrationPerMachine,
+            BOOL fPerMachinePlanPerMachine,
+            BOOL fPerMachineRegistrationPerMachine
+        )
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            InitializeEngineStateForCorePlan(wzManifestFileName, pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPermanentPackagesAsPresentAndCached(pEngineState);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
+            NativeAssert::Succeeded(hr, "CorePlan default failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_SCOPE_DEFAULT, pPlan->plannedScope);
+            Assert::Equal<DWORD>(fDefaultPlanPerMachine, pPlan->fPerMachine);
+            Assert::Equal<DWORD>(fDefaultRegistrationPerMachine, engineState.registration.fPerMachine);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_PER_USER);
+            NativeAssert::Succeeded(hr, "CorePlan per-user failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_SCOPE_PER_USER, pPlan->plannedScope);
+            Assert::Equal<DWORD>(fPerUserPlanPerMachine, pPlan->fPerMachine);
+            Assert::Equal<DWORD>(fPerUserRegistrationPerMachine, engineState.registration.fPerMachine);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_PER_MACHINE);
+            NativeAssert::Succeeded(hr, "CorePlan per-machine failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_SCOPE_PER_MACHINE, pPlan->plannedScope);
+            Assert::Equal<DWORD>(fPerMachinePlanPerMachine, pPlan->fPerMachine);
+            Assert::Equal<DWORD>(fPerMachineRegistrationPerMachine, engineState.registration.fPerMachine);
+        }
+
     public:
         PlanTest(BurnTestFixture^ fixture) : BurnUnitTest(fixture)
         {
+        }
+
+        [Fact]
+        void CommandLineScopeTestNoop()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            engineState.command.commandLineScope = BOOTSTRAPPER_SCOPE_PER_MACHINE;
+
+            InitializeEngineStateForCorePlan(L"AllPmouBundle_manifest.xml", pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPermanentPackagesAsPresentAndCached(pEngineState);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_PER_USER);
+            NativeAssert::Succeeded(hr, "CorePlan default failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_SCOPE_PER_USER, pPlan->plannedScope);
+            Assert::Equal<DWORD>(FALSE, pPlan->fPerMachine);
+            Assert::Equal<DWORD>(FALSE, engineState.registration.fPerMachine);
+        }
+
+        [Fact]
+        void CommandLineScopePerUserTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            engineState.command.commandLineScope = BOOTSTRAPPER_SCOPE_PER_USER;
+
+            InitializeEngineStateForCorePlan(L"AllPmouBundle_manifest.xml", pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPermanentPackagesAsPresentAndCached(pEngineState);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
+            NativeAssert::Succeeded(hr, "CorePlan default failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_SCOPE_PER_USER, pPlan->plannedScope);
+            Assert::Equal<DWORD>(FALSE, pPlan->fPerMachine);
+            Assert::Equal<DWORD>(FALSE, engineState.registration.fPerMachine);
+        }
+
+        [Fact]
+        void CommandLineScopePerMachineTest()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            engineState.command.commandLineScope = BOOTSTRAPPER_SCOPE_PER_MACHINE;
+
+            InitializeEngineStateForCorePlan(L"AllPmouBundle_manifest.xml", pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPermanentPackagesAsPresentAndCached(pEngineState);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
+            NativeAssert::Succeeded(hr, "CorePlan default failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_SCOPE_PER_MACHINE, pPlan->plannedScope);
+            Assert::Equal<DWORD>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<DWORD>(TRUE, engineState.registration.fPerMachine);
+        }
+
+        [Fact]
+        void BundlePackageScopeTestNoop()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            engineState.command.commandLineScope = BOOTSTRAPPER_SCOPE_PER_MACHINE;
+
+            InitializeEngineStateForCorePlan(L"PuomBundlePackage_manifest.xml", pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPermanentPackagesAsPresentAndCached(pEngineState);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_PER_USER);
+            NativeAssert::Succeeded(hr, "CorePlan default failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_SCOPE_PER_USER, pPlan->plannedScope);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_SCOPE_DEFAULT, engineState.packages.rgPackages[0].fPerMachine);
+            Assert::Equal<DWORD>(FALSE, pPlan->fPerMachine);
+            Assert::Equal<DWORD>(FALSE, engineState.registration.fPerMachine);
+        }
+
+        [Fact]
+        void BundlePackageScopeTestSucceeds()
+        {
+            HRESULT hr = S_OK;
+            BURN_ENGINE_STATE engineState = { };
+            BURN_ENGINE_STATE* pEngineState = &engineState;
+            BURN_PLAN* pPlan = &engineState.plan;
+
+            engineState.command.commandLineScope = BOOTSTRAPPER_SCOPE_PER_MACHINE;
+
+            InitializeEngineStateForCorePlan(L"PuomBundlePackage_manifest.xml", pEngineState);
+            DetectAttachedContainerAsAttached(pEngineState);
+            DetectPermanentPackagesAsPresentAndCached(pEngineState);
+
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
+            NativeAssert::Succeeded(hr, "CorePlan default failed");
+
+            Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_SCOPE_PER_MACHINE, pPlan->plannedScope);
+            Assert::Equal<DWORD>(BOOTSTRAPPER_SCOPE_PER_MACHINE, engineState.packages.rgPackages[0].fPerMachine);
+            Assert::Equal<DWORD>(TRUE, pPlan->fPerMachine);
+            Assert::Equal<DWORD>(TRUE, engineState.registration.fPerMachine);
+        }
+
+        [Fact]
+        void AllPerUserScopeTest()
+        {
+            ScopeTest(
+                L"PerUserBundle_manifest.xml",
+                FALSE /*fDefaultPlanPerMachine*/,
+                FALSE /*fDefaultRegistrationPerMachine*/,
+                FALSE /*fPerUserPlanPerMachine*/,
+                FALSE /*fPerUserRegistrationPerMachine*/,
+                FALSE /*fPerMachinePlanPerMachine*/,
+                FALSE /*fPerMachineRegistrationPerMachine*/
+            );
+        }
+
+        [Fact]
+        void AllPerMachineScopeTest()
+        {
+            ScopeTest(
+                L"PerMachineBundle_manifest.xml",
+                TRUE  /*fDefaultPlanPerMachine*/,
+                TRUE  /*fDefaultRegistrationPerMachine*/,
+                TRUE  /*fPerUserPlanPerMachine*/,
+                TRUE  /*fPerUserRegistrationPerMachine*/,
+                TRUE  /*fPerMachinePlanPerMachine*/,
+                TRUE  /*fPerMachineRegistrationPerMachine*/
+            );
+        }
+
+        [Fact]
+        void AllPerMachineOrUserPackagesScopeTest()
+        {
+            ScopeTest(
+                L"AllPmouBundle_manifest.xml",
+                TRUE  /*fDefaultPlanPerMachine*/,
+                TRUE  /*fDefaultRegistrationPerMachine*/,
+                FALSE /*fPerUserPlanPerMachine*/,
+                FALSE /*fPerUserRegistrationPerMachine*/,
+                TRUE  /*fPerMachinePlanPerMachine*/,
+                TRUE  /*fPerMachineRegistrationPerMachine*/
+            );
+        }
+
+        [Fact]
+        void AllPerUserOrMachinePackagesScopeTest()
+        {
+            ScopeTest(
+                L"AllPuomBundle_manifest.xml",
+                FALSE /*fDefaultPlanPerMachine*/,
+                FALSE /*fDefaultRegistrationPerMachine*/,
+                FALSE /*fPerUserPlanPerMachine*/,
+                FALSE /*fPerUserRegistrationPerMachine*/,
+                TRUE  /*fPerMachinePlanPerMachine*/,
+                TRUE  /*fPerMachineRegistrationPerMachine*/
+            );
+        }
+
+        [Fact]
+        void PerMachineAndPerMachineOrUserScopeTest()
+        {
+            ScopeTest(
+                L"PmPmouBundle_manifest.xml",
+                TRUE  /*fDefaultPlanPerMachine*/,
+                TRUE  /*fDefaultRegistrationPerMachine*/,
+                TRUE  /*fPerUserPlanPerMachine*/,
+                FALSE /*fPerUserRegistrationPerMachine*/,
+                TRUE  /*fPerMachinePlanPerMachine*/,
+                TRUE  /*fPerMachineRegistrationPerMachine*/
+            );
+        }
+
+        [Fact]
+        void PerMachineAndPerUserOrMachineScopeTest()
+        {
+            ScopeTest(
+                L"PmPuomBundle_manifest.xml",
+                TRUE  /*fDefaultPlanPerMachine*/,
+                FALSE  /*fDefaultRegistrationPerMachine*/,
+                TRUE  /*fPerUserPlanPerMachine*/,
+                FALSE /*fPerUserRegistrationPerMachine*/,
+                TRUE  /*fPerMachinePlanPerMachine*/,
+                TRUE  /*fPerMachineRegistrationPerMachine*/
+            );
+        }
+
+        [Fact]
+        void PerMachineAndPerUserAndPerMachineOrUserScopeTest()
+        {
+            ScopeTest(
+                L"PmPuPmouBundle_manifest.xml",
+                TRUE  /*fDefaultPlanPerMachine*/,
+                FALSE /*fDefaultRegistrationPerMachine*/,
+                TRUE  /*fPerUserPlanPerMachine*/,
+                FALSE /*fPerUserRegistrationPerMachine*/,
+                TRUE  /*fPerMachinePlanPerMachine*/,
+                FALSE /*fPerMachineRegistrationPerMachine*/
+            );
+        }
+
+        [Fact]
+        void PerMachineAndPerUserAndPerUserOrMachineScopeTest()
+        {
+            ScopeTest(
+                L"PmPuPuomBundle_manifest.xml",
+                TRUE  /*fDefaultPlanPerMachine*/,
+                FALSE /*fDefaultRegistrationPerMachine*/,
+                TRUE  /*fPerUserPlanPerMachine*/,
+                FALSE /*fPerUserRegistrationPerMachine*/,
+                TRUE  /*fPerMachinePlanPerMachine*/,
+                FALSE /*fPerMachineRegistrationPerMachine*/
+            );
+        }
+
+        [Fact]
+        void PerUserAndPerMachineOrUserScopeTest()
+        {
+            ScopeTest(
+                L"PuPmouBundle_manifest.xml",
+                TRUE  /*fDefaultPlanPerMachine*/,
+                FALSE /*fDefaultRegistrationPerMachine*/,
+                FALSE /*fPerUserPlanPerMachine*/,
+                FALSE /*fPerUserRegistrationPerMachine*/,
+                TRUE  /*fPerMachinePlanPerMachine*/,
+                FALSE  /*fPerMachineRegistrationPerMachine*/
+            );
+        }
+
+        [Fact]
+        void PerUserAndPerUserOrMachineScopeTest()
+        {
+            ScopeTest(
+                L"PuPuomBundle_manifest.xml",
+                FALSE /*fDefaultPlanPerMachine*/,
+                FALSE /*fDefaultRegistrationPerMachine*/,
+                FALSE /*fPerUserPlanPerMachine*/,
+                FALSE /*fPerUserRegistrationPerMachine*/,
+                TRUE  /*fPerMachinePlanPerMachine*/,
+                FALSE /*fPerMachineRegistrationPerMachine*/
+            );
         }
 
         [Fact]
@@ -60,7 +366,7 @@ namespace Bootstrapper
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPermanentPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
@@ -154,12 +460,13 @@ namespace Bootstrapper
 
             pEngineState->packages.rgPackages[1].currentState = BOOTSTRAPPER_PACKAGE_STATE_OBSOLETE;
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
             NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleCode);
             NativeAssert::StringEqual(L"{9C459DAD-0E64-40C8-8C9F-4F68E46AB223}", pPlan->wzBundleProviderKey);
+
             Assert::Equal<BOOL>(FALSE, pPlan->fEnabledForwardCompatibleBundle);
             Assert::Equal<BOOL>(FALSE, pPlan->fPerMachine);
             Assert::Equal<BOOL>(TRUE, pPlan->fCanAffectMachineState);
@@ -233,7 +540,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzArpEntryExeManifestFileName, pEngineState);
             DetectPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -326,8 +633,10 @@ namespace Bootstrapper
             DetectPackagesAsAbsent(pEngineState);
             DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"1.0.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
+
+            PlanDump(pPlan);
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
             NativeAssert::StringEqual(L"{E6469F05-BDC8-4EB8-B218-67412543EFAA}", pPlan->wzBundleCode);
@@ -486,7 +795,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzMsiTransactionManifestFileName, pEngineState);
             DetectPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -627,7 +936,7 @@ namespace Bootstrapper
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPermanentPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
@@ -742,7 +1051,7 @@ namespace Bootstrapper
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_REPAIR);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_REPAIR, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_REPAIR, pPlan->action);
@@ -836,7 +1145,7 @@ namespace Bootstrapper
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -955,7 +1264,7 @@ namespace Bootstrapper
             DetectPackagesAsAbsent(pEngineState);
             DetectCompatibleMsiPackage(pEngineState, pEngineState->packages.rgPackages, L"{C24F3903-38E7-4D44-8037-D9856B3C5046}", L"2.0.0.0");
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -1055,7 +1364,7 @@ namespace Bootstrapper
             vfUseRelatedBundlePlanType = TRUE;
             vRelatedBundlePlanType = BOOTSTRAPPER_RELATED_BUNDLE_PLAN_TYPE_UPGRADE;
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
@@ -1174,7 +1483,7 @@ namespace Bootstrapper
             BURN_RELATED_BUNDLE* pRelatedBundle = DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
             pRelatedBundle->fPlannable = FALSE;
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
@@ -1276,7 +1585,7 @@ namespace Bootstrapper
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPermanentPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
@@ -1369,7 +1678,7 @@ namespace Bootstrapper
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPermanentPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_LAYOUT);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_LAYOUT, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_LAYOUT, pPlan->action);
@@ -1452,7 +1761,7 @@ namespace Bootstrapper
             DetectPackagesAsAbsent(pEngineState);
             DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_CACHE);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_CACHE, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_CACHE, pPlan->action);
@@ -1541,7 +1850,7 @@ namespace Bootstrapper
             DetectPackagesAsAbsent(pEngineState);
             DetectRelatedBundle(pEngineState, L"{AF8355C9-CCDD-4D61-BF5F-EA5F948D8F01}", L"1.1.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
@@ -1616,7 +1925,7 @@ namespace Bootstrapper
             vfUseRelatedBundleRequestState = TRUE;
             vRelatedBundleRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT;
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -1705,7 +2014,7 @@ namespace Bootstrapper
             vfUseRelatedBundleRequestState = TRUE;
             vRelatedBundleRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_PRESENT;
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
@@ -1798,7 +2107,7 @@ namespace Bootstrapper
             DetectPackagesAsAbsent(pEngineState);
             DetectRelatedBundle(pEngineState, L"{FD9920AD-DBCA-4C6C-8CD5-B47431CE8D21}", L"0.9.0.0", BOOTSTRAPPER_RELATION_UPGRADE);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
@@ -1904,7 +2213,7 @@ namespace Bootstrapper
 
             pEngineState->registration.detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_FULL;
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_MODIFY);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_MODIFY, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_MODIFY, pPlan->action);
@@ -1983,7 +2292,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -2084,7 +2393,7 @@ namespace Bootstrapper
             DetectPackagesAsPresentAndCached(pEngineState);
             DetectBundleDependent(pEngineState, L"{29855EB1-724D-4285-A89C-5D37D8549DCD}");
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -2154,7 +2463,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectAsRelatedUpgradeBundle(&engineState, L"{02940F3E-C83E-452D-BFCF-C943777ACEAE}", L"2.0.0.0");
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -2240,7 +2549,7 @@ namespace Bootstrapper
             pEngineState->packages.rgPackages[0].currentState = BOOTSTRAPPER_PACKAGE_STATE_SUPERSEDED;
             pEngineState->packages.rgPackages[0].Msi.operation = BOOTSTRAPPER_RELATED_OPERATION_DOWNGRADE;
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -2328,7 +2637,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzSingleMsiManifestFileName, pEngineState);
             DetectPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL, pPlan->action);
@@ -2430,7 +2739,7 @@ namespace Bootstrapper
             DetectAttachedContainerAsAttached(pEngineState);
             DetectPackagesAsAbsent(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             llPlannedAction = VariableGetNumericHelper(&engineState.variables, BURN_BUNDLE_ACTION);
@@ -2523,7 +2832,7 @@ namespace Bootstrapper
             DetectPermanentPackagesAsPresentAndCached(pEngineState);
             PlanTestDetectPatchInitialize(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
@@ -2587,8 +2896,14 @@ namespace Bootstrapper
             ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PackageA", L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", registerActions1, 1);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
+
+
             ValidateExecutePackageProvider(pPlan, fRollback, dwIndex++, L"PatchA", registerActions1, 1);
+
+
             pExecuteAction = ValidateDeletedExecuteMspTarget(pPlan, fRollback, dwIndex++, L"PatchA", BOOTSTRAPPER_ACTION_STATE_INSTALL, L"{5FF7F534-3FFC-41E0-80CD-E6361E5E7B7B}", TRUE, BURN_MSI_PROPERTY_INSTALL, INSTALLUILEVEL_NONE, FALSE, BOOTSTRAPPER_MSI_FILE_VERSIONING_MISSING_OR_OLDER, TRUE);
+
+
             ValidateExecuteMspTargetPatch(pExecuteAction, 0, L"PatchA");
             ValidateExecuteCheckpoint(pPlan, fRollback, dwIndex++, dwExecuteCheckpointId++);
             ValidateExecutePackageDependency(pPlan, fRollback, dwIndex++, L"PatchA", L"{22D1DDBA-284D-40A7-BD14-95EA07906F21}", registerActions1, 1);
@@ -2654,7 +2969,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzSlipstreamManifestFileName, pEngineState);
             DetectPackagesAsPresentAndCached(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -2784,7 +3099,7 @@ namespace Bootstrapper
             vfUsePackageRequestState = TRUE;
             vPackageRequestState = BOOTSTRAPPER_REQUEST_STATE_FORCE_ABSENT;
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_UNINSTALL, pPlan->action);
@@ -2885,7 +3200,7 @@ namespace Bootstrapper
             InitializeEngineStateForCorePlan(wzSlipstreamModifiedManifestFileName, pEngineState);
             DetectPackagesAsAbsent(pEngineState);
 
-            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL);
+            hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_INSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
             NativeAssert::Succeeded(hr, "CorePlan failed");
 
             Assert::Equal<DWORD>(BOOTSTRAPPER_ACTION_INSTALL, pPlan->action);
@@ -3031,7 +3346,7 @@ namespace Bootstrapper
                 Assert::True(FileExistsEx(sczFilePath, NULL), "Test file does not exist.");
 
                 hr = ManifestLoadXmlFromFile(sczFilePath, pEngineState);
-                NativeAssert::Succeeded(hr, "Failed to load manifest.");
+                NativeAssert::Succeeded(hr, "Failed to load test manifest.");
             }
             finally
             {
@@ -3222,7 +3537,7 @@ namespace Bootstrapper
                     for (DWORD j = 0; j < pPackage->Msi.cSlipstreamMspPackages; ++j)
                     {
                         BURN_PACKAGE* pMspPackage = pPackage->Msi.rgSlipstreamMsps[j].pMspPackage;
-                        MspEngineAddDetectedTargetProduct(&pEngineState->packages, pMspPackage, j, pPackage->Msi.sczProductCode, pPackage->fPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED);
+                        MspEngineAddDetectedTargetProduct(&pEngineState->packages, pMspPackage, j, pPackage->Msi.sczProductCode, pPackage->scope == BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED);
 
                         BURN_MSPTARGETPRODUCT* pTargetProduct = pMspPackage->Msp.rgTargetProducts + (pMspPackage->Msp.cTargetProductCodes - 1);
                         pTargetProduct->patchPackageState = BOOTSTRAPPER_PACKAGE_STATE_PRESENT;
@@ -3759,8 +4074,8 @@ namespace Bootstrapper
         void ValidatePlannedProvider(
             __in BURN_PLAN* pPlan,
             __in UINT uIndex,
-            __in LPCWSTR wzKey,
-            __in LPCWSTR wzName
+            __in_z LPCWSTR wzKey,
+            __in_z_opt LPCWSTR wzName
             )
         {
             Assert::InRange(uIndex + 1u, 1u, pPlan->cPlannedProviders);
@@ -3808,8 +4123,6 @@ namespace Bootstrapper
             Assert::Equal<BOOL>(FALSE, pAction->fDeleted);
         }
     };
-}
-}
 }
 }
 }

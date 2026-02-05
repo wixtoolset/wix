@@ -20,6 +20,11 @@ namespace WixToolset.BootstrapperApplicationApi
         Display Display { get; }
 
         /// <summary>
+        /// Gets the bundle scope if set at the command line.
+        /// </summary>
+        BundleScope Scope { get; }
+
+        /// <summary>
         /// Gets the command line arguments.
         /// </summary>
         /// <returns>

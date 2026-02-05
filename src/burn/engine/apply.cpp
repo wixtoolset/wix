@@ -632,7 +632,7 @@ extern "C" HRESULT ApplyCache(
                 {
                     hr = ElevationCachePreparePackage(hPipe, pPackage);
                 }
-                LogExitOnFailure(hr, MSG_CACHE_PREPARE_PACKAGE_FAILED, "Cache prepare package failed: %ls", pPackage->sczId, NULL, NULL);
+                LogExitOnFailure(hr, MSG_CACHE_PREPARE_PACKAGE_FAILED, "Cache prepare package failed: %ls", pPackage->sczId);
             }
 
             hr = ApplyCachePackage(&cacheContext, pPackage);

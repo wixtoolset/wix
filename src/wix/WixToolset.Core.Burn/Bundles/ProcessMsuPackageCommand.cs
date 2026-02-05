@@ -35,7 +35,7 @@ namespace WixToolset.Core.Burn.Bundles
                 this.Facade.PackageSymbol.CacheId = CacheIdGenerator.GenerateLocalCacheId(this.Messaging, null, packagePayload, this.Facade.PackageSymbol.SourceLineNumbers, "MsuPackage");
             }
 
-            this.Facade.PackageSymbol.PerMachine = true; // MSUs are always per-machine.
+            this.Facade.PackageSymbol.Scope = WixBundleScopeType.PerMachine; // MSUs are always per-machine.
         }
     }
 }

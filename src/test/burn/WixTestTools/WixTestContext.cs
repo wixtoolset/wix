@@ -16,6 +16,8 @@ namespace WixTestTools
 
         public WixTestContext(ITestOutputHelper testOutputHelper)
         {
+            this.TestOutputHelper = testOutputHelper;
+
             var test = GetTest(testOutputHelper);
             var splitClassName = test.TestCase.TestMethod.TestClass.Class.Name.Split('.');
 
@@ -33,6 +35,8 @@ namespace WixTestTools
         public string TestGroupName { get; }
 
         public string TestName { get; }
+
+        public ITestOutputHelper TestOutputHelper { get; }
 
         /// <summary>
         /// Gets the test install directory for the current test.

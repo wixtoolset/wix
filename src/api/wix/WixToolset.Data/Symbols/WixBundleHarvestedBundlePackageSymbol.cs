@@ -18,6 +18,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.Version), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.DisplayName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.InstallSize), IntermediateFieldType.LargeNumber),
+                new IntermediateFieldDefinition(nameof(WixBundleHarvestedBundlePackageSymbolFields.Scope), IntermediateFieldType.Number),
             },
             typeof(WixBundleHarvestedBundlePackageSymbol));
     }
@@ -39,13 +40,13 @@ namespace WixToolset.Data.Symbols
         Version,
         DisplayName,
         InstallSize,
+        Scope,
     }
 
     [Flags]
     public enum WixBundleHarvestedBundlePackageAttributes
     {
         None = 0x0,
-        PerMachine = 0x1,
         Win64 = 0x2,
     }
 
@@ -116,20 +117,10 @@ namespace WixToolset.Data.Symbols
             set => this.Set((int)WixBundleHarvestedBundlePackageSymbolFields.InstallSize, value);
         }
 
-        public bool PerMachine
+        public WixBundleScopeType Scope
         {
-            get { return this.Attributes.HasFlag(WixBundleHarvestedBundlePackageAttributes.PerMachine); }
-            set
-            {
-                if (value)
-                {
-                    this.Attributes |= WixBundleHarvestedBundlePackageAttributes.PerMachine;
-                }
-                else
-                {
-                    this.Attributes &= ~WixBundleHarvestedBundlePackageAttributes.PerMachine;
-                }
-            }
+            get => Enum.TryParse((string)this.Fields[(int)WixBundleHarvestedBundlePackageSymbolFields.Scope], true, out WixBundleScopeType value) ? value : WixBundleScopeType.PerMachine;
+            set => this.Set((int)WixBundleHarvestedBundlePackageSymbolFields.Scope, (int)value);
         }
 
         public bool Win64

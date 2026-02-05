@@ -30,6 +30,13 @@ enum BOOTSTRAPPER_ACTION
     BOOTSTRAPPER_ACTION_UPDATE_REPLACE_EMBEDDED,
 };
 
+enum BOOTSTRAPPER_SCOPE
+{
+    BOOTSTRAPPER_SCOPE_DEFAULT,
+    BOOTSTRAPPER_SCOPE_PER_MACHINE,
+    BOOTSTRAPPER_SCOPE_PER_USER,
+};
+
 enum BOOTSTRAPPER_ACTION_STATE
 {
     BOOTSTRAPPER_ACTION_STATE_NONE,
@@ -183,7 +190,7 @@ typedef struct _BAENGINE_ESCAPESTRING_RESULTS
 {
     DWORD dwApiVersion;
     LPWSTR wzOut;
-    // Should be initialized to the size of wzOut.
+    // Should be initialized to the count of wzOut.
     DWORD cchOut;
 } BAENGINE_ESCAPESTRING_RESULTS;
 
@@ -306,6 +313,7 @@ typedef struct _BAENGINE_PLAN_ARGS
 {
     DWORD dwApiVersion;
     BOOTSTRAPPER_ACTION action;
+    BOOTSTRAPPER_SCOPE plannedScope;
 } BAENGINE_PLAN_ARGS;
 
 typedef struct _BAENGINE_PLAN_RESULTS

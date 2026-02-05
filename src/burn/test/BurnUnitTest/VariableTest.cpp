@@ -4,11 +4,7 @@
 #undef GetTempPath
 #undef GetEnvironmentVariable
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -615,8 +611,6 @@ namespace Bootstrapper
             }
         }
     };
-}
-}
 }
 }
 }

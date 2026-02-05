@@ -708,7 +708,10 @@ private:
 
         m_plannedAction = action;
 
-        hr = m_pEngine->Plan(action);
+        // InternalUiBootstrapperApplication isn't in a position to let the user
+        // choose the scope, so we use the default. Unfortunately, a scope choice
+        // in the MSI UI can't "flow" back to affect bundle scope.
+        hr = m_pEngine->Plan(action, BOOTSTRAPPER_SCOPE_DEFAULT);
         BalExitOnFailure(hr, "Failed to start planning packages.");
 
     LExit:

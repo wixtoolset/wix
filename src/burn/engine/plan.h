@@ -249,6 +249,7 @@ typedef struct _BURN_CLEAN_ACTION
 typedef struct _BURN_PLAN
 {
     BOOTSTRAPPER_ACTION action;
+    BOOTSTRAPPER_SCOPE plannedScope;
     BURN_CACHE* pCache;
     BOOTSTRAPPER_COMMAND* pCommand;
     BURN_ENGINE_COMMAND* pInternalCommand;
@@ -328,6 +329,8 @@ void PlanUninitializeExecuteAction(
     );
 HRESULT PlanSetVariables(
     __in BOOTSTRAPPER_ACTION action,
+    __in BOOTSTRAPPER_PACKAGE_SCOPE authoredScope,
+    __in BOOTSTRAPPER_SCOPE plannedScope,
     __in BURN_VARIABLES* pVariables
     );
 HRESULT PlanDefaultRelatedBundlePlanType(
@@ -479,6 +482,15 @@ HRESULT PlanSetResumeCommand(
 void PlanDump(
     __in BURN_PLAN* pPlan
     );
+HRESULT PlanPackagesAndBundleScope(
+    __in BURN_PACKAGE* rgPackages,
+    __in DWORD cPackages,
+    __in BOOTSTRAPPER_SCOPE scope,
+    __in BOOTSTRAPPER_PACKAGE_SCOPE authoredScope,
+    __in BOOTSTRAPPER_SCOPE commandLineScope,
+    __out BOOTSTRAPPER_SCOPE* pResultingScope,
+    __out BOOL* pfPerMachine
+);
 
 #if defined(__cplusplus)
 }

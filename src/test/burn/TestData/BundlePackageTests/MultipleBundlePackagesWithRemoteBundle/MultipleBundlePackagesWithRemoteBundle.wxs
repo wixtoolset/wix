@@ -12,7 +12,7 @@
 
       <BundlePackage Id="Dotnet_Runtime_6.0" Permanent="yes">
         <BundlePackagePayload Id="Dotnet_Runtime_6.0" Name="dotnet-runtime-6.0.10-win-x64.exe" ProductName="Microsoft .NET Runtime - 6.0.10 (x64)" Description="Microsoft .NET Runtime - 6.0.10 (x64)" DownloadUrl="https://download.visualstudio.microsoft.com/download/pr/50336bc7-7fd1-4a12-b5a2-81ce0219edf9/8d862413975808de0d835888e41e49a7/dotnet-runtime-6.0.10-win-x64.exe" Hash="23E4C862AFEF34A2C0D6476A93274CE0158D28F1609E0404737663E4BE17263E61E5A8760382FB125D288A0965394E3D04B9E1C77F99DE80A2C590DD295B8732" Size="27912752" Version="6.0.10.31726">
-          <RemoteBundle BundleCode="{9A89127E-80A4-45FB-AD62-58F72634274A}" DisplayName="Microsoft .NET Runtime - 6.0.10 (x64)" InstallSize="71462036" ManifestNamespace="http://schemas.microsoft.com/wix/2008/Burn" PerMachine="yes" ProviderKey="{9a89127e-80a4-45fb-ad62-58f72634274a}" ProtocolVersion="1" Version="6.0.10.31726" Win64="no" UpgradeCode="{B19A028F-5C89-7AF4-5102-0F8ED67CCACA}" />
+          <RemoteBundle BundleCode="{9A89127E-80A4-45FB-AD62-58F72634274A}" DisplayName="Microsoft .NET Runtime - 6.0.10 (x64)" InstallSize="71462036" ManifestNamespace="http://schemas.microsoft.com/wix/2008/Burn" Scope="perMachine" ProviderKey="{9a89127e-80a4-45fb-ad62-58f72634274a}" ProtocolVersion="1" Version="6.0.10.31726" Win64="no" UpgradeCode="{B19A028F-5C89-7AF4-5102-0F8ED67CCACA}" />
         </BundlePackagePayload>
       </BundlePackage>
     </PackageGroup>

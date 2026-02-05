@@ -23,11 +23,7 @@ typedef struct _CACHE_TEST_CONTEXT
 {
 } CACHE_TEST_CONTEXT;
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -158,7 +154,7 @@ namespace Bootstrapper
                 hr = StrAllocHexDecode(L"25e61cd83485062b70713aebddd3fe4992826cb121466fddc8de3eacb1e42f39d4bdd8455d95eec8c9529ced4c0296ab861931fe2c86df2f2b4e8d259a6d9223", &pb, &cb);
                 Assert::Equal(S_OK, hr);
 
-                package.fPerMachine = FALSE;
+                package.scope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER;
                 package.sczCacheId = L"Bootstrapper.CacheTest.CacheSignatureTest";
                 payload.sczKey = L"CacheSignatureTest.PayloadKey";
                 payload.sczFilePath = L"CacheSignatureTest.File";
@@ -189,8 +185,6 @@ namespace Bootstrapper
             }
         }
     };
-}
-}
 }
 }
 }

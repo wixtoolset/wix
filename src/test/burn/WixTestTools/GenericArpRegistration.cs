@@ -4,6 +4,8 @@ namespace WixTestTools
 {
     using System;
     using Microsoft.Win32;
+    using Xunit;
+    using Xunit.Abstractions;
 
     public class GenericArpRegistration
     {
@@ -69,23 +71,23 @@ namespace WixTestTools
 
         public string UrlUpdateInfo { get; set; }
 
-        public static bool TryGetPerMachineRegistrationById(string id, bool x64, out GenericArpRegistration registration)
+        public static bool TryGetPerMachineRegistrationById(string id, bool x64, ITestOutputHelper testOutputHelper, out GenericArpRegistration registration)
         {
-            return TryGetRegistrationById(id, x64, false, out registration);
+            return TryGetRegistrationById(id, x64, perUser: false, testOutputHelper, out registration);
         }
 
-        public static bool TryGetPerUserRegistrationById(string id, out GenericArpRegistration registration)
+        public static bool TryGetPerUserRegistrationById(string id, ITestOutputHelper testOutputHelper, out GenericArpRegistration registration)
         {
-            return TryGetRegistrationById(id, true, true, out registration);
+            return TryGetRegistrationById(id, x64: true, perUser: true, testOutputHelper, out registration);
         }
 
-        private static bool TryGetRegistrationById(string id, bool x64, bool perUser, out GenericArpRegistration registration)
+        private static bool TryGetRegistrationById(string id, bool x64, bool perUser, ITestOutputHelper testOutputHelper, out GenericArpRegistration registration)
         {
-            registration = GetGenericArpRegistration(id, x64, perUser, key => new GenericArpRegistration());
+            registration = GetGenericArpRegistration(id, x64, perUser, testOutputHelper, key => new GenericArpRegistration());
             return registration != null;
         }
 
-        protected static T GetGenericArpRegistration<T>(string id, bool x64, bool perUser, Func<RegistryKey, T> fnCreate)
+        protected static T GetGenericArpRegistration<T>(string id, bool x64, bool perUser, ITestOutputHelper testOutputHelper, Func<RegistryKey, T> fnCreate)
             where T : GenericArpRegistration
         {
             var baseKey = perUser ? Registry.CurrentUser : Registry.LocalMachine;
@@ -95,6 +97,8 @@ namespace WixTestTools
 
             if (idKey == null)
             {
+                testOutputHelper.WriteLine($"Failed to open key {baseKey} {registrationKeyPath} (per-user {perUser}).");
+
                 return null;
             }
 

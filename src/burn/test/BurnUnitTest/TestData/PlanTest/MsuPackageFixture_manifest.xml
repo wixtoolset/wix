@@ -10,11 +10,11 @@
     <Container Id="WixAttachedContainer" FileSize="119" Hash="06D28293FD57CD231E125EF9C82418A488928A98832A6937A77A3283A17A5C37F8D619C51759319A57E8F8A948FA73E8C5814185A0114130F3213AB268073555" FilePath="test.exe" AttachedIndex="1" Attached="yes" Primary="yes" />
     <Payload Id="test.msu" FilePath="test.msu" FileSize="28" Hash="B040F02D2F90E04E9AFBDC91C00CEB5DF97D48E205D96DC0A44E10AF8870794DAE62CA70224F12BE9112AA730BBE470CA81FB5617AAC690E832F3F84510E92BA" Packaging="embedded" SourcePath="a0" Container="WixAttachedContainer" />
     <RollbackBoundary Id="WixDefaultBoundary" Vital="yes" Transaction="no" />
-    <Registration Code="{06077C60-DC46-4F4A-8D3C-05F869187191}" ExecutableName="test.exe" PerMachine="yes" Tag="" Version="1.0.0.0" ProviderKey="{06077C60-DC46-4F4A-8D3C-05F869187191}">
+    <Registration Code="{06077C60-DC46-4F4A-8D3C-05F869187191}" ExecutableName="test.exe" Scope="perMachine" Tag="" Version="1.0.0.0" ProviderKey="{06077C60-DC46-4F4A-8D3C-05F869187191}">
         <Arp Register="yes" DisplayName="BurnBundle" DisplayVersion="1.0.0.0" Publisher="Example Corporation" />
     </Registration>
     <Chain>
-        <MsuPackage Id="test.msu" Cache="keep" CacheId="B040F02D2F90E04E9AFBDC91C00CEB5DF97D48E205D96DC0A44E10AF8870794DAE62CA70224F12BE9112AA730BBE470CA81FB5617AAC690E832F3F84510E92BA" InstallSize="28" Size="28" PerMachine="yes" Permanent="yes" Vital="yes" RollbackBoundaryForward="WixDefaultBoundary" RollbackBoundaryBackward="WixDefaultBoundary" DetectCondition="DetectedTheMsu">
+        <MsuPackage Id="test.msu" Cache="keep" CacheId="B040F02D2F90E04E9AFBDC91C00CEB5DF97D48E205D96DC0A44E10AF8870794DAE62CA70224F12BE9112AA730BBE470CA81FB5617AAC690E832F3F84510E92BA" InstallSize="28" Size="28" Scope="perMachine" Permanent="yes" Vital="yes" RollbackBoundaryForward="WixDefaultBoundary" RollbackBoundaryBackward="WixDefaultBoundary" DetectCondition="DetectedTheMsu">
             <PayloadRef Id="test.msu" />
         </MsuPackage>
     </Chain>

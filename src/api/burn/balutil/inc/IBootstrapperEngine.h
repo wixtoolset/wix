@@ -108,7 +108,8 @@ DECLARE_INTERFACE_IID_(IBootstrapperEngine, IUnknown, "6480D616-27A0-44D7-905B-8
         ) = 0;
 
     STDMETHOD(Plan)(
-        __in BOOTSTRAPPER_ACTION action
+        __in BOOTSTRAPPER_ACTION action,
+        __in BOOTSTRAPPER_SCOPE plannedScope
         ) = 0;
 
     STDMETHOD(Elevate)(

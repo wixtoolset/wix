@@ -104,7 +104,7 @@ namespace WixToolset.WixBA
         public static void Plan(LaunchAction action)
         {
             WixBA.Model.PlannedAction = action;
-            WixBA.Model.Engine.Plan(WixBA.Model.PlannedAction);
+            WixBA.Model.Engine.Plan(WixBA.Model.PlannedAction, BundleScope.Default);
         }
 
         public static void PlanLayout()

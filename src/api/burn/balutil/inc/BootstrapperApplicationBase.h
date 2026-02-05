@@ -16,7 +16,7 @@ class CBootstrapperApplicationBase : public IBootstrapperApplication
 public: // IUnknown
     virtual STDMETHODIMP QueryInterface(
         __in REFIID riid,
-        __out LPVOID *ppvObject
+        __out LPVOID* ppvObject
         )
     {
         if (!ppvObject)
@@ -478,12 +478,14 @@ public: // IBootstrapperApplication
         __in DWORD dwCode,
         __in_z LPCWSTR wzError,
         __in DWORD dwUIHint,
-        __in DWORD /*cData*/,
+        __in DWORD cData,
         __in_ecount_z_opt(cData) LPCWSTR* /*rgwzData*/,
         __in int /*nRecommendation*/,
         __inout int* pResult
         )
     {
+        UNREFERENCED_PARAMETER(cData);
+
         BalRetryErrorOccurred(wzPackageId, dwCode);
 
         if (BOOTSTRAPPER_DISPLAY_EMBEDDED == m_commandDisplay)
@@ -781,12 +783,14 @@ public: // IBootstrapperApplication
         __in INSTALLMESSAGE /*messageType*/,
         __in DWORD /*dwUIHint*/,
         __in_z LPCWSTR /*wzMessage*/,
-        __in DWORD /*cData*/,
+        __in DWORD cData,
         __in_ecount_z_opt(cData) LPCWSTR* /*rgwzData*/,
         __in int /*nRecommendation*/,
         __inout int* pResult
         )
     {
+        UNREFERENCED_PARAMETER(cData);
+
         if (CheckCanceled())
         {
             *pResult = IDCANCEL;
@@ -797,13 +801,15 @@ public: // IBootstrapperApplication
 
     virtual STDMETHODIMP OnExecuteFilesInUse(
         __in_z LPCWSTR /*wzPackageId*/,
-        __in DWORD /*cFiles*/,
+        __in DWORD cFiles,
         __in_ecount_z(cFiles) LPCWSTR* /*rgwzFiles*/,
         __in int /*nRecommendation*/,
         __in BOOTSTRAPPER_FILES_IN_USE_TYPE /*source*/,
         __inout int* pResult
         )
     {
+        UNREFERENCED_PARAMETER(cFiles);
+
         if (CheckCanceled())
         {
             *pResult = IDCANCEL;

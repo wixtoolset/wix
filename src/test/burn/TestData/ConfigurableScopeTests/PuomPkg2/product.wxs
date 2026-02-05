@@ -1,0 +1,6 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Id="PuomPkg2" Name="PuomPkg2" Language="1033" Version="1.0.0.0" Manufacturer="Acme" Scope="perUserOrMachine">
+    <MediaTemplate EmbedCab="yes" />
+    <File Source="$(sys.SOURCEFILEPATH)" />
+  </Package>
+</Wix>

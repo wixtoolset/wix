@@ -16,6 +16,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Name), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Manufacturer), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Attributes), IntermediateFieldType.Number),
+                new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.Scope), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.AboutUrl), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.HelpUrl), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleSymbolFields.HelpTelephone), IntermediateFieldType.String),
@@ -42,6 +43,7 @@ namespace WixToolset.Data
 namespace WixToolset.Data.Symbols
 {
     using System;
+    using System.Xml.Linq;
 
     public enum WixBundleSymbolFields
     {
@@ -51,6 +53,7 @@ namespace WixToolset.Data.Symbols
         Name,
         Manufacturer,
         Attributes,
+        Scope,
         AboutUrl,
         HelpUrl,
         HelpTelephone,
@@ -78,7 +81,6 @@ namespace WixToolset.Data.Symbols
     {
         None = 0x0,
         DisableRemove = 0x1,
-        PerMachine = 0x2,
     }
 
     public enum WixBundleModifyType
@@ -86,6 +88,14 @@ namespace WixToolset.Data.Symbols
         Allowed = 0,
         Disabled = 1,
         SingleChangeUninstallButton = 2,
+    }
+
+    public enum WixBundleScopeType
+    {
+        PerMachine,
+        PerMachineOrUser,
+        PerUserOrMachine,
+        PerUser,
     }
 
     public class WixBundleSymbol : IntermediateSymbol
@@ -134,6 +144,34 @@ namespace WixToolset.Data.Symbols
         {
             get => (WixBundleAttributes)this.Fields[(int)WixBundleSymbolFields.Attributes].AsNumber();
             set => this.Set((int)WixBundleSymbolFields.Attributes, (int)value);
+        }
+
+        public WixBundleScopeType Scope
+        {
+            get => (WixBundleScopeType)this.Fields[(int)WixBundleSymbolFields.Scope].AsNumber();
+            set => this.Set((int)WixBundleSymbolFields.Scope, (int)value);
+        }
+
+        public string ScopeAsString
+        {
+            get
+            {
+                var value = (WixBundleScopeType)this.Fields[(int)WixBundleSymbolFields.Scope].AsNumber();
+
+                switch (value)
+                {
+                    case WixBundleScopeType.PerMachine:
+                        return "perMachine";
+                    case WixBundleScopeType.PerUser:
+                        return "perUser";
+                    case WixBundleScopeType.PerUserOrMachine:
+                        return "perUserOrMachine";
+                    case WixBundleScopeType.PerMachineOrUser:
+                        return "perMachineOrUser";
+                    default:
+                        return null;
+                }
+            }
         }
 
         public string AboutUrl
@@ -273,22 +311,6 @@ namespace WixToolset.Data.Symbols
                 else
                 {
                     this.Attributes &= ~WixBundleAttributes.DisableRemove;
-                }
-            }
-        }
-
-        public bool PerMachine
-        {
-            get { return this.Attributes.HasFlag(WixBundleAttributes.PerMachine); }
-            set
-            {
-                if (value)
-                {
-                    this.Attributes |= WixBundleAttributes.PerMachine;
-                }
-                else
-                {
-                    this.Attributes &= ~WixBundleAttributes.PerMachine;
                 }
             }
         }
