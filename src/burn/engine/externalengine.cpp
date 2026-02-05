@@ -633,8 +633,9 @@ LExit:
 
 HRESULT ExternalEnginePlan(
     __in BAENGINE_CONTEXT* pEngineContext,
-    __in const BOOTSTRAPPER_ACTION action
-    )
+    __in const BOOTSTRAPPER_ACTION action,
+    __in const BOOTSTRAPPER_SCOPE plannedScope
+)
 {
     HRESULT hr = S_OK;
     BAENGINE_ACTION* pAction = NULL;
@@ -649,6 +650,7 @@ HRESULT ExternalEnginePlan(
 
     pAction->dwMessage = WM_BURN_PLAN;
     pAction->plan.action = action;
+    pAction->plan.plannedScope = plannedScope;
 
     hr = EnqueueAction(pEngineContext, &pAction);
     ExitOnFailure(hr, "Failed to enqueue plan action.");

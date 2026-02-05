@@ -968,6 +968,42 @@ extern "C" LPCSTR LoggingInstallScopeToString(
     return fPerMachine ? "PerMachine" : "PerUser";
 }
 
+extern "C" LPCSTR LoggingPackageScopeToString(
+    __in BOOTSTRAPPER_PACKAGE_SCOPE scope
+    )
+{
+    switch (scope)
+    {
+    case BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE:
+        return "PerMachine";
+    case BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER:
+        return "PerMachineOrUser";
+    case BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE:
+        return "PerUserOrMachine";
+    case BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER:
+        return "PerUser";
+    default:
+        return "Invalid";
+    }
+}
+
+extern "C" LPCSTR LoggingBundleScopeToString(
+    __in BOOTSTRAPPER_SCOPE scope
+    )
+{
+    switch (scope)
+    {
+    case BOOTSTRAPPER_SCOPE_DEFAULT:
+        return "Default";
+    case BOOTSTRAPPER_SCOPE_PER_MACHINE:
+        return "PerMachine";
+    case BOOTSTRAPPER_SCOPE_PER_USER:
+        return "PerUser";
+    default:
+        return "Invalid";
+    }
+}
+
 
 // internal function declarations
 

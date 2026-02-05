@@ -7,11 +7,7 @@ using namespace System;
 using namespace Xunit;
 
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -34,8 +30,6 @@ namespace Bootstrapper
             ReleaseObject(pixdDocument);
         }
     }
-}
-}
 }
 }
 }

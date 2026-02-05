@@ -154,9 +154,12 @@ extern "C" HRESULT PackagesParseFromXml(
         hr = XmlGetAttributeUInt64(pixnNode, L"InstallSize", &pPackage->qwInstallSize);
         ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @InstallSize.");
 
-        // @PerMachine
-        hr = XmlGetYesNoAttribute(pixnNode, L"PerMachine", &pPackage->fPerMachine);
-        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @PerMachine.");
+        // @Scope
+        hr = PackageParseScopeFromXml(pixnNode, &pPackage->scope);
+        ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Scope.");
+
+        // Shortcut for static per-machine or per-user packages.
+        pPackage->fPerMachine = BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE == pPackage->scope;
 
         // @Permanent
         hr = XmlGetYesNoAttribute(pixnNode, L"Permanent", &pPackage->fPermanent);
@@ -590,6 +593,45 @@ extern "C" HRESULT PackageFindRollbackBoundaryById(
     hr = E_NOTFOUND;
 
 LExit:
+    return hr;
+}
+
+extern "C" HRESULT PackageParseScopeFromXml(
+    __in IXMLDOMNode* pixn,
+    __in BOOTSTRAPPER_PACKAGE_SCOPE* pScope
+)
+{
+    HRESULT hr = S_OK;
+    LPWSTR scz = NULL;
+
+    hr = XmlGetAttributeEx(pixn, L"Scope", &scz);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Scope.");
+
+    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, scz, -1, L"perMachine", -1))
+    {
+        *pScope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE;
+    }
+    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, scz, -1, L"perUser", -1))
+    {
+        *pScope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER;
+    }
+    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, scz, -1, L"perUserOrMachine", -1))
+    {
+        *pScope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE;
+    }
+    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, scz, -1, L"perMachineOrUser", -1))
+    {
+        *pScope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER;
+    }
+    else
+    {
+        hr = E_UNEXPECTED;
+        ExitOnRootFailure(hr, "Invalid scope: %ls", scz);
+    }
+
+LExit:
+    ReleaseStr(scz);
+
     return hr;
 }
 

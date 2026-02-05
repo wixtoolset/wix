@@ -93,6 +93,8 @@ HRESULT MsiEngineConcatBurnProperties(
     __in BOOTSTRAPPER_MSI_FILE_VERSIONING fileVersioning,
     __in BOOL fMsiPackage,
     __in BOOL fFeatureSelectionEnabled,
+    __in BOOTSTRAPPER_PACKAGE_SCOPE scope,
+    __in BOOL fPlannedPerMachineScope,
     __deref_out_z LPWSTR* psczProperties
     );
 HRESULT MsiEngineConcatPackageProperties(

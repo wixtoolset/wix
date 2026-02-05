@@ -25,11 +25,7 @@ static HRESULT ProcessChildMessages(
     __out DWORD* pdwResult
     );
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -89,8 +85,6 @@ namespace Bootstrapper
             }
         }
     };
-}
-}
 }
 }
 }

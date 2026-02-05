@@ -268,7 +268,8 @@ typedef struct _BURN_PACKAGE
 
     LPWSTR sczInstallCondition;
     LPWSTR sczRepairCondition;
-    BOOL fPerMachine;
+    BOOTSTRAPPER_PACKAGE_SCOPE scope;
+    BOOL fPerMachine;                   // only valid after Plan (for PUOM/PMOU packages).
     BOOL fPermanent;
     BOOL fVital;
     BOOL fCanAffectRegistration;
@@ -482,6 +483,10 @@ HRESULT PackageFindRollbackBoundaryById(
     __in BURN_PACKAGES* pPackages,
     __in_z LPCWSTR wzId,
     __out BURN_ROLLBACK_BOUNDARY** ppRollbackBoundary
+    );
+HRESULT PackageParseScopeFromXml(
+    __in IXMLDOMNode* pixn,
+    __in BOOTSTRAPPER_PACKAGE_SCOPE* pScope
     );
 
 

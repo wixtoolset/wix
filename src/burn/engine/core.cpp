@@ -379,7 +379,7 @@ extern "C" HRESULT CoreDetect(
             pEngineState->registration.fEligibleForCleanup = FALSE;
         }
 
-        LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingBoolToString(pPackage->fCached), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState));
+        LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingBoolToString(pPackage->fCached), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState), LoggingPackageScopeToString(pPackage->scope));
 
         if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
         {
@@ -424,8 +424,9 @@ LExit:
 
 extern "C" HRESULT CorePlan(
     __in BURN_ENGINE_STATE* pEngineState,
-    __in BOOTSTRAPPER_ACTION action
-    )
+    __in BOOTSTRAPPER_ACTION action,
+    __in BOOTSTRAPPER_SCOPE plannedScope
+)
 {
     HRESULT hr = S_OK;
     BOOL fPlanBegan = FALSE;
@@ -433,7 +434,7 @@ extern "C" HRESULT CorePlan(
     BURN_PACKAGE* pForwardCompatibleBundlePackage = NULL;
     BOOL fContinuePlanning = TRUE; // assume we won't skip planning due to dependencies.
 
-    LogId(REPORT_STANDARD, MSG_PLAN_BEGIN, pEngineState->packages.cPackages, LoggingBurnActionToString(action));
+    LogId(REPORT_STANDARD, MSG_PLAN_BEGIN, pEngineState->packages.cPackages, LoggingBurnActionToString(action), LoggingBundleScopeToString(plannedScope));
 
     fPlanBegan = TRUE;
     hr = BACallbackOnPlanBegin(&pEngineState->userExperience, pEngineState->packages.cPackages);
@@ -452,12 +453,13 @@ extern "C" HRESULT CorePlan(
     pEngineState->fPlanned = FALSE;
     PlanReset(&pEngineState->plan, &pEngineState->variables, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
 
-    hr = PlanSetVariables(action, &pEngineState->variables);
-    ExitOnFailure(hr, "Failed to update action.");
+    hr = PlanSetVariables(action, pEngineState->registration.scope, pEngineState->plan.plannedScope, &pEngineState->variables);
+    ExitOnFailure(hr, "Failed to update plan variables.");
 
     // Remember the overall action state in the plan since it shapes the changes
     // we make everywhere.
     pEngineState->plan.action = action;
+    pEngineState->plan.plannedScope = plannedScope;
     pEngineState->plan.pCache = &pEngineState->cache;
     pEngineState->plan.pCommand = &pEngineState->command;
     pEngineState->plan.pInternalCommand = &pEngineState->internalCommand;
@@ -467,6 +469,17 @@ extern "C" HRESULT CorePlan(
     pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pEngineState->plan.action;
     pEngineState->plan.fPlanPackageCacheRollback = BOOTSTRAPPER_REGISTRATION_TYPE_NONE == pEngineState->registration.detectedRegistrationType;
 
+    hr = PlanPackagesAndBundleScope(pEngineState->packages.rgPackages, pEngineState->packages.cPackages, pEngineState->plan.plannedScope, pEngineState->registration.scope, pEngineState->command.commandLineScope, &pEngineState->plan.plannedScope, &pEngineState->registration.fPerMachine);
+    ExitOnFailure(hr, "Failed to determine packages and bundle scope.");
+
+    if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == pEngineState->registration.scope || BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == pEngineState->registration.scope)
+    {
+        LogId(REPORT_STANDARD, MSG_PLAN_CONFIGURED_SCOPE, LoggingInstallScopeToString(pEngineState->registration.fPerMachine));
+    }
+
+    hr = RegistrationSetPaths(&pEngineState->registration, &pEngineState->cache);
+    ExitOnFailure(hr, "Failed to set registration paths.");
+
     // Set resume commandline
     hr = PlanSetResumeCommand(&pEngineState->plan, &pEngineState->registration, &pEngineState->log);
     ExitOnFailure(hr, "Failed to set resume command");
@@ -475,7 +488,7 @@ extern "C" HRESULT CorePlan(
     ExitOnFailure(hr, "Failed to initialize the dependencies for the plan.");
 
     hr = RegistrationPlanInitialize(&pEngineState->registration);
-    ExitOnFailure(hr, "Failed to initialize registration for the plan.");
+    ExitOnFailure(hr, "Failed to initialize the plan for registration.");
 
     if (BOOTSTRAPPER_ACTION_LAYOUT == action)
     {
@@ -555,6 +568,9 @@ extern "C" HRESULT CorePlan(
         // Finally, display all packages and related bundles in the log.
         LogPackages(pUpgradeBundlePackage, pForwardCompatibleBundlePackage, &pEngineState->packages, &pEngineState->registration.relatedBundles, action);
     }
+
+    hr = PlanSetVariables(action, pEngineState->registration.scope, pEngineState->plan.plannedScope, &pEngineState->variables);
+    ExitOnFailure(hr, "Failed to update plan variables after planning.");
 
     PlanDump(&pEngineState->plan);
 
@@ -1331,7 +1347,7 @@ extern "C" void CoreCleanup(
         ExitFunction();
     }
 
-    hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL);
+    hr = CorePlan(pEngineState, BOOTSTRAPPER_ACTION_UNINSTALL, BOOTSTRAPPER_SCOPE_DEFAULT);
     ExitOnFailure(hr, "Plan during cleanup failed");
 
     hr = CoreApply(pEngineState, pEngineState->hMessageWindow);
@@ -1469,6 +1485,14 @@ extern "C" HRESULT CoreParseCommandLine(
             else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"disablesystemrestore", -1, TRUE))
             {
                 pInternalCommand->fDisableSystemRestore = TRUE;
+            }
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"peruser", -1, TRUE))
+            {
+                pCommand->commandLineScope = BOOTSTRAPPER_SCOPE_PER_USER;
+            }
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"permachine", -1, TRUE))
+            {
+                pCommand->commandLineScope = BOOTSTRAPPER_SCOPE_PER_MACHINE;
             }
             else if (CSTR_EQUAL == ::CompareStringOrdinal(&argv[i][1], -1, L"originalsource", -1, TRUE))
             {
@@ -2346,7 +2370,7 @@ static void LogPackages(
                 LogRollbackBoundary(pPackage->pRollbackBoundaryBackward);
             }
 
-            LogId(REPORT_STANDARD, MSG_PLANNED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingCacheTypeToString(pPackage->authoredCacheType), LoggingCacheTypeToString(pPackage->cacheType), LoggingPlannedCacheToString(pPackage), LoggingBoolToString(pPackage->fPlannedUncache), LoggingDependencyActionToString(pPackage->dependencyExecute), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedInstallRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedCacheRegistrationState));
+            LogId(REPORT_STANDARD, MSG_PLANNED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingRequestStateToString(pPackage->defaultRequested), LoggingRequestStateToString(pPackage->requested), LoggingActionStateToString(pPackage->execute), LoggingActionStateToString(pPackage->rollback), LoggingCacheTypeToString(pPackage->authoredCacheType), LoggingCacheTypeToString(pPackage->cacheType), LoggingPlannedCacheToString(pPackage), LoggingBoolToString(pPackage->fPlannedUncache), LoggingDependencyActionToString(pPackage->dependencyExecute), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedInstallRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->expectedCacheRegistrationState), LoggingInstallScopeToString(pPackage->fPerMachine));
 
             if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
             {

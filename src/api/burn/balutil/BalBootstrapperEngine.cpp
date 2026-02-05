@@ -1188,7 +1188,8 @@ public: // IBootstrapperEngine
     }
 
     virtual STDMETHODIMP Plan(
-        __in BOOTSTRAPPER_ACTION action
+        __in BOOTSTRAPPER_ACTION action,
+        __in BOOTSTRAPPER_SCOPE plannedScope
         )
     {
         HRESULT hr = S_OK;
@@ -1199,17 +1200,21 @@ public: // IBootstrapperEngine
         PIPE_RPC_RESULT rpc = { };
 
         // Init send structs.
-        args.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
+        args.dwApiVersion = WIX_7_BOOTSTRAPPER_APPLICATION_API_VERSION;
         args.action = action;
+        args.plannedScope = plannedScope;
 
-        results.dwApiVersion = WIX_5_BOOTSTRAPPER_APPLICATION_API_VERSION;
+        results.dwApiVersion = WIX_7_BOOTSTRAPPER_APPLICATION_API_VERSION;
 
         // Send args.
         hr = BuffWriteNumberToBuffer(&bufferArgs, args.dwApiVersion);
         ExitOnFailure(hr, "Failed to write API version of Plan args.");
 
         hr = BuffWriteNumberToBuffer(&bufferArgs, static_cast<DWORD>(args.action));
-        ExitOnFailure(hr, "Failed to write parent window of Plan args.");
+        ExitOnFailure(hr, "Failed to write action of Plan args.");
+
+        hr = BuffWriteNumberToBuffer(&bufferArgs, static_cast<DWORD>(args.plannedScope));
+        ExitOnFailure(hr, "Failed to write planned scope of Plan args.");
 
         // Send results.
         hr = BuffWriteNumberToBuffer(&bufferResults, results.dwApiVersion);

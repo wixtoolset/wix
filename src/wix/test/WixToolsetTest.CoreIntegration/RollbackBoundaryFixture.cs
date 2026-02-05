@@ -124,7 +124,7 @@ namespace WixToolsetTest.CoreIntegration
                 var chainPackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/*", ignoreAttributesByElementName);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<MsiPackage Id='test.msi' Cache='keep' CacheId='{040011E1-F84C-4927-AD62-50A5EC19CA32}v1.0.0.0' InstallSize='34' Size='*' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='First' RollbackBoundaryBackward='First' LogPathVariable='WixBundleLog_test.msi' RollbackLogPathVariable='WixBundleRollbackLog_test.msi' ProductCode='{040011E1-F84C-4927-AD62-50A5EC19CA32}' Language='1033' Version='1.0.0.0' UpgradeCode='{047730A5-30FE-4A62-A520-DA9381B8226A}'>" +
+                    "<MsiPackage Id='test.msi' Cache='keep' CacheId='{040011E1-F84C-4927-AD62-50A5EC19CA32}v1.0.0.0' InstallSize='34' Size='*' Scope='perMachine' Permanent='no' Vital='yes' RollbackBoundaryForward='First' RollbackBoundaryBackward='First' LogPathVariable='WixBundleLog_test.msi' RollbackLogPathVariable='WixBundleRollbackLog_test.msi' ProductCode='{040011E1-F84C-4927-AD62-50A5EC19CA32}' Language='1033' Version='1.0.0.0' UpgradeCode='{047730A5-30FE-4A62-A520-DA9381B8226A}'>" +
                     "<MsiProperty Id='ARPSYSTEMCOMPONENT' Value='1' />" +
                     "<MsiProperty Id='MSIFASTINSTALL' Value='7' />" +
                     "<Provides Key='{040011E1-F84C-4927-AD62-50A5EC19CA32}_v1.0.0.0' Version='1.0.0.0' DisplayName='MsiPackage' />" +

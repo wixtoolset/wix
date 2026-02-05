@@ -87,7 +87,6 @@ namespace WixToolset.Core.Burn.Bundles
                 this.ChainPackage.Visible = true;
             }
 
-            this.ChainPackage.PerMachine = harvestedBundlePackage.PerMachine;
             this.PackagePayload.Version = harvestedBundlePackage.Version;
             this.BundlePackage.Version = harvestedBundlePackage.Version;
             this.ChainPackage.Version = harvestedBundlePackage.Version;
@@ -103,6 +102,7 @@ namespace WixToolset.Core.Burn.Bundles
             }
 
             this.ChainPackage.InstallSize = harvestedBundlePackage.InstallSize;
+            this.ChainPackage.Scope = harvestedBundlePackage.Scope;
         }
 
         private WixBundleHarvestedBundlePackageSymbol HarvestPackage()

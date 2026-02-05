@@ -202,6 +202,13 @@ LPCSTR LoggingInstallScopeToString(
     __in BOOL fPerMachine
     );
 
+LPCSTR LoggingPackageScopeToString(
+    __in BOOTSTRAPPER_PACKAGE_SCOPE scope
+    );
+
+LPCSTR LoggingBundleScopeToString(
+    __in BOOTSTRAPPER_SCOPE scope
+    );
 
 #if defined(__cplusplus)
 }

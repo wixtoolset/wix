@@ -98,4 +98,20 @@
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)xunit.runner.visualstudio.testadapter.dll" />
+    <None Include="$(MSBuildThisFileDirectory)xunit.abstractions.dll" />
+    <None Include="$(MSBuildThisFileDirectory)xunit.runner.reporters.net452.dll" />
+    <None Include="$(MSBuildThisFileDirectory)xunit.runner.utility.net452.dll" />
+    <None Include="TestData\CacheTest\CacheSignatureTest.File" />
+    <None Include="TestData\PlanTest\BasicFunctionality_BundleA_manifest.xml" />
+    <None Include="TestData\PlanTest\BundlePackage_Multiple_manifest.xml" />
+    <None Include="TestData\PlanTest\ExePackage_PerUserArpEntry_manifest.xml" />
+    <None Include="TestData\PlanTest\Failure_BundleD_manifest.xml" />
+    <None Include="TestData\PlanTest\PuomWithPerMachineBundle_manifest.xml" />
+    <None Include="TestData\PlanTest\MsiTransaction_BundleAv1_manifest.xml" />
+    <None Include="TestData\PlanTest\MsuPackageFixture_manifest.xml" />
+    <None Include="TestData\PlanTest\Slipstream_BundleA_manifest.xml" />
+    <None Include="TestData\PlanTest\Slipstream_BundleA_modified_manifest.xml" />
+  </ItemGroup>
 </Project>

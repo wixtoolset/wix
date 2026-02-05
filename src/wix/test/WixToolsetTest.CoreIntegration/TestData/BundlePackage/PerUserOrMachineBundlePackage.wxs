@@ -1,0 +1,9 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Bundle Id="WixToolsetTest.PerUserOrMachineBundlePackage" Name="PerUserOrMachineBundlePackage" Version="1.0.2.0" Manufacturer="Example Corporation">
+    <BootstrapperApplication SourceFile="fakeba.dll" />
+
+    <Chain>
+      <BundlePackage SourceFile="BundleWithPerUserOrMachinePackage.exe" />
+    </Chain>
+  </Bundle>
+</Wix>

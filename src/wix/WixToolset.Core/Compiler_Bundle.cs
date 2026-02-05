@@ -2610,11 +2610,11 @@ namespace WixToolset.Core
 
                 if (perMachine == YesNoDefaultType.Yes)
                 {
-                    chainPackageSymbol.PerMachine = true;
+                    chainPackageSymbol.Scope = WixBundleScopeType.PerMachine;
                 }
                 else if (perMachine == YesNoDefaultType.No)
                 {
-                    chainPackageSymbol.PerMachine = false;
+                    chainPackageSymbol.Scope = WixBundleScopeType.PerUser;
                 }
 
                 if (installSize.HasValue)
@@ -2871,9 +2871,9 @@ namespace WixToolset.Core
             string bundleCode = null;
             string displayName = null;
             string engineVersion = null;
+            WixBundleScopeType? scope = null;
             long? installSize = null;
             string manifestNamespace = null;
-            var perMachine = YesNoType.NotSet;
             var protocolVersion = -1;
             string providerKey = null;
             string upgradeCode = null;
@@ -2905,13 +2905,48 @@ namespace WixToolset.Core
                             manifestNamespace = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "PerMachine":
-                            perMachine = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
+                            if (scope.HasValue)
+                            {
+                                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PerMachine", "Scope", eitherOr: true));
+                            }
+                            else
+                            {
+                                scope = this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib) == YesNoType.Yes ? WixBundleScopeType.PerMachine : WixBundleScopeType.PerUser;
+                            }
                             break;
                         case "ProtocolVersion":
                             protocolVersion = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int32.MaxValue);
                             break;
                         case "ProviderKey":
                             providerKey = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "Scope":
+                            if (scope.HasValue)
+                            {
+                                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PerMachine", "Scope", eitherOr: true));
+                            }
+                            else
+                            {
+                                var installScope = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                                switch (installScope)
+                                {
+                                    case "perMachine":
+                                        scope = WixBundleScopeType.PerMachine;
+                                        break;
+                                    case "perUser":
+                                        scope = WixBundleScopeType.PerUser;
+                                        break;
+                                    case "perUserOrMachine":
+                                        scope = WixBundleScopeType.PerUserOrMachine;
+                                        break;
+                                    case "perMachineOrUser":
+                                        scope = WixBundleScopeType.PerMachineOrUser;
+                                        break;
+                                    default:
+                                        this.Core.Write(ErrorMessages.IllegalAttributeValue(sourceLineNumbers, node.Name.LocalName, attrib.Name.LocalName, installScope, "perMachine", "perUser", "perUserOrMachine"));
+                                        break;
+                                }
+                            }
                             break;
                         case "UpgradeCode":
                             upgradeCode = this.Core.GetAttributeGuidValue(sourceLineNumbers, attrib);
@@ -2943,9 +2978,9 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "ManifestNamespace"));
             }
 
-            if (perMachine == YesNoType.NotSet)
+            if (scope == null)
             {
-                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "PerMachine"));
+                this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Scope"));
             }
 
             if (protocolVersion == -1)
@@ -2976,12 +3011,12 @@ namespace WixToolset.Core
             if (!this.Messaging.EncounteredError)
             {
                 WixBundleHarvestedBundlePackageAttributes bundleAttributes = 0;
-                bundleAttributes |= (YesNoType.Yes == perMachine) ? WixBundleHarvestedBundlePackageAttributes.PerMachine : 0;
                 bundleAttributes |= (YesNoType.Yes == win64) ? WixBundleHarvestedBundlePackageAttributes.Win64 : 0;
 
                 var symbol = this.Core.AddSymbol(new WixBundleHarvestedBundlePackageSymbol(sourceLineNumbers, new Identifier(AccessModifier.Section, packagePayloadId))
                 {
                     Attributes = bundleAttributes,
+                    Scope = scope ?? WixBundleScopeType.PerMachine,
                     BundleCode = bundleCode,
                     DisplayName = displayName,
                     EngineVersion = engineVersion,

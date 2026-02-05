@@ -26,7 +26,7 @@ namespace WixTestTools
         public TestTool(string toolFile)
             : base(toolFile)
         {
-            this.PrintOutputToConsole = true;
+            this.PrintOutputToConsoleOnError = true;
         }
 
         /// <summary>
@@ -73,6 +73,11 @@ namespace WixTestTools
         /// Print output from the tool execution to the console
         /// </summary>
         public bool PrintOutputToConsole { get; set; }
+
+        /// <summary>
+        /// Print output from the tool execution to the console
+        /// </summary>
+        public bool PrintOutputToConsoleOnError { get; set; }
 
         /// <summary>
         /// The working directory of the tool
@@ -123,7 +128,12 @@ namespace WixTestTools
 
             if (assertOnError && 0 < this.Errors.Count)
             {
-                if (this.PrintOutputToConsole)
+                if (this.PrintOutputToConsoleOnError)
+                {
+                    Console.WriteLine(FormatResult(result));
+                }
+
+                if (this.PrintOutputToConsole || this.PrintOutputToConsoleOnError)
                 {
                     this.PrintErrors();
                 }

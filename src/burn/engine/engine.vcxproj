@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
-
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -28,7 +27,6 @@
       <Platform>ARM64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8119537D-E1D9-6591-D51A-49768A2F9C37}</ProjectGuid>
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -37,20 +35,15 @@
     <Description>Native component of WixToolset.Burn</Description>
     <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-
   <PropertyGroup>
     <ProjectAdditionalIncludeDirectories>..\..\api\burn\inc;$(BurnGeneratedHeaderDirectory);$(ProjectAdditionalIncludeDirectories)</ProjectAdditionalIncludeDirectories>
   </PropertyGroup>
-
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-
   <ImportGroup Label="Shared">
   </ImportGroup>
-
   <ItemGroup>
     <ClCompile Include="apply.cpp" />
     <ClCompile Include="approvedexe.cpp" />
@@ -97,7 +90,6 @@
     <ClCompile Include="variable.cpp" />
     <ClCompile Include="variant.cpp" />
   </ItemGroup>
-
   <ItemGroup>
     <ClInclude Include="apply.h" />
     <ClInclude Include="approvedexe.h" />
@@ -147,7 +139,6 @@
     <ClInclude Include="variable.h" />
     <ClInclude Include="variant.h" />
   </ItemGroup>
-
   <ItemDefinitionGroup>
     <CustomBuildStep>
       <Message>Compiling message file...</Message>
@@ -157,7 +148,6 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
       <Outputs>$(IntDir)engine.messages.h;$(IntDir)engine.messages.rc</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
-
   <Target Name="SetWixVersion" BeforeTargets="ClCompile">
     <PropertyGroup>
       <rmj>$(SomeVerInfoMajor)</rmj>
@@ -172,11 +162,12 @@ rc.exe -fo "$(OutDir)engine.res" "$(IntDir)engine.messages.rc"</Command>
     </ItemGroup>
     <WriteLinesToFile Overwrite="true" File="$(BurnGeneratedHeaderDirectory)engine.version.h" Lines="@(BurnVersionLines)" />
   </Target>
-
   <ItemGroup>
     <PackageReference Include="WixToolset.DUtil" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="engine.mc" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

@@ -39,10 +39,6 @@ static HRESULT ParseSoftwareTagsFromXml(
     __out BURN_SOFTWARE_TAG** prgSoftwareTags,
     __out DWORD* pcSoftwareTags
     );
-static HRESULT SetPaths(
-    __in BURN_REGISTRATION* pRegistration,
-    __in BURN_CACHE* pCache
-    );
 static HRESULT GetBundleManufacturer(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_VARIABLES* pVariables,
@@ -108,6 +104,15 @@ static HRESULT UpdateEstimatedSize(
     );
 static BOOL IsWuRebootPending();
 static BOOL IsRegistryRebootPending();
+static HRESULT RegistrationDetectResumeTypeByHive(
+    __in HKEY hkRegistrationRoot,
+    __in BURN_REGISTRATION* pRegistration,
+    __out BOOTSTRAPPER_RESUME_TYPE* pResumeType
+);
+static HRESULT DetectInstalled(
+    __in BURN_REGISTRATION* pRegistration,
+    __in HKEY hkRoot
+);
 
 // function definitions
 
@@ -163,9 +168,9 @@ extern "C" HRESULT RegistrationParseFromXml(
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"ExecutableName", &pRegistration->sczExecutableName);
     ExitOnRequiredXmlQueryFailure(hr, "Failed to get @ExecutableName.");
 
-    // @PerMachine
-    hr = XmlGetYesNoAttribute(pixnRegistrationNode, L"PerMachine", &pRegistration->fPerMachine);
-    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @PerMachine.");
+    // @Scope
+    hr = PackageParseScopeFromXml(pixnRegistrationNode, &pRegistration->scope);
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @Scope.");
 
     // select ARP node
     hr = XmlSelectSingleNode(pixnRegistrationNode, L"Arp", &pixnArpNode);
@@ -285,8 +290,18 @@ extern "C" HRESULT RegistrationParseFromXml(
         ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Classification.");
     }
 
-    hr = SetPaths(pRegistration, pCache);
-    ExitOnFailure(hr, "Failed to set registration paths.");
+    // Handle the easy case of build-time bundle scope early.
+    if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE == pRegistration->scope || BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER == pRegistration->scope)
+    {
+        pRegistration->fPerMachine = BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE == pRegistration->scope;
+
+        hr = RegistrationSetPaths(pRegistration, pCache);
+        ExitOnFailure(hr, "Failed to set registration paths for fixed scope.");
+    }
+    else
+    {
+        pRegistration->hkRoot = reinterpret_cast<HKEY>(0ull);
+    }
 
 LExit:
     ReleaseObject(pixnRegistrationNode);
@@ -452,31 +467,28 @@ LExit:
 
 extern "C" HRESULT RegistrationDetectInstalled(
     __in BURN_REGISTRATION* pRegistration
-    )
+)
 {
     HRESULT hr = S_OK;
-    HKEY hkRegistration = NULL;
-    DWORD dwInstalled = 0;
 
-    pRegistration->fCached = FileExistsEx(pRegistration->sczCacheExecutablePath, NULL);
-    pRegistration->detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_NONE;
-
-    // open registration key
-    hr = RegOpen(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_QUERY_VALUE, &hkRegistration);
-    if (SUCCEEDED(hr))
+    if (pRegistration->hkRoot)
     {
-        hr = RegReadNumber(hkRegistration, REGISTRY_BUNDLE_INSTALLED, &dwInstalled);
+        hr = DetectInstalled(pRegistration, pRegistration->hkRoot);
+    }
+    else
+    {
+        // For PUOM/PMOU bundles, check per-machine then fall back to per-user.
+        hr = DetectInstalled(pRegistration, HKEY_LOCAL_MACHINE);
+        ExitOnFailure(hr, "Failed to detect HKEY_LOCAL_MACHINE bundle registration install state.");
 
-        pRegistration->detectedRegistrationType = (1 == dwInstalled) ? BOOTSTRAPPER_REGISTRATION_TYPE_FULL : BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
+        if (BOOTSTRAPPER_REGISTRATION_TYPE_NONE == pRegistration->detectedRegistrationType)
+        {
+            hr = DetectInstalled(pRegistration, HKEY_CURRENT_USER);
+            ExitOnFailure(hr, "Failed to detect HKEY_CURRENT_USER bundle registration install state.");
+        }
     }
 
-    // Not finding the key or value is okay.
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-
-    ReleaseRegKey(hkRegistration);
+LExit:
     return hr;
 }
 
@@ -488,63 +500,26 @@ extern "C" HRESULT RegistrationDetectInstalled(
 extern "C" HRESULT RegistrationDetectResumeType(
     __in BURN_REGISTRATION* pRegistration,
     __out BOOTSTRAPPER_RESUME_TYPE* pResumeType
-    )
+)
 {
     HRESULT hr = S_OK;
-    HKEY hkRegistration = NULL;
-    BOOL fExists = FALSE;
-    DWORD dwResume = 0;
 
-    // open registration key
-    hr = RegOpen(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_QUERY_VALUE, &hkRegistration);
-    ExitOnPathFailure(hr, fExists, "Failed to open registration key.");
-
-    if (!fExists)
+    if (pRegistration->hkRoot)
     {
-        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_NONE;
-        ExitFunction();
+        hr = RegistrationDetectResumeTypeByHive(pRegistration->hkRoot, pRegistration, pResumeType);
     }
-
-    // read Resume value
-    hr = RegReadNumber(hkRegistration, L"Resume", &dwResume);
-    ExitOnPathFailure(hr, fExists, "Failed to read Resume value.");
-
-    if (!fExists)
+    else
     {
-        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_INVALID;
-        ExitFunction();
+        hr = RegistrationDetectResumeTypeByHive(HKEY_LOCAL_MACHINE, pRegistration, pResumeType);
+
+        if (BOOTSTRAPPER_RESUME_TYPE_NONE == *pResumeType)
+        {
+            hr = RegistrationDetectResumeTypeByHive(HKEY_CURRENT_USER, pRegistration, pResumeType);
+        }
     }
-
-    switch (dwResume)
-    {
-    case BURN_RESUME_MODE_ACTIVE:
-        // a previous run was interrupted
-        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_INTERRUPTED;
-        break;
-
-    case BURN_RESUME_MODE_SUSPEND:
-        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_SUSPEND;
-        break;
-
-    case BURN_RESUME_MODE_ARP:
-        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_ARP;
-        break;
-
-    case BURN_RESUME_MODE_REBOOT_PENDING:
-        // The volatile pending registry doesn't exist (checked above) which means
-        // the system was successfully restarted.
-        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_REBOOT;
-        break;
-
-    default:
-        // the value stored in the registry is not valid
-        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_INVALID;
-        break;
-    }
+    ExitOnFailure(hr, "Failed to find bundle registration: %ls", pRegistration->sczRegistrationKey);
 
 LExit:
-    ReleaseRegKey(hkRegistration);
-
     return hr;
 }
 
@@ -889,7 +864,7 @@ extern "C" HRESULT RegistrationSessionEnd(
 
         // Open registration key.
         hr = RegOpen(pRegistration->hkRoot, pRegistration->sczRegistrationKey, KEY_WRITE, &hkRegistration);
-        ExitOnFailure(hr, "Failed to open registration key.");
+        ExitOnFailure(hr, "Failed to open registration key for ending session.");
 
         // update display name
         hr = UpdateBundleNameRegistration(pRegistration, pVariables, hkRegistration, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS == registrationType);
@@ -1068,6 +1043,39 @@ extern "C" HRESULT RegistrationGetResumeCommandLine(
     return hr;
 }
 
+extern "C" HRESULT RegistrationSetPaths(
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache
+    )
+{
+    HRESULT hr = S_OK;
+    LPWSTR sczCacheDirectory = NULL;
+
+    // save registration key root
+    pRegistration->hkRoot = pRegistration->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+
+    // build uninstall registry key path
+    hr = StrAllocFormatted(&pRegistration->sczRegistrationKey, L"%ls\\%ls", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pRegistration->sczCode);
+    ExitOnFailure(hr, "Failed to build uninstall registry key path.");
+
+    // build cache directory
+    hr = CacheGetCompletedPath(pCache, pRegistration->fPerMachine, pRegistration->sczCode, &sczCacheDirectory);
+    ExitOnFailure(hr, "Failed to build cache directory.");
+
+    // build cached executable path
+    hr = PathConcatRelativeToFullyQualifiedBase(sczCacheDirectory, pRegistration->sczExecutableName, &pRegistration->sczCacheExecutablePath);
+    ExitOnFailure(hr, "Failed to build cached executable path.");
+
+    // build state file path
+    hr = StrAllocFormatted(&pRegistration->sczStateFile, L"%ls\\state.rsm", sczCacheDirectory);
+    ExitOnFailure(hr, "Failed to build state file path.");
+
+LExit:
+    ReleaseStr(sczCacheDirectory);
+
+    return hr;
+}
+
 
 // internal helper functions
 
@@ -1138,38 +1146,6 @@ LExit:
     ReleaseObject(pixnNodes);
     ReleaseMem(pSoftwareTags);
 
-    return hr;
-}
-
-static HRESULT SetPaths(
-    __in BURN_REGISTRATION* pRegistration,
-    __in BURN_CACHE* pCache
-    )
-{
-    HRESULT hr = S_OK;
-    LPWSTR sczCacheDirectory = NULL;
-
-    // save registration key root
-    pRegistration->hkRoot = pRegistration->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
-
-    // build uninstall registry key path
-    hr = StrAllocFormatted(&pRegistration->sczRegistrationKey, L"%ls\\%ls", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pRegistration->sczCode);
-    ExitOnFailure(hr, "Failed to build uninstall registry key path.");
-
-    // build cache directory
-    hr = CacheGetCompletedPath(pCache, pRegistration->fPerMachine, pRegistration->sczCode, &sczCacheDirectory);
-    ExitOnFailure(hr, "Failed to build cache directory.");
-
-    // build cached executable path
-    hr = PathConcatRelativeToFullyQualifiedBase(sczCacheDirectory, pRegistration->sczExecutableName, &pRegistration->sczCacheExecutablePath);
-    ExitOnFailure(hr, "Failed to build cached executable path.");
-
-    // build state file path
-    hr = StrAllocFormatted(&pRegistration->sczStateFile, L"%ls\\state.rsm", sczCacheDirectory);
-    ExitOnFailure(hr, "Failed to build state file path.");
-
-LExit:
-    ReleaseStr(sczCacheDirectory);
     return hr;
 }
 
@@ -1703,3 +1679,102 @@ static BOOL IsRegistryRebootPending()
 
     return fRebootPending;
 }
+
+static HRESULT RegistrationDetectResumeTypeByHive(
+    __in HKEY hkRegistrationRoot,
+    __in BURN_REGISTRATION* pRegistration,
+    __out BOOTSTRAPPER_RESUME_TYPE* pResumeType
+)
+{
+    HRESULT hr = S_OK;
+    HKEY hkRegistration = NULL;
+    BOOL fExists = FALSE;
+    DWORD dwResume = 0;
+
+    *pResumeType = BOOTSTRAPPER_RESUME_TYPE_NONE;
+
+    // open registration key
+    hr = RegOpen(hkRegistrationRoot, pRegistration->sczRegistrationKey, KEY_QUERY_VALUE, &hkRegistration);
+    ExitOnPathFailure(hr, fExists, "Failed to open registration key.");
+
+    if (!fExists)
+    {
+        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_NONE;
+        ExitFunction();
+    }
+
+    // read Resume value
+    hr = RegReadNumber(hkRegistration, L"Resume", &dwResume);
+    ExitOnPathFailure(hr, fExists, "Failed to read Resume value.");
+
+    if (!fExists)
+    {
+        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_INVALID;
+        ExitFunction();
+    }
+
+    switch (dwResume)
+    {
+    case BURN_RESUME_MODE_ACTIVE:
+        // a previous run was interrupted
+        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_INTERRUPTED;
+        break;
+
+    case BURN_RESUME_MODE_SUSPEND:
+        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_SUSPEND;
+        break;
+
+    case BURN_RESUME_MODE_ARP:
+        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_ARP;
+        break;
+
+    case BURN_RESUME_MODE_REBOOT_PENDING:
+        // The volatile pending registry doesn't exist (checked above) which means
+        // the system was successfully restarted.
+        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_REBOOT;
+        break;
+
+    default:
+        // the value stored in the registry is not valid
+        *pResumeType = BOOTSTRAPPER_RESUME_TYPE_INVALID;
+        break;
+    }
+
+LExit:
+    ReleaseRegKey(hkRegistration);
+
+    return hr;
+}
+
+static HRESULT DetectInstalled(
+    __in BURN_REGISTRATION* pRegistration,
+    __in HKEY hkRoot
+)
+{
+    HRESULT hr = S_OK;
+    HKEY hkRegistration = NULL;
+    DWORD dwInstalled = 0;
+
+    pRegistration->fCached = pRegistration->sczCacheExecutablePath && FileExistsEx(pRegistration->sczCacheExecutablePath, NULL);
+    pRegistration->detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_NONE;
+
+    // open registration key
+    hr = RegOpen(hkRoot, pRegistration->sczRegistrationKey, KEY_QUERY_VALUE, &hkRegistration);
+    if (SUCCEEDED(hr))
+    {
+        hr = RegReadNumber(hkRegistration, REGISTRY_BUNDLE_INSTALLED, &dwInstalled);
+
+        pRegistration->detectedRegistrationType = (1 == dwInstalled) ? BOOTSTRAPPER_REGISTRATION_TYPE_FULL : BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
+    }
+
+    // Not finding the key or value is okay.
+    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    {
+        hr = S_OK;
+    }
+
+    ReleaseRegKey(hkRegistration);
+
+    return hr;
+}
+

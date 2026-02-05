@@ -102,7 +102,7 @@ namespace WixToolset.Core.Burn.Bundles
             writer.WriteAttributeString("LogPathVariable", this.BundleSymbol.LogPathVariable);
             writer.WriteAttributeString("Compressed", this.BundleSymbol.Compressed == true ? "yes" : "no");
             writer.WriteAttributeString("UpgradeCode", this.BundleSymbol.UpgradeCode);
-            writer.WriteAttributeString("PerMachine", this.BundleSymbol.PerMachine ? "yes" : "no");
+            writer.WriteAttributeString("Scope", this.BundleSymbol.ScopeAsString);
 
             writer.WriteEndElement();
         }

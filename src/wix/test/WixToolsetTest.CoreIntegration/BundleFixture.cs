@@ -170,7 +170,7 @@ namespace WixToolsetTest.CoreIntegration
                     var registrationElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
                     WixAssert.CompareLineByLine(new[]
                     {
-                        $"<Registration Code='{bundleSymbol.BundleCode}' ExecutableName='test.exe' PerMachine='yes' Tag='' Version='1.0.0.0' ProviderKey='{bundleSymbol.BundleCode}'>" +
+                        $"<Registration Code='{bundleSymbol.BundleCode}' ExecutableName='test.exe' Scope='perMachine' Tag='' Version='1.0.0.0' ProviderKey='{bundleSymbol.BundleCode}'>" +
                         "<Arp DisplayName='~TestBundle' DisplayVersion='1.0.0.0' InProgressDisplayName='~InProgressTestBundle' Publisher='Example Corporation' />" +
                         "</Registration>",
                     }, registrationElements);

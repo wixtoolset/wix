@@ -1,22 +1,21 @@
 <Configuration>
+    <Networking>Enable</Networking>
+
     <MappedFolders>
         <MappedFolder>
             <HostFolder>..\..\..\build</HostFolder>
             <SandboxFolder>C:\build</SandboxFolder>
-            <ReadOnly>true</ReadOnly>
-        </MappedFolder>
-        <MappedFolder>
-            <HostFolder>..\..\..\build\logs</HostFolder>
-            <SandboxFolder>C:\logs</SandboxFolder>
             <ReadOnly>false</ReadOnly>
         </MappedFolder>
-		<MappedFolder>
+
+        <MappedFolder>
             <HostFolder>.\</HostFolder>
             <SandboxFolder>C:\sandbox</SandboxFolder>
             <ReadOnly>true</ReadOnly>
         </MappedFolder>
     </MappedFolders>
-	<LogonCommand>
-		<Command>C:\sandbox\startup.bat</Command>
-	</LogonCommand>
+    
+    <LogonCommand>
+      <Command>C:\sandbox\startup.bat</Command>
+    </LogonCommand>
 </Configuration>

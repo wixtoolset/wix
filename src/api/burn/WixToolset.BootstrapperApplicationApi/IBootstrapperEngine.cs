@@ -178,10 +178,11 @@ namespace WixToolset.BootstrapperApplicationApi
             );
 
         /// <summary>
-        /// See <see cref="IEngine.Plan(LaunchAction)"/>.
+        /// See <see cref="IEngine.Plan(LaunchAction, BundleScope)"/>.
         /// </summary>
         void Plan(
-            [MarshalAs(UnmanagedType.U4)] LaunchAction action
+            [MarshalAs(UnmanagedType.U4)] LaunchAction action,
+            [MarshalAs(UnmanagedType.U4)] BundleScope plannedScope
             );
 
         /// <summary>
@@ -341,6 +342,28 @@ namespace WixToolset.BootstrapperApplicationApi
         /// Launch the update registered with <see cref="IEngine.SetUpdate(string, string, long, UpdateHashType, string, string)"/> as an embedded bundle.
         /// </summary>
         UpdateReplaceEmbedded,
+    }
+
+    /// <summary>
+    /// The scope of the bundle when the chain contains per-user-or-machine or per-machone-or-user packages.
+    /// </summary>
+    public enum BundleScope
+    {
+        /// <summary>
+        /// Let Burn choose the scope. Per-user-or-machine packages will be
+        /// planned as per-machine packages.
+        /// </summary>
+        Default,
+
+        /// <summary>
+        /// Set per-machine scope for per-user-or-machine packages.
+        /// </summary>
+        PerMachine,
+
+        /// <summary>
+        /// Set per-user scope for per-user-or-machine packages.
+        /// </summary>
+        PerUser,
     }
 
     /// <summary>

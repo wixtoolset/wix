@@ -61,11 +61,6 @@ namespace WixToolset.Core.Burn
             return Message(sourceLineNumbers, Ids.DiscardedRollbackBoundary2, "Location of rollback boundary related to previous warning.");
         }
 
-        public static Message DiscouragedAllUsersValue(SourceLineNumber sourceLineNumbers, string path, string machineOrUser)
-        {
-            return Message(sourceLineNumbers, Ids.DiscouragedAllUsersValue, "Bundles require a package to be either per-machine or per-user. The MSI '{0}' ALLUSERS Property is set to '2' which may change from per-user to per-machine at install time. The Bundle will assume the package is per-{1} and will not work correctly if that changes. If possible, use the Package/@Scope attribute values 'perUser' or 'perMachine' instead.", path, machineOrUser);
-        }
-
         public static Message DownloadUrlNotSupportedForAttachedContainers(SourceLineNumber sourceLineNumbers, string containerId)
         {
             return Message(sourceLineNumbers, Ids.DownloadUrlNotSupportedForAttachedContainers, "The Container '{0}' is attached but included a @DownloadUrl attribute. Attached Containers cannot be downloaded so the download URL is being ignored.", containerId);
@@ -104,7 +99,6 @@ namespace WixToolset.Core.Burn
         public enum Ids
         {
             DiscardedRollbackBoundary = 1129,
-            DiscouragedAllUsersValue = 1133,
             ImplicitlyPerUser = 1134,
             PerUserButForcingPerMachine = 1135,
             NoPerMachineDependencies = 1140,

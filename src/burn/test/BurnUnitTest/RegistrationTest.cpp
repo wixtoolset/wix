@@ -9,11 +9,7 @@
 #define TEST_BUNDLE_UPGRADE_CODE L"{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}"
 
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -73,7 +69,7 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Scope='peruser' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -92,6 +88,12 @@ namespace Bootstrapper
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
+
+                hr = RegistrationSetPaths(&registration, &cache);
+                TestThrowOnFailure(hr, "Failed to set registration paths.");
+
+                hr = RegistrationPlanInitialize(&registration);
+                TestThrowOnFailure(hr, "Failed to initialize registration for the plan.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
                 plan.pCommand = &command;
@@ -173,7 +175,7 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Scope='peruser' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='Product1' InProgressDisplayName='Product1 Installation' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -192,6 +194,12 @@ namespace Bootstrapper
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
+
+                hr = RegistrationSetPaths(&registration, &cache);
+                TestThrowOnFailure(hr, "Failed to set registration paths.");
+
+                hr = RegistrationPlanInitialize(&registration);
+                TestThrowOnFailure(hr, "Failed to initialize registration for the plan.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
                 plan.pCommand = &command;
@@ -294,7 +302,7 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='bar' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Scope='peruser' Tag='foo' ProviderKey='bar' Version='1.0.0.0' ExecutableName='setup.exe'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='Product1' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"</Bundle>";
@@ -313,6 +321,12 @@ namespace Bootstrapper
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
+
+                hr = RegistrationSetPaths(&registration, &cache);
+                TestThrowOnFailure(hr, "Failed to set registration paths.");
+
+                hr = RegistrationPlanInitialize(&registration);
+                TestThrowOnFailure(hr, "Failed to initialize registration for the plan.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
                 plan.pCommand = &command;
@@ -415,7 +429,7 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Scope='peruser' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe'>"
                     L"        <Arp Register='yes' DisplayName='DisplayName1' DisplayVersion='1.2.3.4' Publisher='Publisher1' HelpLink='http://www.microsoft.com/help'"
                     L"             HelpTelephone='555-555-5555' AboutUrl='http://www.microsoft.com/about' UpdateUrl='http://www.microsoft.com/update'"
                     L"             Comments='Comments1' Contact='Contact1' DisableModify='yes' DisableRemove='yes' />"
@@ -436,6 +450,12 @@ namespace Bootstrapper
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
+
+                hr = RegistrationSetPaths(&registration, &cache);
+                TestThrowOnFailure(hr, "Failed to set registration paths.");
+
+                hr = RegistrationPlanInitialize(&registration);
+                TestThrowOnFailure(hr, "Failed to initialize registration for the plan.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
                 plan.pCommand = &command;
@@ -554,7 +574,7 @@ namespace Bootstrapper
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
                     L"    <RelatedBundle Code='" TEST_BUNDLE_UPGRADE_CODE L"' Action='Upgrade' />"
-                    L"    <Registration Code='" TEST_BUNDLE_ID L"' Tag='foo' ProviderKey='" TEST_BUNDLE_ID L"' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='" TEST_BUNDLE_ID L"' Scope='peruser' Tag='foo' ProviderKey='" TEST_BUNDLE_ID L"' Version='1.0.0.0' ExecutableName='setup.exe'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"    <Variable Id='MyBurnVariable1' Type='numeric' Value='0' Hidden='no' Persisted='yes' />"
@@ -581,6 +601,12 @@ namespace Bootstrapper
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
+
+                hr = RegistrationSetPaths(&registration, &cache);
+                TestThrowOnFailure(hr, "Failed to set registration paths.");
+
+                hr = RegistrationPlanInitialize(&registration);
+                TestThrowOnFailure(hr, "Failed to initialize registration for the plan.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
                 plan.pCommand = &command;
@@ -694,7 +720,7 @@ namespace Bootstrapper
                     L"    <UX PrimaryPayloadId='ux.exe'>"
                     L"        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='ux.exe' Hash='000000000000' />"
                     L"    </UX>"
-                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no'>"
+                    L"    <Registration Code='{D54F896D-1952-43E6-9C67-B5652240618C}' UpgradeCode='{89FDAE1F-8CC1-48B9-B930-3945E0D3E7F0}' Scope='peruser' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe'>"
                     L"        <Arp Register='yes' Publisher='WiX Toolset' DisplayName='RegisterBasicTest' DisplayVersion='1.0.0.0' />"
                     L"    </Registration>"
                     L"    <Variable Id='MyBurnVariable1' Type='numeric' Value='0' Hidden='no' Persisted='yes' />"
@@ -719,6 +745,12 @@ namespace Bootstrapper
 
                 hr = RegistrationParseFromXml(&registration, &cache, pixeBundle);
                 TestThrowOnFailure(hr, L"Failed to parse registration from XML.");
+
+                hr = RegistrationSetPaths(&registration, &cache);
+                TestThrowOnFailure(hr, "Failed to set registration paths.");
+
+                hr = RegistrationPlanInitialize(&registration);
+                TestThrowOnFailure(hr, "Failed to initialize registration for the plan.");
 
                 plan.action = BOOTSTRAPPER_ACTION_INSTALL;
                 plan.pCommand = &command;
@@ -879,8 +911,6 @@ namespace Bootstrapper
             Assert::Empty((System::Collections::IEnumerable^)Registry::GetValue(this->testVariableKeyPath, gcnew String(valueName), nullptr));
         }
     };
-}
-}
 }
 }
 }

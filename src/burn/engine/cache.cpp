@@ -36,8 +36,8 @@ static HRESULT SecurePerMachineCacheRoot(
 static HRESULT CreateCompletedPath(
     __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
-    __in LPCWSTR wzCacheId,
-    __in LPCWSTR wzFilePath,
+    __in_z LPCWSTR wzId,
+    __in_z_opt LPCWSTR wzFilePath,
     __out_z LPWSTR* psczCachePath
     );
 static HRESULT CreateUnverifiedPath(
@@ -1612,7 +1612,7 @@ static HRESULT SecurePerMachineCacheRoot(
 
     if (!pCache->fPerMachineCacheRootVerified)
     {
-        // If we are doing a permachine install but have not yet verified that the root cache folder
+        // If we are doing a per-machine install but have not yet verified that the root cache folder
         // was created with the correct ACLs yet, do that now.
         hr = GetRootPath(pCache, TRUE, TRUE, &sczCacheDirectory);
         ExitOnFailure(hr, "Failed to get cache directory.");
@@ -1635,7 +1635,7 @@ static HRESULT SecurePerMachineCacheRoot(
 
     if (!pCache->fOriginalPerMachineCacheRootVerified)
     {
-        // If we are doing a permachine install but have not yet verified that the original root cache folder
+        // If we are doing a per-machine install but have not yet verified that the original root cache folder
         // was created with the correct ACLs yet, do that now.
         hr = GetRootPath(pCache, TRUE, FALSE, &sczCacheDirectory);
         ExitOnFailure(hr, "Failed to get original cache directory.");
@@ -1658,8 +1658,8 @@ LExit:
 static HRESULT CreateCompletedPath(
     __in BURN_CACHE* pCache,
     __in BOOL fPerMachine,
-    __in LPCWSTR wzId,
-    __in LPCWSTR wzFilePath,
+    __in_z LPCWSTR wzId,
+    __in_z_opt LPCWSTR wzFilePath,
     __out_z LPWSTR* psczCachePath
     )
 {

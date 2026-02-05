@@ -43,6 +43,7 @@ namespace WixToolset.Test.BA
         private bool rollingBack;
         private string forceDownloadSource;
         private string forceUpdateSource;
+        private BundleScope bundleScope;
 
         private IBootstrapperCommand Command { get; set; }
 
@@ -160,6 +161,12 @@ namespace WixToolset.Test.BA
                 this.quitAfterDetect = false;
             }
 
+            string bundleScope = this.ReadPackageAction(null, "BundleScope");
+            if (String.IsNullOrEmpty(bundleScope) || !Enum.TryParse<BundleScope>(bundleScope, out this.bundleScope))
+            {
+                this.bundleScope = BundleScope.Default;
+            }
+
             this.ImportContainerSources();
             this.ImportPayloadSources();
 
@@ -227,7 +234,6 @@ namespace WixToolset.Test.BA
             {
                 this.Log("    OnDetectBegin::ForceUpdateSource: {0}", this.forceUpdateSource);
             }
-
         }
 
         protected override void OnDetectUpdateBegin(DetectUpdateBeginEventArgs args)
@@ -294,7 +300,7 @@ namespace WixToolset.Test.BA
                 }
                 else
                 {
-                    this.Engine.Plan(this.action);
+                    this.Engine.Plan(this.action, this.bundleScope);
                 }
             }
             else
@@ -312,7 +318,7 @@ namespace WixToolset.Test.BA
         {
             if (this.explicitlyElevateAndPlanFromOnElevateBegin)
             {
-                this.Engine.Plan(this.action);
+                this.Engine.Plan(this.action, this.bundleScope);
 
                 // Simulate showing some UI since these tests won't actually show the UAC prompt.
                 MessagePump.ProcessMessages(10);

@@ -1,0 +1,17 @@
+﻿<Project>
+  <PropertyGroup>
+    <OutputType>Bundle</OutputType>
+    <SuppressSpecificWarnings>1140</SuppressSpecificWarnings>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
+    <PackageReference Include="WixToolset.NetFx.wixext" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\TestBA\TestBAWixlib\testbawixlib.wixproj" />
+    <ProjectReference Include="..\PerMachinePkg\PerMachinePkg.wixproj" />
+    <ProjectReference Include="..\PmouPkg1\PmouPkg1.wixproj" />
+    <ProjectReference Include="..\PmouPkg2\PmouPkg2.wixproj" />
+    <ProjectReference Include="..\PerUserPkg\PerUserPkg.wixproj" />
+  </ItemGroup>
+</Project>

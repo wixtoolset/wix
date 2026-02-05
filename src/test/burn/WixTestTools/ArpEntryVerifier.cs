@@ -8,17 +8,25 @@ namespace WixTestTools
     {
         public bool TryGetRegistration(out GenericArpRegistration registration)
         {
-            bool success = !this.PerMachine ? GenericArpRegistration.TryGetPerUserRegistrationById(this.ArpId, out registration)
-                                            : GenericArpRegistration.TryGetPerMachineRegistrationById(this.ArpId, this.X64, out registration);
+            var success = this.PerMachine
+                ? GenericArpRegistration.TryGetPerMachineRegistrationById(this.ArpId, this.X64, this.TestContext.TestOutputHelper, out registration)
+                : GenericArpRegistration.TryGetPerUserRegistrationById(this.ArpId, this.TestContext.TestOutputHelper, out registration);
 
             return success;
         }
 
         public void VerifyRegistered(bool registered)
         {
-            bool success = this.TryGetRegistration(out _);
+            var success = this.TryGetRegistration(out _);
 
-            Assert.Equal(registered, success);
+            if (registered)
+            {
+                Assert.True(success);
+            }
+            else
+            {
+                Assert.False(success);
+            }
         }
     }
 }

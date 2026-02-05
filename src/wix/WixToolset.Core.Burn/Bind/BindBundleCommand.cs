@@ -101,8 +101,6 @@ namespace WixToolset.Core.Burn
 
             bundleSymbol.ProviderKey = bundleSymbol.BundleCode = Guid.NewGuid().ToString("B").ToUpperInvariant();
 
-            bundleSymbol.PerMachine = true; // default to per-machine but the first-per user package wil flip the bundle per-user.
-
             {
                 var command = new NormalizeRelatedBundlesCommand(this.Messaging, bundleSymbol, section);
                 command.Execute();
@@ -589,27 +587,32 @@ namespace WixToolset.Core.Burn
 
             foreach (var facade in facades)
             {
-                if (bundleSymbol.PerMachine && facade.PackageSymbol.PerMachine.HasValue && !facade.PackageSymbol.PerMachine.Value)
+                if (facade.PackageSymbol.Scope == WixBundleScopeType.PerUser)
                 {
                     this.Messaging.Write(VerboseMessages.SwitchingToPerUserPackage(facade.PackageSymbol.SourceLineNumbers, facade.PackageId));
 
-                    bundleSymbol.PerMachine = false;
-                    break;
+                    bundleSymbol.Scope = WixBundleScopeType.PerUser;
+                }
+                else if (facade.PackageSymbol.Scope.HasValue && facade.PackageSymbol.Scope > bundleSymbol.Scope)
+                {
+                    bundleSymbol.Scope = facade.PackageSymbol.Scope.Value;
                 }
             }
 
             foreach (var facade in facades)
             {
-                // Update package scope from bundle scope if default.
-                if (!facade.PackageSymbol.PerMachine.HasValue)
+                // Update package scope from bundle scope once we know it and the
+                // package doesn't have an explicit scope.
+                if (!facade.PackageSymbol.Scope.HasValue)
                 {
-                    facade.PackageSymbol.PerMachine = bundleSymbol.PerMachine;
+                    facade.PackageSymbol.Scope = bundleSymbol.Scope;
                 }
 
-                // We will only register packages in the same scope as the bundle. Warn if any packages with providers
-                // are in a different scope and not permanent (permanents typically don't need a ref-count).
-                if (!bundleSymbol.PerMachine &&
-                    facade.PackageSymbol.PerMachine.Value &&
+                // We know we won't register a per-machine package for per-user bundles. Warn for that here.
+                // (Ignore permanent packates as we won't register a reference count for them.)
+                // TODO: At runtime, log such mismatches once we know the scope of PUOM or PMOU packages.
+                if (bundleSymbol.Scope == WixBundleScopeType.PerUser &&
+                    facade.PackageSymbol.Scope.Value == WixBundleScopeType.PerMachine &&
                     !facade.PackageSymbol.Permanent &&
                     dependencySymbolsById.ContainsKey(facade.PackageId))
                 {

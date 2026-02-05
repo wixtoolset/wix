@@ -44,7 +44,7 @@ namespace WixToolsetTest.CoreIntegration
                 var msuPackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsuPackage");
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<MsuPackage Id='test.msu' Cache='keep' CacheId='B040F02D2F90E04E9AFBDC91C00CEB5DF97D48E205D96DC0A44E10AF8870794D' InstallSize='28' Size='28' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' DetectCondition='DetectedTheMsu'>" +
+                    "<MsuPackage Id='test.msu' Cache='keep' CacheId='B040F02D2F90E04E9AFBDC91C00CEB5DF97D48E205D96DC0A44E10AF8870794D' InstallSize='28' Size='28' Scope='perMachine' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' DetectCondition='DetectedTheMsu'>" +
                     "<PayloadRef Id='test.msu' />" +
                     "</MsuPackage>",
                 }, msuPackages);
@@ -85,7 +85,7 @@ namespace WixToolsetTest.CoreIntegration
                 var msuPackages = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:MsuPackage");
                 WixAssert.CompareLineByLine(new string[]
                 {
-                    "<MsuPackage Id='Windows8.1_KB2937592_x86.msu' Cache='keep' CacheId='8cf75b99-13c0-4184-82ce-dbde45dcd55a' InstallSize='309544' Size='309544' PerMachine='yes' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' DetectCondition='DetectedTheMsu'>" +
+                    "<MsuPackage Id='Windows8.1_KB2937592_x86.msu' Cache='keep' CacheId='8cf75b99-13c0-4184-82ce-dbde45dcd55a' InstallSize='309544' Size='309544' Scope='perMachine' Permanent='no' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' RollbackBoundaryBackward='WixDefaultBoundary' DetectCondition='DetectedTheMsu'>" +
                     "<PayloadRef Id='Windows8.1_KB2937592_x86.msu' />" +
                     "</MsuPackage>",
                 }, msuPackages);

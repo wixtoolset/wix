@@ -20,11 +20,11 @@ namespace WixToolsetTest.BurnE2E
 
             bundleAv1.Install();
             bundleAv1.VerifyRegisteredAndInPackageCache();
-            var gotV1Registration = bundleAv1.TryGetUpdateRegistration(out var v1Registration);
+            var gotV1Registration = bundleAv1.TryGetUpdateRegistration(plannedPerMachine: null, out var v1Registration);
 
             bundleAv2.Install();
             bundleAv2.VerifyRegisteredAndInPackageCache();
-            var gotV2Registration = bundleAv2.TryGetUpdateRegistration(out var v2Registration);
+            var gotV2Registration = bundleAv2.TryGetUpdateRegistration(plannedPerMachine: null, out var v2Registration);
 
             bundleAv1.VerifyUnregisteredAndRemovedFromPackageCache();
 

@@ -20,6 +20,7 @@ namespace WixToolset.BootstrapperApplicationApi
         [MarshalAs(UnmanagedType.I4)] internal int cbSize;
         [MarshalAs(UnmanagedType.U4)] private readonly LaunchAction action;
         [MarshalAs(UnmanagedType.U4)] private readonly Display display;
+        [MarshalAs(UnmanagedType.U4)] private readonly BundleScope scope;
         private readonly IntPtr wzCommandLine;
         [MarshalAs(UnmanagedType.I4)] private readonly int nCmdShow;
         [MarshalAs(UnmanagedType.U4)] private readonly ResumeType resume;
@@ -39,6 +40,7 @@ namespace WixToolset.BootstrapperApplicationApi
             return new BootstrapperCommand(
                 this.action,
                 this.display,
+                this.scope,
                 Marshal.PtrToStringUni(this.wzCommandLine),
                 this.nCmdShow,
                 this.resume,
@@ -62,6 +64,7 @@ namespace WixToolset.BootstrapperApplicationApi
         public BootstrapperCommand(
             LaunchAction action,
             Display display,
+            BundleScope scope,
             string commandLine,
             int cmdShow,
             ResumeType resume,
@@ -74,6 +77,7 @@ namespace WixToolset.BootstrapperApplicationApi
         {
             this.Action = action;
             this.Display = display;
+            this.Scope = scope;
             this.CommandLine = commandLine;
             this.CmdShow = cmdShow;
             this.Resume = resume;
@@ -90,6 +94,9 @@ namespace WixToolset.BootstrapperApplicationApi
 
         /// <inheritdoc/>
         public Display Display { get; }
+
+        /// <inheritdoc/>
+        public BundleScope Scope { get; }
 
         /// <inheritdoc/>
         public string CommandLine { get; }

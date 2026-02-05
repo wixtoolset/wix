@@ -72,6 +72,11 @@ namespace WixToolsetTest.BurnE2E
             this.SetBurnTestValue("ForceUpdateSource", url);
         }
 
+        public void SetBundleScope(BundleScope scope)
+        {
+            this.SetBurnTestValue("BundleScope", scope.ToString());
+        }
+
         /// <summary>
         /// Slows the cache progress of a package.
         /// </summary>

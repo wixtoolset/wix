@@ -31,6 +31,7 @@ typedef struct _BAENGINE_ACTION
         struct
         {
             BOOTSTRAPPER_ACTION action;
+            BOOTSTRAPPER_SCOPE plannedScope;
         } plan;
         struct
         {

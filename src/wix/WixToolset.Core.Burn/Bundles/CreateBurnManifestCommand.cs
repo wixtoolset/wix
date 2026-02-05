@@ -223,7 +223,7 @@ namespace WixToolset.Core.Burn.Bundles
 
                 writer.WriteAttributeString("Code", this.BundleSymbol.BundleCode);
                 writer.WriteAttributeString("ExecutableName", this.ExecutableName);
-                writer.WriteAttributeString("PerMachine", this.BundleSymbol.PerMachine ? "yes" : "no");
+                writer.WriteAttributeString("Scope", this.BundleSymbol.ScopeAsString);
                 writer.WriteAttributeString("Tag", this.BundleSymbol.Tag);
                 writer.WriteAttributeString("Version", this.BundleSymbol.Version);
                 writer.WriteAttributeString("ProviderKey", this.BundleSymbol.ProviderKey);
@@ -345,9 +345,7 @@ namespace WixToolset.Core.Burn.Bundles
                 var slipstreamMspsByPackage = this.Section.Symbols.OfType<WixBundleSlipstreamMspSymbol>().ToLookup(r => r.TargetPackageRef);
                 var exitCodesByPackage = this.Section.Symbols.OfType<WixBundlePackageExitCodeSymbol>().ToLookup(r => r.ChainPackageId);
                 var commandLinesByPackage = this.Section.Symbols.OfType<WixBundlePackageCommandLineSymbol>().ToLookup(r => r.WixBundlePackageRef);
-
                 var dependenciesByPackage = this.Section.Symbols.OfType<WixDependencyProviderSymbol>().ToLookup(p => p.ParentRef);
-
 
                 // Build up the list of target codes from all the MSPs in the chain.
                 var targetCodes = new List<WixBundlePatchTargetCodeSymbol>();
@@ -376,7 +374,12 @@ namespace WixToolset.Core.Burn.Bundles
                     writer.WriteAttributeString("CacheId", package.PackageSymbol.CacheId);
                     writer.WriteAttributeString("InstallSize", Convert.ToString(package.PackageSymbol.InstallSize));
                     writer.WriteAttributeString("Size", Convert.ToString(package.PackageSymbol.Size));
-                    writer.WriteAttributeString("PerMachine", package.PackageSymbol.PerMachine.HasValue && package.PackageSymbol.PerMachine.Value ? "yes" : "no");
+
+                    if (!String.IsNullOrEmpty(package.PackageSymbol.ScopeAsString))
+                    {
+                        writer.WriteAttributeString("Scope", package.PackageSymbol.ScopeAsString);
+                    }
+
                     writer.WriteAttributeString("Permanent", package.PackageSymbol.Permanent ? "yes" : "no");
                     writer.WriteAttributeString("Vital", package.PackageSymbol.Vital ? "yes" : "no");
 

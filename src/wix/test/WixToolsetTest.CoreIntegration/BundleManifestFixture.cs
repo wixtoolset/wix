@@ -5,11 +5,11 @@ namespace WixToolsetTest.CoreIntegration
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using Example.Extension;
     using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
     using Xunit;
-    using System.Linq;
 
     public class BundleManifestFixture
     {
@@ -187,7 +187,7 @@ namespace WixToolsetTest.CoreIntegration
                 var dataRelatedBundlesElements = extractResult.GetBADataTestXmlLines("/ba:BootstrapperApplicationData/ba:WixBundleProperties", ignoreAttributesByElementName);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<WixBundleProperties BundleId='WixToolsetTest.BundleWithInvalidUpgradeCode' Code='*' DisplayName='*' LogPathVariable='WixBundleLog' Compressed='no' UpgradeCode='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' PerMachine='yes' />",
+                    "<WixBundleProperties BundleId='WixToolsetTest.BundleWithInvalidUpgradeCode' Code='*' DisplayName='*' LogPathVariable='WixBundleLog' Compressed='no' UpgradeCode='{6D4CE32B-FB91-45DA-A9B5-7E0D9929A3C3}' Scope='perMachine' />",
                 }, dataRelatedBundlesElements);
             }
         }
@@ -381,8 +381,8 @@ namespace WixToolsetTest.CoreIntegration
                 var exePackageElements = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Chain/burn:ExePackage", ignoreAttributesByElementName);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "<ExePackage Id='credwiz.exe' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_credwiz.exe' RollbackLogPathVariable='WixBundleRollbackLog_credwiz.exe' InstallArguments='' RepairArguments='' Repairable='no' DetectionType='condition' DetectCondition='none' UninstallArguments='-foo' Uninstallable='yes' Protocol='burn' Bundle='yes'><PayloadRef Id='credwiz.exe' /><PayloadRef Id='pldbF0sgj0VCScDauGEpgwmywekS84' /></ExePackage>",
-                    "<ExePackage Id='cscript.exe' Cache='keep' CacheId='*' InstallSize='*' Size='*' PerMachine='yes' Permanent='yes' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_cscript.exe' RollbackLogPathVariable='WixBundleRollbackLog_cscript.exe' InstallArguments='' RepairArguments='' Repairable='no' DetectionType='condition' DetectCondition='none' UninstallArguments='' Uninstallable='yes' Protocol='none' Bundle='yes'><PayloadRef Id='cscript.exe' /><PayloadRef Id='pldbF0sgj0VCScDauGEpgwmywekS84' /></ExePackage>",
+                    "<ExePackage Id='credwiz.exe' Cache='keep' CacheId='*' InstallSize='*' Size='*' Scope='perMachine' Permanent='yes' Vital='yes' RollbackBoundaryForward='WixDefaultBoundary' LogPathVariable='WixBundleLog_credwiz.exe' RollbackLogPathVariable='WixBundleRollbackLog_credwiz.exe' InstallArguments='' RepairArguments='' Repairable='no' DetectionType='condition' DetectCondition='none' UninstallArguments='-foo' Uninstallable='yes' Protocol='burn' Bundle='yes'><PayloadRef Id='credwiz.exe' /><PayloadRef Id='pldbF0sgj0VCScDauGEpgwmywekS84' /></ExePackage>",
+                    "<ExePackage Id='cscript.exe' Cache='keep' CacheId='*' InstallSize='*' Size='*' Scope='perMachine' Permanent='yes' Vital='yes' RollbackBoundaryBackward='WixDefaultBoundary' LogPathVariable='WixBundleLog_cscript.exe' RollbackLogPathVariable='WixBundleRollbackLog_cscript.exe' InstallArguments='' RepairArguments='' Repairable='no' DetectionType='condition' DetectCondition='none' UninstallArguments='' Uninstallable='yes' Protocol='none' Bundle='yes'><PayloadRef Id='cscript.exe' /><PayloadRef Id='pldbF0sgj0VCScDauGEpgwmywekS84' /></ExePackage>",
                 }, exePackageElements);
             }
         }

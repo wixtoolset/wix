@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BurnManifest EngineVersion="7.0.0.54" ProtocolVersion="1" Win64="no" xmlns="http://wixtoolset.org/schemas/v4/2008/Burn">
+  <Log PathVariable="WixBundleLog" Prefix="PuPmouBundle" Extension="log" />
+  <RelatedBundle Code="{92C1B57B-1972-5EB7-BB59-B4D230D806C7}" Action="Upgrade" />
+  <UX PrimaryPayloadId="WixStandardBootstrapperApplication_X86">
+    <Payload Id="payberKyKpNVb0s10isnONgjD92jYc" FilePath="thm.xml" SourcePath="u0" />
+    <Payload Id="payXE.1bvyKgymWAWeJwB8BL4ifPGo" FilePath="thm.wxl" SourcePath="u1" />
+    <Payload Id="pay8cUoxSucOqsVErqhu1LEW8wSG1s" FilePath="logo.png" SourcePath="u2" />
+    <Payload Id="WixStandardBootstrapperApplication_X86" FilePath="wixstdba.exe" SourcePath="u3" />
+    <Payload Id="uxTxMXPVMXwQrPTMIGa5WGt93w0Ns" FilePath="BootstrapperApplicationData.xml" SourcePath="u4" />
+    <Payload Id="uxmKgAFS4cS31ZH_Myfqo5J4kHixQ" FilePath="BootstrapperExtensionData.xml" SourcePath="u5" />
+  </UX>
+  <Container Id="WixAttachedContainer" FileSize="98429" Hash="787872CCF9B905BE17725AD6F4DA2C8ACE196AA7BB90B54421E5029D85FF1F70BB51A91FAD81D2F7E09A956430866E208EF2A51681822501A39B791B88703F20" FilePath="PuPmouBundle.exe" AttachedIndex="1" Attached="yes" Primary="yes" />
+  <Payload Id="PmouPkg1.msi" FilePath="PmouPkg1.msi" FileSize="32768" Hash="BCBB4F1C48953D23BE56CD7D5005BB38CB02C7BAC4AF30F87B7ADF7715EA721D28A3FCFC025D26FD5DC069BAB69F462577C3212C1BFE3707FCCE60FF3F3ED12C" Packaging="embedded" SourcePath="a0" Container="WixAttachedContainer" />
+  <Payload Id="PmouPkg2.msi" FilePath="PmouPkg2.msi" FileSize="32768" Hash="C3BABBCCC0FDA4ACE44D28C60FAB2CA76C00655A405CF6F7A3593F9130FCF47AD18C4DAE1A32D5C0177F58DBAE00CBF7EDCA027BEE19B96E0145A3FA00811B51" Packaging="embedded" SourcePath="a1" Container="WixAttachedContainer" />
+  <Payload Id="PerUserPkg.msi" FilePath="PerUserPkg.msi" FileSize="32768" Hash="26CA1B74EFC52FA969279450110B6A9472E629004EF5655A661D8609A7E4DDB76CA220E5DB6FC2AE554415D9A4E28567014F48EF978EFDEE0B4431E81498572F" Packaging="embedded" SourcePath="a2" Container="WixAttachedContainer" />
+  <RollbackBoundary Id="WixDefaultBoundary" Vital="yes" Transaction="no" />
+  <Registration BundleId="PuPmouBundle" Code="{E974001C-97B1-4FF7-B1E3-B2CAACF1FF4A}" ExecutableName="PuPmouBundle.exe" Scope="perUser" Tag="" Version="1.0.0.0" ProviderKey="{E974001C-97B1-4FF7-B1E3-B2CAACF1FF4A}">
+    <Arp DisplayName="PuPmouBundle" DisplayVersion="1.0.0.0" Publisher="Acme" />
+  </Registration>
+  <Chain>
+    <MsiPackage Id="PmouPkg1.msi" Cache="keep" CacheId="{E46705B9-D2F9-4BE8-8270-F1A11196A9D4}v1.0.0.0" InstallSize="279" Size="32768" Scope="perMachineOrUser" Permanent="no" Vital="yes" RollbackBoundaryForward="WixDefaultBoundary" LogPathVariable="WixBundleLog_PmouPkg1.msi" RollbackLogPathVariable="WixBundleRollbackLog_PmouPkg1.msi" ProductCode="{E46705B9-D2F9-4BE8-8270-F1A11196A9D4}" Language="1033" Version="1.0.0.0" UpgradeCode="{B0DA1185-5CF5-55A3-8351-01F1AD3E50CE}">
+      <MsiProperty Id="ARPSYSTEMCOMPONENT" Value="1" />
+      <MsiProperty Id="MSIFASTINSTALL" Value="7" />
+      <Provides Key="{E46705B9-D2F9-4BE8-8270-F1A11196A9D4}_v1.0.0.0" Version="1.0.0.0" DisplayName="PmouPkg1" />
+      <RelatedPackage Id="{B0DA1185-5CF5-55A3-8351-01F1AD3E50CE}" MaxVersion="1.0.0.0" MaxInclusive="no" OnlyDetect="no" LangInclusive="yes">
+        <Language Id="1033" />
+      </RelatedPackage>
+      <RelatedPackage Id="{B0DA1185-5CF5-55A3-8351-01F1AD3E50CE}" MinVersion="1.0.0.0" MinInclusive="no" OnlyDetect="yes" LangInclusive="yes">
+        <Language Id="1033" />
+      </RelatedPackage>
+      <PayloadRef Id="PmouPkg1.msi" />
+    </MsiPackage>
+    <MsiPackage Id="PmouPkg2.msi" Cache="keep" CacheId="{1B1D793E-4026-48CA-B088-F919E70440AC}v1.0.0.0" InstallSize="279" Size="32768" Scope="perMachineOrUser" Permanent="no" Vital="yes" LogPathVariable="WixBundleLog_PmouPkg2.msi" RollbackLogPathVariable="WixBundleRollbackLog_PmouPkg2.msi" ProductCode="{1B1D793E-4026-48CA-B088-F919E70440AC}" Language="1033" Version="1.0.0.0" UpgradeCode="{98F763B3-EA17-5AE5-AD47-21004FB34B24}">
+      <MsiProperty Id="ARPSYSTEMCOMPONENT" Value="1" />
+      <MsiProperty Id="MSIFASTINSTALL" Value="7" />
+      <Provides Key="{1B1D793E-4026-48CA-B088-F919E70440AC}_v1.0.0.0" Version="1.0.0.0" DisplayName="PmouPkg2" />
+      <RelatedPackage Id="{98F763B3-EA17-5AE5-AD47-21004FB34B24}" MaxVersion="1.0.0.0" MaxInclusive="no" OnlyDetect="no" LangInclusive="yes">
+        <Language Id="1033" />
+      </RelatedPackage>
+      <RelatedPackage Id="{98F763B3-EA17-5AE5-AD47-21004FB34B24}" MinVersion="1.0.0.0" MinInclusive="no" OnlyDetect="yes" LangInclusive="yes">
+        <Language Id="1033" />
+      </RelatedPackage>
+      <PayloadRef Id="PmouPkg2.msi" />
+    </MsiPackage>
+    <MsiPackage Id="PerUserPkg.msi" Cache="keep" CacheId="{7DA760D5-30A8-4A32-A2E0-1563E0C99CEB}v1.0.0.0" InstallSize="274" Size="32768" Scope="perUser" Permanent="no" Vital="yes" RollbackBoundaryBackward="WixDefaultBoundary" LogPathVariable="WixBundleLog_PerUserPkg.msi" RollbackLogPathVariable="WixBundleRollbackLog_PerUserPkg.msi" ProductCode="{7DA760D5-30A8-4A32-A2E0-1563E0C99CEB}" Language="1033" Version="1.0.0.0" UpgradeCode="{0D1FCBA3-488C-5309-B67C-E00C8B3FCADD}">
+      <MsiProperty Id="ARPSYSTEMCOMPONENT" Value="1" />
+      <MsiProperty Id="MSIFASTINSTALL" Value="7" />
+      <Provides Key="{7DA760D5-30A8-4A32-A2E0-1563E0C99CEB}_v1.0.0.0" Version="1.0.0.0" DisplayName="PerUserPkg" />
+      <RelatedPackage Id="{0D1FCBA3-488C-5309-B67C-E00C8B3FCADD}" MaxVersion="1.0.0.0" MaxInclusive="no" OnlyDetect="no" LangInclusive="yes">
+        <Language Id="1033" />
+      </RelatedPackage>
+      <RelatedPackage Id="{0D1FCBA3-488C-5309-B67C-E00C8B3FCADD}" MinVersion="1.0.0.0" MinInclusive="no" OnlyDetect="yes" LangInclusive="yes">
+        <Language Id="1033" />
+      </RelatedPackage>
+      <PayloadRef Id="PerUserPkg.msi" />
+    </MsiPackage>
+  </Chain>
+</BurnManifest>

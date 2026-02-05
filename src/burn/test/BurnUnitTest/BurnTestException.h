@@ -2,11 +2,7 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -32,8 +28,6 @@ namespace Bootstrapper
         }
 
     };
-}
-}
 }
 }
 }
@@ -83,6 +77,6 @@ LExit:
 }
 #pragma warning (pop)
 
-#define TestThrowOnFailure(hr, s) if (FAILED(hr)) { throw gcnew Microsoft::Tools::WindowsInstallerXml::Test::Bootstrapper::BurnTestException(hr, gcnew System::String(s)); }
-#define TestThrowOnFailure1(hr, s, p) if (FAILED(hr)) { throw gcnew Microsoft::Tools::WindowsInstallerXml::Test::Bootstrapper::BurnTestException(hr, gcnew System::String(__TestThrowOnFailure_Format(s, p))); }
-#define TestThrowOnFailure2(hr, s, p1, p2) if (FAILED(hr)) { throw gcnew Microsoft::Tools::WindowsInstallerXml::Test::Bootstrapper::BurnTestException(hr, gcnew System::String(__TestThrowOnFailure_Format(s, p1, p2))); }
+#define TestThrowOnFailure(hr, s) if (FAILED(hr)) { throw gcnew WixToolset::Test::Bootstrapper::BurnTestException(hr, gcnew System::String(s)); }
+#define TestThrowOnFailure1(hr, s, p) if (FAILED(hr)) { throw gcnew WixToolset::Test::Bootstrapper::BurnTestException(hr, gcnew System::String(__TestThrowOnFailure_Format(s, p))); }
+#define TestThrowOnFailure2(hr, s, p1, p2) if (FAILED(hr)) { throw gcnew WixToolset::Test::Bootstrapper::BurnTestException(hr, gcnew System::String(__TestThrowOnFailure_Format(s, p1, p2))); }

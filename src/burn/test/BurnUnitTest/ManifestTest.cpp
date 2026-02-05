@@ -2,11 +2,7 @@
 
 #include "precomp.h"
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -40,7 +36,7 @@ namespace Bootstrapper
                     "    <UX PrimaryPayloadId='ux.exe'>"
                     "        <Payload Id='ux.exe' FilePath='ux.exe' Packaging='embedded' SourcePath='u0' />"
                     "    </UX>"
-                    "    <Registration Code='{D54F896D-1952-43e6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' PerMachine='no' />"
+                    "    <Registration Code='{D54F896D-1952-43e6-9C67-B5652240618C}' Tag='foo' ProviderKey='foo' Version='1.0.0.0' ExecutableName='setup.exe' Scope='peruser' />"
                     "    <Variable Id='Variable1' Type='numeric' Value='1' Hidden='no' Persisted='no' />"
                     "    <RegistrySearch Id='Search1' Type='exists' Root='HKLM' Key='SOFTWARE\\Microsoft' Variable='Variable1' Condition='0' />"
                     "</BurnManifest>";
@@ -64,8 +60,6 @@ namespace Bootstrapper
             }
         }
     };
-}
-}
 }
 }
 }

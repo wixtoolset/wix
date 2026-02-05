@@ -94,11 +94,15 @@ typedef struct _BURN_SOFTWARE_TAGS
 
 typedef struct _BURN_REGISTRATION
 {
-    BOOL fPerMachine;
+    // For configurable-scope bundles, fPerMachine is only valid after
+    // planning when scope is known. For fixed per-machine or per-user
+    // bundles, valid immediately.
+    BOOL fPerMachine; 
     BOOL fForceSystemComponent;
     BOOL fDisableResume;
     BOOL fCached;
     BOOTSTRAPPER_REGISTRATION_TYPE detectedRegistrationType;
+    BOOTSTRAPPER_PACKAGE_SCOPE scope;
     LPWSTR sczCode;
     LPWSTR sczTag;
 
@@ -167,7 +171,7 @@ HRESULT RegistrationParseFromXml(
     __in BURN_REGISTRATION* pRegistration,
     __in BURN_CACHE* pCache,
     __in IXMLDOMNode* pixnBundle
-    );
+);
 void RegistrationUninitialize(
     __in BURN_REGISTRATION* pRegistration
     );
@@ -191,7 +195,7 @@ HRESULT RegistrationDetectRelatedBundles(
     );
 HRESULT RegistrationPlanInitialize(
     __in BURN_REGISTRATION* pRegistration
-    );
+);
 HRESULT RegistrationSessionBegin(
     __in_z LPCWSTR wzEngineWorkingPath,
     __in BURN_REGISTRATION* pRegistration,
@@ -224,6 +228,10 @@ HRESULT RegistrationLoadState(
 HRESULT RegistrationGetResumeCommandLine(
     __in const BURN_REGISTRATION* pRegistration,
     __deref_out_z LPWSTR* psczResumeCommandLine
+    );
+HRESULT RegistrationSetPaths(
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache
     );
 
 

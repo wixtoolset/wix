@@ -1191,7 +1191,6 @@ extern "C" HRESULT ElevationExecuteMsiPackage(
     hr = VariableSerialize(pVariables, FALSE, &pbData, &cbData);
     ExitOnFailure(hr, "Failed to write variables.");
 
-
     // send message
     context.pfnMessageHandler = pfnMessageHandler;
     context.pvContext = pvContext;
@@ -2572,6 +2571,11 @@ static HRESULT OnSessionBegin(
     ExitOnFailure(hr, "Failed to read variables.");
 
     // Begin session in per-machine process.
+    pRegistration->fPerMachine = TRUE;
+
+    hr = RegistrationSetPaths(pRegistration, pCache);
+    ExitOnFailure(hr, "Failed to set elevated registration paths.");
+
     hr = RegistrationSessionBegin(sczEngineWorkingPath, pRegistration, pCache, pVariables, dwRegistrationOperations, qwEstimatedSize, (BOOTSTRAPPER_REGISTRATION_TYPE)dwRegistrationType);
     ExitOnFailure(hr, "Failed to begin registration session.");
 
@@ -2657,6 +2661,8 @@ static HRESULT OnCachePreparePackage(
     {
         hr = PackageFindById(pPackages, scz, &pPackage);
         ExitOnFailure(hr, "Failed to find package: %ls", scz);
+
+        pPackage->fPerMachine = TRUE;
     }
     else
     {
@@ -2698,6 +2704,8 @@ static HRESULT OnCacheCompletePayload(
     {
         hr = PackageFindById(pPackages, scz, &pPackage);
         ExitOnFailure(hr, "Failed to find package: %ls", scz);
+
+        pPackage->fPerMachine = TRUE;
     }
 
     hr = BuffReadString(pbData, cbData, &iData, &scz);
@@ -2717,8 +2725,8 @@ static HRESULT OnCacheCompletePayload(
 
     if (pPackage && pPayload) // complete payload.
     {
-        hr = CacheCompletePayload(pCache, pPackage->fPerMachine, pPayload, pPackage->sczCacheId, sczUnverifiedPath, fMove, BurnCacheMessageHandler, ElevatedProgressRoutine, hPipe);
-        ExitOnFailure(hr, "Failed to cache payload: %ls", pPayload->sczKey);
+        hr = CacheCompletePayload(pCache, TRUE/*fPerMachine*/, pPayload, pPackage->sczCacheId, sczUnverifiedPath, fMove, BurnCacheMessageHandler, ElevatedProgressRoutine, hPipe);
+        ExitOnFailure(hr, "Failed to cache per-machine payload: %ls", pPayload->sczKey);
     }
     else
     {
@@ -2755,6 +2763,8 @@ static HRESULT OnCacheVerifyPayload(
     {
         hr = PackageFindById(pPackages, scz, &pPackage);
         ExitOnFailure(hr, "Failed to find package: %ls", scz);
+
+        pPackage->fPerMachine = TRUE;
     }
 
     hr = BuffReadString(pbData, cbData, &iData, &scz);
@@ -2970,6 +2980,8 @@ static HRESULT OnExecuteBundlePackage(
     hr = PackageFindById(pPackages, sczPackage, &executeAction.bundlePackage.pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
+    executeAction.bundlePackage.pPackage->fPerMachine = TRUE;
+
     if (BURN_PACKAGE_TYPE_BUNDLE != executeAction.bundlePackage.pPackage->type)
     {
         ExitWithRootFailure(hr, E_INVALIDARG, "Package is not a BUNDLE package: %ls", sczPackage);
@@ -3052,6 +3064,8 @@ static HRESULT OnExecuteExePackage(
     hr = PackageFindById(pPackages, sczPackage, &executeAction.exePackage.pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
+    executeAction.exePackage.pPackage->fPerMachine = TRUE;
+
     if (BURN_PACKAGE_TYPE_EXE != executeAction.exePackage.pPackage->type)
     {
         ExitWithRootFailure(hr, E_INVALIDARG, "Package is not an EXE package: %ls", sczPackage);
@@ -3112,6 +3126,8 @@ static HRESULT OnExecuteMsiPackage(
 
     hr = PackageFindById(pPackages, sczPackage, &executeAction.msiPackage.pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
+
+    executeAction.msiPackage.pPackage->fPerMachine = TRUE;
 
     hr = BuffReadPointer(pbData, cbData, &iData, (DWORD_PTR*)&hwndParent);
     ExitOnFailure(hr, "Failed to read parent hwnd.");
@@ -3205,6 +3221,8 @@ static HRESULT OnExecuteMspPackage(
     hr = PackageFindById(pPackages, sczPackage, &executeAction.mspTarget.pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
+    executeAction.mspTarget.pPackage->fPerMachine = TRUE;
+
     hr = BuffReadPointer(pbData, cbData, &iData, (DWORD_PTR*)&hwndParent);
     ExitOnFailure(hr, "Failed to read parent hwnd.");
 
@@ -3246,6 +3264,8 @@ static HRESULT OnExecuteMspPackage(
 
             hr = PackageFindById(pPackages, sczPackage, &executeAction.mspTarget.rgOrderedPatches[i].pPackage);
             ExitOnFailure(hr, "Failed to find ordered patch package: %ls", sczPackage);
+
+            executeAction.mspTarget.rgOrderedPatches[i].pPackage->fPerMachine = TRUE;
         }
     }
 
@@ -3310,6 +3330,8 @@ static HRESULT OnExecuteMsuPackage(
     hr = PackageFindById(pPackages, sczPackage, &executeAction.msuPackage.pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
+    executeAction.msuPackage.pPackage->fPerMachine = TRUE;
+
     if (BURN_PACKAGE_TYPE_MSU != executeAction.msuPackage.pPackage->type)
     {
         ExitWithRootFailure(hr, E_INVALIDARG, "Package is not an MSU package: %ls", sczPackage);
@@ -3371,6 +3393,8 @@ static HRESULT OnUninstallMsiCompatiblePackage(
     hr = PackageFindById(pPackages, sczPackageId, &pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackageId);
 
+    pPackage->fPerMachine = TRUE;
+
     executeAction.uninstallMsiCompatiblePackage.pParentPackage = pPackage;
     pCompatiblePackage = &pPackage->compatiblePackage;
 
@@ -3424,6 +3448,8 @@ static HRESULT OnExecutePackageProviderAction(
     }
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
 
+    executeAction.packageProvider.pPackage->fPerMachine;
+
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&fRollback);
     ExitOnFailure(hr, "Failed to read rollback flag.");
 
@@ -3434,11 +3460,6 @@ static HRESULT OnExecutePackageProviderAction(
         BURN_DEPENDENCY_ACTION* pAction = fRollback ? &pProvider->providerRollback : &pProvider->providerExecute;
         hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)pAction);
         ExitOnFailure(hr, "Failed to read provider action.");
-    }
-
-    if (!executeAction.packageProvider.pPackage->fPerMachine)
-    {
-        ExitWithRootFailure(hr, E_INVALIDARG, "ExecutePackageProviderAction called for per-user package.");
     }
 
     // Execute the package provider action.
@@ -3478,6 +3499,8 @@ static HRESULT OnExecutePackageDependencyAction(
         hr = PackageFindRelatedById(pRelatedBundles, sczPackage, &executeAction.packageDependency.pPackage);
     }
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
+
+    executeAction.packageDependency.pPackage->fPerMachine = TRUE;
 
     hr = BuffReadNumber(pbData, cbData, &iData, (DWORD*)&fRollback);
     ExitOnFailure(hr, "Failed to read rollback flag.");
@@ -3784,6 +3807,8 @@ static HRESULT OnCleanCompatiblePackage(
     hr = PackageFindById(pPackages, sczPackageId, &pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackageId);
 
+    pPackage->fPerMachine = TRUE;
+
     pCompatiblePackage = &pPackage->compatiblePackage;
 
     if (!pCompatiblePackage->fDetected || !pCompatiblePackage->compatibleEntry.sczId || !pCompatiblePackage->sczCacheId || !*pCompatiblePackage->sczCacheId)
@@ -3825,6 +3850,8 @@ static HRESULT OnCleanPackage(
 
     hr = PackageFindById(pPackages, sczPackage, &pPackage);
     ExitOnFailure(hr, "Failed to find package: %ls", sczPackage);
+
+    pPackage->fPerMachine = TRUE;
 
     // Remove the package from the cache.
     hr = CacheRemovePackage(pCache, TRUE, pPackage->sczId, pPackage->sczCacheId);

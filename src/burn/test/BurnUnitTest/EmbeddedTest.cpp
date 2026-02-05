@@ -33,11 +33,7 @@ static int EmbeddedTest_GenericMessageHandler(
     __in LPVOID pvContext
     );
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -81,8 +77,6 @@ namespace Bootstrapper
             }
         }
     };
-}
-}
 }
 }
 }

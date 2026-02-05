@@ -12,7 +12,7 @@ namespace WixToolset.BootstrapperApplicationApi
     /// </summary>
     public sealed class Engine : IEngine
     {
-        private IBootstrapperEngine engine;
+        private readonly IBootstrapperEngine engine;
 
         internal Engine(IBootstrapperEngine engine)
         {
@@ -24,8 +24,7 @@ namespace WixToolset.BootstrapperApplicationApi
         {
             get
             {
-                int count;
-                this.engine.GetPackageCount(out count);
+                this.engine.GetPackageCount(out var count);
 
                 return count;
             }
@@ -110,8 +109,7 @@ namespace WixToolset.BootstrapperApplicationApi
         /// <inheritdoc/>
         public bool EvaluateCondition(string condition)
         {
-            bool value;
-            this.engine.EvaluateCondition(condition, out value);
+            this.engine.EvaluateCondition(condition, out var value);
 
             return value;
         }
@@ -247,9 +245,9 @@ namespace WixToolset.BootstrapperApplicationApi
         }
 
         /// <inheritdoc/>
-        public void Plan(LaunchAction action)
+        public void Plan(LaunchAction action, BundleScope plannedScope)
         {
-            this.engine.Plan(action);
+            this.engine.Plan(action, plannedScope);
         }
 
         /// <inheritdoc/>
@@ -327,16 +325,16 @@ namespace WixToolset.BootstrapperApplicationApi
         /// <inheritdoc/>
         public int SendEmbeddedError(int errorCode, string message, int uiHint)
         {
-            int result = 0;
-            this.engine.SendEmbeddedError(errorCode, message, uiHint, out result);
+            this.engine.SendEmbeddedError(errorCode, message, uiHint, out var result);
+
             return result;
         }
 
         /// <inheritdoc/>
         public int SendEmbeddedProgress(int progressPercentage, int overallPercentage)
         {
-            int result = 0;
-            this.engine.SendEmbeddedProgress(progressPercentage, overallPercentage, out result);
+            this.engine.SendEmbeddedProgress(progressPercentage, overallPercentage, out var result);
+
             return result;
         }
 

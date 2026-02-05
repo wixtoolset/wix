@@ -3420,7 +3420,7 @@ private:
 
 
     static LRESULT CallDefaultWndProc(
-        __in CWixStandardBootstrapperApplication* pBA,
+        __in_opt CWixStandardBootstrapperApplication* pBA,
         __in HWND hWnd,
         __in UINT uMsg,
         __in WPARAM wParam,
@@ -3824,7 +3824,7 @@ private:
 
         SetState(WIXSTDBA_STATE_PLANNING, hr);
 
-        hr = m_pEngine->Plan(action);
+        hr = m_pEngine->Plan(action, BOOTSTRAPPER_SCOPE_DEFAULT/*TODO*/);
         BalExitOnFailure(hr, "Failed to start planning packages.");
 
     LExit:
@@ -3848,7 +3848,7 @@ private:
 
         SetState(WIXSTDBA_STATE_PLANNING_PREREQS, hr);
 
-        hr = m_pEngine->Plan(action);
+        hr = m_pEngine->Plan(action, BOOTSTRAPPER_SCOPE_DEFAULT);
         BalExitOnFailure(hr, "Failed to start planning prereq packages.");
 
     LExit:
@@ -4546,6 +4546,8 @@ LExit:
         __out DWORD* pdwPageId
         )
     {
+        *pdwPageId = 0;
+
         if (BOOTSTRAPPER_DISPLAY_PASSIVE == m_commandDisplay)
         {
             switch (state)
@@ -4573,10 +4575,6 @@ LExit:
             case WIXSTDBA_STATE_EXECUTING: __fallthrough;
             case WIXSTDBA_STATE_EXECUTED:
                 *pdwPageId = m_rgdwPageIds[WIXSTDBA_PAGE_PROGRESS_PASSIVE] ? m_rgdwPageIds[WIXSTDBA_PAGE_PROGRESS_PASSIVE] : m_rgdwPageIds[WIXSTDBA_PAGE_PROGRESS];
-                break;
-
-            default:
-                *pdwPageId = 0;
                 break;
             }
         }

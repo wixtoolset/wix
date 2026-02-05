@@ -139,7 +139,8 @@ namespace WixToolset.BootstrapperApplicationApi
         /// Determine the installation sequencing and costing.
         /// </summary>
         /// <param name="action">The action to perform when planning.</param>
-        void Plan(LaunchAction action);
+        /// <param name="plannedScope">The bundle scope for per-user-or-machine packages.</param>
+        void Plan(LaunchAction action, BundleScope plannedScope);
 
         /// <summary>
         /// Set the update information for a bundle.

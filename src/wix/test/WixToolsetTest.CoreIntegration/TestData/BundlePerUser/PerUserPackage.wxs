@@ -1,0 +1,5 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Id="WixToolsetTest.PerUserPackage" ProductCode="33333333-3333-3333-3333-333333333333" Name="Per-user Package" Version="1.0" Manufacturer="Example Corporation" Scope="perUser">
+    <File Source="test.txt" />
+  </Package>
+</Wix>

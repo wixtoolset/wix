@@ -14,6 +14,7 @@ namespace WixToolset.Data
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedMsiPackageSymbolFields.ProductName), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedMsiPackageSymbolFields.ArpComments), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedMsiPackageSymbolFields.AllUsers), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(WixBundleHarvestedMsiPackageSymbolFields.MsiInstallPerUser), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedMsiPackageSymbolFields.MsiFastInstall), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedMsiPackageSymbolFields.ArpSystemComponent), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(WixBundleHarvestedMsiPackageSymbolFields.ProductCode), IntermediateFieldType.String),
@@ -37,6 +38,7 @@ namespace WixToolset.Data.Symbols
         ProductName,
         ArpComments,
         AllUsers,
+        MsiInstallPerUser,
         MsiFastInstall,
         ArpSystemComponent,
         ProductCode,
@@ -89,6 +91,12 @@ namespace WixToolset.Data.Symbols
         {
             get => this.Fields[(int)WixBundleHarvestedMsiPackageSymbolFields.AllUsers].AsString();
             set => this.Set((int)WixBundleHarvestedMsiPackageSymbolFields.AllUsers, value);
+        }
+
+        public string MsiInstallPerUser
+        {
+            get => this.Fields[(int)WixBundleHarvestedMsiPackageSymbolFields.MsiInstallPerUser].AsString();
+            set => this.Set((int)WixBundleHarvestedMsiPackageSymbolFields.MsiInstallPerUser, value);
         }
 
         public string MsiFastInstall

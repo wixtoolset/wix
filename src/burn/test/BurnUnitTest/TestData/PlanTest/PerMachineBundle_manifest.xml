@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BurnManifest EngineVersion="7.0.0.54" ProtocolVersion="1" Win64="no" xmlns="http://wixtoolset.org/schemas/v4/2008/Burn">
+  <Log PathVariable="WixBundleLog" Prefix="PerMachineBundle" Extension="log" />
+  <RelatedBundle Code="{650EDC96-0BDF-512A-A544-4E5D7DD5D11E}" Action="Upgrade" />
+  <UX PrimaryPayloadId="WixStandardBootstrapperApplication_X86">
+    <Payload Id="payberKyKpNVb0s10isnONgjD92jYc" FilePath="thm.xml" SourcePath="u0" />
+    <Payload Id="payXE.1bvyKgymWAWeJwB8BL4ifPGo" FilePath="thm.wxl" SourcePath="u1" />
+    <Payload Id="pay8cUoxSucOqsVErqhu1LEW8wSG1s" FilePath="logo.png" SourcePath="u2" />
+    <Payload Id="WixStandardBootstrapperApplication_X86" FilePath="wixstdba.exe" SourcePath="u3" />
+    <Payload Id="uxTxMXPVMXwQrPTMIGa5WGt93w0Ns" FilePath="BootstrapperApplicationData.xml" SourcePath="u4" />
+    <Payload Id="uxmKgAFS4cS31ZH_Myfqo5J4kHixQ" FilePath="BootstrapperExtensionData.xml" SourcePath="u5" />
+  </UX>
+  <Container Id="WixAttachedContainer" FileSize="32839" Hash="5BE3F4AAE711DB99A43B248F380EFB9F069C7D85F2C6D20D2B25033AABEDA09BCCF5203C2A99A7DB02D040168785EBB0260DC4073FEF2677F3760821B0948202" FilePath="PerMachineBundle.exe" AttachedIndex="1" Attached="yes" Primary="yes" />
+  <Payload Id="PerMachinePkg.msi" FilePath="PerMachinePkg.msi" FileSize="32768" Hash="4458C6B56290B207657AFB52DC20729FEDDA76799F21C14A7095E08CFB68CF382C5487CD53535CF24C16610066203ADFC29F25489BDE54290D1E480B7DED8FA6" Packaging="embedded" SourcePath="a0" Container="WixAttachedContainer" />
+  <RollbackBoundary Id="WixDefaultBoundary" Vital="yes" Transaction="no" />
+  <Registration BundleId="PerMachineBundle" Code="{3B58FF9C-2B33-417F-8240-10DA7FD7A6C4}" ExecutableName="PerMachineBundle.exe" Scope="perMachine" Tag="" Version="1.0.0.0" ProviderKey="{3B58FF9C-2B33-417F-8240-10DA7FD7A6C4}">
+    <Arp DisplayName="PerMachineBundle" DisplayVersion="1.0.0.0" Publisher="Acme" />
+  </Registration>
+  <Chain>
+    <MsiPackage Id="PerMachinePkg.msi" Cache="keep" CacheId="{DD544949-52BA-432B-925E-9BF0C4DB4B83}v1.0.0.0" InstallSize="283" Size="32768" Scope="perMachine" Permanent="no" Vital="yes" RollbackBoundaryForward="WixDefaultBoundary" RollbackBoundaryBackward="WixDefaultBoundary" LogPathVariable="WixBundleLog_PerMachinePkg.msi" RollbackLogPathVariable="WixBundleRollbackLog_PerMachinePkg.msi" ProductCode="{DD544949-52BA-432B-925E-9BF0C4DB4B83}" Language="1033" Version="1.0.0.0" UpgradeCode="{40B2312E-4395-5299-A08F-5B2744AA5A39}">
+      <MsiProperty Id="ARPSYSTEMCOMPONENT" Value="1" />
+      <MsiProperty Id="MSIFASTINSTALL" Value="7" />
+      <Provides Key="{DD544949-52BA-432B-925E-9BF0C4DB4B83}_v1.0.0.0" Version="1.0.0.0" DisplayName="PerMachinePkg" />
+      <RelatedPackage Id="{40B2312E-4395-5299-A08F-5B2744AA5A39}" MaxVersion="1.0.0.0" MaxInclusive="no" OnlyDetect="no" LangInclusive="yes">
+        <Language Id="1033" />
+      </RelatedPackage>
+      <RelatedPackage Id="{40B2312E-4395-5299-A08F-5B2744AA5A39}" MinVersion="1.0.0.0" MinInclusive="no" OnlyDetect="yes" LangInclusive="yes">
+        <Language Id="1033" />
+      </RelatedPackage>
+      <PayloadRef Id="PerMachinePkg.msi" />
+    </MsiPackage>
+  </Chain>
+</BurnManifest>

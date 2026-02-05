@@ -2,11 +2,7 @@
 
 #include "precomp.h"
 
-namespace Microsoft
-{
-namespace Tools
-{
-namespace WindowsInstallerXml
+namespace WixToolset
 {
 namespace Test
 {
@@ -328,7 +324,7 @@ static void LoadEngineState(
         L"<BurnManifest>"
         L"    <Payload Id='test.exe' FilePath='test.exe' Packaging='external' SourcePath='test.exe' Hash='000000000000' FileSize='1' />"
         L"    <Chain>"
-        L"        <ExePackage Id='Custom' Cache='remove' CacheId='test.exe' InstallSize='1' Size='1' PerMachine='no' Permanent='yes' Vital='yes' DetectCondition='' InstallArguments='[ExeExitCode]' UninstallArguments='' Uninstallable='no' RepairArguments='' Repairable='no' Protocol='none' DetectionType='condition'>"
+        L"        <ExePackage Id='Custom' Cache='remove' CacheId='test.exe' InstallSize='1' Size='1' Scope='peruser' Permanent='yes' Vital='yes' DetectCondition='' InstallArguments='[ExeExitCode]' UninstallArguments='' Uninstallable='no' RepairArguments='' Repairable='no' Protocol='none' DetectionType='condition'>"
         L"            <ExitCode Code='0' Type='2' />"
         L"            <ExitCode Code='3' Type='3' />"
         L"            <ExitCode Code='4' Type='4' />"
@@ -349,7 +345,7 @@ static void LoadEngineState(
         L"            <ExitCode Code='*' Type='1' />"
         L"            <PayloadRef Id='test.exe' />"
         L"        </ExePackage>"
-        L"        <ExePackage Id='Standard' Cache='remove' CacheId='test.exe' InstallSize='1' Size='1' PerMachine='no' Permanent='yes' Vital='yes' DetectCondition='' InstallArguments='[ExeExitCode]' UninstallArguments='' Uninstallable='no' RepairArguments='' Repairable='no' Protocol='none' DetectionType='condition'>"
+        L"        <ExePackage Id='Standard' Cache='remove' CacheId='test.exe' InstallSize='1' Size='1' Scope='peruser' Permanent='yes' Vital='yes' DetectCondition='' InstallArguments='[ExeExitCode]' UninstallArguments='' Uninstallable='no' RepairArguments='' Repairable='no' Protocol='none' DetectionType='condition'>"
         L"            <PayloadRef Id='test.exe' />"
         L"        </ExePackage>"
         L"    </Chain>"
@@ -372,8 +368,6 @@ static void LoadEngineState(
     TestThrowOnFailure(hr, "Failed to parse packages from manifest.");
 
     ReleaseObject(pixeBundle);
-}
-}
 }
 }
 }

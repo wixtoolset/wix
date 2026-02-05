@@ -22,7 +22,7 @@ static __callback int __cdecl CompareRelatedBundlesPlan(
     );
 static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
     __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
-    __in_opt LPVOID pvContext
+    __in LPVOID pvContext
     );
 static HRESULT LoadIfRelatedBundle(
     __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
@@ -258,7 +258,7 @@ static __callback int __cdecl CompareRelatedBundlesPlan(
 
 static BUNDLE_QUERY_CALLBACK_RESULT CALLBACK QueryRelatedBundlesCallback(
     __in const BUNDLE_QUERY_RELATED_BUNDLE_RESULT* pBundle,
-    __in_opt LPVOID pvContext
+    __in LPVOID pvContext
     )
 {
     HRESULT hr = S_OK;

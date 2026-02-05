@@ -92,7 +92,7 @@ namespace WixToolsetTest.BurnE2E
 
             Assert.True(LogVerifier.MessageInLogFile(logPath, "Applied execute package: v3bundle.exe, result: 0x0, restart: None"));
 
-            Assert.True(BundleRegistration.TryGetPerMachineBundleRegistrationById(v3BundleId, false, out var v3Registration));
+            Assert.True(BundleRegistration.TryGetPerMachineBundleRegistrationById(v3BundleId, false, this.TestContext.TestOutputHelper, out var v3Registration));
             Assert.Null(v3Registration.SystemComponent);
         }
 

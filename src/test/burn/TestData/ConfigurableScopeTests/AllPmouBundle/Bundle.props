@@ -1,0 +1,14 @@
+﻿<Project>
+  <PropertyGroup>
+    <OutputType>Bundle</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
+    <PackageReference Include="WixToolset.NetFx.wixext" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\TestBA\TestBAWixlib\testbawixlib.wixproj" />
+    <ProjectReference Include="..\PmouPkg1\PmouPkg1.wixproj" />
+    <ProjectReference Include="..\PmouPkg2\PmouPkg2.wixproj" />
+  </ItemGroup>
+</Project>

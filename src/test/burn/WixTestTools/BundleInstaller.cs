@@ -189,7 +189,8 @@ namespace WixTestTools
         /// <returns>Path to the generated log file.</returns>
         private string RunBundleWithArguments(int expectedExitCode, MSIExec.MSIExecMode mode, string[] arguments, bool assertOnError = true, string bundlePath = null, string layoutDirectory = null)
         {
-            TestTool bundle = new TestTool(bundlePath ?? this.Bundle);
+            var exePath = bundlePath ?? this.Bundle;
+            var bundle = new TestTool(exePath);
             var sb = new StringBuilder();
 
             // Be sure to run silent.
@@ -229,6 +230,8 @@ namespace WixTestTools
 
             // Set the arguments.
             bundle.Arguments = sb.ToString();
+
+            this.TestContext.TestOutputHelper.WriteLine($"Launching '{exePath}' with arguments '{bundle.Arguments}'...");
 
             // Run the tool and assert the expected code.
             bundle.ExpectedExitCode = expectedExitCode;

@@ -1,0 +1,7 @@
+<Project Sdk="WixToolset.Sdk">
+  <PropertyGroup>
+    <BA>TestBA</BA>
+  </PropertyGroup>
+
+  <Import Project="Bundle.props" />
+</Project>

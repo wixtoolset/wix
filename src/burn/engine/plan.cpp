@@ -278,7 +278,7 @@ extern "C" void PlanReset(
         }
     }
 
-    PlanSetVariables(BOOTSTRAPPER_ACTION_UNKNOWN, pVariables);
+    PlanSetVariables(BOOTSTRAPPER_ACTION_UNKNOWN, BOOTSTRAPPER_PACKAGE_SCOPE_INVALID, BOOTSTRAPPER_SCOPE_DEFAULT, pVariables);
 }
 
 extern "C" void PlanUninitializeExecuteAction(
@@ -332,6 +332,8 @@ extern "C" void PlanUninitializeExecuteAction(
 
 extern "C" HRESULT PlanSetVariables(
     __in BOOTSTRAPPER_ACTION action,
+    __in BOOTSTRAPPER_PACKAGE_SCOPE authoredScope,
+    __in BOOTSTRAPPER_SCOPE plannedScope,
     __in BURN_VARIABLES* pVariables
     )
 {
@@ -339,6 +341,12 @@ extern "C" HRESULT PlanSetVariables(
 
     hr = VariableSetNumeric(pVariables, BURN_BUNDLE_ACTION, action, TRUE);
     ExitOnFailure(hr, "Failed to set the bundle action built-in variable.");
+
+    hr = VariableSetNumeric(pVariables, BURN_BUNDLE_SCOPE, authoredScope, TRUE);
+    ExitOnFailure(hr, "Failed to set the bundle authored scope built-in variable.");
+
+    hr = VariableSetNumeric(pVariables, BURN_BUNDLE_PLANNED_SCOPE, plannedScope, TRUE);
+    ExitOnFailure(hr, "Failed to set the bundle planned scope built-in variable.");
 
 LExit:
     return hr;
@@ -811,6 +819,66 @@ extern "C" HRESULT PlanUpdateBundle(
 LExit:
     return hr;
 }
+
+extern "C" HRESULT PlanPackagesAndBundleScope(
+    __in BURN_PACKAGE* rgPackages,
+    __in DWORD cPackages,
+    __in BOOTSTRAPPER_SCOPE scope,
+    __in BOOTSTRAPPER_PACKAGE_SCOPE authoredScope,
+    __in BOOTSTRAPPER_SCOPE commandLineScope,
+    __out BOOTSTRAPPER_SCOPE* pResultingScope,
+    __out BOOL* pfRegistrationPerMachine
+)
+{
+    HRESULT hr = S_OK;
+    BOOL fRegistrationPerMachine = TRUE;
+
+    // If a scope was specified on the command line and the BA didn't set a scope,
+    // let the command-line switch override.
+    if (BOOTSTRAPPER_SCOPE_DEFAULT != commandLineScope)
+    {
+        if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == authoredScope || BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == authoredScope)
+        {
+            if (BOOTSTRAPPER_SCOPE_DEFAULT == scope)
+            {
+                scope = commandLineScope;
+            }
+            else
+            {
+                LogId(REPORT_STANDARD, MSG_SCOPE_IGNORED_BA_SCOPE);
+            }
+        }
+        else
+        {
+            LogId(REPORT_STANDARD, MSG_SCOPE_IGNORED_UNCONFIGURABLE);
+        }
+    }
+
+    for (DWORD i = 0; i < cPackages; ++i)
+    {
+        BURN_PACKAGE* pPackage = rgPackages + i;
+
+        pPackage->fPerMachine =
+            (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE == pPackage->scope)
+            || (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == pPackage->scope &&
+                (BOOTSTRAPPER_SCOPE_DEFAULT == scope || BOOTSTRAPPER_SCOPE_PER_MACHINE == scope))
+            || (BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == pPackage->scope &&
+                BOOTSTRAPPER_SCOPE_PER_MACHINE == scope);
+
+        // Any per-user package makes the registration per-user as well.
+        if (!pPackage->fPerMachine)
+        {
+            fRegistrationPerMachine = FALSE;
+        }
+    }
+
+    *pResultingScope = scope;
+    *pfRegistrationPerMachine = fRegistrationPerMachine;
+
+//LExit:
+    return hr;
+}
+
 
 static HRESULT PlanPackagesHelper(
     __in BURN_PACKAGE* rgPackages,
@@ -2971,7 +3039,7 @@ static void ExecuteActionLog(
         break;
 
     case BURN_EXECUTE_ACTION_TYPE_MSI_PACKAGE:
-        LogStringLine(PlanDumpLevel, "%ls action[%u]: MSI_PACKAGE package id: %ls, action: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %hs, file versioning: %hs, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingActionStateToString(pAction->msiPackage.action), LoggingBurnMsiPropertyToString(pAction->msiPackage.actionMsiProperty), pAction->msiPackage.uiLevel, LoggingBoolToString(pAction->msiPackage.fDisableExternalUiHandler), LoggingMsiFileVersioningToString(pAction->msiPackage.fileVersioning), pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
+        LogStringLine(PlanDumpLevel, "%ls action[%u]: MSI_PACKAGE package id: %ls, scope: %hs, action: %hs, action msi property: %ls, ui level: %u, disable externaluihandler: %hs, file versioning: %hs, log path: %ls, logging attrib: %u", wzBase, iAction, pAction->msiPackage.pPackage->sczId, LoggingPackageScopeToString(pAction->msiPackage.pPackage->scope), LoggingActionStateToString(pAction->msiPackage.action), LoggingBurnMsiPropertyToString(pAction->msiPackage.actionMsiProperty), pAction->msiPackage.uiLevel, LoggingBoolToString(pAction->msiPackage.fDisableExternalUiHandler), LoggingMsiFileVersioningToString(pAction->msiPackage.fileVersioning), pAction->msiPackage.sczLogPath, pAction->msiPackage.dwLoggingAttributes);
         for (DWORD j = 0; j < pAction->msiPackage.pPackage->Msi.cSlipstreamMspPackages; ++j)
         {
             const BURN_SLIPSTREAM_MSP* pSlipstreamMsp = pAction->msiPackage.pPackage->Msi.rgSlipstreamMsps + j;
@@ -3083,6 +3151,7 @@ extern "C" void PlanDump(
     LogStringLine(PlanDumpLevel, "     bundle code: %ls", pPlan->wzBundleCode);
     LogStringLine(PlanDumpLevel, "     bundle provider key: %ls", pPlan->wzBundleProviderKey);
     LogStringLine(PlanDumpLevel, "     use-forward-compatible: %hs", LoggingTrueFalseToString(pPlan->fEnabledForwardCompatibleBundle));
+    LogStringLine(PlanDumpLevel, "     planned scope: %hs", LoggingBundleScopeToString(pPlan->plannedScope));
     LogStringLine(PlanDumpLevel, "     per-machine: %hs", LoggingTrueFalseToString(pPlan->fPerMachine));
     LogStringLine(PlanDumpLevel, "     can affect machine state: %hs", LoggingTrueFalseToString(pPlan->fCanAffectMachineState));
     LogStringLine(PlanDumpLevel, "     disable-rollback: %hs", LoggingTrueFalseToString(pPlan->fDisableRollback));

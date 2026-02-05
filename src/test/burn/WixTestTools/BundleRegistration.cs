@@ -4,6 +4,7 @@ namespace WixTestTools
 {
     using System;
     using Microsoft.Win32;
+    using Xunit.Abstractions;
 
     public class BundleRegistration : GenericArpRegistration
     {
@@ -36,19 +37,19 @@ namespace WixTestTools
 
         public string[] UpgradeCodes { get; set; }
 
-        public static bool TryGetPerMachineBundleRegistrationById(string id, bool x64, out BundleRegistration registration)
+        public static bool TryGetPerMachineBundleRegistrationById(string id, bool x64, ITestOutputHelper testOutputHelper, out BundleRegistration registration)
         {
-            return TryGetRegistrationById(id, x64, false, out registration);
+            return TryGetRegistrationById(id, x64, false, testOutputHelper, out registration);
         }
 
-        public static bool TryGetPerUserBundleRegistrationById(string id, out BundleRegistration registration)
+        public static bool TryGetPerUserBundleRegistrationById(string id, ITestOutputHelper testOutputHelper, out BundleRegistration registration)
         {
-            return TryGetRegistrationById(id, true, true, out registration);
+            return TryGetRegistrationById(id, true, true, testOutputHelper, out registration);
         }
 
-        private static bool TryGetRegistrationById(string id, bool x64, bool perUser, out BundleRegistration registration)
+        private static bool TryGetRegistrationById(string id, bool x64, bool perUser, ITestOutputHelper testOutputHelper, out BundleRegistration registration)
         {
-            registration = GetGenericArpRegistration(id, x64, perUser, key => GetBundleRegistration(key));
+            registration = GetGenericArpRegistration(id, x64, perUser, testOutputHelper, key => GetBundleRegistration(key));
             return registration != null;
         }
 

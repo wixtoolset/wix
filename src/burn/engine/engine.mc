@@ -271,7 +271,7 @@ MessageId=101
 Severity=Success
 SymbolicName=MSG_DETECTED_PACKAGE
 Language=English
-Detected package: %1!ls!, state: %2!hs!, cached: %3!hs!, install registration state: %4!hs!, cache registration state: %5!hs!
+Detected package: %1!ls!, state: %2!hs!, authored scope: %6!hs!, cached: %3!hs!, install registration state: %4!hs!, cache registration state: %5!hs!
 .
 
 MessageId=102
@@ -404,14 +404,21 @@ MessageId=200
 Severity=Success
 SymbolicName=MSG_PLAN_BEGIN
 Language=English
-Plan begin, %1!u! packages, action: %2!hs!
+Plan begin, %1!u! packages, action: %2!hs!, planned scope: %3!hs!
+.
+
+MessageId=226
+Severity=Success
+SymbolicName=MSG_PLAN_CONFIGURED_SCOPE
+Language=English
+Planned configurable scope: %1!hs!
 .
 
 MessageId=201
 Severity=Success
 SymbolicName=MSG_PLANNED_PACKAGE
 Language=English
-Planned package: %1!ls!, state: %2!hs!, default requested: %3!hs!, ba requested: %4!hs!, execute: %5!hs!, rollback: %6!hs!, default cache strategy: %7!hs!, ba requested strategy: %8!hs!, cache: %9!hs!, uncache: %10!hs!, dependency: %11!hs!, expected install registration state: %12!hs!, expected cache registration state: %13!hs!
+Planned package: %1!ls!, state: %2!hs!, default requested: %3!hs!, ba requested: %4!hs!, execute: %5!hs!, rollback: %6!hs!, scope: %14!hs!, default cache strategy: %7!hs!, ba requested strategy: %8!hs!, cache: %9!hs!, uncache: %10!hs!, dependency: %11!hs!, expected install registration state: %12!hs!, expected cache registration state: %13!hs!
 .
 
 MessageId=203
@@ -782,7 +789,7 @@ MessageId=328
 Severity=Warning
 SymbolicName=MSG_DEPENDENCY_PACKAGE_DEPENDENT
 Language=English
-Found dependent: %1!ls!, name: %2!ls!
+  Found dependent: %1!ls!, name: %2!ls!
 .
 
 MessageId=329
@@ -1288,3 +1295,17 @@ SymbolicName=MSG_DEPENDENCY_PACKAGE_DEPENDENTS_OVERRIDDEN
 Language=English
 BA requested to uninstall package: %1!ls!, despite dependents:
 .
+MessageId=702
+Severity=Warning
+SymbolicName=MSG_SCOPE_IGNORED_BA_SCOPE
+Language=English
+Scope command-line switch ignored because the bootstrapper application already specified a scope.
+.
+
+MessageId=703
+Severity=Warning
+SymbolicName=MSG_SCOPE_IGNORED_UNCONFIGURABLE
+Language=English
+Scope command-line switch ignored because the bundle doesn't have any packages with configurable scope.
+.
+
