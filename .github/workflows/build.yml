@@ -41,7 +41,7 @@ jobs:
       - name: Install sign tool
         if: ${{ env.SignBuild == 'true' }}
         shell: cmd
-        run: dotnet tool install --tool-path build\.tools sign --version 0.9.1-beta.24170.3
+        run: dotnet tool install --tool-path build\.tools sign --version 0.9.1-beta.26102.1
 
       - name: Configure automated logging and crash dumps
         shell: cmd
@@ -55,23 +55,22 @@ jobs:
           reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\Windows Error Reporting\LocalDumps" /t REG_DWORD /v DumpCount /d 10 /f
           reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\Windows Error Reporting\LocalDumps" /t REG_DWORD /v DumpType /d 1
 
-      # - name: 'Az CLI login'
-      #   if: ${{ env.SignBuild == 'true' }}
-      #   uses: azure/login@v1
-      #   with:
-      #     allow-no-subscriptions: true
-      #     client-id: ${{ secrets.WIX_SIGNING_CLIENTID }}
-      #     tenant-id: ${{ secrets.WIX_SIGNING_TENANTID }}
+      - name: 'Az CLI login'
+        if: ${{ env.SignBuild == 'true' }}
+        uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # tag: v2.3.0
+        with:
+          allow-no-subscriptions: true
+          client-id: ${{ secrets.WIX_SIGNING_CLIENTID }}
+          tenant-id: ${{ secrets.WIX_SIGNING_TENANTID }}
 
       - name: Build wix7
         shell: cmd
         run: ./src/build_official.cmd
         env:
           RuntimeTestsEnabled: true
+          AZURE_CLIENT_ID: ${{ env.SignBuild == 'true' && secrets.WIX_SIGNING_CLIENTID || '' }}
+          AZURE_TENANT_ID: ${{ env.SignBuild == 'true' && secrets.WIX_SIGNING_TENANTID || '' }}
           SigningKeyVaultUri:  ${{ env.SignBuild == 'true' && secrets.WIX_SIGNING_VAULTURI || '' }}
-          SigningTenantId:  ${{ env.SignBuild == 'true' && secrets.WIX_SIGNING_TENANTID || '' }}
-          SigningClientId:  ${{ env.SignBuild == 'true' && secrets.WIX_SIGNING_CLIENTID || '' }}
-          SigningClientSecret:  ${{ env.SignBuild == 'true' && secrets.WIX_SIGNING_SECRET || '' }}
           SigningCertName:  ${{ env.SignBuild == 'true' && secrets.WIX_SIGNING_CERTNAME || '' }}
 
       - name: Validate test results
