@@ -701,6 +701,10 @@ static HRESULT FindExistingCertificate(
     PCCERT_CONTEXT pCertContext = NULL;
     BYTE* pbCertificate = NULL;
     DWORD cbCertificate = 0;
+    LPWSTR pwzUniquePrefix = NULL;
+
+    hr = StrAllocFormatted(&pwzUniquePrefix, L"%s_wixCert_", wzName);
+    ExitOnFailure(hr, "Failed to format unique name");
 
     hCertStore = ::CertOpenStore(CERT_STORE_PROV_SYSTEM, 0, NULL, dwStoreLocation | CERT_STORE_READONLY_FLAG, wzStore);
     MessageExitOnNullWithLastError(hCertStore, hr, msierrCERTFailedOpen, "Failed to open certificate store.");
@@ -713,7 +717,7 @@ static HRESULT FindExistingCertificate(
         DWORD cbFriendlyName = sizeof(wzFriendlyName);
 
         if (::CertGetCertificateContextProperty(pCertContext, CERT_FRIENDLY_NAME_PROP_ID, reinterpret_cast<BYTE*>(wzFriendlyName), &cbFriendlyName) &&
-            CSTR_EQUAL == ::CompareStringW(LOCALE_SYSTEM_DEFAULT, 0, wzName, -1, wzFriendlyName, -1))
+            CSTR_EQUAL == ::CompareStringW(LOCALE_SYSTEM_DEFAULT, 0, pwzUniquePrefix, -1, wzFriendlyName, -1))
         {
             // If the certificate with matching friendly name is valid, let's use that.
             long lVerify = ::CertVerifyTimeValidity(NULL, pCertContext->pCertInfo);
@@ -739,6 +743,7 @@ static HRESULT FindExistingCertificate(
     pbCertificate = NULL;
 
 LExit:
+    ReleaseStr(pwzUniquePrefix);
     ReleaseMem(pbCertificate);
 
     if (pCertContext)
