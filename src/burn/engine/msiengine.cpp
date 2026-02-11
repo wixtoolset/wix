@@ -457,14 +457,24 @@ extern "C" HRESULT MsiEngineDetectPackage(
     if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == pPackage->scope || BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == pPackage->scope)
     {
         hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, MSIINSTALLCONTEXT_MACHINE, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
-        if (FAILED(hr))
+        if (SUCCEEDED(hr))
+        {
+            pPackage->fDetectedPerMachine = TRUE;
+        }
+        else
         {
             hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
+            if (SUCCEEDED(hr))
+            {
+                pPackage->fDetectedPerMachine = FALSE;
+            }
         }
     }
     else
     {
-        hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, pPackage->scope == BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
+        pPackage->fDetectedPerMachine = BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE == pPackage->scope;
+
+        hr = WiuGetProductInfoEx(pPackage->Msi.sczProductCode, NULL, pPackage->fDetectedPerMachine ? MSIINSTALLCONTEXT_MACHINE : MSIINSTALLCONTEXT_USERUNMANAGED, INSTALLPROPERTY_VERSIONSTRING, &sczInstalledVersion);
     }
     if (SUCCEEDED(hr))
     {

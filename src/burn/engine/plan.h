@@ -488,6 +488,7 @@ HRESULT PlanPackagesAndBundleScope(
     __in BOOTSTRAPPER_SCOPE scope,
     __in BOOTSTRAPPER_PACKAGE_SCOPE authoredScope,
     __in BOOTSTRAPPER_SCOPE commandLineScope,
+    __in BOOTSTRAPPER_SCOPE detectedScope,
     __out BOOTSTRAPPER_SCOPE* pResultingScope,
     __out BOOL* pfPerMachine
 );

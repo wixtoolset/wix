@@ -342,7 +342,7 @@ extern "C" HRESULT PlanSetVariables(
     hr = VariableSetNumeric(pVariables, BURN_BUNDLE_ACTION, action, TRUE);
     ExitOnFailure(hr, "Failed to set the bundle action built-in variable.");
 
-    hr = VariableSetNumeric(pVariables, BURN_BUNDLE_SCOPE, authoredScope, TRUE);
+    hr = VariableSetNumeric(pVariables, BURN_BUNDLE_AUTHORED_SCOPE, authoredScope, TRUE);
     ExitOnFailure(hr, "Failed to set the bundle authored scope built-in variable.");
 
     hr = VariableSetNumeric(pVariables, BURN_BUNDLE_PLANNED_SCOPE, plannedScope, TRUE);
@@ -826,6 +826,7 @@ extern "C" HRESULT PlanPackagesAndBundleScope(
     __in BOOTSTRAPPER_SCOPE scope,
     __in BOOTSTRAPPER_PACKAGE_SCOPE authoredScope,
     __in BOOTSTRAPPER_SCOPE commandLineScope,
+    __in BOOTSTRAPPER_SCOPE detectedScope,
     __out BOOTSTRAPPER_SCOPE* pResultingScope,
     __out BOOL* pfRegistrationPerMachine
 )
@@ -852,6 +853,13 @@ extern "C" HRESULT PlanPackagesAndBundleScope(
         {
             LogId(REPORT_STANDARD, MSG_SCOPE_IGNORED_UNCONFIGURABLE);
         }
+    }
+
+    if (BOOTSTRAPPER_SCOPE_DEFAULT != detectedScope)
+    {
+        scope = detectedScope;
+
+        LogId(REPORT_WARNING, MSG_PLAN_INSTALLED_SCOPE, LoggingBundleScopeToString(detectedScope));
     }
 
     for (DWORD i = 0; i < cPackages; ++i)

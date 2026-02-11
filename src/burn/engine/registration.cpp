@@ -29,6 +29,7 @@ const LPCWSTR REGISTRY_BUNDLE_UNINSTALL_STRING = L"UninstallString";
 const LPCWSTR REGISTRY_BUNDLE_RESUME_COMMAND_LINE = L"BundleResumeCommandLine";
 const LPCWSTR REGISTRY_BUNDLE_VERSION_MAJOR = L"VersionMajor";
 const LPCWSTR REGISTRY_BUNDLE_VERSION_MINOR = L"VersionMinor";
+const LPCWSTR REGISTRY_BUNDLE_SCOPE = L"BundleScope";
 const LPCWSTR SWIDTAG_FOLDER = L"swidtag";
 const LPCWSTR REGISTRY_BUNDLE_VARIABLE_KEY = L"variables";
 
@@ -303,6 +304,10 @@ extern "C" HRESULT RegistrationParseFromXml(
         pRegistration->hkRoot = reinterpret_cast<HKEY>(0ull);
     }
 
+    // build uninstall registry key path
+    hr = StrAllocFormatted(&pRegistration->sczRegistrationKey, L"%ls\\%ls", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pRegistration->sczCode);
+    ExitOnFailure(hr, "Failed to build uninstall registry key path.");
+
 LExit:
     ReleaseObject(pixnRegistrationNode);
     ReleaseObject(pixnArpNode);
@@ -458,6 +463,9 @@ extern "C" HRESULT RegistrationSetDynamicVariables(
     hr = VariableSetNumeric(pVariables, BURN_BUNDLE_INSTALLED, llInstalled, TRUE);
     ExitOnFailure(hr, "Failed to set the bundle installed built-in variable.");
 
+    hr = VariableSetNumeric(pVariables, BURN_BUNDLE_DETECTED_SCOPE, pRegistration->detectedScope, TRUE);
+    ExitOnFailure(hr, "Failed to set the bundle detected scope built-in variable.");
+
     hr = VariableSetNumeric(pVariables, VARIABLE_REBOOTPENDING, IsWuRebootPending() || IsRegistryRebootPending(), TRUE);
     ExitOnFailure(hr, "Failed to overwrite the bundle reboot-pending built-in variable.");
 
@@ -479,16 +487,20 @@ extern "C" HRESULT RegistrationDetectInstalled(
     {
         // For PUOM/PMOU bundles, check per-machine then fall back to per-user.
         hr = DetectInstalled(pRegistration, HKEY_LOCAL_MACHINE);
-        ExitOnFailure(hr, "Failed to detect HKEY_LOCAL_MACHINE bundle registration install state.");
 
-        if (BOOTSTRAPPER_REGISTRATION_TYPE_NONE == pRegistration->detectedRegistrationType)
+        if (FAILED(hr))
         {
             hr = DetectInstalled(pRegistration, HKEY_CURRENT_USER);
-            ExitOnFailure(hr, "Failed to detect HKEY_CURRENT_USER bundle registration install state.");
         }
     }
 
-LExit:
+//LExit:
+    // Not finding the key or value is okay.
+    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
+    {
+        hr = S_OK;
+    }
+
     return hr;
 }
 
@@ -653,6 +665,9 @@ extern "C" HRESULT RegistrationSessionBegin(
     // DisplayIcon: [path to exe] and ",0" to refer to the first icon in the executable.
     hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_DISPLAY_ICON, L"%s,0", pRegistration->sczCacheExecutablePath);
     ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_DISPLAY_ICON);
+
+    hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_SCOPE, pRegistration->fPerMachine ? BOOTSTRAPPER_SCOPE_PER_MACHINE : BOOTSTRAPPER_SCOPE_PER_USER);
+    ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_SCOPE);
 
     // update display name
     hr = UpdateBundleNameRegistration(pRegistration, pVariables, hkRegistration, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS == registrationType);
@@ -1053,10 +1068,6 @@ extern "C" HRESULT RegistrationSetPaths(
 
     // save registration key root
     pRegistration->hkRoot = pRegistration->fPerMachine ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
-
-    // build uninstall registry key path
-    hr = StrAllocFormatted(&pRegistration->sczRegistrationKey, L"%ls\\%ls", BURN_REGISTRATION_REGISTRY_UNINSTALL_KEY, pRegistration->sczCode);
-    ExitOnFailure(hr, "Failed to build uninstall registry key path.");
 
     // build cache directory
     hr = CacheGetCompletedPath(pCache, pRegistration->fPerMachine, pRegistration->sczCode, &sczCacheDirectory);
@@ -1754,25 +1765,28 @@ static HRESULT DetectInstalled(
     HRESULT hr = S_OK;
     HKEY hkRegistration = NULL;
     DWORD dwInstalled = 0;
+    DWORD dwScope = 0;
 
     pRegistration->fCached = pRegistration->sczCacheExecutablePath && FileExistsEx(pRegistration->sczCacheExecutablePath, NULL);
     pRegistration->detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_NONE;
+    pRegistration->detectedScope = BOOTSTRAPPER_SCOPE_DEFAULT;
 
     // open registration key
     hr = RegOpen(hkRoot, pRegistration->sczRegistrationKey, KEY_QUERY_VALUE, &hkRegistration);
     if (SUCCEEDED(hr))
     {
         hr = RegReadNumber(hkRegistration, REGISTRY_BUNDLE_INSTALLED, &dwInstalled);
+        ExitOnFailure(hr, "Failed to read registration %ls@%ls.", pRegistration->sczRegistrationKey, REGISTRY_BUNDLE_INSTALLED);
 
         pRegistration->detectedRegistrationType = (1 == dwInstalled) ? BOOTSTRAPPER_REGISTRATION_TYPE_FULL : BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
+
+        hr = RegReadNumber(hkRegistration, REGISTRY_BUNDLE_SCOPE, &dwScope);
+        ExitOnFailure(hr, "Failed to read registration %ls@%ls.", pRegistration->sczRegistrationKey, REGISTRY_BUNDLE_SCOPE);
+
+        pRegistration->detectedScope = static_cast<BOOTSTRAPPER_SCOPE>(dwScope);
     }
 
-    // Not finding the key or value is okay.
-    if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
-    {
-        hr = S_OK;
-    }
-
+LExit:
     ReleaseRegKey(hkRegistration);
 
     return hr;

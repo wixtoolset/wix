@@ -379,7 +379,7 @@ extern "C" HRESULT CoreDetect(
             pEngineState->registration.fEligibleForCleanup = FALSE;
         }
 
-        LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingBoolToString(pPackage->fCached), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState), LoggingPackageScopeToString(pPackage->scope));
+        LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingBoolToString(pPackage->fCached), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState), LoggingPackageScopeToString(pPackage->scope), LoggingInstallScopeToString(pPackage->fDetectedPerMachine));
 
         if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
         {
@@ -469,7 +469,7 @@ extern "C" HRESULT CorePlan(
     pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pEngineState->plan.action;
     pEngineState->plan.fPlanPackageCacheRollback = BOOTSTRAPPER_REGISTRATION_TYPE_NONE == pEngineState->registration.detectedRegistrationType;
 
-    hr = PlanPackagesAndBundleScope(pEngineState->packages.rgPackages, pEngineState->packages.cPackages, pEngineState->plan.plannedScope, pEngineState->registration.scope, pEngineState->command.commandLineScope, &pEngineState->plan.plannedScope, &pEngineState->registration.fPerMachine);
+    hr = PlanPackagesAndBundleScope(pEngineState->packages.rgPackages, pEngineState->packages.cPackages, pEngineState->plan.plannedScope, pEngineState->registration.scope, pEngineState->command.commandLineScope, pEngineState->registration.detectedScope, &pEngineState->plan.plannedScope, &pEngineState->registration.fPerMachine);
     ExitOnFailure(hr, "Failed to determine packages and bundle scope.");
 
     if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == pEngineState->registration.scope || BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == pEngineState->registration.scope)

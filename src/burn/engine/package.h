@@ -283,6 +283,7 @@ typedef struct _BURN_PACKAGE
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundaryForward;  // used during install and repair.
     BURN_ROLLBACK_BOUNDARY* pRollbackBoundaryBackward; // used during uninstall.
 
+    BOOL fDetectedPerMachine;                   // only valid after Detect.
     BOOTSTRAPPER_PACKAGE_STATE currentState;    // only valid after Detect.
     BOOL fCached;                               // only valid after Detect.
     BOOTSTRAPPER_CACHE_TYPE cacheType;          // only valid during Plan.

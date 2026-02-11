@@ -97,11 +97,12 @@ typedef struct _BURN_REGISTRATION
     // For configurable-scope bundles, fPerMachine is only valid after
     // planning when scope is known. For fixed per-machine or per-user
     // bundles, valid immediately.
-    BOOL fPerMachine; 
+    BOOL fPerMachine;
     BOOL fForceSystemComponent;
     BOOL fDisableResume;
     BOOL fCached;
     BOOTSTRAPPER_REGISTRATION_TYPE detectedRegistrationType;
+    BOOTSTRAPPER_SCOPE detectedScope;
     BOOTSTRAPPER_PACKAGE_SCOPE scope;
     LPWSTR sczCode;
     LPWSTR sczTag;

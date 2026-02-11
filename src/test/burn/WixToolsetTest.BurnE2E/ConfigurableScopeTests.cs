@@ -63,7 +63,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PmouPkg1.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerUser"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PmouPkg2.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerUser"));
 
-            bundle.Uninstall(arguments: "/peruser");
+            bundle.Uninstall();
             bundle.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: false);
             pkg1.VerifyInstalled(false);
             pkg2.VerifyInstalled(false);
@@ -89,7 +89,7 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PuomPkg1.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerMachine,"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PuomPkg2.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerMachine,"));
 
-            bundle.Uninstall(arguments: "/permachine");
+            bundle.Uninstall();
             bundle.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: true);
             pkg1.VerifyInstalled(false);
             pkg2.VerifyInstalled(false);
@@ -114,6 +114,11 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned configurable scope: PerMachine"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PmouPkg1.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerMachine,"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PmouPkg2.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerMachine,"));
+
+            log = bundle.Repair();
+            Assert.True(LogVerifier.MessageInLogFile(log, "Bundle was already installed with scope: PerMachine"));
+            Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PmouPkg1.msi, state: Present, authored scope: PerMachineOrUser, detected scope: PerMachine,"));
+            Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PmouPkg2.msi, state: Present, authored scope: PerMachineOrUser, detected scope: PerMachine,"));
 
             bundle.Uninstall();
             bundle.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: true);
@@ -450,9 +455,15 @@ namespace WixToolsetTest.BurnE2E
 
             Assert.True(LogVerifier.MessageInLogFile(log, "Plan begin, 5 packages, action: Install, planned scope: Default"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PerMachinePkg.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerMachine,"));
-            Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PerUserPkg.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerUser"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PmouPkg1.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerMachine,"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PmouPkg2.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerMachine,"));
+            Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PerUserPkg.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerUser"));
+
+            log = bundle.Repair();
+            Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PerMachinePkg.msi, state: Present, authored scope: PerMachine, detected scope: PerMachine,"));
+            Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PmouPkg1.msi, state: Present, authored scope: PerMachineOrUser, detected scope: PerMachine,"));
+            Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PmouPkg2.msi, state: Present, authored scope: PerMachineOrUser, detected scope: PerMachine,"));
+            Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PerUserPkg.msi, state: Present, authored scope: PerUser, detected scope: PerUser,"));
 
             bundle.Uninstall();
             bundle.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: true);

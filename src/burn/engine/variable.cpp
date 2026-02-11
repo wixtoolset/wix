@@ -305,8 +305,9 @@ extern "C" HRESULT VariableInitialize(
         {BURN_BUNDLE_TAG, InitializeVariableString, (DWORD_PTR)L"", FALSE, TRUE},
         {BURN_BUNDLE_UILEVEL, InitializeVariableNumeric, 0, FALSE, TRUE},
         {BURN_BUNDLE_VERSION, InitializeVariableVersion, (DWORD_PTR)L"0", FALSE, TRUE},
-        {BURN_BUNDLE_SCOPE, InitializeVariableNumeric, 0, FALSE, TRUE},
+        {BURN_BUNDLE_AUTHORED_SCOPE, InitializeVariableNumeric, 0, FALSE, TRUE},
         {BURN_BUNDLE_PLANNED_SCOPE, InitializeVariableNumeric, 0, FALSE, TRUE},
+        {BURN_BUNDLE_DETECTED_SCOPE, InitializeVariableNumeric, 0, FALSE, TRUE},
     };
 
     const WELL_KNOWN_VARIABLE_DECLARATION vrgWellKnownVariableNames[] =

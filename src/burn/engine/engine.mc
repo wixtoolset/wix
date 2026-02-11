@@ -271,7 +271,7 @@ MessageId=101
 Severity=Success
 SymbolicName=MSG_DETECTED_PACKAGE
 Language=English
-Detected package: %1!ls!, state: %2!hs!, authored scope: %6!hs!, cached: %3!hs!, install registration state: %4!hs!, cache registration state: %5!hs!
+Detected package: %1!ls!, state: %2!hs!, authored scope: %6!hs!, detected scope: %7!hs!, cached: %3!hs!, install registration state: %4!hs!, cache registration state: %5!hs!
 .
 
 MessageId=102
@@ -412,6 +412,13 @@ Severity=Success
 SymbolicName=MSG_PLAN_CONFIGURED_SCOPE
 Language=English
 Planned configurable scope: %1!hs!
+.
+
+MessageId=227
+Severity=Success
+SymbolicName=MSG_PLAN_INSTALLED_SCOPE
+Language=English
+Bundle was already installed with scope: %1!hs!
 .
 
 MessageId=201
