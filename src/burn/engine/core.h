@@ -235,11 +235,6 @@ HRESULT CoreSerializeEngineState(
 HRESULT CoreQueryRegistration(
     __in BURN_ENGINE_STATE* pEngineState
     );
-//HRESULT CoreDeserializeEngineState(
-//    __in BURN_ENGINE_STATE* pEngineState,
-//    __in_bcount(cbBuffer) BYTE* pbBuffer,
-//    __in SIZE_T cbBuffer
-//    );
 HRESULT CoreDetect(
     __in BURN_ENGINE_STATE* pEngineState,
     __in_opt HWND hwndParent

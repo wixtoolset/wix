@@ -29,9 +29,10 @@ const LPCWSTR REGISTRY_BUNDLE_UNINSTALL_STRING = L"UninstallString";
 const LPCWSTR REGISTRY_BUNDLE_RESUME_COMMAND_LINE = L"BundleResumeCommandLine";
 const LPCWSTR REGISTRY_BUNDLE_VERSION_MAJOR = L"VersionMajor";
 const LPCWSTR REGISTRY_BUNDLE_VERSION_MINOR = L"VersionMinor";
-const LPCWSTR REGISTRY_BUNDLE_SCOPE = L"BundleScope";
 const LPCWSTR SWIDTAG_FOLDER = L"swidtag";
 const LPCWSTR REGISTRY_BUNDLE_VARIABLE_KEY = L"variables";
+const LPCWSTR REGISTRY_BUNDLE_INSTALLED = L"Installed";
+
 
 // internal function declarations
 
@@ -145,6 +146,10 @@ extern "C" HRESULT RegistrationParseFromXml(
     // @Tag
     hr = XmlGetAttributeEx(pixnRegistrationNode, L"Tag", &pRegistration->sczTag);
     ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Tag.");
+
+    // @PrimaryUpgradeCode
+    hr = XmlGetAttributeEx(pixnRegistrationNode, L"PrimaryUpgradeCode", &pRegistration->sczPrimaryUpgradeCode);
+    ExitOnOptionalXmlQueryFailure(hr, fFoundXml, "Failed to get @PrimaryUpgradeCode.");
 
     hr = BundlePackageEngineParseRelatedCodes(pixnBundle, &pRegistration->rgsczDetectCodes, &pRegistration->cDetectCodes, &pRegistration->rgsczUpgradeCodes, &pRegistration->cUpgradeCodes, &pRegistration->rgsczAddonCodes, &pRegistration->cAddonCodes, &pRegistration->rgsczPatchCodes, &pRegistration->cPatchCodes);
     ExitOnFailure(hr, "Failed to parse related bundles");
@@ -327,7 +332,8 @@ extern "C" void RegistrationUninitialize(
 {
     ReleaseStr(pRegistration->sczCode);
     ReleaseStr(pRegistration->sczTag);
-
+    ReleaseStr(pRegistration->sczPrimaryUpgradeCode);
+    
     for (DWORD i = 0; i < pRegistration->cDetectCodes; ++i)
     {
         ReleaseStr(pRegistration->rgsczDetectCodes[i]);
@@ -666,8 +672,8 @@ extern "C" HRESULT RegistrationSessionBegin(
     hr = RegWriteStringFormatted(hkRegistration, REGISTRY_BUNDLE_DISPLAY_ICON, L"%s,0", pRegistration->sczCacheExecutablePath);
     ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_DISPLAY_ICON);
 
-    hr = RegWriteNumber(hkRegistration, REGISTRY_BUNDLE_SCOPE, pRegistration->fPerMachine ? BOOTSTRAPPER_SCOPE_PER_MACHINE : BOOTSTRAPPER_SCOPE_PER_USER);
-    ExitOnFailure(hr, "Failed to write %ls value.", REGISTRY_BUNDLE_SCOPE);
+    hr = RegWriteNumber(hkRegistration, BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE, pRegistration->fPerMachine ? BOOTSTRAPPER_SCOPE_PER_MACHINE : BOOTSTRAPPER_SCOPE_PER_USER);
+    ExitOnFailure(hr, "Failed to write %ls value.", BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE);
 
     // update display name
     hr = UpdateBundleNameRegistration(pRegistration, pVariables, hkRegistration, BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS == registrationType);
@@ -1780,8 +1786,8 @@ static HRESULT DetectInstalled(
 
         pRegistration->detectedRegistrationType = (1 == dwInstalled) ? BOOTSTRAPPER_REGISTRATION_TYPE_FULL : BOOTSTRAPPER_REGISTRATION_TYPE_INPROGRESS;
 
-        hr = RegReadNumber(hkRegistration, REGISTRY_BUNDLE_SCOPE, &dwScope);
-        ExitOnFailure(hr, "Failed to read registration %ls@%ls.", pRegistration->sczRegistrationKey, REGISTRY_BUNDLE_SCOPE);
+        hr = RegReadNumber(hkRegistration, BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE, &dwScope);
+        ExitOnFailure(hr, "Failed to read registration %ls@%ls.", pRegistration->sczRegistrationKey, BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE);
 
         pRegistration->detectedScope = static_cast<BOOTSTRAPPER_SCOPE>(dwScope);
     }

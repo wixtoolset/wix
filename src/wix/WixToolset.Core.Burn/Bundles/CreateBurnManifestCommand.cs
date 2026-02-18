@@ -227,6 +227,7 @@ namespace WixToolset.Core.Burn.Bundles
                 writer.WriteAttributeString("Tag", this.BundleSymbol.Tag);
                 writer.WriteAttributeString("Version", this.BundleSymbol.Version);
                 writer.WriteAttributeString("ProviderKey", this.BundleSymbol.ProviderKey);
+                writer.WriteAttributeString("PrimaryUpgradeCode", this.BundleSymbol.UpgradeCode);
 
                 writer.WriteStartElement("Arp");
                 writer.WriteAttributeString("DisplayName", this.BundleSymbol.Name);

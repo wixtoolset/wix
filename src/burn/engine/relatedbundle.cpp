@@ -325,6 +325,7 @@ static HRESULT LoadRelatedBundleFromKey(
     BOOL fExists = FALSE;
     BURN_DEPENDENCY_PROVIDER dependencyProvider = { };
     BURN_DEPENDENCY_PROVIDER* pBundleDependencyProvider = NULL;
+    DWORD dwScope = 0;
 
     // Only support progress from engines that are compatible.
     hr = RegReadNumber(hkBundleCode, BURN_REGISTRATION_REGISTRY_ENGINE_PROTOCOL_VERSION, &dwEngineProtocolVersion);
@@ -354,6 +355,11 @@ static HRESULT LoadRelatedBundleFromKey(
     {
         LogId(REPORT_WARNING, MSG_RELATED_PACKAGE_INVALID_VERSION, wzRelatedBundleCode, sczBundleVersion);
     }
+
+    hr = RegReadNumber(hkBundleCode, BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE, &dwScope);
+    ExitOnFailure(hr, "Failed to read registration %ls for bundle %ls.", wzRelatedBundleCode, BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE);
+
+    pRelatedBundle->detectedScope = static_cast<BOOTSTRAPPER_SCOPE>(dwScope);
 
     hr = RegReadString(hkBundleCode, BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH, &sczCachePath);
     ExitOnFailure(hr, "Failed to read cache path from registry for bundle: %ls", wzRelatedBundleCode);
@@ -389,6 +395,12 @@ static HRESULT LoadRelatedBundleFromKey(
     ExitOnPathFailure(hr, fExists, "Failed to read tag from registry for bundle: %ls", wzRelatedBundleCode);
 
     pRelatedBundle->detectRelationType = relationType;
+
+    hr = StrAllocString(&pRelatedBundle->package.Bundle.sczBundleCode, wzRelatedBundleCode, 0);
+    ExitOnFailure(hr, "Failed to bundle code to related bundle.");
+
+    hr = RegReadStringArray(hkBundleCode, BURN_REGISTRATION_REGISTRY_BUNDLE_UPGRADE_CODE, &pRelatedBundle->package.Bundle.rgsczUpgradeCodes, &pRelatedBundle->package.Bundle.cUpgradeCodes);
+    ExitOnFailure(hr, "Failed to read upgrade codes.");
 
     hr = PseudoBundleInitializeRelated(&pRelatedBundle->package, fSupportsBurnProtocol, fPerMachine, wzRelatedBundleCode,
 #ifdef DEBUG

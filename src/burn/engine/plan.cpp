@@ -144,6 +144,12 @@ static BOOL ForceCache(
     __in BURN_PLAN* pPlan,
     __in BURN_PACKAGE* pPackage
     );
+static HRESULT GetUpgradedBundleScope(
+    __in DWORD cRelatedBundles,
+    __in BURN_RELATED_BUNDLE* rgRelatedBundles,
+    __in_z LPCWSTR wzUpgradeCode,
+    __inout BOOTSTRAPPER_SCOPE* pScope
+);
 
 // function definitions
 
@@ -823,6 +829,9 @@ LExit:
 extern "C" HRESULT PlanPackagesAndBundleScope(
     __in BURN_PACKAGE* rgPackages,
     __in DWORD cPackages,
+    __in_z LPCWSTR wzUpgradeCode,
+    __in BURN_RELATED_BUNDLE* rgRelatedBundles,
+    __in DWORD cRelatedBundles,
     __in BOOTSTRAPPER_SCOPE scope,
     __in BOOTSTRAPPER_PACKAGE_SCOPE authoredScope,
     __in BOOTSTRAPPER_SCOPE commandLineScope,
@@ -855,7 +864,11 @@ extern "C" HRESULT PlanPackagesAndBundleScope(
         }
     }
 
-    if (BOOTSTRAPPER_SCOPE_DEFAULT != detectedScope)
+    // If we're upgrading, lock the scope to that of the upgraded bundle.
+    hr = GetUpgradedBundleScope(cRelatedBundles, rgRelatedBundles, wzUpgradeCode, &scope);
+
+    // If we're in maintenance mode instead, lock the scope to the original scope.
+    if (S_FALSE == hr && BOOTSTRAPPER_SCOPE_DEFAULT != detectedScope)
     {
         scope = detectedScope;
 
@@ -887,6 +900,48 @@ extern "C" HRESULT PlanPackagesAndBundleScope(
     return hr;
 }
 
+
+static HRESULT GetUpgradedBundleScope(
+    __in DWORD cRelatedBundles,
+    __in BURN_RELATED_BUNDLE* rgRelatedBundles,
+    __in_z LPCWSTR wzUpgradeCode,
+    __inout BOOTSTRAPPER_SCOPE* pScope
+    )
+{
+    HRESULT hr = S_OK;
+
+    for (DWORD i = 0; i < cRelatedBundles; ++i)
+    {
+        BURN_RELATED_BUNDLE* pRelatedBundle = rgRelatedBundles + i;
+
+        if (BOOTSTRAPPER_RELATION_UPGRADE == pRelatedBundle->detectRelationType)
+        {
+            for (DWORD j = 0; j < pRelatedBundle->package.Bundle.cUpgradeCodes; ++j)
+            {
+                LPCWSTR wzRelatedUpgradeCode = *(pRelatedBundle->package.Bundle.rgsczUpgradeCodes + j);
+
+                // Is the related bundle's upgrade code the same as ours?
+                // If so, lock our scope to the "original" bundle's scope.
+                if (CSTR_EQUAL == ::CompareStringOrdinal(wzRelatedUpgradeCode, -1, wzUpgradeCode, -1, FALSE))
+                if (CSTR_EQUAL == ::CompareStringOrdinal(wzRelatedUpgradeCode, -1, wzUpgradeCode, -1, TRUE))
+                {
+                    *pScope = pRelatedBundle->detectedScope;
+
+                    LogId(REPORT_STANDARD, MSG_PLAN_UPGRADE_SCOPE, pRelatedBundle->package.Bundle.sczBundleCode, LoggingBundleScopeToString(*pScope));
+
+                    ExitFunction();
+                }
+            }
+        }
+    }
+
+    // No upgrade codes or none match, which is fine. But note it via S_FALSE
+    // so we can distinguish the upgrade case from the maintenance case.
+    hr = S_FALSE;
+
+LExit:
+    return hr;
+}
 
 static HRESULT PlanPackagesHelper(
     __in BURN_PACKAGE* rgPackages,

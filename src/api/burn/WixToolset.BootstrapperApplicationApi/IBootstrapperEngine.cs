@@ -345,23 +345,24 @@ namespace WixToolset.BootstrapperApplicationApi
     }
 
     /// <summary>
-    /// The scope of the bundle when the chain contains per-user-or-machine or per-machone-or-user packages.
+    /// The scope of the bundle when the chain contains dual-purpose (per-user-or-machine or per-machone-or-user) packages.
     /// </summary>
     public enum BundleScope
     {
         /// <summary>
         /// Let Burn choose the scope. Per-user-or-machine packages will be
+        /// planned as per-user packages. Per-machine-or-user packages will be
         /// planned as per-machine packages.
         /// </summary>
         Default,
 
         /// <summary>
-        /// Set per-machine scope for per-user-or-machine packages.
+        /// Set per-machine scope for dual-purpose packages.
         /// </summary>
         PerMachine,
 
         /// <summary>
-        /// Set per-user scope for per-user-or-machine packages.
+        /// Set per-user scope for dual-purpose packages.
         /// </summary>
         PerUser,
     }
