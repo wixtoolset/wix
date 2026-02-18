@@ -485,6 +485,9 @@ void PlanDump(
 HRESULT PlanPackagesAndBundleScope(
     __in BURN_PACKAGE* rgPackages,
     __in DWORD cPackages,
+    __in_z LPCWSTR wzUpgradeCode,
+    __in BURN_RELATED_BUNDLE* rgRelatedBundles,
+    __in DWORD cRelatedBundles,
     __in BOOTSTRAPPER_SCOPE scope,
     __in BOOTSTRAPPER_PACKAGE_SCOPE authoredScope,
     __in BOOTSTRAPPER_SCOPE commandLineScope,

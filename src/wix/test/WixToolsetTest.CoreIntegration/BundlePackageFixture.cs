@@ -50,7 +50,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(chainBundlePath));
 
-                var chainBundleId = GetBundleCodeFromWixpdb(chainPdbPath);
+                var (chainBundleId, _) = GetBundleCodesFromWixpdb(chainPdbPath);
 
                 // parent.exe
                 result = WixRunner.Execute(new[]
@@ -68,7 +68,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(parentBundlePath));
 
-                var parentBundleId = GetBundleCodeFromWixpdb(parentPdbPath);
+                var (parentBundleId, parentUpgradeCode) = GetBundleCodesFromWixpdb(parentPdbPath);
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, parentBundlePath, parentBaFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -91,7 +91,7 @@ namespace WixToolsetTest.CoreIntegration
                 var registrations = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    $"<Registration BundleId='WixToolsetTest.TestBundle' Code='{parentBundleId}' ExecutableName='parent.exe' Scope='perMachine' Tag='' Version='1.0.1.0' ProviderKey='{parentBundleId}'>" +
+                    $"<Registration BundleId='WixToolsetTest.TestBundle' Code='{parentBundleId}' ExecutableName='parent.exe' Scope='perMachine' Tag='' Version='1.0.1.0' ProviderKey='{parentBundleId}' PrimaryUpgradeCode='{parentUpgradeCode}'>" +
                     "<Arp DisplayName='BundlePackageBundle' DisplayVersion='1.0.1.0' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
@@ -121,7 +121,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(grandparentBundlePath));
 
-                var grandparentBundleId = GetBundleCodeFromWixpdb(grandparentPdbPath);
+                var (grandparentBundleId, grandparentUpgradeCode) = GetBundleCodesFromWixpdb(grandparentPdbPath);
 
                 var grandparentExtractResult = BundleExtractor.ExtractBAContainer(null, grandparentBundlePath, grandparentBaFolderPath, extractFolderPath);
                 grandparentExtractResult.AssertSuccess();
@@ -154,7 +154,7 @@ namespace WixToolsetTest.CoreIntegration
                 registrations = grandparentExtractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    $"<Registration BundleId='WixToolsetTest.TestBundle' Code='{grandparentBundleId}' ExecutableName='grandparent.exe' Scope='perMachine' Tag='' Version='1.0.2.0' ProviderKey='{grandparentBundleId}'>" +
+                    $"<Registration BundleId='WixToolsetTest.TestBundle' Code='{grandparentBundleId}' ExecutableName='grandparent.exe' Scope='perMachine' Tag='' Version='1.0.2.0' ProviderKey='{grandparentBundleId}' PrimaryUpgradeCode='{grandparentUpgradeCode}'>" +
                     "<Arp DisplayName='PermanentBundlePackageBundle' DisplayVersion='1.0.2.0' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
@@ -202,7 +202,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 var chainBundleId = "{216BDA7F-74BD-45E8-957B-500552F05629}";
 
-                var parentBundleId = GetBundleCodeFromWixpdb(parentPdbPath);
+                var (parentBundleId, parentUpgradeCode) = GetBundleCodesFromWixpdb(parentPdbPath);
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, parentBundlePath, parentBaFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -224,7 +224,7 @@ namespace WixToolsetTest.CoreIntegration
                 var registrations = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    $"<Registration BundleId='WixToolsetTest.TestBundle' Code='{parentBundleId}' ExecutableName='parent.exe' Scope='perMachine' Tag='' Version='1.0.1.0' ProviderKey='{parentBundleId}'>" +
+                    $"<Registration BundleId='WixToolsetTest.TestBundle' Code='{parentBundleId}' ExecutableName='parent.exe' Scope='perMachine' Tag='' Version='1.0.1.0' ProviderKey='{parentBundleId}' PrimaryUpgradeCode='{parentUpgradeCode}'>" +
                     "<Arp DisplayName='RemoteBundlePackageBundle' DisplayVersion='1.0.1.0' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
@@ -280,7 +280,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.True(File.Exists(parentBundlePath));
 
-                var parentBundleId = GetBundleCodeFromWixpdb(parentPdbPath);
+                var (parentBundleId, parentUpgradeCode) = GetBundleCodesFromWixpdb(parentPdbPath);
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, parentBundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -302,7 +302,7 @@ namespace WixToolsetTest.CoreIntegration
                 var registrations = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    $"<Registration Code='{parentBundleId}' ExecutableName='parent.exe' Scope='perMachine' Tag='' Version='1.1.1.1' ProviderKey='{parentBundleId}'>" +
+                    $"<Registration Code='{parentBundleId}' ExecutableName='parent.exe' Scope='perMachine' Tag='' Version='1.1.1.1' ProviderKey='{parentBundleId}' PrimaryUpgradeCode='{parentUpgradeCode}'>" +
                     "<Arp DisplayName='V3BundlePackageBundle' DisplayVersion='1.1.1.1' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
@@ -364,7 +364,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var bundleId = GetBundleCodeFromWixpdb(bundlePdbPath);
+                var (bundleId, _) = GetBundleCodesFromWixpdb(bundlePdbPath);
 
                 var consumingBundleIntermediateFolder = Path.Combine(baseFolder, "obj", "bundle2");
                 var consumingBundleBinFolder = Path.Combine(baseFolder, "bin", "bundle2");
@@ -383,7 +383,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var bundle2Id = GetBundleCodeFromWixpdb(consumingBundlePdbPath);
+                var (bundle2Id, bundle2UpgradeCode) = GetBundleCodesFromWixpdb(consumingBundlePdbPath);
 
                 var parentBaFolderPath = Path.Combine(baseFolder, "parentba");
                 var grandparentBaFolderPath = Path.Combine(baseFolder, "grandparentba");
@@ -409,7 +409,7 @@ namespace WixToolsetTest.CoreIntegration
                 var registrations = bundle2ExtractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    $"<Registration BundleId='WixToolsetTest.PerUserOrMachineBundlePackage' Code='{bundle2Id}' ExecutableName='PerUserOrMachineBundlePackage.exe' Scope='perUserOrMachine' Tag='' Version='1.0.2.0' ProviderKey='{bundle2Id}'>" +
+                    $"<Registration BundleId='WixToolsetTest.PerUserOrMachineBundlePackage' Code='{bundle2Id}' ExecutableName='PerUserOrMachineBundlePackage.exe' Scope='perUserOrMachine' Tag='' Version='1.0.2.0' ProviderKey='{bundle2Id}' PrimaryUpgradeCode='{bundle2UpgradeCode}'>" +
                     "<Arp DisplayName='PerUserOrMachineBundlePackage' DisplayVersion='1.0.2.0' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
@@ -461,7 +461,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var parentBundleId = GetBundleCodeFromWixpdb(bundlePdbPath);
+                var (parentBundleId, parentUpgradeCode) = GetBundleCodesFromWixpdb(bundlePdbPath);
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -469,7 +469,7 @@ namespace WixToolsetTest.CoreIntegration
                 var registrations = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    $"<Registration BundleId='WixToolsetTest.TestBundle' Code='{parentBundleId}' ExecutableName='bundle.exe' Scope='perMachine' Tag='' Version='9.9' ProviderKey='{parentBundleId}'>" +
+                    $"<Registration BundleId='WixToolsetTest.TestBundle' Code='{parentBundleId}' ExecutableName='bundle.exe' Scope='perMachine' Tag='' Version='9.9' ProviderKey='{parentBundleId}' PrimaryUpgradeCode='{parentUpgradeCode}'>" +
                     "<Arp DisplayName='All Users Bundle' DisplayVersion='9.9' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
@@ -532,7 +532,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var parentBundleId = GetBundleCodeFromWixpdb(bundlePdbPath);
+                var (parentBundleId, parentUpgradeCode) = GetBundleCodesFromWixpdb(bundlePdbPath);
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -540,7 +540,7 @@ namespace WixToolsetTest.CoreIntegration
                 var registrations = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    $"<Registration BundleId='WixToolsetTest.PerUserBundle' Code='{parentBundleId}' ExecutableName='bundle.exe' Scope='perUser' Tag='' Version='9.9' ProviderKey='{parentBundleId}'>" +
+                    $"<Registration BundleId='WixToolsetTest.PerUserBundle' Code='{parentBundleId}' ExecutableName='bundle.exe' Scope='perUser' Tag='' Version='9.9' ProviderKey='{parentBundleId}' PrimaryUpgradeCode='{parentUpgradeCode}'>" +
                     "<Arp DisplayName='Per-User Bundle' DisplayVersion='9.9' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
@@ -603,7 +603,7 @@ namespace WixToolsetTest.CoreIntegration
 
                 result.AssertSuccess();
 
-                var parentBundleId = GetBundleCodeFromWixpdb(bundlePdbPath);
+                var (parentBundleId, parentUpgradeCode) = GetBundleCodesFromWixpdb(bundlePdbPath);
 
                 var extractResult = BundleExtractor.ExtractBAContainer(null, bundlePath, baFolderPath, extractFolderPath);
                 extractResult.AssertSuccess();
@@ -611,7 +611,7 @@ namespace WixToolsetTest.CoreIntegration
                 var registrations = extractResult.GetManifestTestXmlLines("/burn:BurnManifest/burn:Registration");
                 WixAssert.CompareLineByLine(new[]
                 {
-                    $"<Registration BundleId='WixToolsetTest.PerUserOrMachineBundle' Code='{parentBundleId}' ExecutableName='bundle.exe' Scope='perUserOrMachine' Tag='' Version='9.9' ProviderKey='{parentBundleId}'>" +
+                    $"<Registration BundleId='WixToolsetTest.PerUserOrMachineBundle' Code='{parentBundleId}' ExecutableName='bundle.exe' Scope='perUserOrMachine' Tag='' Version='9.9' ProviderKey='{parentBundleId}' PrimaryUpgradeCode='{parentUpgradeCode}'>" +
                     "<Arp DisplayName='Per-user-or-machine Bundle' DisplayVersion='9.9' Publisher='Example Corporation' />" +
                     "</Registration>"
                 }, registrations);
@@ -629,16 +629,15 @@ namespace WixToolsetTest.CoreIntegration
             }
         }
 
-        private static string GetBundleCodeFromWixpdb(string bundlePdbPath)
+        private static (string, string) GetBundleCodesFromWixpdb(string bundlePdbPath)
         {
             using (var wixOutput = WixOutput.Read(bundlePdbPath))
             {
-
                 var intermediate = Intermediate.Load(wixOutput);
                 var section = intermediate.Sections.Single();
 
                 var bundleSymbol = section.Symbols.OfType<WixBundleSymbol>().Single();
-                return bundleSymbol.BundleCode;
+                return (bundleSymbol.BundleCode, bundleSymbol.UpgradeCode);
             }
         }
     }

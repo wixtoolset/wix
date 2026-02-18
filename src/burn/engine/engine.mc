@@ -418,7 +418,14 @@ MessageId=227
 Severity=Success
 SymbolicName=MSG_PLAN_INSTALLED_SCOPE
 Language=English
-Bundle was already installed with scope: %1!hs!
+Bundle was already installed with scope: %1!hs!. Scope cannot change during maintenance.
+.
+
+MessageId=228
+Severity=Success
+SymbolicName=MSG_PLAN_UPGRADE_SCOPE
+Language=English
+Upgraded bundle %1!ls! was already installed with scope: %2!hs!. Scope cannot change during upgrade.
 .
 
 MessageId=201

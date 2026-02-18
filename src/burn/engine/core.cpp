@@ -469,7 +469,7 @@ extern "C" HRESULT CorePlan(
     pEngineState->plan.fDisableRollback = pEngineState->fDisableRollback || BOOTSTRAPPER_ACTION_UNSAFE_UNINSTALL == pEngineState->plan.action;
     pEngineState->plan.fPlanPackageCacheRollback = BOOTSTRAPPER_REGISTRATION_TYPE_NONE == pEngineState->registration.detectedRegistrationType;
 
-    hr = PlanPackagesAndBundleScope(pEngineState->packages.rgPackages, pEngineState->packages.cPackages, pEngineState->plan.plannedScope, pEngineState->registration.scope, pEngineState->command.commandLineScope, pEngineState->registration.detectedScope, &pEngineState->plan.plannedScope, &pEngineState->registration.fPerMachine);
+    hr = PlanPackagesAndBundleScope(pEngineState->packages.rgPackages, pEngineState->packages.cPackages, pEngineState->registration.sczPrimaryUpgradeCode, pEngineState->registration.relatedBundles.rgRelatedBundles, pEngineState->registration.relatedBundles.cRelatedBundles, pEngineState->plan.plannedScope, pEngineState->registration.scope, pEngineState->command.commandLineScope, pEngineState->registration.detectedScope, &pEngineState->plan.plannedScope, &pEngineState->registration.fPerMachine);
     ExitOnFailure(hr, "Failed to determine packages and bundle scope.");
 
     if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == pEngineState->registration.scope || BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == pEngineState->registration.scope)

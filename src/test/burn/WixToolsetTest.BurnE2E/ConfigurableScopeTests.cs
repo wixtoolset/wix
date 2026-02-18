@@ -96,6 +96,54 @@ namespace WixToolsetTest.BurnE2E
         }
 
         [RuntimeFact]
+        public void BundleUpgradeIsLockedToFirstBundlesScope()
+        {
+            var testBAController = this.CreateTestBAController();
+            testBAController.SetBundleScope(BundleScope.Default);
+
+            var bundle = this.CreateBundleInstaller("AllPuomBundleTestBA");
+            var log = bundle.Install();
+
+            bundle.VerifyRegisteredAndInPackageCache(plannedPerMachine: false);
+
+            Assert.True(LogVerifier.MessageInLogFile(log, "Plan begin, 3 packages, action: Install, planned scope: Default"));
+
+            log = bundle.Repair();
+            Assert.True(LogVerifier.MessageInLogFile(log, "Bundle was already installed with scope: PerUser. Scope cannot change during maintenance."));
+
+            var bundleV2 = this.CreateBundleInstaller("AllPuomBundleTestBAv2");
+            testBAController.SetBundleScope(BundleScope.PerMachine);
+            log = bundleV2.Install();
+            Assert.True(LogVerifier.MessageInLogFileRegex(log, @"Upgraded bundle [{][0-9A-Fa-f\-]{36}[}] was already installed with scope: PerUser\. Scope cannot change during upgrade\."));
+
+            bundleV2.Uninstall();
+            bundleV2.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: false);
+            bundle.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: false);
+        }
+
+        [RuntimeFact]
+        public void BundleUpgradeWithSameScopeSucceeds()
+        {
+            var bundle = this.CreateBundleInstaller("AllPuomBundleTestBA");
+            var log = bundle.Install();
+
+            bundle.VerifyRegisteredAndInPackageCache(plannedPerMachine: false);
+
+            Assert.True(LogVerifier.MessageInLogFile(log, "Plan begin, 3 packages, action: Install, planned scope: Default"));
+
+            log = bundle.Repair();
+            Assert.True(LogVerifier.MessageInLogFile(log, "Bundle was already installed with scope: PerUser. Scope cannot change during maintenance."));
+
+            var bundleV2 = this.CreateBundleInstaller("AllPuomBundleTestBAv2");
+            log = bundleV2.Install();
+            Assert.True(LogVerifier.MessageInLogFileRegex(log, @"Upgraded bundle [{][0-9A-Fa-f\-]{36}[}] was already installed with scope: PerUser\. Scope cannot change during upgrade\."));
+
+            bundleV2.Uninstall();
+            bundleV2.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: false);
+            bundle.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: false);
+        }
+
+        [RuntimeFact]
         public void PMOU_Bundle_Default_Plan_Installs_PerMachine()
         {
             var testBAController = this.CreateTestBAController();

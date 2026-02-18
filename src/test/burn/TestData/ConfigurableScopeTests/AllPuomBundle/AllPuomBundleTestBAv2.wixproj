@@ -1,7 +1,7 @@
 ﻿<Project Sdk="WixToolset.Sdk">
   <PropertyGroup>
     <BA>TestBA</BA>
-    <DefineConstants>$(DefineConstants);Version=1.0.0.0</DefineConstants>
+    <DefineConstants>$(DefineConstants);Version=2.0.0.0</DefineConstants>
   </PropertyGroup>
 
   <Import Project="Bundle.props" />

@@ -178,6 +178,9 @@ namespace Bootstrapper
 
                 hr = RegWriteString(hkRegistration, BURN_REGISTRATION_REGISTRY_BUNDLE_VERSION, wzVersion);
                 NativeAssert::Succeeded(hr, "Failed to write %ls value.", BURN_REGISTRATION_REGISTRY_BUNDLE_VERSION);
+
+                hr = RegWriteNumber(hkRegistration, BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE, fPerMachine ? BOOTSTRAPPER_SCOPE_PER_MACHINE : BOOTSTRAPPER_SCOPE_PER_USER);
+                NativeAssert::Succeeded(hr, "Failed to write %ls value.", BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE);
             }
             finally
             {
