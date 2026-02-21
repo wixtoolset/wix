@@ -441,6 +441,9 @@ extern "C" HRESULT RegistrationSetVariables(
     hr = VariableSetVersion(pVariables, BURN_BUNDLE_VERSION, pRegistration->pVersion, TRUE);
     ExitOnFailure(hr, "Failed to overwrite the bundle version built-in variable.");
 
+    hr = VariableSetNumeric(pVariables, BURN_BUNDLE_AUTHORED_SCOPE, pRegistration->scope, TRUE);
+    ExitOnFailure(hr, "Failed to set the bundle authored scope built-in variable.");
+
 LExit:
     ReleaseStr(scz);
 

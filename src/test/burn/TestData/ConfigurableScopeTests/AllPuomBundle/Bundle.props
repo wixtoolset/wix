@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
+    <PackageReference Include="WixToolset.Util.wixext" />
     <PackageReference Include="WixToolset.NetFx.wixext" />
   </ItemGroup>
   <ItemGroup>

@@ -284,7 +284,7 @@ extern "C" void PlanReset(
         }
     }
 
-    PlanSetVariables(BOOTSTRAPPER_ACTION_UNKNOWN, BOOTSTRAPPER_PACKAGE_SCOPE_INVALID, BOOTSTRAPPER_SCOPE_DEFAULT, pVariables);
+    PlanSetVariables(BOOTSTRAPPER_ACTION_UNKNOWN, BOOTSTRAPPER_SCOPE_DEFAULT, pVariables);
 }
 
 extern "C" void PlanUninitializeExecuteAction(
@@ -338,7 +338,6 @@ extern "C" void PlanUninitializeExecuteAction(
 
 extern "C" HRESULT PlanSetVariables(
     __in BOOTSTRAPPER_ACTION action,
-    __in BOOTSTRAPPER_PACKAGE_SCOPE authoredScope,
     __in BOOTSTRAPPER_SCOPE plannedScope,
     __in BURN_VARIABLES* pVariables
     )
@@ -347,9 +346,6 @@ extern "C" HRESULT PlanSetVariables(
 
     hr = VariableSetNumeric(pVariables, BURN_BUNDLE_ACTION, action, TRUE);
     ExitOnFailure(hr, "Failed to set the bundle action built-in variable.");
-
-    hr = VariableSetNumeric(pVariables, BURN_BUNDLE_AUTHORED_SCOPE, authoredScope, TRUE);
-    ExitOnFailure(hr, "Failed to set the bundle authored scope built-in variable.");
 
     hr = VariableSetNumeric(pVariables, BURN_BUNDLE_PLANNED_SCOPE, plannedScope, TRUE);
     ExitOnFailure(hr, "Failed to set the bundle planned scope built-in variable.");
@@ -922,7 +918,6 @@ static HRESULT GetUpgradedBundleScope(
 
                 // Is the related bundle's upgrade code the same as ours?
                 // If so, lock our scope to the "original" bundle's scope.
-                if (CSTR_EQUAL == ::CompareStringOrdinal(wzRelatedUpgradeCode, -1, wzUpgradeCode, -1, FALSE))
                 if (CSTR_EQUAL == ::CompareStringOrdinal(wzRelatedUpgradeCode, -1, wzUpgradeCode, -1, TRUE))
                 {
                     *pScope = pRelatedBundle->detectedScope;

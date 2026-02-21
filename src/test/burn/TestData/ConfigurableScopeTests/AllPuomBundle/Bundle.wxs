@@ -1,4 +1,4 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
   <Bundle Id="AllPuomBundle$(BA)" Name="AllPuomBundle$(BA)" Manufacturer="Acme" Version="$(Version)">
     <?if $(BA) = "WixStdBA"?>
     <BootstrapperApplication>
@@ -8,6 +8,12 @@
 
     <Variable Name="TestGroupName" Value="ConfigurableScopeTests" />
 
+    <!-- Add some random upgrade codes for the fun of it. -->
+    <RelatedBundle Code="{087861DF-D2EC-4485-9F07-E4CCD67D12D1}" Action="upgrade" />
+    <RelatedBundle Code="{8D6ADB72-EDE7-4D92-B88F-494A2425FE20}" Action="upgrade" />
+
+    <util:ProductSearchRef Id="FooSearch" />
+    
     <Chain>
       <?if $(BA) = "TestBA"?>
       <PackageGroupRef Id="TestBA" />
@@ -16,4 +22,12 @@
       <MsiPackage SourceFile="PuomPkg2.msi" />
     </Chain>
   </Bundle>
+
+  <Fragment>
+    <util:ProductSearch Id="FooSearch" ProductCode="{BD22A70A-6191-468B-B6EE-2738916017C1}" Variable="Foo" />
+
+    <!-- Add some more random upgrade codes for even more fun. -->
+    <RelatedBundle Code="{B18397C3-C223-4E5B-9FD7-E22838F9EDCB}" Action="upgrade" />
+    <RelatedBundle Code="{5CC50F34-8EB5-48F9-B0CC-DC54232C487A}" Action="upgrade" />
+  </Fragment>
 </Wix>

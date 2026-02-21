@@ -23,6 +23,9 @@ static const LPCWSTR WIXSTDBA_VARIABLE_SHOW_VERSION = L"WixStdBAShowVersion";
 static const LPCWSTR WIXSTDBA_VARIABLE_SUPPRESS_OPTIONS_UI = L"WixStdBASuppressOptionsUI";
 static const LPCWSTR WIXSTDBA_VARIABLE_UPDATE_AVAILABLE = L"WixStdBAUpdateAvailable";
 
+static const LPCWSTR WIXSTDBA_PER_USER_SCOPE = L"PerUser";
+static const LPCWSTR WIXSTDBA_PER_MACHINE_SCOPE = L"PerMachine";;
+
 enum WIXSTDBA_STATE
 {
     WIXSTDBA_STATE_INITIALIZING,
@@ -186,6 +189,7 @@ public: // IBootstrapperApplication
     )
     {
         HRESULT hr = S_OK;
+        LONGLONG llScope = 0;
 
         hr = __super::OnCreate(pEngine, pCommand);
         BalExitOnFailure(hr, "CBootstrapperApplicationBase initialization failed.");
@@ -197,7 +201,12 @@ public: // IBootstrapperApplication
         m_hwndSplashScreen = pCommand->hwndSplashScreen;
 
         hr = BalGetStringVariable(L"WixBundleVersion", &m_sczBundleVersion);
-        BalExitOnFailure(hr, "CWixStandardBootstrapperApplication initialization failed.");
+        BalExitOnFailure(hr, "Failed to get WixBundleVersion.");
+
+        hr = BalGetNumericVariable(L"WixBundleAuthoredScope", &llScope);
+        BalExitOnFailure(hr, "Failed to get WixBundleAuthoredScope.");
+
+        m_bundleScope = static_cast<BOOTSTRAPPER_PACKAGE_SCOPE>(llScope);
 
         hr = InitializeData(pCommand);
         BalExitOnFailure(hr, "Failed to initialize data in bootstrapper application.");
@@ -2888,6 +2897,18 @@ private:
             }
         }
 
+        // Set the variable matching the default theme scope-selection radio buttons
+        // so the default scope is already selected.
+        if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == m_bundleScope)
+        {
+            hr = BalSetStringVariable(L"WixStdBAScope", WIXSTDBA_PER_USER_SCOPE, FALSE);
+        }
+        else if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == m_bundleScope)
+        {
+            hr = BalSetStringVariable(L"WixStdBAScope", WIXSTDBA_PER_MACHINE_SCOPE, FALSE);
+        }
+        BalExitOnFailure(hr, "Failed to set WixStdBAScope.");
+
     LExit:
         ReleaseObject(pixdManifest);
 
@@ -3819,15 +3840,35 @@ private:
         )
     {
         HRESULT hr = S_OK;
+        BOOTSTRAPPER_SCOPE scope = BOOTSTRAPPER_SCOPE_DEFAULT;
+        LPWSTR sczScopeValue = NULL;
 
         m_plannedAction = action;
 
+        if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == m_bundleScope
+            || BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == m_bundleScope)
+        {
+            hr = BalGetStringVariable(L"WixStdBAScope", &sczScopeValue);
+            BalExitOnFailure(hr, "Failed to get scope value.");
+
+            if (CSTR_EQUAL == ::CompareStringOrdinal(sczScopeValue, -1, L"PerUser", -1, TRUE))
+            {
+                scope = BOOTSTRAPPER_SCOPE_PER_USER;
+            }
+            else if (CSTR_EQUAL == ::CompareStringOrdinal(sczScopeValue, -1, L"PerMachine", -1, TRUE))
+            {
+                scope = BOOTSTRAPPER_SCOPE_PER_MACHINE;
+            }
+        }
+
         SetState(WIXSTDBA_STATE_PLANNING, hr);
 
-        hr = m_pEngine->Plan(action, BOOTSTRAPPER_SCOPE_DEFAULT/*TODO*/);
+        hr = m_pEngine->Plan(action, scope);
         BalExitOnFailure(hr, "Failed to start planning packages.");
 
     LExit:
+        ReleaseStr(sczScopeValue);
+
         if (FAILED(hr))
         {
             SetState(WIXSTDBA_STATE_PLANNING, hr);
@@ -5104,6 +5145,7 @@ private:
     HWND m_hwndSplashScreen;
 
     BOOTSTRAPPER_ACTION m_plannedAction;
+    BOOTSTRAPPER_PACKAGE_SCOPE m_bundleScope;
 
     LPWSTR m_sczAfterForcedRestartPackage;
     LPWSTR m_sczBundleVersion;

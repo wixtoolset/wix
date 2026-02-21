@@ -453,7 +453,7 @@ extern "C" HRESULT CorePlan(
     pEngineState->fPlanned = FALSE;
     PlanReset(&pEngineState->plan, &pEngineState->variables, &pEngineState->containers, &pEngineState->packages, &pEngineState->layoutPayloads);
 
-    hr = PlanSetVariables(action, pEngineState->registration.scope, pEngineState->plan.plannedScope, &pEngineState->variables);
+    hr = PlanSetVariables(action, pEngineState->plan.plannedScope, &pEngineState->variables);
     ExitOnFailure(hr, "Failed to update plan variables.");
 
     // Remember the overall action state in the plan since it shapes the changes
@@ -569,7 +569,7 @@ extern "C" HRESULT CorePlan(
         LogPackages(pUpgradeBundlePackage, pForwardCompatibleBundlePackage, &pEngineState->packages, &pEngineState->registration.relatedBundles, action);
     }
 
-    hr = PlanSetVariables(action, pEngineState->registration.scope, pEngineState->plan.plannedScope, &pEngineState->variables);
+    hr = PlanSetVariables(action, pEngineState->plan.plannedScope, &pEngineState->variables);
     ExitOnFailure(hr, "Failed to update plan variables after planning.");
 
     PlanDump(&pEngineState->plan);
