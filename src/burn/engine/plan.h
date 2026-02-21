@@ -329,7 +329,6 @@ void PlanUninitializeExecuteAction(
     );
 HRESULT PlanSetVariables(
     __in BOOTSTRAPPER_ACTION action,
-    __in BOOTSTRAPPER_PACKAGE_SCOPE authoredScope,
     __in BOOTSTRAPPER_SCOPE plannedScope,
     __in BURN_VARIABLES* pVariables
     );

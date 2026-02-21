@@ -45,6 +45,10 @@
                 <Text>#(loc.OptionsBrowseButton)</Text>
                 <BrowseDirectoryAction VariableName="InstallFolder" />
             </Button>
+            <RadioButtons Name="WixStdBAScope">
+                <RadioButton X="11" Y="180" Height="20" Width="-11" Value="PerUser" EnableCondition="WixBundleAuthoredScope = 2 OR WixBundleAuthoredScope = 3" HideWhenDisabled="yes" FontId="3">#(loc.OptionsPerUserScopeText)</RadioButton>
+                <RadioButton X="11" Y="200" Height="20" Width="-11" Value="PerMachine" EnableCondition="WixBundleAuthoredScope = 2 OR WixBundleAuthoredScope = 3" HideWhenDisabled="yes" FontId="3">#(loc.OptionsPerMachineScopeText)</RadioButton>
+            </RadioButtons>
             <Button Name="OptionsOkButton" X="-91" Y="-11" Width="75" Height="23" TabStop="yes" FontId="0">
                 <Text>#(loc.OptionsOkButton)</Text>
                 <ChangePageAction Page="Install" />

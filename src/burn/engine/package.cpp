@@ -607,19 +607,19 @@ extern "C" HRESULT PackageParseScopeFromXml(
     hr = XmlGetAttributeEx(pixn, L"Scope", &scz);
     ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Scope.");
 
-    if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, scz, -1, L"perMachine", -1))
+    if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"perMachine", -1, TRUE))
     {
         *pScope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE;
     }
-    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, scz, -1, L"perUser", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"perUser", -1, TRUE))
     {
         *pScope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER;
     }
-    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, scz, -1, L"perUserOrMachine", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"perUserOrMachine", -1, TRUE))
     {
         *pScope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE;
     }
-    else if (CSTR_EQUAL == ::CompareStringW(LOCALE_INVARIANT, NORM_IGNORECASE, scz, -1, L"perMachineOrUser", -1))
+    else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"perMachineOrUser", -1, TRUE))
     {
         *pScope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER;
     }

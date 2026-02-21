@@ -18,6 +18,8 @@
   <String Id="InstallCancelButton" Value="&amp;Cancel" />
   <String Id="OptionsHeader" Value="Setup Options" />
   <String Id="OptionsLocationLabel" Value="Install location:" />
+  <String Id="OptionsPerUserScopeText" Value="Install [WixBundleName] just for &amp;me" />
+  <String Id="OptionsPerMachineScopeText" Value="Install [WixBundleName] for all &amp;users" />
   <String Id="OptionsBrowseButton" Value="&amp;Browse" />
   <String Id="OptionsOkButton" Value="&amp;OK" />
   <String Id="OptionsCancelButton" Value="&amp;Cancel" />
