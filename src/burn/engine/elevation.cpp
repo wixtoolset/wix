@@ -2913,7 +2913,7 @@ static HRESULT OnExecuteRelatedBundle(
     }
 
     // Execute related bundle.
-    hr = BundlePackageEngineExecuteRelatedBundle(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), GenericExecuteMessageHandler, hPipe, pRestart);
+    hr = BundlePackageEngineExecuteRelatedBundle(&executeAction, pCache, pVariables, static_cast<BOOL>(dwRollback), TRUE/*fPerMachine*/, GenericExecuteMessageHandler, hPipe, pRestart);
     ExitOnFailure(hr, "Failed to execute related bundle.");
 
 LExit:
@@ -3008,7 +3008,7 @@ static HRESULT OnExecuteBundlePackage(
     }
 
     // Execute BUNDLE package.
-    hr = BundlePackageEngineExecutePackage(&executeAction, pCache, pVariables, fRollback, fCacheAvailable, GenericExecuteMessageHandler, hPipe, pRestart);
+    hr = BundlePackageEngineExecutePackage(&executeAction, pCache, pVariables, fRollback, fCacheAvailable, TRUE/*fPerMachine*/, GenericExecuteMessageHandler, hPipe, pRestart);
     ExitOnFailure(hr, "Failed to execute BUNDLE package.");
 
 LExit:

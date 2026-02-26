@@ -25,6 +25,7 @@ static HRESULT ExecuteBundle(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BURN_PACKAGE* pPackage,
     __in BOOL fPseudoPackage,
+    __in BOOL fPerMachine,
     __in_z_opt LPCWSTR wzParent,
     __in_z_opt LPCWSTR wzIgnoreDependencies,
     __in_z_opt LPCWSTR wzAncestors,
@@ -51,7 +52,7 @@ extern "C" HRESULT BundlePackageEngineParsePackageFromXml(
     BOOL fFoundXml = FALSE;
     LPWSTR scz = NULL;
 
-    // @DetectCondition
+    // @BundleCode
     hr = XmlGetAttributeEx(pixnBundlePackage, L"BundleCode", &pPackage->Bundle.sczBundleCode);
     ExitOnRequiredXmlQueryFailure(hr, "Failed to get @BundleCode.");
 
@@ -90,6 +91,10 @@ extern "C" HRESULT BundlePackageEngineParsePackageFromXml(
     // @Win64
     hr = XmlGetYesNoAttribute(pixnBundlePackage, L"Win64", &pPackage->Bundle.fWin64);
     ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Win64.");
+
+    // @Scope
+    hr = PackageParseScopeFromXml(pixnBundlePackage, &pPackage->scope);
+    ExitOnRequiredXmlQueryFailure(hr, "Failed to get @Scope.");
 
     hr = BundlePackageEngineParseRelatedCodes(pixnBundlePackage, &pPackage->Bundle.rgsczDetectCodes, &pPackage->Bundle.cDetectCodes, &pPackage->Bundle.rgsczUpgradeCodes, &pPackage->Bundle.cUpgradeCodes, &pPackage->Bundle.rgsczAddonCodes, &pPackage->Bundle.cAddonCodes, &pPackage->Bundle.rgsczPatchCodes, &pPackage->Bundle.cPatchCodes);
     ExitOnFailure(hr, "Failed to parse related codes.");
@@ -608,6 +613,7 @@ extern "C" HRESULT BundlePackageEngineExecutePackage(
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
     __in BOOL fCacheAvailable,
+    __in BOOL fPerMachine,
     __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
@@ -621,7 +627,7 @@ extern "C" HRESULT BundlePackageEngineExecutePackage(
     BOOTSTRAPPER_RELATION_TYPE relationType = BOOTSTRAPPER_RELATION_CHAIN_PACKAGE;
     BURN_PACKAGE* pPackage = pExecuteAction->bundlePackage.pPackage;
 
-    return ExecuteBundle(pCache, pVariables, fRollback, fCacheAvailable, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, FALSE, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
+    return ExecuteBundle(pCache, pVariables, fRollback, fCacheAvailable, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, FALSE, fPerMachine, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
 }
 
 extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
@@ -629,6 +635,7 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     __in BURN_CACHE* pCache,
     __in BURN_VARIABLES* pVariables,
     __in BOOL fRollback,
+    __in BOOL fPerMachine,
     __in PFN_GENERICMESSAGEHANDLER pfnGenericMessageHandler,
     __in LPVOID pvContext,
     __out BOOTSTRAPPER_APPLY_RESTART* pRestart
@@ -643,7 +650,7 @@ extern "C" HRESULT BundlePackageEngineExecuteRelatedBundle(
     BOOTSTRAPPER_RELATION_TYPE relationType = ConvertRelationType(pRelatedBundle->planRelationType);
     BURN_PACKAGE* pPackage = &pRelatedBundle->package;
 
-    return ExecuteBundle(pCache, pVariables, fRollback, TRUE, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, TRUE, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
+    return ExecuteBundle(pCache, pVariables, fRollback, TRUE, pfnGenericMessageHandler, pvContext, action, relationType, pPackage, TRUE, fPerMachine, wzParent, wzIgnoreDependencies, wzAncestors, wzEngineWorkingDirectory, pRestart);
 }
 
 extern "C" void BundlePackageEngineUpdateInstallRegistrationState(
@@ -742,6 +749,7 @@ static HRESULT ExecuteBundle(
     __in BOOTSTRAPPER_RELATION_TYPE relationType,
     __in BURN_PACKAGE* pPackage,
     __in BOOL fPseudoPackage,
+    __in BOOL fPerMachine,
     __in_z_opt LPCWSTR wzParent,
     __in_z_opt LPCWSTR wzIgnoreDependencies,
     __in_z_opt LPCWSTR wzAncestors,
@@ -986,6 +994,16 @@ static HRESULT ExecuteBundle(
 
     hr = CoreAppendFileHandleSelfToCommandLine(sczExecutablePath, &hExecutableFile, &sczBaseCommand, NULL);
     ExitOnFailure(hr, "Failed to append %ls", BURN_COMMANDLINE_SWITCH_FILEHANDLE_SELF);
+
+    // Configurable-scope bundle packages get the scope of the parent bundle.
+    // Note that the command-line switch takes effect only if the BA does a
+    // default plan.
+    if (BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER == pPackage->scope
+        || BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE == pPackage->scope)
+    {
+        hr = StrAllocConcat(&sczBaseCommand, fPerMachine ? L" -permachine" : L" -peruser", 0);
+        ExitOnFailure(hr, "Failed to append scope switch to the command line.");
+    }
 
     // build user args
     if (sczUnformattedUserArgs && *sczUnformattedUserArgs)

@@ -1,11 +1,13 @@
-﻿<Project Sdk="WixToolset.Sdk">
+﻿<Project>
   <PropertyGroup>
     <OutputType>Bundle</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
+    <PackageReference Include="WixToolset.NetFx.wixext" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\TestBA\TestBAWixlib\testbawixlib.wixproj" />
     <ProjectReference Include="..\AllPuomBundle\AllPuomBundleTestBA.wixproj" />
   </ItemGroup>
 </Project>

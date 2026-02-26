@@ -227,7 +227,7 @@ namespace WixToolset.Test.BA
 
         protected override void OnDetectBegin(DetectBeginEventArgs args)
         {
-            this.Log("OnDetectBegin");
+            this.Log($"OnDetectBegin: Cached={args.Cached}, RegistrationType={args.RegistrationType}, PackageCount={args.PackageCount}");
 
             this.forceUpdateSource = this.ReadPackageAction(null, "ForceUpdateSource");
             if (!String.IsNullOrEmpty(this.forceUpdateSource))
