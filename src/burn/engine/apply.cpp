@@ -2761,7 +2761,7 @@ static HRESULT ExecuteRelatedBundle(
     }
     else
     {
-        hrExecute = BundlePackageEngineExecuteRelatedBundle(pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, GenericExecuteMessageHandler, pContext, pRestart);
+        hrExecute = BundlePackageEngineExecuteRelatedBundle(pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, FALSE/*fPerMachine*/, GenericExecuteMessageHandler, pContext, pRestart);
         ExitOnFailure(hrExecute, "Failed to configure per-user related bundle.");
     }
 
@@ -2888,7 +2888,7 @@ static HRESULT ExecuteBundlePackage(
     }
     else
     {
-        hrExecute = BundlePackageEngineExecutePackage(pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, SUCCEEDED(pExecuteAction->bundlePackage.pPackage->hrCacheResult), GenericExecuteMessageHandler, pContext, pRestart);
+        hrExecute = BundlePackageEngineExecutePackage(pExecuteAction, pContext->pCache, &pEngineState->variables, fRollback, SUCCEEDED(pExecuteAction->bundlePackage.pPackage->hrCacheResult), pEngineState->registration.fPerMachine, GenericExecuteMessageHandler, pContext, pRestart);
         ExitOnFailure(hrExecute, "Failed to configure per-user BUNDLE package.");
     }
 

@@ -685,6 +685,40 @@ namespace WixToolsetTest.BurnE2E
             pkg2.VerifyInstalled(false);
         }
 
+        [RuntimeFact]
+        public void ConfigurableScopeBundlePackage_Follows_PerUser_Scope()
+        {
+            var testBAController = this.CreateTestBAController();
+            testBAController.SetBundleScope(BundleScope.PerUser);
 
+            var bundle = this.CreateBundleInstaller("PuomBundlePackageTestBA");
+            var log = bundle.Install();
+
+            bundle.VerifyRegisteredAndInPackageCache(plannedPerMachine: false);
+
+            Assert.True(LogVerifier.MessageInLogFile(log, "Plan begin, 2 packages, action: Install, planned scope: PerUser"));
+            Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: AllPuomBundleTestBA.exe, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerUser"));
+
+            bundle.Uninstall();
+            bundle.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: false);
+        }
+
+        [RuntimeFact]
+        public void ConfigurableScopeBundlePackage_Follows_PerMachine_Scope()
+        {
+            var testBAController = this.CreateTestBAController();
+            testBAController.SetBundleScope(BundleScope.PerMachine);
+
+            var bundle = this.CreateBundleInstaller("PuomBundlePackageTestBA");
+            var log = bundle.Install();
+
+            bundle.VerifyRegisteredAndInPackageCache(plannedPerMachine: true);
+
+            Assert.True(LogVerifier.MessageInLogFile(log, "Plan begin, 2 packages, action: Install, planned scope: PerMachine"));
+            Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: AllPuomBundleTestBA.exe, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerMachine"));
+
+            bundle.Uninstall();
+            bundle.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: true);
+        }
     }
 }
