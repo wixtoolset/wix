@@ -57,7 +57,7 @@
         </annotation>
       </attribute>
 
-      <attribute name="Enabled" type="FirewallYesNoPropertyType">
+      <attribute name="Enabled" type="FirewallYesNoPropertyType" version="5">
         <annotation>
           <documentation>
             Indicates whether the firewall exception should be enabled.
