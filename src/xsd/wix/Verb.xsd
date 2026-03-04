@@ -1,0 +1,57 @@
+<element name="Verb">
+    <annotation>
+      <documentation>
+            Verb definition for an Extension. When advertised, this element creates a row in the
+            <a href="https://learn.microsoft.com/en-us/windows/win32/msi/verb-table">Verb table</a>.
+            When not advertised, this element creates the appropriate rows in <a href="https://learn.microsoft.com/en-us/windows/win32/msi/registry-table">Registry table</a>.
+            </documentation>
+      <appinfo>
+        <msiRef table="Verb" href="https://learn.microsoft.com/en-us/windows/win32/msi/verb-table" />
+        <msiRef table="Registry" href="https://learn.microsoft.com/en-us/windows/win32/msi/registry-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The verb for the command.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Command" type="xs:string">
+        <annotation>
+          <documentation>The localized text displayed on the context menu.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Argument" type="xs:string">
+        <annotation>
+          <documentation>Value for the command arguments. Note that the resolution of properties in the
+                Argument field is limited. A property formatted as [Property] in this field can only be resolved if the property
+                already has the intended value when the component owning the verb is installed. For example, for the argument
+                "[#MyDoc.doc]" to resolve to the correct value, the same process must be installing the file MyDoc.doc and the
+                component that owns the verb.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sequence" type="Integer">
+        <annotation>
+          <documentation>The sequence of the commands. Only verbs for which the Sequence is specified
+                are used to prepare an ordered list for the default value of the shell key. The Verb with the lowest value in this
+                column becomes the default verb. Used only for Advertised verbs.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="TargetFile" type="xs:string">
+        <annotation>
+          <documentation>
+                        Either this attribute or the TargetProperty attribute must be specified for a non-advertised verb.
+                        The value should be the identifier of the target file to be executed for the verb.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="TargetProperty" type="xs:string">
+        <annotation>
+          <documentation>
+                        Either this attribute or the TargetFile attribute must be specified for a non-advertised verb.
+                        The value should be the identifier of the property which will resolve to the path to the target file to be executed for the verb.
+                    </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

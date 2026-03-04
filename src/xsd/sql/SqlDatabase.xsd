@@ -1,0 +1,126 @@
+<element name="SqlDatabase">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <remarks>
+            Nesting SqlDatabase under a Component element will result in a SqlDatabase being installed to the machine as the package is installed.
+
+            Nesting SqlDatabase under Package, Fragment, or Module
+            results in a database "locator" record being created in
+            the SqlDatabase table.  This means that the database
+            itself is neither installed nor uninstalled by the MSI
+            package.  It does make the database available for referencing
+            from a SqlString or SqlScript record.  This allows MSI to install
+            SqlScripts or SqlStrings to already existing databases on the machine.
+            The install will fail if the database does not exist in these cases.
+
+            The User attribute references credentials specified in a User element.
+            If a user is not specified then Windows Authentication will be used by default
+            using the credentials of the user performing the install to execute sql
+            strings, etc.
+        </remarks>
+        <seeAlso namespace="http://wixtoolset.org/schemas/v4/wxs/util" ref="User" />
+      </appinfo>
+      <documentation>SQL Database</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="SqlFileSpec" />
+        <element ref="SqlLogFileSpec" />
+        <element ref="SqlScript" />
+        <element ref="SqlString" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Unique identifier in your installation package for this database. If an Id is not provided, one will generated for you.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Server" type="xs:string" use="required">
+        <annotation>
+          <documentation>Database server name.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Instance" type="xs:string">
+        <annotation>
+          <documentation>Optional database server instance.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Database" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The name of the database. The value can be a literal value or derived from a
+            Property element using the [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted)
+            syntax.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="User" type="xs:string">
+        <annotation>
+          <documentation>Optional user used to connect to database.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CreateOnInstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Create the database during installation.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CreateOnReinstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether to create the database when the associated component is reinstalled.  Setting CreateOnInstall to yes does <b>not</b> imply CreateOnReinstall is set to yes.  CreateOnReinstall must be set in addition to CreateOnInstall for it to be created during both install and reinstall.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CreateOnUninstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Create the database during uninstallation.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DropOnInstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Drop the database during installation.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DropOnReinstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether to drop the database when the associated component is reinstalled.  Setting DropOnInstall to yes does <b>not</b> imply DropOnReinstall is set to yes.  DropOnReinstall must be set in addition to DropOnInstall for it to be dropped during both install and reinstall.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DropOnUninstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Drop the database during uninstallation.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ContinueOnError" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Continue even if the database operation fails.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ConfirmOverwrite" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Prompt the user to overwrite the database.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

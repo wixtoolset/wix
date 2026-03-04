@@ -1,0 +1,41 @@
+<element name="ComplianceCheck">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="Property" />
+        <msiRef table="CCPSearch" href="https://docs.microsoft.com/en-us/windows/win32/msi/ccpsearch-table" />
+        <msiRef table="Signature" href="https://docs.microsoft.com/en-us/windows/win32/msi/signature-table" />
+      </appinfo>
+      <documentation>Adds a row to the CCPSearch table.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <sequence>
+          <element ref="ComplianceDrive" minOccurs="0">
+            <annotation>
+              <documentation>Starts searches from the CCP_DRIVE.</documentation>
+            </annotation>
+          </element>
+          <element ref="ComponentSearch" minOccurs="0" maxOccurs="unbounded" />
+          <element ref="RegistrySearch" minOccurs="0" maxOccurs="unbounded" />
+          <element ref="IniFileSearch" minOccurs="0" maxOccurs="unbounded" />
+          <element ref="DirectorySearch" minOccurs="0" maxOccurs="unbounded" />
+          <any namespace="##other" processContents="lax">
+            <annotation>
+              <documentation>
+                Extensibility point in the WiX XML Schema. Schema extensions can register additional
+                elements at this point in the schema.
+              </documentation>
+            </annotation>
+          </any>
+        </sequence>
+      </choice>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

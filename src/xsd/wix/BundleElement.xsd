@@ -1,0 +1,10 @@
+<element name="BundleElement">
+    <annotation>
+      <documentation>Instance data for BundleCustomData.</documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="BundleAttribute" maxOccurs="unbounded" />
+      </sequence>
+    </complexType>
+  </element>

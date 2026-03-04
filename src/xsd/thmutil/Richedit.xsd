@@ -1,0 +1,32 @@
+<element name="Richedit">
+        <annotation>
+            <documentation>Defines a rich edit control.</documentation>
+        </annotation>
+        <complexType mixed="true">
+            <annotation>
+                <documentation>
+                    Initial text for the control.
+                    Mutually exclusive with the StringId attribute.
+                </documentation>
+            </annotation>
+            <choice minOccurs="0" maxOccurs="unbounded">
+                <element ref="Text" />
+                <element ref="Tooltip" maxOccurs="1" />
+            </choice>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attribute name="FontId" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Identifier to the Font element that serves as the font for the control.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="StringId" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Identifier that references a string resource in the module to define the initial text for the control.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

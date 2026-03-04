@@ -1,0 +1,8 @@
+<element name="InstallAdminPackage" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="InstallAdminPackage" href="http://msdn.microsoft.com/library/aa369287.aspx" />
+      </appinfo>
+      <documentation>Copies the product database to the administrative installation point. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

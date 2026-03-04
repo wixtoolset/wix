@@ -1,0 +1,30 @@
+<element name="String">
+    <annotation>
+      <appinfo>
+        <howtoRef href="ui_and_localization/build_a_localized_version.html">How To: Build a localized version of your installer</howtoRef>
+        <howtoRef href="ui_and_localization/make_installer_localizable.html">How To: Make your installer localizable</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identity of the localized string. Referenced in .wxs files using `!(loc.Id)` or in locutil using `#(loc.Id)`.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Overridable" type="LocalizationYesNoType">
+        <annotation>
+          <documentation>Determines if the localized string may be overridden by a definition in another localization file. The default value is `no`.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Localizable" type="LocalizationYesNoType">
+        <annotation>
+          <documentation>Indicates whether the string is localizable text or a non-localizable string that must be unique per locale. The value of this attribute is not used by the WiX Toolset. It provided as documentation for localizers to ignore things like GUIDs or identifiers that look like text.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>The localized value for this string.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,104 @@
+<element name="Environment">
+    <annotation>
+      <documentation>
+        Environment variables added or removed for the parent component.
+      </documentation>
+      <appinfo>
+        <msiRef table="Environment" href="http://msdn.microsoft.com/library/aa368369.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Unique identifier for environment entry.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the environment variable.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>
+            The value to set into the environment variable.
+            If this attribute is not set, the environment variable is removed during installation if it exists on the machine.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Separator" type="xs:string">
+        <annotation>
+          <documentation>Optional attribute to change the separator used between values. By default a semicolon is used.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Action">
+        <annotation>
+          <documentation>Specfies whether the environmental variable should be created, set or removed when the parent component is installed.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="create">
+              <annotation>
+                <documentation>Creates the environment variable if it does not exist, then set it during installation. This has no effect on the value of the environment variable if it already exists.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="set">
+              <annotation>
+                <documentation>Creates the environment variable if it does not exist, and then set it during installation. If the environment variable exists, set it during the installation.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="remove">
+              <annotation>
+                <documentation>
+                  Removes the environment variable during an installation.
+                  The installer only removes an environment variable during an installation if the name and value
+                  of the variable match the entries in the Name and Value attributes.
+                  If you want to remove an environment variable, regardless of its value, do not set the Value attribute.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Part">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="all">
+              <annotation>
+                <documentation>
+                  This value is the entire environmental variable. This is the default.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="first">
+              <annotation>
+                <documentation>
+                  This value is prefixed.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="last">
+              <annotation>
+                <documentation>
+                  This value is appended.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Permanent" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies that the environment variable should not be removed on uninstall.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="System" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Specifies that the environment variable should be added to the system environment space. The default
+                    is 'no' which indicates the environment variable is added to the user environment space.
+                </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

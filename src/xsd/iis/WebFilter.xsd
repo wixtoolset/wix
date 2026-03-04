@@ -1,0 +1,73 @@
+<element name="WebFilter">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>IIs Filter for a Component or Web Site</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>The unique Id for the web filter. If the Id is not specified, it will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>The name of the filter to be used in IIS.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Path" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The path of the filter executable file.
+            This should usually be a value like '[!FileId]', where 'FileId' is the file identifier
+            of the filter executable file.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="WebSite" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the parent website for this filter (if there is one).
+            If this is a global filter, then this attribute should not be specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>Description of the filter.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Flags" type="wxs:Integer">
+        <annotation>
+          <documentation>Sets the MD_FILTER_FLAGS metabase key for the filter. This must be an integer. See MSDN 'FilterFlags' documentation for more details.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LoadOrder" type="xs:string">
+        <annotation>
+          <documentation>
+            The legal values are "first", "last", or a number.
+            If a number is specified, it must be greater than 0.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

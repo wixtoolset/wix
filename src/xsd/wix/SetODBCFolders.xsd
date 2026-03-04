@@ -1,0 +1,8 @@
+<element name="SetODBCFolders" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="SetODBCFolders" href="http://msdn.microsoft.com/library/aa371691.aspx" />
+      </appinfo>
+      <documentation>Checks for existing ODBC drivers and sets the target directory for each new driver to the location of an existing driver. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

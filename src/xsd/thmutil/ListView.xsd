@@ -1,0 +1,49 @@
+<element name="ListView">
+        <annotation>
+            <documentation>Defines a listview.</documentation>
+        </annotation>
+        <complexType>
+            <choice maxOccurs="unbounded">
+                <element ref="Column" />
+            </choice>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attribute name="FontId" type="xs:string">
+                <annotation>
+                    <documentation>Identifier to the Font element that serves as the default font for the ListView.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="HexExtendedStyle" type="xs:hexBinary">
+                <annotation>
+                    <documentation>Hexadecimal extended window style.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageList" type="xs:string">
+                <annotation>
+                    <documentation>
+                        The name of the ImageList to assign to this listview with type LVSIL_NORMAL.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageListSmall" type="xs:string">
+                <annotation>
+                    <documentation>
+                        The name of the ImageList to assign to this listview with type LVSIL_SMALL.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageListState" type="xs:string">
+                <annotation>
+                    <documentation>
+                        The name of the ImageList to assign to this listview with type LVSIL_STATE.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageListGroupHeader" type="xs:string">
+                <annotation>
+                    <documentation>
+                        The name of the ImageList to assign to this listview with type LVSIL_GROUPHEADER.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

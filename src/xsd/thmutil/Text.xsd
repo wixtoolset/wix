@@ -1,0 +1,27 @@
+<element name="Text">
+        <annotation>
+            <documentation>
+                Defines text for the parent control based on an optional condition.
+                If multiple Text elements are given for one control, the conditions should be mutually exclusive (when multiple conditions are true, the behavior is undefined and may be changed at any time).
+                If none of the conditions of a control's Text elements are true, then it uses the text of the Text element without the Condition attribute.
+            </documentation>
+        </annotation>
+        <complexType>
+            <simpleContent>
+                <extension base="xs:string">
+                    <annotation>
+                        <documentation>
+                            Text for the parent control.
+                        </documentation>
+                    </annotation>
+                    <attribute name="Condition" type="xs:string">
+                        <annotation>
+                            <documentation>
+                                The condition that determines when the parent control will use this text.
+                            </documentation>
+                        </annotation>
+                    </attribute>
+                </extension>
+            </simpleContent>
+        </complexType>
+    </element>

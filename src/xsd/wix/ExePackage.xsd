@@ -1,0 +1,89 @@
+<element name="ExePackage">
+    <annotation>
+      <documentation>Describes a single exe package to install.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Payload" />
+        <element ref="PayloadGroupRef" />
+        <element ref="Payloads" />
+        <element ref="ExePackagePayload" />
+        <element ref="ExitCode" />
+        <element ref="CommandLine" />
+        <element ref="ArpEntry" />
+        <element ref="Provides" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema. The extension's
+              <code>CompilerExtension.ParseElement()</code>
+              method will be called with the package identifier as the first value in
+              <code>contextValues</code>.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attributeGroup ref="ChainPackageCommonAttributes" />
+      <attributeGroup ref="ChainPackagePermanentAttribute" />
+      <attribute name="DetectCondition" type="xs:string">
+        <annotation>
+          <documentation>
+            A condition that determines if the package is present on the target system. This condition can use built-in
+            variables and variables returned by searches. This condition is necessary because Windows doesn't provide a
+            method to detect the presence of an ExePackage. Burn uses this condition to determine how to treat this
+            package during a bundle action; for example, if this condition is false or omitted and the bundle is being
+            installed, Burn will install this package.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RepairCondition" type="xs:string">
+        <annotation>
+          <documentation>
+            A condition that determines during Repair if the package will be repaired by default.
+            This condition can use built-in variables and variables returned by searches.
+            This attribute may only be specified if RepairArguments is also specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="InstallArguments" type="xs:string">
+        <annotation>
+          <documentation>The command-line arguments provided to the ExePackage during install. If this attribute is absent the executable will be launched with no command-line arguments.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RepairArguments" type="xs:string">
+        <annotation>
+          <documentation>
+            The command-line arguments to specify to indicate a repair. If the executable package can be repaired but
+            does not require any special command-line arguments to do so then set the attribute's value to blank. To
+            indicate that the package does not support repair, omit this attribute.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UninstallArguments" type="xs:string">
+        <annotation>
+          <documentation>The command-line arguments provided to the ExePackage during uninstall. If this attribute is absent the executable will be launched with no command-line arguments. To prevent an ExePackage from being uninstalled set the Permanent attribute to "yes".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PerMachine" type="YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>Indicates the package must be executed elevated. The default is "no".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Bundle" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Indicates the package is a WiX bundle. The default is "no".
+            If "yes", then the default Protocol value is "burn".
+            The engine will prepend command line arguments such as "-norestart" for all operations,
+            as well as avoid running this bundle as a related bundle.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Protocol" type="BurnExeProtocolType">
+        <annotation>
+          <documentation>Indicates the communication protocol the package supports for extended progress and error reporting. The default is "none".</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

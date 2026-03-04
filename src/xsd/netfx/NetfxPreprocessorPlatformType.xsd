@@ -1,0 +1,8 @@
+<simpleType name="NetfxPreprocessorPlatformType">
+    <annotation>
+      <documentation>
+        Platform referencing the machine architecture.
+      </documentation>
+    </annotation>
+    <union memberTypes="NetfxPlatformType wxs:PreprocessorVariables" />
+  </simpleType>

@@ -1,0 +1,12 @@
+<simpleType name="YesNoDefaultType">
+    <annotation>
+      <documentation>Values of this type will either be "default", "yes", or "no".</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="default" />
+      <enumeration value="no" />
+      <enumeration value="false" />
+      <enumeration value="yes" />
+      <enumeration value="true" />
+    </restriction>
+  </simpleType>

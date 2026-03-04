@@ -1,0 +1,6 @@
+<simpleType name="BitnessTypeUnion">
+    <annotation>
+      <documentation>Values of this type will be "default", "always32" or "always64".</documentation>
+    </annotation>
+    <union memberTypes="BitnessType PreprocessorVariables" />
+  </simpleType>

@@ -1,0 +1,25 @@
+<element name="InstanceTransforms">
+    <annotation>
+      <documentation>
+        Use this element to contain definitions for instance transforms.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Instance" />
+      </choice>
+      <attribute name="Property" type="xs:string" use="required">
+        <annotation>
+          <documentation>The Id of the Property who's value should change for each instance.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

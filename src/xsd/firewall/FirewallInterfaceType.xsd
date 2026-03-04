@@ -1,0 +1,8 @@
+<simpleType name="FirewallInterfaceType">
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="all" />
+      <enumeration value="lan" />
+      <enumeration value="remoteAccess" />
+      <enumeration value="wireless" />
+    </restriction>
+  </simpleType>

@@ -1,0 +1,62 @@
+<attributeGroup name="RemotePackagePayloadCommonAttributes">
+    <attribute name="SourceFile" type="xs:string">
+      <annotation>
+        <documentation>
+          Location of the package to add to the bundle.
+          The default value is the Name attribute, if provided.
+          If Hash is specified, must not be specified.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="CertificatePublicKey" type="xs:string">
+      <annotation>
+        <documentation>Optional public key of the certificate used to sign the payload. It is not recommended to use this attribute and rely on the Hash alone.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="CertificateThumbprint" type="xs:string">
+      <annotation>
+        <documentation>Optional thumbprint of the certificate used to sign the payload. It is not recommended to use this attribute and rely on the Hash alone.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Description" type="xs:string">
+      <annotation>
+        <documentation>
+          Description of the file from version resources.
+          If Hash is not specified, must not be specified.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Hash" type="HexType">
+      <annotation>
+        <documentation>
+          SHA-512 hash of the RemotePayload.
+          If SourceFile is specified, must not be specified.
+          If specified then Name, DownloadUrl, and Size are required.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="ProductName" type="xs:string">
+      <annotation>
+        <documentation>
+          Product name of the file from version resouces.
+          If Hash is not specified, must not be specified.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Size" type="Integer">
+      <annotation>
+        <documentation>
+          Size of the remote file in bytes.
+          Required if Hash is specified, otherwise must not be specified.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Version" type="WixVersionType">
+      <annotation>
+        <documentation>
+          Version of the remote file.
+          If Hash is not specified, must not be specified.
+        </documentation>
+      </annotation>
+    </attribute>
+  </attributeGroup>

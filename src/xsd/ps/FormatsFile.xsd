@@ -1,0 +1,47 @@
+<element name="FormatsFile">
+    <annotation>
+      <documentation>
+        Identifies the parent File as a formats XML file for the referenced PowerShell snap-in.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="File" />
+        <remarks>
+          A formats XML file that defines output formats for objects on the pipeline.
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="FileId" type="xs:string">
+        <annotation>
+          <documentation>
+            Reference to the formats File ID. This is required when nested under the SnapIn element.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SnapIn" type="xs:string">
+        <annotation>
+          <documentation>
+            Reference to the PowerShell snap-in ID for which this formats file is associated. This is required when nested under the File element.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

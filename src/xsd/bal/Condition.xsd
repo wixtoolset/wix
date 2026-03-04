@@ -1,0 +1,45 @@
+<element name="Condition">
+    <annotation>
+      <documentation>
+        Conditions for a bundle using WixStdBA.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Message" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Set the value to the text to display when the condition fails and the installation must be terminated.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The condition that must evaluate to true for the installation to continue.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

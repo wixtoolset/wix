@@ -1,0 +1,21 @@
+<element name="IgnoreTable">
+    <annotation>
+      <documentation>
+                Specifies a table from the merge module that is not merged into an .msi file.
+                If the table already exists in an .msi file, it is not modified by the merge.
+                The specified table can therefore contain data that is unneeded after the merge.
+                To minimize the size of the .msm file, it is recommended that developers remove
+                unused tables from modules intended for redistribution rather than creating
+                IgnoreTable elements for those tables.
+            </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+                        The name of the table in the merge module that is not to be merged into the .msi file.
+                    </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

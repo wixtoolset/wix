@@ -1,0 +1,44 @@
+<element name="WindowsFeatureSearch">
+    <annotation>
+      <documentation>Detects the existence of a Windows feature.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attributeGroup ref="SearchCommonAttributes" />
+      <attribute name="Feature" use="required">
+        <annotation>
+          <documentation>The feature to detect.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="sha2CodeSigning">
+              <annotation>
+                <documentation>The oldest OS with this feature is Win7 SP1 with KB3033929.</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

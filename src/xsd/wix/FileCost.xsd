@@ -1,0 +1,10 @@
+<element name="FileCost" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="CostInitialize" />
+        <seeAlso ref="CostFinalize" />
+        <msiRef action="FileCost" href="http://msdn.microsoft.com/library/aa368589.aspx" />
+      </appinfo>
+      <documentation>Initiates dynamic costing of standard installation actions. Any standard or custom actions that affect costing should sequenced before the CostInitialize action. Call the FileCost action immediately following the CostInitialize action. Then call the CostFinalize action following the FileCost action to make all final cost calculations available to the installer through the Component table. The CostInitialize action must be executed before the FileCost action. The installer then determines the disk-space cost of every file in the File table, on a per-component basis, taking both volume clustering and the presence of existing files that may need to be overwritten into account. All actions that consume or release disk space are also considered. If an existing file is found, a file version check is performed to determine whether the new file actually needs to be installed or not. If the existing file is of an equal or greater version number, the existing file is not overwritten and no disk-space cost is incurred. In all cases, the installer uses the results of version number checking to set the installation state of each file. The FileCost action initializes cost calculation with the installer. Actual dynamic costing does not occur until the CostFinalize action is executed. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

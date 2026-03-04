@@ -1,0 +1,12 @@
+<element name="BundleAttributeDefinition">
+    <annotation>
+      <documentation>Attribute definition for BundleCustomData.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The name of the attribute.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

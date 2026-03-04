@@ -1,0 +1,8 @@
+<element name="AllocateRegistrySpace" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="AllocateRegistrySpace" href="http://msdn.microsoft.com/library/aa367554.aspx" />
+      </appinfo>
+      <documentation>Ensures the needed amount of space exists in the registry. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

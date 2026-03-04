@@ -1,0 +1,45 @@
+<element name="PerformanceCounter">
+    <annotation>
+      <documentation>Creates a performance counter in a performance category.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>Name for the performance counter.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Help" type="xs:string">
+        <annotation>
+          <documentation>Optional help text for the performance counter.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type" type="PerformanceCounterTypesType">
+        <annotation>
+          <documentation>Type of the performance counter.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Language" type="PerformanceCounterLanguageType">
+        <annotation>
+          <documentation>Language for the peformance counter name and help.  The default is to use the parent PerformanceCategory element's DefaultLanguage attribute.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

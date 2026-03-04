@@ -1,0 +1,15 @@
+<element name="Page">
+        <annotation>
+            <documentation>Named set of controls that can be shown and hidden collectively.</documentation>
+        </annotation>
+        <complexType>
+            <group ref="ControlElements" maxOccurs="unbounded" />
+            <attribute name="Name" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Optional name for the page.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

@@ -1,0 +1,84 @@
+<element name="ProductSearch">
+    <annotation>
+      <documentation>Describes a product search.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attributeGroup ref="SearchCommonAttributes" />
+      <attribute name="Guid" type="xs:string">
+        <annotation>
+          <documentation>The Guid attribute has been deprecated; use the ProductCode or UpgradeCode attribute instead. If this attribute is used, it is assumed to be a ProductCode.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProductCode" type="xs:string">
+        <annotation>
+          <documentation>The ProductCode to use for the search. This attribute must be omitted if UpgradeCode is specified.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UpgradeCode" type="xs:string">
+        <annotation>
+          <documentation>The UpgradeCode to use for the search. This attribute must be omitted if ProductCode is specified. Note that if multiple products are found, the highest versioned product will be used for the result.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Result">
+        <annotation>
+          <documentation>
+            Rather than saving the product version into the variable, a ProductSearch can save another attribute of the matching product instead.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="assignment">
+              <annotation>
+                <documentation>Saves the assignment type of the product: per-user (0), or per-machine (1).</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="language">
+              <annotation>
+                <documentation>Saves the language of a matching product if found; empty otherwise.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="state">
+              <annotation>
+                <documentation>Saves the state of the product: advertised (1), absent (2), or locally installed (5).</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="version">
+              <annotation>
+                <documentation>Saves the version of a matching product if found; 0.0.0.0 otherwise. This is the default.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="exists">
+              <annotation>
+                <documentation>
+                  [WiX v7 and later]
+                  Saves true if a matching product entry is found (non-absent); false otherwise.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

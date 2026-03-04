@@ -1,0 +1,6 @@
+<simpleType name="FirewallOnUpdateType">
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="doNothing" />
+      <enumeration value="enableOnly" />
+    </restriction>
+  </simpleType>

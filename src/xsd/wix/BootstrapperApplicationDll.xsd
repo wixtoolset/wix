@@ -1,0 +1,79 @@
+<element name="BootstrapperApplicationDll">
+    <annotation>
+      <documentation>Describes the entry point to the bootstrapper application.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>The identifier of BootstrapperApplicationDll element.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string">
+        <annotation>
+          <documentation>
+            Location of the source file.
+            The default value is the Name attribute, if provided.
+            At a minimum, the SourceFile or Name attribute must be specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>
+            The destination path and file name for this payload.
+            The default is the source file name.
+            At a minimum, the Name or SourceFile attribute must be specified.
+            This must be a relative path ('\foo' or 'C:\foo' is not allowed).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DpiAwareness" default="perMonitorV2">
+        <annotation>
+          <documentation>The DPI awareness of the BootstrapperApplication. The default is 'perMonitorV2'. Microsoft High DPI documentation is at https://docs.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="gdiScaled">
+              <annotation>
+                <documentation>Corresponds to the .exe manifest element 'gdiScaling' with content of 'true'. Windows does not support combining this with other DPI awareness modes.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="perMonitor">
+              <annotation>
+               <documentation>Corresponds to the .exe manifest element 'dpiAware' with content of 'true/pm'.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="perMonitorV2">
+              <annotation>
+                <documentation>Corresponds to the .exe manifest element 'dpiAwareness' with content of 'PerMonitorV2, PerMonitor' and the manifest element 'dpiAware' with content of 'true/pm'.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="system">
+              <annotation>
+                <documentation>Corresponds to the .exe manifest element 'dpiAware' with content of 'true'.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="unaware" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              attributes at this point in the schema.
+            </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

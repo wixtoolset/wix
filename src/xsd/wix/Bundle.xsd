@@ -1,0 +1,226 @@
+<element name="Bundle">
+    <annotation>
+      <documentation>The root element for creating bundled packages.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="ApprovedExeForElevation" />
+        <element ref="BootstrapperApplication" />
+        <element ref="BootstrapperApplicationRef" />
+        <element ref="BootstrapperExtension" />
+        <element ref="BootstrapperExtensionRef" />
+        <element ref="BundleCustomData" />
+        <element ref="BundleCustomDataRef" />
+        <element ref="BundleExtension" />
+        <element ref="BundleExtensionRef" />
+        <element ref="OptionalUpdateRegistration" minOccurs="0" maxOccurs="1" />
+        <element ref="Chain" minOccurs="1" maxOccurs="1" />
+        <element ref="Container" />
+        <element ref="ContainerRef" />
+        <element ref="Log" minOccurs="0" maxOccurs="1" />
+        <element ref="PayloadGroup" />
+        <element ref="PayloadGroupRef" />
+        <element ref="Payloads" />
+        <element ref="RelatedBundle" />
+        <element ref="Requires" />
+        <element ref="SetVariable" />
+        <element ref="SetVariableRef" />
+        <element ref="SoftwareTag" />
+        <element ref="Update" minOccurs="0" maxOccurs="1" />
+        <element ref="Variable" />
+        <element ref="WixVariable" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="AboutUrl" type="xs:string">
+        <annotation>
+          <documentation>
+            A URL for more information about the bundle to display in Programs and Features (also
+            known as Add/Remove Programs).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Compressed" type="YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>Whether Packages and Payloads not assigned to a container should be added to the default attached container or if they should be external. The default is yes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>
+            The condition of the bundle. If the condition is not met, the bundle will
+            refuse to run. Conditions are checked before the bootstrapper application is loaded
+            (before detect), and thus can only reference built-in variables such as
+            variables which indicate the version of the OS.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Copyright" type="xs:string">
+        <annotation>
+          <documentation>
+            The legal copyright found in the version resources of final bundle executable. If
+            this attribute is not provided the copyright will be set to "Copyright (c) [Bundle/@Manufacturer]. All rights reserved.".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DisableModify" type="YesNoButtonTypeUnion">
+        <annotation>
+          <documentation>
+            Determines whether the bundle can be modified via the Programs and Features (also known as
+            Add/Remove Programs). If the value is "button" then Programs and Features will show a single
+            "Uninstall/Change" button. If the value is "yes" then Programs and Features will only show
+            the "Uninstall" button". If the value is "no", the default, then a "Change" button is shown.
+            See the DisableRemove attribute for information how to not display the bundle in Programs
+            and Features.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DisableRemove" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Determines whether the bundle can be removed via the Programs and Features (also
+            known as Add/Remove Programs). If the value is "yes" then the "Uninstall" button will
+            not be displayed. The default is "no" which ensures there is an "Uninstall" button to
+            remove the bundle. If the "DisableModify" attribute is also "yes" or "button" then the
+            bundle will not be displayed in Progams and Features and another mechanism (such as
+            registering as a related bundle addon) must be used to ensure the bundle can be removed.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HelpTelephone" type="xs:string">
+        <annotation>
+          <documentation>
+            A telephone number for help to display in Programs and Features (also known as
+            Add/Remove Programs).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HelpUrl" type="xs:string">
+        <annotation>
+          <documentation>
+            A URL to the help for the bundle to display in Programs and Features (also known as
+            Add/Remove Programs).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IconSourceFile" type="xs:string">
+        <annotation>
+          <documentation>
+            Path to an icon that will replace the default icon in the final Bundle executable.
+            This icon will also be displayed in Programs and Features (also known as Add/Remove
+            Programs).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            _New in WiX v6: WiX v6 adds this attribute to the `Bundle` element._
+            A globally unique identiifer for the bundle in the world. It is recommended to use a prefix such as "CompanyName." to
+            create a namespace of sorts. By default, higher versioned upgrade lower versioned bundles with the same Id. Use this
+            attribute instead of the UpgradeCode attribute in new development.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="InProgressName" type="xs:string">
+        <annotation>
+          <documentation>
+            Optional name to display in Add/Remove Programs while the bundle is being installed, uninstalled, repaired.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Manufacturer" type="xs:string">
+        <annotation>
+          <documentation>
+            The publisher of the bundle to display in Programs and Features (also known as
+            Add/Remove Programs).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>
+            The name of the bundle to display in Programs and Features (also known as Add/Remove
+            Programs). This name can be accessed and overwritten by a BootstrapperApplication
+            using the WixBundleName bundle variable.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ParentName" type="xs:string">
+        <annotation>
+          <documentation>
+            The name of the parent bundle to display in Installed Updates (also known as Add/Remove
+            Programs). This name is used to nest or group bundles that will appear as updates.
+            If the parent name does not actually exist, a virtual parent is created automatically.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProviderKey" type="xs:string">
+        <annotation>
+          <documentation>
+            Optional attribute to explicitly author the provider key for the entire bundle.
+            <p>
+              This provider key is designed to persist throughout compatible upgrades so that dependent bundles do not have to be reinstalled
+              and will not prevent your product from being upgraded. If this attribute is not authored, the value is the
+              automatically-generated bundle ID and will not automatically support upgrades.
+            </p>
+            <p>
+              Only a single provider key is supported for bundles. To author that your bundle provides additional features via
+              packages, author different provider keys for your packages.
+            </p>
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SplashScreenSourceFile" type="xs:string">
+        <annotation>
+          <documentation>Path to a bitmap that will be shown as the bootstrapper application is being loaded. If this attribute is not specified, no splash screen will be displayed.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Tag" type="xs:string">
+        <annotation>
+          <documentation>Set this string to uniquely identify this bundle to its own BA, and to related bundles. The value of this string only matters to the BA, and its value has no direct effect on engine functionality.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UpdateUrl" type="xs:string">
+        <annotation>
+          <documentation>
+            A URL for updates of the bundle to display in Programs and Features (also
+            known as Add/Remove Programs).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UpgradeCode" type="Guid">
+        <annotation>
+          <documentation>
+            For new bundles, it is recommended to use the Id attribute instead. This attribute exists for
+            backwards compatibility scenarios. Use this attribute to provide a specific unique identifier
+            for a family of bundles. If two bundles have the same UpgradeCode the bundle with the highest
+            version will be installed.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Version" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The version of the bundle. Newer versions upgrade earlier versions of the bundles
+            with matching UpgradeCodes. If the bundle is registered in Programs and Features
+            then this attribute will be displayed in the Programs and Features user interface.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

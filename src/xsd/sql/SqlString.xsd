@@ -1,0 +1,88 @@
+<element name="SqlString">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>SQL String</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Unique identifier in your installation package for this sql command. If an Id is not provided, one will generated for you.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SqlDb" type="xs:string">
+        <annotation>
+          <documentation>Id of the SqlDatabase to execute the script against. Required when not child of SqlDatabase.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="User" type="xs:string">
+        <annotation>
+          <documentation>Optional user used to connect to database.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SQL" type="xs:string" use="required">
+        <annotation>
+          <documentation>SQL command to execute against the database.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExecuteOnInstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies to execute the string when the associated component is installed.  This attribute is mutually exclusive with the RollbackOnInstall, RollbackOnReinstall and RollbackOnUninstall attributes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExecuteOnReinstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether to execute the string when the associated component is reinstalled.  Setting ExecuteOnInstall to yes does <b>not</b> imply ExecuteOnReinstall is set to yes.  ExecuteOnReinstall must be set in addition to ExecuteOnInstall for it to be executed during both install and reinstall.  This attribute is mutually exclusive with the RollbackOnInstall, RollbackOnReinstall and RollbackOnUninstall attributes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExecuteOnUninstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies to execute the string when the associated component is uninstalled.  This attribute is mutually exclusive with the RollbackOnInstall, RollbackOnReinstall and RollbackOnUninstall attributes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RollbackOnInstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether to execute the string on rollback if an attempt is made to install the associated component.  This attribute is mutually exclusive with the ExecuteOnInstall, ExecuteOnReinstall and ExecuteOnUninstall attributes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RollbackOnReinstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether to execute the string on rollback if an attempt is made to reinstall the associated component.  This attribute is mutually exclusive with the ExecuteOnInstall, ExecuteOnReinstall and ExecuteOnUninstall attributes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RollbackOnUninstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether to execute the string on rollback if an attempt is made to uninstall the associated component.  This attribute is mutually exclusive with the ExecuteOnInstall, ExecuteOnReinstall and ExecuteOnUninstall attributes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ContinueOnError" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Continue executing strings even if this one fails.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sequence" type="wxs:Integer">
+        <annotation>
+          <documentation>Specifes the order to run the SQL Strings.  It is recommended that rollback strings be scheduled before their complementary execution string.  This order is also relative across the SqlScript element.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

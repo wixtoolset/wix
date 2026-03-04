@@ -1,0 +1,60 @@
+<element name="ComPlusSubscription">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>
+        Defines an event subscription for a COM+ component.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Component" use="optional" type="xs:string">
+        <annotation><documentation>
+          If the element is not a child of a ComPlusComponent
+          element, this attribute should be provided with the id of a ComPlusComponent
+          element representing the component the subscription is to be created for.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="SubscriptionId" use="optional" type="xs:string">
+        <annotation><documentation>
+          Id of the subscription. If a value is not provided for
+          this attribute, an id will be generated during installation.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Name" use="required" type="xs:string">
+        <annotation><documentation>
+          Name of the subscription.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="EventCLSID" use="optional" type="xs:string">
+        <annotation><documentation>
+          CLSID of the event class for the subscription. If a value
+          for this attribute is not provided, a value for the PublisherID attribute
+          must be provided.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="PublisherID" use="optional" type="xs:string">
+        <annotation><documentation>
+          Publisher id for the subscription. If a value for this
+          attribute is not provided, a value for the EventCLSID attribute must be
+          provided.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Description" use="optional" type="xs:string" />
+      <attribute name="Enabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="EventClassPartitionID" use="optional" type="xs:string" />
+      <attribute name="FilterCriteria" use="optional" type="xs:string" />
+      <attribute name="InterfaceID" use="optional" type="xs:string" />
+      <attribute name="MachineName" use="optional" type="xs:string" />
+      <attribute name="MethodName" use="optional" type="xs:string" />
+      <attribute name="PerUser" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="Queued" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="SubscriberMoniker" use="optional" type="xs:string" />
+      <attribute name="UserName" use="optional" type="xs:string" />
+    </complexType>
+  </element>

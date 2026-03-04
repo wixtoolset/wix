@@ -1,0 +1,25 @@
+<element name="OptimizeCustomActions">
+    <annotation>
+      <documentation>Indicates whether custom actions can be skipped when applying the patch.</documentation>
+      <appinfo>
+        <msiRef table="MsiPatchMetadata" href="http://msdn.microsoft.com/library/aa370344.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="SkipAssignment" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Skip property (type 51) and directory (type 35) assignment custom actions.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SkipImmediate" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Skip immediate custom actions that are not property or directory assignment custom actions.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SkipDeferred" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Skip custom actions that run within the script.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

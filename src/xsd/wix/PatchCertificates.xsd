@@ -1,0 +1,15 @@
+<element name="PatchCertificates">
+    <annotation>
+      <documentation>
+                Identifies the possible signer certificates used to digitally sign patches.
+            </documentation>
+      <appinfo>
+        <msiRef table="MsiPatchCertificate" href="http://msdn.microsoft.com/library/aa370342.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice maxOccurs="unbounded">
+        <element ref="DigitalCertificate" />
+      </choice>
+    </complexType>
+  </element>

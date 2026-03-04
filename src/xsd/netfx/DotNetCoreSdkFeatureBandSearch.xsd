@@ -1,0 +1,65 @@
+<element name="DotNetCoreSdkFeatureBandSearch">
+    <annotation>
+      <documentation>
+        Searches for an installation of .NET Core SDK of the given platform.
+        The variable gets set to the latest version of the SDK that is in the feature band specified by Version.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the search. If the Id is not specified, one will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Variable" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the variable in which to place the result of the search.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>Condition for evaluating the search. If this evaluates to false, the search is not executed at all.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="After" type="xs:string">
+        <annotation>
+          <documentation>Id of the search that this one should come after.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Platform" type="NetfxPreprocessorPlatformType">
+        <annotation>
+          <documentation>The platform to search for.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Version" type="wxs:StrictThreePartVersionType">
+        <annotation>
+          <documentation>
+            A specific .NET Core SDK feature band. For example, "6.0.400".
+            For more information about feature bands, see https://learn.microsoft.com/en-us/dotnet/core/releases-and-support#feature-bands-sdk-only.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

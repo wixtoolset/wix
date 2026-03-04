@@ -1,0 +1,22 @@
+<attributeGroup name="SearchCommonAttributes">
+    <attribute name="Id" type="xs:string">
+      <annotation>
+        <documentation>Id of the search for ordering and dependency.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Variable" type="xs:string" use="required">
+      <annotation>
+        <documentation>Name of the variable in which to place the result of the search.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Condition" type="xs:string">
+      <annotation>
+        <documentation>Condition for evaluating the search. If this evaluates to false, the search is not executed at all.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="After" type="xs:string">
+      <annotation>
+        <documentation>Id of the search that this one should come after.</documentation>
+      </annotation>
+    </attribute>
+  </attributeGroup>

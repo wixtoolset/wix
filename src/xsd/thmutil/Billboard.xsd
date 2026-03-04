@@ -1,0 +1,23 @@
+<element name="Billboard">
+        <annotation>
+            <documentation>Defines a control that rotates through a set of panels on a specified interval.</documentation>
+        </annotation>
+        <complexType>
+            <sequence>
+                <element ref="Panel" />
+            </sequence>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attribute name="Interval" type="xs:positiveInteger">
+                <annotation>
+                    <documentation>
+                        Specifies the time to wait before showing the next panel, in milliseconds.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="Loop" type="YesNoType">
+                <annotation>
+                    <documentation>Specifies whether the billboard should loop through the panels infinitely.</documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

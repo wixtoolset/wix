@@ -1,0 +1,8 @@
+<element name="RegisterFonts" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RegisterFonts" href="http://msdn.microsoft.com/library/aa371158.aspx" />
+      </appinfo>
+      <documentation>Registers installed fonts with the system. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

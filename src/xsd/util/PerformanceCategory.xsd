@@ -1,0 +1,74 @@
+<element name="PerformanceCategory">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>Used to create performance categories and configure performance counters.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="PerformanceCounter" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Unique identifier in your installation package for this performance counter category.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>Name for the performance counter category.  If this attribute is not provided the Id attribute is used as the name of the performance counter category.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Help" type="xs:string">
+        <annotation>
+          <documentation>Optional help text for the performance counter category.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MultiInstance" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Flag that specifies whether the performance counter category is multi or single instanced.  Default is single instance.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Library" type="xs:string">
+        <annotation>
+          <documentation>DLL that contains the performance counter.  The default is "netfxperf.dll" which should be used for all managed code performance counters.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Open" type="xs:string">
+        <annotation>
+          <documentation>Function entry point in to the Library DLL called when opening the performance counter.  The default is "OpenPerformanceData" which should be used for all managed code performance counters.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Close" type="xs:string">
+        <annotation>
+          <documentation>Function entry point in to the Library DLL called when closing the performance counter.  The default is "ClosePerformanceData" which should be used for all managed code performance counters.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Collect" type="xs:string">
+        <annotation>
+          <documentation>Function entry point in to the Library DLL called when collecting data from the performance counter.  The default is "CollectPerformanceData" which should be used for all managed code performance counters.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DefaultLanguage" type="PerformanceCounterLanguageType">
+        <annotation>
+          <documentation>Default language for the performance category and contained counters' names and help text.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

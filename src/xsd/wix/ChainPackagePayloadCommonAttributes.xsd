@@ -1,0 +1,36 @@
+<attributeGroup name="ChainPackagePayloadCommonAttributes">
+    <attribute name="Id" type="xs:string">
+      <annotation>
+        <documentation>The identifier of the package payload element.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="DownloadUrl" type="xs:string">
+      <annotation>
+        <documentation>
+          <p>The URL to use to download the package. The following substitutions are supported:</p>
+          <ul>
+            <li>{0} is replaced by the package Id.</li>
+            <li>{1} is replaced by the payload Id.</li>
+            <li>{2} is replaced by the payload file name.</li>
+          </ul>
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Compressed" type="YesNoDefaultTypeUnion">
+      <annotation>
+        <documentation>Whether the package payload should be embedded in a container or left as an external payload.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Name" type="xs:string">
+      <annotation>
+        <documentation>
+          The destination path and file name for this chain payload.
+          Use this attribute to rename the chain entry point or extract it into a subfolder.
+          The default value is the file name from the SourceFile attribute.
+          At a minimum, the Name or SourceFile attribute must be specified.
+          This must be a relative path ('\foo' or 'C:\foo' is not allowed).
+        </documentation>
+      </annotation>
+    </attribute>
+    <anyAttribute namespace="##other" processContents="lax" />
+  </attributeGroup>

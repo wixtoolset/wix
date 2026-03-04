@@ -1,0 +1,8 @@
+<simpleType name="PercentType">
+    <annotation>
+      <documentation>Values of this type are any integers between 0 and 100, inclusive.</documentation>
+    </annotation>
+    <restriction base="xs:nonNegativeInteger">
+      <maxInclusive value="100" />
+    </restriction>
+  </simpleType>

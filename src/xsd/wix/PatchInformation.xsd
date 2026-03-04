@@ -1,0 +1,81 @@
+<element name="PatchInformation">
+    <annotation>
+      <documentation>Properties about the patch to be placed in the Summary Information Stream. These are visible from COM through the IStream interface, and these properties can be seen on the package in Explorer.</documentation>
+      <appinfo>
+        <remarks>
+          <p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/) for more information.</p>
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>A short description of the patch that includes the name of the product.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Platforms" type="xs:string">
+        <annotation>
+          <appinfo>
+            <deprecated />
+          </appinfo>
+        </annotation>
+      </attribute>
+      <attribute name="Languages" type="xs:string">
+        <annotation>
+          <appinfo>
+            <deprecated />
+          </appinfo>
+        </annotation>
+      </attribute>
+      <attribute name="Manufacturer" type="xs:string">
+        <annotation>
+          <documentation>The name of the manufacturer of the patch package.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Keywords" type="xs:string">
+        <annotation>
+          <documentation>A semicolon-delimited list of network or URL locations for alternate sources of the patch. The default is "Installer,Patching,PCP,Database".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Comments" type="xs:string">
+        <annotation>
+          <documentation>General purpose of the patch package. For example, "This patch contains the logic and data required to install _product_."</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ReadOnly" type="YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>
+                        The value of this attribute conveys whether the package should be opened as read-only.
+                        A database editing tool should not modify a read-only enforced database and should
+                        issue a warning at attempts to modify a read-only recommended database.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SummaryCodepage" type="xs:string">
+        <annotation>
+          <documentation>The code page integer value or web name for summary info strings only. The default is 1252. See remarks for more information.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShortNames" type="YesNoTypeUnion">
+        <annotation>
+          <appinfo>
+            <deprecated />
+          </appinfo>
+        </annotation>
+      </attribute>
+      <attribute name="Compressed" type="YesNoTypeUnion">
+        <annotation>
+          <appinfo>
+            <deprecated />
+          </appinfo>
+        </annotation>
+      </attribute>
+      <attribute name="AdminImage" type="YesNoTypeUnion">
+        <annotation>
+          <appinfo>
+            <deprecated />
+          </appinfo>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

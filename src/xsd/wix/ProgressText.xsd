@@ -1,0 +1,20 @@
+<element name="ProgressText">
+    <annotation>
+      <appinfo>
+        <msiRef table="ActionText" href="https://learn.microsoft.com/en-us/windows/win32/msi/actiontext-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Action" type="xs:string" use="required" />
+      <attribute name="Message" type="xs:string">
+        <annotation>
+          <documentation>Element value is progress message text for action.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Template" type="xs:string">
+        <annotation>
+          <documentation>Used to format ActionData messages from action processing</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

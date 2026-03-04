@@ -1,0 +1,126 @@
+<element name="Directory">
+    <annotation>
+      <documentation>Directory layout for the product. Also specifies the mappings between source and target directories.</documentation>
+      <appinfo>
+        <seeAlso ref="DirectoryRef" />
+        <msiRef table="Directory" href="http://msdn.microsoft.com/library/aa368295.aspx" />
+        <howtoRef href="files_and_registry/add_a_file.html">How To: Add a file to your installer</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Component" />
+        <element ref="Directory" />
+        <element ref="File" />
+        <element ref="Files" />
+        <element ref="Merge" />
+        <element ref="SymbolPath" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            An optional identifier for the directory. If one is not specified,
+            a private identifier will be generated.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ComponentGuidGenerationSeed" type="Guid">
+        <annotation>
+          <documentation>
+            The Component Guid Generation Seed is a guid that must be used when a Component with the generate guid directive ("*")
+            is not rooted in a standard Windows Installer directory (for example, ProgramFilesFolder or CommonFilesFolder).
+            It is recommended that this attribute be avoided and that developers install their Components under standard
+            directories with unique names instead (for example, "ProgramFilesFolder\Company Name Product Name Version"). It is
+            important to note that once a directory is assigned a Component Guid Generation Seed the value must not change until
+            (and must be changed when) the path to that directory, including itself and all parent directories, changes.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DiskId" type="DiskIdType">
+        <annotation>
+          <documentation>
+            Sets the default disk identifier for the files contained in this directory.
+            This attribute's value may be overridden by a child Component, Directory,
+            Merge or File element. See the File or Merge elements' DiskId attribute for
+            more information.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FileSource" type="xs:string">
+        <annotation>
+          <documentation>Used to set the file system source for this directory's child elements.
+          For more information, see [Specifying source files](../../../tools/payloads/).</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>
+            The name of the directory.
+
+            Do not specify this attribute if this directory represents
+            the same directory as the parent (see the Windows Installer SDK's
+            <a href="http://msdn.microsoft.com/library/Aa368295.aspx">Directory table</a>
+            topic for more information about the "." operator).
+
+            This attribute's value may either a short or long directory name. If a short directory
+            name is specified, the ShortName attribute may not be specified. If this value is a long
+            directory name, the ShortName attribute may be omitted to
+            allow WiX to attempt to generate a unique short directory name.
+            However, if this name collides with another directory or you wish to manually specify
+            the short directory name, then the ShortName attribute may be specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShortName" type="ShortFileNameType">
+        <annotation>
+          <documentation>
+            The short name of the directory in 8.3 format.
+            This attribute should only be set if there is a conflict between generated short directory names
+            or the user wants to manually specify the short directory name.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShortSourceName" type="ShortFileNameType">
+        <annotation>
+          <documentation>
+            The short name of the directory on the source media in 8.3 format.
+            This attribute should only be set if there is a conflict between generated short directory names
+            or the user wants to manually specify the short source directory name.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceName" type="LongFileNameType">
+        <annotation>
+          <documentation>
+            The name of the directory on the source media.
+            If this attribute is not specified, Windows Installer will default to the Name attribute.
+
+            In prior versions of the WiX toolset, this attribute specified the short source directory name.
+            This attribute's value may now be either a short or long directory name.
+            If a short directory name is specified, the ShortSourceName attribute may not be specified.
+            If a long directory name is specified, the LongSource attribute may not be specified.
+            Also, if this value is a long directory name, the ShortSourceName attribute may be omitted to
+            allow WiX to attempt to generate a unique short directory name.
+            However, if this name collides with another directory or you wish to manually specify
+            the short directory name, then the ShortSourceName attribute may be specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

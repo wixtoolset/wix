@@ -1,0 +1,9 @@
+<simpleType name="BurnContainerType">
+    <annotation>
+      <documentation>Values of this type will either be "attached" or "detached".</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="attached" />
+      <enumeration value="detached" />
+    </restriction>
+  </simpleType>

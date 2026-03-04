@@ -1,0 +1,30 @@
+<element name="ComPlusRoleForComponent">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>
+        Represents a role assignment to a COM+ component.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Component" use="optional" type="xs:string">
+        <annotation><documentation>
+          If the element is not a child of a ComPlusComponent
+          element, this attribute should be provided with the id of a ComPlusComponent
+          element representing the component the role is to be added to.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="ApplicationRole" use="required" type="xs:string">
+        <annotation><documentation>
+          Id of the ComPlusApplicationRole element representing the
+          role that shall be granted access to the component.
+        </documentation></annotation>
+      </attribute>
+    </complexType>
+  </element>

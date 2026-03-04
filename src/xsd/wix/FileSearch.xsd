@@ -1,0 +1,83 @@
+<element name="FileSearch">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="ComponentSearch" />
+        <seeAlso ref="DirectorySearch" />
+        <seeAlso ref="DirectorySearchRef" />
+        <seeAlso ref="FileSearchRef" />
+        <seeAlso ref="IniFileSearch" />
+        <seeAlso ref="RegistrySearch" />
+        <msiRef table="DrLocator" href="http://msdn.microsoft.com/library/aa368331.aspx" />
+        <msiRef table="Signature" href="https://docs.microsoft.com/en-us/windows/win32/msi/signature-table" />
+        <howtoRef href="files_and_registry/check_the_version_number.html">How To: Check the version number of a file during installation</howtoRef>
+        <remarks>
+          When the parent DirectorySearch/@Depth attribute is greater than 0, the FileSearch/@Id attribute must be absent or the same as the parent DirectorySearch/@Id attribute value, unless the parent DirectorySearch/@AssignToProperty attribute value is 'yes'.
+        </remarks>
+      </appinfo>
+      <documentation>Searches for file and assigns to fullpath value of parent Property</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Unique identifier for the file search and external key into the Signature table. If this attribute value is not set then the parent element's @Id attribute is used.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="LongFileNameType">
+        <annotation>
+          <documentation>
+                        In prior versions of the WiX toolset, this attribute specified the short file name.
+                        This attribute's value may now be either a short or long file name.
+                        If a short file name is specified, the ShortName attribute may not be specified.
+                        If you wish to manually specify the short file name, then the ShortName
+                        attribute may be specified.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShortName" type="ShortFileNameType">
+        <annotation>
+          <documentation>
+                        The short file name of the file in 8.3 format.
+                        There is a Windows Installer bug which prevents the FileSearch functionality from working
+                        if both a short and long file name are specified. Since the Name attribute allows either
+                        a short or long name to be specified, it is the only attribute related to file names which
+                        should be specified.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MinSize" type="xs:int">
+        <annotation>
+          <documentation>The minimum size of the file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MaxSize" type="xs:int">
+        <annotation>
+          <documentation>The maximum size of the file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MinVersion" type="xs:string">
+        <annotation>
+          <documentation>The minimum version of the file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MaxVersion" type="xs:string">
+        <annotation>
+          <documentation>The maximum version of the file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MinDate" type="xs:dateTime">
+        <annotation>
+          <documentation>The minimum modification date and time of the file. Formatted as YYYY-MM-DDTHH:mm:ss, where YYYY is the year, MM is month, DD is day, 'T' is literal, HH is hour, mm is minute and ss is second.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MaxDate" type="xs:dateTime">
+        <annotation>
+          <documentation>The maximum modification date and time of the file. Formatted as YYYY-MM-DDTHH:mm:ss, where YYYY is the year, MM is month, DD is day, 'T' is literal, HH is hour, mm is minute and ss is second.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Languages" type="xs:string">
+        <annotation>
+          <documentation>The languages supported by the file. If multiple languages are provided, then the search is for a file that supports all of those languages.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

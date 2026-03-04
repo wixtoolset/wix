@@ -1,0 +1,46 @@
+<element name="BootstrapperApplicationPrerequisiteInformation" version="5">
+    <annotation>
+      <documentation>
+        Adds license information for a prereq package, should only be used when unable to add the license attributes to the package directly.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="PackageId" type="xs:string" use="required">
+        <annotation>
+          <documentation>Id of the target package.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LicenseFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the license. May not be used with LicenseUrl.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LicenseUrl" type="xs:string">
+        <annotation>
+          <documentation>Source url of the license. May not be used with LicenseFile.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

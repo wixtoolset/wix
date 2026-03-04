@@ -1,0 +1,51 @@
+<element name="ExitCode">
+    <annotation>
+      <documentation>Describes map of exit code returned from executable package to a bootstrapper behavior.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Value" type="NegativeInteger">
+        <annotation>
+          <documentation>Exit code returned from executable package. If no value is provided it means all values not explicitly set default to this behavior.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Behavior" use="required">
+        <annotation>
+          <documentation>Choose one of the supported behaviors error codes: success, error, scheduleReboot, forceReboot, errorScheduleReboot, errorForceReboot.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:string">
+            <enumeration value="success">
+              <annotation>
+                <documentation>The process completed successfully.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="error">
+              <annotation>
+                <documentation>The process failed.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="scheduleReboot">
+              <annotation>
+                <documentation>The process completed successfully and requires the machine to be restarted.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="forceReboot">
+              <annotation>
+                <documentation>The process completed successfully and initiated a restart.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="errorScheduleReboot">
+              <annotation>
+                <documentation>The process failed and requires the machine to be restarted.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="errorForceReboot">
+              <annotation>
+                <documentation>The process failed and initiated a restart.</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+    </complexType>
+  </element>

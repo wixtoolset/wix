@@ -1,0 +1,3 @@
+<simpleType name="FirewallEdgeTraversalTypeUnion">
+    <union memberTypes="FirewallEdgeTraversalType PropertyReference wxs:PreprocessorVariables" />
+  </simpleType>

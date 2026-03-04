@@ -1,0 +1,45 @@
+<element name="ListItem">
+    <annotation>
+      <documentation>
+        The value (and optional text) associated with an item in a ComboBox, ListBox, or ListView.
+      </documentation>
+      <appinfo>
+        <msiRef table="ComboBox" href="https://docs.microsoft.com/en-us/windows/win32/msi/combobox-table" />
+        <msiRef table="ListBox" href="https://docs.microsoft.com/en-us/windows/win32/msi/listbox-table" />
+        <msiRef table="ListView" href="https://docs.microsoft.com/en-us/windows/win32/msi/listview-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Value" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The value assigned to the associated ComboBox, ListBox, or ListView property if this item is selected.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Text" type="xs:string">
+        <annotation>
+          <documentation>
+            The localizable, visible text to be assigned to the item.
+            If not specified, this will default to the value of the Value attribute.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Icon" type="xs:string">
+        <annotation>
+          <documentation>
+            The identifier of the Binary (not Icon) element containing the icon to associate with this item.
+            This value is only valid when nested under a ListView element.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,48 @@
+<element name="FileShare">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>Creates a file share out of the component's directory.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="FileSharePermission">
+          <annotation>
+            <documentation>At least one of these ACL permission must be specified.</documentation>
+          </annotation>
+        </element>
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the file share (primary key).</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the file share.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>Description of the file share.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,14 @@
+<element name="QueryWindowsWellKnownSIDs">
+    <annotation>
+      <documentation>
+        Schedules the QueryOsWellKnownSID custom action for the current platform. For more information, see [QueryWindowsWellKnownSIDs properties](../../../tools/wixext/wininfo#querywindowswellknownsids).
+      </documentation>
+      <documentation>Schedules the QueryOsWellKnownSID custom action for the current platform.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </appinfo>
+    </annotation>
+  </element>

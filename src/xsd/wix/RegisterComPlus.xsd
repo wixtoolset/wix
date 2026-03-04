@@ -1,0 +1,8 @@
+<element name="RegisterComPlus" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RegisterComPlus" href="http://msdn.microsoft.com/library/aa371155.aspx" />
+      </appinfo>
+      <documentation>Registers COM+ applications. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

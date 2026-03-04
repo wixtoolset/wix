@@ -1,0 +1,24 @@
+<element name="PackageGroup">
+    <annotation>
+      <documentation>Describes a package group to a bootstrapper.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="MsiPackage" />
+        <element ref="MspPackage" />
+        <element ref="MsuPackage" />
+        <element ref="ExePackage" />
+        <element ref="BundlePackage" />
+        <element ref="RollbackBoundary" />
+        <element ref="PackageGroupRef" />
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier for package group.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

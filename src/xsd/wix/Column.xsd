@@ -1,0 +1,200 @@
+<element name="Column">
+    <annotation>
+      <documentation>Column definition for a Custom Table</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier for the column.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PrimaryKey" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether this column is a primary key.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type" use="required">
+        <annotation>
+          <documentation>The type of this column.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="binary">
+              <annotation>
+                <documentation>
+                  Column contains a path to a file that will be inserted into the column as a binary object.
+                  If this value is set, the Category attribute must also be set with a value of 'Binary' to pass ICE validation.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="int">
+              <annotation>
+                <documentation>
+                  Column contains an integer or datetime value (the MinValue and MaxValue attributes should also be set).
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="string">
+              <annotation>
+                <documentation>
+                  Column contains a non-localizable string value.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Width" type="Integer">
+        <annotation>
+          <documentation>Width of this column.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Nullable" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether this column can be left null.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Localizable" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether this column can be localized.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MinValue" type="xs:long">
+        <annotation>
+          <documentation>Minimum value for a numeric value, date or version in this column.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MaxValue" type="xs:long">
+        <annotation>
+          <documentation>Maximum value for a numeric value, date or version in this column.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="KeyTable" type="xs:string">
+        <annotation>
+          <documentation>Table in which this column is an external key. Can be semicolon delimited.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="KeyColumn" type="Integer">
+        <annotation>
+          <documentation>Column in the table in KeyTable attribute.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Category">
+        <annotation>
+          <documentation>
+            Category of this column.
+            This attribute must be specified with a value of 'Binary' if the Type attribute's value is 'binary'.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="text" />
+            <enumeration value="upperCase" />
+            <enumeration value="lowerCase" />
+            <enumeration value="integer" />
+            <enumeration value="doubleInteger" />
+            <enumeration value="timeDate" />
+            <enumeration value="identifier" />
+            <enumeration value="property" />
+            <enumeration value="filename" />
+            <enumeration value="wildCardFilename" />
+            <enumeration value="path" />
+            <enumeration value="paths" />
+            <enumeration value="anyPath" />
+            <enumeration value="defaultDir" />
+            <enumeration value="regPath" />
+            <enumeration value="formatted" />
+            <enumeration value="formattedSddl" />
+            <enumeration value="template" />
+            <enumeration value="condition" />
+            <enumeration value="guid" />
+            <enumeration value="version" />
+            <enumeration value="language" />
+            <enumeration value="binary" />
+            <enumeration value="customSource" />
+            <enumeration value="cabinet" />
+            <enumeration value="shortcut" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Set" type="xs:string">
+        <annotation>
+          <documentation>Semicolon delimited list of permissible values.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>Description of this column.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Modularize">
+        <annotation>
+          <documentation>How this column should be modularized, if at all.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="none">
+              <annotation>
+                <documentation>
+                  Column should not be modularized. This is the default value.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="column">
+              <annotation>
+                <documentation>
+                  Column should be modularized.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="condition">
+              <annotation>
+                <documentation>
+                  Column is a condition and should be modularized.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="icon">
+              <annotation>
+                <documentation>
+                  When the column is an primary or foreign key to the Icon table it should be modularized special.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="property">
+              <annotation>
+                <documentation>
+                  Any Properties in the column should be modularized.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="semicolonDelimited">
+              <annotation>
+                <documentation>
+                  Semi-colon list of keys, all of which need to be modularized.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,8 @@
+<element name="DisableRollback" type="ActionModuleSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="DisableRollback" href="http://msdn.microsoft.com/library/aa368308.aspx" />
+      </appinfo>
+      <documentation>Disables rollback for the remainder of the installation. Special actions don't have a built-in sequence number and thus must appear relative to another action. The suggested way to do this is by using the Before or After attribute. InstallExecute and InstallExecuteAgain can optionally appear anywhere between InstallInitialize and InstallFinalize.</documentation>
+    </annotation>
+  </element>

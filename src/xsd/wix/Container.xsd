@@ -1,0 +1,41 @@
+<element name="Container">
+    <annotation>
+      <documentation>Representation of a file that contains one or more files.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="PackageGroupRef" />
+      </choice>
+      <attribute name="DownloadUrl" type="xs:string">
+        <annotation>
+          <documentation>
+            <p>The URL to use to download the container. This attribute is only valid when the container is detached. The
+            following substitutions are supported:</p>
+            <ul>
+              <li>{0} is always null.</li>
+              <li>{1} is replaced by the container Id.</li>
+              <li>{2} is replaced by the container file name.</li>
+            </ul>
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>The unique identifier for the container. If this attribute is not specified the Name attribute will be used.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>The file name for this container. A relative path may be provided to place the container in a sub-folder of the bundle.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type" type="BurnContainerType">
+        <annotation>
+          <documentation>
+            Indicates whether the container is "attached" to the bundle executable or placed external to the bundle extecutable as "detached". If
+            this attribute is not specified, the default is to create a detached container.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

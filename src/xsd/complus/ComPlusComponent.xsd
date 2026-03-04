@@ -1,0 +1,84 @@
+<element name="ComPlusComponent">
+    <annotation><documentation>
+      Represents a COM+ component in an assembly.
+    </documentation></annotation>
+    <complexType>
+      <sequence>
+        <choice minOccurs="0" maxOccurs="unbounded">
+          <element ref="ComPlusRoleForComponent" />
+          <element ref="ComPlusInterface" />
+          <element ref="ComPlusSubscription" />
+        </choice>
+      </sequence>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="CLSID" use="required" type="uuid">
+        <annotation><documentation>
+          CLSID of the component.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="AllowInprocSubscribers" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="ComponentAccessChecksEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="ComponentTransactionTimeout" use="optional" type="xs:int" />
+      <attribute name="ComponentTransactionTimeoutEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="COMTIIntrinsics" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="ConstructionEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="ConstructorString" use="optional" type="xs:string" />
+      <attribute name="CreationTimeout" use="optional" type="xs:int" />
+      <attribute name="Description" use="optional" type="xs:string" />
+      <attribute name="EventTrackingEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="ExceptionClass" use="optional" type="xs:string" />
+      <attribute name="FireInParallel" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="IISIntrinsics" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="InitializesServerApplication" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="IsEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="IsPrivateComponent" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="JustInTimeActivation" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="LoadBalancingSupported" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="MaxPoolSize" use="optional" type="xs:int" />
+      <attribute name="MinPoolSize" use="optional" type="xs:int" />
+      <attribute name="MultiInterfacePublisherFilterCLSID" use="optional" type="xs:string" />
+      <attribute name="MustRunInClientContext" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="MustRunInDefaultContext" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="ObjectPoolingEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="PublisherID" use="optional" type="xs:string" />
+      <attribute name="SoapAssemblyName" use="optional" type="xs:string" />
+      <attribute name="SoapTypeName" use="optional" type="xs:string" />
+      <attribute name="Synchronization" use="optional">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="ignored" />
+            <enumeration value="none" />
+            <enumeration value="supported" />
+            <enumeration value="required" />
+            <enumeration value="requiresNew" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Transaction" use="optional">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="ignored" />
+            <enumeration value="none" />
+            <enumeration value="supported" />
+            <enumeration value="required" />
+            <enumeration value="requiresNew" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="TxIsolationLevel" use="optional">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="any" />
+            <enumeration value="readUnCommitted" />
+            <enumeration value="readCommitted" />
+            <enumeration value="repeatableRead" />
+            <enumeration value="serializable" />
+          </restriction>
+        </simpleType>
+      </attribute>
+    </complexType>
+  </element>

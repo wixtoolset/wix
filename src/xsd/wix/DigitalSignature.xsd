@@ -1,0 +1,20 @@
+<element name="DigitalSignature">
+    <annotation>
+      <documentation>
+                Adds a digital signature.
+            </documentation>
+      <appinfo>
+        <msiRef table="MsiDigitalSignature" href="http://msdn.microsoft.com/library/aa370087.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice>
+        <element ref="DigitalCertificate" />
+      </choice>
+      <attribute name="SourceFile" type="xs:string">
+        <annotation>
+          <documentation>The path to signature's optional hash file.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,26 @@
+<element name="FindVisualStudio">
+    <annotation>
+      <documentation>
+        This element detects which, if any, Visual Studio instances are installed. If so, it sets
+        the appropriate property or properties: `VS2017_ROOT_FOLDER`, `VS2019_ROOT_FOLDER`, or
+        `VS2022_ROOT_FOLDER`.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+    </complexType>
+  </element>

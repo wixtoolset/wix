@@ -1,0 +1,8 @@
+<element name="UnpublishComponents" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="UnpublishComponents" href="http://msdn.microsoft.com/library/aa372106.aspx" />
+      </appinfo>
+      <documentation>Manages the unadvertisement of components listed in the PublishComponent table. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

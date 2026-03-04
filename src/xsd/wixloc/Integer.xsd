@@ -1,0 +1,8 @@
+<simpleType name="Integer">
+    <annotation>
+      <documentation>Values of this type must be an integer or a preprocessor variable with the format `$(Variable)` or `$(var.Variable).</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="[\d]+|\$\((var\.)?[_A-Za-z][0-9A-Za-z_.]*\)" />
+    </restriction>
+  </simpleType>

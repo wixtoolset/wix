@@ -1,0 +1,6 @@
+<simpleType name="FirewallActionType">
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="allow" />
+      <enumeration value="block" />
+    </restriction>
+  </simpleType>

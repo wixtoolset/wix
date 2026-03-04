@@ -1,0 +1,31 @@
+<element name="Hypertext">
+        <annotation>
+            <documentation>Defines a text block with support for HTML `&lt;a&gt;` tags.</documentation>
+        </annotation>
+        <complexType mixed="true">
+            <annotation>
+                <documentation>
+                    Text to display as the link.
+                    Use HTML &lt;a href="URL"&gt; to create a link.
+                    Mutually exclusive with the StringId attribute and child Text elements.
+                </documentation>
+            </annotation>
+            <choice minOccurs="0" maxOccurs="unbounded">
+                <element ref="Text" />
+                <element ref="Tooltip" maxOccurs="1" />
+            </choice>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attribute name="FontId" type="xs:string">
+                <annotation>
+                    <documentation>Identifier to the Font element that serves as the font for the control.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="StringId" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Identifier that references a string resource in the module to define the text for the control.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

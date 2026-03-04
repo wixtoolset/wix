@@ -1,0 +1,70 @@
+<element name="BundlePackage">
+    <annotation>
+      <documentation>Describes a single bundle package to install.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Payload" />
+        <element ref="PayloadGroupRef" />
+        <element ref="Payloads" />
+        <element ref="BundlePackagePayload" />
+        <element ref="ExitCode" />
+        <element ref="CommandLine" />
+        <element ref="Provides" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema. The extension's
+              <code>CompilerExtension.ParseElement()</code>
+              method will be called with the package identifier as the first value in
+              <code>contextValues</code>.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attributeGroup ref="ChainPackageCommonAttributes" />
+      <attributeGroup ref="ChainPackagePermanentAttribute" />
+      <attribute name="RepairCondition" type="xs:string">
+        <annotation>
+          <documentation>
+            A condition that determines during Repair if the package will be repaired by default.
+            This condition can use built-in variables and variables returned by searches.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="InstallArguments" type="xs:string">
+        <annotation>
+          <documentation>
+            The command-line arguments provided to the BundlePackage during install.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RepairArguments" type="xs:string">
+        <annotation>
+          <documentation>
+            The command-line arguments provided to the BundlePackage during repair.
+            "/repair" is added automatically.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UninstallArguments" type="xs:string">
+        <annotation>
+          <documentation>
+            The command-line arguments provided to the BundlePackage during uninstall.
+            "/uninstall" is added automatically.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Visible" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether the bundle will be displayed in Programs and Features (also known as Add/Remove Programs).
+            If "yes" is specified the bundle package information will be displayed in Programs and Features.
+            "no" indicates the bundle will not be displayed.
+            If not specified, the default is the value of the Permanent attribute.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

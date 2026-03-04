@@ -1,0 +1,135 @@
+<element name="WebAppPool">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+      </appinfo>
+      <documentation>IIS Application Pool</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="RecycleTime" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Id of the AppPool. If the Id is not specified, it will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the AppPool to be shown in IIs.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="User" type="xs:string">
+        <annotation>
+          <documentation>User account to run the AppPool as. To use this, you must set the Identity attribute to 'other'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RecycleMinutes" type="wxs:Integer">
+        <annotation>
+          <documentation>How often, in minutes, you want the AppPool to be recycled.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RecycleRequests" type="wxs:Integer">
+        <annotation>
+          <documentation>How often, in requests, you want the AppPool to be recycled.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="VirtualMemory" type="wxs:Integer">
+        <annotation>
+          <documentation>Specifies the amount of virtual memory (in KB) that a worker process can use before the worker process recycles. The maximum value supported for this attribute is 4,294,967 KB.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PrivateMemory" type="wxs:Integer">
+        <annotation>
+          <documentation>Specifies the amount of private memory (in KB) that a worker process can use before the worker process recycles. The maximum value supported for this attribute is 4,294,967 KB.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IdleTimeout" type="wxs:Integer">
+        <annotation>
+          <documentation>Shutdown worker process after being idle for (time in minutes).</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="QueueLimit" type="wxs:Integer">
+        <annotation>
+          <documentation>Limit the kernel request queue (number of requests).</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MaxCpuUsage" type="PercentType">
+        <annotation>
+          <documentation>Maximum CPU usage (percent).</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RefreshCpu" type="wxs:Integer">
+        <annotation>
+          <documentation>Refresh CPU usage numbers (in minutes).</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CpuAction">
+        <annotation>
+          <documentation>Action taken when CPU exceeds maximum CPU use (as defined with MaxCpuUsage and RefreshCpu).</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:string">
+            <enumeration value="none" />
+            <enumeration value="shutdown" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="MaxWorkerProcesses" type="wxs:Integer">
+        <annotation>
+          <documentation>Maximum number of worker processes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Identity">
+        <annotation>
+          <documentation>Identity you want the AppPool to run under (applicationPoolIdentity is only available on IIS7). Use the 'other' value in conjunction with the User attribute to specify non-standard user.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:string">
+            <enumeration value="networkService" />
+            <enumeration value="localService" />
+            <enumeration value="localSystem" />
+            <enumeration value="other" />
+            <enumeration value="applicationPoolIdentity" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ManagedPipelineMode" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the request-processing mode that is used to process requests for managed content.  Only available on IIS7, ignored on IIS6.
+            See https://learn.microsoft.com/en-us/iis/configuration/system.applicationHost/applicationPools/applicationPoolDefaults/ for valid values.
+            This attribute may be set via a formatted Property (e.g. [MyProperty]).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ManagedRuntimeVersion" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the .NET Framework version to be used by the application pool.  Only available on IIS7, ignored on IIS6.
+            See https://learn.microsoft.com/en-us/iis/configuration/system.applicationHost/applicationPools/applicationPoolDefaults/ for valid values.
+            This attribute may be set via a formatted Property (e.g. [MyProperty]).
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,284 @@
+<element name="Component">
+    <annotation>
+      <documentation>Component for parent Directory</documentation>
+      <appinfo>
+        <seeAlso ref="ComponentRef" />
+        <msiRef table="Component" href="http://msdn.microsoft.com/library/aa368007.aspx" />
+        <msiRef table="Condition" href="http://msdn.microsoft.com/library/aa368014.aspx" />
+        <msiRef table="Directory" href="http://msdn.microsoft.com/library/aa368295.aspx" />
+        <howtoRef href="files_and_registry/add_a_file.html">How To: Add a file to your installer</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="AppId" />
+        <element ref="Category" />
+        <element ref="Class" />
+        <element ref="CopyFile" />
+        <element ref="CreateFolder" />
+        <element ref="Environment" />
+        <element ref="Extension" />
+        <element ref="File" />
+        <element ref="IniFile" />
+        <element ref="Interface" />
+        <element ref="IsolateComponent" />
+        <element ref="ODBCDataSource" />
+        <element ref="ODBCDriver" />
+        <element ref="ODBCTranslator" />
+        <element ref="ProgId" />
+        <element ref="Provides" />
+        <element ref="RegistryKey" />
+        <element ref="RegistryValue" />
+        <element ref="RemoveFile" />
+        <element ref="RemoveFolder" />
+        <element ref="RemoveRegistryKey" />
+        <element ref="RemoveRegistryValue" />
+        <element ref="ReserveCost" />
+        <element ref="ServiceControl" />
+        <element ref="ServiceConfig" />
+        <element ref="ServiceConfigFailureActions" />
+        <element ref="ServiceInstall" />
+        <element ref="Shortcut" />
+        <element ref="SymbolPath" />
+        <element ref="TypeLib" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Component identifier; this is the primary key for identifying components. If omitted,
+            the compiler defaults the identifier to the identifier of the resource that is the
+            explicit or default keypath of the component (for example, a child File element).
+            In WiX v4 and WiX v5, such a default identifier is private to the section where it is
+            defined. To make it public (and therefore accessible from other sections and usable
+            in references like ComponentRef), give the component an explicit value for Id.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ComPlusFlags" type="Integer">
+        <annotation>
+          <documentation>
+            Set this attribute to create a ComPlus entry. The value should be the export flags used
+            during the generation of the .msi file. For more information see the COM+ documentation
+            in the Platform SDK.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>
+            The condition expression to be evaluated at install time. When false the Component will not be installed.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DisableRegistryReflection" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Set this attribute to 'yes' in order to disable registry reflection on all existing and
+            new registry keys affected by this component.
+            When set to 'yes', the Windows Installer calls the RegDisableReflectionKey on each key
+            being accessed by the component.
+            This bit is available with Windows Installer version 4.0 and is ignored on 32-bit systems.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Directory" type="xs:string">
+        <annotation>
+          <documentation>
+            Sets the Directory of the Component. If this element is nested under a Directory element,
+            this value defaults to the value of the parent Directory/@Id.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DiskId" type="DiskIdType">
+        <annotation>
+          <documentation>
+            This attribute provides a default DiskId attribute for all child File elements. Specifying
+            the DiskId on a Component element will override any DiskId attributes set by parent Directory
+            or DirectoryRef elements. See the File element's DiskId attribute for more information about
+            the purpose of the DiskId.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Feature" type="xs:string">
+        <annotation>
+          <documentation>
+            Identifies a feature to which this component belongs, as a shorthand for a child
+            ComponentRef element of the Feature element. The value of this attribute should
+            correspond to the Id attribute of a Feature element authored elsewhere. Note that
+            a single component can belong to multiple features but this attribute allows you
+            to specify only a single feature.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Guid" type="ComponentGuid">
+        <annotation>
+          <documentation>
+            This value should be a guid that uniquely identifies this component's contents, language, platform, and version.
+            If omitted, the default value is '*' which indicates that the linker should generate a stable guid.
+            Generatable guids are supported only for components with a single file as the component's keypath
+            or no files and a registry value as the keypath.
+            It's also possible to set the value to an empty string to specify an unmanaged component.
+            Unmanaged components are a security vulnerability because the component cannot be removed or repaired
+            by Windows Installer (it is essentially an unpatchable, permanent component). Therefore, a guid should
+            always be specified for any component which contains resources that may need to be patched in the future.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="KeyPath" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If this attribute's value is set to 'yes', then the Directory of this Component is used
+            as the KeyPath. To set a Registry value or File as the KeyPath of a component, set the
+            KeyPath attribute to 'yes' on one of those child elements. If KeyPath is not set to 'yes' for the
+            Component or for a child Registry value or File, WiX will look at the child elements under the
+            Component in sequential order and try to automatically select one of them as a key path. Allowing
+            WiX to automatically select a key path can be dangerous because adding or removing child elements
+            under the Component can inadvertantly cause the key path to change, which can lead to
+            installation problems.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Location">
+        <annotation>
+          <documentation>
+            Optional value that specifies the location that the component can be run from.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="local">
+              <annotation>
+                <documentation>
+                  Prevents the component from running from the source or the network (this is the default behavior if this attribute is not set).
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="source">
+              <annotation>
+                <documentation>
+                  Enforces that the component can only be run from the source (it cannot be run from the user's computer).
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="either">
+              <annotation>
+                <documentation>
+                  Allows the component to run from source or locally.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="MultiInstance" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If this attribute is set to 'yes', a new Component/@Guid will be generated for each
+            instance transform. Ensure that all of the resources contained in a multi-instance
+            Component will be installed to different paths based on the instance Property; otherwise,
+            the Component Rules will be violated.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="NeverOverwrite" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If this attribute is set to 'yes', the installer does not install or reinstall the
+            component if a key path file or a key path registry entry for the component already
+            exists. The application does register itself as a client of the component. Use this
+            flag only for components that are being registered by the Registry table. Do not use
+            this flag for components registered by the AppId, Class, Extension, ProgId, MIME, and
+            Verb tables.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Permanent" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If this attribute is set to 'yes', the installer does not remove the component during
+            an uninstall. The installer registers an extra system client for the component in
+            the Windows Installer registry settings (which basically just means that at least one
+            product is always referencing this component). Note that this option differs from the
+            behavior of not setting a guid because although the component is permanent, it is still
+            patchable (because Windows Installer still tracks it), it's just not uninstallable.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Shared" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If this attribute's value is set to 'yes', enables advanced patching semantics for
+            Components that are shared across multiple MSI packages. Specifically, the Windows Installer
+            will cache the shared files to improve patch uninstall. This functionality is available
+            in Windows Installer 4.5 and later.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SharedDllRefCount" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If this attribute's value is set to 'yes', the installer increments the reference count
+            in the shared DLL registry of the component's key file. If this bit is not set, the
+            installer increments the reference count only if the reference count already exists.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Subdirectory" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute defines one or more directories below the directory referenced by the Directory attribute or parent
+            Directory reference where the Component will be installed.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Transitive" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If this attribute is set to 'yes', the installer reevaluates the value of the statement
+            in the Condition upon a reinstall. If the value was previously False and has changed to
+            True, the installer installs the component. If the value was previously True and has
+            changed to False, the installer removes the component even if the component has other
+            products as clients.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UninstallWhenSuperseded" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If this attribute is set to 'yes', the installer will uninstall the Component's files
+            and registry keys when it is superseded by a patch. This functionality is available in
+            Windows Installer 4.5 and later.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Bitness" type="BitnessTypeUnion">
+        <annotation>
+          <documentation>
+            Overrides the default Component bitness. Only 64-bit Components can install to 64-bit locations such
+            as `ProgramFiles64Folder` and the 64-bit registry. The value `always64` will force the Component
+            bitness to be 64-bit and cannot be included in 32-bit packages.
+            Simliarly, the value `always32` will force the Component bitness to 32-bit and can be included in
+            32-bit or 64-bit packages.
+            The default value is `default` where the Component will be installed using the
+            same bitness as the package.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

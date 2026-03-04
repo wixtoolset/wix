@@ -1,0 +1,115 @@
+<element name="User">
+    <annotation>
+      <documentation>User for all kinds of things.  When it is not nested under a component it is included in the MSI so it can be referenced by other elements such as the User attribute in the AppPool element.  When it is nested under a Component element, the User will be created on install and can also be used for reference.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <seeAlso ref="Group" />
+        <seeAlso ref="GroupRef" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="GroupRef" minOccurs="0" maxOccurs="unbounded" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" />
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>A [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that contains the name of the user account.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Domain" type="xs:string">
+        <annotation>
+          <documentation>A [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that contains the local machine or Active Directory domain for the user.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Password" type="xs:string">
+        <annotation>
+          <documentation>Usually a Property that is passed in on the command-line to keep it more secure.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PasswordNeverExpires" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>The account's password never expires. Equivalent to UF_DONT_EXPIRE_PASSWD.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CanNotChangePassword" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>The user cannot change the account's password. Equivalent to UF_PASSWD_CANT_CHANGE.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RemoveOnUninstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether the user account should be removed or left behind on uninstall.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FailIfExists" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates if the install should fail if the user already exists.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LogonAsService" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether or not the user can logon as a serivce.  User creation can be skipped if all that is desired is to set this access right on the user.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LogonAsBatchJob" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether or not the user can logon as a batch job.  User creation can be skipped if all that is desired is to set this access right on the user.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UpdateIfExists" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates if the user account properties should be updated if the user already exists.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PasswordExpired" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether the user must change their password on their first login.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Disabled" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>The account is disabled. Equivalent to UF_ACCOUNTDISABLE.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CreateUser" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether or not to create the user.  User creation can be skipped if all that is desired is to join a user to groups.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Vital" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether failure to create the user or add the user to a group fails the installation. The default value is "yes".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Comment" type="xs:string">
+        <annotation>
+          <documentation>Optional comment to set on the user.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RemoveComment" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether remove the comment from the user. The default value is "no".</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

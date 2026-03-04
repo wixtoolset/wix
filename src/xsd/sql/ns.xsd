@@ -1,0 +1,7 @@
+<schema targetNamespace="http://wixtoolset.org/schemas/v4/wxs/sql">
+  <annotation>
+    <documentation>
+      The source code schema for the WiX Toolset SQL Server Extension.
+    </documentation>
+  </annotation>
+</schema>

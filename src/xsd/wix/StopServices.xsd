@@ -1,0 +1,8 @@
+<element name="StopServices" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="StopServices" href="http://msdn.microsoft.com/library/aa372028.aspx" />
+      </appinfo>
+      <documentation>Stops system services. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

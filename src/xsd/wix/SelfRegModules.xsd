@@ -1,0 +1,8 @@
+<element name="SelfRegModules" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="SelfRegModules" href="http://msdn.microsoft.com/library/aa371607.aspx" />
+      </appinfo>
+      <documentation>Processes all modules listed in the SelfReg table and registers all installed modules with the system. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

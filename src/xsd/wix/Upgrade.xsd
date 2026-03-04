@@ -1,0 +1,28 @@
+<element name="Upgrade">
+    <annotation>
+      <documentation>
+        Upgrade info for a particular UpgradeCode
+      </documentation>
+      <appinfo>
+        <msiRef table="Upgrade" href="https://learn.microsoft.com/en-us/windows/win32/msi/upgrade-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="UpgradeVersion" />
+        <element ref="Property">
+          <annotation>
+            <documentation>
+              Nesting a Property element under an Upgrade element has been deprecated.
+              Please nest Property elements in any of the other supported locations.
+            </documentation>
+          </annotation>
+        </element>
+      </choice>
+      <attribute name="Id" type="Guid" use="required">
+        <annotation>
+          <documentation>This value specifies the upgrade code for the products that are to be detected by the FindRelatedProducts action.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

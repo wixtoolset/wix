@@ -1,0 +1,53 @@
+<element name="RollbackBoundary">
+    <annotation>
+      <documentation>Describes a rollback boundary in the chain.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema. The extension's
+              <code>CompilerExtension.ParseElement()</code>
+              method will be called with the rollback boundary identifier as the 'RollbackBoundaryId' key in
+              <code>contextValues</code>.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Identifier for this rollback boundary, for ordering and cross-referencing. If this attribute is
+            not provided a stable identifier will be generated.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Vital" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether the rollback boundary aborts the chain. The default "yes" indicates that if
+            the rollback boundary is encountered then the chain will fail and roll back or stop. If "no"
+            is specified then the chain should continue successfuly at the next rollback boundary.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LogPathVariable" type="xs:string">
+        <annotation>
+          <documentation>
+            Name of a Variable that will hold the path to the log file when the rollback boundary is a MSI package transaction.
+            An empty value will cause the variable to not be set. The default is "WixBundleLog_[RollbackBoundaryId]".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Transaction" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether the rollback boundary is wrapped in an MSI transaction. The default is "no".
+            Only MsiPackages and MspPackages may be inside of a rollback boundary with Transaction set to "yes".
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

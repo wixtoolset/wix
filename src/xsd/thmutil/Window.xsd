@@ -1,0 +1,94 @@
+<element name="Window">
+        <annotation>
+            <documentation>Defines the overall look of the main window.</documentation>
+        </annotation>
+        <complexType>
+            <choice minOccurs="0" maxOccurs="unbounded">
+                <element ref="Page" />
+                <group ref="ControlElements" minOccurs="0" maxOccurs="unbounded" />
+            </choice>
+            <attribute name="AutoResize" type="YesNoType">
+                <annotation>
+                    <documentation>Specifies whether the ThmUtil default window proc should process WM_SIZE and WM_SIZING events.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="Caption" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Caption for the window.
+                        This is required if not using the StringId attribute.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="FontId" type="xs:string" use="required">
+                <annotation>
+                    <documentation>Identifier to the Font element that serves as the default font for the window.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="Height" type="xs:positiveInteger" use="required">
+                <annotation>
+                    <documentation>Height of the window's client area.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="HexStyle" type="xs:hexBinary">
+                <annotation>
+                    <documentation>
+                        Hexadecimal window style. If this is not specified the default value is: WS_OVERLAPPED | WS_VISIBLE | WS_MINIMIZEBOX | WS_SYSMENU | WS_CAPTION.
+                        If SourceX and SourceY are specified, then WS_OVERLAPPED is replaced with WS_POPUP.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="IconFile" type="xs:string">
+                <annotation>
+                    <documentation>Relative path to an icon file for the window. Mutually exclusive with IconResource attribute.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="IconResource" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Identifier that references an icon resource in the module for the icon for the window.
+                        Mutually exclusive with IconFile attribute.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="MinimumHeight" type="xs:positiveInteger">
+                <annotation>
+                    <documentation>Minimum height of the window. Can only be specified if AutoResize is enabled.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="MinimumWidth" type="xs:positiveInteger">
+                <annotation>
+                    <documentation>Minimum width of the window. Can only be specified if AutoResize is enabled.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="SourceX" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        X offset of the window background in the Theme/@ImageFile or Theme/@ImageResource.
+                        Can only be specified with Theme/@ImageFile or Theme/@ImageResource.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="SourceY" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Y offset of the window background in the Theme/@ImageFile or Theme/@ImageResource.
+                        Can only be specified with Theme/@ImageFile or Theme/@ImageResource.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="StringId" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Identifier that references a string resource in the module to define the window caption.
+                        Mutually exclusive with the Caption attribute.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="Width" type="xs:positiveInteger" use="required">
+                <annotation>
+                    <documentation>Width of the window's client area.</documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

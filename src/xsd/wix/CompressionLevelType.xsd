@@ -1,0 +1,14 @@
+<simpleType name="CompressionLevelType">
+    <annotation>
+      <documentation>
+        Indicates the compression level for a cabinet.
+      </documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="high" />
+      <enumeration value="low" />
+      <enumeration value="medium" />
+      <enumeration value="mszip" />
+      <enumeration value="none" />
+    </restriction>
+  </simpleType>

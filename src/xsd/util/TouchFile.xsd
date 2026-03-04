@@ -1,0 +1,58 @@
+<element name="TouchFile">
+    <annotation>
+      <documentation>Updates the last modified date/time of a file.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the touch file operation. If the identifier is not specified it will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Path" use="required" type="xs:string">
+        <annotation>
+          <documentation>Path of the file to update. This value is formatted.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnInstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether or not the modified time of the file should be updated on install. If the OnInstall, OnReinstall and OnUninstall attributes are all absent the default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnReinstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether or not the modified time of the file should be updated on reinstall. If the OnInstall, OnReinstall and OnUninstall attributes are all absent the default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnUninstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether or not the modified time of the file should be updated on uninstall. If the OnInstall, OnReinstall and OnUninstall attributes are all absent the default is 'no'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Nonvital" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates the installation will succeed even if the modified time of the file cannot be updated. The default is 'no'.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,11 @@
+<element name="ButtonSelectedImage">
+        <annotation>
+            <documentation>
+                Defines a button image that is used when the control is selected.
+                ButtonImage and ButtonHoverImage are required with ButtonSelectedImage.
+            </documentation>
+        </annotation>
+        <complexType>
+            <attributeGroup ref="OwnerDrawImageAttributes" />
+        </complexType>
+    </element>

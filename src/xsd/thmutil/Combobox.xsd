@@ -1,0 +1,13 @@
+<element name="Combobox">
+        <annotation>
+            <documentation>Defines a combobox.</documentation>
+        </annotation>
+        <complexType>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attribute name="FontId" type="xs:string">
+                <annotation>
+                    <documentation>Identifier to the Font element that serves as the font for the control.</documentation>
+                </annotation>
+             </attribute>
+        </complexType>
+    </element>

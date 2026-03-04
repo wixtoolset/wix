@@ -1,0 +1,147 @@
+<element name="WixStandardBootstrapperApplication">
+    <annotation>
+      <documentation>
+        Uses WixStandardBootstrapperApplication as the Bootstrapper Application for a Bundle.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BootstrapperApplication" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="LaunchTarget" type="xs:string">
+        <annotation>
+          <documentation>
+            If set, the success page will show a Launch button the user can use to launch the application being installed.
+            The string value can be formatted using Burn variables enclosed in brackets,
+            to refer to installation directories and so forth.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LaunchTargetElevatedId" type="xs:string">
+        <annotation>
+          <documentation>
+            Id of the target ApprovedExeForElevation element.
+            If set with LaunchTarget, WixStdBA will launch the application through the Engine's LaunchApprovedExe method instead of through ShellExecute.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LaunchArguments" type="xs:string">
+        <annotation>
+          <documentation>
+            If set, WixStdBA will supply these arguments when launching the application specified by the LaunchTarget attribute.
+            The string value can be formatted using Burn variables enclosed in brackets,
+            to refer to installation directories and so forth.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LaunchHidden" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If set to "yes", WixStdBA will launch the application specified by the LaunchTarget attribute with the SW_HIDE flag.
+            This attribute is ignored when the LaunchTargetElevatedId attribute is specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LaunchWorkingFolder" type="xs:string">
+        <annotation>
+          <documentation>
+            WixStdBA will use this working folder when launching the specified application.
+            The string value can be formatted using Burn variables enclosed in brackets,
+            to refer to installation directories and so forth.
+            This attribute is ignored when the LaunchTargetElevatedId attribute is specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LicenseFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the RTF license file. Cannot be used simultaneously with LicenseUrl.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LicenseUrl" type="xs:string">
+        <annotation>
+          <documentation>URL target of the license link. Cannot be used simultaneously with LicenseFile. This attribute can be empty to hide the license link completely.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LogoFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the logo graphic.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LogoSideFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the side logo graphic.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ThemeFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the theme XML.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LocalizationFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the theme localization .wxl file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SuppressOptionsUI" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>If set to "yes", the Options button will not be shown and the user will not be able to choose an installation directory.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SuppressDowngradeFailure" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If set to "yes", attempting to installer a downgraded version of a bundle will be treated as a successful do-nothing operation.
+            The default behavior (or when explicitly set to "no") is to treat downgrade attempts as failures.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SuppressRepair" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>If set to "yes", the Repair button will not be shown in the maintenance-mode UI.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShowVersion" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>If set to "yes", the application version will be displayed on the UI.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SupportCacheOnly" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>If set to "yes", the bundle can be pre-cached using the /cache command line argument.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Theme" use="required">
+        <annotation>
+          <documentation>The built-in theme to use.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="hyperlinkLargeLicense" />
+            <enumeration value="hyperlinkLicense" />
+            <enumeration value="hyperlinkSidebarLicense" />
+            <enumeration value="none" />
+            <enumeration value="rtfLargeLicense" />
+            <enumeration value="rtfLicense" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

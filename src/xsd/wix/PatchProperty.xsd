@@ -1,0 +1,28 @@
+<element name="PatchProperty">
+    <annotation>
+      <documentation>A property for this patch database.</documentation>
+      <appinfo>
+        <msiRef table="MsiPatchMetadata" href="http://msdn.microsoft.com/library/aa370344.aspx" />
+        <remarks>
+          The PatchProperty defines entries in the MsiPatchMetadata table.
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Company" type="xs:string">
+        <annotation>
+          <documentation>Name of the company for a custom metadata property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the patch property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string" use="required">
+        <annotation>
+          <documentation>Value of the patch property.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

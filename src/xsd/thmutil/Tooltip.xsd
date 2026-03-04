@@ -1,0 +1,18 @@
+<element name="Tooltip">
+        <annotation>
+            <documentation>
+                Defines text for the parent control's tooltip.
+            </documentation>
+        </annotation>
+        <complexType>
+            <simpleContent>
+                <extension base="xs:string">
+                    <annotation>
+                        <documentation>
+                            Text for the parent control's tooltip.
+                        </documentation>
+                    </annotation>
+                </extension>
+            </simpleContent>
+        </complexType>
+    </element>

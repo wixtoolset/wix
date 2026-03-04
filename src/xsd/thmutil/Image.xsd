@@ -1,0 +1,37 @@
+<element name="Image">
+        <annotation>
+            <documentation>
+                Defines an image which can be shared between multiple controls.
+                If alternates are provided, the dimensions of the destination rectangle are compared to all of the available sources:
+                1. If there is an exact match for width and height then that source will be used (no scaling required).
+                2. If there is not an exact match then the smallest source whose width and height are larger or equal to the destination will be used and downscaled.
+                3. If there is still no match then the largest source will be used and upscaled.
+            </documentation>
+        </annotation>
+        <complexType>
+            <choice minOccurs="0" maxOccurs="unbounded">
+                <element ref="AlternateResolution" />
+            </choice>
+            <attribute name="Id" type="xs:string" use="required">
+                <annotation>
+                    <documentation>Identifier for the Image.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageFile" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Relative path to an image file for the control.
+                        Mutually exclusive with ImageResource attribute.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageResource" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Identifier that references an image resource with type RT_RCDATA in the module for the control.
+                        Mutually exclusive with ImageFile attribute.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

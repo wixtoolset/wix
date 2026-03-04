@@ -1,0 +1,8 @@
+<element name="Static">
+        <annotation>
+            <documentation>Defines a straight line.</documentation>
+        </annotation>
+        <complexType>
+            <attributeGroup ref="CommonControlAttributes" />
+        </complexType>
+    </element>

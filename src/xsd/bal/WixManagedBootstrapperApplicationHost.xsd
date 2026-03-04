@@ -1,0 +1,67 @@
+<element name="WixManagedBootstrapperApplicationHost" version="4" deprecated="true">
+    <annotation>
+      <documentation>
+        Uses WixManagedBootstrapperApplicationHost as the Bootstrapper Application for a Bundle.
+
+        _Deprecated in WiX v5; use WixPrerequisiteBootstrapperApplication instead._
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BootstrapperApplication" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="AlwaysInstallPrereqs" type="xs:string">
+        <annotation>
+          <documentation>
+            When not set or set to "no", the prereq BA is only used when the .NET Framework runtime can't be loaded.
+            When set to "yes", the prereq BA will always run before the .NET Framework runtime is attempted to be loaded.
+            If set to "yes" and all prereq packages are already installed, then the prereq BA's UI is not shown.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LogoFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the logo graphic.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ThemeFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the theme XML.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LocalizationFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the theme localization .wxl file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Theme">
+        <annotation>
+          <documentation>The built-in theme to use. The default is "standard".</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="none" />
+            <enumeration value="standard" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

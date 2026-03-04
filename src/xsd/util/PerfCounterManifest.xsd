@@ -1,0 +1,38 @@
+<element name="PerfCounterManifest">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="File" />
+      </appinfo>
+      <documentation>
+        Used to install Perfmon Counter Manifests.
+        Note that this functionality cannot be used with major upgrades that are scheduled after the InstallExecute,
+        InstallExecuteAgain, or InstallFinalize actions. For more information on major upgrade scheduling, see
+        [RemoveExistingProducts Action](https://learn.microsoft.com/en-us/windows/win32/msi/removeexistingproducts-action).
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="ResourceFileDirectory" type="xs:string">
+        <annotation>
+          <documentation>The directory that holds the resource file of the providers in the perfmon counter manifest. Often the resource file path cannot be determined until setup time. Put the directory here and during perfmon manifest registrtion the path will be updated in the registry. If not specified, Perfmon will look for the resource file in the same directory of the perfmon counter manifest file.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

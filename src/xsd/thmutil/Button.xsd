@@ -1,0 +1,56 @@
+<element name="Button">
+        <annotation>
+            <documentation>
+                Defines a button.
+            </documentation>
+        </annotation>
+        <complexType mixed="true">
+            <annotation>
+                <documentation>
+                    Text to display in the button.
+                    Mutually exclusive with the StringId attribute and child Text elements.
+                </documentation>
+            </annotation>
+            <choice minOccurs="0" maxOccurs="unbounded">
+                <annotation>
+                    <documentation>
+                        If multiple Action elements are given, the conditions should be mutually exclusive (when multiple conditions are true, the behavior is undefined and could be changed at any time).
+                        If none of the conditions of the Action elements are true, then it uses the Action element without the Condition attribute.
+                    </documentation>
+                </annotation>
+                <element ref="ButtonImage" maxOccurs="1" />
+                <element ref="ButtonFocusImage" maxOccurs="1" />
+                <element ref="ButtonHoverImage" maxOccurs="1" />
+                <element ref="ButtonSelectedImage" maxOccurs="1" />
+                <element ref="BrowseDirectoryAction" />
+                <element ref="ChangePageAction" />
+                <element ref="CloseWindowAction" />
+                <element ref="Text" />
+                <element ref="Tooltip" maxOccurs="1" />
+            </choice>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attributeGroup ref="OwnerDrawImageAttributes" />
+            <attribute name="FontId" type="xs:string">
+                <annotation>
+                    <documentation>Identifier to the Font element that serves as the font for the control. Only valid when using graphic buttons.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="HoverFontId" type="xs:string">
+                <annotation>
+                    <documentation>Identifier to the Font element that serves as the font when the control is hovered over. Only valid when using graphic buttons.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="SelectedFontId" type="xs:string">
+                <annotation>
+                    <documentation>Identifier to the Font element that serves as the font when the control is selected. Only valid when using graphic buttons.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="StringId" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Identifier that references a string resource in the module to define the text for the control.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

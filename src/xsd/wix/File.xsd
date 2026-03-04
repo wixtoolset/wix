@@ -1,0 +1,340 @@
+<element name="File">
+    <annotation>
+      <documentation>
+        Defines a file to be installed by the package.
+      </documentation>
+      <appinfo>
+        <msiRef table="File" href="https://learn.microsoft.com/en-us/windows/win32/msi/file-table" />
+        <howtoRef href="files_and_registry/add_a_file.html">How To: Add a file to your installer</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="AssemblyName" />
+        <element ref="Permission">
+          <annotation>
+            <documentation>Used to configure the ACLs for this file.</documentation>
+          </annotation>
+        </element>
+        <element ref="PermissionEx">
+          <annotation>
+            <documentation>Can also configure the ACLs for this file.</documentation>
+          </annotation>
+        </element>
+        <element ref="CopyFile">
+          <annotation>
+            <documentation>Used to create a duplicate of this file elsewhere.</documentation>
+          </annotation>
+        </element>
+        <element ref="Shortcut">
+          <annotation>
+            <documentation>Target of the shortcut will be set to this file.</documentation>
+          </annotation>
+        </element>
+        <element ref="ODBCDriver" />
+        <element ref="ODBCTranslator" />
+        <element ref="SymbolPath" />
+        <element ref="Class" />
+        <element ref="AppId" />
+        <element ref="TypeLib" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            The unique identifier for this File element. If you omit Id, a stable identifier is generated for you.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Bitness" type="BitnessTypeUnion" version="5">
+        <annotation>
+          <documentation>
+            Only valid when the File element is not a child of the Component element.
+            Overrides the default File bitness. Only a 64-bit File can install to 64-bit locations such
+            as `ProgramFiles64Folder` and the 64-bit registry. The value `always64` will force the File
+            bitness to be 64-bit and cannot be included in 32-bit packages.
+            Simliarly, the value `always32` will force the File bitness to 32-bit and can be included in
+            32-bit or 64-bit packages.
+            The default value is `default` where the File will be installed using the
+            same bitness as the package.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CompanionFile" type="xs:string">
+        <annotation>
+          <documentation>
+            Set this attribute to make this file a companion child of another file. The installation
+            state of a companion file depends not on its own file versioning information, but on the versioning of its
+            companion parent. A file that is the key path for its component can not be a companion file (that means
+            this attribute cannot be set if KeyPath="yes" for this file). The Version attribute cannot be set along
+            with this attribute since companion files are not installed based on their own version.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string" version="5">
+        <annotation>
+          <documentation>
+            Only valid when the File element is not a child of the Component element.
+            The condition expression to be evaluated at install time. When false the File will not be installed.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Directory" type="xs:string" version="5">
+        <annotation>
+          <documentation>
+            Only valid when the File element is not a child of the Component element.
+            This attribute specifies a reference to a Directory element with matching Id attribute containing a directory path.
+            If not provided, the value will default to "INSTALLFOLDER".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Subdirectory" type="xs:string" version="5">
+        <annotation>
+          <documentation>
+            Only valid when the File element is not a child of the Component element.
+            This attribute defines one or more directories below the directory referenced by the Directory attribute.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="LongFileNameType">
+        <annotation>
+          <documentation>
+            Specifies the name of the installed file. If this attribute is omitted, then
+            its default value is the file name portion of the Source attribute. If the
+            Source attribute is omitted, you must specify a Name attribute. For more
+            information, see [Specifying source files](../../../tools/payloads/).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="KeyPath" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set to yes in order to force this file to be the key path for the parent component.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShortName" type="ShortFileNameType">
+        <annotation>
+          <documentation>
+            The short file name of the file in 8.3 format.
+            This attribute should only be set if there is a conflict between generated short file names
+            or the user wants to manually specify the short file name.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ReadOnly" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set to yes in order to have the file's read-only attribute set when it is installed on the target machine.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Hidden" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set to yes in order to have the file's hidden attribute set when it is installed on the target machine.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="System" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set to yes in order to have the file's system attribute set when it is installed on the target machine.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Vital" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>If a file is vital, then installation cannot proceed unless the file is successfully installed. The user will have no option to ignore an error installing this file. If an error occurs, they can merely retry to install the file or abort the installation. The default is "yes," unless the -sfdvital switch (candle.exe) or SuppressFileDefaultVital property (.wixproj) is used.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Checksum" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute should be set to "yes" for every executable file in the installation that has a valid checksum stored in the Portable Executable (PE) file header. Only those files that have this attribute set will be verified for valid checksum during a reinstall.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Compressed" type="YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>Sets the file's source type compression. A setting of "yes"/"true", or "no"/"false" will override the setting in the Word Count Summary Property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="BindPath" type="xs:string">
+        <annotation>
+          <documentation>A list of paths, separated by semicolons, that represent the paths to be searched to find the imported DLLs. The list is usually a list of properties, with each property enclosed inside square brackets. The value may be set to an empty string. Including this attribute will cause an entry to be generated for the file in the BindImage table.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SelfRegCost" type="Integer">
+        <annotation>
+          <documentation>The cost of registering the file in bytes. This must be a non-negative number. Including this attribute will cause an entry to be generated for the file in the SelfReg table.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="TrueType" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Causes an entry to be generated for the file in the Font table with no FontTitle specified. This attribute is intended to be used to register the file as a TrueType font.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FontTitle" type="xs:string">
+        <annotation>
+          <documentation>Causes an entry to be generated for the file in the Font table with the specified FontTitle. This attribute is intended to be used to register the file as a non-TrueType font.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DefaultLanguage" type="xs:string">
+        <annotation>
+          <documentation>This is the default language of this file. The linker will replace this value from the value in the file if the suppress files option is not used.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DefaultSize" type="Integer">
+        <annotation>
+          <documentation>This is the default size of this file. The linker will replace this value from the value in the file if the suppress files option is not used.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DefaultVersion" type="xs:string">
+        <annotation>
+          <documentation>This is the default version of this file. The linker will replace this value from the value in the file if the suppress files option is not used.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Assembly">
+        <annotation>
+          <documentation>
+            Specifies if this File is a Win32 Assembly or .NET Assembly that needs to be installed into the
+            Global Assembly Cache (GAC). If the value is '.net' or 'win32', this file must also be the key path of the Component.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value=".net">
+              <annotation>
+                <documentation>
+                  The file is a .NET Framework assembly.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="no">
+              <annotation>
+                <documentation>
+                  The file is not a .NET Framework or Win32 assembly. This is the default value.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="win32">
+              <annotation>
+                <documentation>
+                  The file is a Win32 assembly.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="AssemblyManifest" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the file identifier of the manifest file that describes this assembly.
+            The manifest file should be in the same component as the assembly it describes.
+            This attribute may only be specified if the Assembly attribute is set to '.net' or 'win32'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AssemblyApplication" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the file identifier of the application file. This assembly will be isolated
+            to the same directory as the application file.
+            If this attribute is absent, the assembly will be installed to the Global Assembly Cache (GAC).
+            This attribute may only be specified if the Assembly attribute is set to '.net' or 'win32'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProcessorArchitecture">
+        <annotation>
+          <documentation>Specifies the architecture for this assembly. This attribute should only be used on .NET Framework 2.0 or higher assemblies.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="msil">
+              <annotation>
+                <documentation>
+                  The file is a .NET Framework assembly that is processor-neutral.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="x86">
+              <annotation>
+                <documentation>
+                  The file is a .NET Framework assembly for the x86 processor.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="x64">
+              <annotation>
+                <documentation>
+                  The file is a .NET Framework assembly for the x64 processor.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="ia64">
+              <annotation>
+                <documentation>
+                  The file is a .NET Framework assembly for the ia64 processor.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="DiskId" type="DiskIdType">
+        <annotation>
+          <documentation>
+            The value of this attribute should correspond to the Id attribute of a Media
+            element authored elsewhere. By creating this connection between a file and
+            its media, you set the packaging options to the values specified in the Media
+            element (values such as compression level, cab embedding, etc...). Specifying
+            the DiskId attribute on the File element overrides the default DiskId attribute
+            from the parent Component element. If no DiskId attribute is specified,
+            the default is "1". This DiskId attribute is ignored when creating a merge module
+            because merge modules do not have media.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Source" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the path to the file in the build process. Overrides default source
+            path set by parent directories and Name attribute. This attribute must be set
+            if no source information can be gathered from parent directories. For more
+            information, see [Specifying source files](../../../tools/payloads/).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PatchGroup" type="Integer">
+        <annotation>
+          <documentation>
+            This attribute must be set for patch-added files. Each patch should be assigned a different patch group number. Patch groups
+            numbers must be greater 0 and should be assigned consecutively. For example, the first patch should use PatchGroup='1', the
+            second patch will have PatchGroup='2', etc...
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PatchIgnore" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Prevents the updating of the file that is in fact changed in the upgraded image relative to the target images.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PatchAllowIgnoreOnError" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set to indicate that the patch is non-vital.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PatchWholeFile" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set if the entire file should be installed rather than creating a binary patch.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

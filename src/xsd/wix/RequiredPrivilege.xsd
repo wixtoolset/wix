@@ -1,0 +1,20 @@
+<element name="RequiredPrivilege" type="xs:string">
+    <annotation>
+      <documentation>
+        Privilege required by service configured by ServiceConfig parent.
+      </documentation>
+      <appinfo>
+        <msiRef table="MsiServiceConfig" href="https://learn.microsoft.com/en-us/windows/win32/msi/msiserviceconfig-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>
+             Valid values are a <a href="http://msdn.microsoft.com/en-us/library/bb530716.aspx">privilege constant</a> or a
+             Formatted property that resolves to a privilege constant.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

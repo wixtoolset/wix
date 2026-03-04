@@ -1,0 +1,8 @@
+<simpleType name="LongFileNameType">
+    <annotation>
+      <documentation>Values of this type will look like: "Long File Name.extension". Legal long names contain no more than 260 characters and must contain at least one non-period character. The following characters are not allowed: \ ? | &gt; : / * " or &lt;. The name must be shorter than 260 characters. The value could also be a localization variable with the format !(loc.VARIABLE).</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="[^\\\?|&gt;&lt;:/\*&quot;]{1,259}|([!$])\(loc\.[_A-Za-z]{1}[0-9A-Za-z_\.]*\)" />
+    </restriction>
+  </simpleType>

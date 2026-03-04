@@ -1,0 +1,8 @@
+<element name="RemoveRegistryValues" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RemoveRegistryValues" href="http://msdn.microsoft.com/library/aa371207.aspx" />
+      </appinfo>
+      <documentation>Removes a registry value that has been authored into the registry table if the associated component was installed locally or as run from source, and is now set to be uninstalled. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

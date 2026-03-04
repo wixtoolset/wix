@@ -1,0 +1,84 @@
+<element name="SniSslCertificate">
+    <annotation>
+      <documentation>
+        Associates an SNI SSL certificate with HTTP.SYS.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Unique ID of this SNI SSL.
+            If this attribute is not specified, an identifier will be generated automatically.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="AppId" type="xs:string">
+        <annotation>
+          <documentation>A GUID used ot identify the SNI SSL binding.</documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="HandleExisting">
+        <annotation>
+          <documentation>
+            Rights for this ACE. Default is "all".
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="replace" />
+            <enumeration value="ignore" />
+            <enumeration value="fail" />
+          </restriction>
+        </simpleType>
+      </attribute>
+
+      <attribute name="Host" type="xs:string" use="required">
+        <annotation>
+          <documentation>Host of the URL to bind with the SNI SSL certificate.</documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Port" type="xs:string" use="required">
+        <annotation>
+          <documentation>Host of the URL to bind with the SNI SSL certificate.</documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Store" type="xs:string">
+        <annotation>
+          <documentation>Certificate store containing the SNI SSL certificate.</documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Thumbprint" type="xs:string" use="required">
+        <annotation>
+          <documentation>Thumbprint of the SNI SSL certificate.</documentation>
+        </annotation>
+      </attribute>
+
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

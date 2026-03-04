@@ -1,0 +1,372 @@
+<element name="Control">
+    <annotation>
+      <appinfo>
+        <msiRef table="Control" href="https://docs.microsoft.com/en-us/windows/win32/msi/control-table" />
+        <msiRef table="ComboBox" href="https://docs.microsoft.com/en-us/windows/win32/msi/combobox-table" />
+        <msiRef table="Dialog" href="https://docs.microsoft.com/en-us/windows/win32/msi/dialog-table" />
+        <msiRef table="ListBox" href="https://docs.microsoft.com/en-us/windows/win32/msi/listbox-table" />
+        <msiRef table="ListView" href="https://docs.microsoft.com/en-us/windows/win32/msi/listview-table" />
+        <msiRef table="RadioButton" href="https://docs.microsoft.com/en-us/windows/win32/msi/radiobutton-table" />
+      </appinfo>
+      <documentation>Contains the controls that appear on each dialog.</documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="Text" minOccurs="0">
+          <annotation>
+            <documentation>Alternative to Text attribute.</documentation>
+          </annotation>
+        </element>
+        <element ref="ComboBox" minOccurs="0">
+          <annotation>
+            <documentation>ComboBox table with ListItem children</documentation>
+          </annotation>
+        </element>
+        <element ref="ListBox" minOccurs="0">
+          <annotation>
+            <documentation>ListBox table with ListItem children</documentation>
+          </annotation>
+        </element>
+        <element ref="ListView" minOccurs="0">
+          <annotation>
+            <documentation>ListView table with ListItem children</documentation>
+          </annotation>
+        </element>
+        <element ref="RadioButtonGroup" minOccurs="0">
+          <annotation>
+            <documentation>RadioButton table with RadioButton children</documentation>
+          </annotation>
+        </element>
+        <element ref="Property" minOccurs="0">
+          <annotation>
+            <documentation>Property table entry for the Property table column associated with this control</documentation>
+          </annotation>
+        </element>
+        <element ref="Binary" minOccurs="0">
+          <annotation>
+            <documentation>Icon referenced in icon column of row</documentation>
+          </annotation>
+        </element>
+        <choice minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Child elements affecting operation of this control</documentation>
+          </annotation>
+          <element ref="Publish" />
+          <element ref="Subscribe" />
+          <any namespace="##other" processContents="lax">
+            <annotation>
+              <documentation>
+                Extensibility point in the WiX XML Schema. Schema extensions can register additional
+                elements at this point in the schema.
+              </documentation>
+            </annotation>
+          </any>
+        </choice>
+      </sequence>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>Combined with the Dialog Id to make up the primary key of the Control table.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type" use="required" type="xs:string">
+        <annotation>
+          <documentation>The type of the control. Could be one of the following: Billboard, Bitmap, CheckBox, ComboBox, DirectoryCombo, DirectoryList, Edit, GroupBox, Hyperlink, Icon, Line, ListBox, ListView, MaskedEdit, PathEdit, ProgressBar, PushButton, RadioButtonGroup, ScrollableText, SelectionTree, Text, VolumeCostList, VolumeSelectCombo</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="X" use="required" type="LocalizableInteger">
+        <annotation>
+          <documentation>Horizontal coordinate of the upper-left corner of the rectangular boundary of the control. This must be a non-negative number.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Y" use="required" type="LocalizableInteger">
+        <annotation>
+          <documentation>Vertical coordinate of the upper-left corner of the rectangular boundary of the control. This must be a non-negative number.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Width" use="required" type="LocalizableInteger">
+        <annotation>
+          <documentation>Width of the rectangular boundary of the control. This must be a non-negative number.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Height" use="required" type="LocalizableInteger">
+        <annotation>
+          <documentation>Height of the rectangular boundary of the control. This must be a non-negative number.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Property" type="xs:string">
+        <annotation>
+          <documentation>The name of a defined property to be linked to this control. This column is required for active controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Text" type="xs:string">
+        <annotation>
+          <documentation>A localizable string used to set the initial text contained in a control. This attribute can contain a formatted string that is processed at install time to insert the values of properties using [PropertyName] syntax. Also supported are environment variables, file installation paths, and component installation directories; see <a href="https://learn.microsoft.com/en-us/windows/win32/msi/formatted">Formatted</a> for details.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Help" type="xs:string">
+        <annotation>
+          <documentation>This attribute is reserved for future use. There is no need to use this until Windows Installer uses it for something.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ToolTip" type="xs:string">
+        <annotation>
+          <documentation>The string used for the Tooltip.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CheckBoxValue" type="xs:string">
+        <annotation>
+          <documentation>This attribute is only valid for CheckBox Controls. When set, the linked Property will be set to this value when the check box is checked.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CheckBoxPropertyRef" type="xs:string">
+        <annotation>
+          <documentation>This attribute is only valid for CheckBox controls. The value is the name of a Property that was already used as the Property for another CheckBox control. The Property attribute cannot be specified. The attribute exists to support multiple checkboxes on different dialogs being tied to the same property.</documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="TabSkip" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause this Control to be skipped in the tab sequence.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Default" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause this Control to be invoked by the return key.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Cancel" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause this Control to be invoked by the escape key.</documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="DefaultCondition">
+        <annotation>
+          <documentation>
+            When the condition expression evaluates to true, set the Control as the default.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="EnableCondition">
+        <annotation>
+          <documentation>
+            When the condition expression evaluates to true, enable the Control.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DisableCondition">
+        <annotation>
+          <documentation>
+            When the condition expression evaluates to true, disable the Control.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HideCondition">
+        <annotation>
+          <documentation>
+            When the condition expression evaluates to true, hide the Control.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShowCondition">
+        <annotation>
+          <documentation>
+            When the condition expression evaluates to true, show the Control.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Hidden" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause the Control to be hidden.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Disabled" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause the Control to be disabled.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sunken" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause the Control to be sunken.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Indirect" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether the value displayed or changed by this control is referenced indirectly. If this bit is set, the control displays or changes the value of the property that has the identifier listed in the Property column of the Control table.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Integer" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause the linked Property value for the Control to be treated as an integer. Otherwise, the Property will be treated as a string.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RightToLeft" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause the Control to display from right to left.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RightAligned" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause the Control to be right aligned.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LeftScroll" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause the scroll bar to display on the left side of the Control.</documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Transparent" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Text Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="NoPrefix" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Text Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="NoWrap" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Text Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FormatSize" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Text Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UserLanguage" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Text Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Multiline" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Edit Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Password" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Edit Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProgressBlocks" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for ProgressBar Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Removable" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Volume and Directory Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Fixed" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Volume and Directory Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Remote" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Volume and Directory Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CDROM" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Volume and Directory Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RAMDisk" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Volume and Directory Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Floppy" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for Volume and Directory Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShowRollbackCost" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for VolumeCostList Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sorted" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            This attribute is only valid for ListBox, ListView, and ComboBox Controls. Set
+            the value of this attribute to "yes" to have entries appear in the order specified under the Control.
+            If the attribute value is "no" or absent the entries in the control will appear in alphabetical order.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ComboList" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for ComboBox Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Image" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for RadioButton, PushButton, and Icon Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IconSize">
+        <annotation>
+          <documentation>This attribute is only valid for RadioButton, PushButton, and Icon Controls.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="16" />
+            <enumeration value="32" />
+            <enumeration value="48" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="FixedSize" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for RadioButton, PushButton, and Icon Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Icon" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for RadioButton and PushButton Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Bitmap" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for RadioButton and PushButton Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PushLike" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for RadioButton and Checkbox Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HasBorder" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>This attribute is only valid for RadioButton Controls.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ElevationShield" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            This attribute is only valid for PushButton controls.
+            Set this attribute to "yes" to add the User Account Control (UAC) elevation icon (shield icon) to the PushButton control.
+            If this attribute's value is "yes" and the installation is not yet running with elevated privileges,
+            the pushbutton control is created using the User Account Control (UAC) elevation icon (shield icon).
+            If this attribute's value is "yes" and the installation is already running with elevated privileges,
+            the pushbutton control is created using the other icon attributes.
+            Otherwise, the pushbutton control is created using the other icon attributes.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

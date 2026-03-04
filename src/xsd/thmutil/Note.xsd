@@ -1,0 +1,27 @@
+<element name="Note">
+        <annotation>
+            <documentation>
+                Defines note text for a command link control based on an optional condition.
+                If multiple Note elements are given for one control, the conditions should be mutually exclusive (when multiple conditions are true, the behavior is undefined and may be changed at any time).
+                If none of the conditions of a control's Note elements are true, then it uses the text of the Note element without the Condition attribute.
+            </documentation>
+        </annotation>
+        <complexType>
+            <simpleContent>
+                <extension base="xs:string">
+                    <annotation>
+                        <documentation>
+                            Note text for the parent command link control.
+                        </documentation>
+                    </annotation>
+                    <attribute name="Condition" type="xs:string">
+                        <annotation>
+                            <documentation>
+                                The condition that determines when the parent control will use this note text.
+                            </documentation>
+                        </annotation>
+                    </attribute>
+                </extension>
+            </simpleContent>
+        </complexType>
+    </element>

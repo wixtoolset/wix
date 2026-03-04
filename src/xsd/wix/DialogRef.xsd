@@ -1,0 +1,26 @@
+<element name="DialogRef">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="Dialog" />
+      </appinfo>
+      <documentation>
+        Reference to a Dialog. This will cause the entire referenced section's contents
+        to be included in the installer database.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the Dialog to reference.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

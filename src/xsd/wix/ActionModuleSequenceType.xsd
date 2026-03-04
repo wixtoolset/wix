@@ -1,0 +1,34 @@
+<complexType name="ActionModuleSequenceType">
+    <attribute name="After" type="xs:string">
+      <annotation>
+        <documentation>The name of an action that this action should come after.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Before" type="xs:string">
+      <annotation>
+        <documentation>The name of an action that this action should come before.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Condition" type="xs:string">
+      <annotation>
+        <documentation>The condition of the action.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Overridable" type="YesNoTypeUnion">
+      <annotation>
+        <documentation>
+          If "yes", the sequencing of this action may be overridden by sequencing elsewhere.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Sequence" type="Integer">
+      <annotation>
+        <documentation>A value used to indicate the position of this action in a sequence.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Suppress" type="YesNoTypeUnion">
+      <annotation>
+        <documentation>If yes, this action will not occur.</documentation>
+      </annotation>
+    </attribute>
+  </complexType>

@@ -1,0 +1,19 @@
+<element name="DigitalCertificateRef">
+    <annotation>
+      <documentation>
+        Reference to a DigitalCertificate element. This will force the entire referenced Fragment's contents
+        to be included in the installer database. This is only used for references when patching.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required" />
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

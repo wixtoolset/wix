@@ -1,0 +1,101 @@
+<element name="UrlReservation">
+    <annotation>
+      <documentation>
+        Makes a reservation record for the HTTP Server API configuration store on Windows XP SP2,
+        Windows Server 2003, and later.  For more information about the HTTP Server API, see
+        [HTTP Server API](https://learn.microsoft.com/en-us/windows/win32/http/http-api-start-page).
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="ServiceInstall" />
+      </appinfo>
+    </annotation>
+
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>
+            The access control entries for the access control list.
+          </documentation>
+        </annotation>
+        <element ref="UrlAce" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+
+      <attribute name="HandleExisting">
+        <annotation>
+          <documentation>
+            Specifies the behavior when trying to install a URL reservation and it already exists.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="replace">
+              <annotation>
+                <documentation>
+                  Replaces the existing URL reservation (the default).
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="ignore">
+              <annotation>
+                <documentation>
+                  Keeps the existing URL reservation.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="fail">
+              <annotation>
+                <documentation>
+                  The installation fails.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Unique ID of this URL reservation.
+            If this attribute is not specified, an identifier will be generated automatically.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Sddl" type="xs:string">
+        <annotation>
+          <documentation>
+            Security descriptor to apply to the URL reservation.
+            Can't be specified when using children UrlAce elements.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Url" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The [UrlPrefix](https://learn.microsoft.com/en-us/windows/win32/http/urlprefix-strings)
+            string that defines the portion of the URL namespace to which this reservation pertains.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

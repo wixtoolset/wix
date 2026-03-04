@@ -1,0 +1,35 @@
+<element name="Editbox">
+        <annotation>
+            <documentation>Defines an edit box.</documentation>
+        </annotation>
+        <complexType mixed="true">
+            <simpleContent>
+                <extension base="xs:string">
+                    <annotation>
+                        <documentation>
+                            Initial text for the control.
+                            Mutually exclusive with the StringId attribute and child Text elements.
+                        </documentation>
+                    </annotation>
+                    <attributeGroup ref="CommonControlAttributes" />
+                    <attribute name="FileSystemAutoComplete" type="YesNoType">
+                        <annotation>
+                            <documentation>Specifies whether the edit box should auto-complete with file system paths.</documentation>
+                        </annotation>
+                    </attribute>
+                    <attribute name="FontId" type="xs:string">
+                        <annotation>
+                            <documentation>Identifier to the Font element that serves as the font for the control.</documentation>
+                        </annotation>
+                    </attribute>
+                    <attribute name="StringId" type="xs:nonNegativeInteger">
+                        <annotation>
+                            <documentation>
+                                Identifier that references a string resource in the module to define the initial text for the control.
+                            </documentation>
+                        </annotation>
+                    </attribute>
+                </extension>
+            </simpleContent>
+        </complexType>
+    </element>

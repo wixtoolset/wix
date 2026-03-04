@@ -1,0 +1,31 @@
+<element name="PatchFamilyRef">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="PatchFamily" />
+      </appinfo>
+      <documentation>
+        This will cause the entire contents of the Fragment containing the referenced PatchFamily to be
+        used in the process of creating a patch.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the PatchFamily to reference.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProductCode" type="Guid">
+        <annotation>
+          <documentation>Specifies the ProductCode of the product that this family applies to.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

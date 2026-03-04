@@ -1,0 +1,91 @@
+<element name="Fragment">
+    <annotation>
+      <documentation>
+                The Fragment element is the building block of creating an installer database in WiX. Once defined,
+                the Fragment becomes an immutable, atomic unit which can either be completely included or excluded
+                from a product. The contents of a Fragment element can be linked into a product by utilizing one
+                of the many *Ref elements. When linking in a Fragment, it will be necessary to link in all of its
+                individual units. For instance, if a given Fragment contains two Component elements, you must link
+                both under features using ComponentRef for each linked Component. Otherwise, you will get a linker
+                warning and have a floating Component that does not appear under any Feature.
+            </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="AdminExecuteSequence" />
+        <element ref="AdminUISequence" />
+        <element ref="AdvertiseExecuteSequence" />
+        <element ref="AppId" />
+        <element ref="Binary" />
+        <element ref="BootstrapperApplication" />
+        <element ref="BootstrapperApplicationRef" />
+        <element ref="BootstrapperExtension" />
+        <element ref="BootstrapperExtensionRef" />
+        <element ref="BundleCustomData" />
+        <element ref="BundleCustomDataRef" />
+        <element ref="BundleExtension" />
+        <element ref="BundleExtensionRef" />
+        <element ref="ComplianceCheck" />
+        <element ref="Component" />
+        <element ref="ComponentGroup" />
+        <element ref="Container" />
+        <element ref="CustomAction" />
+        <element ref="CustomActionRef" />
+        <element ref="CustomTable" />
+        <element ref="CustomTableRef" />
+        <element ref="Directory" />
+        <element ref="DirectoryRef" />
+        <element ref="EmbeddedChainer" />
+        <element ref="EmbeddedChainerRef" />
+        <element ref="EnsureTable" />
+        <element ref="Feature" />
+        <element ref="FeatureGroup" />
+        <element ref="FeatureRef" />
+        <element ref="File" />
+        <element ref="Files" />
+        <element ref="Icon" />
+        <element ref="InstallExecuteSequence" />
+        <element ref="InstallUISequence" />
+        <element ref="Launch" />
+        <element ref="Media" />
+        <element ref="MediaTemplate" />
+        <element ref="PackageGroup" />
+        <element ref="PackageCertificates" />
+        <element ref="PatchCertificates" />
+        <element ref="PatchFamily" />
+        <element ref="PatchFamilyGroup" />
+        <element ref="PatchFamilyGroupRef" />
+        <element ref="PayloadGroup" />
+        <element ref="Property" />
+        <element ref="PropertyRef" />
+        <element ref="RelatedBundle" />
+        <element ref="Requires" />
+        <element ref="SetDirectory" />
+        <element ref="SetProperty" />
+        <element ref="SetVariable" />
+        <element ref="SetVariableRef" />
+        <element ref="SFPCatalog" />
+        <element ref="StandardDirectory" />
+        <element ref="UI" />
+        <element ref="UIRef" />
+        <element ref="Upgrade" />
+        <element ref="Variable" />
+        <element ref="WixVariable" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Optional identifier for a Fragment. Should only be set by advanced users to tag sections.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,29 @@
+<element name="SetVariable">
+    <annotation>
+      <documentation>Schedules a "search" that sets a variable to the given value.</documentation>
+    </annotation>
+    <complexType>
+      <attributeGroup ref="SearchCommonAttributes" />
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>
+            New value for the variable. This string gets formatted, then converted to the specified type, then assigned to the variable.
+            Leaving Value and Type unspecified will clear the variable.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type" type="VariableType">
+        <annotation>
+          <documentation>Type of the variable, inferred from the value if not specified.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

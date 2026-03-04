@@ -1,0 +1,27 @@
+<element name="Substitution">
+    <annotation>
+      <documentation>Specifies the configurable fields of a module database and provides a template for the configuration of each field.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Table" type="xs:string" use="required">
+        <annotation>
+          <documentation>Specifies the name of the table being modified in the module database.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Row" type="xs:string" use="required">
+        <annotation>
+          <documentation>Specifies the primary keys of the target row in the table named in the Table column. If multiple keys, separated by semicolons.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Column" type="xs:string" use="required">
+        <annotation>
+          <documentation>Specifies the target column in the row named in the Row column.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>Provides a formatting template for the data being substituted into the target field specified by Table, Row, and Column.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

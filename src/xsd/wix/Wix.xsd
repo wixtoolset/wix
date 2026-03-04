@@ -1,0 +1,36 @@
+<element name="Wix">
+    <annotation>
+      <documentation>
+        This is the top-level container element for every wxs file. Among the possible children,
+        the Bundle, Package, Module, Patch elements are analogous to the main function in a C program.
+        There can only be one of these present when linking occurs. Package compiles into an MSI file,
+        Module compiles into an MSM file, Patch compiles into an MSP file. The Fragment element is an atomic
+        unit which ultimately links into either a Package, Module. The Fragment can either be completely included or excluded during linking.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0">
+        <sequence>
+          <choice minOccurs="0">
+            <element ref="Bundle" />
+            <element ref="Package" />
+            <element ref="Module" />
+            <element ref="Patch" />
+          </choice>
+          <element ref="Fragment" minOccurs="0" maxOccurs="unbounded" />
+        </sequence>
+      </choice>
+      <attribute name="RequiredVersion" type="WixVersionType">
+        <annotation>
+          <documentation>Required version of the WiX toolset to compile this input file.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

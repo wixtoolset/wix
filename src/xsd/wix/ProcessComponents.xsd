@@ -1,0 +1,8 @@
+<element name="ProcessComponents" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="ProcessComponents" href="http://msdn.microsoft.com/library/aa370853.aspx" />
+      </appinfo>
+      <documentation>Registers and unregisters components, their key paths, and the component clients. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

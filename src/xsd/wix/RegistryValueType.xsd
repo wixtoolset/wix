@@ -1,0 +1,42 @@
+<simpleType name="RegistryValueType">
+    <annotation>
+      <documentation>Values of this type represent possible registry value types.</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="string">
+        <annotation>
+          <documentation>The value is interpreted and stored as a string (REG_SZ).</documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="integer">
+        <annotation>
+          <documentation>
+              The value is interpreted and stored as an integer (REG_DWORD).
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="binary">
+        <annotation>
+          <documentation>
+              The value is interpreted and stored as a hexadecimal value (REG_BINARY).
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="expandable">
+        <annotation>
+          <documentation>
+              The value is interpreted and stored as an expandable string (REG_EXPAND_SZ).
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="multiString">
+        <annotation>
+          <documentation>
+              The value is interpreted and stored as a multiple strings (REG_MULTI_SZ).
+              Please note that this value will only result in a multi-string value if there is more than one registry value
+              or the Action attribute's value is 'append' or 'prepend'. Otherwise a string value will be created.
+          </documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>

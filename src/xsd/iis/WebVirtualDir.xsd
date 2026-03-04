@@ -1,0 +1,67 @@
+<element name="WebVirtualDir">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>Defines an IIS virtual directory. When this element is a child of WebSite element, the virtual directory is defined within that web site. Otherwise this virtual directory must reference a WebSite element via the WebSite attribute</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="WebApplication" minOccurs="0" maxOccurs="1" />
+        <element ref="WebDirProperties" minOccurs="0" maxOccurs="1" />
+        <element ref="WebError" />
+        <element ref="WebVirtualDir" />
+        <element ref="HttpHeader" />
+        <element ref="MimeMap" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the web application. If the Id is not specified, it will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="WebSite" type="xs:string">
+        <annotation>
+          <documentation>References the Id attribute for a WebSite in which this virtual directory belongs. Required when this element is not a child of WebSite element.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Alias" type="xs:string" use="required">
+        <annotation>
+          <documentation>Sets the application name, which is the URL relative path used to access this virtual directory</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Directory" use="required" type="xs:string">
+        <annotation>
+          <documentation>References the Id attribute for a Directory element that points to the content for this virtual directory.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DirProperties" type="xs:string">
+        <annotation>
+          <documentation>
+            References the Id attribute for a WebDirProperties element that specifies the security and access properties for this virtual directory.
+            This attribute may not be specified if a WebDirProperties element is directly nested in this element.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="WebApplication" type="xs:string">
+        <annotation>
+          <documentation>References the Id attribute for a WebApplication element that specifies web application settings for this virtual directory.  If a WebApplication child is not specified, the virtual directory does not host web applications.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

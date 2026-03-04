@@ -1,0 +1,15 @@
+<element name="ContainerRef">
+    <annotation>
+      <documentation>Create a reference to an existing Container element.</documentation>
+      <appinfo>
+        <seeAlso ref="Container" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of Container element to reference.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

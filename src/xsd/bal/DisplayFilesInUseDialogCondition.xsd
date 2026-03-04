@@ -1,0 +1,14 @@
+<attribute name="DisplayFilesInUseDialogCondition" type="xs:string">
+    <annotation>
+      <documentation>
+        Specifies whether the bundle allows the Files In Use dialog to be displayed for the MSI or MSP package. If not
+        specified (the default) or the condition evaluates to true, the Files In Use dialog prompts the user during full 
+        bundle UI to close applications to release the file. Otherwise, the dialog is not displayed and the package might
+        require a restart when files are in use.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MspPackage" />
+      </appinfo>
+    </annotation>
+  </attribute>

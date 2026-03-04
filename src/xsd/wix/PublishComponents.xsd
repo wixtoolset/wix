@@ -1,0 +1,8 @@
+<element name="PublishComponents" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="PublishComponents" href="http://msdn.microsoft.com/library/aa370918.aspx" />
+      </appinfo>
+      <documentation>Manages the advertisement of the components from the PublishComponent table. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

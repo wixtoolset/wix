@@ -1,0 +1,61 @@
+<element name="BootstrapperApplication">
+    <annotation>
+      <documentation>Contains all the relevant information about the setup UI.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="BootstrapperApplicationDll" minOccurs="0" maxOccurs="1" />
+        <element ref="Payload" />
+        <element ref="PayloadGroupRef" />
+        <element ref="Payloads" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>The identifier of the BootstrapperApplication element. Only required if you want to reference this element using a BootstrapperApplicationRef element.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" version="5">
+        <annotation>
+          <documentation>
+            The relative destination path and file name for the bootstrapper application executable.
+            The default is the source file name. Use this attribute to rename the bootstrapper application executable or extract it into a subfolder.
+            At a minimum, the Name or SourceFile attribute must be specified.
+            This must be a relative path ('\foo' or 'C:\foo' is not allowed).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string" version="5">
+        <annotation>
+          <documentation>
+            The path to the bootstrapper application executable.
+            If not provided, will use the Name attribute value.
+            At a minimum, the SourceFile or Name attribute must be specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Secondary" type="YesNoTypeUnion" version="5">
+        <annotation>
+          <documentation>
+            Indicates whether the bootstrapper application is the secondary or fallback.
+            This bootstrapper application will only run if the primary bootstrapper application returns a non-zero exit code.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              attributes at this point in the schema.
+            </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

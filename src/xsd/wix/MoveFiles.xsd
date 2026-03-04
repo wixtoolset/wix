@@ -1,0 +1,9 @@
+<element name="MoveFiles" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef table="MoveFile" href="http://msdn.microsoft.com/library/aa370055.aspx" />
+        <msiRef action="MoveFiles" href="http://msdn.microsoft.com/library/aa370054.aspx" />
+      </appinfo>
+      <documentation>Locates existing files on the system and moves or copies those files to a new location. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

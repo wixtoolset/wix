@@ -1,0 +1,50 @@
+<element name="BundleCustomData">
+    <annotation>
+      <documentation>Defines a custom XML element for use in a bundle data manifest.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="BundleAttributeDefinition">
+          <annotation>
+            <documentation>Attribute definition for BundleCustomData. There must be at least one defined.</documentation>
+          </annotation>
+        </element>
+        <element ref="BundleElement">
+          <annotation>
+            <documentation>Instance data for BundleCustomData.</documentation>
+          </annotation>
+        </element>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Identifier for the custom table.
+            Also used as the name of the XML element.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type">
+        <annotation>
+          <documentation>
+            Indicates the custom data is transformed into the bootstrapper application data manifest or the bundle extension data manifest.
+            Defaults to BootstrapperExtension if ExtensionId is specified, otherwise BootstrapperApplication.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="BootstrapperApplication" />
+            <enumeration value="BootstrapperExtension" />
+            <enumeration value="BundleExtension" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ExtensionId" type="xs:string">
+        <annotation>
+          <documentation>
+            Identifier for the bootstrapper extension.
+            Required when Type is BootstrapperExtension, must not be specified otherwise.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

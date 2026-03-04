@@ -1,0 +1,76 @@
+<attributeGroup name="CommonControlAttributes">
+        <attribute name="Name" type="xs:string">
+            <annotation>
+                <documentation>
+                    Optional name for the control.
+
+                    If the ThmUtil variable callback system has been configured, such as by
+                    WixStandardBootstrapperApplication, ThmUtil uses the control name to
+                    find a matching variable name. ThmUtil retrieves the variable's value
+                    to set the initial value of the control and sets the variable's value
+                    when the user interacts with the control.
+
+                    For example, a checkbox control is checked when the matching variable
+                    has a nonzero value and unchecked for a value of `0`. When the user
+                    checks a checkbox control, ThmUtil sets the variable value to a nonzero
+                    value (currently `1`) and to `0` if the checkbox is unchecked.
+
+                    An edit box control gets its initial value from a matching variable
+                    value. The control value is saved to the variable when navigating away
+                    from the page or when choosing a folder via an associated Browse button.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="EnableCondition" type="xs:string">
+            <annotation>
+                <documentation>A condition that determines if the control is enabled.  If this condition is true or omitted, then the control will be enabled.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="Height" type="xs:int" use="required">
+            <annotation>
+                <documentation>Height of the control. Non-positive values extend the control to the bottom of the window minus the value. A zero value extends the control to the bottom of the window.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="HexStyle" type="xs:hexBinary">
+            <annotation>
+                <documentation>Hexadecimal window style for the control.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="HideWhenDisabled" type="YesNoType">
+            <annotation>
+                <documentation>Specifies whether the control should be hidden when disabled.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="TabStop" type="YesNoType">
+            <annotation>
+                <documentation>Specifies whether the control is part of the tab sequence of controls.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="Visible" type="YesNoType">
+            <annotation>
+                <documentation>Specifies whether the control is initially visible.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="VisibleCondition" type="xs:string">
+            <annotation>
+                <documentation>
+                    A condition that determines if the control is visible.  If this condition is true or omitted, then the control will be visible.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="Width" type="xs:int" use="required">
+            <annotation>
+                <documentation>Width of the control. Non-positive values extend the control to the right of the window minus the value. A zero value extends the control to the right of the window.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="X" type="xs:int" use="required">
+            <annotation>
+                <documentation>X coordinate for the control from the left of the window. Negative values are coordinates from the right of the window minus the width of the control.</documentation>
+            </annotation>
+        </attribute>
+        <attribute name="Y" type="xs:int" use="required">
+            <annotation>
+                <documentation>Y coordinate for the control from the top of the window. Negative values are coordinates from the bottom of the window minus the height of the control.</documentation>
+            </annotation>
+        </attribute>
+    </attributeGroup>

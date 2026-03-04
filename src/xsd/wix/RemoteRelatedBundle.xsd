@@ -1,0 +1,45 @@
+<element name="RemoteRelatedBundle">
+    <annotation>
+      <documentation>
+        Defines a related bundle for the parent RemoteBundle.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="Guid" use="required">
+        <annotation>
+          <documentation>The identifier of the RelatedBundle group.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Action" use="required">
+        <annotation>
+          <documentation>The action to take on bundles related to this one.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:string">
+            <enumeration value="detect" />
+            <enumeration value="upgrade" />
+            <enumeration value="addon" />
+            <enumeration value="patch" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

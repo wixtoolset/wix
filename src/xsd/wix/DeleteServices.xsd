@@ -1,0 +1,8 @@
+<element name="DeleteServices" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="DeleteServices" href="http://msdn.microsoft.com/library/aa368270.aspx" />
+      </appinfo>
+      <documentation>Stops a service and removes its registration from the system. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

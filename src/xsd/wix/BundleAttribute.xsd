@@ -1,0 +1,17 @@
+<element name="BundleAttribute">
+    <annotation>
+      <documentation>Used for BundleCustomData. Specifies a BundleAttributeDefinition and its value for the parent BundleElement.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Specifies the BundleAttributeDefinition associated with this value.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+      <annotation>
+        <documentation>An attribute's value.</documentation>
+      </annotation>
+      </attribute>
+    </complexType>
+  </element>

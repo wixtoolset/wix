@@ -1,0 +1,8 @@
+<element name="InstallExecuteAgain" type="ActionModuleSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="InstallExecuteAgain" href="http://msdn.microsoft.com/library/aa369497.aspx" />
+      </appinfo>
+      <documentation>Runs a script containing all operations spooled since either the start of the installation or the last InstallExecute action, or InstallExecuteAgain action. Should only be used after InstallExecute. Special actions don't have a built-in sequence number and thus must appear relative to another action. The suggested way to do this is by using the Before or After attribute. InstallExecute and InstallExecuteAgain can optionally appear anywhere between InstallInitialize and InstallFinalize.</documentation>
+    </annotation>
+  </element>

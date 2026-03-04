@@ -1,0 +1,34 @@
+<element name="ListBox">
+    <annotation>
+      <documentation>
+        Set of items for a particular ListBox control tied to an install Property
+      </documentation>
+      <appinfo>
+        <msiRef table="Control" href="https://docs.microsoft.com/en-us/windows/win32/msi/control-table" />
+        <msiRef table="Dialog" href="https://docs.microsoft.com/en-us/windows/win32/msi/dialog-table" />
+        <msiRef table="ListView" href="https://docs.microsoft.com/en-us/windows/win32/msi/listview-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="ListItem">
+          <annotation>
+            <documentation>entry for ListBox table</documentation>
+          </annotation>
+        </element>
+      </choice>
+      <attribute name="Property" use="required" type="xs:string">
+        <annotation>
+          <documentation>Property tied to this group</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

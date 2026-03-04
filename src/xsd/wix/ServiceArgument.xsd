@@ -1,0 +1,19 @@
+<element name="ServiceArgument" type="xs:string">
+    <annotation>
+      <documentation>
+        Argument used in ServiceControl parent
+      </documentation>
+      <appinfo>
+        <msiRef table="ServiceControl" href="http://msdn.microsoft.com/library/aa371634.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>
+             A Formatted value for the Service argument.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

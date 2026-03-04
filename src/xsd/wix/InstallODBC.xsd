@@ -1,0 +1,8 @@
+<element name="InstallODBC" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="InstallODBC" href="http://msdn.microsoft.com/library/aa369538.aspx" />
+      </appinfo>
+      <documentation>Installs the drivers, translators, and data sources in the ODBCDriver table, ODBCTranslator table, and ODBCDataSource table. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

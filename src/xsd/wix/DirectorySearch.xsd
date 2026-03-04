@@ -1,0 +1,49 @@
+<element name="DirectorySearch">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="ComponentSearch" />
+        <seeAlso ref="IniFileSearch" />
+        <seeAlso ref="RegistrySearch" />
+        <msiRef table="DrLocator" href="http://msdn.microsoft.com/library/aa368331.aspx" />
+        <msiRef table="Signature" href="https://docs.microsoft.com/en-us/windows/win32/msi/signature-table" />
+        <howtoRef href="files_and_registry/check_the_version_number.html">How To: Check the version number of a file during installation</howtoRef>
+        <howtoRef href="files_and_registry/directorysearchref.html">How To: Reference another DirectorySearch element</howtoRef>
+        <howtoRef href="files_and_registry/parentdirectorysearch.html">How To: Get the parent directory of a file search</howtoRef>
+        <remarks>
+          Use the AssignToProperty attribute to search for a file but set the outer property to the directory containing the file. When this attribute is set to 'yes', you may only nest a FileSearch element with a unique Id or define no child element.
+          When the parent DirectorySearch/@Depth attribute is greater than 0, the FileSearch/@Id attribute must be absent or the same as the parent DirectorySearch/@Id attribute value, unless the parent DirectorySearch/@AssignToProperty attribute value is 'yes'.
+        </remarks>
+      </appinfo>
+      <documentation>Searches for directory and assigns to value of parent Property.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0">
+        <element ref="DirectorySearch" />
+        <element ref="DirectorySearchRef" />
+        <element ref="FileSearch" />
+        <element ref="FileSearchRef" />
+      </choice>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>Unique identifier for the directory search.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Path" type="xs:string">
+        <annotation>
+          <documentation>Path on the user's system. Either absolute, or relative to containing directories.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Depth" type="Integer">
+        <annotation>
+          <documentation>
+                        Depth below the path that the installer searches for the file or directory specified by the search. See remarks for more information.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AssignToProperty" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set the value of the outer Property to the result of this search. See remarks for more information.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

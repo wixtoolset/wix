@@ -1,0 +1,57 @@
+<element name="WixPrerequisiteBootstrapperApplication" version="5">
+    <annotation>
+      <documentation>
+        Uses WixPrerequisiteBootstrapperApplication as a secondary Bootstrapper Application for a Bundle,
+        to bootstrap the prerequisites needed for a primary bootstrapper application.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BootstrapperApplication" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="LogoFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the logo graphic.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ThemeFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the theme XML.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LocalizationFile" type="xs:string">
+        <annotation>
+          <documentation>Source file of the theme localization .wxl file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Theme">
+        <annotation>
+          <documentation>The built-in theme to use. The default is "standard".</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="none" />
+            <enumeration value="standard" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

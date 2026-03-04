@@ -1,0 +1,8 @@
+<element name="RemoveODBC" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RemoveODBC" href="http://msdn.microsoft.com/library/aa371206.aspx" />
+      </appinfo>
+      <documentation>Removes the data sources, translators, and drivers listed for removal during the installation. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

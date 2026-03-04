@@ -1,0 +1,29 @@
+<element name="MergeRef">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="Merge" />
+        <howtoRef href="redistributables_and_install_checks/install_vcredist.html">How To: Install the Visual C++ Redistributable with your installer</howtoRef>
+      </appinfo>
+      <documentation>Merge reference to connect a Merge Module to parent Feature</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The unique identifier for the Merge element to be referenced.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Primary" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether the feature containing this MergeRef is the primary feature for advertising the merge module's components.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+                    Extensibility point in the WiX XML Schema. Schema extensions can register additional
+                    attributes at this point in the schema.
+                </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

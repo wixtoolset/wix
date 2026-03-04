@@ -1,0 +1,39 @@
+<element name="FormatFile">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="File" />
+      </appinfo>
+      <documentation>
+        Formats a file's contents at install time. The contents are formatted according to the rules of the
+        [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted) data type.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="BinaryRef" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The id of a Binary row that contains a copy of the file. The file in the Binary table overwrites whatever
+            file is installed by the parent component.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

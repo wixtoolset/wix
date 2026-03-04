@@ -1,0 +1,37 @@
+<element name="ComPlusMethod">
+    <annotation>
+      <documentation>
+        Represents a method for an interface.
+      </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="ComPlusRoleForMethod" minOccurs="0" maxOccurs="unbounded" />
+      </sequence>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>
+            Identifier for the element.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Index" use="optional" type="xs:int">
+        <annotation>
+          <documentation>
+            Dispatch id of the method. If this attribute is not set a
+            value must be provided for the Name attribute.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" use="optional" type="xs:string">
+        <annotation>
+          <documentation>
+            Name of the method. If this attribute is not set a value
+            must be provided for the Index attribute.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AutoComplete" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="Description" use="optional" type="xs:string" />
+    </complexType>
+  </element>

@@ -1,0 +1,11 @@
+<attribute name="Enforce" type="wxs:YesNoTypeUnion">
+    <annotation>
+      <documentation>
+        When set to "yes", adds a custom action to prompt the user when dependencies are missing from the computer. The default is "no".
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Requires" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="RequiresRef" />
+      </appinfo>
+    </annotation>
+  </attribute>

@@ -1,0 +1,30 @@
+<element name="Checkbox">
+        <annotation>
+            <documentation>Defines a checkbox.</documentation>
+        </annotation>
+        <complexType mixed="true">
+            <annotation>
+                <documentation>
+                    Text to display beside the checkbox.
+                    Mutually exclusive with the StringId attribute and child Text elements.
+                </documentation>
+            </annotation>
+            <choice minOccurs="0" maxOccurs="unbounded">
+                <element ref="Text" />
+                <element ref="Tooltip" maxOccurs="1" />
+            </choice>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attribute name="FontId" type="xs:string">
+                <annotation>
+                    <documentation>Identifier to the Font element that serves as the font for the control.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="StringId" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Identifier that references a string resource in the module to define the text for the control.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

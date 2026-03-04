@@ -1,0 +1,11 @@
+<schema targetNamespace="http://wixtoolset.org/schemas/v4/wxs/difxapp" deprecated="true">
+  <annotation>
+    <documentation>
+      The source code schema for the WiX Toolset Driver Install Frameworks for Applications Extension.
+
+      ## WixToolset.DifxApp.wixext was deprecated in WiX v4
+
+      ## WixToolset.DifxApp.wixext was removed in WiX v5
+    </documentation>
+  </annotation>
+</schema>

@@ -1,0 +1,15 @@
+<attribute name="PrereqLicenseFile" type="xs:string">
+    <annotation>
+      <documentation>
+        Source file of the RTF license file.
+        There may only be one package in the bundle that has either the PrereqLicenseFile attribute or the PrereqLicenseUrl attribute.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BundlePackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="ExePackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MspPackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsuPackage" />
+      </appinfo>
+    </annotation>
+  </attribute>

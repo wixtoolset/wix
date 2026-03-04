@@ -1,0 +1,10 @@
+<simpleType name="FirewallLocalScopeType">
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="any" />
+      <enumeration value="dns" />
+      <enumeration value="dhcp" />
+      <enumeration value="wins" />
+      <enumeration value="localSubnet" />
+      <enumeration value="defaultGateway" />
+    </restriction>
+  </simpleType>

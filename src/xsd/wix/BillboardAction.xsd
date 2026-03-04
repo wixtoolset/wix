@@ -1,0 +1,33 @@
+<element name="BillboardAction">
+    <annotation>
+      <documentation>
+        Billboard action during which child Billboards are displayed
+      </documentation>
+      <appinfo>
+        <msiRef table="Billboard" href="https://learn.microsoft.com/en-us/windows/win32/msi/billboard-table" />
+        <msiRef table="BBControl" href="https://learn.microsoft.com/en-us/windows/win32/msi/bbcontrol-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="Billboard" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Order of Billboard elements determines order of display</documentation>
+          </annotation>
+        </element>
+      </sequence>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Action name that determines when the Billboard should be shown.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

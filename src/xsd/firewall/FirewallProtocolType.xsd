@@ -1,0 +1,6 @@
+<simpleType name="FirewallProtocolType">
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="tcp" />
+      <enumeration value="udp" />
+    </restriction>
+  </simpleType>

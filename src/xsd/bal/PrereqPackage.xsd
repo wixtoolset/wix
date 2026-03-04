@@ -1,0 +1,14 @@
+<attribute name="PrereqPackage" type="wxs:YesNoTypeUnion">
+    <annotation>
+      <documentation>
+        When set to "yes", the Prereq BA will plan the package to be installed if its InstallCondition is "true" or empty.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BundlePackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="ExePackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MspPackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsuPackage" />
+      </appinfo>
+    </annotation>
+  </attribute>

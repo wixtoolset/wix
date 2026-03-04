@@ -1,0 +1,28 @@
+<simpleType name="RegistryValueAction">
+    <annotation>
+      <documentation>Values of this type represent possible registry value actions.</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="append">
+        <annotation>
+          <documentation>
+            Appends the specified value(s) to a multiString registry value.
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="prepend">
+        <annotation>
+          <documentation>
+            Prepends the specified value(s) to a multiString registry value.
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="write">
+        <annotation>
+          <documentation>
+            Writes a registry value.
+          </documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>

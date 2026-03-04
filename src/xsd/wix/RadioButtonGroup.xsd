@@ -1,0 +1,30 @@
+<element name="RadioButtonGroup">
+    <annotation>
+      <documentation>
+        Set of radio buttons tied to the specified Property
+      </documentation>
+      <appinfo>
+        <msiRef table="RadioButton" href="https://docs.microsoft.com/en-us/windows/win32/msi/radiobutton-table" />
+        <msiRef table="Control" href="https://docs.microsoft.com/en-us/windows/win32/msi/control-table" />
+        <msiRef table="Dialog" href="https://docs.microsoft.com/en-us/windows/win32/msi/dialog-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="RadioButton" maxOccurs="unbounded" />
+      </sequence>
+      <attribute name="Property" use="required" type="xs:string">
+        <annotation>
+          <documentation>Property tied to this group.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

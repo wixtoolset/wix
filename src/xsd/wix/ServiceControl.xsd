@@ -1,0 +1,70 @@
+<element name="ServiceControl">
+    <annotation>
+      <documentation>
+        Starts, stops, and removes services for parent Component. This element is used to control the state
+        of a service installed by the MSI or MSM file by using the start, stop and remove attributes.
+        For example, Start='install' Stop='both' Remove='uninstall' would mean: start the service on install,
+        remove the service when the product is uninstalled, and stop the service both on install and uninstall.
+      </documentation>
+      <appinfo>
+        <msiRef table="ServiceControl" href="http://msdn.microsoft.com/library/aa371634.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="ServiceArgument" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Ordered list of arguments used when modifying services.</documentation>
+          </annotation>
+        </element>
+      </sequence>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Unique identifier for this service control. This value will default to the Name attribute if not
+            specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the service.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Start" type="InstallUninstallType">
+        <annotation>
+          <documentation>
+            Specifies whether the service should be started by the StartServices action on install, uninstall or both.
+            For 'install', the service will be started only when the parent component is being installed (msiInstallStateLocal or
+            msiInstallStateSource); for 'uninstall', the service will be started only when the parent component
+            is being removed (msiInstallStateAbsent); for 'both', the service will be started in both cases.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Stop" type="InstallUninstallType">
+        <annotation>
+          <documentation>
+            Specifies whether the service should be stopped by the StopServices action on install, uninstall or both.
+            For 'install', the service will be stopped only when the parent component is being installed (msiInstallStateLocal or
+            msiInstallStateSource); for 'uninstall', the service will be stopped only when the parent component
+            is being removed (msiInstallStateAbsent); for 'both', the service will be stopped in both cases.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Remove" type="InstallUninstallType">
+        <annotation>
+          <documentation>
+            Specifies whether the service should be removed by the DeleteServices action on install, uninstall or both.
+            For 'install', the service will be removed only when the parent component is being installed (msiInstallStateLocal or
+            msiInstallStateSource); for 'uninstall', the service will be removed only when the parent component
+            is being removed (msiInstallStateAbsent); for 'both', the service will be removed in both cases.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Wait" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether or not to wait for the service to complete before continuing. The default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

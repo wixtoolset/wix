@@ -1,0 +1,37 @@
+<element name="Error">
+    <annotation>
+      <appinfo>
+        <msiRef table="Error" href="https://learn.microsoft.com/en-us/windows/win32/msi/error-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="Integer">
+        <annotation>
+          <documentation>Number of the error for which a message is being provided. See MSI SDK for error definitions.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Message" type="xs:string">
+        <annotation>
+          <documentation>Message to display for the specified error number.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

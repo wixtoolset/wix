@@ -1,0 +1,149 @@
+<attributeGroup name="ChainPackageCommonAttributes">
+    <attribute name="SourceFile" type="xs:string">
+      <annotation>
+        <documentation>
+            Location of the package to add to the bundle.
+            The default value is the Name attribute, if provided.
+            At a minimum, the SourceFile or Name attribute must be specified.
+            Must not be specified if the package payload is given by the *PackagePayload element.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Name" type="xs:string">
+      <annotation>
+        <documentation>
+            The destination path and file name for this chain payload. Use this attribute to rename the
+            chain entry point or extract it into a subfolder. The default value is the file name from the
+            SourceFile attribute, if provided. At a minimum, the Name or SourceFile attribute must be specified.
+            This must be a relative path ('\foo' or 'C:\foo' is not allowed).
+            Must not be specified if the package payload is given by the *PackagePayload element.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="DownloadUrl" type="xs:string">
+      <annotation>
+        <documentation>
+          <p>The URL to use to download the package. The following substitutions are supported:</p>
+          <ul>
+          <li>{0} is replaced by the package Id.</li>
+          <li>{1} is replaced by the payload Id.</li>
+          <li>{2} is replaced by the payload file name.</li>
+          </ul>
+          Must not be specified if the package payload is given by the *PackagePayload element.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Id" type="xs:string">
+      <annotation>
+        <documentation>
+            Identifier for this package, for ordering and cross-referencing. The default is the Name attribute
+            modified to be suitable as an identifier (i.e. invalid characters are replaced with underscores).
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="After" type="xs:string">
+      <annotation>
+        <documentation>
+            The identifier of another package that this one should be installed after. By default the After
+            attribute is set to the previous sibling package in the Chain or PackageGroup element. If this
+            attribute is specified ensure that a cycle is not created explicitly or implicitly.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="InstallSize" type="xs:string">
+      <annotation>
+        <documentation>
+            The size this package will take on disk in bytes after it is installed. By default, the binder will
+            calculate the install size by scanning the package (File table for MSIs, Payloads for EXEs)
+            and use the total for the install size of the package.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="InstallCondition" type="xs:string">
+      <annotation>
+        <documentation>
+          A condition to evaluate before installing the package. The package will only be installed if the condition
+          evaluates to true. If the condition evaluates to false and the bundle is being installed, repaired, or modified,
+          the package will be uninstalled.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Cache" type="KeepRemoveForceTypeUnion">
+      <annotation>
+        <documentation>Whether to cache the package. The default is "keep".</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="CacheId" type="xs:string">
+      <annotation>
+        <documentation>
+          The identifier to use when caching the package. WiX provides default cache ids---do not override the default unless you
+          have a specific need and understand the implications.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="DisplayName" type="xs:string">
+      <annotation>
+        <documentation>
+          Specifies the display name to place in the bootstrapper application data manifest for the package. By default, ExePackages
+          use the ProductName field from the version information, MsiPackages use the ProductName property, and MspPackages use
+          the DisplayName patch metadata property. Other package types must use this attribute to define a display name in the
+          bootstrapper application data manifest.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Description" type="xs:string">
+      <annotation>
+        <documentation>
+          Specifies the description to place in the bootstrapper application data manifest for the package. By default, ExePackages
+          use the FileName field from the version information, MsiPackages use the ARPCOMMENTS property, and MspPackages use
+          the Description patch metadata property. Other package types must use this attribute to define a description in the
+          bootstrapper application data manifest.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="LogPathVariable" type="xs:string">
+      <annotation>
+        <documentation>
+          Name of a Variable that will hold the path to the log file. An empty value will cause the variable to not
+          be set. The default is "WixBundleLog_[PackageId]" except for MSU packages which default to no logging.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="RollbackLogPathVariable" type="xs:string">
+      <annotation>
+        <documentation>
+          Name of a Variable that will hold the path to the log file used during rollback. An empty value will cause
+          the variable to not be set. The default is "WixBundleRollbackLog_[PackageId]" except for MSU packages which
+          default to no logging.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Vital" type="YesNoTypeUnion">
+      <annotation>
+        <documentation>
+          Specifies whether the package must succeed for the chain to continue. The default "yes"
+          indicates that if the package fails then the chain will fail and roll back or stop. If
+          "no" is specified then the chain will continue even if the package reports failure.
+        </documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Compressed" type="YesNoDefaultTypeUnion">
+      <annotation>
+        <documentation>
+          Whether the package payload should be embedded in a container or left as an external payload.
+          Must not be specified if the package payload is given by the *PackagePayload element.
+        </documentation>
+      </annotation>
+    </attribute>
+    <anyAttribute namespace="##other" processContents="lax">
+      <annotation>
+        <documentation>
+          Extensibility point in the WiX XML Schema. Schema extensions can register additional
+          attributes at this point in the schema. The extension's
+          <code>CompilerExtension.ParseAttribute()</code>
+          method will be called with the package identifier in
+          <code>contextValues["PackageId"]</code>.
+        </documentation>
+      </annotation>
+    </anyAttribute>
+  </attributeGroup>

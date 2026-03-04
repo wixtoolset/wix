@@ -1,0 +1,15 @@
+<element name="PackageCertificates">
+    <annotation>
+      <documentation>
+          Digital signatures that identify installation packages in a multi-product transaction.
+        </documentation>
+      <appinfo>
+        <msiRef table="MsiPackageCertificate" href="http://msdn.microsoft.com/library/cc542575.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice maxOccurs="unbounded">
+        <element ref="DigitalCertificate" />
+      </choice>
+    </complexType>
+  </element>

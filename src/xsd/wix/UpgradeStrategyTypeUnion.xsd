@@ -1,0 +1,6 @@
+<simpleType name="UpgradeStrategyTypeUnion">
+    <annotation>
+      <documentation>Use this attribute to specify the upgrade strategy of this package: major upgrade or none.</documentation>
+    </annotation>
+    <union memberTypes="UpgradeStrategyType PreprocessorVariables" />
+  </simpleType>

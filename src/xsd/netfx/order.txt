@@ -1,0 +1,13 @@
+element|NativeImage
+element|DotNetCoreSearch
+element|DotNetCoreSearchRef
+element|DotNetCoreSdkSearch
+element|DotNetCoreSdkSearchRef
+element|DotNetCoreSdkFeatureBandSearch
+element|DotNetCoreSdkFeatureBandSearchRef
+element|DotNetCompatibilityCheck
+element|DotNetCompatibilityCheckRef
+simpleType|NativeImagePlatformType
+simpleType|NativeImagePreprocessorPlatformType
+simpleType|NetfxPlatformType
+simpleType|NetfxPreprocessorPlatformType

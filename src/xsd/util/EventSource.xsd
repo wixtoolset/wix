@@ -1,0 +1,121 @@
+<element name="EventSource">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>Creates an event source.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="CategoryCount" type="wxs:Integer">
+        <annotation>
+          <documentation>
+            The number of categories in CategoryMessageFile. CategoryMessageFile
+            must be specified too.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CategoryMessageFile" type="xs:string">
+        <annotation>
+          <documentation>
+            Name of the category message file. CategoryCount must be specified too.
+            Note that this is a formatted field, so you can use [#fileId] syntax to
+            refer to a file being installed. It is also written as a REG_EXPAND_SZ
+            string, so you can use %environment_variable% syntax to refer to a file
+            already present on the user's machine.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="EventMessageFile" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Name of the event message file.
+            Note that this is a formatted field, so you can use [#fileId] syntax to
+            refer to a file being installed. It is also written as a REG_EXPAND_SZ
+            string, so you can use %environment_variable% syntax to refer to a file
+            already present on the user's machine.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="KeyPath" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Marks the EventSource registry as the key path of the component it belongs to.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Log" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the event source's log. The "Security" log is not support.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the event source.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ParameterMessageFile" type="xs:string">
+        <annotation>
+          <documentation>
+            Name of the parameter message file.
+            Note that this is a formatted field, so you can use [#fileId] syntax to
+            refer to a file being installed. It is also written as a REG_EXPAND_SZ
+            string, so you can use %environment_variable% syntax to refer to a file
+            already present on the user's machine.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SupportsErrors" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Equivalent to EVENTLOG_ERROR_TYPE.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SupportsFailureAudits" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Equivalent to EVENTLOG_AUDIT_FAILURE.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SupportsInformationals" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Equivalent to EVENTLOG_INFORMATION_TYPE.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SupportsSuccessAudits" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Equivalent to EVENTLOG_AUDIT_SUCCESS.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SupportsWarnings" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Equivalent to EVENTLOG_WARNING_TYPE.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

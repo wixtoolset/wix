@@ -1,0 +1,6 @@
+<simpleType name="YesNoDefaultTypeUnion">
+    <annotation>
+      <documentation>Values of this type will either be "default", "yes", or "no".</documentation>
+    </annotation>
+    <union memberTypes="YesNoDefaultType PreprocessorVariables" />
+  </simpleType>

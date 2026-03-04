@@ -1,0 +1,10 @@
+<schema targetNamespace="http://wixtoolset.org/schemas/v4/wxs">
+  <annotation>
+    <documentation>
+      Schema for describing Windows Installer database files (.msi/.msm/.msp).
+    </documentation>
+    <appinfo>
+      <main />
+    </appinfo>
+  </annotation>
+</schema>

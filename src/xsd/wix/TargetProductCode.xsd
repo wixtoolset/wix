@@ -1,0 +1,21 @@
+<element name="TargetProductCode">
+    <annotation>
+      <documentation>
+        A product code for a product that can accept the patch.
+      </documentation>
+      <appinfo>
+        <remarks>
+          The Id attribute value must not be '*'. Use the TargetProductCodes/@Replace attribute instead.
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The product code for a product that can accept the patch. This can be '*'. See remarks for more information.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

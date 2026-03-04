@@ -1,0 +1,25 @@
+<simpleType name="UpgradeStrategyType">
+    <annotation>
+      <documentation>Use this attribute to specify the installation scope of this package: major upgrade or none.</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="majorUpgrade">
+        <annotation>
+          <documentation>
+            Set this value to declare that the package will be upgraded via major upgrades.
+            You can author a major upgrade with your preferred options or a default major
+            upgrade will be provided if you don't. The UpgradeCode attribute is required.
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="none">
+        <annotation>
+          <documentation>
+            Set this value to declare that the package will not support major upgrades.
+            This value is _not_ recommended because it means a product cannot be serviced
+            in the event of major bug or security vulnerability.
+          </documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>

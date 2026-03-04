@@ -1,0 +1,8 @@
+<element name="MsiPublishAssemblies" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="MsiPublishAssemblies" href="http://msdn.microsoft.com/library/aa370359.aspx" />
+      </appinfo>
+      <documentation>Manages the advertisement of CLR and Win32 assemblies. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

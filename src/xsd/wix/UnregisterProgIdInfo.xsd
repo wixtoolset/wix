@@ -1,0 +1,8 @@
+<element name="UnregisterProgIdInfo" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="UnregisterProgIdInfo" href="http://msdn.microsoft.com/library/aa372114.aspx" />
+      </appinfo>
+      <documentation>Manages the unregistration of OLE ProgId information with the system. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

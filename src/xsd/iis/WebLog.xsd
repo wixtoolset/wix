@@ -1,0 +1,76 @@
+<element name="WebLog">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+      </appinfo>
+      <documentation>WebLog definition.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier for the WebLog.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type" use="required">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="IIS">
+              <annotation>
+                <documentation>
+                  Microsoft IIS Log File Format
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="NCSA">
+              <annotation>
+                <documentation>
+                  NCSA Common Log File Format
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="none">
+              <annotation>
+                <documentation>
+                  Disables logging.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="ODBC">
+              <annotation>
+                <documentation>
+                  ODBC Logging
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="W3C">
+              <annotation>
+                <documentation>
+                  W3C Extended Log File Format
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

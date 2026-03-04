@@ -1,0 +1,10 @@
+<attribute name="Check" type="wxs:YesNoTypeUnion">
+    <annotation>
+      <documentation>
+        When set to "yes", adds a custom action to prompt the user when dependencies are still on the computer. The default is "no".
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Provides" />
+      </appinfo>
+    </annotation>
+  </attribute>

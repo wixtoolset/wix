@@ -1,0 +1,7 @@
+<schema targetNamespace="http://wixtoolset.org/schemas/v4/wxs/http">
+  <annotation>
+    <documentation>
+      The source code schema for the Windows Installer XML Toolset Http Extension.
+    </documentation>
+  </annotation>
+</schema>

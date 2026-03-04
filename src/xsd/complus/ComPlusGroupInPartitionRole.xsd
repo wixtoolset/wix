@@ -1,0 +1,30 @@
+<element name="ComPlusGroupInPartitionRole">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>
+        This element represents a security group membership in a
+        partition role. When the parent component of this element is installed, the
+        security group will be added to the associated partition role.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="PartitionRole" use="optional" type="xs:string">
+        <annotation><documentation>
+          The id of a ComPlusPartitionRole element representing the
+          partition the user should be added to.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Group" use="required" type="xs:string">
+        <annotation><documentation>
+          Foreign key into the Group table.
+        </documentation></annotation>
+      </attribute>
+    </complexType>
+  </element>

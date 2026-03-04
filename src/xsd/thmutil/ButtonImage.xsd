@@ -1,0 +1,11 @@
+<element name="ButtonImage">
+        <annotation>
+            <documentation>
+                Defines a button image.
+                ButtonHoverImage and ButtonSelectedImage are required with ButtonImage.
+            </documentation>
+        </annotation>
+        <complexType>
+            <attributeGroup ref="OwnerDrawImageAttributes" />
+        </complexType>
+    </element>

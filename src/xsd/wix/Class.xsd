@@ -1,0 +1,254 @@
+<element name="Class">
+    <annotation>
+      <documentation>COM Class registration for parent Component.</documentation>
+      <appinfo>
+        <seeAlso ref="AppId" />
+        <msiRef table="Class" href="http://msdn.microsoft.com/library/aa367861.aspx" />
+        <msiRef table="ProgId" href="http://msdn.microsoft.com/library/aa370879.aspx" />
+        <msiRef table="Registry" href="https://learn.microsoft.com/en-us/windows/win32/msi/registry-table" />
+        <msiRef table="AppId" href="http://msdn.microsoft.com/library/aa367566.aspx" />
+        <remarks>
+          When being used in unadvertised mode, the attributes in the Class element correspond to registry
+          values under the `[HKCR\CLSID\{Id}]` and `[HKCR\CLSID\{Id}\Context]` keys as follows:
+
+          - `Id, Context`: [HKCR\CLSID\{Id}\Context]
+          - `Server`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\LocalServer32]\@="[!comserv.dll]"
+          - `ForeignServer`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\LocalServer32]\@="mscoree.dll"
+          - `AppId`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}]\AppId="{00000000-89AB-0000-0123-000000000000}"
+          - `Argument`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\LocalServer32]\@="[!comserv.dll] /arg1 /arg2 /arg3"
+          - `Control`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\Control]
+          - `Description`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}]\@="Description of Example COM Component"
+          - `Handler`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\InprocHandler32]\@="handler.dll"
+          - `Insertable`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\Insertable]
+          - `Insertable`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\NotInsertable]
+          - `Programmable`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\Programmable]
+          - `SafeForInitializing`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\Implemented Categories\{7DD95801-9882-11CF-9FA9-00AA006C42C4}]
+          - `ThreadingModel`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\LocalServer32]\ThreadingModel="Apartment"
+          - `TypeLibId`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\TypeLib]\@="{11111111-89AB-1111-0123-111111111111}"
+          - `Version`: [HKCR\CLSID\{01234567-89AB-CDEF-0123-456789ABCDEF}\Version]\@="1.0.0.0"
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="ProgId">
+          <annotation>
+            <documentation>A ProgId associated with Class must be a child element of the Class element</documentation>
+          </annotation>
+        </element>
+        <element ref="FileTypeMask" />
+        <element ref="Interface">
+          <annotation>
+            <documentation>These Interfaces will be registered with the parent Class and TypeLib (if present).</documentation>
+          </annotation>
+        </element>
+      </choice>
+      <attribute name="Id" type="Guid" use="required">
+        <annotation>
+          <documentation>The Class identifier (CLSID) of a COM server.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Context">
+        <annotation>
+          <documentation>
+                  The server context(s) for this COM server. This attribute is optional for VB6 libraries that are marked "PublicNotCreateable".
+                  Class elements marked Advertised must specify at least one server context. It is most common for there to be a single value
+                  for the Context attribute.
+                </documentation>
+        </annotation>
+        <simpleType>
+          <list>
+            <simpleType>
+              <restriction base="xs:NMTOKEN">
+                <enumeration value="LocalServer">
+                  <annotation>
+                    <documentation>
+                                            A 16-bit local server application.
+                                        </documentation>
+                  </annotation>
+                </enumeration>
+                <enumeration value="LocalServer32">
+                  <annotation>
+                    <documentation>
+                                            A 32-bit local server application.
+                                        </documentation>
+                  </annotation>
+                </enumeration>
+                <enumeration value="InprocServer">
+                  <annotation>
+                    <documentation>
+                                            A 16-bit in-process server DLL.
+                                        </documentation>
+                  </annotation>
+                </enumeration>
+                <enumeration value="InprocServer32">
+                  <annotation>
+                    <documentation>
+                                            A 32-bit in-process server DLL.
+                                        </documentation>
+                  </annotation>
+                </enumeration>
+              </restriction>
+            </simpleType>
+          </list>
+        </simpleType>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>Localized description associated with the Class ID and Program ID.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AppId" type="Guid">
+        <annotation>
+          <documentation>
+                    This attribute is only allowed when a Class is advertised. Using this attribute will reference an Application ID
+                    containing DCOM information for the associated application GUID. The value must correspond to an AppId/@Id of an
+                    AppId element nested under a Fragment, Module, or Package element. To associate an AppId with a non-advertised
+                    class, nest the class within a parent AppId element.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Icon" type="xs:string">
+        <annotation>
+          <documentation>
+                    The file providing the icon associated with this CLSID. Reference to an Icon element
+                    (should match the Id attribute of an Icon element). This is currently not supported if the
+                    value of the Advertise attribute is "no".
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IconIndex" type="Integer">
+        <annotation>
+          <documentation>Icon index into the icon file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Handler" type="xs:string">
+        <annotation>
+          <documentation>
+                    The default inproc handler. May be optionally provided only for Context = LocalServer or
+                    LocalServer32. Value of "1" creates a 16-bit InprocHandler (appearing as the InprocHandler
+                    value). Value of "2" creates a 32-bit InprocHandler (appearing as the InprocHandler32 value).
+                    Value of "3" creates 16-bit as well as 32-bit InprocHandlers. A non-numeric value is treated
+                    as a system file that serves as the 32-bit InprocHandler (appearing as the InprocHandler32 value).
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Argument" type="xs:string">
+        <annotation>
+          <documentation>
+                    This column is optional only when the Context column is set to "LocalServer"
+                    or "LocalServer32" server context. The text is registered as the argument against
+                    the OLE server and is used by OLE for invoking the server. Note that the resolution
+                    of properties in the Argument field is limited. A property formatted as [Property] in
+                    this field can only be resolved if the property already has the intended value when
+                    the component owning the class is installed. For example, for the argument "[#MyDoc.doc]"
+                    to resolve to the correct value, the same process must be installing the file MyDoc.doc and the
+                    component that owns the class.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RelativePath" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    When the value is "yes", the bare file name can be used for COM servers. The installer
+                    registers the file name only instead of the complete path. This enables the server in
+                    the current directory to take precedence and allows multiple copies of the same component.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Advertise" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Set this value to "yes" in order to create a normal Class table row. Set this value to
+                    "no" in order to generate Registry rows that perform similar registration (without the
+                    often problematic Windows Installer advertising behavior).
+                </documentation>
+        </annotation>
+      </attribute>
+      <!-- Following attributes are not advertised, but add the appropriate rows to the Registry table -->
+      <attribute name="ThreadingModel">
+        <annotation>
+          <documentation>
+                    Threading model for the CLSID.
+                </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="apartment" />
+            <enumeration value="free" />
+            <enumeration value="both" />
+            <enumeration value="neutral" />
+            <enumeration value="single" />
+            <enumeration value="rental" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Version" type="xs:string">
+        <annotation>
+          <documentation>
+                    Version for the CLSID.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Insertable" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Specifies the CLSID may be insertable.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Programmable" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Specifies the CLSID may be programmable.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ForeignServer" type="xs:string">
+        <annotation>
+          <documentation>
+                  May only be specified if the value of the Advertise attribute is "no" and Server has not been specified. In addition, it may only
+                  be used when the Class element is directly under the Component element. The value can be
+                  that of an registry type (REG_SZ). This attribute should be used to specify foreign servers, such as mscoree.dll if needed.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Server" type="xs:string">
+        <annotation>
+          <documentation>
+                    May only be specified if the value of the Advertise attribute is "no" and the ForeignServer attribute is not specified. File Id of the
+                    COM server file. If this element is nested under a File element, this value defaults to
+                    the value of the parent File/@Id.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShortPath" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                        Specifies whether or not to use the short path for the COM server. This can only apply when Advertise is set to 'no'. The default is 'no' meaning that it will use the long file name for the COM server.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SafeForScripting" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    May only be specified if the value of the Advertise attribute is "no".
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SafeForInitializing" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    May only be specified if the value of the Advertise attribute is "no".
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Control" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Set this attribute's value to 'yes' to identify an object as an ActiveX Control. The default value is 'no'.
+                </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

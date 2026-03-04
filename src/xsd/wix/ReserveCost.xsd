@@ -1,0 +1,43 @@
+<element name="ReserveCost">
+    <annotation>
+      <documentation>
+        Disk cost to reserve in a folder for running locally and/or from source.
+      </documentation>
+      <appinfo>
+        <msiRef table="ReserveCost" href="http://msdn.microsoft.com/library/aa371226.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>A primary key that uniquely identifies this ReserveCost entry.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Directory" type="xs:string">
+        <annotation>
+          <documentation>
+            Adds the amount of disk space specified in RunFromSource or RunLocal to the volume cost of the device containing the directory.
+            If this attribute is not set, it will default to the directory of parent component.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Subdirectory" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute defines one or more directories below the directory referenced by the Directory attribute
+            to add cost to.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RunFromSource" type="Integer" use="required">
+        <annotation>
+          <documentation>The number of bytes of disk space to reserve if the component is installed to run from source.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RunLocal" type="Integer" use="required">
+        <annotation>
+          <documentation>The number of bytes of disk space to reserve if the component is installed to run locally.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,43 @@
+<element name="BundleExtension">
+    <annotation>
+      <documentation>[WIX v4 only]An extension to the Burn engine. Currently requires a WiX compiler extension to do anything useful.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Payload" />
+        <element ref="PayloadGroupRef" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>The identifier of the BundleExtension element. Only required if you want to reference this element using a BundleExtensionRef element.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>
+            The relative destination path and file name for the bundle extension DLL.
+            The default is the source file name. Use this attribute to rename the bundle extension DLL or extract it into a subfolder.
+            At a minimum, the Name or SourceFile attribute must be specified.
+            This must be a relative path ('\foo' or 'C:\foo' is not allowed).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string">
+        <annotation>
+          <documentation>
+            The DLL with the bundle extension entry function.
+            The default value is the Name attribute, if provided.
+            At a minimum, the SourceFile or Name attribute must be specified.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

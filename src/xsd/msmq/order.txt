@@ -1,0 +1,2 @@
+element|MessageQueue
+element|MessageQueuePermission

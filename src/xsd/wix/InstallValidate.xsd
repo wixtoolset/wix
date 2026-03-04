@@ -1,0 +1,8 @@
+<element name="InstallValidate" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="InstallValidate" href="http://msdn.microsoft.com/library/aa369546.aspx" />
+      </appinfo>
+      <documentation>Verifies that all costed volumes have enough space for the installation. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

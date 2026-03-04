@@ -1,0 +1,328 @@
+<element name="CustomAction">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="Custom" />
+        <seeAlso ref="CustomActionRef" />
+        <msiRef table="CustomAction" href="https://learn.microsoft.com/en-us/windows/win32/msi/customaction-table" />
+      </appinfo>
+      <documentation>
+        Specifies a custom action to be added to the MSI CustomAction table. Various combinations of the attributes for this element
+        correspond to different custom action types. For more information about custom actions see the
+        <a href="https://learn.microsoft.com/en-us/windows/win32/msi/summary-list-of-all-custom-action-types">
+        Custom Action Types</a> topic on MSDN.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The identifier of the custom action.
+          </documentation>
+        </annotation>
+      </attribute>
+      <!-- CustomAction Source specification, sets source Attribute bits -->
+      <attribute name="BinaryRef" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute is a reference to a Binary element with matching Id attribute. That binary stream contains
+            the custom action for use during install. The custom action will not be installed into a target directory. This attribute is
+            typically used with the DllEntry attribute to specify the custom action DLL to use for a type 1 custom action, with the ExeCommand
+            attribute to specify a type 17 custom action that runs an embedded executable, or with the VBScriptCall or JScriptCall attributes
+            to specify a type 5 or 6 custom action.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FileRef" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies a reference to a File element with matching Id attribute that
+            will execute the custom action code in the file after the file is installed. This
+            attribute is typically used with the ExeCommand attribute to specify a type 18 custom action
+            that runs an installed executable, with the DllEntry attribute to specify an installed custom
+            action DLL to use for a type 17 custom action, or with the VBScriptCall or JScriptCall
+            attributes to specify a type 21 or 22 custom action.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Property" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies a reference to a Property element with matching Id attribute that specifies the Property
+            to be used or updated on execution of this custom action. This attribute is
+            typically used with the Value attribute to create a type 51 custom action that parses
+            the text in Value and places it into the specified Property. This attribute is also used with
+            the ExeCommand attribute to create a type 50 custom action that uses the value of the
+            given property to specify the path to the executable. Type 51 custom actions are often useful to
+            pass values to a deferred custom action.
+            See <a href="https://learn.microsoft.com/en-us/windows/win32/msi/obtaining-context-information-for-deferred-execution-custom-actions">
+            Obtaining Context Information for Deferred Execution Custom Actions</a> for more information.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Directory" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies a reference to a Directory element with matching Id attribute containing a directory path.
+            This attribute is typically used with the ExeCommand attribute to specify the source executable for a type 34
+            custom action, or with the Value attribute to specify a formatted string to place in the specified Directory
+            table entry in a type 35 custom action.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Subdirectory" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute defines one or more directories below the directory referenced by the Directory attribute.
+            This attribute is optional but can only be specified when the Directory attribute is also specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <!-- CustomAction Target specification, sets target Attribute bits -->
+      <attribute name="DllEntry" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies the name of a function in a custom action to execute.
+            This attribute is used with the BinaryRef attribute to create a type 1 custom
+            action, or with the FileRef attribute to create a type 17 custom action.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExeCommand" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies the command line parameters to supply to an externally
+            run executable. This attribute is typically used with the BinaryRef attribute for a type 2 custom action,
+            the FileRef attribute for a type 18 custom action, the Property attribute for a type 50 custom action,
+            or the Directory attribute for a type 34 custom action that specify the executable to run.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="JScriptCall" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies the name of the JScript function to execute in a script. The script must be
+            provided in a Binary element identified by the BinaryRef attribute described above. In other words, this
+            attribute must be specified in conjunction with the BinaryRef attribute.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="VBScriptCall" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies the name of the VBScript Subroutine to execute in a script. The script must be
+            provided in a Binary element identified by the BinaryRef attribute described above. In other words, this
+            attribute must be specified in conjunction with the BinaryRef attribute.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Script">
+        <annotation>
+          <documentation>
+            Creates a type 37 or 38 custom action. Specify a path to the script to be embedded in the package in the
+            `ScriptSourceFile` attribute.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="jscript" />
+            <enumeration value="vbscript" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ScriptSourceFile" type="xs:string">
+        <annotation>
+          <documentation>
+            Path to the external file containing the script code. Can be used only with the Script attribute.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SuppressModularization" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Use to suppress modularization of this custom action name in merge modules.
+            This should only be necessary for table-driven custom actions because the
+            table name which they interact with cannot be modularized, so there can only
+            be one instance of the table.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies a string value to use in the custom action. This attribute
+            must be used with the Property attribute to set the property as part of a
+            type 51 custom action or with the Directory attribute to set a directory path in that
+            table in a type 35 custom action. The value can be a literal value or derived from a
+            Property element using the <a href="https://learn.microsoft.com/en-us/windows/win32/msi/formatted">Formatted</a>
+            syntax.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Error" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies an index in the MSI Error table to use as an error message for a
+            type 19 custom action that displays the error message and aborts a product's installation.
+          </documentation>
+        </annotation>
+      </attribute>
+      <!-- Other CustomAction type attributes -->
+      <attribute name="Return">
+        <annotation>
+          <documentation>
+            Set this attribute to set the return behavior of the custom action.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="asyncNoWait">
+              <annotation>
+                <documentation>
+                  Indicates that the custom action will run asyncronously and execution may continue after the installer terminates.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="asyncWait">
+              <annotation>
+                <documentation>
+                  Indicates that the custom action will run asynchronously but the installer will wait for the return code at sequence end.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="check">
+              <annotation>
+                <documentation>
+                  Indicates that the custom action will run synchronously and the return code will be checked for success. This is the default.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="ignore">
+              <annotation>
+                <documentation>
+                  Indicates that the custom action will run synchronously and the return code will not be checked.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Execute">
+        <annotation>
+          <documentation>
+            This attribute indicates the scheduling of the custom action.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="commit">
+              <annotation>
+                <documentation>
+                  Indicates that the custom action will run after successful completion of the installation script (at the end of the installation).
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="deferred">
+              <annotation>
+                <documentation>
+                  Indicates that the custom action runs in-script (possibly with elevated privileges).
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="firstSequence">
+              <annotation>
+                <documentation>
+                  Indicates that the custom action will only run in the first sequence that runs it.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="immediate">
+              <annotation>
+                <documentation>
+                  Indicates that the custom action will run during normal processing time with user privileges. This is the default.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="oncePerProcess">
+              <annotation>
+                <documentation>
+                  Indicates that the custom action will only run in the first sequence that runs it in the same process.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="rollback">
+              <annotation>
+                <documentation>
+                  Indicates that a custom action will run in the rollback sequence when a failure
+                  occurs during installation, usually to undo changes made by a deferred custom action.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="secondSequence">
+              <annotation>
+                <documentation>
+                  Indicates that a custom action should be run a second time if it was previously run in an earlier sequence.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Impersonate" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            This attribute specifies whether the Windows Installer, which executes as LocalSystem,
+            should impersonate the user context of the installing user when executing this custom action.
+            Typically the value should be 'yes', except when the custom action needs elevated privileges
+            to apply changes to the machine.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PatchUninstall" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            This attribute specifies that the Windows Installer, execute the custom action only when
+            a patch is being uninstalled. These custom actions should also be conditioned using the
+            MSIPATCHREMOVE property to ensure proper down level (less than Windows Installer 4.5)
+            behavior.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Bitness" type="BitnessTypeUnion">
+        <annotation>
+          <documentation>
+            Valid only when used with the Script, VBScriptCall, and JScriptCall attributes.
+            Overrides the default scripting host for script custom actions. The value `always64` will force the
+            script to run in the 64-bit scripting host. Simliarly, the value `always32` will force the script
+            to run in the 64-bit scripting host.
+            The default value is `default` where the script will be run in the scripting host that matches the
+            same bitness as the package.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="TerminalServerAware" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            This attribute specifies controls whether the custom action will impersonate the
+            installing user during per-machine installs on Terminal Server machines.
+            Deferred execution custom actions that do not specify this attribute, or explicitly set it 'no',
+            will run with no user impersonation on Terminal Server machines during
+            per-machine installations. This attribute is only applicable when installing on the
+            Windows Server 2003 family.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HideTarget" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Ensures the installer does not log the CustomActionData for the deferred custom action.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

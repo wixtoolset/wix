@@ -1,0 +1,40 @@
+<element name="HttpHeader">
+    <annotation>
+      <documentation>Custom HTTP Header definition for IIS resources such as WebSite and WebVirtualDir.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Primary key for custom HTTP Header entry. This will default to the Name attribute.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the custom HTTP Header.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>Value for the custom HTTP Header. This attribute can contain a formatted string that is processed at install time to insert the values of properties using [PropertyName] syntax. Also supported are environment variables, file installation paths, and component installation directories; see <a href="http://msdn.microsoft.com/library/aa368609.aspx" target="_blank" xmlns="http://wixtoolset.org/schemas/v4/wxs/iis">Formatted</a> for details.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

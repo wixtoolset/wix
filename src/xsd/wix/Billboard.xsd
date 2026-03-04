@@ -1,0 +1,38 @@
+<element name="Billboard">
+    <annotation>
+      <documentation>
+        Billboard to display during install of a Feature
+      </documentation>
+      <appinfo>
+        <msiRef table="Billboard" href="https://learn.microsoft.com/en-us/windows/win32/msi/billboard-table" />
+        <msiRef table="BBControl" href="https://learn.microsoft.com/en-us/windows/win32/msi/bbcontrol-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="Control" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Only controls of static type such as: Text, Bitmap, Icon, or custom control can be placed on a billboard.</documentation>
+          </annotation>
+        </element>
+      </sequence>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Unique identifier for the Billboard.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Feature" type="xs:string">
+        <annotation>
+          <documentation>Feature whose state determines if the Billboard is shown.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

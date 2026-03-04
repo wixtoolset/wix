@@ -1,0 +1,8 @@
+<simpleType name="StrictThreePartVersionType">
+    <annotation>
+      <documentation>Values of this type will look exactly like: "x.x.x" where x is an integer.</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="(\d+\.){2}\d+|\$\((var\.)?[_A-Za-z]{1}[0-9A-Za-z_\.]*\)|!\((loc|bind)\.[_A-Za-z]{1}[0-9A-Za-z_\.]*\)" />
+    </restriction>
+  </simpleType>

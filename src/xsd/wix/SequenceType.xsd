@@ -1,0 +1,37 @@
+<simpleType name="SequenceType">
+    <annotation>
+      <documentation>
+                Controls which sequences the item assignment is sequenced in.
+            </documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="both">
+        <annotation>
+          <documentation>
+                        Schedules the assignment in the InstallUISequence and the InstallExecuteSequence.
+                    </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="first">
+        <annotation>
+          <documentation>
+                        Schedules the assignment to run in the InstallUISequence or the InstallExecuteSequence if the InstallUISequence is skipped.
+                    </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="execute">
+        <annotation>
+          <documentation>
+                        Schedules the assignment only in the the InstallExecuteSequence.
+                    </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="ui">
+        <annotation>
+          <documentation>
+                        Schedules the assignment only in the the InstallUISequence.
+                    </documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>

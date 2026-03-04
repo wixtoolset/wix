@@ -1,0 +1,91 @@
+<element name="InstallUISequence">
+    <annotation>
+      <appinfo>
+        <msiRef table="InstallUISequence" href="https://docs.microsoft.com/en-us/windows/win32/msi/installuisequence-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Custom" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Use to sequence a custom action.</documentation>
+          </annotation>
+        </element>
+        <element ref="Show" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Displays a Dialog.</documentation>
+          </annotation>
+        </element>
+        <element ref="ScheduleReboot" minOccurs="0">
+          <annotation>
+            <documentation>Prompts the user to restart the system at the end of installation. Not fixed sequence.</documentation>
+          </annotation>
+        </element>
+        <element ref="LaunchConditions" minOccurs="0">
+          <annotation>
+            <documentation>Queries the LaunchCondition table and evaluates each conditional statement recorded there.</documentation>
+          </annotation>
+        </element>
+        <element ref="FindRelatedProducts" minOccurs="0">
+          <annotation>
+            <documentation>Runs through each record of the Upgrade table in sequence and compares the upgrade code, product version, and language in each row to products installed on the system.</documentation>
+          </annotation>
+        </element>
+        <element ref="AppSearch" minOccurs="0">
+          <annotation>
+            <documentation>Uses file signatures to search for existing versions of products.</documentation>
+          </annotation>
+        </element>
+        <element ref="CCPSearch" minOccurs="0">
+          <annotation>
+            <documentation>Uses file signatures to validate that qualifying products are installed on a system before an upgrade installation is performed.</documentation>
+          </annotation>
+        </element>
+        <element ref="RMCCPSearch" minOccurs="0">
+          <annotation>
+            <documentation>Uses file signatures to validate that qualifying products are installed on a system before an upgrade installation is performed.</documentation>
+          </annotation>
+        </element>
+        <element ref="ValidateProductID">
+          <annotation>
+            <documentation>Sets the ProductID property to the full product identifier.</documentation>
+          </annotation>
+        </element>
+        <element ref="CostInitialize">
+          <annotation>
+            <documentation>Initiates the internal installation costing process.</documentation>
+          </annotation>
+        </element>
+        <element ref="FileCost">
+          <annotation>
+            <documentation>Initiates dynamic costing of standard installation actions.</documentation>
+          </annotation>
+        </element>
+        <element ref="IsolateComponents">
+          <annotation>
+            <documentation>Installs a copy of a component (commonly a shared DLL) into a private location for use by a specific application (typically an .exe).</documentation>
+          </annotation>
+        </element>
+        <element ref="ResolveSource" minOccurs="0">
+          <annotation>
+            <documentation>Determines the location of the source and sets the SourceDir property if the source has not been resolved yet.</documentation>
+          </annotation>
+        </element>
+        <element ref="CostFinalize">
+          <annotation>
+            <documentation>Ends the internal installation costing process begun by the CostInitialize action.</documentation>
+          </annotation>
+        </element>
+        <element ref="MigrateFeatureStates">
+          <annotation>
+            <documentation>Used for upgrading or installing over an existing application.</documentation>
+          </annotation>
+        </element>
+        <element ref="ExecuteAction" minOccurs="0">
+          <annotation>
+            <documentation>Initiates the execution sequence.</documentation>
+          </annotation>
+        </element>
+      </choice>
+    </complexType>
+  </element>

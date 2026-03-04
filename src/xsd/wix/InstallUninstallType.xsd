@@ -1,0 +1,28 @@
+<simpleType name="InstallUninstallType">
+    <annotation>
+      <documentation>Specifies whether an action occur on install, uninstall or both.</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="install">
+        <annotation>
+          <documentation>
+                        The action should happen during install (msiInstallStateLocal or msiInstallStateSource).
+                    </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="uninstall">
+        <annotation>
+          <documentation>
+                        The action should happen during uninstall (msiInstallStateAbsent).
+                    </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="both">
+        <annotation>
+          <documentation>
+                        The action should happen during both install and uninstall.
+                    </documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>

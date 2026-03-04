@@ -1,0 +1,8 @@
+<simpleType name="PreprocessorVariables">
+    <annotation>
+      <documentation>A type that represents 1 or more preprocessor variables.</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="(\$\((\w+\.)?(\w[\w()]*)\))+" />
+    </restriction>
+  </simpleType>

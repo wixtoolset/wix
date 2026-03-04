@@ -1,0 +1,48 @@
+<element name="FeatureGroupRef">
+    <annotation>
+      <documentation>Create a reference to a FeatureGroup in another Fragment.</documentation>
+      <appinfo>
+        <seeAlso ref="FeatureGroup" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the FeatureGroup to reference.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreParent" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Normally feature group references that end up nested under a parent element create a
+            connection to that parent. This behavior is undesirable when trying to simply reference
+            to a FeatureGroup in a different Fragment. Specify 'yes' to have this feature group
+            reference not create a connection to its parent. The default is 'no'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Primary" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Set this attribute to 'yes' in order to make the parent feature of this group
+            the primary feature for any components and merges contained in the group.
+            Features may belong to multiple features. By designating a feature as the
+            primary feature of a component or merge, you ensure that whenever a component is
+            selected for install-on-demand (IOD), the primary feature will be the one to install
+            it. This attribute should only be set if a component actually nests under multiple
+            features. If a component nests under only one feature, that feature is the primary
+            feature for the component. You cannot set more than one feature as the primary
+            feature of a given component.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

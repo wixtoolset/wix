@@ -1,0 +1,23 @@
+<element name="AssemblyName">
+    <annotation>
+      <documentation>
+        The MsiAssemblyName table specifies the schema for the elements of a strong assembly cache name for a .NET Framework or Win32 assembly.
+        Consider using the Assembly attribute on File element to have the toolset populate these entries automatically.
+      </documentation>
+      <appinfo>
+        <msiRef table="MsiAssemblyName" href="http://msdn.microsoft.com/library/aa370062.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>Name of the attribute associated with the value specified in the Value column.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>Value associated with the name specified in the Name column.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,71 @@
+<element name="CommandLink">
+        <annotation>
+            <documentation>Defines a button.</documentation>
+        </annotation>
+        <complexType mixed="true">
+            <annotation>
+                <documentation>
+                    Text to display in the button.
+                    Mutually exclusive with the StringId attribute and child Text elements.
+                </documentation>
+            </annotation>
+            <choice minOccurs="0" maxOccurs="unbounded">
+                <annotation>
+                    <documentation>
+                        If multiple Action elements are given, the conditions should be mutually exclusive (when multiple conditions are true, the behavior is undefined and could be changed at any time).
+                        If none of the conditions of the Action elements are true, then it uses the Action element without the Condition attribute.
+                    </documentation>
+                </annotation>
+                <element ref="BrowseDirectoryAction" />
+                <element ref="ChangePageAction" />
+                <element ref="CloseWindowAction" />
+                <element ref="Note" />
+                <element ref="Text" />
+            </choice>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attribute name="FontId" type="xs:string">
+                <annotation>
+                    <documentation>Identifier to the Font element that serves as the font for the control. Only valid when using graphic buttons.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="IconFile" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Relative path to an icon file to define a command link glyph.
+                        Mutually exclusive with IconResource and ImageFile and ImageResource attributes.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="IconResource" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Identifier that references an icon resource in the module to define a command link glyph.
+                        Mutually exclusive with IconFile and ImageFile and ImageResource attributes.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageFile" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Relative path to an image file to define a command link glyph.
+                        Mutually exclusive with IconFile and IconResource and ImageResource attributes.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageResource" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Identifier that references an image resource in the module to define a command link glyph.
+                        Mutually exclusive with IconFile and IconResource and ImageFile attributes.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="StringId" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Identifier that references a string resource in the module to define the text for the control.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

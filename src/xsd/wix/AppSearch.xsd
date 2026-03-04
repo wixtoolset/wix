@@ -1,0 +1,13 @@
+<element name="AppSearch" type="ActionModuleSequenceType">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="ComponentSearch" />
+        <seeAlso ref="FileSearch" />
+        <seeAlso ref="IniFileSearch" />
+        <seeAlso ref="RegistrySearch" />
+        <msiRef table="AppSearch" href="http://msdn.microsoft.com/library/aa367579.aspx" />
+        <msiRef action="AppSearch" href="http://msdn.microsoft.com/library/aa367578.aspx" />
+      </appinfo>
+      <documentation>Uses file signatures to search for existing versions of products. The AppSearch action may use this information to determine where upgrades are to be installed. The AppSearch action can also be used to set a property to the existing value of an registry or .ini file entry. AppSearch should be authored into the InstallUISequence table and InstallExecuteSequence table. The installer prevents The AppSearch action from running in the InstallExecuteSequence sequence if the action has already run in InstallUISequence sequence. The AppSearch action searches for file signatures using the CompLocator table first, the RegLocator table next, then the IniLocator table, and finally the DrLocator table. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

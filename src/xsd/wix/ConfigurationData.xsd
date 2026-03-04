@@ -1,0 +1,17 @@
+<element name="ConfigurationData">
+    <annotation>
+      <documentation>Data to use as input to a configurable merge module.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the item in the ModuleConfiguration table.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string" use="required">
+        <annotation>
+          <documentation>Value to be passed to configurable merge module.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

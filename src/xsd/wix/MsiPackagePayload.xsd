@@ -1,0 +1,12 @@
+<element name="MsiPackagePayload">
+    <annotation>
+      <documentation>
+        Describes information about the MsiPackage payload.
+        Cannot be specified if the owning MsiPackage specified any of SourceFile, Name, DownloadUrl, or Compressed.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attributeGroup ref="ChainPackagePayloadCommonAttributes" />
+      <attributeGroup ref="LocalPackagePayloadCommonAttributes" />
+    </complexType>
+  </element>

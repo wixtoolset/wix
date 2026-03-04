@@ -1,0 +1,44 @@
+<attribute name="PrimaryPackageType">
+    <annotation>
+      <documentation>Used by WixInternalUIBootstrapperApplication to determine which package is the primary package. The default value is "default".</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="BundlePackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="ExePackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MspPackage" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsuPackage" />
+      </appinfo>
+    </annotation>
+    <simpleType>
+      <restriction base="xs:NMTOKEN">
+        <enumeration value="default">
+          <annotation>
+            <documentation>
+              This package is used unless there is a package for the runtime machine's architecture.
+            </documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="x86">
+          <annotation>
+            <documentation>
+              This package is used when the runtime machine's OS is x86 (IMAGE_FILE_MACHINE_I386).
+            </documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="x64">
+          <annotation>
+            <documentation>
+              This package is used when the runtime machine's OS is x64 (IMAGE_FILE_MACHINE_AMD64).
+            </documentation>
+          </annotation>
+        </enumeration>
+        <enumeration value="arm64">
+          <annotation>
+            <documentation>
+              This package is used when the runtime machine's OS is ARM64 (IMAGE_FILE_MACHINE_ARM64).
+            </documentation>
+          </annotation>
+        </enumeration>
+      </restriction>
+    </simpleType>
+  </attribute>

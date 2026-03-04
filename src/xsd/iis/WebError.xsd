@@ -1,0 +1,52 @@
+<element name="WebError">
+    <annotation>
+      <documentation>Custom Web Errors used by WebSites and Virtual Directories.</documentation>
+      <appinfo>
+        <remarks>
+          You can only use error code and sub code combinations which are supported by IIS.  Attempting to set a custom error for
+          an error code and sub code combination that is not supported by IIS (in the default list of error codes) will result in
+          an installation failure.
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="ErrorCode" use="required" type="wxs:Integer">
+        <annotation>
+          <documentation>HTTP 1.1 error code.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SubCode" use="required" type="wxs:Integer">
+        <annotation>
+          <documentation>Error sub code.  Set to 0 to get the wild card "*".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="File" type="xs:string">
+        <annotation>
+          <documentation>File to be sent to the client for this error code and sub code.  This can be formatted.  For example: [#FileId].</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="URL" type="xs:string">
+        <annotation>
+          <documentation>URL to be sent to the client for this error code and sub code.  This can be formatted.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

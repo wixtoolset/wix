@@ -1,0 +1,15 @@
+<element name="PayloadGroupRef">
+    <annotation>
+      <documentation>Create a reference to PayloadGroup element that exists inside a Bundle or Fragment element.</documentation>
+      <appinfo>
+        <seeAlso ref="PayloadGroup" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the PayloadGroup element to reference.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

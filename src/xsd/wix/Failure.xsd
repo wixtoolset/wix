@@ -1,0 +1,22 @@
+<element name="Failure">
+    <annotation>
+      <documentation>Failure action for a ServiceConfigFailureActions element.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Action" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Specifies the action to take when the service fails. Valid values are "none", "restartComputer", "restartService", "runCommand" or a Formatted property
+            that resolves to "0" (for "none"), "1" (for "restartService"), "2" (for "restartComputer") or "3" (for "runCommand").
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Delay" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+                    Specifies the time in milliseconds to wait before performing the value from the Action attribute.
+                </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

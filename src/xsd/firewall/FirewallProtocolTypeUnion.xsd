@@ -1,0 +1,3 @@
+<simpleType name="FirewallProtocolTypeUnion">
+    <union memberTypes="PropertyReference FirewallProtocolType FirewallProtocolNumber wxs:PreprocessorVariables" />
+  </simpleType>

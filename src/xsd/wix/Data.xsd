@@ -1,0 +1,25 @@
+<element name="Data">
+    <annotation>
+      <documentation>Used for a Custom Table. Specifies the data for the parent Row and specified Column.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Column" type="xs:string" use="required">
+        <annotation>
+          <documentation>Specifies in which column to insert this data.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>Specifies the optional data for this column.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

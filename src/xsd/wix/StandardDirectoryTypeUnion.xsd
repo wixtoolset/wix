@@ -1,0 +1,6 @@
+<simpleType name="StandardDirectoryTypeUnion">
+    <annotation>
+      <documentation>A Windows Installer standard directory.</documentation>
+    </annotation>
+    <union memberTypes="StandardDirectoryType PreprocessorVariables" />
+  </simpleType>

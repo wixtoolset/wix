@@ -1,0 +1,62 @@
+<element name="ODBCDataSource">
+    <annotation>
+      <documentation>
+                ODBCDataSource for a Component
+            </documentation>
+      <appinfo>
+        <msiRef table="ODBCDataSource" href="http://msdn.microsoft.com/library/aa370546.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Property">
+          <annotation>
+            <documentation>Translates into ODBCSourceAttributes</documentation>
+          </annotation>
+        </element>
+      </choice>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>Identifier of the data source.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" use="required" type="xs:string">
+        <annotation>
+          <documentation>Name for the data source.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DriverName" type="xs:string">
+        <annotation>
+          <documentation>Required if not found as child of ODBCDriver element</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Registration" use="required">
+        <annotation>
+          <documentation>Scope for which the data source should be registered.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="machine">
+              <annotation>
+                <documentation>
+                                    Data source is registered per machine.
+                                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="user">
+              <annotation>
+                <documentation>
+                                    Data source is registered per user.
+                                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="KeyPath" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set 'yes' to force this file to be key path for parent Component</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

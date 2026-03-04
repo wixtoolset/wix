@@ -1,0 +1,2 @@
+attribute|Check
+attribute|Enforce

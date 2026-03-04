@@ -1,0 +1,8 @@
+<element name="RegisterProduct" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RegisterProduct" href="http://msdn.microsoft.com/library/aa371162.aspx" />
+      </appinfo>
+      <documentation>Registers the product information with the installer. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

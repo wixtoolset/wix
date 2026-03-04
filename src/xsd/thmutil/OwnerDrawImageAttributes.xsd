@@ -1,0 +1,44 @@
+<attributeGroup name="OwnerDrawImageAttributes">
+        <attribute name="ImageId" type="xs:string">
+            <annotation>
+                <documentation>
+                    Identifier to the Image element that serves as the image for the control.
+                    Mutually exclusive with ImageFile and ImageResource and SourceX and SourceY attributes.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="ImageFile" type="xs:string">
+            <annotation>
+                <documentation>
+                    Relative path to an image file for the control.
+                    Mutually exclusive with ImageId and ImageResource and SourceX and SourceY attributes.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="ImageResource" type="xs:nonNegativeInteger">
+            <annotation>
+                <documentation>
+                    Identifier that references an image resource with type RT_RCDATA in the module for the control.
+                    Mutually exclusive with ImageId and ImageFile and SourceX and SourceY attributes.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="SourceX" type="xs:nonNegativeInteger">
+            <annotation>
+                <documentation>
+                    X offset of the Theme/@ImageFile or Theme/@ImageResource.
+                    Can only be specified with Theme/@ImageFile or Theme/@ImageResource.
+                    Mutually exclusive with ImageId and ImageFile and ImageResource attributes.
+                </documentation>
+            </annotation>
+        </attribute>
+        <attribute name="SourceY" type="xs:nonNegativeInteger">
+            <annotation>
+                <documentation>
+                    Y offset of the Theme/@ImageFile or Theme/@ImageResource.
+                    Can only be specified with Theme/@ImageFile or Theme/@ImageResource.
+                    Mutually exclusive with ImageId and ImageFile and ImageResource attributes.
+                </documentation>
+            </annotation>
+        </attribute>
+    </attributeGroup>

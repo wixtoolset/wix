@@ -1,0 +1,8 @@
+<element name="RegisterUser" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RegisterUser" href="http://msdn.microsoft.com/library/aa371166.aspx" />
+      </appinfo>
+      <documentation>Registers the user information with the installer to identify the user of a product. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

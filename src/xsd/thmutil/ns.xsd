@@ -1,0 +1,7 @@
+<schema targetNamespace="http://wixtoolset.org/schemas/v4/thmutil">
+  <annotation>
+        <documentation>
+            Schema for describing Theme files processed by thmutil.
+        </documentation>
+    </annotation>
+</schema>

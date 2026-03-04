@@ -1,0 +1,20 @@
+<element name="MultiString">
+    <annotation>
+      <documentation>
+        Use several of these elements to specify each registry value in a multiString registry value. This element
+        cannot be used if the Value attribute is specified unless the Type attribute is set to 'multiString'.
+      </documentation>
+      <appinfo>
+        <msiRef table="Registry" href="https://learn.microsoft.com/en-us/windows/win32/msi/registry-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>
+            The multi-string value.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

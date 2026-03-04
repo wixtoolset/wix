@@ -1,0 +1,8 @@
+<element name="ResolveSource" type="ActionModuleSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="ResolveSource" href="http://msdn.microsoft.com/library/aa371232.aspx" />
+      </appinfo>
+      <documentation>Determines the location of the source and sets the SourceDir property if the source has not been resolved yet. Special actions don't have a built-in sequence number and thus must appear relative to another action. The suggested way to do this is by using the Before or After attribute. InstallExecute and InstallExecuteAgain can optionally appear anywhere between InstallInitialize and InstallFinalize.</documentation>
+    </annotation>
+  </element>

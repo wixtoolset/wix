@@ -1,0 +1,6 @@
+<simpleType name="RegistryValueTypeUnion">
+    <annotation>
+      <documentation>Values of this type represent possible registry value types.</documentation>
+    </annotation>
+    <union memberTypes="RegistryValueType PreprocessorVariables" />
+  </simpleType>

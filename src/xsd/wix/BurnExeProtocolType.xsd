@@ -1,0 +1,29 @@
+<simpleType name="BurnExeProtocolType">
+    <annotation>
+      <documentation>The list of communcation protocols with executable packages Burn supports.
+          </documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="none">
+        <annotation>
+          <documentation>
+                The executable package does not support a communication protocol.
+              </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="burn">
+        <annotation>
+          <documentation>
+                The executable package implements the Burn communication protocol.
+              </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="netfx4">
+        <annotation>
+          <documentation>
+                The executable package implements the .NET Framework v4.0 communication protocol.
+              </documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>

@@ -1,0 +1,50 @@
+<element name="EmbeddedUIResource">
+    <annotation>
+      <documentation>
+        Defines a resource for use by the embedded UI.
+      </documentation>
+      <appinfo>
+        <seeAlso ref="EmbeddedUI" />
+        <msiRef table="MsiEmbeddedUI" href="https://learn.microsoft.com/en-us/windows/win32/msi/msiembeddedui-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier for the embedded UI resource.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="LongFileNameType" use="required">
+        <annotation>
+          <documentation>
+            The name for the resource when it is extracted from the MSI package for use by the embedded UI DLL. (Windows
+            Installer does not support the typical short filename and long filename combination for embedded UI files
+            as it does for other kinds of files.) If this attribute is not specified the Id attribute will be used.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string" use="required">
+        <annotation>
+          <documentation>Path to the binary file that is the embedded UI resource.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

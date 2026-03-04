@@ -1,0 +1,8 @@
+<simpleType name="WixVersionType">
+    <annotation>
+      <documentation>Values of this type will be a 1-part, 2-part, 3-part or 4-part version number or a semantic version.</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="v?(\d+\.){0,3}\d+(-[\w.\d]+)?||\$\((var\.)?[_A-Za-z]{1}[0-9A-Za-z_\.]*\)|!\((loc|bind)\.[_A-Za-z]{1}[0-9A-Za-z_\.]*\)" />
+    </restriction>
+  </simpleType>

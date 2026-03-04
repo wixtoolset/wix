@@ -1,0 +1,6 @@
+<simpleType name="FirewallProtocolNumber">
+    <restriction base="xs:integer">
+      <minInclusive value="0" />
+      <maxInclusive value="255" />
+    </restriction>
+  </simpleType>

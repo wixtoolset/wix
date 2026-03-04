@@ -1,0 +1,42 @@
+<element name="WixLocalization">
+    <annotation>
+      <appinfo>
+        <remarks>
+          <p>You can specify any valid Windows code page by integer like 1252, or by web name like Windows-1252 or iso-8859-1. See [Code pages](../../../tools/codepage/) for more information.</p>
+        </remarks>
+        <howtoRef href="ui_and_localization/build_a_localized_version.html">How To: Build a localized version of your installer</howtoRef>
+        <howtoRef href="ui_and_localization/make_installer_localizable.html">How To: Make your installer localizable</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="String" />
+        <element ref="UI" />
+      </choice>
+      <attribute name="Codepage" type="xs:string">
+        <annotation>
+          <documentation>Optional code page integer value or web name for the resulting database. You can also specify -1 which will not reset the database code page. See remarks for more information.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Culture" type="xs:string">
+        <annotation>
+          <documentation>Optional culture for this localization file. If the Culture attribute is not provided, the localization file is considered to be language neutral. This culture value is used to filter applicable localization files during the build. Language neutral localization files are always included.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExtensionDefaultCulture" type="LocalizationYesNoType" version="5">
+        <annotation>
+          <documentation>Optional. Indicates that the localization file's culture is the default culture for a WiX Extension. Only valid when used in a WiX library included in a WiX Extension..</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Language" type="Integer">
+        <annotation>
+          <documentation>The decimal language ID (LCID) for the culture. Used only when processed by native code using locutil.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SummaryInformationCodepage" type="xs:string">
+        <annotation>
+          <documentation>Optional code page integer value or web name for the resulting database's SummaryInformation. If not specified, the SummaryInformation codepage will be set to the same value from the Codepage attribute. If no codepage is provided, the SummaryInformation will default to the ANSI codepage. See remarks for more information.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,62 @@
+<element name="UrlAce">
+    <annotation>
+      <documentation>
+        The security principal and which rights to assign to them for the URL reservation.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Unique ID of this URL ACE.
+            If this attribute is not specified, an identifier will be generated automatically.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="SecurityPrincipal" type="xs:string">
+        <annotation>
+          <documentation>
+            The security principal for this ACE. When the UrlReservation is under a ServiceInstall element, this defaults to
+            "NT SERVICE\ServiceInstallName". This may be either a SID or an account name in a format that
+            [LookupAccountName](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupaccountnamea)
+            supports. When using a SID, an asterisk must be prepended.  For example, "*S-1-5-18".
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Rights">
+        <annotation>
+          <documentation>
+            Rights for this ACE. Default is "all".
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="register" />
+            <enumeration value="delegate" />
+            <enumeration value="all" />
+          </restriction>
+        </simpleType>
+      </attribute>
+
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,80 @@
+<element name="Property">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="PropertyRef" />
+        <msiRef table="Property" href="http://msdn.microsoft.com/library/aa370908.aspx" />
+        <howtoRef href="files_and_registry/check_the_version_number.html">How To: Check the version number of a file during installation</howtoRef>
+      </appinfo>
+      <documentation>Property value for a Package or Module.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="ComplianceDrive" />
+        <element ref="ComponentSearch" />
+        <element ref="RegistrySearch" />
+        <element ref="RegistrySearchRef" />
+        <element ref="IniFileSearch" />
+        <element ref="DirectorySearch" />
+        <element ref="DirectorySearchRef" />
+        <element ref="ProductSearch" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Unique identifier for Property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>Sets a default value for the property. The value will be overwritten if the Property is used for a search.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ComplianceCheck" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Adds a row to the CCPSearch table. This attribute is only valid when this Property contains a search element.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Admin" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Denotes that the property is saved during [administrative installations](https://learn.microsoft.com/en-us/windows/win32/msi/administrative-installation).
+            Adds the property name to the [AdminProperties property](https://learn.microsoft.com/en-us/windows/win32/msi/adminproperties).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Secure" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Denotes that the Property can be passed to the server side when doing a managed installation with elevated privileges. See the <a href="https://learn.microsoft.com/en-us/windows/win32/msi/securecustomproperties">SecureCustomProperties Property</a> for more information.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Hidden" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Denotes that the Property is not logged during installation. See the <a href="https://learn.microsoft.com/en-us/windows/win32/msi/msihiddenproperties">MsiHiddenProperties Property</a> for more information.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SuppressModularization" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Use to suppress modularization of this property identifier in merge modules.
+            Using this functionality is strongly discouraged; it should only be
+            necessary as a workaround of last resort in rare scenarios.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

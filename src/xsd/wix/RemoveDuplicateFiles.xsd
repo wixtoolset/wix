@@ -1,0 +1,8 @@
+<element name="RemoveDuplicateFiles" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RemoveDuplicateFiles" href="http://msdn.microsoft.com/library/aa371195.aspx" />
+      </appinfo>
+      <documentation>Deletes files installed by the DuplicateFiles action. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

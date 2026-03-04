@@ -1,0 +1,17 @@
+<simpleType name="SystemColorType">
+        <annotation>
+            <documentation>
+                Indicates a system color for a font.
+            </documentation>
+        </annotation>
+        <restriction base="xs:NMTOKEN">
+            <enumeration value="btnface" />
+            <enumeration value="btntext" />
+            <enumeration value="graytext" />
+            <enumeration value="highlight" />
+            <enumeration value="highlighttext" />
+            <enumeration value="hotlight" />
+            <enumeration value="window" />
+            <enumeration value="windowtext" />
+        </restriction>
+    </simpleType>

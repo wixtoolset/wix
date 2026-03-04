@@ -1,0 +1,26 @@
+<element name="ShortcutProperty">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="Shortcut" />
+        <msiRef table="MsiShortcutProperty" />
+      </appinfo>
+      <documentation>Property values for a shortcut. This element's functionality is available starting with MSI 5.0.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Unique identifier for MsiShortcutProperty table. If omitted, a stable identifier will be generated from the parent shortcut identifier and Key value.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Key" type="xs:string" use="required">
+        <annotation>
+          <documentation>A formatted string identifying the property to be set.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>A formatted string supplying the value of the property.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

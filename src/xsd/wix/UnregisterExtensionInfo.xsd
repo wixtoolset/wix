@@ -1,0 +1,8 @@
+<element name="UnregisterExtensionInfo" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="UnregisterExtensionInfo" href="http://msdn.microsoft.com/library/aa372110.aspx" />
+      </appinfo>
+      <documentation>Manages the removal of extension-related information from the system registry. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

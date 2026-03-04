@@ -1,0 +1,88 @@
+<element name="DotNetCompatibilityCheck">
+    <annotation>
+      <documentation>
+        Validates whether the specified .NET is installed on the computer.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the compatibility check. If the Id is not specified, one will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Property" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Name of the property in which to place the result of the compatibility check. The possible values are:
+              - 0 - Successful compatibility check.
+              - 13 - Requested platform is not compatible with OS. _Introduced in WiX v5._
+              - 12289 - No runtime is installed.
+              - 12290 - Required runtime is not installed.
+              - 12291 - Failed to get hostfxr exports.
+              - 12292 - Invalid arguments.
+              - 12293 - Failed to construct temp json file path.
+              - 12294 - Failed to create temp json file.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RuntimeType">
+        <annotation>
+          <documentation>The .NET runtime to check against.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="aspnet" />
+            <enumeration value="core" />
+            <enumeration value="desktop" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Platform" type="NetfxPreprocessorPlatformType">
+        <annotation>
+          <documentation>The platform to use to validate.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Version" type="wxs:StrictThreePartVersionType">
+        <annotation>
+          <documentation>Version of .NET to check against.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RollForward">
+        <annotation>
+          <documentation>The roll forward policy to use while validating.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="latestMajor" />
+            <enumeration value="major" />
+            <enumeration value="latestMinor" />
+            <enumeration value="minor" />
+            <enumeration value="latestPatch" />
+            <enumeration value="disable" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

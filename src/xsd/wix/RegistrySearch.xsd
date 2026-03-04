@@ -1,0 +1,131 @@
+<element name="RegistrySearch">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="ComponentSearch" />
+        <seeAlso ref="IniFileSearch" />
+        <msiRef table="RegLocator" href="http://msdn.microsoft.com/library/aa371171.aspx" />
+        <msiRef table="Signature" href="https://docs.microsoft.com/en-us/windows/win32/msi/signature-table" />
+        <howtoRef href="files_and_registry/read_a_registry_entry.html">How To: Read a registry entry during installation</howtoRef>
+        <remarks>
+          <p>
+                        When the Type attribute value is 'directory' the registry value must specify the path to a directory excluding the file name.
+                        When the Type attribute value is 'file' the registry value must specify the path to a file including the file name;
+                        however, if there is no child FileSearch element the parent directory of the file is returned. The FileSearch element requires
+                        that you author the name of the file you are searching for. If you do not know the file name
+                        you must set the Type attribute to 'raw' to return the full file path including the file name.
+                    </p>
+        </remarks>
+      </appinfo>
+      <documentation>Searches for file, directory or registry key and assigns to value of parent Property</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0">
+        <element ref="DirectorySearch" />
+        <element ref="DirectorySearchRef" />
+        <element ref="FileSearch" />
+        <element ref="FileSearchRef" />
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Signature to be used for the file, directory or registry key being searched for. If omitted, WiX generates a suitable id.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Bitness" type="BitnessTypeUnion">
+        <annotation>
+          <documentation>
+            Overrides the default registry to search. The value `always64` will force
+            the search to look in the 64-bit registry even when building for 32-bit.
+            Simliarly, the value `always32` will force the search to look in the 32-bit
+            registry even when building for 64-bit.
+            The default value is `default` where the search will look in the same registry
+            as the bitness of the package.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Root" use="required">
+        <annotation>
+          <documentation>Root key for the registry value.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="HKCR">
+              <annotation>
+                <documentation>
+                                    HKEY_CLASSES_ROOT
+                                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="HKCU">
+              <annotation>
+                <documentation>
+                                    HKEY_CURRENT_USER
+                                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="HKLM">
+              <annotation>
+                <documentation>
+                                    HKEY_LOCAL_MACHINE
+                                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="HKU">
+              <annotation>
+                <documentation>
+                                    HKEY_USERS
+                                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Key" use="required" type="xs:string">
+        <annotation>
+          <documentation>Key for the registry value.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>Registry value name. If this value is null, then the value from the key's unnamed or default value, if any, is retrieved.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type" use="required">
+        <annotation>
+          <documentation>
+                        The value must be 'file' if the child is a FileSearch element, and must be 'directory' if child is a DirectorySearch element.
+                    </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="directory">
+              <annotation>
+                <documentation>
+                    The registry value contains the path to a directory.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="file">
+              <annotation>
+                <documentation>
+                    The registry value contains the path to a file. To return the full file path you must add a FileSearch element as a child of this element; otherwise, the parent directory of the file path is returned.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="raw">
+              <annotation>
+                <documentation>
+                    Sets the raw value from the registry value. Please note that this value will contain a prefix as follows:
+
+                    - DWORD: Starts with `#` optionally followed by `+` or `-`.
+                    - REG_BINARY: Starts with `#x` and the installer converts and saves each hexadecimal digit (nibble) as an ASCII character prefixed by `#x`.
+                    - REG_EXPAND_SZ: Starts with `#%`.
+                    - REG_MULTI_SZ: Starts with `[~]` and ends with `[~]`.
+                    - REG_SZ: No prefix, but if the first character of the registry value is `#`, the installer escapes the character by prefixing it with another `#`.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+    </complexType>
+  </element>

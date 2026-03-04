@@ -1,0 +1,287 @@
+<element name="FirewallException">
+    <annotation>
+      <documentation>
+        Registers an exception for a program or a specific port and protocol in the Windows Firewall.
+        For more information about the Windows Firewall, see [Windows Firewall with Advanced Security](https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ics/windows-firewall-advanced-security-start-page).
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="File" />
+      </appinfo>
+    </annotation>
+
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>
+            Explicitly-listed remote addresses that this exception allows through the
+            firewall.
+          </documentation>
+        </annotation>
+        <element ref="LocalAddress" />
+        <element ref="Interface" />
+        <element ref="InterfaceType" />
+        <element ref="RemoteAddress" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Unique ID of this firewall exception. If the Id is not specified, one will be generated.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Name of this firewall exception, visible to the user in the firewall
+            control panel.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Action" type="FirewallActionTypeUnion">
+        <annotation>
+          <documentation>
+            The action for this firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Enabled" type="FirewallYesNoPropertyType">
+        <annotation>
+          <documentation>
+            Indicates whether the firewall exception should be enabled.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Grouping" type="xs:string">
+        <annotation>
+          <documentation>
+            Grouping for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="IcmpTypesAndCodes" type="xs:string">
+        <annotation>
+          <documentation>
+            ICMP types and codes for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Interface" type="xs:string">
+        <annotation>
+          <documentation>
+            Interface for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="InterfaceType" type="FirewallInterfaceTypeUnion">
+        <annotation>
+          <documentation>
+            Interface type for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="IPSecSecureFlags" type="FirewallIPSecSecureFlagsUnion">
+        <annotation>
+          <documentation>
+            IPSec secure flags for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="LocalAppPackageId" type="xs:string">
+        <annotation>
+          <documentation>
+            Local AppPackageId for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="LocalUserAuthorizedList" type="xs:string">
+        <annotation>
+          <documentation>
+            Local user authorized list for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="LocalUserOwner" type="xs:string">
+        <annotation>
+          <documentation>
+            Local user owner for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="LocalScope" type="FirewallLocalScopeTypeUnion">
+        <annotation>
+          <documentation>
+            Local scope for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Scope" type="FirewallScopeTypeUnion">
+        <annotation>
+          <documentation>
+            The scope of this firewall exception, which indicates whether incoming
+            connections can come from any computer including those on the Internet
+            or only those on the local network subnet. To more precisely specify
+            allowed remote address, specify a custom scope using RemoteAddress
+            child elements.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Port" type="xs:string">
+        <annotation>
+          <documentation>
+            Port to allow through the firewall for this exception. By default,
+            any program is allowed access through the port unless a File or
+            Program attribute is specified.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Protocol" type="FirewallProtocolTypeUnion">
+        <annotation>
+          <documentation>
+            IP protocol used for this firewall exception. If Port is defined,
+            "tcp" is assumed if the protocol is not specified.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="File" type="xs:string">
+        <annotation>
+          <documentation>
+            Identifier of a File to be granted access through the firewall. By default,
+            all incoming ports and protocols are allowed unless the Port and/or Protocol
+            attributes are specified.
+
+            If you use File, you cannot also use Program.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Program" type="xs:string">
+        <annotation>
+          <documentation>
+            Path to a target program to be granted access through the firewall. By default,
+            all incoming ports and protocols are allowed unless the Port and/or Protocol
+            attributes are specified.
+
+            Note that this is a formatted field, so you can use [#fileId]
+            syntax to refer to a file being installed. If you use Program, you cannot
+            also use File.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="IgnoreFailure" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If "yes", failures to register this firewall exception will be silently
+            ignored. If "no" (the default), failures will cause rollback.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Profile" type="FirewallProfileTypeUnion">
+        <annotation>
+          <documentation>
+            Profile type for this firewall exception. Default is "all".
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>
+            Description for this firewall rule displayed in Windows Firewall manager.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="EdgeTraversal" type="FirewallEdgeTraversalTypeUnion">
+        <annotation>
+          <documentation>
+            Sets the edge traversal of the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="OnUpdate" type="FirewallOnUpdateTypeUnion">
+        <annotation>
+          <documentation>
+            Installation instruction when updating the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Outbound" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If "yes", registers an outbound firewall rule. The default is "no".
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="RemoteMachineAuthorizedList" type="xs:string">
+        <annotation>
+          <documentation>
+            Remote machine authorized list for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="RemoteUserAuthorizedList" type="xs:string">
+        <annotation>
+          <documentation>
+            Remote user authorized list for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="RemotePort" type="xs:string">
+        <annotation>
+          <documentation>
+            Remote port for the firewall exception.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Service" type="xs:string">
+        <annotation>
+          <documentation>
+            Service for the firewall exception. Cannot be specified when the firewall exception is a child of a service element.
+          </documentation>
+        </annotation>
+      </attribute>
+
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

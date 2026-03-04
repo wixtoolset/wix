@@ -1,0 +1,40 @@
+<element name="SummaryInformation">
+    <annotation>
+      <documentation>
+        Properties about the package to be placed in the Summary Information Stream. These are
+        visible from COM through the IStream interface, and these properties can be seen on the package in Explorer.
+      </documentation>
+      <appinfo>
+        <remarks>
+          <p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/) for more information.</p>
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Codepage" type="xs:string">
+        <annotation>
+          <documentation>The code page integer value or web name for summary info strings only. See remarks for more information.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Comments" type="xs:string" version="5">
+        <annotation>
+          <documentation>Optional comments for browsing.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>The product full name or description.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Keywords" type="xs:string">
+        <annotation>
+          <documentation>Optional keywords for browsing.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Manufacturer" type="xs:string">
+        <annotation>
+          <documentation>The vendor releasing the package. Defaults to the Package/@Manufacturer attribute's value.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

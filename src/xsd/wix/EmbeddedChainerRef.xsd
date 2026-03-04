@@ -1,0 +1,22 @@
+<element name="EmbeddedChainerRef">
+    <annotation>
+      <documentation>
+        Reference to an EmbeddedChainer element. This will force the entire referenced Fragment's contents
+        to be included in the installer database.
+      </documentation>
+      <appinfo>
+        <seeAlso ref="EmbeddedChainer" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required" />
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

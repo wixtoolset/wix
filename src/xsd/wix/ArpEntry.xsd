@@ -1,0 +1,47 @@
+<element name="ArpEntry">
+    <annotation>
+      <documentation>
+        Information about the Add/Remove Programs entry that is installed by the package.
+        ArpEntry may not be specified with DetectCondition or UninstallArguments.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The id of the ARP entry.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Win64" type="YesNoTypeUnion" use="required">
+        <annotation>
+          <documentation>
+            Whether the ARP entry is 64-bit.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Version" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The DisplayVersion value of the ARP entry that is installed by this package.
+            Older or missing versions cause this package to be detected as absent.
+            Newer versions cause this package to be detected as obsolete.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AdditionalUninstallArguments" type="xs:string">
+        <annotation>
+          <documentation>
+            Additional arguments for the uninstall command line.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UseUninstallString" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If yes, use the `UninstallString` value instead of the default `QuietUninstallString`.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

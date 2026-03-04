@@ -1,0 +1,58 @@
+<element name="WebServiceExtension">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>The WebServiceExtension property is used by the Web server to determine whether a Web service extension is permitted to run.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the web service extension. Used within the MSI package only. If the Id is not specified, it will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="File" type="xs:string" use="required">
+        <annotation>
+          <documentation>Usually a Property that resolves to short file name path</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>Description of the extension.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Group" type="xs:string">
+        <annotation>
+          <documentation>String used to identify groups of extensions.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Allow" use="required" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates if the extension is allowed or denied.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UIDeletable" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates if the UI is allowed to delete the extension from the list of not.  Default: Not deletable.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,41 @@
+<element name="Log">
+    <annotation>
+      <documentation>Overrides the default log settings for a bundle.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Disable" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Disables the default logging in the Bundle. The end user can still generate a
+            log file by specifying the "-l" command-line argument when installing the
+            Bundle.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PathVariable" type="xs:string">
+        <annotation>
+          <documentation>
+            Name of a Variable that will hold the path to the log file. An empty value
+            will cause the variable to not be set. The default is "WixBundleLog".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Prefix" type="xs:string">
+        <annotation>
+          <documentation>
+            File name and optionally a relative path to use as the prefix for the log file. The
+            default is to use the Bundle/@Name or, if Bundle/@Name is not specified, the value
+            "Setup".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Extension" type="xs:string">
+        <annotation>
+          <documentation>The extension to use for the log. The default is ".log".</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

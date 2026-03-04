@@ -1,0 +1,110 @@
+<element name="RemoveFolderEx">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <msiRef table="RemoveFile" href="https://learn.microsoft.com/en-us/windows/win32/msi/removefile-table" />
+        <remarks>
+          <p>
+            The custom action that implements RemoveFolderEx does so by writing temporary rows to the RemoveFile table
+            for each subfolder of the root folder you specify. Because it might dramatically affect Windows Installer's
+            [File Costing](https://learn.microsoft.com/en-us/windows/win32/msi/file-costing),
+            the temporary rows must be written before the CostInitialize standard action. Unfortunately, MSI doesn't
+            create properties for the Directory hierarchy in your package until later, in the CostFinalize action.
+          </p>
+          <p>
+            An easy workaround for a typical use case of removing a folder during uninstall is to write the directory
+            path to the registry and to load it during uninstall. See [The WiX toolset's "Remember Property" pattern](http://robmensching.com/blog/posts/2010/5/2/the-wix-toolsets-remember-property-pattern)
+            for an example.
+          </p>
+          <p>
+            If you use custom actions to set properties, ensure that they are scheduled before the WixRemoveFoldersEx custom action.
+          </p>
+        </remarks>
+      </appinfo>
+      <documentation>
+        Remove a folder and all contained files and folders if the parent component is selected for installation or removal.
+        The folder must be specified in the Property attribute as the name of a property that will have a value that resolves
+        to the full path of the folder before the CostInitialize action. Note that Directory ids cannot be used.
+        For more details, see the Remarks.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Primary key used to identify this particular entry. If this is not specified, a stable identifier
+            will be generated at compile time based on the other attributes.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>
+            Condition that determines if the folders should be removed. Must be blank or evaluate to true
+            for the folder to be scheduled for removal.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Property" type="xs:string">
+        <annotation>
+          <documentation>
+            The id of a property that resolves to the full path of the source directory.  The property does not have
+            to exist in the installer database at creation time; it could be created at installation time by a custom
+            action, on the command line, etc. The property value can contain environment variables surrounded by
+            percent signs such as from a REG_EXPAND_SZ registry value; environment variables will be expanded before
+            being evaluated for a full path.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="On">
+        <annotation>
+          <documentation>
+            This value determines when the folder may be removed.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="install">
+              <annotation>
+                <documentation>
+                  Removes the folder only when the parent component is being installed (msiInstallStateLocal or msiInstallStateSource).
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="uninstall">
+              <annotation>
+                <documentation>
+                  Removes the folder only when the parent component is being removed (msiInstallStateAbsent). This is the default if the On attribute is not specified.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="both">
+              <annotation>
+                <documentation>
+                  Removes the folder when the parent component is being installed or removed.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

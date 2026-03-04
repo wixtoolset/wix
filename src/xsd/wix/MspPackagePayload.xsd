@@ -1,0 +1,12 @@
+<element name="MspPackagePayload">
+    <annotation>
+      <documentation>
+        Describes information about the MspPackage payload.
+        Cannot be specified if the owning MspPackage specified any of SourceFile, Name, DownloadUrl, or Compressed.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attributeGroup ref="ChainPackagePayloadCommonAttributes" />
+      <attributeGroup ref="LocalPackagePayloadCommonAttributes" />
+    </complexType>
+  </element>

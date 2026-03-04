@@ -1,0 +1,25 @@
+<element name="AlternateResolution">
+        <annotation>
+            <documentation>
+                Defines an alternate resolution to avoid scaling in different DPIs.
+            </documentation>
+        </annotation>
+        <complexType>
+            <attribute name="ImageFile" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Relative path to an image file for the control.
+                        Mutually exclusive with ImageResource attribute.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageResource" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Identifier that references an image resource with type RT_RCDATA in the module for the control.
+                        Mutually exclusive with ImageFile attribute.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

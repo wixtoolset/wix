@@ -1,0 +1,8 @@
+<element name="CreateFolders" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="CreateFolders" href="http://msdn.microsoft.com/library/aa368052.aspx" />
+      </appinfo>
+      <documentation>Creates empty folders for components that are set to be installed. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

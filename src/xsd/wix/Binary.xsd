@@ -1,0 +1,47 @@
+<element name="Binary">
+    <annotation>
+      <documentation>
+        Binary data used for CustomAction elements and UI controls.
+      </documentation>
+      <appinfo>
+        <msiRef table="Binary" href="https://learn.microsoft.com/en-us/windows/win32/msi/binary-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The Id cannot be longer than 55 characters.  In order to prevent errors in cases where the Id is modularized, it should not be longer than 18 characters.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string">
+        <annotation>
+          <documentation>Path to the binary file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SuppressModularization" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Use to suppress modularization of this Binary identifier in merge modules.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

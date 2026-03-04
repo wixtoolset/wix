@@ -1,0 +1,8 @@
+<element name="UnpublishFeatures" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="UnpublishFeatures" href="http://msdn.microsoft.com/library/aa372107.aspx" />
+      </appinfo>
+      <documentation>Removes selection-state and feature-component mapping information from the registry. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

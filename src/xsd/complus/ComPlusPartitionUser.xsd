@@ -1,0 +1,30 @@
+<element name="ComPlusPartitionUser">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>
+        Represents a default partition definition for a user. When
+        the parent component of this element is installed, the default partition of the
+        user will be set to the referenced partition.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Partition" use="optional" type="xs:string">
+        <annotation><documentation>
+          The id of a ComPlusPartition element representing the
+          partition that will be the default partition for the user.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="User" use="required" type="xs:string">
+        <annotation><documentation>
+          Foreign key into the User table.
+        </documentation></annotation>
+      </attribute>
+    </complexType>
+  </element>

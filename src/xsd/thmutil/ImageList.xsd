@@ -1,0 +1,17 @@
+<element name="ImageList">
+        <annotation>
+            <documentation>List of images which can be shared between multiple controls.</documentation>
+        </annotation>
+        <complexType>
+            <choice maxOccurs="unbounded">
+                <element ref="ImageListItem" />
+            </choice>
+            <attribute name="Name" type="xs:string" use="required">
+                <annotation>
+                    <documentation>
+                        Name of the ImageList, to be referenced by other controls.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

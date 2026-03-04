@@ -1,0 +1,11 @@
+<element name="ComplianceDrive">
+    <annotation>
+      <documentation>Sets the parent of a nested DirectorySearch element to CCP_DRIVE.</documentation>
+    </annotation>
+    <complexType>
+      <choice>
+        <element ref="DirectorySearch" />
+        <element ref="DirectorySearchRef" />
+      </choice>
+    </complexType>
+  </element>

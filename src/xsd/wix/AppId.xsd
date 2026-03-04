@@ -1,0 +1,101 @@
+<element name="AppId">
+    <annotation>
+      <documentation>
+                Application ID containing DCOM information for the associated application GUID.
+                If this element is nested under a Fragment, Module, or Package element, it must be
+                advertised.
+            </documentation>
+      <appinfo>
+        <msiRef table="AppId" href="http://msdn.microsoft.com/library/aa367566.aspx" />
+        <msiRef table="Registry" href="https://learn.microsoft.com/en-us/windows/win32/msi/registry-table" />
+        <remarks>
+          When being used in unadvertised mode, the attributes in the AppId element correspond to registry values
+          under the `[HKCR\AppID\{Id}]` key, as follows:
+
+          - `Id`: [HKCR\AppID\`Id`]
+          - `ActivateAtStorage`: [HKCR\AppID\`Id`]/ActivateAtStorage="Y"
+          - `Description`: [HKCR\AppID\`Id`]/@="My AppId Description"
+          - `DllSurrogate`: [HKCR\AppID\`Id`]/DllSurrogate="C:\surrogate.exe"
+          - `LocalService`: [HKCR\AppID\`Id`]/LocalService="MyServiceName"
+          - `RemoteServerName`: [HKCR\AppID\`Id`]/RemoteServerName="MyRemoteServer"
+          - `RunAsInteractiveUser`: [HKCR\AppID\`Id`]/RunAs="Interactive User"
+          - `ServiceParameters`: [HKCR\AppID\`Id`]/ServiceParameters="-param"
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Class" />
+      </choice>
+      <attribute name="ActivateAtStorage" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Set this value to 'yes' to configure the client to activate on the same system as persistent storage.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Advertise" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Set this value to 'yes' in order to create a normal AppId table row. Set this value to 'no' in order to
+                    generate Registry rows that perform similar registration (without the often problematic Windows Installer
+                    advertising behavior).
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>
+                    Set this value to the description of the AppId. It can only be specified when the AppId is not being advertised.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DllSurrogate" type="xs:string">
+        <annotation>
+          <documentation>
+                    Set this value to specify that the class is a DLL that is to be activated in a surrogate EXE
+                    process, and the surrogate process to be used is the path of a surrogate EXE file specified by the value.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Id" type="Guid" use="required">
+        <annotation>
+          <documentation>
+                    Set this value to the AppID GUID that corresponds to the named executable.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LocalService" type="xs:string">
+        <annotation>
+          <documentation>
+                    Set this value to the name of a service to allow the object to be installed as a Win32 service.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RemoteServerName" type="xs:string">
+        <annotation>
+          <documentation>
+                    Set this value to the name of the remote server to configure the client to request the object
+                    be run at a particular machine whenever an activation function is called for which a COSERVERINFO
+                    structure is not specified.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RunAsInteractiveUser" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Set this value to 'yes' to configure a class to run under the identity of the user currently
+                    logged on and connected to the interactive desktop when activated by a remote client without
+                    being written as a Win32 service.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceParameters" type="xs:string">
+        <annotation>
+          <documentation>
+                    Set this value to the parameters to be passed to a LocalService on invocation.
+                </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

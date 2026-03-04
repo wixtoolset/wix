@@ -1,0 +1,15 @@
+<attribute name="BAFactoryAssembly" type="wxs:YesNoTypeUnion" version="4" deprecated="true">
+    <annotation>
+      <documentation>
+        When set to "yes", WixDotNetCoreBootstrapperApplicationHost will load the DLL and instantiate the type with the BootstrapperApplicationFactoryAttribute.
+        The DLL must have been built referencing the WixToolset.Dnc.HostGenerator source generator NuGet package.
+        The .NET Core project must have been published, not just built.
+        Only one payload may be marked with this attribute set to "yes".
+
+        _In WiX v5, move the Payload/@SourceFile attribute to be the BootstrapperApplication/@SourceFile attribute and remove the Payload element._
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Payload" />
+      </appinfo>
+    </annotation>
+  </attribute>

@@ -1,0 +1,63 @@
+<element name="ComponentGroup">
+    <annotation>
+      <documentation>
+        Groups together multiple components to be used in other locations.
+      </documentation>
+      <appinfo>
+        <seeAlso ref="ComponentGroupRef" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Component" />
+        <element ref="ComponentGroupRef" />
+        <element ref="ComponentRef" />
+        <element ref="File" />
+        <element ref="Files" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier for the ComponentGroup.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Directory" type="xs:string">
+        <annotation>
+          <documentation>
+            Sets the default directory identifier for child Component elements.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Subdirectory" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute defines one or more directories below the directory referenced by the Directory attribute or parent
+            Directory reference where the contained Components will be installed.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Source" type="xs:string">
+        <annotation>
+          <documentation>
+            Used to set the default file system source for child Component elements. For more information, see
+            [Specifying source files](../../../tools/payloads/).
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

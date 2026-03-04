@@ -1,0 +1,8 @@
+<simpleType name="NativeImagePreprocessorPlatformType">
+    <annotation>
+      <documentation>
+        Platform referencing the machine architecture.
+      </documentation>
+    </annotation>
+    <union memberTypes="NativeImagePlatformType wxs:PreprocessorVariables" />
+  </simpleType>

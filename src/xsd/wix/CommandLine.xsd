@@ -1,0 +1,34 @@
+<element name="CommandLine">
+    <annotation>
+      <documentation>Describes additional, conditional command-line arguments for an ExePackage or BundlePackage.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="InstallArgument" type="xs:string">
+        <annotation>
+          <documentation>Additional command-line arguments to apply during package installation if Condition is true.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UninstallArgument" type="xs:string">
+        <annotation>
+          <documentation>Additional command-line arguments to apply during package uninstallation if Condition is true.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RepairArgument" type="xs:string">
+        <annotation>
+          <documentation>Additional command-line arguments to apply during package repair if Condition is true.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>
+            The condition that controls whether the command-line arguments specified in the
+            InstallArgument, UninstallArgument, or RepairArgument attributes are appended to the
+            command line passed to the package. Which attribute is used depends on the
+            action being applied to the package. For example, when the package is
+            being installed, the InstallArgument attribute value is appended to the command
+            line when the package is executed.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

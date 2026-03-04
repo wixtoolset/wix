@@ -1,0 +1,8 @@
+<element name="MigrateFeatureStates" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="MigrateFeatureStates" href="http://msdn.microsoft.com/library/aa370034.aspx" />
+      </appinfo>
+      <documentation>Used for upgrading or installing over an existing application. Reads feature states from existing application and sets these feature states for the pending installation. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

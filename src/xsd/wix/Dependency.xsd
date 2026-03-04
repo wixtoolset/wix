@@ -1,0 +1,22 @@
+<element name="Dependency">
+    <annotation>
+      <documentation>Declares a dependency on another merge module.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="RequiredId" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier of the merge module required by the merge module.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RequiredLanguage" type="Integer" use="required">
+        <annotation>
+          <documentation>Numeric language ID of the merge module in RequiredID.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RequiredVersion" type="xs:string">
+        <annotation>
+          <documentation>Version of the merge module in RequiredID.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,22 @@
+<element name="DigitalCertificate">
+    <annotation>
+      <documentation>
+                Adds a digital certificate.
+            </documentation>
+      <appinfo>
+        <msiRef table="MsiDigitalCertificate" href="http://msdn.microsoft.com/library/aa370086.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier for a certificate file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string" use="required">
+        <annotation>
+          <documentation>The path to the certificate file.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

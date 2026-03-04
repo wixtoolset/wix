@@ -1,0 +1,9 @@
+<element name="Panel">
+        <annotation>
+            <documentation>Defines a collection of controls.</documentation>
+        </annotation>
+        <complexType>
+            <group ref="PanelControlElements" maxOccurs="unbounded" />
+            <attributeGroup ref="CommonControlAttributes" />
+        </complexType>
+    </element>

@@ -1,0 +1,12 @@
+<element name="ExePackagePayload">
+    <annotation>
+      <documentation>
+        Describes information about the ExePackage payload.
+        Cannot be specified if the owning ExePackage specified any of SourceFile, Name, DownloadUrl, or Compressed.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attributeGroup ref="ChainPackagePayloadCommonAttributes" />
+      <attributeGroup ref="RemotePackagePayloadCommonAttributes" />
+    </complexType>
+  </element>
