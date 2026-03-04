@@ -1,0 +1,96 @@
+<element name="ServiceConfig">
+    <annotation>
+      <documentation>
+        Configures a service being installed or one that already exists. This element's functionality is available starting with MSI 5.0. However, a
+        [remark indicating the functionality does not work correctly](https://learn.microsoft.com/en-us/windows/win32/msi/msiconfigureservices-action) was added later.
+        Consider using the [util:ServiceConfig element](/wix/schema/util/serviceconfig/) instead.
+      </documentation>
+      <appinfo>
+        <msiRef table="MsiServiceConfig" href="https://learn.microsoft.com/en-us/windows/win32/msi/msiserviceconfig-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="RequiredPrivilege">
+          <annotation>
+            <documentation>List of privileges to apply to service.</documentation>
+          </annotation>
+        </element>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Unique identifier for this service configuration. This value will default to the ServiceName attribute if not
+            specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DelayedAutoStart" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies whether an auto-start service should delay its start until after all other auto-start
+            services. This attribute only affects auto-start services. Allowed values are "yes", "no" or a Formatted property that
+            resolves to "1" (for "yes") or "0" (for "no"). If this attribute is not present the setting is not configured.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FailureActionsWhen" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies when failure actions should be applied. Allowed values are "failedToStop", "failedToStopOrReturnedError"
+            or a Formatted property that resolves to "1" (for "failedToStopOrReturnedError") or "0" (for "failedToStop"). If this attribute
+            is not present the setting is not configured.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PreShutdownDelay" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies time in milliseconds that the Service Control Manager (SCM) waits after notifying the service of a system
+            shutdown. If this attribute is not present the default value, 3 minutes, is used.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnInstall" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether to configure the service when the parent Component is installed. This attribute may be combined with OnReinstall
+            and OnUninstall.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnReinstall" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether to configure the service when the parent Component is reinstalled. This attribute may be combined with OnInstall
+            and OnUninstall.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnUninstall" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether to configure the service when the parent Component is uninstalled. This attribute may be combined with OnInstall
+            and OnReinstall.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceName" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the name of the service to configure. This value will default to the ServiceInstall/@Name attribute when nested under
+            a ServiceInstall element.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceSid" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the service SID to apply to the service. Valid values are "none", "restricted", "unrestricted" or a Formatted property
+            that resolves to "0" (for "none"), "3" (for "restricted") or "1" (for "unrestricted"). If this attribute is not present the
+            setting is not configured.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

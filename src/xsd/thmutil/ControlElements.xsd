@@ -1,0 +1,22 @@
+<group name="ControlElements">
+        <choice>
+            <element ref="Billboard" />
+            <element ref="Button" />
+            <element ref="Checkbox" />
+            <element ref="Combobox" />
+            <element ref="CommandLink" />
+            <element ref="Editbox" />
+            <element ref="Hyperlink" />
+            <element ref="Hypertext" />
+            <element ref="ImageControl" />
+            <element ref="Label" />
+            <element ref="ListView" />
+            <element ref="Panel" />
+            <element ref="Progressbar" />
+            <element ref="RadioButtons" />
+            <element ref="Richedit" />
+            <element ref="Static" />
+            <element ref="Tabs" />
+            <element ref="TreeView" />
+        </choice>
+    </group>

@@ -1,0 +1,55 @@
+<element name="RadioButton">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="RadioButtonGroup" />
+        <msiRef table="RadioButton" href="https://docs.microsoft.com/en-us/windows/win32/msi/radiobutton-table" />
+        <msiRef table="Control" href="https://docs.microsoft.com/en-us/windows/win32/msi/control-table" />
+        <msiRef table="Dialog" href="https://docs.microsoft.com/en-us/windows/win32/msi/dialog-table" />
+      </appinfo>
+      <documentation>Text or Icon plus Value that is assigned to the Property of the parent Control (RadioButtonGroup).</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Bitmap" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute defines the bitmap displayed with the radio button. The value of the attribute creates a reference
+            to a Binary element that represents the bitmap. This attribute is mutually exclusive with the Icon and Text
+            attributes.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Height" use="required" type="LocalizableInteger" />
+      <attribute name="Help" type="xs:string" />
+      <attribute name="Icon" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute defines the icon displayed with the radio button. The value of the attribute creates a reference
+            to a Binary element that represents the icon. This attribute is mutually exclusive with the Bitmap and Text
+            attributes.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Text" type="xs:string">
+        <annotation>
+          <documentation>Text displayed with the radio button. This attribute is mutually exclusive with the Bitmap and Icon attributes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ToolTip" type="xs:string" />
+      <attribute name="Value" type="xs:string" use="required">
+        <annotation>
+          <documentation>Value assigned to the associated control Property when this radio button is selected.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Width" use="required" type="LocalizableInteger" />
+      <attribute name="X" use="required" type="LocalizableInteger" />
+      <attribute name="Y" use="required" type="LocalizableInteger" />
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

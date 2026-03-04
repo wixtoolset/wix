@@ -1,0 +1,45 @@
+<element name="Interface">
+    <annotation>
+      <documentation>COM Interface registration for parent TypeLib.</documentation>
+      <appinfo>
+        <msiRef table="Registry" href="https://learn.microsoft.com/en-us/windows/win32/msi/registry-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="Guid" use="required">
+        <annotation>
+          <documentation>GUID identifier for COM Interface.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name for COM Interface.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="BaseInterface" type="Guid">
+        <annotation>
+          <documentation>Identifies the interface from which the current interface is derived.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProxyStubClassId" type="Guid">
+        <annotation>
+          <documentation>GUID CLSID for proxy stub to COM Interface.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProxyStubClassId32" type="Guid">
+        <annotation>
+          <documentation>GUID CLSID for 32-bit proxy stub to COM Interface.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="NumMethods" type="Integer">
+        <annotation>
+          <documentation>Number of methods implemented on COM Interface.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Versioned" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Determines whether a Typelib version entry should be created with the other COM Interface registry keys. Default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,8 @@
+<element name="WriteRegistryValues" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="WriteRegistryValues" href="http://msdn.microsoft.com/library/aa372891.aspx" />
+      </appinfo>
+      <documentation>Sets up an application's registry information. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

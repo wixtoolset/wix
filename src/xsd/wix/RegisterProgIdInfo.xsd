@@ -1,0 +1,8 @@
+<element name="RegisterProgIdInfo" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RegisterProgIdInfo" href="http://msdn.microsoft.com/library/aa371164.aspx" />
+      </appinfo>
+      <documentation>Manages the registration of OLE ProgId information with the system. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

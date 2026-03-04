@@ -1,0 +1,15 @@
+<element name="RegistrySearchRef">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="RegistrySearch" />
+      </appinfo>
+      <documentation>References an existing RegistrySearch element.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Specify the Id of the RegistrySearch to reference.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

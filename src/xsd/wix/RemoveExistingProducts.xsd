@@ -1,0 +1,8 @@
+<element name="RemoveExistingProducts" type="ActionModuleSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RemoveExistingProducts" href="http://msdn.microsoft.com/library/aa371197.aspx" />
+      </appinfo>
+      <documentation>Goes through the product codes listed in the ActionProperty column of the Upgrade table and removes the products in sequence. Special actions don't have a built-in sequence number and thus must appear relative to another action. The suggested way to do this is by using the Before or After attribute. InstallExecute and InstallExecuteAgain can optionally appear anywhere between InstallInitialize and InstallFinalize.</documentation>
+    </annotation>
+  </element>

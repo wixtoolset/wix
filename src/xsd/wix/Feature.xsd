@@ -1,0 +1,169 @@
+<element name="Feature">
+    <annotation>
+      <documentation>
+        A feature for the Feature table. Features are the smallest installable unit. See msi.chm for more
+        detailed information on the myriad installation options for a feature.
+      </documentation>
+      <appinfo>
+        <seeAlso ref="FeatureRef" />
+        <msiRef table="Feature" href="https://learn.microsoft.com/en-us/windows/win32/msi/feature-table" />
+        <howtoRef href="files_and_registry/add_a_file.html">How To: Add a file to your installer</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Component" />
+        <element ref="ComponentGroupRef" />
+        <element ref="ComponentRef" />
+        <element ref="File" />
+        <element ref="Files" />
+        <element ref="Level" />
+        <element ref="Feature" />
+        <element ref="FeatureGroupRef" />
+        <element ref="FeatureRef" />
+        <element ref="MergeRef" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Unique identifier of the feature. The id must be shorter than 38 characters.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AllowAbsent" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            This attribute determines if a user will have the option to set a feature to absent in the user interface.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AllowAdvertise" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            This attribute determines the possible advertise states for this feature. The default is 'yes'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ConfigurableDirectory" type="xs:string">
+        <annotation>
+          <documentation>
+            Specify the Id of a Directory that can be configured by the user at installation time. This identifier
+            must be a public property and therefore completely uppercase.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>
+            Longer string of text describing the feature. This localizable string is displayed by the
+            Text Control of the Selection Dialog.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Display" type="xs:string">
+        <annotation>
+          <documentation>
+            Determines the initial display of this feature in the feature tree.
+            This attribute's value should be one of the following:
+
+            - `collapse`: Initially shows the feature collapsed. This is the default value.
+            - `expand`: Initially shows the feature expanded.
+            - `hidden`: Prevents the feature from displaying in the user interface.
+            - an explicit integer value: For advanced users only, it is possible to directly set the integer value of the display value that will appear in the Feature row.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="InstallDefault">
+        <annotation>
+          <documentation>
+            This attribute determines the default install/run location of a feature. This attribute cannot be specified
+            if the value of the FollowParent attribute is 'yes' since that would ask the installer to force this feature
+            to follow the parent installation state and simultaneously favor a particular installation state just for this feature.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="followParent">
+              <annotation>
+                <documentation>
+                  Forces the feature to follow the same installation state as its parent feature.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="local">
+              <annotation>
+                <documentation>
+                  Favors installing this feature locally by setting the msidbFeatureAttributesFavorLocal attribute.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="source">
+              <annotation>
+                <documentation>
+                  Favors running this feature from source by setting the msidbFeatureAttributesFavorSource attribute.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Level" type="Integer">
+        <annotation>
+          <documentation>
+            Sets the install level of this feature. A value of 0 will disable the feature. This value
+            can be modified at install time using the Level element as a child of the Feature.
+            The default value is "1".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Title" type="xs:string">
+        <annotation>
+          <documentation>
+            Short string of text identifying the feature. This string is listed as an item by the
+            SelectionTree control of the Selection Dialog.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="TypicalDefault">
+        <annotation>
+          <documentation>
+            This attribute determines the default advertise state of the feature.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="advertise">
+              <annotation>
+                <documentation>
+                  Sets the feature to be advertised by setting the msidbFeatureAttributesFavorAdvertise attribute.
+                  This value cannot be set if the value of the AllowAdvertise attribute is 'no' since that would ask the installer to
+                  disallow the advertised state for this feature while at the same time favoring it.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="install">
+              <annotation>
+                <documentation>
+                  Sets the feature to the default non-advertised installation option.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

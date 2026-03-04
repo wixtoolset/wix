@@ -1,0 +1,8 @@
+<element name="RegisterClassInfo" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RegisterClassInfo" href="http://msdn.microsoft.com/library/aa371154.aspx" />
+      </appinfo>
+      <documentation>Manages the registration of COM class information with the system. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

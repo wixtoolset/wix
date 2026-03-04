@@ -1,0 +1,8 @@
+<simpleType name="FirewallProfileType">
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="domain" />
+      <enumeration value="private" />
+      <enumeration value="public" />
+      <enumeration value="all" />
+    </restriction>
+  </simpleType>

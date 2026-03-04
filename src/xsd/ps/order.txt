@@ -1,0 +1,4 @@
+element|FormatsFile
+element|TypesFile
+element|SnapIn
+simpleType|EmbeddedResource

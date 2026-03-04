@@ -1,0 +1,49 @@
+<element name="Category">
+    <annotation>
+      <documentation>
+        Qualified published component for parent Component
+      </documentation>
+      <appinfo>
+        <msiRef table="PublishComponent" href="https://learn.microsoft.com/en-us/windows/win32/msi/publishcomponent-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" use="required" type="Guid">
+        <annotation>
+          <documentation>A string GUID that represents the category of components being grouped together.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Qualifier" use="required" type="xs:string">
+        <annotation>
+          <documentation>A text string that qualifies the value in the Id attribute. A qualifier is used to distinguish multiple forms of the same Component, such as a Component that is implemented in multiple languages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AppData" type="xs:string">
+        <annotation>
+          <documentation>An optional localizable text describing the category. The string is commonly parsed by the application and can be displayed to the user. It should describe the category.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Feature" type="xs:string">
+        <annotation>
+          <documentation>Feature that controls the advertisement of the category. Defaults to the primary Feature for the parent Component .</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

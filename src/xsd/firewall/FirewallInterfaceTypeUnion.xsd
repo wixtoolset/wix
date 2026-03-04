@@ -1,0 +1,3 @@
+<simpleType name="FirewallInterfaceTypeUnion">
+    <union memberTypes="FirewallInterfaceType PropertyReference wxs:PreprocessorVariables" />
+  </simpleType>

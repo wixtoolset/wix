@@ -1,0 +1,84 @@
+<element name="IniFileSearch">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="ComponentSearch" />
+        <seeAlso ref="RegistrySearch" />
+        <msiRef table="IniLocator" href="http://msdn.microsoft.com/library/aa369283.aspx" />
+        <msiRef table="Signature" href="https://docs.microsoft.com/en-us/windows/win32/msi/signature-table" />
+      </appinfo>
+      <documentation>Searches for file, directory or registry key and assigns to value of parent Property</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0">
+        <element ref="DirectorySearch" />
+        <element ref="DirectorySearchRef" />
+        <element ref="FileSearch" />
+        <element ref="FileSearchRef" />
+      </choice>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>External key into the Signature table.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Field" type="Integer">
+        <annotation>
+          <documentation>The field in the .ini line. If field is Null or 0, the entire line is read.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Key" use="required" type="xs:string">
+        <annotation>
+          <documentation>The key value within the section.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="LongFileNameType" use="required">
+        <annotation>
+          <documentation>
+                        In prior versions of the WiX toolset, this attribute specified the short name.
+                        This attribute's value may now be either a short or long name.
+                        If a short name is specified, the ShortName attribute may not be specified.
+                        Also, if this value is a long name, the ShortName attribute may be omitted to
+                        allow WiX to attempt to generate a unique short name.
+                        However, if you wish to manually specify the short name, then the ShortName
+                        attribute may be specified.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Section" use="required" type="xs:string">
+        <annotation>
+          <documentation>The localizable .ini file section.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShortName" type="ShortFileNameType">
+        <annotation>
+          <documentation>
+                        The short name of the file in 8.3 format.
+                        This attribute should only be set if the user wants to manually specify the short name.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type">
+        <annotation>
+          <documentation>Must be file if last child is FileSearch element and must be directory if last child is DirectorySearch element.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="directory">
+              <annotation>
+                <documentation>A directory location.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="file">
+              <annotation>
+                <documentation>A file location. This is the default value.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="raw">
+              <annotation>
+                <documentation>A raw .ini value.</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+    </complexType>
+  </element>

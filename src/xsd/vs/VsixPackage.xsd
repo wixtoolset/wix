@@ -1,0 +1,94 @@
+<element name="VsixPackage">
+    <annotation>
+      <documentation>
+        This element provides the metdata required to install/uninstall a file as
+        a VSIX Package. The VSIX package file will be installed as part of the MSI
+        then passed to the VSIX installer to install the VSIX package. To avoid the
+        duplication, simply use the MSI to install the VSIX package itself.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="File" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="File" type="xs:string">
+        <annotation>
+          <documentation>
+            Reference to file identifer. This attribute is required when the element is not a
+            child of a File element and is invalid when the element is a child of the File element.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PackageId" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Identity of the VSIX package per its internal manifest. If this value is not correct
+            the VSIX package will not correctly uninstall.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Permanent" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Indicates whether the VSIX package is uninstalled when the parent Component is uninstalled.
+            The default is 'no'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Target" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the SKU of Visual Studio in which to register the extension. If no target
+            is specified the extension is registered with all installed SKUs. If the Target
+            attribute is specified the TargetVersion attribute must also be specified. The 
+            following is a list of known Visual Studio targets: integratedShell, professional,
+            premium, ultimate, vbExpress, vcExpress, vcsExpress, vwdExpress
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="TargetVersion" type="wxs:VersionType">
+        <annotation>
+          <documentation>
+            Specifies the version of Visual Studio in which to register the extension. This attribute
+            is required if the Target attribute is specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Vital" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Indicates whether failure to install the VSIX package causes the installation to rollback.
+            The default is 'yes'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="VsixInstallerPathProperty" type="xs:string">
+        <annotation>
+          <documentation>
+            Optional reference to a Property element that contains the path to the VsixInstaller.exe.
+            By default, the latest VsixInstaller.exe on the machine will be used to install the VSIX
+            package. It is highly recommended that this attribute is *not* used.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

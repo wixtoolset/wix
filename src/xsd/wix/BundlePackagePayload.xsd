@@ -1,0 +1,66 @@
+<element name="BundlePackagePayload">
+    <annotation>
+      <documentation>
+        Describes information about the BundlePackage payload.
+        Cannot be specified if the owning BundlePackage specified any of SourceFile, Name, DownloadUrl, or Compressed.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="RemoteBundle" minOccurs="0" maxOccurs="1" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="PayloadGeneration">
+        <annotation>
+          <documentation>
+            Choose one of the supported payload generation types: none, externalWithoutDownloadUrl, external, all.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:string">
+            <enumeration value="none">
+              <annotation>
+                <documentation>
+                  None of the bundle's payloads or containers are automatically included as payloads for the package.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="externalWithoutDownloadUrl">
+              <annotation>
+                <documentation>
+                  All detached containers from the bundle that have no download url are included as payloads for the package,
+                  as well as all external payloads from the bundle that have no download url.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="external">
+              <annotation>
+                <documentation>
+                  All detached containers from the bundle are included as payloads for the package,
+                  as well as all external payloads from the bundle.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="all">
+              <annotation>
+                <documentation>
+                  All detached containers from the bundle are included as payloads for the package,
+                  as well as all other payloads that are not compressed into the detached containers.
+                  This option normally requires extra work to use since it requires all attached containers to have been extracted.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attributeGroup ref="ChainPackagePayloadCommonAttributes" />
+      <attributeGroup ref="RemotePackagePayloadCommonAttributes" />
+    </complexType>
+  </element>

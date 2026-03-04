@@ -1,0 +1,56 @@
+<element name="CreateFolder">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="RemoveFolder" />
+        <msiRef table="CreateFolder" href="https://learn.microsoft.com/en-us/windows/win32/msi/createfolder-table" />
+      </appinfo>
+      <documentation>Create folder as part of parent Component.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Shortcut" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Non-advertised shortcut to this folder, Shortcut Target is preset to the folder</documentation>
+          </annotation>
+        </element>
+        <element ref="Permission" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>ACL permission</documentation>
+          </annotation>
+        </element>
+        <element ref="PermissionEx">
+          <annotation>
+            <documentation>Can also configure the ACLs for this folder.</documentation>
+          </annotation>
+        </element>
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Directory" type="xs:string">
+        <annotation>
+          <documentation>Identifier of Directory to create. Defaults to Directory of parent Component.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Subdirectory" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute defines one or more directories below the directory referenced by the Directory attribute or parent
+            Directory reference for the directory to be created.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,95 @@
+<element name="DotNetCoreSearch">
+    <annotation>
+      <documentation>
+        Searches for an installation of .NET Core.
+        The variable gets set to the latest version of the given Runtime, Platform, and Major Version.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the search. If the Id is not specified, one will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Variable" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the variable in which to place the result of the search.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>Condition for evaluating the search. If this evaluates to false, the search is not executed at all.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="After" type="xs:string">
+        <annotation>
+          <documentation>Id of the search that this one should come after.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RuntimeType">
+        <annotation>
+          <documentation>The type of .NET Core runtime to search for.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="aspnet">
+              <annotation>
+                <documentation>
+                  Attempt to check for an ASP.NET Core type runtime.
+                  The ASP.NET Core Runtime enables you to run web/server applications.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="core">
+              <annotation>
+                <documentation>
+                  Attempt to check for a .NET type runtime.
+                  The .NET Core Runtime contains just the components needed to run a console app.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="desktop">
+              <annotation>
+                <documentation>
+                  Attempt to check for a .NET Desktop type runtime.
+                  The .NET Desktop Runtime enables you to run Windows desktop applications.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Platform" type="NetfxPreprocessorPlatformType">
+        <annotation>
+          <documentation>The platform to search for.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MajorVersion" type="wxs:Integer">
+        <annotation>
+          <documentation>Major version of .NET. For example, "6".</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,40 @@
+<element name="Label">
+        <annotation>
+            <documentation>Defines a label.</documentation>
+        </annotation>
+        <complexType mixed="true">
+            <annotation>
+                <documentation>
+                    Text for the label to display.
+                    Mutually exclusive with the StringId attribute and child Text elements.
+                </documentation>
+            </annotation>
+            <choice minOccurs="0" maxOccurs="unbounded">
+                <element ref="Text" />
+                <element ref="Tooltip" maxOccurs="1" />
+            </choice>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attribute name="Center" type="YesNoType" use="optional">
+                <annotation>
+                    <documentation>Specifies whether the text should be centered horizontally in the width of the control. Default is "no".</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="DisablePrefix" type="YesNoType" use="optional">
+                <annotation>
+                    <documentation>By default ampersands (&amp;) in the text will underline the next character and treat it as an accelerator key. Set this attribute to "yes" to disable that behavior. Default is "no".</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="FontId" type="xs:string">
+                <annotation>
+                    <documentation>Numeric identifier to the Font element that serves as the font for the control.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="StringId" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Identifier that references a string resource in the module to define the text for the label.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

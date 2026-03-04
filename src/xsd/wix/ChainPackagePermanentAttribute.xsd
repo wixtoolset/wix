@@ -1,0 +1,9 @@
+<attributeGroup name="ChainPackagePermanentAttribute">
+    <attribute name="Permanent" type="YesNoTypeUnion">
+      <annotation>
+        <documentation>
+          Specifies whether the package can be uninstalled. The default is "no".
+        </documentation>
+      </annotation>
+    </attribute>
+  </attributeGroup>

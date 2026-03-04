@@ -1,0 +1,70 @@
+<element name="Configuration">
+    <annotation>
+      <documentation>Defines the configurable attributes of merge module.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Defines the name of the configurable item.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Format" use="required">
+        <annotation>
+          <documentation>Specifies the format of the data being changed.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:string">
+            <enumeration value="Text" />
+            <enumeration value="Key" />
+            <enumeration value="Integer" />
+            <enumeration value="Bitfield" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Type" type="xs:string">
+        <annotation>
+          <documentation>Specifies the type of the data being changed.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ContextData" type="xs:string">
+        <annotation>
+          <documentation>Specifies a semantic context for the requested data.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DefaultValue" type="xs:string">
+        <annotation>
+          <documentation>Specifies a default value for the item in this record if the merge tool declines to provide a value.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="KeyNoOrphan" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Does not merge rule according to rules in MSI SDK.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="NonNullable" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>If yes, null is not a valid entry.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DisplayName" type="xs:string">
+        <annotation>
+          <documentation>Display name for authoring.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>Description for authoring.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HelpLocation" type="xs:string">
+        <annotation>
+          <documentation>Location of chm file for authoring.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HelpKeyword" type="xs:string">
+        <annotation>
+          <documentation>Keyword into chm file for authoring.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

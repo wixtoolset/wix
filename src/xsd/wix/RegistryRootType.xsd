@@ -1,0 +1,46 @@
+<simpleType name="RegistryRootType">
+    <annotation>
+      <documentation>Values of this type represent possible registry roots.</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="HKMU">
+        <annotation>
+          <documentation>
+                        A per-user installation will make the operation occur under HKEY_CURRENT_USER.
+                        A per-machine installation will make the operation occur under HKEY_LOCAL_MACHINE.
+                    </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="HKCR">
+        <annotation>
+          <documentation>
+                        Operation occurs under HKEY_CLASSES_ROOT. When using Windows 2000 or later, the installer writes or removes the value
+                        from the HKCU\Software\Classes hive during per-user installations. When using Windows 2000 or later operating systems,
+                        the installer writes or removes the value from the HKLM\Software\Classes hive during per-machine installations.
+                    </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="HKCU">
+        <annotation>
+          <documentation>
+                        Operation occurs under HKEY_CURRENT_USER. It is recommended to set the KeyPath attribute to `yes` when setting this value for writing values
+                        in order to ensure that the installer writes the necessary registry entries when there are multiple users on the same computer.
+                    </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="HKLM">
+        <annotation>
+          <documentation>
+                        Operation occurs under HKEY_LOCAL_MACHINE.
+                    </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="HKU">
+        <annotation>
+          <documentation>
+                        Operation occurs under HKEY_USERS.
+                    </documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>

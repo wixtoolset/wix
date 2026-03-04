@@ -1,0 +1,35 @@
+<element name="RadioButton">
+        <annotation>
+            <documentation>Defines an individual radio button within a set of radio buttons.</documentation>
+        </annotation>
+        <complexType mixed="true">
+            <annotation>
+                <documentation>
+                    Text to display beside the radio button.
+                    Mutually exclusive with the StringId attribute and child Text elements.
+                </documentation>
+            </annotation>
+            <choice minOccurs="0" maxOccurs="unbounded">
+                <element ref="Text" />
+                <element ref="Tooltip" maxOccurs="1" />
+            </choice>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attribute name="FontId" type="xs:string">
+                <annotation>
+                    <documentation>Identifier to the Font element that serves as the font for the control.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="StringId" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>
+                        Identifier that references a string resource in the module to define the text for the control.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="Value" type="xs:string">
+                <annotation>
+                    <documentation>Optional value used when setting the variable associated with the set of radio buttons.</documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

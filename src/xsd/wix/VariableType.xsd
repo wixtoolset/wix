@@ -1,0 +1,19 @@
+<simpleType name="VariableType">
+    <annotation>
+      <documentation>Indicates the type of a Variable.</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="string">
+        <annotation>
+          <documentation>A literal string.</documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="formatted">
+        <annotation>
+          <documentation>A string that may contain Variables.</documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="numeric" />
+      <enumeration value="version" />
+    </restriction>
+  </simpleType>

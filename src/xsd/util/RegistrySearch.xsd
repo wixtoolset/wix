@@ -1,0 +1,107 @@
+<element name="RegistrySearch">
+    <annotation>
+      <documentation>Describes a registry search.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attributeGroup ref="SearchCommonAttributes" />
+      <attribute name="Bitness" type="wxs:BitnessTypeUnion">
+        <annotation>
+          <documentation>
+            Overrides the default registry to search. The value `always64` will force
+            the search to look in the 64-bit registry even when building for 32-bit.
+            Simliarly, the value `always32` will force the search to look in the 32-bit
+            registry even when building for 64-bit.
+            The default value is `default` where the search will look in the same registry
+            as the bitness of the package.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Root" use="required">
+        <annotation>
+          <documentation>Registry root hive to search under.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="HKLM">
+              <annotation>
+                <documentation>HKEY_LOCAL_MACHINE</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="HKCU">
+              <annotation>
+                <documentation>HKEY_CURRENT_USER</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="HKCR">
+              <annotation>
+                <documentation>HKEY_CLASSES_ROOT</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="HKU">
+              <annotation>
+                <documentation>HKEY_USERS</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Key" type="xs:string" use="required">
+        <annotation>
+          <documentation>Key to search for.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>Optional value to search for under the given Key.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExpandEnvironmentVariables" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether to expand any environment variables in REG_SZ, REG_EXPAND_SZ, or REG_MULTI_SZ values.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Result">
+        <annotation>
+          <documentation>
+            Rather than saving the matching registry value into the variable, a RegistrySearch can save an attribute of the matching entry instead.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="exists">
+              <annotation>
+                <documentation>Saves true if a matching registry entry is found; false otherwise.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="value">
+              <annotation>
+                <documentation>Saves the value of the registry key in the variable. This is the default.</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

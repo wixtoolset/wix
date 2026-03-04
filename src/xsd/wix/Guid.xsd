@@ -1,0 +1,8 @@
+<simpleType name="Guid">
+    <annotation>
+      <documentation>Values of this type will look like: "01234567-89AB-CDEF-0123-456789ABCDEF" or "{01234567-89AB-CDEF-0123-456789ABCDEF}". Also allows "PUT-GUID-HERE" for use in examples.</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="[{(]?[0-9A-Fa-f]{8}\-?[0-9A-Fa-f]{4}\-?[0-9A-Fa-f]{4}\-?[0-9A-Fa-f]{4}\-?[0-9A-Fa-f]{12}[})]?|PUT\-GUID\-(\d+\-)?HERE|\$\((var\.)?[_A-Za-z]{1}[0-9A-Za-z_\.]*\)|!\((loc|wix)\.[_A-Za-z]{1}[0-9A-Za-z_\.]*\)" />
+    </restriction>
+  </simpleType>

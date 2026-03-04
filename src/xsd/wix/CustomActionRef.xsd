@@ -1,0 +1,26 @@
+<element name="CustomActionRef">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="CustomAction" />
+      </appinfo>
+      <documentation>
+        This will cause the entire contents of the Fragment containing the referenced CustomAction to be
+        included in the installer database.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the CustomAction to reference.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

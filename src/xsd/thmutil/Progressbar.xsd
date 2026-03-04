@@ -1,0 +1,13 @@
+<element name="Progressbar">
+        <annotation>
+            <documentation>
+                Defines a progress bar.
+            </documentation>
+        </annotation>
+        <complexType>
+            <choice minOccurs="0" maxOccurs="unbounded">
+                <element ref="ProgressbarImage" />
+            </choice>
+            <attributeGroup ref="CommonControlAttributes" />
+        </complexType>
+    </element>

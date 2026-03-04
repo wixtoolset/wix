@@ -1,0 +1,12 @@
+<attribute name="Overridable" type="wxs:YesNoTypeUnion">
+    <annotation>
+      <documentation>
+        When set to "yes", lets the user override the variable's default value by specifying another value on the command line,
+        in the form Variable=Value. Otherwise, WixStdBA won't overwrite the default value and will log
+        "Ignoring attempt to set non-overridable variable: 'BAR'."
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Variable" />
+      </appinfo>
+    </annotation>
+  </attribute>

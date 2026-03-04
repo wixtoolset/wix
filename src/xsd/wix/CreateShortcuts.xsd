@@ -1,0 +1,8 @@
+<element name="CreateShortcuts" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="CreateShortcuts" href="http://msdn.microsoft.com/library/aa368054.aspx" />
+      </appinfo>
+      <documentation>Manages the creation of shortcuts. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

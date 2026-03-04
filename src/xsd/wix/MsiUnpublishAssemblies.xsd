@@ -1,0 +1,8 @@
+<element name="MsiUnpublishAssemblies" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="MsiUnpublishAssemblies" href="http://msdn.microsoft.com/library/aa370500.aspx" />
+      </appinfo>
+      <documentation>Manages the unadvertisement of CLR and Win32 assemblies that are being removed. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

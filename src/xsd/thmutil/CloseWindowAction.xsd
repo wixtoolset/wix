@@ -1,0 +1,16 @@
+<element name="CloseWindowAction">
+        <annotation>
+            <documentation>
+                When the button is pressed, the WM_CLOSE message is sent to the window.
+            </documentation>
+        </annotation>
+        <complexType>
+            <attribute name="Condition" type="xs:string">
+                <annotation>
+                    <documentation>
+                        The condition that determines if the parent control will execute this action.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

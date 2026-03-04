@@ -1,0 +1,17 @@
+<element name="Update">
+    <annotation>
+      <documentation>Defines the update for a Bundle.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Location" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The absolute path or URL to check for an update bundle. Currently the engine provides this value
+            in the IBootstrapperApplication::OnDetectUpdateBegin() and otherwise ignores the value. In the
+            future the engine will be able to acquire an update bundle from the location and determine if it
+            is newer than the current executing bundle.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

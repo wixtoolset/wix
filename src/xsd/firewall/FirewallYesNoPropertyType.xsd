@@ -1,0 +1,8 @@
+<simpleType name="FirewallYesNoPropertyType">
+    <annotation>
+      <documentation>
+        Allows "yes" or "true" or "no" or "false" or a Property reference.
+      </documentation>
+    </annotation>
+    <union memberTypes="PropertyReference wxs:YesNoTypeUnion" />
+  </simpleType>

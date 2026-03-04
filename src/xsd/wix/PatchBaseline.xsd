@@ -1,0 +1,30 @@
+<element name="PatchBaseline">
+    <annotation>
+      <documentation>Identifies a set of product versions.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0">
+        <element ref="Validate" minOccurs="0" />
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier for a set of product versions. It is recommended to use short identifiers like 'RTM' and 'SP1'. The identifier will been trimmed to less than 28 characters as required by the Windows Installer.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="BaselineFile" type="xs:string" use="required">
+        <annotation>
+          <documentation>Path to baseline MSI for patch.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UpdateFile" type="xs:string" use="required">
+        <annotation>
+          <documentation>Path to updated MSI for patch.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DiskId" type="Integer">
+        <annotation>
+          <documentation>Optional id for cabinet to place patched files in.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,63 @@
+<element name="MsiPackage">
+    <annotation>
+      <documentation>Describes a single msi package to install.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="MsiProperty" />
+        <element ref="SlipstreamMsp" />
+        <element ref="Payload" />
+        <element ref="PayloadGroupRef" />
+        <element ref="Payloads" />
+        <element ref="MsiPackagePayload" />
+        <element ref="Provides" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema. The extension's
+              <code>CompilerExtension.ParseElement()</code>
+              method will be called with the package identifier as the first value in
+              <code>contextValues</code>.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attributeGroup ref="ChainPackageCommonAttributes" />
+      <attributeGroup ref="ChainPackagePermanentAttribute" />
+      <attribute name="RepairCondition" type="xs:string">
+        <annotation>
+          <documentation>
+            A condition that determines during Repair if the package will be repaired by default.
+            This condition can use built-in variables and variables returned by searches.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="EnableFeatureSelection" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+              Specifies whether the bundle will allow individual control over the installation state of Features inside
+              the msi package. Managing feature selection requires special care to ensure the install, modify, update and
+              uninstall behavior of the package is always correct. The default is "no".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ForcePerMachine" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+              Override the automatic per-machine detection of MSI packages and force the package to be per-machine.
+              The default is "no", which allows the tools to detect the expected value.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Visible" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether the MSI will be displayed in Programs and Features (also known as Add/Remove Programs). If "yes" is
+            specified the MSI package information will be displayed in Programs and Features. The default "no" indicates the MSI
+            will not be displayed.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

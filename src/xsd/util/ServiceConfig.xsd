@@ -1,0 +1,97 @@
+<element name="ServiceConfig">
+    <annotation>
+      <documentation>Service configuration information for failure actions.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="ServiceInstall" />
+        <remarks>
+            Nesting a ServiceConfig element under a ServiceInstall element will result in the service being installed to be configured.
+            Nesting a ServiceConfig element under a component element will result in an already installed service to be configured. If the service does not exist prior to the install of the MSI package, the install will fail.
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="ServiceName" type="xs:string">
+        <annotation>
+          <documentation>Required if not under a ServiceInstall element.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FirstFailureActionType" use="required">
+        <annotation>
+          <documentation>Action to take on the first failure of the service.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="none" />
+            <enumeration value="reboot" />
+            <enumeration value="restart" />
+            <enumeration value="runCommand" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="SecondFailureActionType" use="required">
+        <annotation>
+          <documentation>Action to take on the second failure of the service.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="none" />
+            <enumeration value="reboot" />
+            <enumeration value="restart" />
+            <enumeration value="runCommand" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ThirdFailureActionType" use="required">
+        <annotation>
+          <documentation>Action to take on the third failure of the service.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="none" />
+            <enumeration value="reboot" />
+            <enumeration value="restart" />
+            <enumeration value="runCommand" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ResetPeriodInDays" type="wxs:Integer">
+        <annotation>
+          <documentation>Number of days after which to reset the failure count to zero if there are no failures.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RestartServiceDelayInSeconds" type="wxs:Integer">
+        <annotation>
+          <documentation>If any of the three *ActionType attributes is "restart", this specifies the number of seconds to wait before doing so.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProgramCommandLine" type="xs:string">
+        <annotation>
+          <documentation>If any of the three *ActionType attributes is "runCommand", this specifies the command to run when doing so.  This value is formatted.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RebootMessage" type="xs:string">
+        <annotation>
+          <documentation>If any of the three *ActionType attributes is "reboot", this specifies the message to broadcast to server users before doing so.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

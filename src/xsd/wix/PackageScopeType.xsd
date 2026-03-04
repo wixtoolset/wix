@@ -1,0 +1,42 @@
+<simpleType name="PackageScopeType">
+    <annotation>
+      <documentation>Use this attribute to specify the installation scope of this package: per-machine, per-user, or a choice of either.</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="perMachine">
+        <annotation>
+          <documentation>
+            Set this value to declare that the package is a per-machine installation and requires elevated privileges to install.
+            Sets the ALLUSERS property to 1.
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="perMachineOrUser">
+        <annotation>
+          <documentation>
+            _New in WiX v7: WiX v7 adds this option to the Package Scope attribute._
+            Set this value to declare that the package is [dual-purpose that can install per-machine or per-user](https://learn.microsoft.com/en-us/windows/win32/msi/single-package-authoring)
+            and defaults to installing per-machine.
+            Sets the ALLUSERS property to 2.
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="perUser">
+        <annotation>
+          <documentation>
+            Set this value to declare that the package is a per-user installation and does not require elevated privileges to install.
+            Sets the package's InstallPrivileges attribute to "limited."
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="perUserOrMachine">
+        <annotation>
+          <documentation>
+            Set this value to declare that the package is [dual-purpose that can install per-user or per-machine](https://learn.microsoft.com/en-us/windows/win32/msi/single-package-authoring)
+            and defaults to installing per-user.
+            Sets the ALLUSERS property to 2 and MSIINSTALLPERUSER property to 1.
+          </documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>

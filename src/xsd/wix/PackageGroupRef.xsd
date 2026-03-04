@@ -1,0 +1,20 @@
+<element name="PackageGroupRef">
+    <annotation>
+      <documentation>Create a reference to PackageGroup element that exists inside a Bundle or Fragment element.</documentation>
+      <appinfo>
+        <seeAlso ref="PackageGroup" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the PackageGroup element to reference.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="After" type="xs:string">
+        <annotation>
+          <documentation>The identifier of a package that this group should be installed after.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

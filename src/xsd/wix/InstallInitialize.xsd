@@ -1,0 +1,9 @@
+<element name="InstallInitialize" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="InstallFinalize" />
+        <msiRef action="InstallInitialize" href="http://msdn.microsoft.com/library/aa369535.aspx" />
+      </appinfo>
+      <documentation>Marks the beginning of a sequence of actions that change the system. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

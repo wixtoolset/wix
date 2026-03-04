@@ -1,0 +1,40 @@
+<element name="ODBCDriver">
+    <annotation>
+      <documentation>
+                ODBCDriver for a Component
+            </documentation>
+      <appinfo>
+        <msiRef table="ODBCDriver" href="http://msdn.microsoft.com/library/aa370547.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Property">
+          <annotation>
+            <documentation>Translates into ODBCSourceAttributes</documentation>
+          </annotation>
+        </element>
+        <element ref="ODBCDataSource" />
+      </choice>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the driver.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" use="required" type="xs:string">
+        <annotation>
+          <documentation>Name for the driver.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="File" type="xs:string">
+        <annotation>
+          <documentation>Required if not found as child of File element</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SetupFile" type="xs:string">
+        <annotation>
+          <documentation>Required if not found as child of File element or different from File attribute above</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

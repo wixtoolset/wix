@@ -1,0 +1,9 @@
+<simpleType name="FirewallIPSecSecureFlags">
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="none" />
+      <enumeration value="encrypt" />
+      <enumeration value="negotiateEncryption" />
+      <enumeration value="noEncapsulation" />
+      <enumeration value="withIntegrity" />
+    </restriction>
+  </simpleType>

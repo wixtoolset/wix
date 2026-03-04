@@ -1,0 +1,10 @@
+<element name="CostInitialize" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="FileCost" />
+        <seeAlso ref="CostFinalize" />
+        <msiRef action="CostInitialize" href="http://msdn.microsoft.com/library/aa368048.aspx" />
+      </appinfo>
+      <documentation>Initiates the internal installation costing process. Any standard or custom actions that affect costing should be sequenced before the CostInitialize action. Call the FileCost action immediately following the CostInitialize action. Then call the CostFinalize action following the CostInitialize action to make all final cost calculations available to the installer through the Component table. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

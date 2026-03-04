@@ -1,0 +1,153 @@
+<element name="EmbeddedUI">
+    <annotation>
+      <appinfo>
+        <msiRef table="MsiEmbeddedUI" href="https://learn.microsoft.com/en-us/windows/win32/msi/msiembeddedui-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="EmbeddedUIResource">
+          <annotation>
+            <documentation>Specifies extra files to be extracted for use by the embedded UI, such as language resources.</documentation>
+          </annotation>
+        </element>
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Unique identifier for embedded UI. If this attribute is not specified the Name attribute or the file name
+            portion of the SourceFile attribute will be used.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreFatalExit" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_FATALEXIT messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreError" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_ERROR messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreWarning" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_WARNING messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreUser" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_USER messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreInfo" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_INFO messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreFilesInUse" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_FILESINUSE messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreResolveSource" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_RESOLVESOURCE messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreOutOfDiskSpace" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_OUTOFDISKSPACE messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreActionStart" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_ACTIONSTART messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreActionData" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_ACTIONDATA messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreProgress" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_PROGRESS messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreCommonData" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_COMMONDATA messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreInitialize" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_INITIALIZE messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreTerminate" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_TERMINATE messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreShowDialog" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_SHOWDIALOG messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreRMFilesInUse" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_RMFILESINUSE messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreInstallStart" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_INSTALLSTART messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreInstallEnd" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Embedded UI will not recieve any INSTALLLOGMODE_INSTALLEND messages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="LongFileNameType">
+        <annotation>
+          <documentation>
+            The name for the embedded UI DLL when it is extracted from the MSI package and executed. (Windows Installer
+            does not support the typical short filename and long filename combination for embedded UI files as it
+            does for other kinds of files.) If this attribute is not specified the file name portion of the SourceFile
+            attribute will be used.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Path to the binary file that is the embedded UI. This must be a DLL that exports the following
+            three entry points: InitializeEmbeddedUI, EmbeddedUIHandler and ShutdownEmbeddedUI.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SupportBasicUI" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set yes to allow the Windows Installer to display the embedded UI during basic UI level installation.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

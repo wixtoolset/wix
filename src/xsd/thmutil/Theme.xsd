@@ -1,0 +1,33 @@
+<element name="Theme">
+        <annotation>
+            <documentation>
+                This is the top-level container element for every thmutil Theme file.
+            </documentation>
+        </annotation>
+        <complexType>
+            <sequence>
+                <element ref="Font" maxOccurs="unbounded" />
+                <element ref="Image" minOccurs="0" maxOccurs="unbounded" />
+                <element ref="ImageList" minOccurs="0" maxOccurs="unbounded" />
+                <element ref="Window" minOccurs="1" maxOccurs="1" />
+            </sequence>
+            <attribute name="ImageFile" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Relative path to an image file that can serve as a single source for images in the rest of the theme.
+                        This image is referenced by controls using the SourceX and SourceY attributes.
+                        Mutually exclusive with the ImageResource attribute.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageResource" type="xs:string">
+                <annotation>
+                    <documentation>
+                        Identifier that references an image resource in the module for the window.
+                        This image is referenced by controls using the SourceX and SourceY attributes.
+                        Mutually exclusive with the ImageFile attribute.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

@@ -1,0 +1,17 @@
+<element name="ImageListItem">
+        <annotation>
+            <documentation>Defines an image for an ImageList.</documentation>
+        </annotation>
+        <complexType>
+            <attribute name="ImageFile" type="xs:string">
+                <annotation>
+                    <documentation>Relative path to an image file. Mutually exclusive with ImageResource.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="ImageResource" type="xs:nonNegativeInteger">
+                <annotation>
+                    <documentation>Identifier that references an image resource in the module. Mutually exclusive with ImageFile.</documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

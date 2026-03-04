@@ -1,0 +1,12 @@
+<element name="Include">
+    <annotation>
+      <documentation>
+        This is the top-level container element for every wxi file.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##any" processContents="lax" />
+      </choice>
+    </complexType>
+  </element>

@@ -1,0 +1,44 @@
+<element name="FeatureGroup">
+    <annotation>
+      <documentation>
+        Groups together multiple components, features, and merges to be used in other locations.
+      </documentation>
+      <appinfo>
+        <seeAlso ref="FeatureGroupRef" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Component" />
+        <element ref="ComponentGroupRef" />
+        <element ref="ComponentRef" />
+        <element ref="Feature" />
+        <element ref="FeatureGroupRef" />
+        <element ref="FeatureRef" />
+        <element ref="File" />
+        <element ref="Files" />
+        <element ref="MergeRef" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier for the FeatureGroup.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

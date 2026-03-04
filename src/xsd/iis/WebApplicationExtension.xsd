@@ -1,0 +1,46 @@
+<element name="WebApplicationExtension">
+    <annotation>
+      <documentation>Extension for WebApplication</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Executable" type="xs:string" use="required">
+        <annotation>
+          <documentation>Usually a Property that resolves to short file name path.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Extension" type="xs:string">
+        <annotation>
+          <documentation>
+            Extension being registered. Do not prefix with a '.' (e.g. you should use "html", not ".html").
+            To register for all extensions, use Extension="*". To register a wildcard application map (which
+            handles all requests, even those for directories or files with no extension) omit the Extension
+            attribute completely.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Verbs" type="xs:string">
+      </attribute>
+      <attribute name="Script" type="wxs:YesNoTypeUnion">
+      </attribute>
+      <attribute name="CheckPath" type="wxs:YesNoTypeUnion">
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

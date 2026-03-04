@@ -1,0 +1,55 @@
+<element name="Exclude">
+    <annotation>
+      <documentation>
+        Using wildcards, defines the files from a parent `Files` or `Payloads` element that should be excluded from harvesting.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Files" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Excludes files from the set of files harvested via the parent `Files` or `Payloads` element.
+            Inclusion and exclusion wildcards must match paths. For example, if you have a
+            `Files` element with `Include="!(bindpath.ToBeHarvested)\**"` and want to
+            exclude one of the files, use an `Exclude` element with a `Files` attribute
+            like `!(bindpath.ToBeHarvested)\notatest.txt` to match the inclusion path.
+            You can also use the `**` wildcard to match directories, such as
+            `Files="**\pleasedontincludeme.dat"`.
+
+            The file-selection pattern can include directory names, file names, and wildcards.
+            If a pattern is not an absolute path (via a preprocessor variable, unnamed bind path,
+            or named bind path), it is interpreted as relative to the directory containing the
+            source file. Absolute paths via a named bind path are recommended.
+
+            Wildcards include typical `*.ext` globs and MSBuild-style `**` globs to indicate
+            that directories should be recursed. Examples include:
+
+            | Pattern | Description |
+            | ------- | ----------- |
+            | `!(bindpath.ToBeHarvested)\**` | All files in the parent directory identified by the `ToBeHarvested` bind path and its subdirectories. |
+            | `$(PayloadFiles)\bin\Release\**` | All files in the `bin\Release` subdirectory in the directory named by the `PayloadFiles` preprocessor variable and its subdirectories. |
+            | `!(bindpath.arm64)\**.pdb` | All files with `.pdb` extension in the parent directory identified by the `arm64` bind path and its subdirectories. |
+            | `**` | If an unnamed bind path was specified, all files in that directory and its subdirectories. If an unnamed bind path was _not_ specified, all files in directory of the source .wxs file and its subdirectories. |
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

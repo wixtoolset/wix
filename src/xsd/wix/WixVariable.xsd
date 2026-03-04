@@ -1,0 +1,45 @@
+<element name="WixVariable">
+    <annotation>
+      <documentation>
+        This element exposes advanced WiX functionality. Use this element to declare WiX variables
+        from directly within your authoring. WiX variables are not resolved until the final package
+        file is actually generated (bind time). WiX variables do not persist into the package file,
+        so they cannot be used when an MSI file is being installed; it's a WiX-only concept.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The name of the variable.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Overridable" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Set this value to 'yes' in order to make the variable's value overridable either by
+            another WixVariable entry or via the command-line option -d_name_=_value_;
+            for light.exe. If the same variable is declared overridable in multiple places it
+            will cause an error (since WiX won't know which value is correct). The default value
+            is 'no'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The value of the variable. Note that because values are substituted at bind time,
+            they skip all the validation done at compile time, which can be more thorough than
+            validation done at bind time.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

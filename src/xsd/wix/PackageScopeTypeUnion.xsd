@@ -1,0 +1,6 @@
+<simpleType name="PackageScopeTypeUnion">
+    <annotation>
+      <documentation>Use this attribute to specify the installation scope of this package: per-machine, per-user, or a choice of either.</documentation>
+    </annotation>
+    <union memberTypes="PackageScopeType PreprocessorVariables" />
+  </simpleType>

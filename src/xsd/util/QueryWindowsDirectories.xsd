@@ -1,0 +1,13 @@
+<element name="QueryWindowsDirectories">
+    <annotation>
+      <documentation>
+        Schedules the QueryOsDirs custom action for the current platform. For more information, see [QueryWindowsDirectories properties](../../../tools/wixext/wininfo#querywindowsdirectories).
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </appinfo>
+    </annotation>
+  </element>

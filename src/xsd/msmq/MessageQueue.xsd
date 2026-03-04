@@ -1,0 +1,69 @@
+<element name="MessageQueue">
+    <annotation>
+      <documentation>Installs an MSMQ message queue.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="MessageQueuePermission" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the message queue. If the Id is not specified, one will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Authenticate" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>The default value is "no".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="BasePriority" type="wxs:Integer">
+        <annotation>
+          <documentation>The base priority of the queue.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Journal" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>The default value is "no".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="JournalQuota" type="wxs:Integer" />
+      <attribute name="Label" use="required" type="xs:string" />
+      <attribute name="MulticastAddress" type="xs:string" />
+      <attribute name="PathName" use="required" type="xs:string" />
+      <attribute name="PrivLevel">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="none" />
+            <enumeration value="optional" />
+            <enumeration value="body" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Quota" type="wxs:Integer" />
+      <attribute name="Transactional" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>The default value is "no".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceTypeGuid" type="xs:string" />
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

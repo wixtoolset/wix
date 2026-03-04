@@ -1,0 +1,12 @@
+<element name="ProgressbarImage">
+        <annotation>
+            <documentation>
+                Defines a progress bar image.
+                The image must be 4 pixels wide: left pixel is the left side of progress bar, left middle pixel is progress used, right middle pixel is progress unused, right pixel is right side of progress bar.
+                If multiple ProgressbarImages are given, each is assigned an index in document order and can be selected programmatically with ThemeSetProgressControlColor.
+            </documentation>
+        </annotation>
+        <complexType>
+            <attributeGroup ref="OwnerDrawImageAttributes" />
+        </complexType>
+    </element>

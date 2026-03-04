@@ -1,0 +1,37 @@
+<element name="MsuPackage">
+    <annotation>
+      <documentation>Describes a single msu package to install.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Payload" />
+        <element ref="PayloadGroupRef" />
+        <element ref="Payloads" />
+        <element ref="MsuPackagePayload" />
+        <element ref="Provides" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+                Extensibility point in the WiX XML Schema. Schema extensions can register additional
+                elements at this point in the schema. The extension's
+                <code>CompilerExtension.ParseElement()</code>
+                method will be called with the package identifier as the first value in
+                <code>contextValues</code>.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attributeGroup ref="ChainPackageCommonAttributes" />
+      <attribute name="DetectCondition" type="xs:string">
+        <annotation>
+          <documentation>
+            A condition that determines if the package is present on the target system. This condition can use built-in
+            variables and variables returned by searches. This condition is necessary because Windows doesn't provide a
+            method to detect the presence of an MsuPackage. Burn uses this condition to determine how to treat this
+            package during a bundle action; for example, if this condition is false or omitted and the bundle is being
+            installed, Burn will install this package.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

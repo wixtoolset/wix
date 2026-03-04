@@ -1,0 +1,126 @@
+<element name="Dialog">
+    <annotation>
+      <appinfo>
+        <msiRef table="Control" href="https://docs.microsoft.com/en-us/windows/win32/msi/control-table" />
+        <msiRef table="ComboBox" href="https://docs.microsoft.com/en-us/windows/win32/msi/combobox-table" />
+        <msiRef table="Dialog" href="https://docs.microsoft.com/en-us/windows/win32/msi/dialog-table" />
+        <msiRef table="ListBox" href="https://docs.microsoft.com/en-us/windows/win32/msi/listbox-table" />
+        <msiRef table="ListView" href="https://docs.microsoft.com/en-us/windows/win32/msi/listview-table" />
+        <msiRef table="RadioButton" href="https://docs.microsoft.com/en-us/windows/win32/msi/radiobutton-table" />
+      </appinfo>
+      <documentation>
+        Defines a dialog box in the Dialog Table.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Control">
+          <annotation>
+            <documentation>Control elements belonging to this dialog.</documentation>
+          </annotation>
+        </element>
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Unique identifier for the dialog.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="X" type="Integer">
+        <annotation>
+          <documentation>Horizontal placement of the dialog box as a percentage of screen width. The default value is 50.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Y" type="Integer">
+        <annotation>
+          <documentation>Vertical placement of the dialog box as a percentage of screen height. The default value is 50.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Width" use="required" type="Integer">
+        <annotation>
+          <documentation>The width of the dialog box in dialog units.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Height" use="required" type="Integer">
+        <annotation>
+          <documentation>The height of the dialog box in dialog units.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Title" type="xs:string">
+        <annotation>
+          <documentation>The title of the dialog box.</documentation>
+        </annotation>
+      </attribute>
+
+      <attribute name="Hidden" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Used to hide the dialog.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Modeless" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Used to set the dialog as modeless.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="NoMinimize" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Used to specify if the dialog can be minimized.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SystemModal" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Used to set the dialog as system modal.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="KeepModeless" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Keep modeless dialogs alive when this dialog is created through DoAction.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="TrackDiskSpace" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Have the dialog periodically call the installer to check if available disk space has changed.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CustomPalette" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Used to specify if pictures in the dialog box are rendered with a custom palette.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RightToLeft" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Used to specify if the text in the dialog should be displayed in right to left reading order.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RightAligned" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Align text on the right.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LeftScroll" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Used to align the scroll bar on the left.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ErrorDialog" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies this dialog as an error dialog.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

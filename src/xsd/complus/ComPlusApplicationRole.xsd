@@ -1,0 +1,43 @@
+<element name="ComPlusApplicationRole">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+      </appinfo>
+      <documentation>
+        Defines an application role. If this element is a descendent
+        of a Component element, the application role will be created in association
+        with this component. If the element is a child of any of the Fragment, Module,
+        or Package elements it is considered to be a locater, referencing an existing
+        application role.
+      </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <choice minOccurs="0" maxOccurs="unbounded">
+          <element ref="ComPlusUserInApplicationRole" />
+          <element ref="ComPlusGroupInApplicationRole" />
+        </choice>
+      </sequence>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Application" use="optional" type="xs:string">
+        <annotation><documentation>
+          If the element is not a child of a ComPlusApplication
+          element, this attribute should be provided with the id of a
+          ComPlusApplication element representing the application the role belongs to.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Name" use="required" type="xs:string">
+        <annotation><documentation>
+          Name of the application role.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Description" use="optional" type="xs:string" />
+    </complexType>
+  </element>

@@ -1,0 +1,44 @@
+<element name="Extension">
+    <annotation>
+      <documentation>
+                Extension for a Component
+            </documentation>
+      <appinfo>
+        <msiRef table="MIME" href="http://msdn.microsoft.com/library/aa370035.aspx" />
+        <msiRef table="Verb" href="https://learn.microsoft.com/en-us/windows/win32/msi/verb-table" />
+        <msiRef table="Registry" href="https://learn.microsoft.com/en-us/windows/win32/msi/registry-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <annotation>
+          <documentation>MIME and Verbs can be associated with Extensions</documentation>
+        </annotation>
+        <element ref="MIME" />
+        <element ref="Verb" />
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>This is simply the file extension, like "doc" or "xml". Do not include the preceding period.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ContentType" type="xs:string">
+        <annotation>
+          <documentation>The MIME type that is to be written.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Advertise" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether this extension is to be advertised. The default is "no".</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+                    Extensibility point in the WiX XML Schema. Schema extensions can register additional
+                    attributes at this point in the schema.
+                </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

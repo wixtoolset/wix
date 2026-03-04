@@ -1,0 +1,54 @@
+<element name="Chain">
+    <annotation>
+      <documentation>Contains the chain of packages to install.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="MsiPackage" />
+        <element ref="MspPackage" />
+        <element ref="MsuPackage" />
+        <element ref="ExePackage" />
+        <element ref="BundlePackage" />
+        <element ref="RollbackBoundary" />
+        <element ref="PackageGroupRef" />
+      </choice>
+      <attribute name="DisableRollback" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether the bundle will attempt to roll back packages
+            executed in the chain. If "yes" is specified then when a vital
+            package fails to install only that package will roll back and the
+            chain will stop with the error. The default is "no" which
+            indicates all packages executed during the chain will be
+            rolledback to their previous state when a vital package fails.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DisableSystemRestore" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether the bundle will attempt to create a system
+            restore point when executing the chain. If "yes" is specified then
+            a system restore point will not be created. The default is "no" which
+            indicates a system restore point will be created when the bundle is
+            installed, uninstalled, repaired, modified, etc. If the system restore
+            point cannot be created, the bundle will log the issue and continue.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ParallelCache" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether the bundle will start installing packages
+            while other packages are still being cached. If "yes",
+            packages will start executing when a rollback boundary is
+            encountered. The default is "no" which dictates all packages
+            must be cached before any packages will start to be installed.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

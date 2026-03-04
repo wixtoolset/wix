@@ -1,0 +1,11 @@
+<attributeGroup name="LocalPackagePayloadCommonAttributes">
+    <attribute name="SourceFile" type="xs:string">
+      <annotation>
+        <documentation>
+          Location of the package to add to the bundle.
+          The default value is the Name attribute, if provided.
+          At a minimum, the SourceFile or Name attribute must be specified.
+        </documentation>
+      </annotation>
+    </attribute>
+  </attributeGroup>

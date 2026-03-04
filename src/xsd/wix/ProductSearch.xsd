@@ -1,0 +1,52 @@
+<element name="ProductSearch">
+    <annotation>
+      <appinfo>
+        <msiRef table="Upgrade" href="https://learn.microsoft.com/en-us/windows/win32/msi/upgrade-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Minimum" type="xs:string">
+        <annotation>
+          <documentation>Specifies the lower bound on the range of product versions to be detected by FindRelatedProducts.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Maximum" type="xs:string">
+        <annotation>
+          <documentation>Specifies the upper boundary of the range of product versions detected by FindRelatedProducts.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Language" type="xs:string">
+        <annotation>
+          <documentation>Specifies the set of languages detected by FindRelatedProducts. Enter a list of numeric language identifiers (LANGID) separated by commas (,). Leave this value null to specify all languages. Set ExcludeLanguages to "yes" in order detect all languages, excluding the languages listed in this value.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IncludeMinimum" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set to "no" to make the range of versions detected exclude the value specified in Minimum. This attribute is "yes" by default.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IncludeMaximum" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set to "yes" to make the range of versions detected include the value specified in Maximum.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExcludeLanguages" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Set to "yes" to detect all languages, excluding the languages listed in the Language attribute.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UpgradeCode" type="Guid" use="required">
+        <annotation>
+          <documentation>This value specifies the upgrade code for the products that are to be detected by the FindRelatedProducts action.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

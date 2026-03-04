@@ -1,0 +1,8 @@
+<element name="DuplicateFiles" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="DuplicateFiles" href="http://msdn.microsoft.com/library/aa368334.aspx" />
+      </appinfo>
+      <documentation>Duplicates files installed by the InstallFiles action. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

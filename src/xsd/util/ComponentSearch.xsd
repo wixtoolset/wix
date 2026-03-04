@@ -1,0 +1,66 @@
+<element name="ComponentSearch">
+    <annotation>
+      <documentation>Describes a component search.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attributeGroup ref="SearchCommonAttributes" />
+      <attribute name="Guid" type="xs:string" use="required">
+        <annotation>
+          <documentation>Component to search for.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProductCode" type="xs:string">
+        <annotation>
+          <documentation>Optional ProductCode to determine if the component is installed.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Result">
+        <annotation>
+          <documentation>
+            Rather than saving the matching key path into the variable, a ComponentSearch can save an attribute of the component instead.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="directory">
+              <annotation>
+                <documentation>Saves the parent directory for the component's file key path; other types of key path are returned unmodified.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="keyPath">
+              <annotation>
+                <documentation>Saves the key path of the component if installed. This is the default.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="state">
+              <annotation>
+                <documentation>Saves the state of the component: absent (2), locally installed (3), will run from source (4), or installed in default location (either local or from source) (5)</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

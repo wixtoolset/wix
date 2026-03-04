@@ -1,0 +1,6 @@
+<simpleType name="YesNoButtonTypeUnion">
+    <annotation>
+      <documentation>Values of this type will either be "button", "yes"/"true", or "no"/"false".</documentation>
+    </annotation>
+    <union memberTypes="YesNoButtonType PreprocessorVariables" />
+  </simpleType>

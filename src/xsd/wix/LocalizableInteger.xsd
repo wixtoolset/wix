@@ -1,0 +1,8 @@
+<simpleType name="LocalizableInteger">
+    <annotation>
+      <documentation>Values of this type must be a non-negative integer or a localization variable with the format `!(loc.Variable)` where `Variable` is the name of the localization variable.</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="[\d]+|\$\((var\.)?[_A-Za-z]{1}[_A-Za-z0-9\.]*\)|!\((loc|bind)\.[_A-Za-z]{1}[_A-Za-z0-9\.]*\)" />
+    </restriction>
+  </simpleType>

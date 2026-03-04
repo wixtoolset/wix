@@ -1,0 +1,54 @@
+<element name="Font">
+        <annotation>
+            <documentation>Defines a font including the size and color.</documentation>
+        </annotation>
+        <complexType>
+            <simpleContent>
+                <extension base="xs:string">
+                    <annotation>
+                        <documentation>Name of the font face (required).</documentation>
+                    </annotation>
+                    <attribute name="Id" type="xs:string" use="required">
+                        <annotation>
+                            <documentation>Identifier for the font.</documentation>
+                        </annotation>
+                    </attribute>
+                    <attribute name="Height" type="xs:int" use="required">
+                        <annotation>
+                            <documentation>Font size. Use negative numbers to specify the font in pixels.</documentation>
+                        </annotation>
+                    </attribute>
+                    <attribute name="Weight" type="xs:nonNegativeInteger">
+                        <annotation>
+                            <documentation>Font weight.</documentation>
+                        </annotation>
+                    </attribute>
+                    <attribute name="Foreground" type="FontColorType">
+                        <annotation>
+                            <documentation>
+                                A system color id or a hexadecimal value representing BGR foreground color of the font.
+                                "ffffff" is white, "ff0000" is pure blue, "00ff00" is pure green, "0000ff" is pure red, and "000000" is black.
+                                If this attribute is absent the foreground will be transparent.
+                                Supported system color ids are: btnface, btntext, graytext, highlight, highlighttext, hotlight, window, and windowtext.
+                            </documentation>
+                        </annotation>
+                    </attribute>
+                    <attribute name="Background" type="FontColorType">
+                        <annotation>
+                            <documentation>
+                                A system color id or a hexadecimal value representing BGR background color of the font.
+                                "ffffff" is white, "ff0000" is pure blue, "00ff00" is pure green, "0000ff" is pure red, and "000000" is black.
+                                If this attribute is absent the background will be transparent.
+                                Supported system color ids are: btnface, btntext, graytext, highlight, highlighttext, hotlight, window, and windowtext.
+                            </documentation>
+                        </annotation>
+                    </attribute>
+                    <attribute name="Underline" type="YesNoType">
+                        <annotation>
+                            <documentation>Specifies whether the font is underlined.</documentation>
+                        </annotation>
+                    </attribute>
+                </extension>
+            </simpleContent>
+        </complexType>
+    </element>

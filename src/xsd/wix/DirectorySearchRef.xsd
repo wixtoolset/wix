@@ -1,0 +1,37 @@
+<element name="DirectorySearchRef">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="ComponentSearch" />
+        <seeAlso ref="IniFileSearch" />
+        <seeAlso ref="RegistrySearch" />
+        <howtoRef href="files_and_registry/directorysearchref.html">How To: Reference another DirectorySearch element</howtoRef>
+        <remarks>
+          <p>A reference to another DirectorySearch element must reference the same Id, the same Parent Id, and the same Path. If any of these attribute values are different you must instead use a DirectorySearch element.</p>
+        </remarks>
+      </appinfo>
+      <documentation>References an existing DirectorySearch element.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0">
+        <element ref="DirectorySearch" />
+        <element ref="DirectorySearchRef" />
+        <element ref="FileSearch" />
+        <element ref="FileSearchRef" />
+      </choice>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>Id of the search being referred to.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Parent" type="xs:string">
+        <annotation>
+          <documentation>This attribute is the signature of the parent directory of the file or directory in the Signature_ column. If this field is null, and the Path column does not expand to a full path, then all the fixed drives of the user's system are searched by using the Path. This field is a key into one of the following tables: the RegLocator, the IniLocator, the CompLocator, or the DrLocator tables.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Path" type="xs:string">
+        <annotation>
+          <documentation>Path on the user's system. Either absolute, or relative to containing directories.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

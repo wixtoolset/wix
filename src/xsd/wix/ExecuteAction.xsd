@@ -1,0 +1,8 @@
+<element name="ExecuteAction" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="ExecuteAction" href="http://msdn.microsoft.com/library/aa368565.aspx" />
+      </appinfo>
+      <documentation>Initiates the execution sequence. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

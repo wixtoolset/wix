@@ -1,0 +1,46 @@
+<element name="Merge">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="MergeRef" />
+        <howtoRef href="redistributables_and_install_checks/install_vcredist.html">How To: Install the Visual C++ Redistributable with your installer</howtoRef>
+      </appinfo>
+      <documentation>Merge directive to bring in a merge module that will be redirected to the parent directory.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="ConfigurationData">
+          <annotation>
+            <documentation>Data to use as input to a configurable merge module.</documentation>
+          </annotation>
+        </element>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The unique identifier for the Merge element in the source code. Referenced by the MergeRef/@Id.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DiskId" type="DiskIdType">
+        <annotation>
+          <documentation>The value of this attribute should correspond to the Id attribute of a
+                    Media element authored elsewhere. By creating this connection between the merge module and Media
+                    element, you set the packaging options to the values specified in the Media
+                    element (values such as compression level, cab embedding, etc...).</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FileCompression" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies if the files in the merge module should be compressed.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Language" type="LocalizableInteger" use="required">
+        <annotation>
+          <documentation>Specifies the decimal LCID or localization token for the language to merge the Module in as.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string">
+        <annotation>
+          <documentation>Path to the source location of the merge module.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

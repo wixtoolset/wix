@@ -1,0 +1,12 @@
+<simpleType name="ExitType">
+    <annotation>
+      <documentation>Value indicates that this action is executed if the installer returns the associated exit type. Each exit type can be used with no more than one action.
+                        Multiple actions can have exit types assigned, but every action and exit type must be different. Exit types are typically used with dialog boxes.</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="success" />
+      <enumeration value="cancel" />
+      <enumeration value="error" />
+      <enumeration value="suspend" />
+    </restriction>
+  </simpleType>

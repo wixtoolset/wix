@@ -1,0 +1,15 @@
+<simpleType name="EmbeddedResource">
+    <annotation>
+      <documentation>
+        <p>
+          Values should be in the format *ResourceName,StringName*, where *ResourceName*
+          is the name of the embedded resource in your assembly sans the ".resources" extension, and *StringName*
+          is the name of the string resource in the embedded resource.
+        </p>
+        <p>
+          Example: UtilityMshSnapInResources,Description
+        </p>
+      </documentation>
+    </annotation>
+    <restriction base="xs:string" />
+  </simpleType>

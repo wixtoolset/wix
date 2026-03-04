@@ -1,0 +1,96 @@
+<element name="SnapIn">
+    <annotation>
+      <documentation>
+        Identifies the parent File as a PowerShell snap-in to be registered on the system.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="File" />
+        <remarks>
+          [PowerShell](http://www.microsoft.com/powershell) snap-ins allow developers to
+          extend the functionality of of the PowerShell engine. Add this element to identify
+          the parent File as a PowerShell snap-in that will get registered on the system.
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="FormatsFile" />
+        <element ref="TypesFile" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The identifier for this PowerShell snap-in.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CustomSnapInType" type="xs:string">
+        <annotation>
+          <documentation>
+            The full type name of a class that is used to register a list of cmdlets and providers.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>
+            A brief description of the snap-in.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DescriptionIndirect" type="EmbeddedResource">
+        <annotation>
+          <documentation>
+            An embedded resource that contains a brief description of the snap-in.
+            This resource must be embedded in the current snap-in assembly.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RequiredPowerShellVersion" type="wxs:VersionType">
+        <annotation>
+          <documentation>
+            The required version of PowerShell that must be installed and is associated with the
+            snap-in registration. The default value is "1.0".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Vendor" type="xs:string">
+        <annotation>
+          <documentation>
+            The name of the snap-in vendor.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="VendorIndirect" type="EmbeddedResource">
+        <annotation>
+          <documentation>
+            An embedded resource that contains the name of the snap-in vendor.
+            This resource must be embedded in the current snap-in assembly.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Version" type="wxs:VersionType">
+        <annotation>
+          <documentation>
+            The version of the snapin. If not specified, this is taken from the assembly name.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              attributes at this point in the schema.
+            </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

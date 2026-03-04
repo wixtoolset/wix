@@ -1,0 +1,9 @@
+<element name="ImageControl">
+        <annotation>
+            <documentation>Defines an image control.</documentation>
+        </annotation>
+        <complexType>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attributeGroup ref="OwnerDrawImageAttributes" />
+        </complexType>
+    </element>

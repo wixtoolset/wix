@@ -1,0 +1,68 @@
+<element name="SqlLogFileSpec">
+    <annotation>
+      <documentation>File specification for a Sql database.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Unique identifier in your installation package for this log file specification. If an Id is not provided, one will generated for you.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>Specifies the logical name for the log file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Filename" type="xs:string">
+        <annotation>
+          <documentation>Specifies the operating-system file name for the log file.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Size" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the size of the log file. The GB, MB and KB suffixes can be used to specify gigabytes, 
+            megabytes or kilobytes. The default is megabytes if no suffix is specified. When a Size is not 
+            supplied for a log file, SQL Server makes the file 1 MB.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MaxSize" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the maximum size to which the log file can grow. The GB, MB and KB suffixes can be used to 
+            to specify gigabytes, megabytes or kilobytes. The default is megabytes if no suffix is specified. If 
+            MaxSize is not specified, the file will grow until the disk is full.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="GrowthSize" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the growth increment of the log file. The GB, MB and KB and % suffixes can be used to 
+            specify gigabytes, megabytes, kilobytes or a percentage of the current file size to grow. The default is 
+            megabytes if no suffix is specified. The default value is 10% if GrowthSize is not specified, and the 
+            minimum value is 64 KB. The GrowthSize setting for a file cannot exceed the MaxSize setting.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema.  Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

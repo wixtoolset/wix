@@ -1,0 +1,82 @@
+<element name="ServiceConfigFailureActions">
+    <annotation>
+      <documentation>
+                Configures the failure actions for a service being installed or one that already exists. This element's functionality is available starting with MSI 5.0.
+            </documentation>
+      <appinfo>
+        <msiRef table="MsiServiceConfigFailureActions" href="https://learn.microsoft.com/en-us/windows/win32/msi/msiserviceconfigfailureactions-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Failure">
+          <annotation>
+            <documentation>Ordered list of failure actions to apply to service.</documentation>
+          </annotation>
+        </element>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Unique identifier for this service configuration. This value will default to the ServiceName attribute if not
+            specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Command" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies command to execute when a "runCommand" failure action hit. If an empty string is provided it clears
+            the existing command. If this attribute is not present the setting is not changed.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnInstall" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether to configure the service when the parent Component is installed. This attribute may be combined with OnReinstall
+            and OnUninstall.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnReinstall" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether to configure the service when the parent Component is reinstalled. This attribute may be combined with OnInstall
+            and OnUninstall.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnUninstall" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether to configure the service when the parent Component is uninstalled. This attribute may be combined with OnInstall
+            and OnReinstall.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RebootMessage" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the message to show for a reboot failure action. If an empty string is provided it clears any existing reboot message. If this
+            attribute is not present the setting is not changed.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ResetPeriod" type="Integer">
+        <annotation>
+          <documentation>
+            Specifies the time in seconds to reset the failure count. If this attribute is not present the failure count will not be reset.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceName" type="xs:string">
+        <annotation>
+          <documentation>
+            Specifies the name of the service to configure. This value will default to the ServiceInstall/@Name attribute when nested under
+            a ServiceInstall element.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

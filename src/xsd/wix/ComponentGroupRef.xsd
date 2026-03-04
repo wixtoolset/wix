@@ -1,0 +1,40 @@
+<element name="ComponentGroupRef">
+    <annotation>
+      <documentation>
+        Create a reference to a ComponentGroup in another Fragment.
+        _New in WiX v5: Can be a child of the `Package` element._
+      </documentation>
+      <appinfo>
+        <seeAlso ref="ComponentGroup" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the ComponentGroup to reference.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Primary" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Set this attribute to 'yes' in order to make the parent feature of this component
+            the primary feature for this component. Components may belong to multiple features.
+            By designating a feature as the primary feature of a component, you ensure that
+            whenever a component is selected for install-on-demand (IOD), the primary feature
+            will be the one to install it. This attribute should only be set if a component
+            actually nests under multiple features. If a component nests under only one feature,
+            that feature is the primary feature for the component. You cannot set more than one
+            feature as the primary feature of a given component.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

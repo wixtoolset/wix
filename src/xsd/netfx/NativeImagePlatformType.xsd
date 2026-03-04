@@ -1,0 +1,33 @@
+<simpleType name="NativeImagePlatformType">
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="32bit">
+        <annotation>
+          <documentation>
+            Attempt to generate native images only for the 32-bit version of the .NET Framework
+            on the target machine. If the 32-bit version of the .NET Framework 2.0 or newer is not
+            present on the target machine, native image custom actions will not be scheduled.
+            This is the default value.
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="64bit">
+        <annotation>
+          <documentation>
+            Attempt to generate native images only for the 64-bit version of the .NET Framework
+            on the target machine. If a 64-bit version of the .NET Framework 2.0 or newer is not
+            present on the target machine, native image custom actions will not be scheduled.
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="all">
+        <annotation>
+          <documentation>
+            Attempt to generate native images for the 32-bit and 64-bit versions of the .NET Framework
+            on the target machine. If a version of the .NET Framework 2.0 or newer is not present on the
+            target machine for a processor architecture, native image custom actions will not be
+            scheduled for that processor architecture.
+          </documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>

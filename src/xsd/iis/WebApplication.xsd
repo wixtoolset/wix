@@ -1,0 +1,124 @@
+<element name="WebApplication">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+      </appinfo>
+      <documentation>Defines properties for a web application. These properties can be used for more than one application defined in a web site or vroot, by defining this element in a common location and referring to it by setting the WebApplication attribute of the WebSite and WebVirtualDir elements.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="WebApplicationExtension" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the web application. If the Id is not specified, it will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>Sets the name of this application.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Isolation">
+        <annotation>
+          <documentation>
+            Sets the application isolation level for this application for pre-IIS 6 applications.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="low">
+              <annotation>
+                <documentation>
+                  Means the application executes within the IIS process.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="medium">
+              <annotation>
+                <documentation>
+                  Executes pooled in a separate process.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="high">
+              <annotation>
+                <documentation>
+                  Means execution alone in a separate process.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="AllowSessions" type="wxs:YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>Sets the Enable Session State option. When enabled, you can set the session timeout using the SessionTimeout attribute.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SessionTimeout" type="wxs:Integer">
+        <annotation>
+          <documentation>Sets the timeout value for sessions in minutes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Buffer" type="wxs:YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>Sets the option that enables response buffering in the application, which allows ASP script to set response headers anywhere in the script.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ParentPaths" type="wxs:YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>Sets the parent paths option, which allows a client to use relative paths to reach parent directories from this application.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DefaultScript">
+        <annotation>
+          <documentation>Sets the default script language for the site.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="VBScript" />
+            <enumeration value="JScript" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ScriptTimeout" type="wxs:Integer">
+        <annotation>
+          <documentation>Sets the timeout value in seconds for executing ASP scripts.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServerDebugging" type="wxs:YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>Enable ASP server-side script debugging.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ClientDebugging" type="wxs:YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>Enable ASP client-side script debugging.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="WebAppPool" type="xs:string">
+        <annotation>
+          <documentation>References the Id attribute of a WebAppPool element to use as the application pool for this application in IIS 6 applications.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

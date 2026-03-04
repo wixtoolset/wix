@@ -1,0 +1,8 @@
+<simpleType name="WildCardShortFileNameType">
+    <annotation>
+      <documentation>Values of this type will look like: "File?.*". Only one period is allowed. The following characters are not allowed: \ | &gt; : / " + , ; = [ ] &lt;, or whitespace. The name cannot be longer than 8 characters and the extension cannot exceed 3 characters. The value could also be a localization variable with the format !(loc.VARIABLE).</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="[^\\\|&gt;&lt;:/&quot;\+,;=\[\]\. ]{1,16}(\.[^\\\|&gt;&lt;:/&quot;\+,;=\[\]\. ]{0,6})?|([!$])\(loc\.[_A-Za-z]{1}[0-9A-Za-z_\.]*\)" />
+    </restriction>
+  </simpleType>

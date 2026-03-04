@@ -1,0 +1,141 @@
+<element name="Patch">
+    <annotation>
+      <documentation>
+            The Patch element is analogous to the main function in a C program. When linking, only one Patch section
+            can be given to the linker to produce a successful result. Using this element creates an MSP file.
+            </documentation>
+      <appinfo>
+        <remarks>
+          <p>You can specify any valid Windows code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/) for more information.</p>
+          <p>The ClientPatchId attribute allows you to specify an easily referenced identity that you can use in product authoring. This identity prefixes properties added by WiX to a patch transform, such as <i>ClientPatchId</i>.PatchCode and <i>ClientPatchId</i>.AllowRemoval. If the patch code GUID is auto-generated you could not reference any properties using this auto-generated prefix.</p>
+          <p>For example, if you were planning to ship a patch referred to as "QFE1" and needed to write your own registry values for Add/Remove Programs in product authoring such as the UninstallString for this patch, you could author a RegistryValue with the name UninstallString and the value <code>[SystemFolder]msiexec.exe /package [ProductCode] /uninstall [QFE1.PatchCode]</code>. In your patch authoring you would then set ClientPatchId to "QFE1" and WiX will add the QFE1.PatchCode property to the patch transform when the patch is created. If the Id attribute specified the patch code to be generated automatically, you could not reference the <i>prefix</i>.PatchCode property as shown above.</p>
+          <p>The summary information is automatically populated from attribute values of the Patch element including the code page. If you want to override some of these summary information properties or use a different code page for the summary information itself, author the PatchInformation element.</p>
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <sequence>
+        <choice minOccurs="0" maxOccurs="unbounded">
+          <element ref="PatchInformation" minOccurs="0" maxOccurs="1">
+            <annotation>
+              <documentation>Optional element that allows overriding summary information properties.</documentation>
+            </annotation>
+          </element>
+          <element ref="Media" minOccurs="1" maxOccurs="unbounded" />
+          <element ref="OptimizeCustomActions" minOccurs="0" maxOccurs="1">
+            <annotation>
+              <documentation>Indicates whether custom actions can be skipped when applying the patch.</documentation>
+            </annotation>
+          </element>
+          <element ref="PatchFamily" minOccurs="1" maxOccurs="unbounded" />
+          <element ref="PatchFamilyRef" minOccurs="0" maxOccurs="unbounded" />
+          <element ref="PatchFamilyGroup" minOccurs="1" maxOccurs="unbounded" />
+          <element ref="PatchFamilyGroupRef" minOccurs="0" maxOccurs="unbounded" />
+          <element ref="PatchProperty" />
+          <element ref="TargetProductCodes" />
+          <any namespace="##other" processContents="lax">
+            <annotation>
+              <documentation>
+                            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+                            elements at this point in the schema.
+                        </documentation>
+            </annotation>
+          </any>
+        </choice>
+      </sequence>
+      <attribute name="Id" type="AutogenGuid">
+        <annotation>
+          <documentation>Patch code for this patch.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Codepage" type="xs:string">
+        <annotation>
+          <documentation>The code page integer value or web name for the resulting MSP. See remarks for more information.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AllowRemoval" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether this is an uninstallable patch.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Classification" type="xs:string" use="required">
+        <annotation>
+          <documentation>Category of updates. Recommended values are Critical Update, Hotfix, Security Rollup, Security Update, Service Pack, Update, Update Rollup.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ClientPatchId" type="xs:string">
+        <annotation>
+          <documentation>An easily referenced identity unique to a patch that can be used in product authoring. See remarks for more information.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ApiPatchingSymbolNoImagehlpFlag" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Flag used when creating a binary file patch. Default is "no". Don't use imagehlp.dll.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ApiPatchingSymbolNoFailuresFlag" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Flag used when creating a binary file patch. Default is "no". Don't fail patch due to imagehlp failures.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ApiPatchingSymbolUndecoratedTooFlag" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Flag used when creating a binary file patch. Default is "no". After matching decorated symbols, try to match remaining by undecorated names.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string" use="required">
+        <annotation>
+          <documentation>Description of the patch.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DisplayName" type="xs:string" use="required">
+        <annotation>
+          <documentation>A title for the patch that is suitable for public display. In Add/Remove Programs from XP SP2 on.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Comments" type="xs:string">
+        <annotation>
+          <documentation>Optional comments for browsing.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Manufacturer" type="xs:string">
+        <annotation>
+          <documentation>Vendor releasing the package</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MinorUpdateTargetRTM" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Indicates that the patch targets the RTM version of the product or the most recent major
+                    upgrade patch. Author this optional property in minor update patches that contain sequencing
+                    information to indicate that the patch removes all patches up to the RTM version of the
+                    product, or up to the most recent major upgrade patch. This property is available beginning
+                    with Windows Installer 3.1.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MoreInfoURL" type="xs:string">
+        <annotation>
+          <documentation>A URL that provides information specific to this patch. In Add/Remove Programs from XP SP2 on.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OptimizedInstallMode" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    If this attribute is set to 'yes' in all the patches to be applied in a transaction, the
+                    application of the patch is optimized if possible. Available beginning with Windows Installer 3.1.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="TargetProductName" type="xs:string">
+        <annotation>
+          <documentation>Name of the application or target product suite.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OptimizePatchSizeForLargeFiles" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>When this attribute is set, patches for files greater than approximately 4 MB in size may be made smaller.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

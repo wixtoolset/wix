@@ -1,0 +1,32 @@
+<element name="MIME">
+    <annotation>
+      <documentation>
+                MIME content-type for an Extension
+            </documentation>
+      <appinfo>
+        <msiRef table="MIME" href="http://msdn.microsoft.com/library/aa370035.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Advertise" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether this MIME is to be advertised. The default is to match whatever the parent extension element uses. If the parent element is not advertised, then this element cannot be advertised either.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ContentType" type="xs:string" use="required">
+        <annotation>
+          <documentation>This is the identifier for the MIME content. It is commonly written in the form of type/format.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Class" type="Guid">
+        <annotation>
+          <documentation>Class ID for the COM server that is to be associated with the MIME content.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Default" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>If 'yes', become the content type for the parent Extension. The default value is 'no'.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

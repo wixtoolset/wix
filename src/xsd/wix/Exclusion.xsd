@@ -1,0 +1,32 @@
+<element name="Exclusion">
+    <annotation>
+      <documentation>Declares a merge module with which this merge module is incompatible.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="ExcludedId" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier of the merge module that is incompatible.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExcludeExceptLanguage" type="Integer">
+        <annotation>
+          <documentation>Numeric language ID of the merge module in ExcludedID. All except this language will be excluded. Only one of ExcludeExceptLanguage and ExcludeLanguage may be specified.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExcludeLanguage" type="Integer">
+        <annotation>
+          <documentation>Numeric language ID of the merge module in ExcludedID. The specified language will be excluded. Only one of ExcludeExceptLanguage and ExcludeLanguage may be specified.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExcludedMinVersion" type="xs:string">
+        <annotation>
+          <documentation>Minimum version excluded from a range. If not set, all versions before max are excluded. If neither max nor min, no exclusion based on version.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ExcludedMaxVersion" type="xs:string">
+        <annotation>
+          <documentation>Maximum version excluded from a range. If not set, all versions after min are excluded. If neither max nor min, no exclusion based on version.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

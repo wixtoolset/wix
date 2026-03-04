@@ -1,0 +1,22 @@
+<element name="FileTypeMask">
+    <annotation>
+      <documentation>FileType data for class Id registration.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Offset" type="Integer" use="required">
+        <annotation>
+          <documentation>Offset into file. If positive, offset is from the beginning; if negative, offset is from the end.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Mask" type="HexType" use="required">
+        <annotation>
+          <documentation>Hex value that is AND'd against the bytes in the file at Offset.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="HexType" use="required">
+        <annotation>
+          <documentation>If the result of the AND'ing of Mask with the bytes in the file is Value, the file is a match for this File Type.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

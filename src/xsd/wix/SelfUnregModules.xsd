@@ -1,0 +1,8 @@
+<element name="SelfUnregModules" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="SelfUnregModules" href="http://msdn.microsoft.com/library/aa371610.aspx" />
+      </appinfo>
+      <documentation>Unregisters all modules listed in the SelfReg table that are scheduled to be uninstalled. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

@@ -1,0 +1,5 @@
+element|WixLocalization
+element|String
+element|UI
+simpleType|Integer
+simpleType|LocalizationYesNoType

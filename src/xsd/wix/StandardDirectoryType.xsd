@@ -1,0 +1,38 @@
+<simpleType name="StandardDirectoryType">
+    <annotation>
+      <documentation>A Windows Installer standard directory.</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="TARGETDIR" />
+      <enumeration value="AdminToolsFolder" />
+      <enumeration value="AppDataFolder" />
+      <enumeration value="CommonAppDataFolder" />
+      <enumeration value="CommonFilesFolder" />
+      <enumeration value="CommonFiles64Folder" />
+      <enumeration value="CommonFiles6432Folder" />
+      <enumeration value="DesktopFolder" />
+      <enumeration value="FavoritesFolder" />
+      <enumeration value="FontsFolder" />
+      <enumeration value="LocalAppDataFolder" />
+      <enumeration value="MyPicturesFolder" />
+      <enumeration value="NetHoodFolder" />
+      <enumeration value="PersonalFolder" />
+      <enumeration value="PrintHoodFolder" />
+      <enumeration value="ProgramFilesFolder" />
+      <enumeration value="ProgramFiles64Folder" />
+      <enumeration value="ProgramFiles6432Folder" />
+      <enumeration value="ProgramMenuFolder" />
+      <enumeration value="PerUserProgramFilesFolder" />
+      <enumeration value="RecentFolder" />
+      <enumeration value="SendToFolder" />
+      <enumeration value="StartMenuFolder" />
+      <enumeration value="StartupFolder" />
+      <enumeration value="SystemFolder" />
+      <enumeration value="System16Folder" />
+      <enumeration value="System64Folder" />
+      <enumeration value="System6432Folder" />
+      <enumeration value="TempFolder" />
+      <enumeration value="TemplateFolder" />
+      <enumeration value="WindowsFolder" />
+    </restriction>
+  </simpleType>

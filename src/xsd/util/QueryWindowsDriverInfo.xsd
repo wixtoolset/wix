@@ -1,0 +1,13 @@
+<element name="QueryWindowsDriverInfo">
+    <annotation>
+      <documentation>
+        Schedules the QueryOsDriverInfo custom action for the current platform. For more information, see [QueryWindowsDriverInfo properties](../../../tools/wixext/wininfo#querywindowsdriverinfo).
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </appinfo>
+    </annotation>
+  </element>

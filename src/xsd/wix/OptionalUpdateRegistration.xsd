@@ -1,0 +1,60 @@
+<element name="OptionalUpdateRegistration">
+    <annotation>
+      <documentation>Writes additional information to the Windows registry that can be used to detect the bundle.
+      This registration is intended primarily for update to an existing product.</documentation>
+      <appinfo>
+        <remarks>
+          <p>The attributes are used to write the following registry values to the key:
+          <code>SOFTWARE\[Manufacturer]\Updates\[ProductFamily]\[Name]</code></p>
+          <ul>
+            <li>ThisVersionInstalled: Y</li>
+            <li>PackageName: (bundle name)</li>
+            <li>PackageVersion: (bundle version)</li>
+            <li>Publisher: [Manufacturer]</li>
+            <li>PublishingGroup: [Department]</li>
+            <li>ReleaseType: [Classification]</li>
+            <li>InstalledBy: [LogonUser]</li>
+            <li>InstalledDate: [Date]</li>
+            <li>InstallerName: (installer name)</li>
+            <li>InstallerVersion: (installer version)</li>
+          </ul>
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Manufacturer" type="xs:string">
+        <annotation>
+          <documentation>The name of the manufacturer. The default is the Bundle/@Manufacturer attribute,
+          but may also be a short form, ex: Acme instead of Acme Corporation.
+          An error is generated at build time if neither attribute is specified.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Department" type="xs:string">
+        <annotation>
+          <documentation>The name of the department or division publishing the update bundle.
+          The PublishingGroup registry value is not written if this attribute is not specified.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProductFamily" type="xs:string">
+        <annotation>
+          <documentation>The name of the family of products being updated. The default is the Bundle/@ParentName attribute.
+          The corresponding registry key is not created if neither attribute is specified.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>The name of the bundle. The default is the Bundle/@Name attribute,
+          but may also be a short form, ex: KB12345 instead of Update to Product (KB12345).
+          An error is generated at build time if neither attribute is specified.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Classification" type="xs:string" default="Update">
+        <annotation>
+          <documentation>
+            The release type of the update bundle, such as Update, Security Update, Service Pack, etc.
+            The default value is Update.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

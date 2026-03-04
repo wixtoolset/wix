@@ -1,0 +1,123 @@
+<element name="Validate">
+    <annotation>
+      <documentation>Sets information in the patch transform that determines if the transform applies to an installed product and what errors should be ignored when applying the patch transform.</documentation>
+      <appinfo>
+        <remarks>
+          <p>A transform contains the differences between the target product and the upgraded product. When a transform or a patch (which contains transforms) is applied, the following properties of the installed product are validated against the properties of the target product stored in a transform.</p>
+          <ul>
+            <li>ProductCode</li>
+            <li>ProductLanguage</li>
+            <li>ProductVersion</li>
+            <li>UpgradeCode</li>
+          </ul>
+          <p>Windows Installer simply validates that the ProductCode, ProductLanguage, and UpgradeCode of an installed product are equivalent to those propeties of the target product used to create the transform; however, the ProductVersion can be validated with a greater range of comparisons.</p>
+          <p>You can compare up to the first three fields of the ProductVersion. Changes to the fourth field are not validated and are useful for small updates. You can also choose how to compare the target ProductVersion used to create the transform with the installed ProductVersion. For example, while the default value of 'Equals' is recommended, if you wanted a minor upgrade patch to apply to the target ProductVersion and all older products with the same ProductCode, you would use 'LesserOrEqual'.</p>
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="ProductId" type="YesNoTypeUnion" default="yes">
+        <annotation>
+          <documentation>Requires that the installed ProductCode match the target ProductCode used to create the transform. The default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProductLanguage" type="YesNoTypeUnion" default="no">
+        <annotation>
+          <documentation>Requires that the installed ProductLanguage match the target ProductLanguage used to create the transform. The default is 'no'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProductVersion" default="Update">
+        <annotation>
+          <documentation>Determines how many fields of the installed ProductVersion to compare. See remarks for more information. The default is 'Update'.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="Major">
+              <annotation>
+                <documentation>Checks the major version.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="Minor">
+              <annotation>
+                <documentation>Checks the major and minor versions.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="Update">
+              <annotation>
+                <documentation>Checks the major, minor, and update versions.</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ProductVersionOperator" default="Equal">
+        <annotation>
+          <documentation>Determines how the installed ProductVersion is compared to the target ProductVersion used to create the transform. See remarks for more information. The default is 'Equal'.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="Lesser">
+              <annotation>
+                <documentation>Installed ProductVersion &lt; target ProductVersion.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="LesserOrEqual">
+              <annotation>
+                <documentation>Installed ProductVersion &lt;= target ProductVersion.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="Equal">
+              <annotation>
+                <documentation>Installed ProductVersion = target ProductVersion.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="GreaterOrEqual">
+              <annotation>
+                <documentation>Installed ProductVersion &gt;= target ProductVersion.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="Greater">
+              <annotation>
+                <documentation>Installed ProductVersion &gt; target ProductVersion.</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="UpgradeCode" type="YesNoTypeUnion" default="yes">
+        <annotation>
+          <documentation>Requires that the installed UpgradeCode match the target UpgradeCode used to create the transform. The default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreAddExistingRow" type="YesNoTypeUnion" default="yes">
+        <annotation>
+          <documentation>Ignore errors when adding existing rows. The default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreAddExistingTable" type="YesNoTypeUnion" default="yes">
+        <annotation>
+          <documentation>Ignore errors when adding existing tables. The default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreDeleteMissingRow" type="YesNoTypeUnion" default="yes">
+        <annotation>
+          <documentation>Ignore errors when deleting missing rows. The default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreDeleteMissingTable" type="YesNoTypeUnion" default="yes">
+        <annotation>
+          <documentation>Ignore errors when deleting missing tables. The default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreUpdateMissingRow" type="YesNoTypeUnion" default="yes">
+        <annotation>
+          <documentation>Ignore errors when updating missing rows. The default is 'yes'.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IgnoreChangingCodePage" type="YesNoTypeUnion" default="no">
+        <annotation>
+          <documentation>Ignore errors when changing the database code page. The default is 'no'.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

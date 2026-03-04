@@ -1,0 +1,25 @@
+<element name="ComPlusInterface">
+    <annotation><documentation>
+      Represents an interface for a COM+ component.
+    </documentation></annotation>
+    <complexType>
+      <sequence>
+        <choice minOccurs="0" maxOccurs="unbounded">
+          <element ref="ComPlusRoleForInterface" />
+          <element ref="ComPlusMethod" />
+        </choice>
+      </sequence>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="IID" use="required" type="uuid">
+        <annotation><documentation>
+          IID of the interface.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Description" use="optional" type="xs:string" />
+      <attribute name="QueuingEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+    </complexType>
+  </element>

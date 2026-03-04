@@ -1,0 +1,48 @@
+<element name="ComponentSearch">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="IniFileSearch" />
+        <seeAlso ref="RegistrySearch" />
+        <msiRef table="CompLocator" href="http://msdn.microsoft.com/library/aa368001.aspx" />
+        <msiRef table="Signature" href="https://docs.microsoft.com/en-us/windows/win32/msi/signature-table" />
+      </appinfo>
+      <documentation>Searches for file or directory and assigns to value of parent Property.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0">
+        <element ref="DirectorySearch" />
+        <element ref="DirectorySearchRef" />
+        <element ref="FileSearch" />
+        <element ref="FileSearchRef" />
+      </choice>
+      <attribute name="Id" use="required" type="xs:string" />
+      <attribute name="Guid" type="Guid">
+        <annotation>
+          <documentation>The component ID of the component whose key path is to be used for the search.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type">
+        <annotation>
+          <documentation>Must be file if last child is FileSearch element and must be directory if last child is DirectorySearch element.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="directory">
+              <annotation>
+                <documentation>
+                                    The key path of the component is a directory.
+                                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="file">
+              <annotation>
+                <documentation>
+                                    The key path of the component is a file. This is the default value.
+                                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+    </complexType>
+  </element>

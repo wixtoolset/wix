@@ -1,0 +1,78 @@
+<element name="Permission">
+    <annotation>
+      <documentation>
+                Sets ACLs on File, Registry, or CreateFolder. When under a Registry element, this cannot be used
+                if the Action attribute's value is remove or removeKeyOnInstall. This element has no Id attribute.
+                The table and key are taken from the parent element.
+            </documentation>
+      <appinfo>
+        <msiRef table="LockPermissions" href="http://msdn.microsoft.com/library/aa369774.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Domain" type="xs:string"></attribute>
+      <attribute name="User" use="required" type="xs:string"></attribute>
+      <!-- Common ACLs -->
+      <attribute name="Read" type="YesNoTypeUnion"></attribute>
+      <attribute name="Delete" type="YesNoTypeUnion"></attribute>
+      <attribute name="ReadPermission" type="YesNoTypeUnion"></attribute>
+      <attribute name="ChangePermission" type="YesNoTypeUnion"></attribute>
+      <attribute name="TakeOwnership" type="YesNoTypeUnion"></attribute>
+      <attribute name="SpecificRightsAll" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Bit mask for SPECIFIC_RIGHTS_ALL from WinNT.h (0x0000FFFF).</documentation>
+        </annotation>
+      </attribute>
+      <!-- Folder and File ACLs -->
+      <attribute name="ReadAttributes" type="YesNoTypeUnion"></attribute>
+      <attribute name="WriteAttributes" type="YesNoTypeUnion"></attribute>
+      <attribute name="ReadExtendedAttributes" type="YesNoTypeUnion"></attribute>
+      <attribute name="WriteExtendedAttributes" type="YesNoTypeUnion"></attribute>
+      <attribute name="Synchronize" type="YesNoTypeUnion"></attribute>
+      <!-- Folder only ACLs -->
+      <attribute name="CreateFile" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>For a directory, the right to create a file in the directory. Only valid under a 'CreateFolder' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CreateChild" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>For a directory, the right to create a subdirectory. Only valid under a 'CreateFolder' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DeleteChild" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>For a directory, the right to delete a directory and all the files it contains, including read-only files. Only valid under a 'CreateFolder' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Traverse" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>For a directory, the right to traverse the directory. By default, users are assigned the BYPASS_TRAVERSE_CHECKING privilege, which ignores the FILE_TRAVERSE access right. Only valid under a 'CreateFolder' parent.</documentation>
+        </annotation>
+      </attribute>
+      <!-- File only ACLs -->
+      <attribute name="Append" type="YesNoTypeUnion"></attribute>
+      <attribute name="Execute" type="YesNoTypeUnion"></attribute>
+      <attribute name="FileAllRights" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Bit mask for FILE_ALL_ACCESS from WinNT.h (0x001F01FF).</documentation>
+        </annotation>
+      </attribute>
+      <!-- File and Registry ACLs -->
+      <attribute name="Write" type="YesNoTypeUnion"></attribute>
+      <!-- Registry only ACLs -->
+      <attribute name="CreateSubkeys" type="YesNoTypeUnion"></attribute>
+      <attribute name="EnumerateSubkeys" type="YesNoTypeUnion"></attribute>
+      <attribute name="Notify" type="YesNoTypeUnion"></attribute>
+      <attribute name="CreateLink" type="YesNoTypeUnion"></attribute>
+      <!-- Generic ACLs, mapped by system to appropriate permissions -->
+      <attribute name="GenericAll" type="YesNoTypeUnion"></attribute>
+      <attribute name="GenericExecute" type="YesNoTypeUnion"></attribute>
+      <attribute name="GenericWrite" type="YesNoTypeUnion"></attribute>
+      <attribute name="GenericRead" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>specifying this will fail to grant read access</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

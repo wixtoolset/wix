@@ -1,0 +1,36 @@
+<element name="EnsureTable">
+    <annotation>
+      <documentation>
+        Use this element to ensure that a table appears in the installer database, even if its empty.
+      </documentation>
+      <appinfo>
+        <remarks>
+          This element is particularly useful for two problems that may occur while merging merge modules:
+
+          * The first likely problem is that in order to properly merge you need to have certain
+            tables present prior to merging. Using this element is one way to ensure those tables
+            are present prior to the merging.
+
+          * The other common problem is that a merge module has incorrect validation information
+            about some tables. By ensuring these tables prior to merging, you can avoid this
+            problem because the correct validation information will go into the installer database
+            before the merge module has a chance to set it incorrectly.
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>The name of the table.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

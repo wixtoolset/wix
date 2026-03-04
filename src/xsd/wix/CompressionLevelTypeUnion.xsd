@@ -1,0 +1,8 @@
+<simpleType name="CompressionLevelTypeUnion">
+    <annotation>
+      <documentation>
+        Indicates the compression level for a cabinet.
+      </documentation>
+    </annotation>
+    <union memberTypes="CompressionLevelType PreprocessorVariables" />
+  </simpleType>

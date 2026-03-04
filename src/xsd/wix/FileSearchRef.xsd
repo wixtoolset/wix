@@ -1,0 +1,18 @@
+<element name="FileSearchRef">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="FileSearch" />
+        <remarks>
+          <p>A reference to another FileSearch element must reference the same Id and the same Parent Id. If any of these attribute values are different you must instead use a FileSearch element.</p>
+        </remarks>
+      </appinfo>
+      <documentation>References an existing FileSearch element.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>Specify the Id to the FileSearch to reference.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

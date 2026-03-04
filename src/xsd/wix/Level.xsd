@@ -1,0 +1,26 @@
+<element name="Level">
+    <annotation>
+      <documentation>
+        Feature levels for MSI packages.
+      </documentation>
+      <appinfo>
+        <msiRef table="Condition" href="http://msdn.microsoft.com/library/aa368014.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Condition" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The condition expression to be evaluated at install time. When true the Feature level is set to the Value.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="Integer" use="required">
+        <annotation>
+          <documentation>
+            Allows modifying the level of a Feature based on the result of the condition.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

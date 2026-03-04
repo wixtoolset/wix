@@ -1,0 +1,114 @@
+<element name="XmlFile">
+    <annotation>
+      <documentation>
+        Adds or removes .xml file entries.  If you use the XmlFile element you must reference WixUtilExtension.dll as it contains the XmlFile custom actions.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for xml file modification.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ElementPath" type="xs:string" use="required">
+        <annotation>
+          <documentation>The XPath of the element to be modified.  Note that this is a formatted field and therefore, square brackets in the XPath must be escaped. In addition, XPaths allow backslashes to be used to escape characters, so if you intend to include literal backslashes, you must escape them as well by doubling them in this attribute. The string is formatted by MSI first, and the result is consumed as the XPath.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="File" type="xs:string" use="required">
+        <annotation>
+          <documentation>Path of the .xml file to configure.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>Name of XML node to set/add to the specified element.  Not setting this attribute causes the element's text value to be set.  Otherwise this specified the attribute name that is set.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>
+            The value to be written.  See the <a href="http://msdn.microsoft.com/library/aa368609(VS.85).aspx" target="_blank">Formatted topic</a> for information how to escape square brackets in the value.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Action" use="required">
+        <annotation>
+          <documentation>The type of modification to be made to the XML file when the component is installed.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="createElement">
+              <annotation>
+                <documentation>Creates a new element under the element specified in ElementPath.  The Name attribute is required in this case and specifies the name of the new element.  The Value attribute is not necessary when createElement is specified as the action.  If the Value attribute is set, it will cause the new element's text value to be set.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="deleteValue">
+              <annotation>
+                <documentation>Deletes a value from the element specified in the ElementPath.  If Name is specified, the attribute with that name is deleted.  If Name is not specified, the text value of the element specified in the ElementPath is deleted.  The Value attribute is ignored if deleteValue is the action specified.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="setValue">
+              <annotation>
+                <documentation>Sets a value in the element specified in the ElementPath.  If Name is specified, and attribute with that name is set to the value specified in Value.  If Name is not specified, the text value of the element is set.  Value is a required attribute if setValue is the action specified.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="bulkSetValue">
+              <annotation>
+                <documentation>Sets all the values in the elements that match the ElementPath.  If Name is specified, attributes with that name are set to the same value specified in Value.  If Name is not specified, the text values of the elements are set.  Value is a required attribute if setBulkValue is the action specified.</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Permanent" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether or not the modification should be removed on uninstall.  This has no effect on uninstall if the action was deleteValue.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PreserveModifiedDate" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies wheter or not the modification should preserve the modified date.  Preserving the modified date will allow the file to be patched if no other modifications have been made.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sequence" type="wxs:Integer">
+        <annotation>
+          <documentation>Specifies the order in which the modification is to be attempted on the XML file.  It is important to ensure that new elements are created before you attempt to add an attribute to them.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SelectionLanguage">
+        <annotation>
+          <documentation>
+            Specify whether the DOM object should use XPath language or the old XSLPattern language (default) as the query language.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="XPath" />
+            <enumeration value="XSLPattern" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,8 @@
+<element name="UnregisterClassInfo" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="UnregisterClassInfo" href="http://msdn.microsoft.com/library/aa372108.aspx" />
+      </appinfo>
+      <documentation>Manages the removal of COM class information from the system registry. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

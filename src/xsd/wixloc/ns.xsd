@@ -1,0 +1,7 @@
+<schema targetNamespace="http://wixtoolset.org/schemas/v4/wxl">
+  <annotation>
+    <documentation>
+      Schema for describing WiX Localization files (.wxl).
+    </documentation>
+  </annotation>
+</schema>

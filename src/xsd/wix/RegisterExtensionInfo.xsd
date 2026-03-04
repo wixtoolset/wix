@@ -1,0 +1,8 @@
+<element name="RegisterExtensionInfo" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RegisterExtensionInfo" href="http://msdn.microsoft.com/library/aa371156.aspx" />
+      </appinfo>
+      <documentation>Manages the registration of extension related information with the system. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

@@ -1,0 +1,171 @@
+<element name="Certificate">
+    <annotation>
+      <documentation>
+        Used to install and uninstall certificates.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <seeAlso ref="CertificateRef" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Unique identifier for this certificate in the installation package. If the Id is not specified, it will be generated.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Name of the certificate that will be installed or uninstalled in the specified store.
+            This attribute may be set via a formatted Property (e.g. [MyProperty]).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="StoreName" use="required">
+        <simpleType>
+          <restriction base="xs:string">
+            <enumeration value="ca">
+              <annotation>
+                <documentation>
+                  Contains the certificates of certificate authorities that the user trusts to issue certificates to others. Certificates in these stores are normally supplied with the operating system or by the user's network administrator.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="my">
+              <annotation>
+                <documentation>
+                  Use the "personal" value instead.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="personal">
+              <annotation>
+                <documentation>
+                  Contains personal certificates. These certificates will usually have an associated private key. This store is often
+                  referred to as the "MY" certificate store.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="request" />
+            <enumeration value="root">
+              <annotation>
+                <documentation>
+                  Contains the certificates of certificate authorities that the user trusts to issue certificates to others. Certificates in these stores are normally supplied with the operating system or by the user's network administrator. Certificates in this store are typically self-signed.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="otherPeople">
+              <annotation>
+                <documentation>
+                  Contains the certificates of those that the user normally sends enveloped messages to or receives signed messages from.
+                  See <a href="http://msdn.microsoft.com/library/aa388160.aspx" target="_blank" xmlns="http://wixtoolset.org/schemas/v4/wxs/iis">MSDN documentation</a> for more information.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="trustedPeople">
+              <annotation>
+                <documentation>
+                  Contains the certificates of those directly trusted people and resources.
+                  See <a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.storename.aspx" target="_blank" xmlns="http://wixtoolset.org/schemas/v4/wxs/iis">MSDN documentation</a> for more information.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="trustedPublisher">
+              <annotation>
+                <documentation>
+                  Contains the certificates of those publishers who are trusted.
+                  See <a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.x509certificates.storename.aspx" target="_blank" xmlns="http://wixtoolset.org/schemas/v4/wxs/iis">MSDN documentation</a> for more information.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="StoreLocation" use="required">
+        <annotation>
+          <documentation>
+              This attribute controls which Certificate Store Location will be used for the Certificate.
+              See <a href="https://learn.microsoft.com/en-us/windows/win32/seccrypto/system-store-locations" target="_blank" xmlns="http://wixtoolset.org/schemas/v4/wxs/iis">MSDN documentation</a> for more information.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:string">
+            <enumeration value="currentUser" />
+            <enumeration value="localMachine" />
+            <enumeration value="services" />
+            <enumeration value="users" />
+            <enumeration value="userPolicy" />
+            <enumeration value="localMachinePolicy" />
+            <enumeration value="localMachineEnterprise" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <!-- The Overwrite attribute is not implemented at this time.
+      <xs:attribute name="Overwrite" type="wxs:YesNoTypeUnion" />
+      -->
+      <attribute name="Request" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            This attribute controls whether the CertificatePath attribute is a path to a certificate file (Request='no') or the
+            certificate authority to request the certificate from (Request='yes').
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="BinaryRef" type="xs:string">
+        <annotation>
+          <documentation>
+            Reference to a Binary element that will store the certificate as a stream inside the package.  This attribute cannot be specified with
+            the CertificatePath attribute.
+          </documentation>
+          <appinfo>
+            <seeAlso ref="Binary" />
+          </appinfo>
+        </annotation>
+      </attribute>
+      <attribute name="CertificatePath" type="xs:string">
+        <annotation>
+          <documentation>
+            If the Request attribute is "no" then this attribute is the path to the certificate file outside of the package.
+            If the Request attribute is "yes" then this atribute is the certificate authority to request the certificate from.
+            This attribute may be set via a formatted Property (e.g. [MyProperty]).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PFXPassword" type="xs:string">
+        <annotation>
+          <documentation>
+            If the Binary stream or path to the file outside of the package is a password protected PFX file, the password for that
+            PFX must be specified here.  This attribute may be set via a formatted Property (e.g. [MyProperty]).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Vital" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Indicates whether to fail the install if the certificate fails to install. The default is "yes".
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,86 @@
+<element name="AdvertiseExecuteSequence">
+    <annotation>
+      <appinfo>
+        <msiRef table="AdvtExecuteSequence" href="https://docs.microsoft.com/en-us/windows/win32/msi/advtexecutesequence-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="CostInitialize">
+          <annotation>
+            <documentation>Initiates the internal installation costing process.</documentation>
+          </annotation>
+        </element>
+        <element ref="CostFinalize">
+          <annotation>
+            <documentation>Ends the internal installation costing process begun by the CostInitialize action.</documentation>
+          </annotation>
+        </element>
+        <element ref="Custom" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Use to sequence a custom action. The only custom actions that are allowed in the AdvtExecuteSequence are type 19 (0x013) type 35 (0x023) and type 51 (0x033).</documentation>
+          </annotation>
+        </element>
+        <element ref="InstallValidate">
+          <annotation>
+            <documentation>Verifies that all costed volumes have enough space for the installation.</documentation>
+          </annotation>
+        </element>
+        <element ref="InstallInitialize">
+          <annotation>
+            <documentation>Marks the beginning of a sequence of actions that change the system.</documentation>
+          </annotation>
+        </element>
+        <element ref="CreateShortcuts">
+          <annotation>
+            <documentation>Manages the creation of shortcuts.</documentation>
+          </annotation>
+        </element>
+        <element ref="RegisterClassInfo">
+          <annotation>
+            <documentation>Manages the registration of COM class information with the system.</documentation>
+          </annotation>
+        </element>
+        <element ref="RegisterExtensionInfo">
+          <annotation>
+            <documentation>Manages the registration of extension related information with the system.</documentation>
+          </annotation>
+        </element>
+        <element ref="RegisterMIMEInfo">
+          <annotation>
+            <documentation>Registers MIME-related registry information with the system.</documentation>
+          </annotation>
+        </element>
+        <element ref="RegisterProgIdInfo">
+          <annotation>
+            <documentation>Manages the registration of OLE ProgId information with the system.</documentation>
+          </annotation>
+        </element>
+        <element ref="PublishComponents">
+          <annotation>
+            <documentation>Manages the advertisement of the components from the PublishComponent table.</documentation>
+          </annotation>
+        </element>
+        <element ref="PublishFeatures">
+          <annotation>
+            <documentation>Writes each feature's state into the system registry.</documentation>
+          </annotation>
+        </element>
+        <element ref="PublishProduct">
+          <annotation>
+            <documentation>Manages the advertisement of the product information with the system.</documentation>
+          </annotation>
+        </element>
+        <element ref="InstallFinalize">
+          <annotation>
+            <documentation>Marks the end of a sequence of actions that change the system.</documentation>
+          </annotation>
+        </element>
+        <element ref="MsiPublishAssemblies">
+          <annotation>
+            <documentation>Manages the advertisement of CLR and Win32 assemblies.</documentation>
+          </annotation>
+        </element>
+      </choice>
+    </complexType>
+  </element>

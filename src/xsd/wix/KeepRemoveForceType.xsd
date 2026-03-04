@@ -1,0 +1,28 @@
+<simpleType name="KeepRemoveForceType">
+    <annotation>
+      <documentation>Values of this type will either be "force", "keep", or "remove".</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="force">
+        <annotation>
+          <documentation>
+            Always cache the package during Cache, Install, Modify, Repair, and Layout.
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="keep">
+        <annotation>
+          <documentation>
+            Keep the package cached when the package is requested to be present.
+          </documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="remove">
+        <annotation>
+          <documentation>
+            Always uncache the package after Cache, Install, Modify, Repair, Uninstall, and Layout.
+          </documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>

@@ -1,0 +1,11 @@
+<element name="WaitForEventDeferred">
+    <annotation>
+      <documentation>Schedules the WaitForEventDeferred custom action for the current platform.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </appinfo>
+    </annotation>
+  </element>

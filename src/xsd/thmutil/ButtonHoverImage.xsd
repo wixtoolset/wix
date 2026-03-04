@@ -1,0 +1,11 @@
+<element name="ButtonHoverImage">
+        <annotation>
+            <documentation>
+                Defines a button image that is used when the control is hovered over.
+                ButtonImage and ButtonSelectedImage are required with ButtonHoverImage.
+            </documentation>
+        </annotation>
+        <complexType>
+            <attributeGroup ref="OwnerDrawImageAttributes" />
+        </complexType>
+    </element>

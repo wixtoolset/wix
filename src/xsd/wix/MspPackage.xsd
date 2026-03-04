@@ -1,0 +1,52 @@
+<element name="MspPackage">
+    <annotation>
+      <documentation>Describes a single msp package to install.</documentation>
+      <appinfo>
+        <seeAlso ref="SlipstreamMsp" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="MsiProperty" />
+        <element ref="Payload" />
+        <element ref="PayloadGroupRef" />
+        <element ref="Payloads" />
+        <element ref="MspPackagePayload" />
+        <element ref="Provides" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+                Extensibility point in the WiX XML Schema. Schema extensions can register additional
+                elements at this point in the schema. The extension's
+                <code>CompilerExtension.ParseElement()</code>
+                method will be called with the package identifier as the first value in
+                <code>contextValues</code>.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attributeGroup ref="ChainPackageCommonAttributes" />
+      <attributeGroup ref="ChainPackagePermanentAttribute" />
+      <attribute name="RepairCondition" type="xs:string">
+        <annotation>
+          <documentation>
+            A condition that determines during Repair if the package will be repaired by default.
+            This condition can use built-in variables and variables returned by searches.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PerMachine" type="YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>Indicates the package must be executed elevated. The default is "no".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Slipstream" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Specifies whether to automatically slipstream the patch for any target msi packages in the chain. The default is "no".
+            Even when the value is "no", you can still author the SlipstreamMsp element under MsiPackage elements as desired.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

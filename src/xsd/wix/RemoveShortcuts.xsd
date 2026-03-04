@@ -1,0 +1,8 @@
+<element name="RemoveShortcuts" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RemoveShortcuts" href="http://msdn.microsoft.com/library/aa371209.aspx" />
+      </appinfo>
+      <documentation>Manages the removal of an advertised shortcut whose feature is selected for uninstallation or a nonadvertised shortcut whose component is selected for uninstallation. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

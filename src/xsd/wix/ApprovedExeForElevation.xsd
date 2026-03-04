@@ -1,0 +1,43 @@
+<element name="ApprovedExeForElevation">
+    <annotation>
+      <documentation>Provides information about an .exe so that the BA can request the engine to run it elevated from any secure location.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the ApprovedExeForElevation element.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Key" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The key path.
+            For security purposes, the root key will be HKLM and Variables are not supported.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>
+            The value name.
+            For security purposes, Variables are not supported.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Bitness" type="BitnessTypeUnion">
+        <annotation>
+          <documentation>
+            Overrides the default registry to search. The value `always64` will force
+            the search to look in the 64-bit registry even when building for 32-bit.
+            Simliarly, the value `always32` will force the search to look in the 32-bit
+            registry even when building for 64-bit.
+            The default value is `default` where the search will look in the same registry
+            as the bitness of the package.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,8 @@
+<element name="PublishProduct" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="PublishProduct" href="http://msdn.microsoft.com/library/aa370932.aspx" />
+      </appinfo>
+      <documentation>Manages the advertisement of the product information with the system. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

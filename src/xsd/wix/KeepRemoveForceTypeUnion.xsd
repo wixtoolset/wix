@@ -1,0 +1,6 @@
+<simpleType name="KeepRemoveForceTypeUnion">
+    <annotation>
+      <documentation>Values of this type will either be "force", "keep", or "remove".</documentation>
+    </annotation>
+    <union memberTypes="KeepRemoveForceType PreprocessorVariables" />
+  </simpleType>

@@ -1,0 +1,40 @@
+<element name="Variable">
+    <annotation>
+      <documentation>Describes a burn engine variable to define.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Hidden" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether the value of the variable should be hidden.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>The name for the variable.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Persisted" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether the variable should be persisted.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>Starting value for the variable.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type" type="VariableType">
+        <annotation>
+          <documentation>Type of the variable, inferred from the value if not specified.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

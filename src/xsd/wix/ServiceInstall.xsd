@@ -1,0 +1,209 @@
+<element name="ServiceInstall">
+    <annotation>
+      <documentation>
+        Adds services for parent Component. Use the ServiceControl element to remove services.
+      </documentation>
+      <appinfo>
+        <msiRef table="ServiceInstall" href="https://docs.microsoft.com/en-us/windows/win32/msi/serviceinstall-table" />
+        <remarks>
+          The service executable installed will point to the KeyPath for the Component.
+          Therefore, you must ensure that the correct executable is either the first child
+          File element under this Component or explicitly mark the appropriate File element
+          as KeyPath='yes'.
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="PermissionEx">
+          <annotation>
+            <documentation>Configures the ACLs for this service.</documentation>
+          </annotation>
+        </element>
+        <element ref="ServiceDependency">
+          <annotation>
+            <documentation>Ordered list of dependencies when installing services.</documentation>
+          </annotation>
+        </element>
+        <element ref="ServiceConfig" />
+        <element ref="ServiceConfigFailureActions" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Unique identifier for this service configuration. This value will default to the Name attribute if not
+            specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>This column is the string that gives the service name to install.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DisplayName" type="xs:string">
+        <annotation>
+          <documentation>This column is the localizable string that user interface programs use to identify the service.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type" use="required">
+        <annotation>
+          <documentation>The Windows Installer does not currently support kernelDriver or systemDriver.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="ownProcess">
+              <annotation>
+                <documentation>
+                  A Win32 service that runs its own process.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="shareProcess">
+              <annotation>
+                <documentation>
+                  A Win32 service that shares a process.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="kernelDriver">
+              <annotation>
+                <documentation>
+                  A kernel driver service. This value is not currently supported by the Windows Installer.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="systemDriver">
+              <annotation>
+                <documentation>
+                  A file system driver service. This value is not currently supported by the Windows Installer.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Interactive" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether or not the service interacts with the desktop.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Start" use="required">
+        <annotation>
+          <documentation>Determines when the service should be started. The Windows Installer does not support boot or system.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="auto">
+              <annotation>
+                <documentation>
+                  The service will start during startup of the system.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="demand">
+              <annotation>
+                <documentation>
+                  The service will start when the service control manager calls the StartService function.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="disabled">
+              <annotation>
+                <documentation>
+                  The service can no longer be started.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="boot">
+              <annotation>
+                <documentation>
+                  The service is a device driver that will be started by the operating system boot loader. This value is not currently supported by the Windows Installer.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="system">
+              <annotation>
+                <documentation>
+                  The service is a device driver that will be started by the IoInitSystem function. This value is not currently supported by the Windows Installer.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ErrorControl" use="required">
+        <annotation>
+          <documentation>Determines what action should be taken on an error.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="ignore">
+              <annotation>
+                <documentation>
+                  Logs the error and continues with the startup operation.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="normal">
+              <annotation>
+                <documentation>
+                  Logs the error, displays a message box and continues the startup operation.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="critical">
+              <annotation>
+                <documentation>
+                  Logs the error if it is possible and the system is restarted with the last configuration known to be good. If the last-known-good configuration is being started, the startup operation fails.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Vital" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>When set to 'yes' or left unspecified the overall install will fail if this service fails to install. A value of 'no' indicates failure to install the service will be ignored.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LoadOrderGroup" type="xs:string">
+        <annotation>
+          <documentation>The load ordering group that this service should be a part of.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Account" type="xs:string">
+        <annotation>
+          <documentation>Fully qualified names must be used even for local accounts, e.g.: ".\LOCAL_ACCOUNT". Valid only when ServiceType is ownProcess.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Password" type="xs:string">
+        <annotation>
+          <documentation>The password for the account. Valid only when the account has a password.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Arguments" type="xs:string">
+        <annotation>
+          <documentation>Contains any command line arguments or properties required to run the service.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>Sets the description of the service.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="EraseDescription" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Determines whether the existing service description will be ignored. If 'yes', the service description will be null, even if the Description attribute is set.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

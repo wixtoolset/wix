@@ -1,0 +1,83 @@
+<element name="Group">
+    <annotation>
+      <documentation>Group for all kinds of (usergroup) things.  When it is not nested under a component it is included in the MSI so it can be referenced by other elements such as the GroupRef element under a User element (to add the User to the Group).  When it is nested under a Component element, the Group will be created on install and can also be used for reference.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <seeAlso ref="GroupRef" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="GroupRef" minOccurs="0" maxOccurs="unbounded" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Unique identifier in your installation package for this group.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>A [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that contains the name of the group.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Domain" type="xs:string">
+        <annotation>
+          <documentation>An optional [Formatted](https://learn.microsoft.com/en-us/windows/win32/msi/formatted) string that specifies the domain for the group.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RemoveOnUninstall" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether the group should be removed or left behind on uninstall.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FailIfExists" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates if the install should fail if the group already exists.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UpdateIfExists" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates if the group properties should be updated if the group already exists.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CreateGroup" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether or not to create the group.  Group creation can be skipped if all that is desired is to add group memberships.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Vital" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether failure to create the group or add the group to another group fails the installation. The default value is "yes".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Comment" type="xs:string">
+        <annotation>
+            <documentation>Optional comment to set on the group.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RemoveComment" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether remove the comment from the group. The default value is "no".</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,10 @@
+<simpleType name="BitnessType">
+    <annotation>
+      <documentation>Values of this type will be "default", "always32" or "always64".</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="default" />
+      <enumeration value="always32" />
+      <enumeration value="always64" />
+    </restriction>
+  </simpleType>

@@ -1,0 +1,39 @@
+<element name="StandardDirectory">
+    <annotation>
+      <documentation>References a standard Windows Installer directory, such as ProgramFilesFolder.</documentation>
+      <appinfo>
+        <seeAlso ref="Directory" />
+        <howtoRef href="files_and_registry/add_a_file.html">How To: Add a file to your installer</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Component" />
+        <element ref="Directory" />
+        <element ref="File" />
+        <element ref="Files" />
+        <element ref="Merge" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="StandardDirectoryTypeUnion" use="required">
+        <annotation>
+          <documentation>The identifier of the standard directory to include in the package.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

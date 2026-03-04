@@ -1,0 +1,39 @@
+<element name="ComPlusPartitionRole">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+      </appinfo>
+      <documentation>
+        Defines a COM+ partition role. Partition roles can not be
+        created; this element can only be used as a locater to reference an existing
+        role.
+      </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <choice minOccurs="0" maxOccurs="unbounded">
+          <element ref="ComPlusUserInPartitionRole" />
+          <element ref="ComPlusGroupInPartitionRole" />
+        </choice>
+      </sequence>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Partition" use="optional" type="xs:string">
+        <annotation><documentation>
+          The id of a ComPlusPartition element representing the partition
+          the role belongs to.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Name" use="required" type="xs:string">
+        <annotation><documentation>
+          Name of the partition role.
+        </documentation></annotation>
+      </attribute>
+    </complexType>
+  </element>

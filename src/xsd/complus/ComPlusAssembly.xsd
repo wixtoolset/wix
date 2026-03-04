@@ -1,0 +1,117 @@
+<element name="ComPlusAssembly">
+    <annotation>
+      <documentation>
+        Represents a DLL or assembly to be registered with COM+. If
+        this element is a child of a ComPlusApplication element, the assembly will be
+        registered in this application. Other ways the Application attribute must be
+        set to an application. The element must be a descendent of a Component element,
+        it can not be a child of a ComPlusApplication locator element.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <remarks>
+          <p>
+            When installing a native assembly, all components
+            contained in the assembly must be represented as ComPlusComponent elements
+            under this element. Any component not listed will not be removed during
+            uninstall.
+          </p>
+
+          <p>
+            The fields DllPath, TlbPath and PSDllPath are formatted
+            fields that should contain file paths to there respective file types. A typical
+            value for DllPath for example, should be something like “[#MyAssembly_dll]”,
+            where “MyAssembly_dll” is the key of the dll file in the File table.
+          </p>
+
+          <p>
+            <b>Warning</b>: The assembly name provided in the AssemblyName
+            attribute must be a fully specified assembly name, if a partial name is
+            provided a random assembly matching the partial name will be selected.
+          </p>
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <sequence>
+        <choice minOccurs="0" maxOccurs="unbounded">
+          <element ref="ComPlusAssemblyDependency" />
+          <element ref="ComPlusComponent" />
+        </choice>
+      </sequence>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Application" use="optional" type="xs:string">
+        <annotation><documentation>
+          If the element is not a child of a ComPlusApplication
+          element, this attribute should be provided with the id of a ComPlusApplication
+          element representing the application the assembly is to be registered in.
+          This attribute can be omitted for a .NET assembly even if the application is
+          not a child of a ComPlusApplication element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="AssemblyName" use="optional" type="xs:string">
+        <annotation><documentation>
+          The name of the assembly used to identify the assembly in
+          the GAC. This attribute can be provided only if DllPathFromGAC is set to
+          “yes”.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="DllPath" use="optional" type="xs:string">
+        <annotation><documentation>
+          The path to locate the assembly DLL during registration.
+          This attribute should be provided if DllPathFromGAC is not set to “yes”.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="TlbPath" use="optional" type="xs:string">
+        <annotation><documentation>
+          An optional path to an external type lib for the assembly.
+          This attribute must be provided if the Type attribute is set to “.net”.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="PSDllPath" use="optional" type="xs:string">
+        <annotation><documentation>
+          An optional path to an external proxy/stub DLL for the assembly.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Type" use="required">
+        <annotation><documentation>
+        </documentation></annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="native" />
+            <enumeration value=".net" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="EventClass" use="optional" type="wxs:YesNoTypeUnion">
+        <annotation><documentation>
+          Indicates that the assembly is to be installed as an event
+          class DLL. This attribute is only valid for native assemblies. The assembly
+          will be installed with the COM+ catalog’s InstallEventClass() function.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="DllPathFromGAC" use="optional" type="wxs:YesNoTypeUnion">
+        <annotation><documentation>
+          Indicates that the DLL path should be extracted from the
+          GAC instead for being provided in the DllPath attribute. If this attribute is
+          set to “yes”, the name of the assembly can be provided using the AssemblyName
+          attribute. Or, if this AssemblyName attribute is missing, the name will be
+          extracted from the MsiAssemblyName table using the id of the parent Component
+          element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="RegisterInCommit" use="optional" type="wxs:YesNoTypeUnion">
+        <annotation><documentation>
+          Indicates that the assembly should be installed in the
+          commit custom action instead of the normal deferred custom action. This is
+          necessary when installing .NET assemblies to the GAC in the same
+          installation, as the assemblies are not visible in the GAC until after the
+          InstallFinalize action has run.
+        </documentation></annotation>
+      </attribute>
+    </complexType>
+  </element>

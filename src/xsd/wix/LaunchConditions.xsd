@@ -1,0 +1,9 @@
+<element name="LaunchConditions" type="ActionModuleSequenceType">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="Launch" />
+        <msiRef action="LaunchConditions" href="http://msdn.microsoft.com/library/aa369751.aspx" />
+      </appinfo>
+      <documentation>Queries the LaunchCondition table and evaluates each conditional statement recorded there. If any of these conditional statements fail, an error message is displayed to the user and the installation is terminated. The LaunchConditions action is optional. This action is normally the first in the sequence, but the AppSearch Action may be sequenced before the LaunchConditions action. If there are launch conditions that do not apply to all installation modes, the appropriate installation mode property should be used in a conditional expression in the appropriate sequence table. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

@@ -1,0 +1,8 @@
+<simpleType name="PropertyReference">
+    <annotation>
+      <documentation>A type that represents a Property reference.</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="\[.+\]" />
+    </restriction>
+  </simpleType>

@@ -1,0 +1,12 @@
+<simpleType name="NetfxPlatformType">
+    <annotation>
+      <documentation>
+        Platform referencing the machine architecture.
+      </documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="arm64" />
+      <enumeration value="x64" />
+      <enumeration value="x86" />
+    </restriction>
+  </simpleType>

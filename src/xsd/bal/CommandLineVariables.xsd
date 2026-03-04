@@ -1,0 +1,16 @@
+<attribute name="CommandLineVariables">
+    <annotation>
+      <documentation>
+        This value determines whether case sensitivity is used to match overridable variables specified on the command line. The default is "caseSensitive".
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+      </appinfo>
+    </annotation>
+    <simpleType>
+      <restriction base="xs:NMTOKEN">
+        <enumeration value="caseSensitive" />
+        <enumeration value="caseInsensitive" />
+      </restriction>
+    </simpleType>
+  </attribute>

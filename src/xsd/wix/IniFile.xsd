@@ -1,0 +1,97 @@
+<element name="IniFile">
+    <annotation>
+      <documentation>
+        Adds or removes .ini file entries.
+      </documentation>
+      <appinfo>
+        <msiRef table="IniFile" href="https://learn.microsoft.com/en-us/windows/win32/msi/inifile-table" />
+        <msiRef table="RemoveIniFile" href="https://learn.microsoft.com/en-us/windows/win32/msi/removeinifile-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for ini file. If one is not specified a stable identifier will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Action" use="required">
+        <annotation>
+          <documentation>The type of modification to be made.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="addLine">
+              <annotation>
+                <documentation>Creates or updates an .ini entry.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="addTag">
+              <annotation>
+                <documentation>Creates a new entry or appends a new comma-separated value to an existing entry.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="createLine">
+              <annotation>
+                <documentation>Creates an .ini entry only if the entry does no already exist.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="removeLine">
+              <annotation>
+                <documentation>Removes an .ini entry.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="removeTag">
+              <annotation>
+                <documentation>Removes a tag from an .ini entry.</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Directory" type="xs:string">
+        <annotation>
+          <documentation>Name of a property, the value of which is the full path of the folder containing the .ini file. Can be name of a directory in the Directory table, a property set by the AppSearch table, or any other property representing a full path.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Key" use="required" type="xs:string">
+        <annotation>
+          <documentation>The localizable .ini file key within the section.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="LongFileNameType" use="required">
+        <annotation>
+          <documentation>
+                        In prior versions of the WiX toolset, this attribute specified the short name.
+                        This attribute's value may now be either a short or long name.
+                        If a short name is specified, the ShortName attribute may not be specified.
+                        Also, if this value is a long name, the ShortName attribute may be omitted to
+                        allow WiX to attempt to generate a unique short name.
+                        However, if this name collides with another file or you wish to manually specify
+                        the short name, then the ShortName attribute may be specified.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Section" use="required" type="xs:string">
+        <annotation>
+          <documentation>The localizable .ini file section.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShortName" type="ShortFileNameType">
+        <annotation>
+          <documentation>
+                        The short name of the in 8.3 format.
+                        This attribute should only be set if there is a conflict between generated short names
+                        or the user wants to manually specify the short name.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>
+                        The localizable value to be written or deleted. This attribute must be set if
+                        the Action attribute's value is "addLine", "addTag", or "createLine".
+                    </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

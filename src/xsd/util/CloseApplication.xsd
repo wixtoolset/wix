@@ -1,0 +1,119 @@
+<element name="CloseApplication">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Bundle" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+      </appinfo>
+      <documentation>Closes applications or schedules a reboot if application cannot be closed.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the close application (primary key). If the Id is not specified, one will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Target" type="xs:string" use="required">
+        <annotation>
+          <documentation>Name of the exectuable to be closed.  This should only be the file name.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>
+            Condition that determines if the application should be closed.  Must be blank or evaluate to true
+            for the application to be scheduled for closing.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>Description to show if application is running and needs to be closed.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sequence" type="wxs:Integer">
+        <annotation>
+          <documentation>Optionally orders the applications to be closed.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CloseMessage" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Optionally sends a close message to the application. Default is no.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="EndSessionMessage" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sends WM_QUERYENDSESSION then WM_ENDSESSION messages to the application. Default is "no".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ElevatedCloseMessage" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Optionally sends a close message to the application from deffered action without impersonation. Default is no.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ElevatedEndSessionMessage" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sends WM_QUERYENDSESSION then WM_ENDSESSION messages to the application from a deffered action without impersonation. Default is "no".</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RebootPrompt" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Optionally prompts for reboot if application is still running.
+            The TerminateProcess attribute must be "no" or not specified if this attribute is "yes".
+            The default is "yes".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PromptToContinue" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            When this attribute is set to "yes", the user will be prompted when the application is still running. The Description attribute must contain the message to
+            display in the prompt. The prompt occurs before executing any of the other options and gives the options to "Abort", "Retry", or "Ignore". Abort will cancel
+            the install. Retry will attempt the check again and if the application is still running, prompt again. "Ignore" will continue and execute any other options
+            set on the CloseApplication element. The default is "no".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Property" type="xs:string">
+        <annotation>
+          <documentation>Property to be set if application is still running. Useful for launch conditions or to conditionalize custom UI to ask user to shut down apps.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="TerminateProcess" type="wxs:Integer">
+        <annotation>
+          <documentation>
+            Attempts to terminates process and return the attribute value as the process's exit code if the application is still running after sending any requested close and/or end session messages.
+            If this attribute is specified, the RebootPrompt attribute must be "no".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Timeout" type="wxs:Integer">
+        <annotation>
+          <documentation>
+            Optional time in seconds to wait for the application to exit after the close and/or end session messages. If the application is still running after the timeout then
+            the RebootPrompt or TerminateProcess attributes will be considered. The default value is "5" seconds.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

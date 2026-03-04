@@ -1,0 +1,35 @@
+<simpleType name="PerformanceCounterTypesType">
+    <annotation>
+      <documentation>Enumeration of valid types for performance counters.</documentation>
+    </annotation>
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="averageBase" />
+      <enumeration value="averageCount64" />
+      <enumeration value="averageTimer32" />
+      <enumeration value="counterDelta32" />
+      <enumeration value="counterTimerInverse" />
+      <enumeration value="sampleFraction" />
+      <enumeration value="timer100Ns" />
+      <enumeration value="counterTimer" />
+      <enumeration value="rawFraction" />
+      <enumeration value="timer100NsInverse" />
+      <enumeration value="counterMultiTimer" />
+      <enumeration value="counterMultiTimer100Ns" />
+      <enumeration value="counterMultiTimerInverse" />
+      <enumeration value="counterMultiTimer100NsInverse" />
+      <enumeration value="elapsedTime" />
+      <enumeration value="sampleBase" />
+      <enumeration value="rawBase" />
+      <enumeration value="counterMultiBase" />
+      <enumeration value="rateOfCountsPerSecond64" />
+      <enumeration value="rateOfCountsPerSecond32" />
+      <enumeration value="countPerTimeInterval64" />
+      <enumeration value="countPerTimeInterval32" />
+      <enumeration value="sampleCounter" />
+      <enumeration value="counterDelta64" />
+      <enumeration value="numberOfItems64" />
+      <enumeration value="numberOfItems32" />
+      <enumeration value="numberOfItemsHEX64" />
+      <enumeration value="numberOfItemsHEX32" />
+    </restriction>
+  </simpleType>

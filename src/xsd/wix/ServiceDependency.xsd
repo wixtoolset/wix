@@ -1,0 +1,26 @@
+<element name="ServiceDependency">
+    <annotation>
+      <documentation>
+        Service or group of services that must start before the parent service.
+      </documentation>
+      <appinfo>
+        <msiRef table="ServiceInstall" href="https://docs.microsoft.com/en-us/windows/win32/msi/serviceinstall-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The name (not the display name) of a previously installed service or the name of a service group when the Group attribute is set to 'yes'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Group" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Set to 'yes' to indicate that the value in the Id attribute is the name of a group of services. If 'no' or not set, the Id attribute refers to another service by name.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

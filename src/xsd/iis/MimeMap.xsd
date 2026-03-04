@@ -1,0 +1,40 @@
+<element name="MimeMap">
+    <annotation>
+      <documentation>MimeMap definition for IIS resources.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Id for the MimeMap. If the Id is not specified, it will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type" type="xs:string" use="required">
+        <annotation>
+          <documentation>Mime-type covered by the MimeMap.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Extension" type="xs:string" use="required">
+        <annotation>
+          <documentation>Extension covered by the MimeMap. Must begin with a dot.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

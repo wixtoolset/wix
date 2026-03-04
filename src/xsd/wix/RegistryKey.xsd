@@ -1,0 +1,124 @@
+<element name="RegistryKey">
+    <annotation>
+      <documentation>
+        Used for organization of child RegistryValue elements or to create a registry key
+        (and optionally remove it during uninstallation).
+      </documentation>
+      <appinfo>
+        <msiRef table="Registry" href="https://learn.microsoft.com/en-us/windows/win32/msi/registry-table" />
+        <howtoRef href="files_and_registry/read_a_registry_entry.html">How To: Read a registry entry during installation</howtoRef>
+        <howtoRef href="files_and_registry/write_a_registry_entry.html">How To: Write a registry entry during installation</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="RegistryKey" />
+        <element ref="RegistryValue" />
+        <element ref="Permission" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>ACL permission</documentation>
+          </annotation>
+        </element>
+        <element ref="PermissionEx">
+          <annotation>
+            <documentation>Can also configure the ACLs for this registry key.</documentation>
+          </annotation>
+        </element>
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Primary key used to identify this particular entry. If this attribute is not specified, an identifier will be
+            generated.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Action">
+        <annotation>
+          <documentation>
+            The Action attribute has been deprecated. In most cases, you can simply omit @Action. If you need to force Windows Installer
+            to create an empty key or recursively delete the key, use the ForceCreateOnInstall or ForceDeleteOnUninstall attributes instead.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="create">
+              <annotation>
+                <documentation>
+                  Creates the key, if absent, when the parent component is installed.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="createAndRemoveOnUninstall">
+              <annotation>
+                <documentation>
+                  Creates the key, if absent, when the parent component is installed then remove the key with all its values and subkeys when the parent component is uninstalled.
+                  Note that this value is useful only if your program creates additional values or subkeys under this key and you want an uninstall to remove them. MSI already
+                  removes all values and subkeys that it creates, so this option just adds additional overhead to uninstall.
+                </documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="none">
+              <annotation>
+                <documentation>
+                  Does nothing; this element is used merely in WiX authoring for organization and does nothing to the final output.
+                  This is the default value.
+                </documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ForceCreateOnInstall" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Set this attribute to 'yes' to create an empty key, if absent, when the parent component is installed.
+            This value is needed only to create an empty key with no subkeys or values. Windows Installer creates
+            keys as needed to store subkeys and values. The default is "no".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ForceDeleteOnUninstall" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Set this attribute to 'yes' to remove the key with all its values and subkeys when the parent component is uninstalled.
+            Note that this value is useful only if your program creates additional values or subkeys under this key and you want an uninstall to remove them. MSI already
+            removes all values and subkeys that it creates, so this option just adds additional overhead to uninstall.
+            The default is "no".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Key" type="xs:string">
+        <annotation>
+          <documentation>
+            The localizable key for the registry value.
+            If the parent element is a RegistryKey, this value may be omitted to use the
+            path of the parent, or if its specified it will be appended to the path of the parent.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Root" type="RegistryRootType">
+        <annotation>
+          <documentation>
+            The predefined root key for the registry value.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

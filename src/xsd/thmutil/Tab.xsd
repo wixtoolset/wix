@@ -1,0 +1,24 @@
+<element name="Tab">
+        <annotation>
+            <documentation>Defines an individual tab within a set of tabs.</documentation>
+        </annotation>
+        <complexType>
+            <simpleContent>
+                <extension base="xs:string">
+                    <annotation>
+                        <documentation>
+                            Caption of the tab.
+                            Mutually exclusive with the StringId attribute.
+                        </documentation>
+                    </annotation>
+                    <attribute name="StringId" type="xs:nonNegativeInteger">
+                        <annotation>
+                            <documentation>
+                                Identifier that references a string resource in the module to define the caption of the tab.
+                            </documentation>
+                        </annotation>
+                    </attribute>
+                </extension>
+            </simpleContent>
+        </complexType>
+    </element>

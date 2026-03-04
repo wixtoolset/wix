@@ -1,0 +1,13 @@
+<element name="QueryNativeMachine">
+    <annotation>
+      <documentation>
+        Schedules the QueryNativeMachine custom action for the current platform. For more information, see [QueryNativeMachine properties](../../../tools/wixext/wininfo#querynativemachine).
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="UI" />
+      </appinfo>
+    </annotation>
+  </element>

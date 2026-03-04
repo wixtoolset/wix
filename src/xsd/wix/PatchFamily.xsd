@@ -1,0 +1,64 @@
+<element name="PatchFamily">
+    <annotation>
+      <documentation>Collection of items that should be kept from the differences between two products.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="All" minOccurs="0" />
+        <element ref="BinaryRef" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="ComponentRef" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="CustomActionRef" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="DigitalCertificateRef" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="DirectoryRef" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="FeatureRef" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="IconRef" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="PropertyRef" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="SoftwareTagRef" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="UIRef" minOccurs="0" maxOccurs="unbounded" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier which indicates a sequence family to which this patch belongs.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProductCode" type="Guid">
+        <annotation>
+          <documentation>
+            Specifies the ProductCode of the product that this family applies to.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Version" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Used to populate the sequence column of the MsiPatchSequence table in the final MSP file.
+            Specified in x.x.x.x format. See documentation for Sequence column of MsiPatchSequence table in MSI SDK.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Supersede" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Set this value to 'yes' to indicate that this patch will supersede all previous patches in this patch family.
+            The default value is 'no'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

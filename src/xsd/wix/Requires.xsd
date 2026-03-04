@@ -1,0 +1,74 @@
+<element name="Requires">
+    <annotation>
+      <documentation>
+        Describes a dependency on a provider for the current component or package.
+      </documentation>
+      <appinfo>
+        <remarks>
+          <p>
+            This element declares a dependency on any product that uses the Provides element. If that product is uninstalled
+            before a product that requires it, the uninstall will err or warn the user that other products are installed
+            which depend on that product. This behavior can be modified by changing the attribute values on the Requires element.
+          </p>
+          <p>
+            If you do not nest this element under a Provides element, you must specify the @Id attribute
+            so that it can be referenced by a RequiresRef element nested under a Provides element.
+          </p>
+        </remarks>
+        <seeAlso ref="RequiresRef" />
+        <howtoRef href="author_product_dependencies.html">How To: Author product dependencies</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            Dependency requirement identity. If this attribute is not specified, an identifier will be generated automatically.
+            If this element is not authored under a Provides element, this attribute is required.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProviderKey" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The unique registry key name for the dependency provider to require during installation of this product.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Minimum" type="WixVersionType">
+        <annotation>
+          <documentation>
+            The minimum version of the dependency provider required to be installed. The default is unbound.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Maximum" type="WixVersionType">
+        <annotation>
+          <documentation>
+            The maximum version of the dependency provider required to be installed. The default is unbound.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IncludeMinimum" type="YesNoType">
+        <annotation>
+          <documentation>
+            Set to "yes" to make the range of dependency provider versions required include the value specified in Minimum.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IncludeMaximum" type="YesNoType">
+        <annotation>
+          <documentation>
+            Set to "yes" to make the range of dependency provider versions required include the value specified in Maximum.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

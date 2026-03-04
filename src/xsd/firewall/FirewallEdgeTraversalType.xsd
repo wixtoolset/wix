@@ -1,0 +1,8 @@
+<simpleType name="FirewallEdgeTraversalType">
+    <restriction base="xs:NMTOKEN">
+      <enumeration value="allow" />
+      <enumeration value="deferToApp" />
+      <enumeration value="deferToUser" />
+      <enumeration value="deny" />
+    </restriction>
+  </simpleType>

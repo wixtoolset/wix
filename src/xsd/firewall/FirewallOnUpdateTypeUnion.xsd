@@ -1,0 +1,3 @@
+<simpleType name="FirewallOnUpdateTypeUnion">
+    <union memberTypes="FirewallOnUpdateType PropertyReference wxs:PreprocessorVariables" />
+  </simpleType>

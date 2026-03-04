@@ -1,0 +1,17 @@
+<element name="SFPFile">
+    <annotation>
+      <documentation>
+        Provides a many-to-many mapping from the SFPCatalog table to the File table
+      </documentation>
+      <appinfo>
+        <msiRef table="FileSFPCatalog" href="http://msdn.microsoft.com/library/aa368591.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>Primary Key to File Table.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

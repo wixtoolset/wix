@@ -1,0 +1,93 @@
+<element name="InternetShortcut">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <howtoRef href="files_and_registry/create_internet_shortcut.html">How To: Create a shortcut to a webpage</howtoRef>
+      </appinfo>
+      <documentation>Creates a shortcut to a URL.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Unique identifier in your installation package for this Internet shortcut.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Directory" type="xs:string">
+        <annotation>
+          <documentation>Identifier reference to Directory element where shortcut is to be created. This attribute's value defaults to the parent Component directory.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The name of the shortcut file, which is visible to the user. (The .lnk
+            extension is added automatically and by default, is not shown to the user.)
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Target" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            URL that should be opened when the user selects the shortcut. Windows
+            opens the URL in the appropriate handler for the protocol specified
+            in the URL. Note that this is a formatted field, so you can use
+            [#fileId] syntax to refer to a file being installed (using the file:
+            protocol).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Type">
+        <annotation>
+          <documentation>Which type of shortcut should be created.</documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="url">
+              <annotation>
+                <documentation>Creates .url files using IUniformResourceLocatorW.</documentation>
+              </annotation>
+            </enumeration>
+            <enumeration value="link">
+              <annotation>
+                <documentation>Creates .lnk files using IShellLinkW (default).</documentation>
+              </annotation>
+            </enumeration>
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="IconFile" type="xs:string">
+        <annotation>
+          <documentation>
+            Icon file that should be displayed. Note that this is a formatted field, so you can use
+            [#fileId] syntax to refer to a file being installed (using the file:
+            protocol).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IconIndex" type="wxs:Integer">
+        <annotation>
+          <documentation>
+            Index of the icon being referenced.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

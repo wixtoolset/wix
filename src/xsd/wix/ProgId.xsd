@@ -1,0 +1,41 @@
+<element name="ProgId">
+    <annotation>
+      <documentation>
+                ProgId registration for parent Component. If ProgId has an associated Class, it must be a child of that element.
+            </documentation>
+      <appinfo>
+        <msiRef table="ProgId" href="http://msdn.microsoft.com/library/aa370879.aspx" />
+        <msiRef table="Class" href="http://msdn.microsoft.com/library/aa367861.aspx" />
+        <msiRef table="Registry" href="https://learn.microsoft.com/en-us/windows/win32/msi/registry-table" />
+        <msiRef table="Icon" href="http://msdn.microsoft.com/library/aa369210.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="ProgId" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>The version-independent ProgId must be the first child element of actual ProgId. Nesting other ProgId elements within the Version-independent ProgId will create COM+ aliases, see <a href="http://support.microsoft.com/kb/305745">http://support.microsoft.com/kb/305745</a> for more information.</documentation>
+          </annotation>
+        </element>
+        <element ref="Extension" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Extensions that refer to this ProgId</documentation>
+          </annotation>
+        </element>
+      </sequence>
+      <attribute name="Id" type="xs:string" use="required" />
+      <attribute name="Description" type="xs:string" />
+      <attribute name="Icon" type="xs:string">
+        <annotation>
+          <documentation>For an advertised ProgId, the Id of an Icon element. For a non-advertised ProgId, this is the Id of a file containing an icon resource.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IconIndex" type="Integer" />
+      <attribute name="Advertise" type="YesNoTypeUnion" />
+      <attribute name="NoOpen" type="xs:string">
+        <annotation>
+          <documentation>Specifies that the associated ProgId should not be opened by users. The value is presented as a warning to users. An empty string is also valid for this attribute.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

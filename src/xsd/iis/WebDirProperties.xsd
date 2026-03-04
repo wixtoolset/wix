@@ -1,0 +1,146 @@
+<element name="WebDirProperties">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+      </appinfo>
+      <documentation>
+        WebDirProperties used by one or more WebSites. Lists properties common to IIS web sites and vroots. Corresponding properties can be viewed through the IIS Manager snap-in. One property entry can be reused by multiple sites or vroots using the Id field as a reference, using WebVirtualDir.DirProperties, WebSite.DirProperties, or WebDir.DirProperties.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the WebDirProperties. The Id is required when the parent is a Fragment, Module, or Package. Otherwise, Id is optional and if not specified, it will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Read" type="wxs:YesNoTypeUnion" />
+      <attribute name="Write" type="wxs:YesNoTypeUnion" />
+      <attribute name="Script" type="wxs:YesNoTypeUnion" />
+      <attribute name="Execute" type="wxs:YesNoTypeUnion" />
+      <attribute name="AnonymousAccess" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sets the Enable Anonymous Access checkbox, which maps anonymous users to a Windows user account. When setting this to 'yes' you should also provide the user account using the AnonymousUser attribute, and determine what setting to use for the IIsControlledPassword attribute. Defaults to 'no.'</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AnonymousUser" type="xs:string">
+        <annotation>
+          <documentation>Reference to the Id attribute on the User element to be used as the anonymous user for the directory. See the User element for more information.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="IIsControlledPassword" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sets whether IIS should control the password used for the Windows account specified in the AnonymousUser attribute. Defaults to 'no.'</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="WindowsAuthentication" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sets the Windows Authentication option, which enables integrated Windows authentication to be used on the site. Defaults to 'no.'</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DigestAuthentication" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sets the Digest Authentication option, which allows using digest authentication with domain user accounts. Defaults to 'no.'</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="BasicAuthentication" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sets the Basic Authentication option, which allows clients to provide credentials in plaintext over the wire. Defaults to 'no.'</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PassportAuthentication" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sets the Passport Authentication option, which allows clients to provide credentials via a .Net Passport account. Defaults to 'no.'</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LogVisits" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sets whether visits to this site should be logged. Defaults to 'no.'</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Index" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sets the Index Resource option, which specifies whether this web directory should be indexed. Defaults to 'no.'</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DefaultDocuments" type="xs:string">
+        <annotation>
+          <documentation>The list of default documents to set for this web directory, in comma-delimited format.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AspDetailedError" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Sets the option for whether to send detailed ASP errors back to the client on script error. Default is 'no.'</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HttpExpires" type="xs:string">
+        <annotation>
+          <documentation>Value to set the HttpExpires attribute to for a Web Dir in the metabase.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CacheControlMaxAge" type="xs:nonNegativeInteger">
+        <annotation>
+          <documentation>Integer value specifying the cache control maximum age value.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CacheControlCustom" type="xs:string">
+        <annotation>
+          <documentation>Custom HTTP 1.1 cache control directives.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ClearCustomError" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies whether IIs will return custom errors for this directory.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AccessSSL" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>A value of true indicates that file access requires SSL file permission processing, with or without a client certificate. This corresponds to AccessSSL flag for AccessSSLFlags IIS metabase property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AccessSSL128" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>A value of true indicates that file access requires SSL file permission processing with a minimum key size of 128 bits, with or without a client certificate. This corresponds to AccessSSL128 flag for AccessSSLFlags IIS metabase property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AccessSSLMapCert" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>This corresponds to AccessSSLMapCert flag for AccessSSLFlags IIS metabase property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AccessSSLNegotiateCert" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>This corresponds to AccessSSLNegotiateCert flag for AccessSSLFlags IIS metabase property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AccessSSLRequireCert" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>This corresponds to AccessSSLRequireCert flag for AccessSSLFlags IIS metabase property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="AuthenticationProviders" type="xs:string">
+        <annotation>
+          <documentation>Comma delimited list, in order of precedence, of Windows authentication providers that IIS will attempt to use: NTLM, Kerberos, Negotiate, and others.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

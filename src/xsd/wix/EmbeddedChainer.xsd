@@ -1,0 +1,64 @@
+<element name="EmbeddedChainer">
+    <annotation>
+      <appinfo>
+        <msiRef table="MsiEmbeddedChainer " href="http://msdn.microsoft.com/library/bb736316.aspx" />
+        <seeAlso ref="Binary" />
+        <seeAlso ref="File" />
+        <seeAlso ref="Property" />
+        <seeAlso ref="EmbeddedChainerRef" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Unique identifier for embedded chainer.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CommandLine" type="xs:string">
+        <annotation>
+          <documentation>Value to append to the transaction handle and passed to the chainer executable.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>
+            Value is the condition. It is important to note that each EmbeddedChainer element must have a mutually exclusive condition
+            to ensure that only one embedded chainer will execute at a time. If the conditions are not mutually exclusive the chainer
+            that executes is undeterministic.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="BinarySource" type="xs:string">
+        <annotation>
+          <documentation>
+            Reference to the Binary element that contains the chainer executable. Mutually exclusive with
+            the FileSource and PropertySource attributes.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FileSource" type="xs:string">
+        <annotation>
+          <documentation>
+            Reference to the File element that is the chainer executable. Mutually exclusive with
+            the BinarySource and PropertySource attributes.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="PropertySource" type="xs:string">
+        <annotation>
+          <documentation>
+            Reference to a Property that resolves to the full path to the chainer executable. Mutually exclusive with
+            the BinarySource and FileSource attributes.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

@@ -1,0 +1,8 @@
+<element name="StartServices" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="StartServices" href="http://msdn.microsoft.com/library/aa372026.aspx" />
+      </appinfo>
+      <documentation>Starts system services. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

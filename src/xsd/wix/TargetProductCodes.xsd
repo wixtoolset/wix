@@ -1,0 +1,17 @@
+<element name="TargetProductCodes">
+    <annotation>
+      <documentation>
+                The product codes for products that can accept the patch.
+            </documentation>
+    </annotation>
+    <complexType>
+      <choice maxOccurs="unbounded">
+        <element ref="TargetProductCode" />
+      </choice>
+      <attribute name="Replace" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether to replace the product codes that can accept the patch from the target packages with the child elements.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

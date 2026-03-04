@@ -1,0 +1,17 @@
+<complexType name="ActionSequenceType">
+    <attribute name="Condition" type="xs:string">
+      <annotation>
+        <documentation>The condition of the action.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Sequence" type="Integer">
+      <annotation>
+        <documentation>A value used to indicate the position of this action in a sequence.</documentation>
+      </annotation>
+    </attribute>
+    <attribute name="Suppress" type="YesNoTypeUnion">
+      <annotation>
+        <documentation>If yes, this action will not occur.</documentation>
+      </annotation>
+    </attribute>
+  </complexType>

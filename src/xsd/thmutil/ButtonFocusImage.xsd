@@ -1,0 +1,12 @@
+<element name="ButtonFocusImage">
+        <annotation>
+            <documentation>
+                Defines a button image that is used when the control has focus.
+                ButtonImage, ButtonHoverImage, and ButtonSelectedImage are required with ButtonFocusImage.
+                If not specified, then the default focus rectangle is drawn on top of ButtonImage.
+            </documentation>
+        </annotation>
+        <complexType>
+            <attributeGroup ref="OwnerDrawImageAttributes" />
+        </complexType>
+    </element>

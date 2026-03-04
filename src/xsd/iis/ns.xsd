@@ -1,0 +1,7 @@
+<schema targetNamespace="http://wixtoolset.org/schemas/v4/wxs/iis">
+  <annotation>
+    <documentation>
+      The source code schema for the WiX Toolset Internet Information Services Extension.
+    </documentation>
+  </annotation>
+</schema>

@@ -1,0 +1,9 @@
+<simpleType name="YesNoType">
+        <annotation>
+            <documentation>Values of this type will either be "yes" or "no".</documentation>
+        </annotation>
+        <restriction base="xs:NMTOKEN">
+            <enumeration value="no" />
+            <enumeration value="yes" />
+        </restriction>
+    </simpleType>

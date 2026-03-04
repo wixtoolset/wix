@@ -1,0 +1,55 @@
+<element name="DirectoryRef">
+    <annotation>
+      <documentation>Create a reference to a Directory element in another Fragment.</documentation>
+      <appinfo>
+        <seeAlso ref="Directory" />
+        <howtoRef href="files_and_registry/add_a_file.html">How To: Add a file to your installer</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Component" />
+        <element ref="Directory" />
+        <element ref="File" />
+        <element ref="Files" />
+        <element ref="Merge" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the Directory element to reference.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DiskId" type="DiskIdType">
+        <annotation>
+          <documentation>
+            Sets the default disk identifier for the files contained in this directory.
+            This attribute's value may be overridden by a child Component, Directory,
+            Merge or File element. See the File or Merge elements' DiskId attribute for
+            more information.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="FileSource" type="xs:string">
+        <annotation>
+          <documentation>Used to set the file system source for this DirectoryRef's child elements.
+          For more information, see [Specifying source files](../../../tools/payloads/).</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

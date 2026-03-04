@@ -1,0 +1,20 @@
+<element name="BinaryRef">
+    <annotation>
+      <documentation>Used only for PatchFamilies to include only a binary table entry in a patch.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the Binary element to reference.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+                    Extensibility point in the WiX XML Schema. Schema extensions can register additional
+                    attributes at this point in the schema.
+                </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

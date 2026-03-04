@@ -1,0 +1,8 @@
+<element name="RemoveFolders" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="RemoveFolders" href="http://msdn.microsoft.com/library/aa371202.aspx" />
+      </appinfo>
+      <documentation>Removes any folders linked to components set to be removed or run from source. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

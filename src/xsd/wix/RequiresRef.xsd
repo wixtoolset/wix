@@ -1,0 +1,34 @@
+<element name="RequiresRef">
+    <annotation>
+      <documentation>
+        References existing authoring for a dependency on a provider for the current component or package.
+      </documentation>
+      <appinfo>
+        <remarks>
+          <p>
+            This element references a dependency on any product that uses the Provides element. If that product is uninstalled
+            before a product that requires it, the uninstall will err or warn the user that other products are installed
+            which depend on that product. This behavior can be modified by changing the attribute values on the Requires element.
+          </p>
+        </remarks>
+        <seeAlso ref="Requires" />
+        <howtoRef href="author_product_dependencies.html">How To: Author product dependencies</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The identifier of the Requires element to reference.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

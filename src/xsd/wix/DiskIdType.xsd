@@ -1,0 +1,8 @@
+<simpleType name="DiskIdType">
+    <annotation>
+      <documentation>Values of this type must be an integer or the value of one or more preprocessor variables with the format `$(Variable)` or `$(var.Variable)`.</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="((\d+)|(\$\(\w+\.(\w|[.])+\)))+" />
+    </restriction>
+  </simpleType>

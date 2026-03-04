@@ -1,0 +1,72 @@
+<element name="SoftwareTag">
+    <annotation>
+      <documentation>
+        This extension implements the ISO/IEC 19770-2:2015 specification. A SWID tag file
+        will be generated an inserted into the Package or Bundle.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+            <documentation>
+              Name to use in the filename for the software id tag. By default the filename
+              uses the Bundle/@Name or Package/@Name. If the bundle name or package name contains
+              invalid filename characters such as ":" or "?", use this attribute to provide
+              a valid filename.
+            </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Regid" type="xs:string" use="required">
+        <annotation>
+            <documentation>
+              The regid for the software manufacturer. A regid is a URI simplified for the common
+              case. Namely, if the scheme is "http://", it can be removed. Additionally, the domain
+              should be minimized as much as possible (for example, remove "www." prefix if unnecessary).
+
+              For example, the WiX toolset regid is "wixtoolset.org".
+            </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="InstallDirectory" type="xs:string">
+        <annotation>
+            <documentation>
+              A reference to an existing Directory/@Id where the software is installed. The SWID tag file will be installed in a "swidtag" folder
+              under that directory as per the specification. This attribute is required on a SoftwareTag element found under a Package element.
+            </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="InstallPath" type="xs:string">
+        <annotation>
+            <documentation>
+              The path where the software is installed. The SWID tag file will be installed in a "swidtag" folder.
+              This is a formatted attribute so it is possible to use Variables as the InstallPath by setting
+              the value to, for example, "[ProgramFilesFolder]CompanyName\Product Name". This attribute is required
+              on a SoftwareTag element found under a Bundle element.
+            </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Feature" type="xs:string">
+        <annotation>
+            <documentation>
+              Optional attribute to explicitly set the Feature when defining the software id tag
+              in a Package. By default the software id tag will always be installed by a top-level hidden feature.
+              It is recommended to <strong>not</strong> set this attribute.
+            </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Bitness" type="BitnessTypeUnion">
+        <annotation>
+          <documentation>
+            This attribute facilitates the installation of packages that install both 32-bit and 64-bit files. Set this attribute to 'always32'
+            force the software id tag to a 32-bit location (such as "ProgramFilesFolder") or 'always64' to force the tag to be installed to
+            a 64-bit location (such as "ProgramFiles64Folder").
+
+            The default value is `default` where the tag will be installed to the directory that matches the
+            same bitness as the package.
+
+            This attribute is only allowed on a SoftwareTag element found under a Package element.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

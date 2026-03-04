@@ -1,0 +1,7 @@
+<schema targetNamespace="http://wixtoolset.org/schemas/v4/wxs/vs">
+  <annotation>
+    <documentation>
+      The source code schema for the WiX Toolset Visual Studio Extension.
+    </documentation>
+  </annotation>
+</schema>

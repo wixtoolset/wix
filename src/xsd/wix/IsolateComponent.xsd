@@ -1,0 +1,17 @@
+<element name="IsolateComponent">
+    <annotation>
+      <documentation>
+                Shared Component to be privately replicated in folder of parent Component
+            </documentation>
+      <appinfo>
+        <msiRef table="IsolateComponent" href="http://msdn.microsoft.com/library/aa369730.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Shared" type="xs:string" use="required">
+        <annotation>
+          <documentation>Shared Component for this application Component.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

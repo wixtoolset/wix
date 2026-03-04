@@ -1,0 +1,26 @@
+<element name="PayloadGroup">
+    <annotation>
+      <documentation>
+        Describes a payload group to a bootstrapper. PayloadGroups referenced from within a Bundle are tied to the Bundle.
+        PayloadGroups referenced from a Fragment are tied to the context of whatever references them such as an ExePackage or MsiPackage.
+        It is possible to share a PayloadGroup between multiple Packages and/or a Bundle by creating multiple references to it.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="BundlePackagePayload" />
+        <element ref="ExePackagePayload" />
+        <element ref="MsiPackagePayload" />
+        <element ref="MspPackagePayload" />
+        <element ref="MsuPackagePayload" />
+        <element ref="Payload" />
+        <element ref="PayloadGroupRef" />
+        <element ref="Payloads" />
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>Identifier for payload group.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

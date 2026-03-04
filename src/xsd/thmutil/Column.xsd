@@ -1,0 +1,38 @@
+<element name="Column">
+        <annotation>
+            <documentation>A column of a list.</documentation>
+        </annotation>
+        <complexType>
+            <simpleContent>
+                <extension base="xs:string">
+                    <annotation>
+                        <documentation>
+                            Text for the column header.
+                            Mutually exclusive with the StringId attribute.
+                        </documentation>
+                    </annotation>
+                    <attribute name="Width" type="xs:int">
+                        <annotation>
+                            <documentation>Width of the column.</documentation>
+                        </annotation>
+                    </attribute>
+                    <attribute name="Expands" type="YesNoType">
+                        <annotation>
+                            <documentation>
+                                Whether or not this column can grow to fill available width of the listview.
+                                More than one column can be marked with yes - all expandable columns will share available extra space.
+                                This is especially useful if the Window/@AutoResize is yes.
+                            </documentation>
+                        </annotation>
+                    </attribute>
+                    <attribute name="StringId" type="xs:nonNegativeInteger">
+                        <annotation>
+                            <documentation>
+                                Identifier that references a string resource in the module to define the text for the column header.
+                            </documentation>
+                        </annotation>
+                    </attribute>
+                </extension>
+            </simpleContent>
+        </complexType>
+    </element>

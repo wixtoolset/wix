@@ -1,0 +1,157 @@
+<element name="ComPlusApplication">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Fragment" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Module" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Package" />
+      </appinfo>
+      <documentation>
+        Defines a COM+ application. If this element is a descendent
+        of a Component element, the application will be created in association with
+        this component. If the element is a child of any of the Fragment, Module, or
+        Package elements it is considered to be a locater, referencing an existing
+        application.
+
+        If the element is a child of a ComPlusPartition element,
+        or have its Partition attribute set, the application will be installed under
+        the referenced partition.
+      </documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <choice minOccurs="0" maxOccurs="unbounded">
+          <element ref="ComPlusApplicationRole" />
+          <element ref="ComPlusAssembly" />
+        </choice>
+      </sequence>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Partition" use="optional" type="xs:string">
+        <annotation><documentation>
+          If the element is not a child of a ComPlusPartition
+          element, this attribute can be provided with the id of a ComPlusPartition
+          element representing the partition the application belongs to.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="ApplicationId" use="optional" type="xs:string">
+        <annotation><documentation>
+          Id for the application. This attribute can be omitted, in
+          which case an id will be generated on install. If the element is a locater,
+          this attribute can be omitted if a value is provided for the Name attribute.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="Name" use="optional" type="xs:string">
+        <annotation><documentation>
+          Name of the application. This attribute can be omitted if
+          the element is a locater, and a value is provided for the PartitionId
+          attribute.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="ThreeGigSupportEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="AccessChecksLevel" use="optional">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="applicationLevel" />
+            <enumeration value="applicationComponentLevel" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Activation" use="optional">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="inproc" />
+            <enumeration value="local" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ApplicationAccessChecksEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="ApplicationDirectory" use="optional" type="xs:string" />
+      <attribute name="Authentication" use="optional">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="default" />
+            <enumeration value="none" />
+            <enumeration value="connect" />
+            <enumeration value="call" />
+            <enumeration value="packet" />
+            <enumeration value="integrity" />
+            <enumeration value="privacy" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="AuthenticationCapability" use="optional">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="none" />
+            <enumeration value="secureReference" />
+            <enumeration value="staticCloaking" />
+            <enumeration value="dynamicCloaking" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="Changeable" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="CommandLine" use="optional" type="xs:string" />
+      <attribute name="ConcurrentApps" use="optional" type="xs:int" />
+      <attribute name="CreatedBy" use="optional" type="xs:string" />
+      <attribute name="CRMEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="CRMLogFile" use="optional" type="xs:string" />
+      <attribute name="Deleteable" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="Description" use="optional" type="xs:string" />
+      <attribute name="DumpEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="DumpOnException" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="DumpOnFailfast" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="DumpPath" use="optional" type="xs:string" />
+      <attribute name="EventsEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="Identity" use="optional" type="xs:string" />
+      <attribute name="ImpersonationLevel" use="optional">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="anonymous" />
+            <enumeration value="identify" />
+            <enumeration value="impersonate" />
+            <enumeration value="delegate" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="IsEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="MaxDumpCount" use="optional" type="xs:int" />
+      <attribute name="Password" use="optional" type="xs:string" />
+      <attribute name="QCAuthenticateMsgs" use="optional">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="secureApps" />
+            <enumeration value="off" />
+            <enumeration value="on" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="QCListenerMaxThreads" use="optional" type="xs:int" />
+      <attribute name="QueueListenerEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="QueuingEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="RecycleActivationLimit" use="optional" type="xs:int" />
+      <attribute name="RecycleCallLimit" use="optional" type="xs:int" />
+      <attribute name="RecycleExpirationTimeout" use="optional" type="xs:int" />
+      <attribute name="RecycleLifetimeLimit" use="optional" type="xs:int" />
+      <attribute name="RecycleMemoryLimit" use="optional" type="xs:int" />
+      <attribute name="Replicable" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="RunForever" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="ShutdownAfter" use="optional" type="xs:int" />
+      <attribute name="SoapActivated" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="SoapBaseUrl" use="optional" type="xs:string" />
+      <attribute name="SoapMailTo" use="optional" type="xs:string" />
+      <attribute name="SoapVRoot" use="optional" type="xs:string" />
+      <attribute name="SRPEnabled" use="optional" type="wxs:YesNoTypeUnion" />
+      <attribute name="SRPTrustLevel" use="optional">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="disallowed" />
+            <enumeration value="fullyTrusted" />
+          </restriction>
+        </simpleType>
+      </attribute>
+    </complexType>
+  </element>

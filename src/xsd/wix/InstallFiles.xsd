@@ -1,0 +1,8 @@
+<element name="InstallFiles" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="InstallFiles" href="http://msdn.microsoft.com/library/aa369503.aspx" />
+      </appinfo>
+      <documentation>Copies files specified in the File table from the source directory to the destination directory. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

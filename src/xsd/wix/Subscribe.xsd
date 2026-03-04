@@ -1,0 +1,40 @@
+<element name="Subscribe">
+    <annotation>
+      <documentation>
+        Sets attributes for events in the EventMapping table
+      </documentation>
+      <appinfo>
+        <msiRef table="EventMapping" href="https://learn.microsoft.com/en-us/windows/win32/msi/eventmapping-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Event" type="xs:string">
+        <annotation>
+          <documentation>must be one of the standard control events'</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Attribute" type="xs:string">
+        <annotation>
+          <documentation>if not present can only handle enable, disable, hide, unhide events</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

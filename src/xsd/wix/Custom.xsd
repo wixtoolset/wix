@@ -1,0 +1,48 @@
+<element name="Custom">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="CustomAction" />
+      </appinfo>
+      <documentation>Use to sequence a custom action.</documentation>
+    </annotation>
+    <complexType>
+      <annotation>
+        <documentation>Text node specifies the condition of the action.</documentation>
+      </annotation>
+      <attribute name="Action" type="xs:string" use="required">
+        <annotation>
+          <documentation>The CustomAction to which the Custom element applies.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>Optional condition that determines whether the action should be executed.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnExit" type="ExitType">
+        <annotation>
+          <documentation>Mutually exclusive with Before, After, and Sequence attributes</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Before" type="xs:string">
+        <annotation>
+          <documentation>The name of the standard or custom action before which this action should be performed. Mutually exclusive with OnExit, After, and Sequence attributes</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="After" type="xs:string">
+        <annotation>
+          <documentation>The name of the standard or custom action after which this action should be performed. Mutually exclusive with Before, OnExit, and Sequence attributes</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Overridable" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>If "yes", the sequencing of this action may be overridden by sequencing elsewhere.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sequence" type="Integer">
+        <annotation>
+          <documentation>The sequence number for this action. It is recommended to use one of the other mutually exclusive attributes: OnExit, After, and Before.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,32 @@
+<element name="ODBCTranslator">
+    <annotation>
+      <documentation>
+                ODBCTranslator for a Component
+            </documentation>
+      <appinfo>
+        <msiRef table="ODBCTranslator" href="http://msdn.microsoft.com/library/aa370549.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the translator.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" use="required" type="xs:string">
+        <annotation>
+          <documentation>Name for the translator.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="File" type="xs:string">
+        <annotation>
+          <documentation>Required if not found as child of File element</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SetupFile" type="xs:string">
+        <annotation>
+          <documentation>Required if not found as child of File element or different from File attribute above</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

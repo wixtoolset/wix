@@ -1,0 +1,141 @@
+<element name="PermissionEx">
+    <annotation>
+      <documentation>
+          Sets ACLs on File, Registry, CreateFolder, or ServiceInstall.  When under a Registry element, this cannot be used
+          if the Action attribute's value is remove or removeKeyOnInstall.  This element has no Id attribute.
+          The table and key are taken from the parent element.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="CreateFolder" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="File" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="RegistryKey" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="RegistryValue" />
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="ServiceInstall" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="User" type="xs:string" use="required"></attribute>
+      <attribute name="Domain" type="xs:string"></attribute>
+      <attribute name="Inheritable" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Whether the permissions are inheritable. The default is "yes".</documentation>
+        </annotation>
+      </attribute>
+      <!-- Common ACLs -->
+      <attribute name="Read" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="Delete" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="ReadPermission" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="ChangePermission" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="TakeOwnership" type="wxs:YesNoTypeUnion"></attribute>
+      <!-- Folder and File ACLs -->
+      <attribute name="ReadAttributes" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="WriteAttributes" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="ReadExtendedAttributes" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="WriteExtendedAttributes" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="Synchronize" type="wxs:YesNoTypeUnion"></attribute>
+      <!-- Folder only ACLs -->
+      <attribute name="CreateFile" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>For a directory, the right to create a file in the directory.  Only valid under a 'CreateFolder' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CreateChild" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>For a directory, the right to create a subdirectory.  Only valid under a 'CreateFolder' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DeleteChild" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>For a directory, the right to delete a directory and all the files it contains, including read-only files.  Only valid under a 'CreateFolder' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Traverse" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>For a directory, the right to traverse the directory.  By default, users are assigned the BYPASS_TRAVERSE_CHECKING privilege, which ignores the FILE_TRAVERSE access right.  Only valid under a 'CreateFolder' parent.</documentation>
+        </annotation>
+      </attribute>
+      <!-- File only ACLs -->
+      <attribute name="Append" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="Execute" type="wxs:YesNoTypeUnion"></attribute>
+      <!-- File and Registry ACLs -->
+      <attribute name="Write" type="wxs:YesNoTypeUnion"></attribute>
+      <!-- Registry only ACLs -->
+      <attribute name="CreateSubkeys" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="EnumerateSubkeys" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="Notify" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="CreateLink" type="wxs:YesNoTypeUnion"></attribute>
+      <!-- Generic ACLs, mapped by system to appropriate permissions -->
+      <attribute name="GenericAll" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="GenericExecute" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="GenericWrite" type="wxs:YesNoTypeUnion"></attribute>
+      <attribute name="GenericRead" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>specifying this will fail to grant read access</documentation>
+        </annotation>
+      </attribute>
+      <!-- Service only ACLs -->
+      <attribute name="ServiceQueryConfig" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Required to call the QueryServiceConfig and QueryServiceConfig2 functions to query the service configuration.  Only valid under a 'ServiceInstall' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceChangeConfig" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Required to call the ChangeServiceConfig or ChangeServiceConfig2 function to change the service configuration.  Only valid under a 'ServiceInstall' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceQueryStatus" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Required to call the QueryServiceStatus function to ask the service control manager about the status of the service.  Only valid under a 'ServiceInstall' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceEnumerateDependents" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Required to call the EnumDependentServices function to enumerate all the services dependent on the service.  Only valid under a 'ServiceInstall' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceStart" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Required to call the StartService function to start the service.  Only valid under a 'ServiceInstall' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceStop" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Required to call the ControlService function to stop the service.  Only valid under a 'ServiceInstall' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServicePauseContinue" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Required to call the ControlService function to pause or continue the service.  Only valid under a 'ServiceInstall' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceInterrogate" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Required to call the ControlService function to ask the service to report its status immediately.  Only valid under a 'ServiceInstall' parent.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ServiceUserDefinedControl" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Required to call the ControlService function to specify a user-defined control code.  Only valid under a 'ServiceInstall' parent.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

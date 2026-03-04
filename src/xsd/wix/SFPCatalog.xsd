@@ -1,0 +1,35 @@
+<element name="SFPCatalog">
+    <annotation>
+      <documentation>
+                Adds a system file protection update catalog file
+            </documentation>
+      <appinfo>
+        <msiRef table="SFPCatalog" href="http://msdn.microsoft.com/library/aa371833.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="SFPCatalog" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="SFPFile" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Primary Key to File Table.</documentation>
+          </annotation>
+        </element>
+      </choice>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>Filename for catalog file when installed.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Dependency" type="xs:string">
+        <annotation>
+          <documentation>Used to define dependency outside of the package.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string">
+        <annotation>
+          <documentation>Path to catalog file in binary.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

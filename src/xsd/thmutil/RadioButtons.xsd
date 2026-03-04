@@ -1,0 +1,15 @@
+<element name="RadioButtons">
+        <annotation>
+            <documentation>Defines a set of radio buttons.</documentation>
+        </annotation>
+        <complexType>
+            <choice maxOccurs="unbounded">
+                <element ref="RadioButton" />
+            </choice>
+            <attribute name="Name" type="xs:string">
+                <annotation>
+                    <documentation>Optional variable name for the set of radio buttons.</documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

@@ -1,0 +1,64 @@
+<element name="MessageQueuePermission">
+    <annotation><documentation>
+    </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation>
+          <documentation>Identifier for the message queue permission. If the Id is not specified, one will be generated.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MessageQueue" type="xs:string">
+        <annotation>
+          <documentation>Message queue to set permissions on. Must be specified when under a Component element. Cannot be specified when under a MessageQueue element.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="User" type="xs:string">
+        <annotation>
+          <documentation></documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Group" type="xs:string">
+        <annotation>
+          <documentation></documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DeleteMessage" type="wxs:YesNoTypeUnion" />
+      <attribute name="PeekMessage" type="wxs:YesNoTypeUnion" />
+      <attribute name="WriteMessage" type="wxs:YesNoTypeUnion" />
+      <attribute name="DeleteJournalMessage" type="wxs:YesNoTypeUnion" />
+      <attribute name="SetQueueProperties" type="wxs:YesNoTypeUnion" />
+      <attribute name="GetQueueProperties" type="wxs:YesNoTypeUnion" />
+      <attribute name="DeleteQueue" type="wxs:YesNoTypeUnion" />
+      <attribute name="GetQueuePermissions" type="wxs:YesNoTypeUnion" />
+      <attribute name="ChangeQueuePermissions" type="wxs:YesNoTypeUnion" />
+      <attribute name="TakeQueueOwnership" type="wxs:YesNoTypeUnion" />
+      <attribute name="ReceiveMessage" type="wxs:YesNoTypeUnion" />
+      <attribute name="ReceiveJournalMessage" type="wxs:YesNoTypeUnion" />
+      <attribute name="QueueGenericRead" type="wxs:YesNoTypeUnion" />
+      <attribute name="QueueGenericWrite" type="wxs:YesNoTypeUnion" />
+      <attribute name="QueueGenericExecute" type="wxs:YesNoTypeUnion" />
+      <attribute name="QueueGenericAll" type="wxs:YesNoTypeUnion" />
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

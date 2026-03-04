@@ -1,0 +1,37 @@
+<element name="PermissionEx">
+    <annotation>
+      <documentation>
+        Sets ACLs on File, Registry, CreateFolder, or ServiceInstall. When under a Registry element, this cannot be used
+        if the Action attribute's value is remove or removeKeyOnInstall. This element is only available
+        when installing with MSI 5.0. For downlevel support, see the PermissionEx element from the
+        WixUtilExtension.
+      </documentation>
+      <appinfo>
+        <msiRef table="MsiLockPermissionsEx" href="http://msdn.microsoft.com/library/aa369774.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+                    Primary key used to identify this particular entry. If this is not specified the parent element's Id attribute
+                    will be used instead.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>
+            Optional condition that controls whether the permissions are applied.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sddl" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+                    Security descriptor to apply to parent object.
+                </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

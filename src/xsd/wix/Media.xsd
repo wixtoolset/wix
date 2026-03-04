@@ -1,0 +1,83 @@
+<element name="Media">
+    <annotation>
+      <documentation>Media element describes a disk that makes up the source media for the installation.</documentation>
+      <appinfo>
+        <msiRef table="Media" href="http://msdn.microsoft.com/library/aa369801.aspx" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <sequence>
+        <choice minOccurs="0" maxOccurs="unbounded">
+          <element ref="DigitalSignature" minOccurs="0" />
+          <element ref="PatchBaseline" minOccurs="0" maxOccurs="unbounded" />
+          <element ref="SymbolPath" />
+        </choice>
+      </sequence>
+      <attribute name="Id" type="DiskIdType" use="required">
+        <annotation>
+          <documentation>Disk identifier for Media table. This number must be equal to or greater than 1.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Cabinet" type="xs:string">
+        <annotation>
+          <documentation>The name of the cabinet if some or all of the files stored on the media are in a cabinet file. If no cabinets are used, this attribute must not be set.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CompressionLevel" type="CompressionLevelTypeUnion">
+        <annotation>
+          <documentation>
+            Indicates the compression level for the Media's cabinet. This attribute can
+            only be used in conjunction with the Cabinet attribute. The default is 'medium'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DiskPrompt" type="xs:string">
+        <annotation>
+          <documentation>The disk name, which is usually the visible text printed on the disk. This localizable text is used to prompt the user when this disk needs to be inserted. This value will be used in the "[1]" of the DiskPrompt Property. Using this attribute will require you to define a DiskPrompt Property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="EmbedCab" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Instructs the binder to embed the cabinet in the product if 'yes'. This attribute can only be specified in conjunction with the Cabinet attribute.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Layout" type="xs:string">
+        <annotation>
+          <documentation>
+                        This attribute specifies the root directory for the uncompressed files that
+                        are a part of this Media element. By default, the src will be the output
+                        directory for the final image. The default value ensures the binder generates
+                        an installable image. If a relative path is specified in the src attribute,
+                        the value will be appended to the image's output directory. If an absolute
+                        path is provided, that path will be used without modification. The latter two
+                        options are provided to ease the layout of an image onto multiple medias (CDs/DVDs).
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="VolumeLabel" type="xs:string">
+        <annotation>
+          <documentation>
+                        The label attributed to the volume. This is the volume label returned
+                        by the GetVolumeInformation function. If the SourceDir property refers
+                        to a removable (floppy or CD-ROM) volume, then this volume label is
+                        used to verify that the proper disk is in the drive before attempting
+                        to install files. The entry in this column must match the volume label
+                        of the physical media.
+                    </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Source" type="xs:string">
+        <annotation>
+          <documentation>
+                        Optional property that identifies the source of the embedded cabinet.
+                        If a cabinet is specified for a patch, this property should be defined
+                        and unique to each patch so that the embedded cabinet containing patched
+                        and new files can be located in the patch package. If the cabinet is not
+                        embedded - this is not typical - the cabinet can be found in the directory
+                        referenced in this column. If empty, the external cabinet must be located
+                        in the SourceDir directory.
+                    </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

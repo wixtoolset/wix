@@ -1,0 +1,69 @@
+<element name="SetDirectory">
+    <annotation>
+      <appinfo>
+        <seeAlso ref="Custom" />
+        <seeAlso ref="CustomActionRef" />
+        <seeAlso ref="InstallUISequence" />
+        <seeAlso ref="InstallExecuteSequence" />
+        <msiRef table="CustomAction" href="https://learn.microsoft.com/en-us/windows/win32/msi/customaction-table" />
+      </appinfo>
+      <documentation>
+        Sets a Directory to a particular value. This is accomplished by creating a Type 51 custom action that is appropriately scheduled in
+        the InstallUISequence and InstallExecuteSequence.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Action" type="xs:string">
+        <annotation>
+          <documentation>
+            By default the action is "Set" + Id attribute's value. This optional attribute can override the action name in the case
+            where multiple SetDirectory elements target the same Id (probably with mutually exclusive conditions).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>
+            The condition that determines whether the Directory is set. If the condition evaluates to false, the SetDirectory is skipped.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies a reference to a Directory element with matching Id attribute. The path of the Directory will be set to
+            the Value attribute.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sequence" type="SequenceType">
+        <annotation>
+          <documentation>
+            Controls which sequences the Directory assignment is sequenced in.
+            For 'execute', the assignment is scheduled in the InstallExecuteSequence.
+            For 'ui', the assignment is scheduled in the InstallUISequence.
+            For 'first', the assignment is scheduled in the InstallUISequence or the InstallExecuteSequence if the InstallUISequence is skipped at install time.
+            For 'both', the assignment is scheduled in both the InstallUISequence and the InstallExecuteSequence.
+            The default is 'both'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute specifies a string value to assign to the Directory. The value can be a literal value or derived from a
+            Property element using the <a href="https://learn.microsoft.com/en-us/windows/win32/msi/formatted">Formatted</a>
+            syntax.
+          </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

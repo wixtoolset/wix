@@ -1,0 +1,110 @@
+<element name="TypeLib">
+    <annotation>
+      <documentation>
+                Register a type library (TypeLib). Please note that in order to properly use this
+                non-advertised, you will need use this element with Advertise='no' and also author the
+                appropriate child Interface elements by extracting them from the type library itself.
+            </documentation>
+      <appinfo>
+        <msiRef table="TypeLib" href="http://msdn.microsoft.com/library/aa372092.aspx" />
+        <msiRef table="Registry" href="https://learn.microsoft.com/en-us/windows/win32/msi/registry-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="AppId" />
+        <element ref="Class" />
+        <element ref="Interface" />
+      </choice>
+      <attribute name="Id" type="Guid" use="required">
+        <annotation>
+          <documentation>The GUID that identifes the type library.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Advertise" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Value of 'yes' will create a row in the TypeLib table.
+                    Value of 'no' will create rows in the Registry table.
+                    The default value is 'no'.
+                </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Control" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Value of 'yes' means the type library describes controls, and should not be displayed in type browsers intended for nonvisual objects.
+            This attribute can only be set if Advertise='no'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Cost" type="xs:int">
+        <annotation>
+          <documentation>
+            The cost associated with the registration of the type library in bytes. This attribute cannot be set if Advertise='no'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Description" type="xs:string">
+        <annotation>
+          <documentation>The localizable description of the type library.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HasDiskImage" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Value of 'yes' means the type library exists in a persisted form on disk. This attribute can only be set if Advertise='no'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HelpDirectory" type="xs:string">
+        <annotation>
+          <documentation>The identifier of the Directory element for the help directory.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="HelpSubirectory" type="xs:string">
+        <annotation>
+          <documentation>
+            This attribute defines one or more directories below the directory referenced by the HelpDirectory attribute
+            for the typelib's help directory.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Hidden" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            Value of 'yes' means the type library should not be displayed to users, although its use is not restricted.
+            Should be used by controls. Hosts should create a new type library that wraps the control with extended properties.
+            This attribute can only be set if Advertise='no'.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Language" use="required" type="Integer">
+        <annotation>
+          <documentation>The language of the type library. This must be a non-negative integer.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MajorVersion" type="Integer">
+        <annotation>
+          <documentation>The major version of the type library. The value should be an integer from 0 - 255.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="MinorVersion" type="Integer">
+        <annotation>
+          <documentation>The minor version of the type library. The value should be an integer from 0 - 255.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ResourceId" type="Integer">
+        <annotation>
+          <documentation>The resource id of a typelib. The value is appended to the end of the typelib path in the registry.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Restricted" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+                    Value of 'yes' means the type library is restricted, and should not be displayed to users. This attribute can only be set if Advertise='no'.
+                </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

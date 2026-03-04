@@ -1,0 +1,38 @@
+<element name="TreeView">
+        <annotation>
+            <documentation>Defines a treeview.</documentation>
+        </annotation>
+        <complexType>
+            <attributeGroup ref="CommonControlAttributes" />
+            <attribute name="AlwaysShowSelect">
+                <annotation>
+                    <documentation>Specifies whether the row always appears selected even when the treeview has lost focus.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="EnableDragDrop">
+                <annotation>
+                    <documentation>Specifies whether drag and drop is enabled for the treeview.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="FullRowSelect">
+                <annotation>
+                    <documentation>Specifies whether an entire row is selected for the treeview.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="HasButtons">
+                <annotation>
+                    <documentation>Specifies whether the treeview will show buttons.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="HasLines">
+                <annotation>
+                    <documentation>Specifies whether lines appear for all treeview items.</documentation>
+                </annotation>
+            </attribute>
+            <attribute name="LinesAtRoot">
+                <annotation>
+                    <documentation>Specifies whether the root nodes have lines beside them.</documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

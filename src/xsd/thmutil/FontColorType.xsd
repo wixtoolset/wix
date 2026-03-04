@@ -1,0 +1,8 @@
+<simpleType name="FontColorType">
+        <annotation>
+            <documentation>
+                Indicates the foreground or background color of a font.
+            </documentation>
+        </annotation>
+        <union memberTypes="SystemColorType xs:string" />
+    </simpleType>

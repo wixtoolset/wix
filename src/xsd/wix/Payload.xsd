@@ -1,0 +1,76 @@
+<element name="Payload">
+    <annotation>
+      <documentation>Describes a payload to a bootstrapper.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>The identifier of Payload element.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CertificatePublicKey" type="xs:string">
+        <annotation>
+          <documentation>Optional public key of the certificate used to sign the payload. It is not recommended to use this attribute and rely on the Hash alone.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="CertificateThumbprint" type="xs:string">
+        <annotation>
+          <documentation>Optional thumbprint of the certificate used to sign the payload. It is not recommended to use this attribute and rely on the Hash alone.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Compressed" type="YesNoDefaultTypeUnion">
+        <annotation>
+          <documentation>Whether the payload should be embedded in a container or left as an external payload.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Hash" type="xs:string">
+        <annotation>
+          <documentation>Optional SHA256 hash of the payload. Must be provided if the SourceFile attribute is not used.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Size" type="Integer">
+        <annotation>
+          <documentation>Optional size of the payload in bytes. Required if Hash is specified, otherwise must not be specified.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string">
+        <annotation>
+          <documentation>
+            Location of the source file.
+            The default value is the Name attribute, if provided.
+            At a minimum, the SourceFile or Name attribute must be specified.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>
+            The destination path and file name for this payload.
+            The default is the source file name.
+            At a minimum, the Name or SourceFile attribute must be specified.
+            This must be a relative path ('\foo' or 'C:\foo' is not allowed).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="DownloadUrl" type="xs:string">
+        <annotation>
+        <documentation>
+          <p>The URL to use to download the package. The following substitutions are supported:</p>
+          <ul>
+          <li>{0} is replaced by the package Id.</li>
+          <li>{1} is replaced by the payload Id.</li>
+          <li>{2} is replaced by the payload file name.</li>
+          </ul>
+        </documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              attributes at this point in the schema.
+            </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

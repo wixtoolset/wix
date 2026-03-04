@@ -1,0 +1,41 @@
+<element name="Show">
+    <complexType>
+      <attribute name="Dialog" type="xs:string" use="required">
+        <annotation>
+          <documentation>Reference to dialog to show.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>Optional condition that determines whether the dialog should be displayed.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="OnExit" type="ExitType">
+        <annotation>
+          <documentation>Show the dialog Mutually exclusive with Before, After, and Sequence attributes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Before" type="xs:string">
+        <annotation>
+          <documentation>Show the dialog before the specified action. Mutually exclusive with OnExit, After, and Sequence attributes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="After" type="xs:string">
+        <annotation>
+          <documentation>Show the dialog after the specified action. Mutually exclusive with OnExit, Before, and Sequence attributes.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Overridable" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>
+            If "yes", the sequencing of this dialog may be overridden by sequencing elsewhere. The default is "no".
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sequence" type="Integer">
+        <annotation>
+          <documentation>Show the dialog at the specified sequence. It is recommended to use one of the other mutually exclusive attributes: OnExit, After, and Before.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

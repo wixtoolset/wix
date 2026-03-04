@@ -1,0 +1,98 @@
+<element name="Module">
+    <annotation>
+      <documentation>
+        The Module element is analogous to the main function in a C program. When linking, only
+        one Module section can be given to the linker to produce a successful result. Using this
+        element creates an msm file.
+      </documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="AppId" />
+        <element ref="Binary" />
+        <element ref="Component" />
+        <element ref="ComponentGroupRef" />
+        <element ref="ComponentRef" />
+        <element ref="Configuration" />
+        <element ref="CustomAction" />
+        <element ref="CustomActionRef" />
+        <element ref="CustomTable" />
+        <element ref="CustomTableRef" />
+        <element ref="Dependency" />
+        <element ref="Directory" />
+        <element ref="DirectoryRef" />
+        <element ref="EmbeddedChainer" />
+        <element ref="EmbeddedChainerRef" />
+        <element ref="EnsureTable" />
+        <element ref="Exclusion" />
+        <element ref="File" />
+        <element ref="Files" />
+        <element ref="Icon" />
+        <element ref="IgnoreTable" />
+        <element ref="Property" />
+        <element ref="PropertyRef" />
+        <element ref="Requires" />
+        <element ref="SetDirectory" />
+        <element ref="SetProperty" />
+        <element ref="SFPCatalog" />
+        <element ref="StandardDirectory" />
+        <element ref="Substitution" />
+        <element ref="SummaryInformation" />
+        <element ref="UI" />
+        <element ref="UIRef" />
+        <element ref="WixVariable" />
+        <element ref="InstallExecuteSequence" />
+        <element ref="InstallUISequence" />
+        <element ref="AdminExecuteSequence" />
+        <element ref="AdminUISequence" />
+        <element ref="AdvertiseExecuteSequence" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The name of the merge module (not the file name).</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Codepage" type="xs:string">
+        <annotation>
+          <documentation>
+            The code page integer value or web name for the resulting MSM. You can specify any valid Windows
+            code by by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/)
+            for more information.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Guid" type="Guid">
+        <annotation>
+          <documentation>The GUID of the Merge Module that will be appended to primary keys in the database.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="InstallerVersion" type="Integer">
+        <annotation>
+          <documentation>
+            The minimum version of the Windows Installer required to install this package. Take the major version of the required Windows Installer
+            and multiply by a 100 then add the minor version of the Windows Installer. For example, "200" would represent Windows Installer 2.0 and
+            "405" would represent Windows Installer 4.5. This value is defaulted to "500" which is the latest version of the Windows Installer and
+            present in Windows 7 and later.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Language" type="LocalizableInteger" use="required">
+        <annotation>
+          <documentation>The decimal language ID (LCID) of the merge module.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Version" type="xs:string" use="required">
+        <annotation>
+          <documentation>The major and minor versions of the merge module.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

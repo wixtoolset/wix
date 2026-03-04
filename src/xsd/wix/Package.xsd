@@ -1,0 +1,173 @@
+<element name="Package">
+    <annotation>
+      <documentation>
+        The Package element is analogous to the main function in a C program. When linking, only one Package section
+        can be given to the build to produce a successful result. Using this element creates an MSI file which often
+        referred to as a Product.
+      </documentation>
+      <appinfo>
+        <remarks>
+          <p>You can specify any valid Windows code page by integer like 1252, or by web name like Windows-1252. See [Code pages](../../../tools/codepage/) for more information.</p>
+        </remarks>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="AdminExecuteSequence" />
+        <element ref="AdminUISequence" />
+        <element ref="AdvertiseExecuteSequence" />
+        <element ref="AppId" />
+        <element ref="Binary" />
+        <element ref="ComplianceCheck" />
+        <element ref="Component" />
+        <element ref="ComponentRef" />
+        <element ref="ComponentGroup" />
+        <element ref="ComponentGroupRef" />
+        <element ref="CustomAction" />
+        <element ref="CustomActionRef" />
+        <element ref="CustomTable" />
+        <element ref="CustomTableRef" />
+        <element ref="Directory" />
+        <element ref="DirectoryRef" />
+        <element ref="EmbeddedChainer" />
+        <element ref="EmbeddedChainerRef" />
+        <element ref="EnsureTable" />
+        <element ref="Feature" />
+        <element ref="FeatureRef" />
+        <element ref="FeatureGroupRef" />
+        <element ref="File" />
+        <element ref="Files" />
+        <element ref="Icon" />
+        <element ref="InstallExecuteSequence" />
+        <element ref="InstallUISequence" />
+        <element ref="InstanceTransforms" />
+        <element ref="Launch" />
+        <element ref="MajorUpgrade" />
+        <element ref="Media" />
+        <element ref="MediaTemplate" />
+        <element ref="PackageCertificates" />
+        <element ref="PatchCertificates" />
+        <element ref="Property" />
+        <element ref="PropertyRef" />
+        <element ref="Requires" />
+        <element ref="SetDirectory" />
+        <element ref="SetProperty" />
+        <element ref="SFPCatalog" />
+        <element ref="SoftwareTag" />
+        <element ref="StandardDirectory" />
+        <element ref="SummaryInformation" />
+        <element ref="SymbolPath" />
+        <element ref="UI" />
+        <element ref="UIRef" />
+        <element ref="Upgrade" />
+        <element ref="WixVariable" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Codepage" type="xs:string">
+        <annotation>
+          <documentation>
+            The code page integer value or web name for the resulting MSI. See remarks for more information.
+            The default codepage is 65001 (UTF-8).
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Compressed" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether the package files are compressed. Default is compressed packages.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>
+            _New in WiX v6: WiX v6 adds this attribute to the `Package` element._
+            A globally unique identiifer for the package in the world. It is recommended to use a prefix such as "CompanyName." to
+            create a namespace of sorts. By default, higher versioned upgrade lower versioned packages with the same Id.  Use this
+            attibute instead of the UpgradeCode attribute in new development.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="InstallerVersion" type="Integer">
+        <annotation>
+          <documentation>
+            The minimum version of the Windows Installer required to install this package. Take the major version of the required Windows Installer
+            and multiply by a 100 then add the minor version of the Windows Installer. For example, "200" would represent Windows Installer 2.0 and
+            "405" would represent Windows Installer 4.5. This value is defaulted to "500" which is the latest version of the Windows Installer and
+            present in Windows 7 and later.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Language" type="LocalizableInteger">
+        <annotation>
+          <documentation>The decimal language ID (LCID) for the product. Sets the ProductLanguage property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Manufacturer" type="xs:string" use="required">
+        <annotation>
+          <documentation>The manufacturer of the package. Sets the Manufacturer property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>The descriptive name of the product. Sets the ProductName property.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ProductCode" type="AutogenGuid">
+        <annotation>
+          <documentation>
+            Optional ProductCode GUID for the package. By default, a new ProductCode property will be
+            generated with every build enabling major upgrades.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Scope" type="PackageScopeTypeUnion">
+        <annotation>
+          <documentation>Use this attribute to specify the installation scope of this package: per-machine, per-user, or a choice of either. The default is per-machine.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ShortNames" type="YesNoTypeUnion">
+        <annotation>
+          <documentation>Indicates whether the package files are installed using 8.3 filenames. The default is no.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UpgradeCode" type="Guid">
+        <annotation>
+          <documentation>
+            For new packages, it is recommended to use the Id attribute instead. This attribute exists for
+            backwards compatibility scenarios. Use this attribute to provide a specific upgrade code GUID
+            for a MSI package. See <a href="https://learn.microsoft.com/en-us/windows/win32/msi/upgradecode">UpgradeCode</a>
+            for more information.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="UpgradeStrategy" type="UpgradeStrategyTypeUnion" version="5">
+        <annotation>
+          <documentation>
+          The upgrade strategy for the package. If "none," no major upgrade is expected.
+          If "majorUpgrade," the UpgradeCode attribute is required and a major upgrade is expected.
+          The default is "majorUpgrade."
+          A default major upgrade is automatically provided if none is authored.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Version" type="xs:string" use="required">
+        <annotation>
+          <documentation>The product's version string. Sets the ProductVersion property.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

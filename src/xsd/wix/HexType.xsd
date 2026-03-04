@@ -1,0 +1,8 @@
+<simpleType name="HexType">
+    <annotation>
+      <documentation>This type supports any hexadecimal number. Both upper and lower case are supported for letters appearing in the number. This type also includes the empty string: "".</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="[0-9A-Fa-f]*" />
+    </restriction>
+  </simpleType>

@@ -1,0 +1,35 @@
+<element name="ComPlusUserInApplicationRole">
+    <annotation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+      <documentation>
+        This element represents a user membership in an
+        application role. When the parent component of this element is installed, the
+        user will be added to the associated application role. This element must be a descendent
+        of a Component element; it can not be a child of a ComPlusApplicationRole
+        locater element. To reference a locater element use the ApplicationRole
+        attribute.
+      </documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Id" use="required" type="xs:string">
+        <annotation><documentation>
+          Identifier for the element.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="ApplicationRole" use="optional" type="xs:string">
+        <annotation><documentation>
+          If the element is not a child of a ComPlusApplicationRole
+          element, this attribute should be provided with the id of a
+          ComPlusApplicationRole element representing the application role the user is
+          to be added to.
+        </documentation></annotation>
+      </attribute>
+      <attribute name="User" use="required" type="xs:string">
+        <annotation><documentation>
+          Foreign key into the User table.
+        </documentation></annotation>
+      </attribute>
+    </complexType>
+  </element>

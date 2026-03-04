@@ -1,0 +1,28 @@
+<element name="Launch">
+    <annotation>
+      <documentation>
+        Launch conditions for MSI packages.
+      </documentation>
+      <appinfo>
+        <msiRef table="LaunchCondition" href="https://docs.microsoft.com/en-us/windows/win32/msi/launchcondition-table" />
+        <howtoRef href="redistributables_and_install_checks/block_install_on_os.html">How To: Block installation based on OS version</howtoRef>
+        <howtoRef href="files_and_registry/check_the_version_number.html">How To: Check the version number of a file during installation</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Condition" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The condition expression to be evaluated at install time.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Message" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            Set the value to the text to display when the condition fails and the installation must be terminated.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

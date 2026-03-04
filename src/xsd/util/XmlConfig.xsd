@@ -1,0 +1,103 @@
+<element name="XmlConfig">
+    <annotation>
+      <documentation>
+        Adds or removes .xml file entries. If you use the XmlConfig element you must reference WixUtilExtension.dll as it contains the XmlConfig custom actions.
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Component" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="XmlConfig" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string">
+        <annotation>
+          <documentation>Identifier for xml file modification.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Action">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="create" />
+            <enumeration value="delete" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="ElementId" type="xs:string">
+        <annotation>
+          <documentation>The Id of another XmlConfig to add attributes to.  In this case, the 'ElementPath', 'Action', 'Node', and 'On' attributes must be omitted.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ElementPath" type="xs:string">
+        <annotation>
+          <documentation>The XPath of the parent element being modified.  Note that this is a formatted field and therefore, square brackets in the XPath must be escaped. In addition, XPaths allow backslashes to be used to escape characters, so if you intend to include literal backslashes, you must escape them as well by doubling them in this attribute. The string is formatted by MSI first, and the result is consumed as the XPath.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="File" type="xs:string" use="required">
+        <annotation>
+          <documentation>Path of the .xml file to configure.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Name" type="xs:string">
+        <annotation>
+          <documentation>Name of XML node to set/add to the specified element.  Not setting this attribute causes the element's text value to be set.  Otherwise this specified the attribute name that is set.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Node">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="element" />
+            <enumeration value="value" />
+            <enumeration value="document" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="On">
+        <simpleType>
+          <restriction base="xs:NMTOKEN">
+            <enumeration value="install" />
+            <enumeration value="uninstall" />
+          </restriction>
+        </simpleType>
+      </attribute>
+      <attribute name="PreserveModifiedDate" type="wxs:YesNoTypeUnion">
+        <annotation>
+          <documentation>Specifies wheter or not the modification should preserve the modified date.  Preserving the modified date will allow the file to be patched if no other modifications have been made.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Sequence" type="wxs:Integer">
+        <annotation>
+          <documentation>Specifies the order in which the modification is to be attempted on the XML file.  It is important to ensure that new elements are created before you attempt to add an attribute to them.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string">
+        <annotation>
+          <documentation>
+            The value to be written.  See the <a href="https://docs.microsoft.com/en-us/windows/win32/msi/formatted" target="_blank">Formatted topic</a> for information how to escape square brackets in the value.
+          </documentation>
+        </annotation>
+      </attribute>
+      <attribute name="VerifyPath" type="xs:string">
+        <annotation>
+          <documentation>The XPath to the element being modified.  This is required for 'delete' actions.  For 'create' actions, VerifyPath is used to decide if the element already exists. Note that this is a formatted field and therefore, square brackets in the XPath must be escaped. In addition, XPaths allow backslashes to be used to escape characters, so if you intend to include literal backslashes, you must escape them as well by doubling them in this attribute. The string is formatted by MSI first, and the result is consumed as the XPath.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

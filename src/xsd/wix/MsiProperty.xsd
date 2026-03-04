@@ -1,0 +1,25 @@
+<element name="MsiProperty">
+    <annotation>
+      <documentation>Allows an MSI property to be set based on the value of a burn engine expression.</documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="MsiPackage" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Name" type="xs:string" use="required">
+        <annotation>
+          <documentation>The name of the MSI property to set. Burn controls the follow MSI properties so they cannot be set with MsiProperty: ACTION, ALLUSERS, REBOOT, REINSTALL, REINSTALLMODE</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Value" type="xs:string" use="required">
+        <annotation>
+          <documentation>The value to set the property to. This string is evaluated by the Burn engine and can be as simple as a Burn engine variable reference or as complex as a full expression.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Condition" type="xs:string">
+        <annotation>
+          <documentation>Condition to determine whether to pass the MSI Property. If this evaluates to false, the MSI Property is not passed along.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

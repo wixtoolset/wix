@@ -1,0 +1,24 @@
+<element name="Icon">
+    <annotation>
+      <documentation>
+        Icon used for Shortcut, ProgId, or Class elements (but not UI controls).
+      </documentation>
+      <appinfo>
+        <msiRef table="Icon" href="https://learn.microsoft.com/en-us/windows/win32/msi/icon-table" />
+        <howtoRef href="ui_and_localization/configure_arp_appearance.html">How To: Set your installer's icon in Add/Remove Programs</howtoRef>
+        <howtoRef href="files_and_registry/create_start_menu_shortcut.html">How To: Create a shortcut on the Start Menu</howtoRef>
+      </appinfo>
+    </annotation>
+    <complexType>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The Id cannot be longer than 55 characters. In order to prevent errors in cases where the Id is modularized, it should not be longer than 18 characters.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="SourceFile" type="xs:string">
+        <annotation>
+          <documentation>Path to the icon file.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

@@ -1,0 +1,27 @@
+<element name="CustomTableRef">
+    <annotation>
+      <documentation>Used to reference a CustomTable element and optionally add more data.</documentation>
+    </annotation>
+    <complexType>
+      <sequence>
+        <element ref="Row" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Row definition for the custom table.</documentation>
+          </annotation>
+        </element>
+      </sequence>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>The identifier of the CustomTable element to reference.</documentation>
+        </annotation>
+      </attribute>
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>

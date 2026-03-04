@@ -1,0 +1,21 @@
+<element name="BundleCustomDataRef">
+    <annotation>
+      <documentation>Used to reference a BundleCustomData element and optionally add more data.</documentation>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="BundleElement">
+          <annotation>
+            <documentation>Instance data for BundleCustomData.</documentation>
+          </annotation>
+        </element>
+      </choice>
+      <attribute name="Id" type="xs:string" use="required">
+        <annotation>
+          <documentation>
+            The identifier of the BundleCustomData element to reference.
+          </documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

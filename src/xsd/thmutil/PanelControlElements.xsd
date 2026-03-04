@@ -1,0 +1,10 @@
+<group name="PanelControlElements">
+        <choice>
+            <element ref="Hyperlink" />
+            <element ref="Hypertext" />
+            <element ref="ImageControl" />
+            <element ref="Label" />
+            <element ref="Progressbar" />
+            <element ref="Static" />
+        </choice>
+    </group>

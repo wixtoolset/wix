@@ -1,0 +1,57 @@
+<element name="UI">
+    <annotation>
+      <documentation>Allows a localization to override the position, size, and text of dialogs and controls.</documentation>
+    </annotation>
+    <complexType mixed="true">
+      <attribute name="Dialog" type="xs:string">
+        <annotation>
+          <documentation>Identifies the dialog to localize or the dialog that a control to localize is in.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Control" type="xs:string">
+        <annotation>
+          <documentation>Combined with the Dialog attribute, identifies the control to localize.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="X" type="Integer">
+        <annotation>
+          <documentation>For a dialog, overrides the authored horizontal centering. For a control, overrides the authored horizontal coordinate of the upper-left corner of the rectangular boundary. This must be a non-negative number.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Y" type="Integer">
+        <annotation>
+          <documentation>For a dialog, overrides the authored vertical centering. For a control, overrides the authored vertical coordinate of the upper-left corner of the rectangular boundary of the control. This must be a non-negative number.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Width" type="Integer">
+        <annotation>
+          <documentation>For a dialog, overrides the authored width in dialog units. For a control, overrides the authored width of the rectangular boundary of the control. This must be a non-negative number.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Height" type="Integer">
+        <annotation>
+          <documentation>For a dialog, overrides the authored height in dialog units. For a control, overrides the authored height of the rectangular boundary of the control. This must be a non-negative number.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RightToLeft" type="LocalizationYesNoType">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause the Control to display from right to left. Not valid for a dialog.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="RightAligned" type="LocalizationYesNoType">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause the Control to be right aligned. Not valid for a dialog.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="LeftScroll" type="LocalizationYesNoType">
+        <annotation>
+          <documentation>Set this attribute to "yes" to cause the scroll bar to display on the left side of the Control. Not valid for a dialog.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="Text" type="xs:string">
+        <annotation>
+          <documentation>Override the text of a UI element.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>

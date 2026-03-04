@@ -1,0 +1,8 @@
+<element name="ForceReboot" type="ActionModuleSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="ForceReboot" href="http://msdn.microsoft.com/library/aa368607.aspx" />
+      </appinfo>
+      <documentation>Prompts the user for a restart of the system during the installation. Special actions don't have a built-in sequence number and thus must appear relative to another action. The suggested way to do this is by using the Before or After attribute. InstallExecute and InstallExecuteAgain can optionally appear anywhere between InstallInitialize and InstallFinalize.</documentation>
+    </annotation>
+  </element>

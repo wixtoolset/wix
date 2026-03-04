@@ -1,0 +1,30 @@
+<element name="ChangePageAction">
+        <annotation>
+            <documentation>
+                When the button is pressed, the specified page is shown.
+            </documentation>
+        </annotation>
+        <complexType>
+            <attribute name="Cancel" type="YesNoType">
+                <annotation>
+                    <documentation>
+                        When set to 'yes', none of the variable changes made on the current page are saved.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="Condition" type="xs:string">
+                <annotation>
+                    <documentation>
+                        The condition that determines if the parent control will execute this action.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="Page" type="xs:string" use="required">
+                <annotation>
+                    <documentation>
+                        The Name of the Page to show.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

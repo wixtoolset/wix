@@ -1,0 +1,8 @@
+<element name="InstallServices" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="InstallServices" href="http://msdn.microsoft.com/library/aa369540.aspx" />
+      </appinfo>
+      <documentation>Registers a service for the system. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

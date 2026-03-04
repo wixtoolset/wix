@@ -1,0 +1,8 @@
+<simpleType name="ComponentGuid">
+    <annotation>
+      <documentation>Values of this type must be a GUID, with or without braces: `01234567-89AB-CDEF-0123-456789ABCDEF` or `{01234567-89AB-CDEF-0123-456789ABCDEF}`. `PUT-GUID-HERE` can be used for sample code. Empty values are also supported.</documentation>
+    </annotation>
+    <restriction base="xs:string">
+      <pattern value="[{(]?[0-9A-Fa-f]{8}\-?[0-9A-Fa-f]{4}\-?[0-9A-Fa-f]{4}\-?[0-9A-Fa-f]{4}\-?[0-9A-Fa-f]{12}[})]?|PUT\-GUID\-(\d+\-)?HERE|\$\((var\.)?[_A-Za-z]{1}[0-9A-Za-z_\.]*\)|!\((loc|wix)\.[_A-Za-z]{1}[0-9A-Za-z_\.]*\)|\*|^$" />
+    </restriction>
+  </simpleType>

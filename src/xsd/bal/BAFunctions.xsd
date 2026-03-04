@@ -1,0 +1,11 @@
+<attribute name="BAFunctions" type="wxs:YesNoTypeUnion">
+    <annotation>
+      <documentation>
+        When set to "yes", WixStdBA will load the DLL and work with it to handle BA messages.
+        Only one payload may be marked with this attribute set to "yes".
+      </documentation>
+      <appinfo>
+        <parent namespace="http://wixtoolset.org/schemas/v4/wxs" ref="Payload" />
+      </appinfo>
+    </annotation>
+  </attribute>

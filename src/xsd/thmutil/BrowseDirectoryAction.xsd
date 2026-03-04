@@ -1,0 +1,23 @@
+<element name="BrowseDirectoryAction">
+        <annotation>
+            <documentation>
+                When the button is pressed, a directory browser dialog is shown.
+            </documentation>
+        </annotation>
+        <complexType>
+            <attribute name="Condition" type="xs:string">
+                <annotation>
+                    <documentation>
+                        The condition that determines if the parent control will execute this action.
+                    </documentation>
+                </annotation>
+            </attribute>
+            <attribute name="VariableName" type="xs:string" use="required">
+                <annotation>
+                    <documentation>
+                        The name of the variable to update when the user selects a directory from the dialog.
+                    </documentation>
+                </annotation>
+            </attribute>
+        </complexType>
+    </element>

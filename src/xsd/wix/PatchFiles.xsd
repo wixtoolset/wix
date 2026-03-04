@@ -1,0 +1,8 @@
+<element name="PatchFiles" type="ActionSequenceType">
+    <annotation>
+      <appinfo>
+        <msiRef action="PatchFiles" href="http://msdn.microsoft.com/library/aa370577.aspx" />
+      </appinfo>
+      <documentation>Queries the Patch table to determine which patches are to be applied. The condition for this action may be specified in the element's inner text.</documentation>
+    </annotation>
+  </element>

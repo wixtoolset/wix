@@ -1,0 +1,67 @@
+<element name="AdminUISequence">
+    <annotation>
+      <appinfo>
+        <msiRef table="AdminUISequence" href="https://docs.microsoft.com/en-us/windows/win32/msi/adminuisequence-table" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="Custom" minOccurs="0" maxOccurs="unbounded">
+          <annotation>
+            <documentation>Use to sequence a custom action.</documentation>
+          </annotation>
+        </element>
+        <element ref="Show" minOccurs="0" maxOccurs="unbounded" />
+        <element ref="CostInitialize">
+          <annotation>
+            <documentation>Initiates the internal installation costing process.</documentation>
+          </annotation>
+        </element>
+        <element ref="FileCost">
+          <annotation>
+            <documentation>Initiates dynamic costing of standard installation actions.</documentation>
+          </annotation>
+        </element>
+        <element ref="CostFinalize">
+          <annotation>
+            <documentation>Ends the internal installation costing process begun by the CostInitialize action.</documentation>
+          </annotation>
+        </element>
+        <element ref="ExecuteAction">
+          <annotation>
+            <documentation>Initiates the execution sequence.</documentation>
+          </annotation>
+        </element>
+        <element ref="InstallValidate">
+          <annotation>
+            <documentation>Verifies that all costed volumes have enough space for the installation.</documentation>
+          </annotation>
+        </element>
+        <element ref="InstallInitialize">
+          <annotation>
+            <documentation>Marks the beginning of a sequence of actions that change the system.</documentation>
+          </annotation>
+        </element>
+        <element ref="InstallAdminPackage">
+          <annotation>
+            <documentation>Copies the product database to the administrative installation point.</documentation>
+          </annotation>
+        </element>
+        <element ref="InstallFiles">
+          <annotation>
+            <documentation>Copies files specified in the File table from the source directory to the destination directory.</documentation>
+          </annotation>
+        </element>
+        <element ref="InstallFinalize">
+          <annotation>
+            <documentation>Marks the end of a sequence of actions that change the system.</documentation>
+          </annotation>
+        </element>
+        <element ref="LaunchConditions">
+          <annotation>
+            <documentation>Queries the LaunchCondition table and evaluates each conditional statement recorded there.</documentation>
+          </annotation>
+        </element>
+      </choice>
+    </complexType>
+  </element>

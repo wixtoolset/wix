@@ -1,0 +1,53 @@
+<element name="UI">
+    <annotation>
+      <documentation>
+        Enclosing element to compartmentalize UI specifications.
+      </documentation>
+      <appinfo>
+        <seeAlso ref="UIRef" />
+      </appinfo>
+    </annotation>
+    <complexType>
+      <choice minOccurs="0" maxOccurs="unbounded">
+        <element ref="BillboardAction" />
+        <element ref="ComboBox" />
+        <element ref="Dialog" />
+        <element ref="DialogRef" />
+        <element ref="EmbeddedUI" />
+        <element ref="Error" />
+        <element ref="ListBox" />
+        <element ref="ListView" />
+        <element ref="ProgressText" />
+        <element ref="Publish" />
+        <element ref="RadioButtonGroup" />
+        <element ref="TextStyle" />
+        <element ref="UIText" />
+        <!--
+          Elements with identical behavior as under Package/Fragment element, solely to allow grouping with other UI elements
+        -->
+        <element ref="AdminUISequence" />
+        <element ref="InstallUISequence" />
+        <element ref="Binary" />
+        <element ref="Property" />
+        <element ref="PropertyRef" />
+        <element ref="UIRef" />
+        <any namespace="##other" processContents="lax">
+          <annotation>
+            <documentation>
+              Extensibility point in the WiX XML Schema. Schema extensions can register additional
+              elements at this point in the schema.
+            </documentation>
+          </annotation>
+        </any>
+      </choice>
+      <attribute name="Id" type="xs:string" />
+      <anyAttribute namespace="##other" processContents="lax">
+        <annotation>
+          <documentation>
+            Extensibility point in the WiX XML Schema. Schema extensions can register additional
+            attributes at this point in the schema.
+          </documentation>
+        </annotation>
+      </anyAttribute>
+    </complexType>
+  </element>
