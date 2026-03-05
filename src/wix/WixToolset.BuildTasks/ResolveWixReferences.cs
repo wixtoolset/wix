@@ -106,7 +106,7 @@ namespace WixToolset.BuildTasks
         }
 
         /// <summary>
-        /// Resolves a single reference item by searcheing for referenced items using the specified SearchPaths.
+        /// Resolves a single reference item by searching for referenced items using the specified SearchPaths.
         /// This method is made public so the resolution logic can be reused by other tasks.
         /// </summary>
         /// <param name="reference">The referenced item.</param>
