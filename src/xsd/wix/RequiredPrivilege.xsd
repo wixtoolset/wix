@@ -1,4 +1,4 @@
-<element name="RequiredPrivilege" type="xs:string">
+<element name="RequiredPrivilege">
     <annotation>
       <documentation>
         Privilege required by service configured by ServiceConfig parent.

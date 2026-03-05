@@ -1,4 +1,4 @@
-<element name="ServiceArgument" type="xs:string">
+<element name="ServiceArgument">
     <annotation>
       <documentation>
         Argument used in ServiceControl parent

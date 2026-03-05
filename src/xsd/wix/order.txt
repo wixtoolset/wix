@@ -72,6 +72,7 @@ element|PatchInformation
 element|TargetProductCodes
 element|TargetProductCode
 element|PatchProperty
+element|SymbolPath
 element|SummaryInformation
 element|AssemblyName
 element|PatchCertificates
