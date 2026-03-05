@@ -1,0 +1,12 @@
+<element name="SymbolPath">
+    <annotation>
+      <documentation>A path to symbols.</documentation>
+    </annotation>
+    <complexType>
+      <attribute name="Path" type="xs:string" use="required">
+        <annotation>
+          <documentation>The path.</documentation>
+        </annotation>
+      </attribute>
+    </complexType>
+  </element>
