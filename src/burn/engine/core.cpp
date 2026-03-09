@@ -256,6 +256,10 @@ extern "C" HRESULT CoreQueryRegistration(
     SIZE_T cbBuffer = 0;
     SIZE_T iBuffer = 0;
 
+    // Detect if bundle is already installed.
+    hr = RegistrationDetectInstalled(&pEngineState->registration, &pEngineState->cache);
+    ExitOnFailure(hr, "Failed to detect bundle install state.");
+
     // detect resume type
     hr = RegistrationDetectResumeType(&pEngineState->registration, &pEngineState->command.resumeType);
     ExitOnFailure(hr, "Failed to detect resume type.");
@@ -2280,6 +2284,7 @@ static HRESULT DetectPackagePayloadsCached(
 LExit:
     ReleaseStr(sczPayloadCachePath);
     ReleaseStr(sczCachePath);
+
     return hr;
 }
 

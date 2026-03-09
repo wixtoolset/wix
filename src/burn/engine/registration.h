@@ -186,7 +186,8 @@ HRESULT RegistrationSetDynamicVariables(
     __in BURN_VARIABLES* pVariables
     );
 HRESULT RegistrationDetectInstalled(
-    __in BURN_REGISTRATION* pRegistration
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache
     );
 HRESULT RegistrationDetectResumeType(
     __in BURN_REGISTRATION* pRegistration,
