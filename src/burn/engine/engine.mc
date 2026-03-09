@@ -1055,7 +1055,7 @@ MessageId=371
 Severity=Success
 SymbolicName=MSG_SESSION_UPDATE
 Language=English
-Updating session, registration key: %1!ls!, scope: %2!hs!, resume: %3!hs!, restart initiated: %4!hs!, disable resume: %5!hs!
+Updating session, registration key: %1!ls!, scope: %2!hs!, resume: %3!hs!, restart initiated: %4!hs!, disable resume: %5!hs!, registration: %6!hs!
 .
 
 MessageId=372

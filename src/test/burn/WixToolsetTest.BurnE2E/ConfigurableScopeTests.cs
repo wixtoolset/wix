@@ -108,7 +108,12 @@ namespace WixToolsetTest.BurnE2E
 
             Assert.True(LogVerifier.MessageInLogFile(log, "Plan begin, 3 packages, action: Install, planned scope: Default"));
 
+            log = bundle.Modify();
+            Assert.True(LogVerifier.MessageInLogFile(log, "TESTBA: OnDetectBegin: Cached=True"));
+            Assert.False(LogVerifier.MessageInLogFile(log, "Could not load or read state file:"));
+
             log = bundle.Repair();
+            Assert.False(LogVerifier.MessageInLogFile(log, "Could not load or read state file:"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Bundle was already installed with scope: PerUser. Scope cannot change during maintenance."));
 
             var bundleV2 = this.CreateBundleInstaller("AllPuomBundleTestBAv2");
@@ -132,6 +137,8 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(LogVerifier.MessageInLogFile(log, "Plan begin, 3 packages, action: Install, planned scope: Default"));
 
             log = bundle.Repair();
+            Assert.True(LogVerifier.MessageInLogFile(log, "TESTBA: OnDetectBegin: Cached=True"));
+            Assert.False(LogVerifier.MessageInLogFile(log, "Could not load or read state file:"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Bundle was already installed with scope: PerUser. Scope cannot change during maintenance."));
 
             var bundleV2 = this.CreateBundleInstaller("AllPuomBundleTestBAv2");
@@ -164,6 +171,8 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PmouPkg2.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerMachine,"));
 
             log = bundle.Repair();
+            Assert.True(LogVerifier.MessageInLogFile(log, "TESTBA: OnDetectBegin: Cached=True"));
+            Assert.False(LogVerifier.MessageInLogFile(log, "Could not load or read state file:"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Bundle was already installed with scope: PerMachine"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PmouPkg1.msi, state: Present, authored scope: PerMachineOrUser, detected scope: PerMachine,"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PmouPkg2.msi, state: Present, authored scope: PerMachineOrUser, detected scope: PerMachine,"));
@@ -508,6 +517,8 @@ namespace WixToolsetTest.BurnE2E
             Assert.True(LogVerifier.MessageInLogFile(log, "Planned package: PerUserPkg.msi, state: Absent, default requested: Present, ba requested: Present, execute: Install, rollback: Uninstall, scope: PerUser"));
 
             log = bundle.Repair();
+            Assert.True(LogVerifier.MessageInLogFile(log, "TESTBA: OnDetectBegin: Cached=True"));
+            Assert.False(LogVerifier.MessageInLogFile(log, "Could not load or read state file:"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PerMachinePkg.msi, state: Present, authored scope: PerMachine, detected scope: PerMachine,"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PmouPkg1.msi, state: Present, authored scope: PerMachineOrUser, detected scope: PerMachine,"));
             Assert.True(LogVerifier.MessageInLogFile(log, "Detected package: PmouPkg2.msi, state: Present, authored scope: PerMachineOrUser, detected scope: PerMachine,"));

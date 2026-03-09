@@ -64,7 +64,7 @@ static HRESULT EnsureRegistrationVariable(
     );
 static HRESULT UpdateResumeMode(
     __in BURN_REGISTRATION* pRegistration,
-    __in HKEY hkRegistration,
+    __in_opt HKEY hkRegistration,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType,
     __in BOOL fRestartInitiated
@@ -461,13 +461,7 @@ extern "C" HRESULT RegistrationSetDynamicVariables(
     )
 {
     HRESULT hr = S_OK;
-    LONGLONG llInstalled = 0;
-
-    // Detect if bundle is already installed.
-    hr = RegistrationDetectInstalled(pRegistration);
-    ExitOnFailure(hr, "Failed to detect bundle install state.");
-
-    llInstalled = BOOTSTRAPPER_REGISTRATION_TYPE_FULL == pRegistration->detectedRegistrationType ? 1 : 0;
+    LONGLONG llInstalled = BOOTSTRAPPER_REGISTRATION_TYPE_FULL == pRegistration->detectedRegistrationType ? 1 : 0;
 
     hr = VariableSetNumeric(pVariables, BURN_BUNDLE_INSTALLED, llInstalled, TRUE);
     ExitOnFailure(hr, "Failed to set the bundle installed built-in variable.");
@@ -483,7 +477,8 @@ LExit:
 }
 
 extern "C" HRESULT RegistrationDetectInstalled(
-    __in BURN_REGISTRATION* pRegistration
+    __in BURN_REGISTRATION* pRegistration,
+    __in BURN_CACHE* pCache
 )
 {
     HRESULT hr = S_OK;
@@ -496,14 +491,28 @@ extern "C" HRESULT RegistrationDetectInstalled(
     {
         // For PUOM/PMOU bundles, check per-machine then fall back to per-user.
         hr = DetectInstalled(pRegistration, HKEY_LOCAL_MACHINE);
+        if (SUCCEEDED(hr))
+        {
+            pRegistration->fPerMachine = TRUE;
 
-        if (FAILED(hr))
+            hr = RegistrationSetPaths(pRegistration, pCache);
+            ExitOnFailure(hr, "Failed to set registration paths for per-machine configurable scope.");
+        }
+        else
         {
             hr = DetectInstalled(pRegistration, HKEY_CURRENT_USER);
+
+            if (SUCCEEDED(hr))
+            {
+                pRegistration->fPerMachine = FALSE;
+
+                hr = RegistrationSetPaths(pRegistration, pCache);
+                ExitOnFailure(hr, "Failed to set registration paths for per-user configurable scope.");
+            }
         }
     }
 
-//LExit:
+LExit:
     // Not finding the key or value is okay.
     if (E_FILENOTFOUND == hr || E_PATHNOTFOUND == hr)
     {
@@ -1086,6 +1095,8 @@ extern "C" HRESULT RegistrationSetPaths(
     hr = PathConcatRelativeToFullyQualifiedBase(sczCacheDirectory, pRegistration->sczExecutableName, &pRegistration->sczCacheExecutablePath);
     ExitOnFailure(hr, "Failed to build cached executable path.");
 
+    pRegistration->fCached = pRegistration->sczCacheExecutablePath && FileExistsEx(pRegistration->sczCacheExecutablePath, NULL);
+
     // build state file path
     hr = StrAllocFormatted(&pRegistration->sczStateFile, L"%ls\\state.rsm", sczCacheDirectory);
     ExitOnFailure(hr, "Failed to build state file path.");
@@ -1242,7 +1253,7 @@ LExit:
 
 static HRESULT UpdateResumeMode(
     __in BURN_REGISTRATION* pRegistration,
-    __in HKEY hkRegistration,
+    __in_opt HKEY hkRegistration,
     __in BURN_RESUME_MODE resumeMode,
     __in BOOTSTRAPPER_REGISTRATION_TYPE registrationType,
     __in BOOL fRestartInitiated
@@ -1254,7 +1265,7 @@ static HRESULT UpdateResumeMode(
     LPWSTR sczRunOnceCommandLine = NULL;
     LPCWSTR sczResumeKey = REGISTRY_RUN_ONCE_KEY;
 
-    LogId(REPORT_STANDARD, MSG_SESSION_UPDATE, pRegistration->sczRegistrationKey, LoggingInstallScopeToString(pRegistration->fPerMachine), LoggingResumeModeToString(resumeMode), LoggingBoolToString(fRestartInitiated), LoggingBoolToString(pRegistration->fDisableResume));
+    LogId(REPORT_STANDARD, MSG_SESSION_UPDATE, pRegistration->sczRegistrationKey, LoggingInstallScopeToString(pRegistration->fPerMachine), LoggingResumeModeToString(resumeMode), LoggingBoolToString(fRestartInitiated), LoggingBoolToString(pRegistration->fDisableResume), LoggingRegistrationTypeToString(registrationType));
 
     // write resume information
     if (hkRegistration)
@@ -1776,7 +1787,6 @@ static HRESULT DetectInstalled(
     DWORD dwInstalled = 0;
     DWORD dwScope = 0;
 
-    pRegistration->fCached = pRegistration->sczCacheExecutablePath && FileExistsEx(pRegistration->sczCacheExecutablePath, NULL);
     pRegistration->detectedRegistrationType = BOOTSTRAPPER_REGISTRATION_TYPE_NONE;
     pRegistration->detectedScope = BOOTSTRAPPER_SCOPE_DEFAULT;
 
