@@ -67,9 +67,14 @@ extern "C" HRESULT DAPI ConsoleInitialize()
         vfConsoleOut = TRUE;
     }
 
-    if (!::SetConsoleCP(CP_UTF8) || !::SetConsoleOutputCP(CP_UTF8))
+    // Console codepage only applies to interactive sessions. SetConsoleCP may
+    // fail in console-less environments and the error path closes stdin/stdout.
+    if (vfStdOutInteractive)
     {
-        ConExitWithLastError(hr, "failed to set console codepage to UTF-8");
+        if (!::SetConsoleCP(CP_UTF8) || !::SetConsoleOutputCP(CP_UTF8))
+        {
+            ConExitWithLastError(hr, "failed to set console codepage to UTF-8");
+        }
     }
 
 LExit:
