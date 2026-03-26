@@ -8,7 +8,7 @@ namespace WixInternal.MSTestSupport
 
     public class MsbuildRunner : ExternalExecutable
     {
-        private static readonly string VswhereFindArguments = "-property installationPath -version [17.0,18.0)";
+        private static readonly string VswhereFindArguments = "-property installationPath -version [17.0,19.0)";
         private static readonly string MsbuildCurrentRelativePath = @"MSBuild\Current\Bin\MSBuild.exe";
         private static readonly string MsbuildCurrentRelativePath64 = @"MSBuild\Current\Bin\amd64\MSBuild.exe";
 
