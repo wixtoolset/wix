@@ -151,6 +151,46 @@ namespace WixToolsetTest.BurnE2E
         }
 
         [RuntimeFact]
+        public void BundleUpgradeFromWix6IsLockedToFirstBundlesScope()
+        {
+            var bundle = this.CreateBundleInstaller("PerMachineBundleWix6");
+            bundle.Install();
+
+            bundle.VerifyRegisteredAndInPackageCache(plannedPerMachine: true);
+
+            var testBAController = this.CreateTestBAController();
+            testBAController.SetBundleScope(BundleScope.PerUser);
+
+            var bundleV2 = this.CreateBundleInstaller("PerMachineBundleV2");
+            var log = bundleV2.Install();
+            Assert.True(LogVerifier.MessageInLogFileRegex(log, @"Upgraded bundle [{][0-9A-Fa-f\-]{36}[}] was already installed with scope: PerMachine\. Scope cannot change during upgrade\."));
+
+            bundleV2.Uninstall();
+            bundleV2.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: true);
+            bundle.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: true);
+        }
+
+        [RuntimeFact]
+        public void BundleUpgradeFromWix6WithSameScopeSucceeds()
+        {
+            var bundle = this.CreateBundleInstaller("PerMachineBundleWix6");
+            bundle.Install();
+
+            bundle.VerifyRegisteredAndInPackageCache(plannedPerMachine: true);
+
+            var testBAController = this.CreateTestBAController();
+            testBAController.SetBundleScope(BundleScope.PerMachine);
+
+            var bundleV2 = this.CreateBundleInstaller("PerMachineBundleV2");
+            var log = bundleV2.Install();
+            Assert.True(LogVerifier.MessageInLogFileRegex(log, @"Upgraded bundle [{][0-9A-Fa-f\-]{36}[}] was already installed with scope: PerMachine\. Scope cannot change during upgrade\."));
+
+            bundleV2.Uninstall();
+            bundleV2.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: true);
+            bundle.VerifyUnregisteredAndRemovedFromPackageCache(plannedPerMachine: true);
+        }
+
+        [RuntimeFact]
         public void PMOU_Bundle_Default_Plan_Installs_PerMachine()
         {
             var testBAController = this.CreateTestBAController();

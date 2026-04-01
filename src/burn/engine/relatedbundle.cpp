@@ -356,10 +356,19 @@ static HRESULT LoadRelatedBundleFromKey(
         LogId(REPORT_WARNING, MSG_RELATED_PACKAGE_INVALID_VERSION, wzRelatedBundleCode, sczBundleVersion);
     }
 
+    // Look for v7+ scope registration.
     hr = RegReadNumber(hkBundleCode, BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE, &dwScope);
-    ExitOnFailure(hr, "Failed to read registration %ls for bundle %ls.", wzRelatedBundleCode, BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE);
+    if (SUCCEEDED(hr))
+    {
+        pRelatedBundle->detectedScope = static_cast<BOOTSTRAPPER_SCOPE>(dwScope);
+    }
+    else if (E_FILENOTFOUND == hr)
+    {
+        hr = S_OK;
 
-    pRelatedBundle->detectedScope = static_cast<BOOTSTRAPPER_SCOPE>(dwScope);
+        pRelatedBundle->detectedScope = fPerMachine ? BOOTSTRAPPER_SCOPE_PER_MACHINE : BOOTSTRAPPER_SCOPE_PER_USER;
+    }
+    ExitOnFailure(hr, "Failed to read registration %ls for bundle %ls.", wzRelatedBundleCode, BURN_REGISTRATION_REGISTRY_BUNDLE_SCOPE);
 
     hr = RegReadString(hkBundleCode, BURN_REGISTRATION_REGISTRY_BUNDLE_CACHE_PATH, &sczCachePath);
     ExitOnFailure(hr, "Failed to read cache path from registry for bundle: %ls", wzRelatedBundleCode);
