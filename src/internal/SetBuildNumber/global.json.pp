@@ -6,7 +6,7 @@
     "WixToolset.Sdk": "{packageversion}"
   },
   "sdk": {
-    "version": "10.0.100",
+    "version": "9.0.300",
     "rollForward": "latestFeature"
   }
 }

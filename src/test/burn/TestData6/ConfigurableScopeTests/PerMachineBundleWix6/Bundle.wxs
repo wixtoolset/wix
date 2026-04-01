@@ -1,13 +1,13 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
-  <Bundle Id="PerMachineBundle" Name="PerMachineBundle" Manufacturer="Acme" Version="$(Version)">
+  <Bundle Id="PerMachineBundle" Name="PerMachineBundle" Manufacturer="Acme" Version="1.0.0.0">
     <BootstrapperApplication>
       <bal:WixStandardBootstrapperApplication LicenseUrl="https://www.example.com/license" Theme="hyperlinkLicense" />
     </BootstrapperApplication>
 
-    <Variable Name="TestBundleId" Value="PerMachineBundle v$(Version)" />
+    <Variable Name="TestBundleId" Value="PerMachineBundleWix6 v1.0.0.0" />
 
     <Chain>
-      <MsiPackage SourceFile="PerMachinePkg.msi" />
+      <MsiPackage SourceFile="PerMachinePkgWix6.msi" />
     </Chain>
   </Bundle>
 </Wix>
