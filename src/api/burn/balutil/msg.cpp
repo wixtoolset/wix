@@ -513,6 +513,8 @@ static HRESULT OnCacheAcquireResolving(
     hr = BuffReaderReadString(pReaderArgs, &sczDownloadUrl);
     ExitOnFailure(hr, "Failed to read download url of OnCacheAcquireResolving args.");
 
+    args.wzDownloadUrl = sczDownloadUrl;
+
     hr = BuffReaderReadString(pReaderArgs, &sczPayloadContainerId);
     ExitOnFailure(hr, "Failed to read payload container id of OnCacheAcquireResolving args.");
 
