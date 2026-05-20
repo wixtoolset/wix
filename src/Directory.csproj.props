@@ -12,6 +12,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AcceptEula>abc;wix7;xyz;123</AcceptEula>
+    <AcceptEula>abc;wix8;xyz;123</AcceptEula>
   </PropertyGroup>
 </Project>
