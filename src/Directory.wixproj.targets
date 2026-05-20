@@ -3,7 +3,7 @@
 
 <Project>
   <PropertyGroup>
-    <AcceptEula>wix7</AcceptEula>
+    <AcceptEula>wix8</AcceptEula>
   </PropertyGroup>
 
   <Target Name="_SetWixVersion"

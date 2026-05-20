@@ -3,7 +3,7 @@
   <Import Project="$(WixMSBuildProps)" />
 
   <PropertyGroup>
-    <AcceptEula>wix7</AcceptEula>
+    <AcceptEula>wix8</AcceptEula>
   </PropertyGroup>
 
   <ItemGroup>

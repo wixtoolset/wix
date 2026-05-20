@@ -4,7 +4,7 @@
 <Project>
 
   <Target
-    Name="CheckWix7LicenseAcceptance"
+    Name="CheckWix8LicenseAcceptance"
     BeforeTargets="CoreCompile">
 
     <ItemGroup>
@@ -12,19 +12,19 @@
     </ItemGroup>
 
     <PropertyGroup>
-      <_Wix7EulaFile>$(USERPROFILE)\.wix\wix7-osmf-eula.txt</_Wix7EulaFile>
+      <_Wix8EulaFile>$(USERPROFILE)\.wix\wix8-osmf-eula.txt</_Wix8EulaFile>
     </PropertyGroup>
 
-    <FindInList List="@(_AcceptEula)" ItemSpecToFind="wix7">
-      <Output TaskParameter="ItemFound" ItemName="_Wix7LicenseAccepted" />
+    <FindInList List="@(_AcceptEula)" ItemSpecToFind="wix8">
+      <Output TaskParameter="ItemFound" ItemName="_Wix8LicenseAccepted" />
     </FindInList>
 
     <Error
-      Text="You must accept the Open Source Maintenance Fee (OSMF) EULA to use WiX Toolset v7. For instructions, see https://wixtoolset.org/osmf/"
+      Text="You must accept the Open Source Maintenance Fee (OSMF) EULA to use WiX Toolset v8. For instructions, see https://wixtoolset.org/osmf/"
       Code="WIX7015"
       File="$(MSBuildProjectFile)"
       HelpLink="https://wixtoolset.org/osmf"
-      Condition=" '@(_Wix7LicenseAccepted)' == '' and !Exists('$(_Wix7EulaFile)')" />
+      Condition=" '@(_Wix8LicenseAccepted)' == '' and !Exists('$(_Wix8EulaFile)')" />
   </Target>
 
 </Project>
