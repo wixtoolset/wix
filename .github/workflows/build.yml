@@ -20,7 +20,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: windows-2025
+    runs-on: windows-2025-vs2026
     env:
       RepoOrg: ${{ github.repository_owner }}
       SignBuild: ${{ github.repository_owner == 'wixtoolset' && startsWith(github.ref, 'refs/tags/v') }}

@@ -1,18 +1,21 @@
 // Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information.
 
-namespace WixE2E
-{
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Security.Cryptography;
-    using System.Text;
-    using WixInternal.TestSupport;
-    using Xunit;
+using System;
+using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using WixInternal.MSTestSupport;
 
+[assembly: DoNotParallelize]
+
+namespace WixToolsetTest.WixE2E
+{
+    [TestClass]
     public class WixE2EFixture
     {
-        [Fact]
+        [TestMethod]
         public void CanBuildWixlibMultiFramework()
         {
             var projectPath = TestData.Get("TestData", "WixprojLibraryMultiFramework", "WixprojLibraryMultiFramework.wixproj");
@@ -23,7 +26,7 @@ namespace WixE2E
             result.AssertSuccess();
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildWixlibWithNativeDll()
         {
             var projectPath = TestData.Get("TestData", "WixprojLibraryVcxprojDll", "WixprojLibraryVcxprojDll.wixproj");
@@ -34,7 +37,7 @@ namespace WixE2E
             result.AssertSuccess();
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildModuleWithWinFormsApp()
         {
             var projectPath = TestData.Get("TestData", "WixprojModuleCsprojWinFormsNetFx", "WixprojModuleCsprojWinFormsNetFx.wixproj");
@@ -45,7 +48,7 @@ namespace WixE2E
             result.AssertSuccess();
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildPackageWithWebApp()
         {
             var projectPath = TestData.Get("TestData", "WixprojPackageCsprojWebApplicationNetCore", "WixprojPackageCsprojWebApplicationNetCore.wixproj");
@@ -56,7 +59,7 @@ namespace WixE2E
             result.AssertSuccess();
         }
 
-        [Fact]
+        [TestMethod]
         public void CanBuildPackageWithNativeWindowsApp()
         {
             var projectPath = TestData.Get("TestData", "WixprojPackageVcxprojWindowsApp", "WixprojPackageVcxprojWindowsApp.wixproj");
@@ -75,7 +78,7 @@ namespace WixE2E
             }, signingStatement);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanIncrementalBuildPackageWithNativeWindowsAppWithNoEdits()
         {
             var projectDirectory = TestData.Get("TestData", "WixprojPackageVcxprojWindowsApp");
@@ -101,7 +104,7 @@ namespace WixE2E
             WixAssert.CompareLineByLine(firstHashes, secondHashes);
         }
 
-        [Fact]
+        [TestMethod]
         public void CanIncrementalBuildPackageWithNativeWindowsAppWithEdits()
         {
             var projectDirectory = TestData.Get("TestData", "WixprojPackageVcxprojWindowsApp");
@@ -130,37 +133,38 @@ namespace WixE2E
             var secondHashes = secondBuiltFiles.Select(s => $"{s.Substring(projectBinPath.Length).TrimStart('\\')} with hash: {GetFileHash(s)}").ToArray();
 
             WixAssert.CompareLineByLine(firstRelativePaths, secondRelativePaths);
-            Assert.NotEqual(firstHashes, secondHashes);
+            Assert.AreNotEqual(firstHashes, secondHashes);
         }
 
-        [Fact(Skip = "Investigate if .NET Core WebApplications can be incrementally built")]
-        public void CanIncrementalBuildPackageWithNetCoreWebAppWithoutEdits()
-        {
-            var projectDirectory = TestData.Get("TestData", "WixprojPackageCsprojWebApplicationNetCore");
-            var projectPath = Path.Combine(projectDirectory, "WixprojPackageCsprojWebApplicationNetCore.wixproj");
-            var projectBinPath = Path.Combine(projectDirectory, "bin");
+        //[TestMethod]
+        //[Fact(Skip = "Investigate if .NET Core WebApplications can be incrementally built")]
+        //public void CanIncrementalBuildPackageWithNetCoreWebAppWithoutEdits()
+        //{
+        //    var projectDirectory = TestData.Get("TestData", "WixprojPackageCsprojWebApplicationNetCore");
+        //    var projectPath = Path.Combine(projectDirectory, "WixprojPackageCsprojWebApplicationNetCore.wixproj");
+        //    var projectBinPath = Path.Combine(projectDirectory, "bin");
 
-            CleanEverything();
+        //    CleanEverything();
 
-            var result = RestoreAndBuild(projectPath);
-            result.AssertSuccess();
+        //    var result = RestoreAndBuild(projectPath);
+        //    result.AssertSuccess();
 
-            var firstBuiltFiles = Directory.GetFiles(projectBinPath, "*.*", SearchOption.AllDirectories).ToArray();
-            var firstHashes = firstBuiltFiles.Select(s => $"{s.Substring(projectBinPath.Length).TrimStart('\\')} with hash: {GetFileHash(s)}").ToArray();
+        //    var firstBuiltFiles = Directory.GetFiles(projectBinPath, "*.*", SearchOption.AllDirectories).ToArray();
+        //    var firstHashes = firstBuiltFiles.Select(s => $"{s.Substring(projectBinPath.Length).TrimStart('\\')} with hash: {GetFileHash(s)}").ToArray();
 
-            //var packageWxsPath = Path.Combine(projectDirectory, "Package.wxs");
-            //File.SetLastWriteTime(packageWxsPath, DateTime.Now);
+        //    //var packageWxsPath = Path.Combine(projectDirectory, "Package.wxs");
+        //    //File.SetLastWriteTime(packageWxsPath, DateTime.Now);
 
-            // This should be an incremental build that does work because a file was updated.
-            //
-            result = RestoreAndBuild(projectPath);
-            result.AssertSuccess();
+        //    // This should be an incremental build that does work because a file was updated.
+        //    //
+        //    result = RestoreAndBuild(projectPath);
+        //    result.AssertSuccess();
 
-            var secondBuiltFiles = Directory.GetFiles(projectBinPath, "*.*", SearchOption.AllDirectories).ToArray();
-            var secondHashes = secondBuiltFiles.Select(s => $"{s.Substring(projectBinPath.Length).TrimStart('\\')} with hash: {GetFileHash(s)}").ToArray();
+        //    var secondBuiltFiles = Directory.GetFiles(projectBinPath, "*.*", SearchOption.AllDirectories).ToArray();
+        //    var secondHashes = secondBuiltFiles.Select(s => $"{s.Substring(projectBinPath.Length).TrimStart('\\')} with hash: {GetFileHash(s)}").ToArray();
 
-            WixAssert.CompareLineByLine(firstHashes, secondHashes);
-        }
+        //    WixAssert.CompareLineByLine(firstHashes, secondHashes);
+        //}
 
         private static void CleanEverything()
         {
@@ -178,11 +182,6 @@ namespace WixE2E
                         Directory.Delete(folder, true);
                     }
                 }
-            }
-
-            foreach (var logFile in Directory.GetFiles(rootFolder, "*.binlog", SearchOption.AllDirectories))
-            {
-                File.Delete(logFile);
             }
         }
 
@@ -205,7 +204,23 @@ namespace WixE2E
 
         private static MsbuildRunnerResult RestoreAndBuild(string projectPath, bool x64 = true, bool suppressValidation = true)
         {
-            return MsbuildRunner.Execute(projectPath, new[] { "-Restore", "-v:m", "-bl", $"-p:SuppressValidation={suppressValidation}" }, x64);
+            var logPath = BinlogPath(projectPath);
+
+            var result = MsbuildRunner.Execute(projectPath, new[] { "-Restore", "-v:m", $"-bl:{logPath}", $"-p:SuppressValidation={suppressValidation}" }, x64);
+
+            return result;
+        }
+
+        private static string BinlogPath(string basePath)
+        {
+            var logPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(basePath), "..", "..", "..", "..", "..", "logs", "tests", "WixE2E", Path.ChangeExtension(Path.GetFileName(basePath), ".binlog")));
+
+            while (File.Exists(logPath))
+            {
+                logPath = Path.ChangeExtension(logPath, ".X.binlog");
+            }
+
+            return logPath;
         }
     }
 }

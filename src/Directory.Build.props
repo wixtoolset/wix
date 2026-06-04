@@ -23,9 +23,9 @@
     <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
 
     <!-- This is C++-specific but used from managed projects to pick up native build artifacts. -->
-    <WixNativeSdkLibraryToolset>v143</WixNativeSdkLibraryToolset>
+    <WixNativeSdkLibraryToolset>v145</WixNativeSdkLibraryToolset>
     <PlatformToolset Condition=" '$(ConfigurationType)' == 'StaticLibrary' ">$(WixNativeSdkLibraryToolset)</PlatformToolset>
-    <PlatformToolset Condition=" '$(PlatformToolset)' == '' ">v143</PlatformToolset>
+    <PlatformToolset Condition=" '$(PlatformToolset)' == '' ">v145</PlatformToolset>
 
     <NuGetAudit>true</NuGetAudit>
     <NuGetAuditMode>all</NuGetAuditMode>

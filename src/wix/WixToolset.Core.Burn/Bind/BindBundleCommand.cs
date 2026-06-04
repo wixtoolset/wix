@@ -375,7 +375,7 @@ namespace WixToolset.Core.Burn
                 return;
             }
 
-            // Give the extension one last hook before generating the output files.
+            // Give the extensions one last hook before generating the output files.
             foreach (var extension in this.BackendExtensions)
             {
                 extension.SymbolsFinalized(section);

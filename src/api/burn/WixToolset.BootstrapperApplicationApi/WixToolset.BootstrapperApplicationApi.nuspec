@@ -37,15 +37,15 @@
     <file src="netstandard2.0\$id$.dll" target="lib\netstandard2.0" />
     <file src="netstandard2.0\$id$.xml" target="lib\netstandard2.0" />
 
-    <file src="v143\ARM64\mbanative.dll" target="runtimes\win-arm64\native" />
-    <file src="v143\x64\mbanative.dll" target="runtimes\win-x64\native" />
-    <file src="v143\x86\mbanative.dll" target="runtimes\win-x86\native" />
+    <file src="v145\ARM64\mbanative.dll" target="runtimes\win-arm64\native" />
+    <file src="v145\x64\mbanative.dll" target="runtimes\win-x64\native" />
+    <file src="v145\x86\mbanative.dll" target="runtimes\win-x86\native" />
 
     <file src="$projectFolder$\..\balutil\inc\*" target="build\native\include" />
     <file src="$projectFolder$\..\inc\BootstrapperApplicationTypes.h" target="build\native\include" />
     <file src="$projectFolder$\..\inc\BootstrapperEngineTypes.h" target="build\native\include" />
-    <file src="v143\x86\balutil.lib" target="build\native\v14\x86" />
-    <file src="v143\x64\balutil.lib" target="build\native\v14\x64" />
-    <file src="v143\ARM64\balutil.lib" target="build\native\v14\ARM64" />
+    <file src="v145\x86\balutil.lib" target="build\native\v14\x86" />
+    <file src="v145\x64\balutil.lib" target="build\native\v14\x64" />
+    <file src="v145\ARM64\balutil.lib" target="build\native\v14\ARM64" />
   </files>
 </package>
