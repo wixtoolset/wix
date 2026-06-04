@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TestExe\TestExe.csproj" Publish="true" TargetFrameworks="net8.0,net472|win-x64" RuntimeIdentifiers="win-x86,win-x64" />
+    <ProjectReference Include="..\TestExe\TestExe.csproj" Publish="true" TargetFrameworks="net10.0,net472|win-x64" RuntimeIdentifiers="win-x86,win-x64" />
   </ItemGroup>
 
   <Import Project="$(WixTargetsPath)" />

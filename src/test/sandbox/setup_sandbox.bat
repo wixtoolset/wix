@@ -1,6 +1,6 @@
 @setlocal enabledelayedexpansion
 @echo off
-SET DOTNET_VERSION=8.0
+SET DOTNET_VERSION=10.0
 
 :MENU
 cls

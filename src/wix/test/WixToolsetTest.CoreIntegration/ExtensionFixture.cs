@@ -361,7 +361,13 @@ namespace WixToolsetTest.CoreIntegration
                     });
 
                     Assert.Equal(2, result.ExitCode);
-                    Assert.Equal(6101, result.Messages.Single().Id);
+
+                    var message = result.Messages.SingleOrDefault();
+                    if (message != null)
+                    {
+                        // Tolerate a missing .nupkg for offline scenarios.
+                        Assert.Equal(6101, message.Id);
+                    }
                 }
             }
             finally

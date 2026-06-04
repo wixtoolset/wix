@@ -956,7 +956,7 @@ namespace WixToolsetTest.Sdk
                 var filesFolder = Path.Combine(binFolder, "Release", @"PFiles\");
                 var projectPath = Path.Combine(baseFolder, "TargetFrameworkError.wixproj");
 
-                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, 
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath,
                 [
                     "-Restore",
                     "-p:AcceptEula=wix" + SomeVerInfo.Major,
@@ -997,7 +997,7 @@ namespace WixToolsetTest.Sdk
                 var errors = GetDistinctErrorMessages(result.Output, baseFolder);
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"<basefolder>\TargetFrameworksError.wixproj : error WIX9001: The TargetFrameworks property is not supported by the WiX Toolset. Remove the TargetFrameworks property from your project and try building again. TargetFrameworks = net8.0",
+                    @"<basefolder>\TargetFrameworksError.wixproj : error WIX9001: The TargetFrameworks property is not supported by the WiX Toolset. Remove the TargetFrameworks property from your project and try building again. TargetFrameworks = net10.0",
                 }, errors);
             }
         }

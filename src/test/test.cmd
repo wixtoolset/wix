@@ -13,8 +13,7 @@
 
 @call burn\test_burn.cmd %_C% %_T% || exit /b
 @call msi\test_msi.cmd %_C% %_T% || exit /b
-
-dotnet test wix -c %_C% --nologo -l "trx;LogFileName=%_L%\TestResults\WixToolsetTest.WixE2ETests.trx" || exit /b
+@call wix\test_wix.cmd %_C% %_T% || exit /b
 
 @popd
 @endlocal
