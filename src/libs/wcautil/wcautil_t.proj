@@ -3,6 +3,7 @@
     <ProjectReference Include="WixToolset.WcaUtil\wcautil.vcxproj" Properties="Platform=x86" />
     <ProjectReference Include="WixToolset.WcaUtil\wcautil.vcxproj" Properties="Platform=x64" />
     <ProjectReference Include="WixToolset.WcaUtil\wcautil.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="WixToolset.WcaUtil\wcautil.vcxproj" Properties="Platform=ARM64EC" />
 
     <ProjectReference Include="WixToolset.WcaUtil\wcautil.vcxproj" Targets="PackNative" />
   </ItemGroup>
