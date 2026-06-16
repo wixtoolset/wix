@@ -5,6 +5,8 @@
   <!-- Overrides the standard Cpp.Build.props to include the PlatformToolset in the output path. -->
   <PropertyGroup>
     <IntDir>$(BaseIntermediateOutputPath)$(Configuration)\$(PlatformToolset)\$(PlatformTarget)\</IntDir>
+    <IntDir Condition=" '$(Platform)' == 'ARM64EC' ">$(BaseIntermediateOutputPath)$(Configuration)\ARM64EC\</IntDir>
     <OutDir>$(OutputPath)$(PlatformToolset)\$(PlatformTarget)\</OutDir>
+    <OutDir Condition=" '$(Platform)' == 'ARM64EC' ">$(OutputPath)$(PlatformToolset)\ARM64EC\</OutDir>
   </PropertyGroup>
 </Project>
