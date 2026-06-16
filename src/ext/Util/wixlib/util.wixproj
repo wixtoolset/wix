@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\be\utilbe.vcxproj" Platforms="arm64,x86,x64" />
-    <ProjectReference Include="..\ca\utilca.vcxproj" Platforms="arm64,x86,x64" />
+    <ProjectReference Include="..\ca\utilca.vcxproj" Platforms="arm64,arm64ec,x86,x64" />
   </ItemGroup>
 
   <ItemGroup>
