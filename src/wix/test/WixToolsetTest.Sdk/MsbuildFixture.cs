@@ -828,10 +828,10 @@ namespace WixToolsetTest.Sdk
 
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"net472_x64\e_sqlite3.dll - 1601536",
-                    @"net472_x86\e_sqlite3.dll - 1207296",
-                    @"net8_x64\e_sqlite3.dll - 1601536",
-                    @"net8_x86\e_sqlite3.dll - 1207296",
+                    @"net472_x64\e_sqlite3.dll - 1911296",
+                    @"net472_x86\e_sqlite3.dll - 1503232",
+                    @"net8_x64\e_sqlite3.dll - 1911296",
+                    @"net8_x86\e_sqlite3.dll - 1503232",
                 }, releaseFileSizes);
             }
         }
@@ -898,14 +898,14 @@ namespace WixToolsetTest.Sdk
 
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"debug_net472_x64\e_sqlite3.dll - 1601536",
-                    @"debug_net472_x86\e_sqlite3.dll - 1207296",
-                    @"debug_net8_x64\e_sqlite3.dll - 1601536",
-                    @"debug_net8_x86\e_sqlite3.dll - 1207296",
-                    @"release_net472_x64\e_sqlite3.dll - 1601536",
-                    @"release_net472_x86\e_sqlite3.dll - 1207296",
-                    @"release_net8_x64\e_sqlite3.dll - 1601536",
-                    @"release_net8_x86\e_sqlite3.dll - 1207296",
+                    @"debug_net472_x64\e_sqlite3.dll - 1911296",
+                    @"debug_net472_x86\e_sqlite3.dll - 1503232",
+                    @"debug_net8_x64\e_sqlite3.dll - 1911296",
+                    @"debug_net8_x86\e_sqlite3.dll - 1503232",
+                    @"release_net472_x64\e_sqlite3.dll - 1911296",
+                    @"release_net472_x86\e_sqlite3.dll - 1503232",
+                    @"release_net8_x64\e_sqlite3.dll - 1911296",
+                    @"release_net8_x86\e_sqlite3.dll - 1503232",
                 }, releaseFileSizes);
             }
         }

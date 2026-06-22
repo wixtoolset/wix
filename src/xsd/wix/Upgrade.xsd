@@ -14,7 +14,7 @@
           <annotation>
             <documentation>
               Nesting a Property element under an Upgrade element has been deprecated.
-              Please nest Property elements in any of the other supported locations.
+              Use ProductSearch instead.
             </documentation>
           </annotation>
         </element>

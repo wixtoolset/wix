@@ -383,7 +383,7 @@ extern "C" HRESULT CoreDetect(
             pEngineState->registration.fEligibleForCleanup = FALSE;
         }
 
-        LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), LoggingBoolToString(pPackage->fCached), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState), LoggingPackageScopeToString(pPackage->scope), LoggingInstallScopeToString(pPackage->fDetectedPerMachine));
+        LogId(REPORT_STANDARD, MSG_DETECTED_PACKAGE, pPackage->sczId, LoggingPackageStateToString(pPackage->currentState), BURN_PACKAGE_TYPE_MSI == pPackage->type ? LoggingBoolToString(pPackage->fCached) : "(not configurable scope)", LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->installRegistrationState), LoggingPackageRegistrationStateToString(pPackage->fCanAffectRegistration, pPackage->cacheRegistrationState), LoggingPackageScopeToString(pPackage->scope), LoggingInstallScopeToString(pPackage->fDetectedPerMachine));
 
         if (BURN_PACKAGE_TYPE_MSI == pPackage->type)
         {

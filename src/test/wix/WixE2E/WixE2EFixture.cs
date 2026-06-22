@@ -136,35 +136,36 @@ namespace WixToolsetTest.WixE2E
             Assert.AreNotEqual(firstHashes, secondHashes);
         }
 
-        //[TestMethod]
+        [Ignore]
+        [TestMethod]
         //[Fact(Skip = "Investigate if .NET Core WebApplications can be incrementally built")]
-        //public void CanIncrementalBuildPackageWithNetCoreWebAppWithoutEdits()
-        //{
-        //    var projectDirectory = TestData.Get("TestData", "WixprojPackageCsprojWebApplicationNetCore");
-        //    var projectPath = Path.Combine(projectDirectory, "WixprojPackageCsprojWebApplicationNetCore.wixproj");
-        //    var projectBinPath = Path.Combine(projectDirectory, "bin");
+        public void CanIncrementalBuildPackageWithNetCoreWebAppWithoutEdits()
+        {
+            var projectDirectory = TestData.Get("TestData", "WixprojPackageCsprojWebApplicationNetCore");
+            var projectPath = Path.Combine(projectDirectory, "WixprojPackageCsprojWebApplicationNetCore.wixproj");
+            var projectBinPath = Path.Combine(projectDirectory, "bin");
 
-        //    CleanEverything();
+            CleanEverything();
 
-        //    var result = RestoreAndBuild(projectPath);
-        //    result.AssertSuccess();
+            var result = RestoreAndBuild(projectPath);
+            result.AssertSuccess();
 
-        //    var firstBuiltFiles = Directory.GetFiles(projectBinPath, "*.*", SearchOption.AllDirectories).ToArray();
-        //    var firstHashes = firstBuiltFiles.Select(s => $"{s.Substring(projectBinPath.Length).TrimStart('\\')} with hash: {GetFileHash(s)}").ToArray();
+            var firstBuiltFiles = Directory.GetFiles(projectBinPath, "*.*", SearchOption.AllDirectories).ToArray();
+            var firstHashes = firstBuiltFiles.Select(s => $"{s.Substring(projectBinPath.Length).TrimStart('\\')} with hash: {GetFileHash(s)}").ToArray();
 
-        //    //var packageWxsPath = Path.Combine(projectDirectory, "Package.wxs");
-        //    //File.SetLastWriteTime(packageWxsPath, DateTime.Now);
+            //var packageWxsPath = Path.Combine(projectDirectory, "Package.wxs");
+            //File.SetLastWriteTime(packageWxsPath, DateTime.Now);
 
-        //    // This should be an incremental build that does work because a file was updated.
-        //    //
-        //    result = RestoreAndBuild(projectPath);
-        //    result.AssertSuccess();
+            // This should be an incremental build that does work because a file was updated.
+            //
+            result = RestoreAndBuild(projectPath);
+            result.AssertSuccess();
 
-        //    var secondBuiltFiles = Directory.GetFiles(projectBinPath, "*.*", SearchOption.AllDirectories).ToArray();
-        //    var secondHashes = secondBuiltFiles.Select(s => $"{s.Substring(projectBinPath.Length).TrimStart('\\')} with hash: {GetFileHash(s)}").ToArray();
+            var secondBuiltFiles = Directory.GetFiles(projectBinPath, "*.*", SearchOption.AllDirectories).ToArray();
+            var secondHashes = secondBuiltFiles.Select(s => $"{s.Substring(projectBinPath.Length).TrimStart('\\')} with hash: {GetFileHash(s)}").ToArray();
 
-        //    WixAssert.CompareLineByLine(firstHashes, secondHashes);
-        //}
+            WixAssert.CompareLineByLine(firstHashes, secondHashes);
+        }
 
         private static void CleanEverything()
         {
