@@ -80,6 +80,7 @@ namespace WixToolsetTest.VisualStudio
                 "VS2017DEVENV",
                 "VS2019_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED",
                 "VS2022_ROOT_FOLDER",
+                "VS2026_ROOT_FOLDER",
                 "WIX_DOWNGRADE_DETECTED",
                 "WIX_UPGRADE_DETECTED",
             }, propertyResults);
