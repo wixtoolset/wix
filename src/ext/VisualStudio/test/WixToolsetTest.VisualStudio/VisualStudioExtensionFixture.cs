@@ -36,7 +36,7 @@ namespace WixToolsetTest.VisualStudio
                 "CustomAction:Vwd2012VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2012_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
                 "CustomAction:Vwd2013VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2013_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
                 "CustomAction:Vwd2015VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2015_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
-                "CustomAction:Wix4VSFindInstances_X86\t257\tVSCA_X86\tFindInstances\t",
+                "CustomAction:Wix4VSFindInstances_X86\t257\tWix4VSCA_X86\tFindInstances\t",
             }, results);
         }
 
@@ -64,7 +64,7 @@ namespace WixToolsetTest.VisualStudio
                 "CustomAction:Vwd2012VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2012_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
                 "CustomAction:Vwd2013VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2013_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
                 "CustomAction:Vwd2015VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2015_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
-                "CustomAction:Wix4VSFindInstances_A64\t257\tVSCA_A64\tFindInstances\t",
+                "CustomAction:Wix4VSFindInstances_A64\t257\tWix4VSCA_A64\tFindInstances\t",
             }, customActionResults);
 
             var propertyResults = results.Single(r => r.StartsWith("Property:SecureCustomProperties")).Split('\t')[1].Split(';');
