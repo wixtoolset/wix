@@ -8,7 +8,7 @@
     <PropertyRef Id="VS2022_ROOT_FOLDER" />
     <PropertyRef Id="VS2026_ROOT_FOLDER" />
 
-      <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
+    <Feature Id="ProductFeature" Title="!(loc.FeatureTitle)">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
   </Package>
