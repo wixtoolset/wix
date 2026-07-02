@@ -77,7 +77,7 @@
     <String Id="FatalError_Title" Overridable="yes" Value="Installazione di [ProductName]" />
     <String Id="FatalErrorBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
     <String Id="FatalErrorTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}Installazione guidata di [ProductName] terminata prima del completamento" />
-    <String Id="FatalErrorDescription1" Overridable="yes" Value="L'Installazione guidata di [ProductName] è terminata prima del completamento a causa di un errore. Il sistema non è stato modificato. Per installare il programma in un secondo momento, esegui di nuovo l'Installazione guidata." />
+    <String Id="FatalErrorDescription1" Overridable="yes" Value="L'installazione guidata di [ProductName] è terminata prima del completamento a causa di un errore. Il sistema non è stato modificato. Per installare il programma in un secondo momento, esegui di nuovo l'Installazione guidata." />
     <String Id="FatalErrorDescription2" Overridable="yes" Value="per uscire dall'Installazione guidata seleziona 'Fine'." />
 
     <String Id="FeaturesDlg_Title" Overridable="yes" Value="Installazione di [ProductName]" />
@@ -146,7 +146,7 @@
 
     <String Id="MaintenanceWelcomeDlg_Title" Overridable="yes" Value="Installazione di [ProductName]" />
     <String Id="MaintenanceWelcomeDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
-    <String Id="MaintenanceWelcomeDlgDescription" Overridable="yes" Value="L'Installazione guidata consente di cambiare la modalità di installazione delle funzionalità di [ProductName] nel computer o di rimuovere il prodotto. per continuare seleziona 'Avanti' o 'Annulla' per uscire dall'installazione guidata." />
+    <String Id="MaintenanceWelcomeDlgDescription" Overridable="yes" Value="L'installazione guidata consente di cambiare la modalità di installazione delle funzionalità di [ProductName] nel computer o di rimuovere il prodotto. Per continuare seleziona 'Avanti' o 'Annulla' per uscire dall'installazione guidata." />
     <String Id="MaintenanceWelcomeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}Installazione guidata di [ProductName]" />
 
     <String Id="MsiRMFilesInUse_Title" Overridable="yes" Value="Installazione di [ProductName]" />
@@ -221,7 +221,7 @@
     <String Id="VerifyReadyDlg_Title" Overridable="yes" Value="Installazione di [ProductName]" />
     <String Id="VerifyReadyDlgBannerBitmap" Overridable="yes" Value="WixUI_Bmp_Banner" />
     <String Id="VerifyReadyDlgInstall" Overridable="yes" Value="&amp;Installa" />
-    <String Id="VerifyReadyDlgInstallText" Overridable="yes" Value="Per avviare l'installazione seleziona 'Installa'. Per rivedere o modificare le impostazioni di installazione seleziona 'Indietro'. per uscire dalla procedura guidata selrziona 'Annulla'." />
+    <String Id="VerifyReadyDlgInstallText" Overridable="yes" Value="Per avviare l'installazione seleziona 'Installa'. Per rivedere o modificare le impostazioni di installazione seleziona 'Indietro'. Per uscire dalla procedura guidata selrziona 'Annulla'." />
     <String Id="VerifyReadyDlgInstallTitle" Overridable="yes" Value="{\WixUI_Font_Title}Inizio installazione di [ProductName]" />
     <String Id="VerifyReadyDlgChange" Overridable="yes" Value="&amp;Cambia" />
     <String Id="VerifyReadyDlgChangeText" Overridable="yes" Value="Per avviare l'installazione seleziona 'Cambia'. Per rivedere o modificare le impostazioni di installazione seleziona 'Indietro'. Per uscire dalla procedura guidata seleziona 'Annulla'." />
@@ -233,7 +233,7 @@
     <String Id="VerifyReadyDlgRemoveText" Overridable="yes" Value="Per rimuovere [ProductName] dal computer seleziona 'Rimuovi'. Per rivedere o modificare le impostazioni di installazione seleziona 'Indietro'. Per uscire dalla procedura guidata seleziona 'Annulla'." />
     <String Id="VerifyReadyDlgRemoveTitle" Overridable="yes" Value="{\WixUI_Font_Title}Inizio rimozione di [ProductName]" />
     <String Id="VerifyReadyDlgUpdate" Overridable="yes" Value="A&amp;ggiorna" />
-    <String Id="VerifyReadyDlgUpdateText" Overridable="yes" Value="Per eseguire l'aggiornamento di [ProductName] nel computer seleziona 'Aggiorna'. Per rivedere o modificare le impostazioni di installazione seleziona 'Indietro'. per uscire dalla procedura guidata seleziona 'Annulla'." />
+    <String Id="VerifyReadyDlgUpdateText" Overridable="yes" Value="Per eseguire l'aggiornamento di [ProductName] nel computer seleziona 'Aggiorna'. Per rivedere o modificare le impostazioni di installazione seleziona 'Indietro'. Per uscire dalla procedura guidata seleziona 'Annulla'." />
     <String Id="VerifyReadyDlgUpdateTitle" Overridable="yes" Value="{\WixUI_Font_Title}Inizio aggiornamento di [ProductName]" />
 
     <String Id="WaitForCostingDlg_Title" Overridable="yes" Value="Installazione di [ProductName]" />
@@ -244,7 +244,7 @@
 
     <String Id="WelcomeDlg_Title" Overridable="yes" Value="Installazione di [ProductName]" />
     <String Id="WelcomeDlgBitmap" Overridable="yes" Value="WixUI_Bmp_Dialog" />
-    <String Id="WelcomeDlgDescription" Overridable="yes" Value="L'Installazione guidata consente di installare [ProductName] nel computer. Per continuare seleziona 'Avanti' o 'Annulla' per uscire dall'installazione guidata." />
+    <String Id="WelcomeDlgDescription" Overridable="yes" Value="L'installazione guidata consente di installare [ProductName] nel computer. Per continuare seleziona 'Avanti' o 'Annulla' per uscire dall'installazione guidata." />
     <String Id="WelcomeUpdateDlgDescriptionUpdate" Overridable="yes" Value="Verrà eseguito l'aggiornamento di [ProductName] nel computer. Per continuare seleziona 'Avanti' o 'Annulla' per uscire dall'installazione guidata." />
     <String Id="WelcomeDlgTitle" Overridable="yes" Value="{\WixUI_Font_Bigger}Installazione guidata di [ProductName]" />
 
