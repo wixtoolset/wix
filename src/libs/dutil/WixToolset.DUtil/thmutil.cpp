@@ -3538,6 +3538,9 @@ static HRESULT ParseControl(
     }
     else if (THEME_CONTROL_TYPE_HYPERLINK == pControl->type || THEME_CONTROL_TYPE_BUTTON == pControl->type)
     {
+        hr = XmlGetAttributeEx(pixn, L"ElevationShieldCondition", &pControl->sczElevationShieldCondition);
+        ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' ElevationShieldCondition attribute.", pControl->sczName);
+
         hr = GetAttributeFontId(pTheme, pixn, L"HoverFontId", &pControl->dwFontHoverId);
         ThmExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed when querying control '%ls' HoverFontId attribute.", pControl->sczName);
 
@@ -4826,6 +4829,7 @@ static void FreeControl(
         ReleaseStr(pControl->sczNote);
         ReleaseStr(pControl->sczEnableCondition);
         ReleaseStr(pControl->sczVisibleCondition);
+        ReleaseStr(pControl->sczElevationShieldCondition);
         ReleaseStr(pControl->sczValue);
         ReleaseStr(pControl->sczVariable);
 
@@ -5625,6 +5629,7 @@ static HRESULT ShowControl(
 
     BOOL fEnabled = !(pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_DISABLED);
     BOOL fVisible = !(pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_HIDDEN);
+    BOOL fShield = FALSE;
 
     if (pTheme->pfnEvaluateCondition)
     {
@@ -5640,6 +5645,13 @@ static HRESULT ShowControl(
         {
             hr = pTheme->pfnEvaluateCondition(pControl->sczEnableCondition, &fEnabled, pTheme->pvVariableContext);
             ThmExitOnFailure(hr, "Failed to evaluate EnableCondition: %ls", pControl->sczEnableCondition);
+        }
+
+        // If the control has an ElevationShieldCondition, check if it's true.
+        if (pControl->sczElevationShieldCondition && pControl->fAutomaticElevationShield)
+        {
+            hr = pTheme->pfnEvaluateCondition(pControl->sczElevationShieldCondition, &fShield, pTheme->pvVariableContext);
+            ThmExitOnFailure(hr, "Failed to evaluate ElevationShieldCondition: %ls", pControl->sczElevationShieldCondition);
         }
     }
 
@@ -5815,6 +5827,8 @@ static HRESULT ShowControl(
             Button_SetCheck(hWnd, (!sczText && !pControl->sczValue) || (sczText && CSTR_EQUAL == ::CompareStringOrdinal(sczText, -1, pControl->sczValue, -1, FALSE)));
         }
     }
+
+    ThemeControlElevates(pControl, fShield);
 
     if (!fVisible || (!fEnabled && (pControl->dwInternalStyle & INTERNAL_CONTROL_STYLE_HIDE_WHEN_DISABLED)))
     {
@@ -6283,6 +6297,7 @@ static HRESULT LoadControls(
         pControl->fAutomaticAction = THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ACTION != (THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ACTION & dwAutomaticBehaviorType);
         pControl->fAutomaticText = THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_TEXT != (THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_TEXT & dwAutomaticBehaviorType);
         pControl->fAutomaticValue = THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VALUE != (THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VALUE & dwAutomaticBehaviorType);
+        pControl->fAutomaticElevationShield = THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ELEVATION_SHIELD != (THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ELEVATION_SHIELD & dwAutomaticBehaviorType);
 
         // This range is reserved for thmutil. The process will run out of available window handles before reaching the end of the range.
         if (THEME_FIRST_AUTO_ASSIGN_CONTROL_ID <= wControlId && THEME_FIRST_ASSIGN_CONTROL_ID > wControlId)
