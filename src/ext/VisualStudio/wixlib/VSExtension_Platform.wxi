@@ -1,10 +1,10 @@
-﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 <Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <?include ..\..\caDecor.wxi ?>
 
     <Fragment>
-        <CustomAction Id="$(var.Prefix)VSFindInstances$(var.Suffix)" DllEntry="FindInstances" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="VSCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)VSFindInstances$(var.Suffix)" DllEntry="FindInstances" Execute="firstSequence" Return="check" SuppressModularization="yes" BinaryRef="$(var.Prefix)VSCA$(var.Suffix)" />
         <InstallExecuteSequence>
             <Custom Action="virtual $(var.Prefix)VSFindInstances$(var.Suffix)" Before="AppSearch" />
         </InstallExecuteSequence>
@@ -14,6 +14,6 @@
     </Fragment>
 
     <Fragment>
-        <Binary Id="VSCA$(var.Suffix)" SourceFile="vsca.dll" />
+        <Binary Id="$(var.Prefix)VSCA$(var.Suffix)" SourceFile="!(bindpath.vsca.$(var.platform))vsca.dll" />
     </Fragment>
 </Include>

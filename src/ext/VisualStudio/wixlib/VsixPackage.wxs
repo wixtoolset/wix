@@ -1,4 +1,4 @@
-﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -28,6 +28,30 @@
             </RegistrySearch>
         </Property>
 
+        <Property Id="VS2017_VSIX_INSTALLER_PATH" Secure="yes">
+            <DirectorySearchRef Id="VS2017EnvironmentDirectorySearch" Parent="VS2017DirectorySearch" Path="Common7\IDE">
+                <FileSearch Id="WixVS2017VsixInstaller" Name="VSIXInstaller.exe" />
+            </DirectorySearchRef>
+        </Property>
+
+        <Property Id="VS2019_VSIX_INSTALLER_PATH" Secure="yes">
+            <DirectorySearchRef Id="VS2019EnvironmentDirectorySearch" Parent="VS2019DirectorySearch" Path="Common7\IDE">
+                <FileSearch Id="WixVS2019VsixInstaller" Name="VSIXInstaller.exe" />
+            </DirectorySearchRef>
+        </Property>
+
+        <Property Id="VS2022_VSIX_INSTALLER_PATH" Secure="yes">
+            <DirectorySearchRef Id="VS2022EnvironmentDirectorySearch" Parent="VS2022DirectorySearch" Path="Common7\IDE">
+                <FileSearch Id="WixVS2022VsixInstaller" Name="VSIXInstaller.exe" />
+            </DirectorySearchRef>
+        </Property>
+
+        <Property Id="VS2026_VSIX_INSTALLER_PATH" Secure="yes">
+            <DirectorySearchRef Id="VS2026EnvironmentDirectorySearch" Parent="VS2026DirectorySearch" Path="Common7\IDE">
+                <FileSearch Id="WixVS2026VsixInstaller" Name="VSIXInstaller.exe" />
+            </DirectorySearchRef>
+        </Property>
+
         <Property Id="VS_VSIX_INSTALLER_PATH" Secure="yes" />
 
         <!-- VWD2012 registers differently than the rest of Visual Studio, so search for it in the case VS2012 is missing. -->
@@ -46,7 +70,15 @@
         </Property>
 
         <!-- Use the latest VS- or VWD-installed VSIXInstaller.exe. -->
-        <SetProperty Action="SetVS2015Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2015_VSIX_INSTALLER_PATH]" Sequence="both" After="AppSearch" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2015_VSIX_INSTALLER_PATH" />
+        <SetProperty Action="SetVS2026Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2026_VSIX_INSTALLER_PATH]" Sequence="both" After="AppSearch" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2026_VSIX_INSTALLER_PATH" />
+
+        <SetProperty Action="SetVS2022Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2022_VSIX_INSTALLER_PATH]" Sequence="both" After="SetVS2026Vsix" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2022_VSIX_INSTALLER_PATH" />
+
+        <SetProperty Action="SetVS2019Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2019_VSIX_INSTALLER_PATH]" Sequence="both" After="SetVS2022Vsix" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2019_VSIX_INSTALLER_PATH" />
+
+        <SetProperty Action="SetVS2017Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2017_VSIX_INSTALLER_PATH]" Sequence="both" After="SetVS2019Vsix" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2017_VSIX_INSTALLER_PATH" />
+
+        <SetProperty Action="SetVS2015Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2015_VSIX_INSTALLER_PATH]" Sequence="both" After="SetVS2017Vsix" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2015_VSIX_INSTALLER_PATH" />
         <SetProperty Action="Vwd2015VsixWhenVSAbsent" Id="VS_VSIX_INSTALLER_PATH" Value="[VWD2015_VSIX_INSTALL_ROOT]\Common7\IDE\VSIXInstaller.exe" Sequence="both" After="SetVS2015Vsix" Condition="NOT VS_VSIX_INSTALLER_PATH AND VWD2015_VSIX_INSTALL_ROOT" />
 
         <SetProperty Action="SetVS2013Vsix" Id="VS_VSIX_INSTALLER_PATH" Value="[VS2013_VSIX_INSTALLER_PATH]" Sequence="both" After="Vwd2015VsixWhenVSAbsent" Condition="NOT VS_VSIX_INSTALLER_PATH AND VS2013_VSIX_INSTALLER_PATH" />
