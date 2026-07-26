@@ -124,14 +124,32 @@ DAPI_(HRESULT) BalInfoParseFromXml(
     HRESULT hr = S_OK;
     IXMLDOMNode* pNode = NULL;
     BOOL fXmlFound = FALSE;
+    LPWSTR scz = NULL;
 
     hr = XmlSelectSingleNode(pixdManifest, L"/BootstrapperApplicationData/WixBundleProperties", &pNode);
     BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to select bundle information.");
 
     if (fXmlFound)
     {
-        hr = XmlGetYesNoAttribute(pNode, L"PerMachine", &pBundle->fPerMachine);
-        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to read bundle information per-machine.");
+        hr = XmlGetAttributeEx(pNode, L"Scope", &scz);
+        BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to read bundle information scope.");
+
+        if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"perMachine", -1, TRUE))
+        {
+            pBundle->scope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE;
+        }
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"perUser", -1, TRUE))
+        {
+            pBundle->scope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER;
+        }
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"perUserOrMachine", -1, TRUE))
+        {
+            pBundle->scope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_USER_OR_PER_MACHINE;
+        }
+        else if (CSTR_EQUAL == ::CompareStringOrdinal(scz, -1, L"perMachineOrUser", -1, TRUE))
+        {
+            pBundle->scope = BOOTSTRAPPER_PACKAGE_SCOPE_PER_MACHINE_OR_PER_USER;
+        }
 
         hr = XmlGetAttributeEx(pNode, L"DisplayName", &pBundle->sczName);
         BalExitOnOptionalXmlQueryFailure(hr, fXmlFound, "Failed to read bundle information display name.");
@@ -150,6 +168,7 @@ DAPI_(HRESULT) BalInfoParseFromXml(
     BalExitOnFailure(hr, "Failed to parse bal package information from bootstrapper application data.");
 
 LExit:
+    ReleaseStr(scz);
     ReleaseObject(pNode);
 
     return hr;

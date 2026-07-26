@@ -3967,8 +3967,6 @@ private:
                 // Enable disable controls per-page.
                 if (m_rgdwPageIds[WIXSTDBA_PAGE_INSTALL] == dwNewPageId) // on the "Install" page, ensure the install button is enabled/disabled correctly.
                 {
-                    ThemeControlElevates(m_pControlInstallButton, (m_Bundle.fPerMachine && !llElevated));
-
                     // If the EULA control exists, show it only if a license URL is provided as well.
                     if (m_pControlEulaHyperlink)
                     {
@@ -3982,9 +3980,6 @@ private:
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_MODIFY] == dwNewPageId)
                 {
-                    ThemeControlElevates(m_pControlRepairButton, (m_Bundle.fPerMachine && !llElevated));
-                    ThemeControlElevates(m_pControlUninstallButton, (m_Bundle.fPerMachine && !llElevated));
-
                     ThemeControlEnable(m_pControlRepairButton, !m_fSuppressRepair);
                 }
                 else if (m_rgdwPageIds[WIXSTDBA_PAGE_SUCCESS] == dwNewPageId) // on the "Success" page, check if the restart or launch button should be enabled.
