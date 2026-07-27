@@ -93,7 +93,7 @@ typedef struct _BAL_INFO_OVERRIDABLE_VARIABLES
 
 typedef struct _BAL_INFO_BUNDLE
 {
-    BOOL fPerMachine;
+    BOOTSTRAPPER_PACKAGE_SCOPE scope;
     LPWSTR sczName;
     LPWSTR sczLogVariable;
     BAL_INFO_PACKAGES packages;

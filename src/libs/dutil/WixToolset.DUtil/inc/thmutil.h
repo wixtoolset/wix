@@ -69,6 +69,7 @@ typedef enum THEME_CONTROL_AUTOMATIC_BEHAVIOR_TYPE
     THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_VALUE = 0x8,
     // This has no effect on editboxes since their text is their value.
     THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_TEXT = 0x10,
+    THEME_CONTROL_AUTOMATIC_BEHAVIOR_EXCLUDE_ELEVATION_SHIELD = 0x20,
 } THEME_CONTROL_AUTOMATIC_BEHAVIOR_TYPE;
 
 typedef enum THEME_CONTROL_TYPE
@@ -238,12 +239,14 @@ typedef struct _THEME_CONTROL
 
     LPWSTR sczEnableCondition;
     LPWSTR sczVisibleCondition;
+    LPWSTR sczElevationShieldCondition;
 
     BOOL fAutomaticEnabled;
     BOOL fAutomaticVisible;
     BOOL fAutomaticAction;
     BOOL fAutomaticValue;
     BOOL fAutomaticText;
+    BOOL fAutomaticElevationShield;
 
     union
     {
