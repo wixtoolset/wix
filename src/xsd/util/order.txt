@@ -33,6 +33,7 @@ element|XmlFile
 element|XmlConfig
 element|BroadcastEnvironmentChange
 element|BroadcastSettingChange
+element|CancelWhenDeferred
 element|CheckRebootRequired
 element|ExitEarlyWithSuccess
 element|FailWhenDeferred
