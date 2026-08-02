@@ -101,6 +101,21 @@ namespace WixToolsetTest.Util
         }
 
         [TestMethod]
+        public void CanBuildWithFailures()
+        {
+            var folder = TestData.Get(@"TestData\Failures");
+            var build = new Builder(folder, typeof(UtilExtensionFactory), new[] { folder });
+
+            var results = build.BuildAndQuery(BuildX64, "Binary", "CustomAction");
+            WixAssert.CompareLineByLine(
+            [
+                "Binary:Wix4UtilCA_X64\t[Binary data]",
+                "CustomAction:Wix4CancelWhenDeferred_X64\t1025\tWix4UtilCA_X64\tWixCancelWhenDeferred\t",
+                "CustomAction:Wix4FailWhenDeferred_X64\t1025\tWix4UtilCA_X64\tWixFailWhenDeferred\t",
+            ], [.. results.OrderBy(s => s)]);
+        }
+
+        [TestMethod]
         public void CanBuildInternetShortcutInProduct()
         {
             var folder = TestData.Get(@"TestData\InternetShortcut");

@@ -210,6 +210,7 @@ namespace WixToolset.Util
                             break;
                         case "BroadcastEnvironmentChange":
                         case "BroadcastSettingChange":
+                        case "CancelWhenDeferred":
                         case "CheckRebootRequired":
                         case "ExitEarlyWithSuccess":
                         case "FailWhenDeferred":
@@ -328,6 +329,7 @@ namespace WixToolset.Util
                     {
                         case "BroadcastEnvironmentChange":
                         case "BroadcastSettingChange":
+                        case "CancelWhenDeferred":
                         case "CheckRebootRequired":
                         case "ExitEarlyWithSuccess":
                         case "FailWhenDeferred":
@@ -363,6 +365,7 @@ namespace WixToolset.Util
             {
                 case "BroadcastEnvironmentChange":
                 case "BroadcastSettingChange":
+                case "CancelWhenDeferred":
                 case "CheckRebootRequired":
                 case "ExitEarlyWithSuccess":
                 case "FailWhenDeferred":
