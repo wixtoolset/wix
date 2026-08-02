@@ -40,6 +40,21 @@ static LRESULT CALLBACK WndProc(
 
 
 /******************************************************************
+WixCancelWhenDeferred - entry point for WixCancelWhenDeferred
+    custom action which always cancels when running as a deferred
+    custom action (otherwise it blindly succeeds). It's useful when
+    testing the rollback of deferred custom actions: Schedule it
+    immediately after the rollback/deferred CA pair you're testing
+    and it will fail, causing your rollback CA to get invoked.
+********************************************************************/
+extern "C" UINT __stdcall WixCancelWhenDeferred(
+    __in MSIHANDLE hInstall
+)
+{
+    return ::MsiGetMode(hInstall, MSIRUNMODE_SCHEDULED) ? ERROR_INSTALL_USEREXIT : ERROR_SUCCESS;
+}
+
+/******************************************************************
 WixFailWhenDeferred - entry point for WixFailWhenDeferred
     custom action which always fails when running as a deferred
     custom action (otherwise it blindly succeeds). It's useful when
