@@ -4,7 +4,7 @@
   <Import Project="..\Directory.Build.targets" />
 
   <ItemGroup Condition=" '$(RequiresNativeWixAssets)'=='true' and ('$(TargetFrameworkIdentifier)'=='.NETFramework' or '$(RuntimeIdentifier)'!='' ) ">
-    <!-- Copy the x64 binaries when there is no RuntimeIdentifier since we've standardized on VS2022 (which is 64-bit) -->
+    <!-- Copy the x64 binaries when there is no RuntimeIdentifier since we've standardized on VS2026 (which is 64-bit) -->
     <None Include="$(MSBuildThisFileDirectory)wixnative\x64\mergemod.dll" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-x64' or '$(RuntimeIdentifier)'=='' " />
     <None Include="$(BaseOutputPath)$(Configuration)\x64\wixnative.exe" CopyToOutputDirectory="PreserveNewest" Condition=" '$(RuntimeIdentifier)'=='win-x64' or '$(RuntimeIdentifier)'=='' " />
 

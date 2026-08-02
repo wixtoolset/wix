@@ -82,6 +82,7 @@ EXPORTS
     WixShellExecBinary
     WixUnelevatedShellExec
 ; test.cpp
+    WixCancelWhenDeferred
     WixFailWhenDeferred
     WixWaitForEvent
 ; TouchFile.cpp

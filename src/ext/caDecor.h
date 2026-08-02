@@ -31,3 +31,13 @@
 #else
 #define CUSTOM_ACTION_DECORATION6(f) L"Wix6" f L"_X86"
 #endif
+
+#if defined(_M_ARM64)
+#define CUSTOM_ACTION_DECORATION8(f) L"Wix8" f L"_A64"
+#elif defined(_M_AMD64)
+#define CUSTOM_ACTION_DECORATION8(f) L"Wix8" f L"_X64"
+#elif defined(_M_ARM)
+#define CUSTOM_ACTION_DECORATION8(f) L"Wix8" f L"_ARM"
+#else
+#define CUSTOM_ACTION_DECORATION8(f) L"Wix8" f L"_X86"
+#endif

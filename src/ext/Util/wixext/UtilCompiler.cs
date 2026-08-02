@@ -210,6 +210,7 @@ namespace WixToolset.Util
                             break;
                         case "BroadcastEnvironmentChange":
                         case "BroadcastSettingChange":
+                        case "CancelWhenDeferred":
                         case "CheckRebootRequired":
                         case "ExitEarlyWithSuccess":
                         case "FailWhenDeferred":
@@ -328,6 +329,7 @@ namespace WixToolset.Util
                     {
                         case "BroadcastEnvironmentChange":
                         case "BroadcastSettingChange":
+                        case "CancelWhenDeferred":
                         case "CheckRebootRequired":
                         case "ExitEarlyWithSuccess":
                         case "FailWhenDeferred":
@@ -358,6 +360,7 @@ namespace WixToolset.Util
                 return;
             }
 
+            var prefix = "Wix4";
             var customAction = element.Name.LocalName;
             switch (element.Name.LocalName)
             {
@@ -368,6 +371,10 @@ namespace WixToolset.Util
                 case "FailWhenDeferred":
                 case "WaitForEvent":
                 case "WaitForEventDeferred":
+                    //default: customAction = element.Name.LocalName;
+                    break;
+                case "CancelWhenDeferred":
+                    prefix = "Wix8";
                     //default: customAction = element.Name.LocalName;
                     break;
                 case "QueryWindowsDirectories":
@@ -400,7 +407,7 @@ namespace WixToolset.Util
 
             this.ParseHelper.ParseForExtensionElements(this.Context.Extensions, intermediate, section, element);
 
-            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, "Wix4" + customAction, this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
+            this.ParseHelper.CreateCustomActionReference(sourceLineNumbers, section, prefix + customAction, this.Context.Platform, CustomActionPlatforms.X86 | CustomActionPlatforms.X64 | CustomActionPlatforms.ARM64);
         }
 
         /// <summary>
