@@ -27,6 +27,10 @@ namespace WixToolsetTest.VisualStudio
                 "CustomAction:SetVS2012Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2012_VSIX_INSTALLER_PATH]\t",
                 "CustomAction:SetVS2013Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2013_VSIX_INSTALLER_PATH]\t",
                 "CustomAction:SetVS2015Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2015_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2017Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2017_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2019Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2019_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2022Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2022_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2026Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2026_VSIX_INSTALLER_PATH]\t",
                 "CustomAction:vimLa9TyFoAVwf8JmA0_ZJHA69J2fo\t3122\tVS_VSIX_INSTALLER_PATH\t/q  \"[#filzi8nwT8Ta133xcfp7qSIdGdRiC0]\" /admin\t",
                 "CustomAction:viuMpl8IvFSDAzTulrmpAzBwAmCRTQ\t1074\tVS_VSIX_INSTALLER_PATH\t/q  \"[#filzi8nwT8Ta133xcfp7qSIdGdRiC0]\"\t",
                 "CustomAction:vrmLa9TyFoAVwf8JmA0_ZJHA69J2fo\t3442\tVS_VSIX_INSTALLER_PATH\t/q  /u:\"ExampleVsix\" /admin\t",
@@ -36,7 +40,7 @@ namespace WixToolsetTest.VisualStudio
                 "CustomAction:Vwd2012VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2012_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
                 "CustomAction:Vwd2013VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2013_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
                 "CustomAction:Vwd2015VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2015_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
-                "CustomAction:Wix4VSFindInstances_X86\t257\tVSCA_X86\tFindInstances\t",
+                "CustomAction:Wix4VSFindInstances_X86\t257\tWix4VSCA_X86\tFindInstances\t",
             }, results);
         }
 
@@ -55,6 +59,10 @@ namespace WixToolsetTest.VisualStudio
                 "CustomAction:SetVS2012Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2012_VSIX_INSTALLER_PATH]\t",
                 "CustomAction:SetVS2013Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2013_VSIX_INSTALLER_PATH]\t",
                 "CustomAction:SetVS2015Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2015_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2017Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2017_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2019Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2019_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2022Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2022_VSIX_INSTALLER_PATH]\t",
+                "CustomAction:SetVS2026Vsix\t51\tVS_VSIX_INSTALLER_PATH\t[VS2026_VSIX_INSTALLER_PATH]\t",
                 "CustomAction:vimLa9TyFoAVwf8JmA0_ZJHA69J2fo\t3122\tVS_VSIX_INSTALLER_PATH\t/q  \"[#filzi8nwT8Ta133xcfp7qSIdGdRiC0]\" /admin\t",
                 "CustomAction:viuMpl8IvFSDAzTulrmpAzBwAmCRTQ\t1074\tVS_VSIX_INSTALLER_PATH\t/q  \"[#filzi8nwT8Ta133xcfp7qSIdGdRiC0]\"\t",
                 "CustomAction:vrmLa9TyFoAVwf8JmA0_ZJHA69J2fo\t3442\tVS_VSIX_INSTALLER_PATH\t/q  /u:\"ExampleVsix\" /admin\t",
@@ -64,7 +72,7 @@ namespace WixToolsetTest.VisualStudio
                 "CustomAction:Vwd2012VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2012_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
                 "CustomAction:Vwd2013VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2013_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
                 "CustomAction:Vwd2015VsixWhenVSAbsent\t51\tVS_VSIX_INSTALLER_PATH\t[VWD2015_VSIX_INSTALL_ROOT]\\Common7\\IDE\\VSIXInstaller.exe\t",
-                "CustomAction:Wix4VSFindInstances_A64\t257\tVSCA_A64\tFindInstances\t",
+                "CustomAction:Wix4VSFindInstances_A64\t257\tWix4VSCA_A64\tFindInstances\t",
             }, customActionResults);
 
             var propertyResults = results.Single(r => r.StartsWith("Property:SecureCustomProperties")).Split('\t')[1].Split(';');
@@ -77,9 +85,18 @@ namespace WixToolsetTest.VisualStudio
                 "VS2015_VSIX_INSTALLER_PATH",
                 "VS2017_IDE_DIR",
                 "VS2017_ROOT_FOLDER",
+                "VS2017_VSIX_INSTALLER_PATH",
                 "VS2017DEVENV",
+                "VS2019_IDE_DIR",
                 "VS2019_IDE_VCSHARP_PROJECTSYSTEM_INSTALLED",
+                "VS2019_ROOT_FOLDER",
+                "VS2019_VSIX_INSTALLER_PATH",
+                "VS2022_IDE_DIR",
                 "VS2022_ROOT_FOLDER",
+                "VS2022_VSIX_INSTALLER_PATH",
+                "VS2026_IDE_DIR",
+                "VS2026_ROOT_FOLDER",
+                "VS2026_VSIX_INSTALLER_PATH",
                 "WIX_DOWNGRADE_DETECTED",
                 "WIX_UPGRADE_DETECTED",
             }, propertyResults);
