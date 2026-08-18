@@ -36,6 +36,7 @@ namespace WixToolsetTest.CoreIntegration
                 }
 
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var outputPath = Path.Combine(baseFolder, "bin", "test.msi");
 
                 var result = WixRunner.Execute(
                 [
@@ -45,8 +46,21 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, "bin", "test.msi")
+                    "-o", outputPath,
                 ]);
+
+                if (result.ExitCode == 223/*WindowsInstallerBackendErrors.OpenDatabaseFailed*/
+                    && result.Messages.Length > 0)
+                {
+                    // In a bit of a twist, WiX's long-path support relies on 8.3 short file names. As
+                    // [Raymond Chen suggests](https://devblogs.microsoft.com/oldnewthing/20181004-00/?p=99895),
+                    // not all file systems support 8.3 names. That includes ReFS, the file system used
+                    // by Dev Drives. So pass the test if the failure is due to missing 8.3 names.
+                    Assert.Equal(outputPath, result.Messages[0].MessageArgs[0]);
+                    Assert.Equal("The Windows Installer service failed to start. Contact your support personnel.", result.Messages[0].MessageArgs[1]);
+
+                    return;
+                }
 
                 result.AssertSuccess();
 
