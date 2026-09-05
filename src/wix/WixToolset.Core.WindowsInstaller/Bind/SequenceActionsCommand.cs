@@ -47,7 +47,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             { "MoveFile", SymbolDefinitionType.MoveFile },
             { "MsiAssembly", SymbolDefinitionType.Assembly },
             { "MsiAssemblyName", SymbolDefinitionType.Assembly },
-            { "MsiServiceConfig", SymbolDefinitionType.LaunchCondition },
+            { "MsiServiceConfig", SymbolDefinitionType.MsiServiceConfig },
             { "MsiServiceConfigFailureActions", SymbolDefinitionType.MsiServiceConfigFailureActions },
             { "ODBCAttribute", SymbolDefinitionType.ODBCAttribute },
             { "ODBCDataSource", SymbolDefinitionType.ODBCDataSource },
