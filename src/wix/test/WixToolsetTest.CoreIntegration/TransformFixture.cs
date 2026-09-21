@@ -7,6 +7,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Dtf.WindowsInstaller;
     using Xunit;
 
     public class TransformFixture
@@ -137,6 +138,94 @@ namespace WixToolsetTest.CoreIntegration
                 result.AssertSuccess();
 
                 Assert.True(File.Exists(mstPath));
+            }
+        }
+
+        [Fact]
+        public void CanIncludeBinaryStreamDifferenceInTransform()
+        {
+            var folder = TestData.Get(@"TestData", "TransformBinaryDifference");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var brandA = Path.Combine(baseFolder, "brandA");
+                var brandB = Path.Combine(baseFolder, "brandB");
+                Directory.CreateDirectory(brandA);
+                Directory.CreateDirectory(brandB);
+
+                File.WriteAllText(Path.Combine(brandA, "test.txt"), "same file");
+                File.WriteAllText(Path.Combine(brandB, "test.txt"), "same file");
+                var originalBinary = new byte[] { 0x42, 0x4D, 0x01, 0x02, 0x03, 0x04 };
+                var updatedBinary = new byte[] { 0x42, 0x4D, 0x99, 0x88, 0x77, 0x66, 0x55, 0x44 };
+                File.WriteAllBytes(Path.Combine(brandA, "background.bin"), originalBinary);
+                File.WriteAllBytes(Path.Combine(brandB, "background.bin"), updatedBinary);
+
+                var originalMsiPath = Path.Combine(baseFolder, @"bin\main.msi");
+                var updatedMsiPath = Path.Combine(baseFolder, @"bin\main.otherbrand.msi");
+                var mstPath = Path.Combine(baseFolder, @"bin\sometransform.mst");
+                var package = Path.Combine(folder, "Package.wxs");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    package,
+                    "-bindpath", brandA,
+                    "-intermediateFolder", Path.Combine(baseFolder, "objA"),
+                    "-o", originalMsiPath
+                });
+                result.AssertSuccess();
+
+                result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    package,
+                    "-bindpath", brandB,
+                    "-intermediateFolder", Path.Combine(baseFolder, "objB"),
+                    "-o", updatedMsiPath
+                });
+                result.AssertSuccess();
+
+                Assert.Equal(originalBinary.Length, GetBinaryStreamLength(originalMsiPath, "Background"));
+                Assert.Equal(updatedBinary.Length, GetBinaryStreamLength(updatedMsiPath, "Background"));
+
+                result = WixRunner.Execute(new[]
+                {
+                    "msi", "transform",
+                    "-p",
+                    "-intermediateFolder", Path.Combine(baseFolder, "objT"),
+                    "-o", mstPath,
+                    originalMsiPath,
+                    updatedMsiPath
+                });
+                result.AssertSuccess();
+
+                Assert.True(File.Exists(mstPath));
+
+                var appliedMsiPath = Path.Combine(baseFolder, @"bin\main.applied.msi");
+                File.Copy(originalMsiPath, appliedMsiPath);
+
+                using (var db = new Database(appliedMsiPath, DatabaseOpenMode.Transact))
+                {
+                    db.ApplyTransform(mstPath);
+                    db.Commit();
+                }
+
+                Assert.Equal(updatedBinary.Length, GetBinaryStreamLength(appliedMsiPath, "Background"));
+            }
+        }
+
+        private static int GetBinaryStreamLength(string msiPath, string binaryName)
+        {
+            using (var db = new Database(msiPath, DatabaseOpenMode.ReadOnly))
+            using (var view = db.OpenView("SELECT `Data` FROM `Binary` WHERE `Name`='{0}'", binaryName))
+            {
+                view.Execute();
+                using (var record = view.Fetch())
+                {
+                    Assert.NotNull(record);
+                    return record.GetDataSize(1);
+                }
             }
         }
     }
