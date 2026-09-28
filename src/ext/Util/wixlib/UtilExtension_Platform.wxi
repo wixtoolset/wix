@@ -396,6 +396,10 @@
     </Fragment>
 
     <Fragment>
-        <Binary Id="$(var.Prefix)UtilCA$(var.Suffix)" SourceFile="!(bindpath.utilca.$(var.platform))utilca.dll" />
+        <?if $(platform) ~= "ARM64" ?>
+          <Binary Id="$(Prefix)UtilCA$(Suffix)" SourceFile="!(bindpath.utilca.ARM64EC)utilca.dll" />
+        <?else?>
+          <Binary Id="$(Prefix)UtilCA$(Suffix)" SourceFile="!(bindpath.utilca.$(platform))utilca.dll" />
+        <?endif?>
     </Fragment>
 </Include>
