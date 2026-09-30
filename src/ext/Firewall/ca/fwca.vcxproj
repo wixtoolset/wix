@@ -12,6 +12,17 @@
       <Platform>ARM64</Platform>
     </ProjectConfiguration>
 
+    <ProjectConfiguration Include="Debug|ARM64EC">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64EC</Platform>
+      <BuildAsX>true</BuildAsX>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64EC">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64EC</Platform>
+      <BuildAsX>true</BuildAsX>
+    </ProjectConfiguration>
+
     <ProjectConfiguration Include="Debug|X64">
       <Configuration>Debug</Configuration>
       <Platform>X64</Platform>

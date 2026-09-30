@@ -13,9 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\msmqca.vcxproj" Properties="Platform=ARM64" />
-    <ProjectReference Include="..\ca\msmqca.vcxproj" Properties="Platform=x86" />
-    <ProjectReference Include="..\ca\msmqca.vcxproj" Properties="Platform=x64" />
+    <ProjectReference Include="..\ca\msmqca.vcxproj" Platforms="arm64,arm64ec,x86,x64" />
   </ItemGroup>
 
   <ItemGroup>

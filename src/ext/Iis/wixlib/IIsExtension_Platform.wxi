@@ -40,7 +40,7 @@
   </Fragment>
 
   <Fragment>
-    <Binary Id="IisCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))iisca.dll" />
+    <Binary Id="IisCA$(var.Suffix)" SourceFile="!(bindpath.iisca.$(var.platformbinary))iisca.dll" />
   </Fragment>
 
   <Fragment>

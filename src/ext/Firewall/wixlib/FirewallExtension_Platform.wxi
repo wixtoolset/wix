@@ -33,6 +33,6 @@
 
     <!-- Firewall Custom Action DLL Definitions -->
     <Fragment>
-        <Binary Id="$(var.Prefix5)FWCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))fwca.dll" />
+        <Binary Id="$(var.Prefix5)FWCA$(var.Suffix)" SourceFile="!(bindpath.fwca.$(var.platformbinary))fwca.dll" />
     </Fragment>
 </Include>

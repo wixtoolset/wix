@@ -3,6 +3,22 @@
 
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|X64">
+      <Configuration>Debug</Configuration>
+      <Platform>X64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|X64">
+      <Configuration>Release</Configuration>
+      <Platform>X64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|ARM64">
       <Configuration>Debug</Configuration>
       <Platform>ARM64</Platform>
@@ -21,22 +37,6 @@
       <Platform>ARM64EC</Platform>
       <BuildAsX>true</BuildAsX>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|X64">
-      <Configuration>Debug</Configuration>
-      <Platform>X64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|X64">
-      <Configuration>Release</Configuration>
-      <Platform>X64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
   </ItemGroup>
 
   <PropertyGroup Label="Globals">
@@ -54,12 +54,6 @@
   <PropertyGroup>
     <ProjectAdditionalLinkLibraries>activeds.lib;adsiid.lib;msi.lib;netapi32.lib;shlwapi.lib</ProjectAdditionalLinkLibraries>
   </PropertyGroup>
-
-  <ItemDefinitionGroup Condition=" '$(Platform)' == 'ARM64EC' ">
-    <Link>
-      <AdditionalOptions>/IGNORE:4279</AdditionalOptions>
-    </Link>
-  </ItemDefinitionGroup>
 
   <ItemGroup>
     <ClCompile Include="BroadcastSettingChange.cpp" />

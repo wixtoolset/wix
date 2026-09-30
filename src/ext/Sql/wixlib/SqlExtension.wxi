@@ -32,6 +32,6 @@
 
     <!-- Server Custom Action DLL Definitions -->
     <Fragment>
-        <Binary Id="SqlCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))sqlca.dll" />
+        <Binary Id="SqlCA$(var.Suffix)" SourceFile="!(bindpath.sqlca.$(var.platformbinary))sqlca.dll" />
     </Fragment>
 </Include>

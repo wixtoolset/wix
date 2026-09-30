@@ -5,7 +5,7 @@
     <?include ..\..\caDecor.wxi ?>
 
     <Fragment>
-        <CustomAction Id="$(var.Prefix)DependencyRequire$(var.Suffix)" DllEntry="WixDependencyRequire" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="DependencyCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)DependencyRequire$(var.Suffix)" DllEntry="WixDependencyRequire" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(Prefix)DependCA$(var.Suffix)" />
         <InstallExecuteSequence>
             <Custom Action="virtual $(var.Prefix)DependencyRequire$(var.Suffix)" Before="$(var.Prefix)DependencyCheck$(var.Suffix)" Condition="NOT DISABLEDEPENDENCYCHECK" />
         </InstallExecuteSequence>
@@ -16,7 +16,7 @@
     </Fragment>
 
     <Fragment>
-        <CustomAction Id="$(var.Prefix)DependencyCheck$(var.Suffix)" DllEntry="WixDependencyCheck" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="DependencyCA$(var.Suffix)" />
+        <CustomAction Id="$(var.Prefix)DependencyCheck$(var.Suffix)" DllEntry="WixDependencyCheck" Execute="immediate" Return="check" SuppressModularization="yes" BinaryRef="$(Prefix)DependCA$(var.Suffix)" />
         <InstallExecuteSequence>
             <Custom Action="virtual $(var.Prefix)DependencyCheck$(var.Suffix)" Before="InstallInitialize" Condition="(REMOVE OR MsiPatchRemovalList) AND NOT (UPGRADINGPRODUCTCODE OR IGNOREDEPENDENCIES=&quot;ALL&quot;)" />
         </InstallExecuteSequence>
@@ -27,6 +27,6 @@
     </Fragment>
 
     <Fragment>
-        <Binary Id="DependencyCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))dependencyca.dll" />
+        <Binary Id="$(Prefix)DependCA$(Suffix)" SourceFile="!(bindpath.dependencyca.$(platformbinary))dependencyca.dll" />
     </Fragment>
 </Include>

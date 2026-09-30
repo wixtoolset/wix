@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\be\netfxbe.vcxproj" Platforms="arm64,x86,x64" />
-    <ProjectReference Include="..\ca\netfxca.vcxproj" Platforms="arm64,x86,x64" />
+    <ProjectReference Include="..\ca\netfxca.vcxproj" Platforms="arm64,arm64ec,x86,x64" />
     <ProjectReference Include="..\netcoresearch\netcoresearch.vcxproj" Platforms="arm64,x86,x64" />
   </ItemGroup>
 

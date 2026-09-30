@@ -12,9 +12,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\ca\directxca.vcxproj" Properties="Platform=x86" />
-    <ProjectReference Include="..\ca\directxca.vcxproj" Properties="Platform=x64" />
-    <ProjectReference Include="..\ca\directxca.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="..\ca\directxca.vcxproj" Platforms="arm64,arm64ec,x86,x64" />
   </ItemGroup>
 
   <ItemGroup>
