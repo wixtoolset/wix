@@ -17,9 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=ARM64" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=x86" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\ca\dependencyca.vcxproj" Properties="Platform=x64" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\ca\dependencyca.vcxproj" Platforms="arm64,arm64ec,x86,x64" />
   </ItemGroup>
 
   <ItemGroup>

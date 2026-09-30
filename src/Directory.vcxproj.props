@@ -117,4 +117,9 @@
       <DelaySign>$(LinkDelaySign)</DelaySign>
     </Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition=" '$(Platform)' == 'ARM64EC' ">
+    <Link>
+      <AdditionalOptions>/IGNORE:4279</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
 </Project>

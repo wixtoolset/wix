@@ -3,5 +3,6 @@
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <?define platform=arm64 ?>
+    <?define platformbinary=arm64ec ?>
     <?include SqlExtension.wxi ?>
 </Wix>

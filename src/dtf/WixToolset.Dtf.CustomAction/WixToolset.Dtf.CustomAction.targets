@@ -15,7 +15,7 @@
     <MakeSfxCAPath Condition=" '$(MakeSfxCAPath)' == '' ">$(MSBuildThisFileDirectory)..\tools\</MakeSfxCAPath>
 
     <MakeSfxCA Condition=" '$(MakeSfxCA)' == '' ">$(MakeSfxCAPath)WixToolset.Dtf.MakeSfxCA.exe</MakeSfxCA>
-    <SfxCADll Condition=" '$(SfxCADll)' == '' and '$(Platform)' == 'ARM64' ">$(MakeSfxCAPath)arm64\SfxCA.dll</SfxCADll>
+    <SfxCADll Condition=" '$(SfxCADll)' == '' and '$(Platform)' == 'ARM64' ">$(MakeSfxCAPath)arm64ec\SfxCA.dll</SfxCADll>
     <SfxCADll Condition=" '$(SfxCADll)' == '' and '$(Platform)' == 'x64' ">$(MakeSfxCAPath)x64\SfxCA.dll</SfxCADll>
     <SfxCADll Condition=" '$(SfxCADll)' == '' ">$(MakeSfxCAPath)x86\SfxCA.dll</SfxCADll>
   </PropertyGroup>
