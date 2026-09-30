@@ -53,6 +53,6 @@
     </Fragment>
 
     <Fragment>
-        <Binary Id="$(var.Prefix6)HttpCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))httpca.dll" />
+        <Binary Id="$(var.Prefix6)HttpCA$(var.Suffix)" SourceFile="!(bindpath.httpca.$(var.platformbinary))httpca.dll" />
     </Fragment>
 </Include>

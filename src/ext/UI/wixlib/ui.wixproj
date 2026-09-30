@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ca\uica.vcxproj" Platforms="arm64,x86,x64" />
+    <ProjectReference Include="..\ca\uica.vcxproj" Platforms="arm64,arm64ec,x86,x64" />
   </ItemGroup>
 
   <ItemGroup>

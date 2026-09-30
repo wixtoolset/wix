@@ -39,6 +39,6 @@
   </Fragment>
 
   <Fragment>
-    <Binary Id="$(var.Prefix)cpca$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))complusca.dll" />
+    <Binary Id="$(Prefix)cpca$(Suffix)" SourceFile="!(bindpath.complusca.$(platformbinary))complusca.dll" />
   </Fragment>
 </Include>

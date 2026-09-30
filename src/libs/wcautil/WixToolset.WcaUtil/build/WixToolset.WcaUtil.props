@@ -10,9 +10,14 @@
       <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)native\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition=" $(PlatformToolset.ToLower().StartsWith('v14')) ">
+  <ItemDefinitionGroup Condition=" $(PlatformToolset.ToLower().StartsWith('v14')) AND '$(Platform)' != 'ARM64EC' ">
     <Link>
       <AdditionalDependencies>$(MSBuildThisFileDirectory)native\v14\$(PlatformTarget)\wcautil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition=" $(PlatformToolset.ToLower().StartsWith('v14')) AND '$(Platform)' == 'ARM64EC' ">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)native\v14\ARM64EC\wcautil.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
 </Project>

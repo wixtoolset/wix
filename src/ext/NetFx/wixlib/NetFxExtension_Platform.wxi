@@ -21,7 +21,7 @@
   </Fragment>
 
   <Fragment>
-    <Binary Id="$(var.Prefix)NetFxCA$(var.Suffix)" SourceFile="!(bindpath.netfxca.$(var.platform))netfxca.dll" />
+    <Binary Id="$(var.Prefix)NetFxCA$(var.Suffix)" SourceFile="!(bindpath.netfxca.$(var.platformbinary))netfxca.dll" />
   </Fragment>
 
   <Fragment>

@@ -396,6 +396,6 @@
     </Fragment>
 
     <Fragment>
-        <Binary Id="$(var.Prefix)UtilCA$(var.Suffix)" SourceFile="!(bindpath.utilca.$(var.platform))utilca.dll" />
+        <Binary Id="$(Prefix)UtilCA$(Suffix)" SourceFile="!(bindpath.utilca.$(platformbinary))utilca.dll" />
     </Fragment>
 </Include>

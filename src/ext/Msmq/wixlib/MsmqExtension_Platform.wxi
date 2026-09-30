@@ -21,6 +21,6 @@
   </Fragment>
 
   <Fragment>
-    <Binary Id="$(var.Prefix)MsmqCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))msmqca.dll" />
+    <Binary Id="$(var.Prefix)MsmqCA$(var.Suffix)" SourceFile="!(bindpath.msmqca.$(var.platformbinary))msmqca.dll" />
   </Fragment>
 </Include>

@@ -6,7 +6,7 @@
 
     <!-- DirectX Custom Action DLL Definitions -->
     <Fragment>
-        <Binary Id="$(var.Prefix)DXCA$(var.Suffix)" SourceFile="!(bindpath.$(var.platform))dxca.dll" />
+        <Binary Id="$(Prefix)DXCA$(Suffix)" SourceFile="!(bindpath.directxca.$(platformbinary))DXCA.dll" />
     </Fragment>
 
     <Fragment>

@@ -32,6 +32,6 @@
     <file src="net472\WixToolset.Dtf.Resources.dll" target="tools" />
     <file src="x64\SfxCA.dll" target="tools\x64" />
     <file src="x86\SfxCA.dll" target="tools\x86" />
-    <file src="ARM64\SfxCA.dll" target="tools\arm64" />
+    <file src="ARM64EC\SfxCA.dll" target="tools\arm64" />
   </files>
 </package>

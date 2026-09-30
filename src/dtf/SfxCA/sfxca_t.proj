@@ -3,5 +3,6 @@
     <ProjectReference Include="SfxCA.vcxproj" Properties="Platform=x86" />
     <ProjectReference Include="SfxCA.vcxproj" Properties="Platform=x64" />
     <ProjectReference Include="SfxCA.vcxproj" Properties="Platform=ARM64" />
+    <ProjectReference Include="SfxCA.vcxproj" Properties="Platform=ARM64EC" />
   </ItemGroup>
 </Project>
