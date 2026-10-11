@@ -4896,7 +4896,8 @@ public:
         m_fTriedToLaunchElevated = FALSE;
 
         m_fPrereq = fRunAsPrereqBA;
-        m_fHandleHelp = FALSE;
+        // Let the pre-req options control the help page. Otherwise, let WixStdBA show help.
+        m_fHandleHelp = !fRunAsPrereqBA;
         m_fPreplanPrereqs = FALSE;
         m_fPrereqPackagePlanned = FALSE;
         m_fPrereqInstalled = FALSE;
