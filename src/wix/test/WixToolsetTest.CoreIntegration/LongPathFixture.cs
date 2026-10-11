@@ -36,6 +36,7 @@ namespace WixToolsetTest.CoreIntegration
                 }
 
                 var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var outputPath = Path.Combine(baseFolder, "bin", "test.msi");
 
                 var result = WixRunner.Execute(
                 [
@@ -45,8 +46,19 @@ namespace WixToolsetTest.CoreIntegration
                     "-loc", Path.Combine(folder, "Package.en-us.wxl"),
                     "-bindpath", Path.Combine(folder, "data"),
                     "-intermediateFolder", intermediateFolder,
-                    "-o", Path.Combine(baseFolder, "bin", "test.msi")
+                    "-o", outputPath,
                 ]);
+
+                var driveInfo = new DriveInfo(outputPath.Substring(0, 2));
+                if (driveInfo.DriveFormat.Equals("ReFS", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    // In a bit of a twist, WiX's long-path support relies on 8.3 short file names. As
+                    // [Raymond Chen suggests](https://devblogs.microsoft.com/oldnewthing/20181004-00/?p=99895),
+                    // not all file systems support 8.3 names. That includes ReFS, the file system used
+                    // by Dev Drives. So pass the test if the failure is due to ReFS.
+
+                    return;
+                }
 
                 result.AssertSuccess();
 
