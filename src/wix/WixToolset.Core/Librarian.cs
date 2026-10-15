@@ -124,6 +124,15 @@ namespace WixToolset.Core
 
                         if (pathField != null && !String.IsNullOrEmpty(pathField.Path))
                         {
+                            // A field that is already embedded came from a referenced .wixlib: its Path is the
+                            // "wix-ir/..." entry inside that library and its BaseUri (only ever set on load, never
+                            // serialized) points at the library. There is nothing on disk to resolve, so leave the
+                            // field alone and Intermediate.Save will copy the stream out of BaseUri instead.
+                            if (pathField.Embed && pathField.BaseUri != null)
+                            {
+                                continue;
+                            }
+
                             var resolution = variableResolver.ResolveVariables(symbol.SourceLineNumbers, pathField.Path);
 
                             try

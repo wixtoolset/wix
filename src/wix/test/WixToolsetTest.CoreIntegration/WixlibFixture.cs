@@ -132,6 +132,64 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CanBuildWixlibWithBindFilesUsingWixlibWithEmbeddedFiles()
+        {
+            var folder = TestData.Get(@"TestData", "WixlibReferencingWixlib");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var libraryWixlibPath = Path.Combine(intermediateFolder, "library.wixlib");
+                var referencingWixlibPath = Path.Combine(intermediateFolder, "referencing.wixlib");
+
+                // Build a library that embeds its own file.
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "LibraryComponents.wxs"),
+                    "-bf",
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", libraryWixlibPath,
+                });
+
+                result.AssertSuccess();
+
+                // Build a second library that also embeds files and references the first library. The files
+                // already embedded in the first library are not on disk so must be copied over, not re-resolved.
+                result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "ReferencingComponents.wxs"),
+                    "-bf",
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-lib", libraryWixlibPath,
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", referencingWixlibPath,
+                });
+
+                result.AssertSuccess();
+
+                var wixlib = Intermediate.Load(referencingWixlibPath);
+                var fileSymbols = wixlib.Sections.SelectMany(s => s.Symbols).OfType<FileSymbol>().OrderBy(f => f.Source.Path).ToList();
+
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "wix-ir/library.txt",
+                    "wix-ir/referencing.txt",
+                }, fileSymbols.Select(f => f.Source.Path).ToArray());
+                Assert.All(fileSymbols, f => Assert.True(f.Source.Embed));
+
+                using (var wixout = WixOutput.Read(referencingWixlibPath))
+                {
+                    WixAssert.StringEqual("This is library.txt.", wixout.GetData("wix-ir/library.txt"));
+                    WixAssert.StringEqual("This is referencing.txt.", wixout.GetData("wix-ir/referencing.txt"));
+                }
+            }
+        }
+
+        [Fact]
         public void CanBuildSingleFileUsingWixlib()
         {
             var folder = TestData.Get(@"TestData\SingleFile");
