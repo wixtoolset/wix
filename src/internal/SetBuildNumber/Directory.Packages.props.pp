@@ -53,7 +53,7 @@
     <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="8.0.0" />
     <PackageVersion Include="System.Management" Version="8.0.0" />
     <PackageVersion Include="System.Reflection.Metadata" Version="8.0.0" />
-    <PackageVersion Include="System.Security.Cryptography.Xml" Version="8.0.4" />
+    <PackageVersion Include="System.Security.Cryptography.Xml" Version="8.0.5" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     <PackageVersion Include="System.Text.Json" Version="8.0.6" />
 
@@ -65,12 +65,6 @@
     <PackageVersion Include="Microsoft.AspNetCore.Owin" Version="8.0.21" />
     <PackageVersion Include="Microsoft.VisualStudio.Setup.Configuration.Native" Version="3.14.2075" />
     <PackageVersion Include="Microsoft.Win32.Registry" Version="5.0.0" />
-
-    <!-- Pin System.Private.Uri address security vulnerabilities in transitive dependencies. Review as dependencies update. -->
-    <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
-
-    <!-- Use System.Memory v4.5.5 as it is compatible with VS2022 -->
-    <PackageVersion Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
 
   <!-- NuGet stack -->
@@ -87,7 +81,7 @@
 
   <!-- Keep the following versions in sync with internal\WixInternal.TestSupport.Native\packages.config -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
 
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
