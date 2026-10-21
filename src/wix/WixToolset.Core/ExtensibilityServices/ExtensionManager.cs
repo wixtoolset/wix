@@ -87,14 +87,14 @@ namespace WixToolset.Core.ExtensibilityServices
 
                 if (assembly == null)
                 {
-                    throw new WixException(CoreErrors.CouldNotFindExtensionInPaths(extensionPath, checkedPaths));
+                    throw new WixException(CoreErrors.CouldNotFindExtensionInPaths(extensionPath, checkedPaths), exception: null, detailed: true);
                 }
 
                 this.Add(assembly);
             }
             catch (ReflectionTypeLoadException rtle)
             {
-                throw new WixException(CoreErrors.InvalidExtension(checkPath, String.Join(Environment.NewLine, rtle.LoaderExceptions.Select(le => le.ToString()))));
+                throw new WixException(CoreErrors.InvalidExtension(checkPath, String.Join(Environment.NewLine, rtle.LoaderExceptions.Select(le => le.ToString()))), exception: rtle, detailed: true);
             }
             catch (WixException)
             {
@@ -102,7 +102,7 @@ namespace WixToolset.Core.ExtensibilityServices
             }
             catch (Exception e)
             {
-                throw new WixException(CoreErrors.InvalidExtension(checkPath, e.Message), e);
+                throw new WixException(CoreErrors.InvalidExtension(checkPath, e.Message), e, detailed: true);
             }
         }
 
