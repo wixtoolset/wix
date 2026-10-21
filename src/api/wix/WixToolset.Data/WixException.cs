@@ -21,7 +21,8 @@ namespace WixToolset.Data
         /// Instantiate a new WixException with a simple string message.
         /// </summary>
         /// <param name="message">Simple string message.</param>
-        public WixException(string message) : base(message)
+        public WixException(string message)
+            : base(message)
         {
         }
 
@@ -30,12 +31,13 @@ namespace WixToolset.Data
         /// </summary>
         /// <param name="message">Simple string message.</param>
         /// <param name="innerException">Inner exception.</param>
-        public WixException(string message, Exception innerException) : base(message, innerException)
+        public WixException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
 
         /// <summary>
-        /// Instantiate a new WixException with a given WixError.
+        /// Instantiate a new WixException with a given Message.
         /// </summary>
         /// <param name="error">The localized error information.</param>
         public WixException(Message error)
@@ -44,14 +46,28 @@ namespace WixToolset.Data
         }
 
         /// <summary>
-        /// Instantiate a new WixException with a given WixError.
+        /// Instantiate a new WixException with a given Message.
         /// </summary>
-        /// <param name="error">The localized error information.</param>
+        /// <param name="error">The error information as a Message.</param>
         /// <param name="exception">Original exception.</param>
-        public WixException(Message error, Exception exception) :
-            base(error.ToString(), exception)
+        public WixException(Message error, Exception exception)
+            : base(error.ToString(), exception)
         {
             this.Error = error;
+        }
+
+        /// <summary>
+        /// Instantiate a new WixException with a given source and message.
+        /// </summary>
+        /// <param name="error">The error information as a Message.</param>
+        /// <param name="exception">Original exception.</param>
+        /// <param name="detailed">Flag to include the source line numbers and inner exception details.</param>
+        public WixException(Message error, Exception exception, bool detailed)
+            : base($"{(error.SourceLineNumbers is null ? String.Empty : String.Concat(error.SourceLineNumbers.ToString(), " : "))}{error}{(exception is null ? String.Empty : String.Concat(" : ", exception.ToString()))}", exception)
+        {
+            this.Error = error;
+
+            this.Source = error.SourceLineNumbers is null ? String.Empty : error.SourceLineNumbers.ToString();
         }
 
         /// <summary>
