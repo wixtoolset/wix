@@ -694,7 +694,7 @@
 
     <PropertyGroup>
       <CabinetCachePath Condition=" '$(CabinetCachePath)'=='' and '$(ReuseCabinetCache)'=='true' ">$(IntermediateOutputPath)cabcache\</CabinetCachePath>
-      <_WixBuildCabinetCachePath Condition=" '$(CabinetCachePath)'!='' ">$([MSBuild]::NormalizeDirectory($(CabinetCachePath), %(CultureGroup.OutputFolder)))</_WixBuildCabinetCachePath>
+      <_WixBuildCabinetCachePath Condition=" '$(CabinetCachePath)'!='' ">$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $(CabinetCachePath), %(CultureGroup.OutputFolder)))</_WixBuildCabinetCachePath>
     </PropertyGroup>
 
     <Warning
@@ -1012,7 +1012,7 @@
     <PropertyGroup>
       <CopyBuildOutputToOutputDirectory Condition="'$(CopyBuildOutputToOutputDirectory)'==''">true</CopyBuildOutputToOutputDirectory>
       <CopyOutputSymbolsToOutputDirectory Condition="'$(CopyOutputSymbolsToOutputDirectory)'==''">true</CopyOutputSymbolsToOutputDirectory>
-      <FullIntermediateOutputPath>$([MSBuild]::NormalizeDirectory($(IntermediateOutputPath)))</FullIntermediateOutputPath>
+      <FullIntermediateOutputPath>$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $(IntermediateOutputPath)))</FullIntermediateOutputPath>
     </PropertyGroup>
 
     <!-- Add the target output to the list to be copied. -->
