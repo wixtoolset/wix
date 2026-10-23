@@ -87,6 +87,13 @@ namespace WixToolset.Core.Burn.Bundles
                 }
                 else
                 {
+                    // Identical payloads aren't problematic duplicates, so don't throw error messages.
+                    if (collisionSymbol is WixBundlePayloadSymbol collidingPayloadSymbol
+                        && String.Equals(payload.Hash, collidingPayloadSymbol.Hash, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
                     this.Messaging.Write(BurnBackendErrors.ExternalPayloadCollision(payload.SourceLineNumbers, "Payload", payload.Id.Id, payload.Name));
                     this.Messaging.Write(BurnBackendErrors.ExternalPayloadCollision2(collisionSymbol.SourceLineNumbers));
                 }
