@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+    <Fragment>
+        <PackageGroup Id="BundlePackages">
+            <ExePackage Id="ExePackage1.exe" Name="ExePackage.exe" SourceFile="$(sys.SOURCEFILEDIR)DuplicateCacheIds.wxs" Compressed="no" DetectCondition="none" UninstallArguments="-u" CacheId="Exe1">
+                <Payload Id="ExePayload11" SourceFile="$(sys.SOURCEFILEDIR)BundleVariable.wxs" Compressed="no" Name="PayloadCollision" />
+            </ExePackage>
+
+            <ExePackage Id="ExePackage2.exe" Name="ExePackage.exe" SourceFile="$(sys.SOURCEFILEDIR)DuplicateCacheIds.wxs" Compressed="no" DetectCondition="none" UninstallArguments="-u" CacheId="Exe2">
+                <Payload Id="ExePayload21" SourceFile="$(sys.SOURCEFILEDIR)BundleVariable.wxs" Compressed="no" Name="PayloadCollision" />
+            </ExePackage>
+        </PackageGroup>
+    </Fragment>
+</Wix>
