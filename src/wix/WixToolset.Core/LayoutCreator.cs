@@ -45,7 +45,7 @@ namespace WixToolset.Core
                 {
                     this.Messaging.Write(VerboseMessages.LayingOutMedia());
 
-                    var command = new TransferFilesCommand(this.Messaging, this.FileSystem, context.Extensions, context.FileTransfers, context.ResetAcls);
+                    var command = new TransferFilesCommand(this.Messaging, this.FileSystem, context.Extensions, context.FileTransfers, context.ResetAcls, context.SuppressHardlinks);
                     command.Execute();
                 }
 
