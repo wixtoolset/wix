@@ -585,31 +585,44 @@
 
     Updates the TargetPath and TargetPdbPath properties to be used in subsequent targets.
 
+    Also assigns TargetPath metadata to Content and None items so items marked with
+    CopyToOutputDirectory are copied to the output directory.
+
     [IN]
     @(EmbeddedResource) - The list of wxl files to use for localization.
     $(Cultures) - The list of culture groups to build.
+    @(Content), @(None) - Items that may be copied to the output directory.
 
     [OUT]
+    @(ContentWithTargetPath), @(_NoneWithTargetPath) - Content and None items with TargetPath metadata
     @(CultureGroup) - The list of culture group strings with OutputFolder metadata
     $(TargetPath) - Property list of target link output MSIs/MSMs
     $(TargetPdbPath) - Property list of target output pdbs
     ================================================================================================
     -->
   <Target
-      Name="AssignTargetPaths"
-      Condition=" '$(OutputType)' == 'Package' or '$(OutputType)' == 'Module' ">
+      Name="AssignTargetPaths">
 
-    <WixAssignCulture Cultures="$(Cultures)" Files="@(EmbeddedResource)">
+    <!-- Assign target paths to the items that may be copied to the output directory. -->
+    <AssignTargetPath Files="@(Content)" RootFolder="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="AssignedFiles" ItemName="ContentWithTargetPath" />
+    </AssignTargetPath>
+
+    <AssignTargetPath Files="@(None)" RootFolder="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="AssignedFiles" ItemName="_NoneWithTargetPath" />
+    </AssignTargetPath>
+
+    <WixAssignCulture Cultures="$(Cultures)" Files="@(EmbeddedResource)" Condition=" '$(OutputType)' == 'Package' or '$(OutputType)' == 'Module' ">
       <Output TaskParameter="CultureGroups" ItemName="CultureGroup" />
     </WixAssignCulture>
 
     <!-- Expand the culture groups then put them back into the appropriate property -->
-    <ItemGroup>
+    <ItemGroup Condition=" '$(OutputType)' == 'Package' or '$(OutputType)' == 'Module' ">
       <_CulturedTargetPath Include="$(TargetDir)%(CultureGroup.OutputFolder)$(TargetFileName)" />
       <_CulturedTargetPdbPath Include="$(TargetPdbDir)%(CultureGroup.OutputFolder)$(TargetPdbFileName)" />
     </ItemGroup>
 
-    <PropertyGroup>
+    <PropertyGroup Condition=" '$(OutputType)' == 'Package' or '$(OutputType)' == 'Module' ">
       <TargetPath>@(_CulturedTargetPath)</TargetPath>
       <TargetPdbPath>@(_CulturedTargetPdbPath)</TargetPdbPath>
 
@@ -999,8 +1012,15 @@
     Copy all build outputs, satellites and other necessary files to the final directory.
     ================================================================================================
     -->
+  <PropertyGroup>
+    <CopyFilesToOutputDirectoryDependsOn>
+      $(CopyFilesToOutputDirectoryDependsOn);
+      _CopySourceItemsToOutputDirectory
+    </CopyFilesToOutputDirectoryDependsOn>
+  </PropertyGroup>
   <Target
-      Name="CopyFilesToOutputDirectory">
+      Name="CopyFilesToOutputDirectory"
+      DependsOnTargets="$(CopyFilesToOutputDirectoryDependsOn)">
 
     <PropertyGroup>
       <!-- By default we're using hard links to copy to the output directory, disabling this could slow the build significantly -->
