@@ -355,9 +355,15 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
 
         private WindowsInstallerData CreateTransform()
         {
-            var targetData = this.GetWindowsInstallerData(this.TargetPath);
+            // Binary/object columns are compared as files. Export each MSI into its own
+            // folder so same-named streams (for example Binary.Background) are not overwritten
+            // and so streams are extracted even when -x is omitted.
+            var exportRoot = String.IsNullOrEmpty(this.ExportBasePath)
+                ? Path.Combine(this.IntermediateFolder, "transform")
+                : this.ExportBasePath;
 
-            var updatedData = this.GetWindowsInstallerData(this.UpdatedPath);
+            var targetData = this.GetWindowsInstallerData(this.TargetPath, Path.Combine(exportRoot, "target"));
+            var updatedData = this.GetWindowsInstallerData(this.UpdatedPath, Path.Combine(exportRoot, "updated"));
 
             var differ = new Differ(this.Messaging)
             {
@@ -377,11 +383,12 @@ namespace WixToolset.Core.WindowsInstaller.CommandLine
             return loadTableDefinitions.Execute();
         }
 
-        private WindowsInstallerData GetWindowsInstallerData(string path)
+        private WindowsInstallerData GetWindowsInstallerData(string path, string exportBasePath = null)
         {
             if (!DataLoader.TryLoadWindowsInstallerData(path, out var data))
             {
-                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, path, null, OutputType.Package, this.ExportBasePath, null, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
+                exportBasePath ??= this.ExportBasePath;
+                var unbindCommand = new UnbindDatabaseCommand(this.Messaging, this.BackendHelper, this.FileSystem, this.PathResolver, path, null, OutputType.Package, exportBasePath, exportBasePath, this.IntermediateFolder, enableDemodularization: false, skipSummaryInfo: false);
                 data = unbindCommand.Execute();
             }
 
