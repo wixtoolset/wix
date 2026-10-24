@@ -63,6 +63,7 @@ namespace WixToolset.Core.CommandLine
                 new CommandLineHelpSwitch("-loc", "Localization file to use in the build. By default, .wxl files are recognized as localization."),
                 new CommandLineHelpSwitch("-lib", "Library file to use in the build. By default, .wixlib files are recognized as libraries."),
                 new CommandLineHelpSwitch("-src", "Source file to use in the build. By default, .wxs files are recognized as source code."),
+                new CommandLineHelpSwitch("-nohardlinks", "Always copy files to the output instead of creating hard links."),
                 new CommandLineHelpSwitch("-nostdlib", "Skip use of WiX standard wixlib."),
                 new CommandLineHelpSwitch("-out", "-o", "Path to output the build to."),
                 new CommandLineHelpSwitch("-outputtype", "Explicitly set the output type if it cannot be determined from the output."),
@@ -370,6 +371,7 @@ namespace WixToolset.Core.CommandLine
             context.OutputPath = this.OutputPath;
             context.TrackingFile = this.TrackingFile;
             context.ResetAcls = this.commandLine.ResetAcls;
+            context.SuppressHardlinks = this.commandLine.SuppressHardlinks;
             context.CancellationToken = cancellationToken;
 
             var layout = this.ServiceProvider.GetService<ILayoutCreator>();
@@ -534,6 +536,8 @@ namespace WixToolset.Core.CommandLine
 
             public bool ResetAcls { get; set; }
 
+            public bool SuppressHardlinks { get; set; }
+
             public CommandLine(IServiceProvider serviceProvider, IMessaging messaging)
             {
                 this.ServiceProvider = serviceProvider;
@@ -689,6 +693,10 @@ namespace WixToolset.Core.CommandLine
 
                         case "src":
                             parser.GetNextArgumentAsFilePathOrError(arg, "source code", this.SourceFilePaths);
+                            return true;
+
+                        case "nohardlinks":
+                            this.SuppressHardlinks = true;
                             return true;
 
                         case "nostdlib":

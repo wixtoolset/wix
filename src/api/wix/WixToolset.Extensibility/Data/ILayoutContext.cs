@@ -52,6 +52,11 @@ namespace WixToolset.Extensibility.Data
         bool ResetAcls { get; set; }
 
         /// <summary>
+        /// Suppress hard links on file transfers so files are always copied.
+        /// </summary>
+        bool SuppressHardlinks { get; set; }
+
+        /// <summary>
         /// Cancellation token.
         /// </summary>
         CancellationToken CancellationToken { get; set; }

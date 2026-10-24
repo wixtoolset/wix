@@ -209,6 +209,35 @@ namespace WixToolsetTest.Sdk
         [DataRow(BuildSystem.DotNetCoreSdk)]
         [DataRow(BuildSystem.MSBuild)]
         [DataRow(BuildSystem.MSBuild64)]
+        public void CanCopyNoneItemToOutputDirectory(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get("TestData", "CopyToOutputDirectory");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var binFolder = Path.Combine(baseFolder, "bin");
+                var projectPath = Path.Combine(baseFolder, "CopyToOutputDirectory.wixproj");
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    "-p:AcceptEula=wix" + SomeVerInfo.Major,
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                });
+                result.AssertSuccess();
+
+                var copiedFile = Path.Combine(binFolder, "copy-to-output.txt");
+                var copiedFileContent = File.ReadAllText(copiedFile).Trim();
+
+                Assert.AreEqual("This file should be copied to the output directory.", copiedFileContent);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanBuildSimpleMsiPackageWithMergeModule(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get(@"TestData", "MergeModule");

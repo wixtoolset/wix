@@ -1,0 +1,13 @@
+<Project>
+  <Import Project="$(WixMSBuildProps)" />
+
+  <ItemGroup>
+    <None Include="copy-to-output.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <Import Project="$(WixTargetsPath)" />
+
+  <PropertyGroup>
+    <OutDir>$(MSBuildProjectDirectory)\bin\</OutDir>
+  </PropertyGroup>
+</Project>

@@ -471,6 +471,13 @@ LExit:
 
     BACallbackOnElevateComplete(&pEngineState->userExperience, hr);
 
+    // If elevation succeeded and the parent window is valid, visible, and not minimized, try to bring it to
+    // the foreground. This is best effort as Windows is very particular about changing focus.
+    if (SUCCEEDED(hr) && ::IsWindow(hwndParent) && ::IsWindowVisible(hwndParent) && !::IsIconic(hwndParent))
+    {
+        ::SetForegroundWindow(hwndParent);
+    }
+
     return hr;
 }
 
