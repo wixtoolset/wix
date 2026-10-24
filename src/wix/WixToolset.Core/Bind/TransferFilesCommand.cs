@@ -14,13 +14,14 @@ namespace WixToolset.Core.Bind
 
     internal class TransferFilesCommand
     {
-        public TransferFilesCommand(IMessaging messaging, IFileSystem fileSystem, IEnumerable<ILayoutExtension> extensions, IEnumerable<IFileTransfer> fileTransfers, bool resetAcls)
+        public TransferFilesCommand(IMessaging messaging, IFileSystem fileSystem, IEnumerable<ILayoutExtension> extensions, IEnumerable<IFileTransfer> fileTransfers, bool resetAcls, bool suppressHardlinks)
         {
             this.Extensions = extensions;
             this.Messaging = messaging;
             this.FileSystem = fileSystem;
             this.FileTransfers = fileTransfers;
             this.ResetAcls = resetAcls;
+            this.SuppressHardlinks = suppressHardlinks;
         }
 
         private IMessaging Messaging { get; }
@@ -32,6 +33,8 @@ namespace WixToolset.Core.Bind
         private IEnumerable<IFileTransfer> FileTransfers { get; }
 
         private bool ResetAcls { get; }
+
+        private bool SuppressHardlinks { get; }
 
         public void Execute()
         {
@@ -181,7 +184,7 @@ namespace WixToolset.Core.Bind
                 }
             }
 
-            this.FileSystem.CopyFile(sourceLineNumbers, source, destination, allowHardlink: true);
+            this.FileSystem.CopyFile(sourceLineNumbers, source, destination, allowHardlink: !this.SuppressHardlinks);
         }
 
         private void MoveFile(SourceLineNumber sourceLineNumbers, string source, string destination)
