@@ -389,6 +389,11 @@ namespace WixToolset.Core.WindowsInstaller
             return Message(sourceLineNumbers, Ids.OverridableActionCollision2, "The location of the action related to previous error.");
         }
 
+        public static Message PatchMediaDiskIdConflictsWithTarget(SourceLineNumber sourceLineNumbers, int diskId, string baselineId, int suggestedDiskId)
+        {
+            return Message(sourceLineNumbers, Ids.PatchMediaDiskIdConflictsWithTarget, "The patch Media DiskId '{0}' conflicts with a Media row that already exists in the target of PatchBaseline '{1}'. A patch's Media must use a DiskId that is not used by its targets or the patch will overwrite the target's Media row. Change the Media/@Id to '{2}' or higher.", diskId, baselineId, suggestedDiskId);
+        }
+
         public static Message PatchNotRemovable()
         {
             return Message(null, Ids.PatchNotRemovable, "This patch is not uninstallable. The 'Patch' element's attribute 'AllowRemoval' should be set to 'no'.");
@@ -591,6 +596,7 @@ namespace WixToolset.Core.WindowsInstaller
             UnknownValidationTargetFileExtension = 7505,
             InvalidWindowsInstallerWixpdbForValidation = 7506,
             UnexpectedAnonymousDirectoryCollision = 7507,
+            PatchMediaDiskIdConflictsWithTarget = 7508,
         } // last available is 7999. 8000 is BurnBackendErrors.
     }
 }

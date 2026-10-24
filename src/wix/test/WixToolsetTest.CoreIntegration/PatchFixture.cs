@@ -445,6 +445,27 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CannotBuildPatchWithMediaDiskIdConflictingWithTarget()
+        {
+            var sourceFolder = TestData.Get(@"TestData", "PatchWithConflictingMediaDiskId");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var tempFolderPatch = Path.Combine(baseFolder, "patch");
+
+                var result = BuildMspForResult("Patch1.msp", sourceFolder, tempFolderPatch, "1.0.1", bindpaths: new[] { Path.GetDirectoryName(this.templateBaselinePdb), Path.GetDirectoryName(this.templateUpdatePdb) });
+
+                var messages = result.Messages.Select(m => m.ToString()).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    "The patch Media DiskId '1' conflicts with a Media row that already exists in the target of PatchBaseline 'RTM'. A patch's Media must use a DiskId that is not used by its targets or the patch will overwrite the target's Media row. Change the Media/@Id to '2' or higher.",
+                }, messages);
+                Assert.Equal(7508, result.ExitCode);
+            }
+        }
+
+        [Fact]
         public void CanBuildPatchWithFileFiltering()
         {
             var sourceFolder = TestData.Get(@"TestData", "PatchFamilyFileFilter");
