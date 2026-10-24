@@ -5,12 +5,17 @@ namespace WixToolset.Core.WindowsInstaller.Bind
     using System;
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Extensibility.Services;
 
     internal class UpdateFromTextFilesCommand
     {
+        // Matches the set of RTF control words that can cause the RichEdit control used by ScrollableText to be
+        // blank. The lookbehind ensures the backslash is not itself escaped (i.e. "\\rtlch" is literal text).
+        private static readonly Regex ProblematicRtfControlWords = new(@"(?<=(?:^|[^\\])(?:\\\\)*)\\(?:rtlch|ltrch|fcs|afs|af|adeff|fbidi)(?![a-zA-Z])(?:-?[0-9]+)? ?", RegexOptions.CultureInvariant);
+
         public UpdateFromTextFilesCommand(IMessaging messaging, IntermediateSection section)
         {
             this.Messaging = messaging;
@@ -30,7 +35,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             foreach (var control in this.Section.Symbols.OfType<ControlSymbol>().Where(t => t.SourceFile != null))
             {
-                control.Text = this.ReadTextFile(control.SourceLineNumbers, control.SourceFile.Path);
+                var text = this.ReadTextFile(control.SourceLineNumbers, control.SourceFile.Path);
+
+                if (control.Type == "ScrollableText")
+                {
+                    text = RemoveProblematicRtfControlWords(text);
+                }
+
+                control.Text = text;
             }
 
             foreach (var customAction in this.Section.Symbols.OfType<CustomActionSymbol>().Where(c => c.ScriptFile != null))
@@ -72,6 +84,21 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Removes RTF control words known to prevent the ScrollableText control from rendering.
+        /// </summary>
+        /// <param name="text">RTF text.</param>
+        /// <returns>RTF text with the problematic control words removed.</returns>
+        private static string RemoveProblematicRtfControlWords(string text)
+        {
+            if (text == null || !text.StartsWith(@"{\rtf", StringComparison.Ordinal))
+            {
+                return text;
+            }
+
+            return ProblematicRtfControlWords.Replace(text, String.Empty);
         }
     }
 }
