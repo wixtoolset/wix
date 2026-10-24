@@ -6,7 +6,7 @@
     Manufacturer="Example Corporation"
     Classification="Update">
 
-    <Media Id="1" Cabinet="foo.cab">
+    <Media Id="100" Cabinet="foo.cab">
       <PatchBaseline Id="RTM" BaselineFile="Baseline.wixpdb" UpdateFile="Update.wixpdb" />
     </Media>
 

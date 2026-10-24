@@ -65,10 +65,14 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
             var patchRefSymbols = symbols.OfType<WixPatchRefSymbol>().ToList();
 
+            var patchMediaSymbols = symbols.OfType<MediaSymbol>().ToList();
+
             foreach (var symbol in patchBaselineSymbols)
             {
                 var targetData = this.GetWindowsInstallerData(symbol.BaselineFile.Path, BindStage.Target);
                 var updatedData = this.GetWindowsInstallerData(symbol.UpdateFile.Path, BindStage.Updated);
+
+                this.ValidatePatchMediaDoesNotConflictWithTarget(symbol, patchMediaSymbols, targetData);
 
                 if (patchRefSymbols.Count > 0)
                 {
@@ -93,6 +97,23 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.PatchTransforms = patchTransforms;
 
             return this.PatchTransforms;
+        }
+
+        private void ValidatePatchMediaDoesNotConflictWithTarget(WixPatchBaselineSymbol baselineSymbol, IEnumerable<MediaSymbol> patchMediaSymbols, WindowsInstallerData targetData)
+        {
+            // The patch's Media row is added to the target when the patch is applied, so reusing a DiskId from the target
+            // replaces the target's Media row and breaks source resolution for the target's files.
+            if (targetData?.Tables.TryGetTable("Media", out var targetMediaTable) == true && targetMediaTable.Rows.Count > 0)
+            {
+                var targetDiskIds = targetMediaTable.Rows.Select(r => r.FieldAsInteger(0)).ToList();
+
+                if (targetDiskIds.Contains(baselineSymbol.DiskId))
+                {
+                    var mediaSymbol = patchMediaSymbols.FirstOrDefault(m => m.DiskId == baselineSymbol.DiskId);
+
+                    this.Messaging.Write(WindowsInstallerBackendErrors.PatchMediaDiskIdConflictsWithTarget(mediaSymbol?.SourceLineNumbers ?? baselineSymbol.SourceLineNumbers, baselineSymbol.DiskId, baselineSymbol.Id.Id, targetDiskIds.Max() + 1));
+                }
+            }
         }
 
         private WindowsInstallerData GetWindowsInstallerData(string path, BindStage stage)
