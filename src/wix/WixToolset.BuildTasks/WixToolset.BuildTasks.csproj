@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Tasks.Core" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" />
     <PackageReference Include="WixInternal.BaseBuildTasks.Sources" />
     <PackageReference Include="WixToolset.Dtf.WindowsInstaller" />
   </ItemGroup>

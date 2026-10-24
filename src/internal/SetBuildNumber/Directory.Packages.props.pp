@@ -47,15 +47,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
-    <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
+    <PackageVersion Include="System.Diagnostics.PerformanceCounter" Version="8.0.1" />
     <PackageVersion Include="System.DirectoryServices" Version="8.0.0" />
     <PackageVersion Include="System.DirectoryServices.AccountManagement" Version="8.0.0" />
     <PackageVersion Include="System.Management" Version="8.0.0" />
-    <PackageVersion Include="System.Reflection.Metadata" Version="8.0.0" />
-    <PackageVersion Include="System.Security.Cryptography.Xml" Version="8.0.5" />
-    <PackageVersion Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-    <PackageVersion Include="System.Text.Json" Version="8.0.6" />
+    <PackageVersion Include="System.Reflection.Metadata" Version="8.0.1" />
+    <PackageVersion Include="System.Text.Encoding.CodePages" Version="9.0.11" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.21" />
 
     <PackageVersion Include="System.IO.Compression" Version="4.3.0" />
     <PackageVersion Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
@@ -74,16 +72,16 @@
     <PackageVersion Include="NuGet.Versioning" Version="6.13.2" />
   </ItemGroup>
 
-  <!-- MSBuild (aligned with VS 17.13 toolset) -->
+  <!-- MSBuild (aligned with VS 17.14 toolset) -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Build.Tasks.Core" Version="17.13.26" />
+    <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
   </ItemGroup>
 
   <!-- Keep the following versions in sync with internal\WixInternal.TestSupport.Native\packages.config -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.401" />
 
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageVersion Include="xunit.assert" Version="2.9.3" />
