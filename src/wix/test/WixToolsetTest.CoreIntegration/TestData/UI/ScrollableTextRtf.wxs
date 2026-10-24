@@ -1,0 +1,23 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <UI Id="CustomUI">
+            <Dialog Id="LicenseDialog" Width="100" Height="100">
+                <Control Id="License" Type="ScrollableText" X="0" Y="0" Width="90" Height="50" Sunken="yes" TabSkip="no">
+                    <Text SourceFile="license.rtf" />
+                </Control>
+                <Control Id="Plain" Type="Text" X="0" Y="50" Width="90" Height="50">
+                    <Text SourceFile="license.rtf" />
+                </Control>
+            </Dialog>
+
+            <InstallUISequence>
+                <Show Dialog="LicenseDialog" Before="ExecuteAction" />
+            </InstallUISequence>
+        </UI>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component>
+                <File Source="test.txt" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>
