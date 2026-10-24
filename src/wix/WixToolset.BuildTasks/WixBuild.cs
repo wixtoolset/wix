@@ -34,6 +34,8 @@ namespace WixToolset.BuildTasks
 
         public ITaskItem[] LibraryFiles { get; set; }
 
+        public bool NoHardlinks { get; set; }
+
         [Required]
         public ITaskItem OutputFile { get; set; }
 
@@ -84,6 +86,7 @@ namespace WixToolset.BuildTasks
             base.BuildCommandLine(commandLineBuilder);
 
             commandLineBuilder.AppendIfTrue("-bindFiles", this.BindFiles);
+            commandLineBuilder.AppendIfTrue("-nohardlinks", this.NoHardlinks);
             commandLineBuilder.AppendArrayIfNotNull("-bindPath ", this.CalculateBindPathStrings());
             commandLineBuilder.AppendArrayIfNotNull("-bindVariable ", this.CalculateBindVariableStrings());
             commandLineBuilder.AppendArrayIfNotNull("-loc ", this.LocalizationFiles);

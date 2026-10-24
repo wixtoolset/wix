@@ -137,6 +137,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <!-- By default we're using hard links to copy to the output directory, disabling this could slow the build significantly. -->
+    <CreateHardLinksForCopyFilesToOutputDirectoryIfPossible Condition=" '$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)' == '' ">true</CreateHardLinksForCopyFilesToOutputDirectoryIfPossible>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <!-- Default pdb output path to the intermediate output directory -->
     <PdbOutputDir Condition=" '$(PdbOutputDir)'=='' ">$(TargetDir)</PdbOutputDir>
     <TargetPdbDir Condition=" '$(PdbOutputDir)'!='' ">$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $(PdbOutputDir)))</TargetPdbDir>
@@ -708,6 +713,7 @@
     <PropertyGroup>
       <CabinetCachePath Condition=" '$(CabinetCachePath)'=='' and '$(ReuseCabinetCache)'=='true' ">$(IntermediateOutputPath)cabcache\</CabinetCachePath>
       <_WixBuildCabinetCachePath Condition=" '$(CabinetCachePath)'!='' ">$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory), $(CabinetCachePath), %(CultureGroup.OutputFolder)))</_WixBuildCabinetCachePath>
+      <_WixBuildNoHardlinks Condition=" '$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)'!='true' ">true</_WixBuildNoHardlinks>
     </PropertyGroup>
 
     <Warning
@@ -748,6 +754,7 @@
         CabinetCreationThreadCount="$(CabinetCreationThreadCount)"
         DefaultCompressionLevel="$(DefaultCompressionLevel)"
         AcceptEula="$(AcceptEula)"
+        NoHardlinks="$(_WixBuildNoHardlinks)"
 
         SuppressAllWarnings="$(SuppressAllWarnings)"
         SuppressSpecificWarnings="$(SuppressSpecificWarnings)"
@@ -1023,8 +1030,6 @@
       DependsOnTargets="$(CopyFilesToOutputDirectoryDependsOn)">
 
     <PropertyGroup>
-      <!-- By default we're using hard links to copy to the output directory, disabling this could slow the build significantly -->
-      <CreateHardLinksForCopyFilesToOutputDirectoryIfPossible Condition=" '$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)' == '' ">true</CreateHardLinksForCopyFilesToOutputDirectoryIfPossible>
       <CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible Condition="'$(BuildingInsideVisualStudio)' == 'true' or '$(CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible)' == ''">false</CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible>
       <ErrorIfLinkFailsForCopyFilesToOutputDirectory Condition="'$(BuildingInsideVisualStudio)' == 'true' or '$(ErrorIfLinkFailsForCopyFilesToOutputDirectory)' == ''">false</ErrorIfLinkFailsForCopyFilesToOutputDirectory>
     </PropertyGroup>
