@@ -715,7 +715,7 @@ namespace WixToolset.Core
                 {
                     this.Core.Write(ErrorMessages.StreamNameTooLong(sourceLineNumbers, node.Name.LocalName, "Id", id.Id, id.Id.Length, 55));
                 }
-                else if (!this.compilingProduct) // if we're not doing a product then we can't be sure that a binary identifier will fit when modularized
+                else if (!this.compilingProduct && suppressModularization != YesNoType.Yes) // if we're not doing a product and we're not suppressing modularization, then we can't be sure that a binary identifier will fit when modularized
                 {
                     if (18 < id.Id.Length)
                     {
