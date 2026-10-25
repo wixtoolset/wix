@@ -60,6 +60,28 @@ namespace WixToolsetTest.WixE2E
         }
 
         [TestMethod]
+        public void CanCleanPackageWithPublishedWebApp()
+        {
+            var projectDirectory = TestData.Get("TestData", "WixprojPackageCsprojWebApplicationNetCore");
+            var projectPath = Path.Combine(projectDirectory, "WixprojPackageCsprojWebApplicationNetCore.wixproj");
+            var projectObjPath = Path.Combine(projectDirectory, "obj");
+
+            CleanEverything();
+
+            var result = RestoreAndBuild(projectPath);
+            result.AssertSuccess();
+
+            var publishFolders = Directory.GetDirectories(projectObjPath, "publish", SearchOption.AllDirectories);
+            Assert.HasCount(1, publishFolders);
+            Assert.IsTrue(Directory.Exists(Path.Combine(publishFolders[0], "CsprojWebApplicationNetCore")));
+
+            result = MsbuildRunner.Execute(projectPath, new[] { "-t:Clean", "-v:m", $"-bl:{BinlogPath(projectPath)}" }, x64: true);
+            result.AssertSuccess();
+
+            Assert.IsFalse(Directory.Exists(publishFolders[0]));
+        }
+
+        [TestMethod]
         public void CanBuildPackageWithNativeWindowsApp()
         {
             var projectPath = TestData.Get("TestData", "WixprojPackageVcxprojWindowsApp", "WixprojPackageVcxprojWindowsApp.wixproj");

@@ -154,6 +154,11 @@
     <BindTrackingFileExtension Condition=" '$(BindTrackingFileExtension)' == '' ">.txt</BindTrackingFileExtension>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <!-- Folder where project references with Publish="true" and no explicit PublishDir are published. Removed during Clean. -->
+    <_WixProjectReferencePublishFolder>$(IntermediateOutputPath)publish\</_WixProjectReferencePublishFolder>
+  </PropertyGroup>
+
   <!--
   ***********************************************************************************************
   ***********************************************************************************************
@@ -378,7 +383,7 @@
 
     <UpdateProjectReferenceMetadata
         ProjectReferences="@(_MSBuildProjectReferenceExistent)"
-        IntermediateFolder="$(IntermediateOutputPath)">
+        PublishFolder="$(_WixProjectReferencePublishFolder)">
       <Output TaskParameter="UpdatedProjectReferences" ItemName="_WixUpdatedProjectReferences" />
     </UpdateProjectReferenceMetadata>
 
@@ -386,6 +391,26 @@
       <_MSBuildProjectReferenceExistent Remove='@(_WixUpdatedProjectReferences)' />
       <_MSBuildProjectReferenceExistent Include='@(_WixUpdatedProjectReferences)' />
     </ItemGroup>
+  </Target>
+
+  <!--
+    ================================================================================================
+                                        _WixCleanProjectReferencePublishFolder
+
+    Removes the folder where project references are published when they do not specify an explicit
+    PublishDir. The referenced project's Clean does not remove its publish output, so without this
+    stale published files would be included in the next build.
+
+    [IN]
+    $(_WixProjectReferencePublishFolder) - Folder where project references are implicitly published.
+    ================================================================================================
+    -->
+  <Target
+    Name="_WixCleanProjectReferencePublishFolder"
+    AfterTargets="CoreClean"
+    Condition=" Exists('$(_WixProjectReferencePublishFolder)') ">
+
+    <RemoveDir Directories="$(_WixProjectReferencePublishFolder)" />
   </Target>
 
   <!--
