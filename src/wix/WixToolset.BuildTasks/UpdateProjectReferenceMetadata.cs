@@ -23,8 +23,11 @@ namespace WixToolset.BuildTasks
         [Required]
         public ITaskItem[] ProjectReferences { get; set; }
 
+        /// <summary>
+        /// The folder where project references are published when they do not specify a PublishDir.
+        /// </summary>
         [Required]
-        public string IntermediateFolder { get; set; }
+        public string PublishFolder { get; set; }
 
         [Output]
         public ITaskItem[] UpdatedProjectReferences { get; private set; }
@@ -36,10 +39,10 @@ namespace WixToolset.BuildTasks
         /// <returns>True upon completion of the task execution.</returns>
         public override bool Execute()
         {
-            var intermediateFolder = Path.GetFullPath(this.IntermediateFolder);
+            var publishFolder = Path.GetFullPath(this.PublishFolder);
 
             // Create the project reference facades.
-            var projectReferenceFacades = this.ProjectReferences.Select(p => ProjectReferenceFacade.CreateFacade(p, this.Log, intermediateFolder));
+            var projectReferenceFacades = this.ProjectReferences.Select(p => ProjectReferenceFacade.CreateFacade(p, this.Log, publishFolder));
 
             // Expand the facade count by applying Configurations/Platforms.
             projectReferenceFacades = this.ExpandProjectReferencesForConfigurationsAndPlatforms(projectReferenceFacades);
@@ -332,7 +335,7 @@ namespace WixToolset.BuildTasks
                 return new ProjectReferenceFacade(new TaskItem(this.ProjectReference), this.AvailableConfigurations, this.configuration, this.AvailablePlatforms, this.platform, this.AvailableTargetFrameworks, this.targetFramework, this.AvailableRuntimeIdentifiers, this.runtimeIdentifier, this.PublishBaseDir);
             }
 
-            public static ProjectReferenceFacade CreateFacade(ITaskItem projectReference, TaskLoggingHelper logger, string intermediateFolder)
+            public static ProjectReferenceFacade CreateFacade(ITaskItem projectReference, TaskLoggingHelper logger, string publishFolder)
             {
                 var configurationsValue = new MetadataValueList(projectReference, "Configurations");
                 var setConfigurationValue = new MetadataValue(projectReference, "SetConfiguration", "Configuration=");
@@ -360,7 +363,7 @@ namespace WixToolset.BuildTasks
                     }
                     else
                     {
-                        publishBaseDir = Path.Combine(intermediateFolder, "publish", Path.GetFileNameWithoutExtension(projectReference.ItemSpec));
+                        publishBaseDir = Path.Combine(publishFolder, Path.GetFileNameWithoutExtension(projectReference.ItemSpec));
                     }
                 }
 
