@@ -77,6 +77,50 @@ namespace WixToolset.Core.ExtensionCache
             return Task.FromResult(false);
         }
 
+
+        public async Task<bool> UpdateAsync(bool global, string extension, CancellationToken cancellationToken)
+        {
+            if (String.IsNullOrEmpty(extension))
+            {
+                throw new ArgumentNullException(nameof(extension));
+            }
+
+            (var extensionId, var extensionVersion) = ParseExtensionReference(extension);
+
+            var cacheFolder = this.GetCacheFolder(global);
+
+            // Get installed extension versions:
+            var extensionFolder = Path.Combine(cacheFolder, extensionId);
+            var extensionNugetVersion = NuGetVersion.Parse(extensionVersion);
+
+            // Maybe the extension is not installed at all.
+            if (Directory.Exists(extensionFolder))
+            {
+                foreach (var existingExtensionVersionFolder in Directory.GetDirectories(extensionFolder))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    // Remove only older versions, so parse the version:
+                    var existingExtensionVersionFolderName = Path.GetFileName(existingExtensionVersionFolder);
+                    if (!NuGetVersion.TryParse(existingExtensionVersionFolderName, out var existingExtensionNugetVersion))
+                    {
+                        throw new ArgumentException($"Invalid extension version in {existingExtensionVersionFolder}: {existingExtensionVersionFolderName}");
+                    }
+
+                    if (existingExtensionNugetVersion.Version < extensionNugetVersion.Version)
+                    {
+                        // Remove old version:
+                        // TODO: reuse extension removal message.
+                        this.Messaging.Write("Removing old version: " + existingExtensionVersionFolder);
+
+                        Directory.Delete(existingExtensionVersionFolder, true);
+                    }
+                }
+            }
+            // Now update extension:
+            return await this.AddAsync(global, extension, cancellationToken);
+        }
+
         public Task<IEnumerable<CachedExtension>> ListAsync(bool global, string extension, CancellationToken cancellationToken)
         {
             var found = new List<CachedExtension>();
