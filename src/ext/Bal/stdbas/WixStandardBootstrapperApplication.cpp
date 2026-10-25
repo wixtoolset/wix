@@ -4333,7 +4333,14 @@ private:
                 BalExitOnFailure(hr, "Failed to format launch working directory variable: %ls", sczUnformattedLaunchFolder);
             }
 
-            hr = ShelExec(sczLaunchTarget, sczArguments, L"open", sczLaunchFolder, nCmdShow, m_hWnd, NULL);
+            // Launch through the shell so the target does not inherit this process's mitigation policies (aka RedirectionGuard).
+            hr = ShelExecUnelevated(sczLaunchTarget, sczArguments, L"open", sczLaunchFolder, nCmdShow);
+            if (FAILED(hr) && HRESULT_FROM_WIN32(ERROR_CANCELLED) != hr)
+            {
+                BalLog(BOOTSTRAPPER_LOG_LEVEL_STANDARD, "Could not launch target through the shell, error: 0x%x. Launching directly instead.", hr);
+
+                hr = ShelExec(sczLaunchTarget, sczArguments, L"open", sczLaunchFolder, nCmdShow, m_hWnd, NULL);
+            }
             BalExitOnFailure(hr, "Failed to launch target: %ls", sczLaunchTarget);
 
             ::PostMessageW(m_hWnd, WM_CLOSE, 0, 0);
