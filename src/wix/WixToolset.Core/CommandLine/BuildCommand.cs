@@ -423,8 +423,6 @@ namespace WixToolset.Core.CommandLine
             context.Extensions = this.ExtensionManager.GetServices<IPreprocessorExtension>();
             context.Platform = this.Platform;
             context.IncludeSearchPaths = includeSearchPaths;
-            context.IntermediateFolder = this.IntermediateFolder;
-            context.OutputPath = this.OutputPath;
             context.SourcePath = sourcePath;
             context.Variables = preprocessorVariables;
             context.CancellationToken = cancellationToken;
