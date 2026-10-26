@@ -13,7 +13,6 @@
     <RestoreIgnoreFailedSources>true</RestoreIgnoreFailedSources>
 
     <!-- SomeVer configuration -->
-    <SomeVerAutoIncrement>major</SomeVerAutoIncrement>
     <SomeVerDefaultPreReleaseIdentifiers>build</SomeVerDefaultPreReleaseIdentifiers>
     <SomeVerIncludeDefaultPreReleaseIdentifiersWithPrereleases>true</SomeVerIncludeDefaultPreReleaseIdentifiersWithPrereleases>
     <SomeVerTagPrefix>v</SomeVerTagPrefix>
