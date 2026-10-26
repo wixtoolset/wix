@@ -1,0 +1,7 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Id="WixToolsetTest.TestPackage" Name="PacakgeWithBindVariables" Version="!(bind.Property.ProductVersion)" Manufacturer="!(bind.Property.Manufacturer)">
+    <Component Directory="ProgramFiles6432Folder" Subdirectory="test">
+      <File Id="TestTextFile" Source="data\test.txt" />
+    </Component>
+  </Package>
+</Wix>
