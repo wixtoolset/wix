@@ -5,8 +5,9 @@ namespace WixToolsetTest.CoreIntegration
     using System;
     using System.IO;
     using System.Linq;
-    using WixInternal.TestSupport;
     using WixInternal.Core.TestPackage;
+    using WixInternal.TestSupport;
+    using WixToolset.Data;
     using Xunit;
 
     public class BindVariablesFixture
@@ -70,6 +71,38 @@ namespace WixToolsetTest.CoreIntegration
                 WixAssert.StringEqual("Property:TestPackageVersion\t3.14.1703.0", queryResults["Property:TestPackageVersion"]);
                 WixAssert.StringEqual("Property:TestTextVersion\tv", queryResults["Property:TestTextVersion"]);
                 Assert.False(queryResults.ContainsKey("Property:TestTextLanguage"));
+            }
+        }
+
+        [Fact]
+        public void CannotBuildPackageWithRecursiveBindVariableValues()
+        {
+            var folder = TestData.Get(@"TestData", "BindVariables");
+            var dotDataFolder = TestData.Get(@"TestData", ".Data");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(intermediateFolder, @"test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "PackageWithRecursiveBindVariableValues.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-bindpath", folder,
+                    "-bindpath", dotDataFolder,
+                    "-o", msiPath,
+                });
+
+                // Multiple instances of:
+                //   `Unresolved bind-time variable !(bind.Property.Manufacturer).`
+                // and
+                //   `Unresolved bind-time variable !(bind.Property.ProductVersion).`
+                Assert.Equal(7, result.Messages.Count(m => m.Id == 298/*CoreErrors.UnresolvedBindReference*/));
+                // `!(bind.Property.ProductVersion)` is not a valid package version.
+                Assert.Single(result.Messages, m => m.Id == (int)WarningMessages.Ids.InvalidMsiProductVersion);
             }
         }
 
