@@ -16,6 +16,11 @@ namespace WixToolset.Core.ExtensionCache
             return Message(new SourceLineNumber(extensionId), Ids.MissingExtensionPackageRootFolder, "Could not find expected package root folder {0}. Ensure {1}/{2} is compatible with WiX v{3}.", packageRootFolderName, extensionId, packageVersion, wixVersion);
         }
 
+        public static Message RemoveExtensionNotInstalled(string extensionId, string packageVersion, string extensionCacheFolder)
+        {
+            return Message(new SourceLineNumber(extensionId), Ids.NotInstalledExtension, "Extension {0} with Id {1} not found in {2}.", extensionId, packageVersion, extensionCacheFolder);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Warning, (int)id, format, args);
@@ -25,6 +30,7 @@ namespace WixToolset.Core.ExtensionCache
         {
             NugetException = 6100,
             MissingExtensionPackageRootFolder = 6101,
+            NotInstalledExtension = 6102,
         } // last available is 6499. 6500 is ExtensionCacheErrors.
     }
 }

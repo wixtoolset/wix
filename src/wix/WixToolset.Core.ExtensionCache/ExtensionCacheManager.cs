@@ -70,8 +70,13 @@ namespace WixToolset.Core.ExtensionCache
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                Directory.Delete(cacheFolder, true);
+                this.Messaging.Write(ExtensionCacheInformations.RemovedExtension(extensionFolder));
+                Directory.Delete(extensionFolder, true);
                 return Task.FromResult(true);
+            }
+            else
+            {
+                this.Messaging.Write(ExtensionCacheWarnings.RemoveExtensionNotInstalled(extensionId, extensionVersion, extensionFolder));
             }
 
             return Task.FromResult(false);
