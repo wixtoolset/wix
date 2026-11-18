@@ -77,6 +77,39 @@ namespace WixToolset.Core.ExtensionCache
             return Task.FromResult(false);
         }
 
+
+        public async Task<bool> UpdateAsync(bool global, string extension, CancellationToken cancellationToken)
+        {
+            if (String.IsNullOrEmpty(extension))
+            {
+                throw new ArgumentNullException(nameof(extension));
+            }
+
+            (var extensionId, var extensionVersion) = ParseExtensionReference(extension);
+
+            var cacheFolder = this.GetCacheFolder(global);
+
+            var extensionNugetVersion = NuGetVersion.Parse(extensionVersion);
+
+            // Get installed extension versions and remove old versions:
+            IEnumerable<CachedExtension> installedExtensions = this.ListInFolderAsync(cacheFolder, extensionId, cancellationToken).Result;
+            foreach (var installedExtension in installedExtensions)
+            {
+                if (!NuGetVersion.TryParse(installedExtension.Version, out var installedExtensionNugetVersion))
+                {
+                    throw new ArgumentException($"Invalid extension version in {cacheFolder}: {installedExtension.Version}");
+                }
+
+                if (installedExtensionNugetVersion.Version < extensionNugetVersion.Version)
+                {
+                    // Remove old version:
+                    await this.RemoveAsync(global, installedExtension.Id + "/" + installedExtension.Version, cancellationToken);
+                }
+            }
+            // Now update extension:
+            return await this.AddAsync(global, extension, cancellationToken);
+        }
+
         public Task<IEnumerable<CachedExtension>> ListAsync(bool global, string extension, CancellationToken cancellationToken)
         {
             var found = new List<CachedExtension>();
@@ -99,39 +132,50 @@ namespace WixToolset.Core.ExtensionCache
                 }
                 else // looking for all versions of an extension or all versions of all extensions.
                 {
-                    IEnumerable<string> foundExtensionIds;
+                    var foundInFolder = this.ListInFolderAsync(cacheFolder, extensionId, cancellationToken).Result;
 
-                    if (String.IsNullOrEmpty(extensionId))
+                    found.AddRange(foundInFolder);
+                }
+            }
+
+            return Task.FromResult((IEnumerable<CachedExtension>)found);
+        }
+
+        private Task<IEnumerable<CachedExtension>> ListInFolderAsync(string cacheFolder, string extensionId, CancellationToken cancellationToken)
+        {
+            var found = new List<CachedExtension>();
+
+            IEnumerable<string> foundExtensionIds;
+
+            if (String.IsNullOrEmpty(extensionId))
+            {
+                // Looking for all versions of all extensions.
+                foundExtensionIds = Directory.GetDirectories(cacheFolder).Select(folder => Path.GetFileName(folder)).ToList();
+            }
+            else
+            {
+                // Looking for all versions of a single extension.
+                var extensionFolder = Path.Combine(cacheFolder, extensionId);
+                foundExtensionIds = Directory.Exists(extensionFolder) ? new[] { extensionId } : Array.Empty<string>();
+            }
+
+            foreach (var foundExtensionId in foundExtensionIds)
+            {
+                var extensionFolder = Path.Combine(cacheFolder, foundExtensionId);
+
+                foreach (var foundExtensionVersionFolder in Directory.GetDirectories(extensionFolder))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    var foundExtensionVersion = Path.GetFileName(foundExtensionVersionFolder);
+
+                    if (!NuGetVersion.TryParse(foundExtensionVersion, out _))
                     {
-                        // Looking for all versions of all extensions.
-                        foundExtensionIds = Directory.GetDirectories(cacheFolder).Select(folder => Path.GetFileName(folder)).ToList();
-                    }
-                    else
-                    {
-                        // Looking for all versions of a single extension.
-                        var extensionFolder = Path.Combine(cacheFolder, extensionId);
-                        foundExtensionIds = Directory.Exists(extensionFolder) ? new[] { extensionId } : Array.Empty<string>();
+                        continue;
                     }
 
-                    foreach (var foundExtensionId in foundExtensionIds)
-                    {
-                        var extensionFolder = Path.Combine(cacheFolder, foundExtensionId);
-
-                        foreach (var foundExtensionVersionFolder in Directory.GetDirectories(extensionFolder))
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            var foundExtensionVersion = Path.GetFileName(foundExtensionVersionFolder);
-
-                            if (!NuGetVersion.TryParse(foundExtensionVersion, out _))
-                            {
-                                continue;
-                            }
-
-                            var present = this.ExtensionFileExists(cacheFolder, foundExtensionId, foundExtensionVersion);
-                            found.Add(new CachedExtension(foundExtensionId, foundExtensionVersion, !present));
-                        }
-                    }
+                    var present = this.ExtensionFileExists(cacheFolder, foundExtensionId, foundExtensionVersion);
+                    found.Add(new CachedExtension(foundExtensionId, foundExtensionVersion, !present));
                 }
             }
 

@@ -20,6 +20,9 @@ namespace WixToolset.Core.ExtensionCache
         private enum CacheSubcommand
         {
             Add,
+
+            Update,
+
             Remove,
             List
         }
@@ -52,6 +55,7 @@ namespace WixToolset.Core.ExtensionCache
                 Commands = new[]
                 {
                     new CommandLineHelpCommand("add", "Add extension to the cache."),
+                    new CommandLineHelpCommand("update", "Update extension in the cache. If the extension is not installed, it is the same as 'add'."),
                     new CommandLineHelpCommand("list", "List extensions in the cache."),
                     new CommandLineHelpCommand("remove", "Remove extension from the cache."),
                 },
@@ -74,6 +78,10 @@ namespace WixToolset.Core.ExtensionCache
             {
                 case CacheSubcommand.Add:
                     success = await this.AddExtensions(cacheManager, cancellationToken);
+                    break;
+
+                case CacheSubcommand.Update:
+                    success = await this.UpdateExtensions(cacheManager, cancellationToken);
                     break;
 
                 case CacheSubcommand.Remove:
@@ -128,6 +136,19 @@ namespace WixToolset.Core.ExtensionCache
             foreach (var extensionRef in this.ExtensionReferences)
             {
                 var added = await cacheManager.AddAsync(this.Global, extensionRef, cancellationToken);
+                success |= added;
+            }
+
+            return success;
+        }
+
+        private async Task<bool> UpdateExtensions(ExtensionCacheManager cacheManager, CancellationToken cancellationToken)
+        {
+            var success = false;
+
+            foreach (var extensionRef in this.ExtensionReferences)
+            {
+                var added = await cacheManager.UpdateAsync(this.Global, extensionRef, cancellationToken);
                 success |= added;
             }
 
