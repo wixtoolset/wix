@@ -28,13 +28,15 @@ namespace WixToolset.Extensibility.Data
         IReadOnlyCollection<string> IncludeSearchPaths { get; set; }
 
         /// <summary>
-        /// Intermediate folder.
+        /// Unused.
         /// </summary>
+        [Obsolete("The preprocessor does not write files.")]
         string IntermediateFolder { get; set; }
 
         /// <summary>
-        /// Output path.
+        /// Unused.
         /// </summary>
+        [Obsolete("The preprocessor does not write files.")]
         string OutputPath { get; set; }
 
         /// <summary>
