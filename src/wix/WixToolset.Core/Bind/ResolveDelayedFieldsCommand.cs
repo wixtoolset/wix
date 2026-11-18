@@ -130,6 +130,12 @@ namespace WixToolset.Core.Bind
                         resolvedValue = parsed.DefaultValue;
                     }
 
+                    if (value == resolvedValue)
+                    {
+                        // If the values are the same, we have a recursively-defined variable and should fail to avoid the infinite loop.
+                        resolvedValue = null;
+                    }
+
                     // insert the resolved value if it was found or display an error
                     if (null != resolvedValue)
                     {
