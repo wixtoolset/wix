@@ -747,7 +747,12 @@
         File="$(MSBuildProjectFile)"
         Condition=" '@(UnsupportedWixExtension)' != '' "/>
 
+    <!--
+      Like Csc, skip building when SkipCompilerExecution is set (such as during design-time builds) so IDEs can
+      evaluate CoreCompile without creating outputs that race with the real build.
+    -->
     <WixBuild
+        Condition=" '$(SkipCompilerExecution)' != 'true' "
         SourceFiles="@(Compile)"
         LibraryFiles="@(_ResolvedWixLibraryPaths)"
         LocalizationFiles="@(_WixLocalizationFile)"
@@ -793,7 +798,7 @@
         <Output TaskParameter="ExitCode" PropertyName="_WixBuildExitCode" />
       </WixBuild>
 
-    <ItemGroup>
+    <ItemGroup Condition=" '$(SkipCompilerExecution)' != 'true' ">
       <_WixBuildOutputFile Include="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)" />
     </ItemGroup>
   </Target>
@@ -801,7 +806,7 @@
   <Target
       Name="WindowsInstallerValidation"
       DependsOnTargets="CoreCompile"
-      Condition=" '$(_WixBuildExitCode)' != '' and '$(SuppressValidation)' != 'true' and ('$(OutputType)' == 'Package' or '$(OutputType)' == 'Module') ">
+      Condition=" '$(_WixBuildExitCode)' != '' and '$(SkipCompilerExecution)' != 'true' and '$(SuppressValidation)' != 'true' and ('$(OutputType)' == 'Package' or '$(OutputType)' == 'Module') ">
       <WindowsInstallerValidation
           DatabaseFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetFileName)"
           WixpdbFile="$(IntermediateOutputPath)%(CultureGroup.OutputFolder)$(TargetPdbFileName)"

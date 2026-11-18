@@ -209,6 +209,151 @@ namespace WixToolsetTest.Sdk
         [DataRow(BuildSystem.DotNetCoreSdk)]
         [DataRow(BuildSystem.MSBuild)]
         [DataRow(BuildSystem.MSBuild64)]
+        public void CanSkipBuildingMsiPackageInDesignTimeBuild(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
+
+                // Redefine the signing extension points so the test fails if they run. Signing's DependsOnTargets
+                // would run them even though its own inputs are empty when WixBuild is skipped.
+                var projectContent = File.ReadAllText(projectPath).Replace("</Project>",
+                    "  <Target Name=\"BeforeSigning\"><Message Importance=\"high\" Text=\"TEST: BeforeSigning\" /></Target>\r\n" +
+                    "  <Target Name=\"AfterSigning\"><Message Importance=\"high\" Text=\"TEST: AfterSigning\" /></Target>\r\n" +
+                    "</Project>");
+                File.WriteAllText(projectPath, projectContent);
+
+                // Mimic an IDE's design-time build (such as ReSharper loading the project), which requests Compile.
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, new[]
+                {
+                    "-t:Compile",
+                    "-p:DesignTimeBuild=true",
+                    "-p:SkipCompilerExecution=true",
+                    "-p:AcceptEula=wix" + SomeVerInfo.Major,
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                    "-p:SignOutput=true",
+                }, suppressValidation: false);
+                result.AssertSuccess();
+
+                var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem).ToArray();
+                WixAssert.StringCollectionEmpty(wixBuildCommands);
+
+                var wixValidateCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "msi validate", buildSystem).ToArray();
+                WixAssert.StringCollectionEmpty(wixValidateCommands);
+
+                var testMessages = result.Output.Where(line => line.Contains("TEST:")).ToArray();
+                WixAssert.StringCollectionEmpty(testMessages);
+
+                // Nothing should be written: no package, wixpdb, cabinets, bind tracking, validation database or signing marker.
+                var paths = Directory.EnumerateFiles(baseFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(baseFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"data\test.txt",
+                    @"MsiPackage.binlog",
+                    @"MsiPackage.wixproj",
+                    @"Package.en-us.wxl",
+                    @"Package.wxs",
+                    @"PackageComponents.wxs",
+                }, paths);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
+        public void CanSkipBuildingMsiPackageInDesignTimeBuildAfterBuild(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData\SimpleMsiPackage\MsiPackage");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var projectPath = Path.Combine(baseFolder, "MsiPackage.wixproj");
+
+                var buildArguments = new[]
+                {
+                    "-p:AcceptEula=wix" + SomeVerInfo.Major,
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "WixMSBuildProps", MsbuildFixture.WixPropsPath),
+                };
+
+                // Mimic an IDE's design-time build (such as ReSharper loading the project), which requests Compile.
+                var designTimeBuildArguments = buildArguments.Concat(new[]
+                {
+                    "-t:Compile",
+                    "-p:DesignTimeBuild=true",
+                    "-p:SkipCompilerExecution=true",
+                }).ToArray();
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, buildArguments, suppressValidation: false);
+                result.AssertSuccess();
+
+                var outputsAfterBuild = GetOutputsWithTimestamps(baseFolder);
+                WixAssert.NotEmpty(outputsAfterBuild);
+
+                // Make CoreCompile out of date, as when the project is edited and the IDE reloads it.
+                File.SetLastWriteTimeUtc(Path.Combine(baseFolder, "Package.wxs"), DateTime.UtcNow);
+
+                // Hold the package, its wixpdb and the validation working copy open exclusively, as a concurrent real
+                // build would, so the design-time build fails if it reads or writes any of them.
+                var cultureFolder = Path.Combine(baseFolder, @"obj\x86\Release\en-US");
+                var validateDatabasePath = Path.Combine(cultureFolder, "MsiPackage_validate.msi");
+                var lockedPaths = new[]
+                {
+                    Path.Combine(cultureFolder, "MsiPackage.msi"),
+                    Path.Combine(cultureFolder, "MsiPackage.wixpdb"),
+                    validateDatabasePath,
+                };
+                var locks = new List<FileStream>();
+
+                try
+                {
+                    locks.AddRange(lockedPaths.Select(path => File.Open(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None)));
+
+                    result = MsbuildUtilities.BuildProject(buildSystem, projectPath, designTimeBuildArguments, suppressValidation: false);
+                    result.AssertSuccess();
+                }
+                finally
+                {
+                    locks.ForEach(l => l.Dispose());
+                }
+
+                // Validation deletes its working copy, so remove the one created by the lock above.
+                File.Delete(validateDatabasePath);
+
+                var wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem).ToArray();
+                WixAssert.StringCollectionEmpty(wixBuildCommands);
+
+                var wixValidateCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "msi validate", buildSystem).ToArray();
+                WixAssert.StringCollectionEmpty(wixValidateCommands);
+
+                // The real build's outputs must be untouched, so they still look out of date to the next real build.
+                var outputsAfterDesignTimeBuild = GetOutputsWithTimestamps(baseFolder);
+                WixAssert.CompareLineByLine(outputsAfterBuild, outputsAfterDesignTimeBuild);
+
+                result = MsbuildUtilities.BuildProject(buildSystem, projectPath, buildArguments, suppressValidation: false);
+                result.AssertSuccess();
+
+                wixBuildCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "build", buildSystem).ToArray();
+                WixAssert.Single(wixBuildCommands);
+
+                wixValidateCommands = MsbuildUtilities.GetToolCommandLines(result, "wix", "msi validate", buildSystem).ToArray();
+                WixAssert.Single(wixValidateCommands);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
         public void CanCopyNoneItemToOutputDirectory(BuildSystem buildSystem)
         {
             var sourceFolder = TestData.Get("TestData", "CopyToOutputDirectory");
@@ -1196,6 +1341,17 @@ namespace WixToolsetTest.Sdk
         {
             var fi = new FileInfo(path);
             return $"{fi.FullName.Replace(replace, String.Empty)} - {fi.Length}";
+        }
+
+        private static string[] GetOutputsWithTimestamps(string baseFolder)
+        {
+            return new[] { "bin", "obj" }
+                .Select(folder => Path.Combine(baseFolder, folder))
+                .Where(Directory.Exists)
+                .SelectMany(folder => Directory.EnumerateFiles(folder, @"*.*", SearchOption.AllDirectories))
+                .Select(s => $"{s.Substring(baseFolder.Length + 1)} {File.GetLastWriteTimeUtc(s):o}")
+                .OrderBy(s => s)
+                .ToArray();
         }
     }
 }

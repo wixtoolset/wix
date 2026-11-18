@@ -86,7 +86,7 @@
       DependsOnTargets="$(SigningDependsOn)"
       Inputs="@(_WixBuildOutputFile)"
       Outputs="$(SignedFilePath)"
-      Condition=" '$(SignOutput)' == 'true' ">
+      Condition=" '$(SignOutput)' == 'true' and '$(SkipCompilerExecution)' != 'true' ">
 
     <ItemGroup>
       <FileWrites Include="$(SignedFilePath)" />
