@@ -20,6 +20,7 @@ namespace WixToolsetTest.Sdk
     {
         public static readonly string WixMsbuildPath = Path.Combine(Path.GetDirectoryName(typeof(MsbuildFixture).Assembly.Location), "..", "..", "..", "publish", "WixToolset.Sdk");
         public static readonly string WixPropsPath = Path.Combine(WixMsbuildPath, "Sdk", "Sdk.props");
+        public static readonly string ArtifactsPath = Path.Combine(Path.GetDirectoryName(typeof(MsbuildFixture).Assembly.Location), "..", "..", "..", "..", "..", "artifacts");
 
         [TestMethod]
         [DataRow(BuildSystem.DotNetCoreSdk)]
@@ -1158,6 +1159,100 @@ namespace WixToolsetTest.Sdk
                     .OrderBy(s => s)
                     .ToArray();
                 WixAssert.CompareLineByLine(expectedOutputFiles, paths);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(BuildSystem.DotNetCoreSdk)]
+        [DataRow(BuildSystem.MSBuild)]
+        [DataRow(BuildSystem.MSBuild64)]
+        public void CanSkipPackingCustomActionInDesignTimeBuildAfterBuild(BuildSystem buildSystem)
+        {
+            var sourceFolder = TestData.Get(@"TestData", "CustomActionProject");
+
+            using (var fs = new TestDataFolderFileSystem())
+            {
+                fs.Initialize(sourceFolder);
+                var baseFolder = fs.BaseFolder;
+                var intermediateFolder = Path.Combine(baseFolder, @"obj\Release\net472");
+                var projectPath = Path.Combine(baseFolder, "TestCA.csproj");
+
+                // Restore the DTF packages built alongside this test into a private folder, so a stale copy with the
+                // same version in the global packages folder is never used. The DTF targets require the wix8 EULA.
+                var buildArguments = new[]
+                {
+                    "-p:AcceptEula=wix8",
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "DtfPackageVersion", SomeVerInfo.InformationalVersion),
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "RestoreAdditionalProjectSources", Path.GetFullPath(MsbuildFixture.ArtifactsPath)),
+                    MsbuildUtilities.GetQuotedPropertySwitch(buildSystem, "RestorePackagesPath", Path.Combine(baseFolder, "packages")),
+                };
+
+                // Mimic an IDE's design-time build (such as Visual Studio or ReSharper loading the project), which requests Compile.
+                var designTimeBuildArguments = buildArguments.Concat(new[]
+                {
+                    "-t:Compile",
+                    "-p:DesignTimeBuild=true",
+                    "-p:SkipCompilerExecution=true",
+                    "-p:ProvideCommandLineArgs=true",
+                }).ToArray();
+
+                // The .NET SDK updates its *.cache files in design-time builds, so they're excluded.
+                string[] GetOutputsWithTimestamps()
+                {
+                    return new[] { "bin", "obj" }
+                        .Select(folder => Path.Combine(baseFolder, folder))
+                        .Where(Directory.Exists)
+                        .SelectMany(folder => Directory.EnumerateFiles(folder, @"*.*", SearchOption.AllDirectories))
+                        .Where(s => !s.EndsWith(".cache", StringComparison.OrdinalIgnoreCase))
+                        .Select(s => $"{s.Substring(baseFolder.Length + 1)} {File.GetLastWriteTimeUtc(s):o}")
+                        .OrderBy(s => s)
+                        .ToArray();
+                }
+
+                var result = MsbuildUtilities.BuildProject(buildSystem, projectPath, buildArguments.Concat(new[] { "-Restore" }).ToArray());
+                result.AssertSuccess();
+
+                var makeSfxCACommands = result.Output.Where(line => line.Contains("WixToolset.Dtf.MakeSfxCA.exe")).ToArray();
+                WixAssert.Single(makeSfxCACommands);
+
+                var outputsAfterBuild = GetOutputsWithTimestamps();
+
+                // Make the custom action package out of date, as when a Content file is edited and the IDE reloads the project.
+                File.SetLastWriteTimeUtc(Path.Combine(baseFolder, "CustomAction.config"), DateTime.UtcNow);
+
+                // Hold the custom action package and its response file open exclusively, as a concurrent real build
+                // would, so the design-time build fails if it reads or writes either of them.
+                var lockedPaths = new[]
+                {
+                    Path.Combine(intermediateFolder, "TestCA.CA.dll"),
+                    Path.Combine(intermediateFolder, "TestCA.CA.rsp"),
+                };
+                var locks = new List<FileStream>();
+
+                try
+                {
+                    locks.AddRange(lockedPaths.Select(path => File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None)));
+
+                    result = MsbuildUtilities.BuildProject(buildSystem, projectPath, designTimeBuildArguments);
+                    result.AssertSuccess();
+                }
+                finally
+                {
+                    locks.ForEach(l => l.Dispose());
+                }
+
+                makeSfxCACommands = result.Output.Where(line => line.Contains("WixToolset.Dtf.MakeSfxCA.exe")).ToArray();
+                WixAssert.StringCollectionEmpty(makeSfxCACommands);
+
+                // The real build's outputs must be untouched, so they still look out of date to the next real build.
+                var outputsAfterDesignTimeBuild = GetOutputsWithTimestamps();
+                WixAssert.CompareLineByLine(outputsAfterBuild, outputsAfterDesignTimeBuild);
+
+                result = MsbuildUtilities.BuildProject(buildSystem, projectPath, buildArguments);
+                result.AssertSuccess();
+
+                makeSfxCACommands = result.Output.Where(line => line.Contains("WixToolset.Dtf.MakeSfxCA.exe")).ToArray();
+                WixAssert.Single(makeSfxCACommands);
             }
         }
 
