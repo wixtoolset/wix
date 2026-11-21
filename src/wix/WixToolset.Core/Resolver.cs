@@ -43,25 +43,31 @@ namespace WixToolset.Core
             ResolveResult resolveResult = null;
             try
             {
-                var filteredLocalizations = FilterLocalizations(context);
+                var cultureGroups = context.FilterCultureGroups;
+                var hasAdditionalCultures = cultureGroups != null && cultureGroups.Count > 1;
+                var originalIntermediate = hasAdditionalCultures ? context.IntermediateRepresentation.Clone() : null;
 
-                var variableResolver = this.CreateVariableResolver(context, filteredLocalizations);
+                var primaryFilterCultures = (cultureGroups != null && cultureGroups.Count > 0) ? cultureGroups.First() : context.FilterCultures;
+                resolveResult = this.ResolveCultureGroup(context, context.IntermediateRepresentation, primaryFilterCultures);
 
-                this.LocalizeUI(variableResolver, context.IntermediateRepresentation);
-
-                resolveResult = this.ResolveFields(context, variableResolver);
-
-                var primaryLocalization = filteredLocalizations.FirstOrDefault();
-
-                if (primaryLocalization != null)
+                if (hasAdditionalCultures && !this.Messaging.EncounteredError)
                 {
-                    this.TryGetCultureInfo(primaryLocalization.Culture, out var cultureInfo);
+                    var embeddedResults = new List<IResolveResult>();
 
-                    resolveResult.Codepage = primaryLocalization.Codepage ?? cultureInfo?.TextInfo.ANSICodePage;
+                    foreach (var cultureGroup in cultureGroups.Skip(1))
+                    {
+                        var clonedIntermediate = originalIntermediate.Clone();
+                        var embeddedResult = this.ResolveCultureGroup(context, clonedIntermediate, cultureGroup);
 
-                    resolveResult.SummaryInformationCodepage = primaryLocalization.SummaryInformationCodepage ?? primaryLocalization.Codepage ?? cultureInfo?.TextInfo.ANSICodePage;
+                        if (this.Messaging.EncounteredError)
+                        {
+                            break;
+                        }
 
-                    resolveResult.PackageLcid = cultureInfo?.LCID;
+                        embeddedResults.Add(embeddedResult);
+                    }
+
+                    resolveResult.EmbeddedLanguageResolveResults = embeddedResults;
                 }
             }
             finally
@@ -75,13 +81,39 @@ namespace WixToolset.Core
             return resolveResult;
         }
 
-        private ResolveResult ResolveFields(IResolveContext context, IVariableResolver variableResolver)
+        private ResolveResult ResolveCultureGroup(IResolveContext context, Intermediate intermediate, IReadOnlyCollection<string> filterCultures)
+        {
+            var filteredLocalizations = FilterLocalizations(context, intermediate, filterCultures);
+
+            var variableResolver = this.CreateVariableResolver(context, intermediate, filteredLocalizations);
+
+            this.LocalizeUI(variableResolver, intermediate);
+
+            var resolveResult = this.ResolveFields(context, intermediate, variableResolver);
+
+            var primaryLocalization = filteredLocalizations.FirstOrDefault(l => !String.IsNullOrEmpty(l.Culture)) ?? filteredLocalizations.FirstOrDefault();
+
+            if (primaryLocalization != null)
+            {
+                this.TryGetCultureInfo(primaryLocalization.Culture, out var cultureInfo);
+
+                resolveResult.Codepage = primaryLocalization.Codepage ?? cultureInfo?.TextInfo.ANSICodePage;
+
+                resolveResult.SummaryInformationCodepage = primaryLocalization.SummaryInformationCodepage ?? primaryLocalization.Codepage ?? cultureInfo?.TextInfo.ANSICodePage;
+
+                resolveResult.PackageLcid = cultureInfo?.LCID;
+            }
+
+            return resolveResult;
+        }
+
+        private ResolveResult ResolveFields(IResolveContext context, Intermediate intermediate, IVariableResolver variableResolver)
         {
             var filesWithEmbeddedFiles = new ExtractEmbeddedFiles();
 
             IReadOnlyCollection<DelayedField> delayedFields;
             {
-                var command = new ResolveFieldsCommand(this.Messaging, this.FileResolver, variableResolver, context.BindPaths, context.Extensions, filesWithEmbeddedFiles, context.IntermediateFolder, context.IntermediateRepresentation, context.AllowUnresolvedVariables);
+                var command = new ResolveFieldsCommand(this.Messaging, this.FileResolver, variableResolver, context.BindPaths, context.Extensions, filesWithEmbeddedFiles, context.IntermediateFolder, intermediate, context.AllowUnresolvedVariables);
                 command.Execute();
 
                 delayedFields = command.DelayedFields;
@@ -89,13 +121,13 @@ namespace WixToolset.Core
 
             var expectedEmbeddedFiles = filesWithEmbeddedFiles.GetExpectedEmbeddedFiles();
 
-            context.IntermediateRepresentation.UpdateLevel(IntermediateLevels.Resolved);
+            intermediate.UpdateLevel(IntermediateLevels.Resolved);
 
             return new ResolveResult
             {
                 ExpectedEmbeddedFiles = expectedEmbeddedFiles,
                 DelayedFields = delayedFields,
-                IntermediateRepresentation = context.IntermediateRepresentation
+                IntermediateRepresentation = intermediate
             };
         }
 
@@ -178,7 +210,7 @@ namespace WixToolset.Core
             }
         }
 
-        private IVariableResolver CreateVariableResolver(IResolveContext context, IEnumerable<Localization> filteredLocalizations)
+        private IVariableResolver CreateVariableResolver(IResolveContext context, Intermediate intermediate, IEnumerable<Localization> filteredLocalizations)
         {
             var variableResolver = this.ServiceProvider.GetService<IVariableResolver>();
 
@@ -193,7 +225,7 @@ namespace WixToolset.Core
             }
 
             // Gather all the wix variables.
-            var wixVariableSymbols = context.IntermediateRepresentation.Sections.SelectMany(s => s.Symbols).OfType<WixVariableSymbol>();
+            var wixVariableSymbols = intermediate.Sections.SelectMany(s => s.Symbols).OfType<WixVariableSymbol>();
             foreach (var symbol in wixVariableSymbols)
             {
                 variableResolver.AddVariable(symbol.SourceLineNumbers, symbol.Id.Id, symbol.Value, symbol.Overridable);
@@ -221,28 +253,32 @@ namespace WixToolset.Core
             return cultureInfo != null;
         }
 
-        private static IEnumerable<Localization> FilterLocalizations(IResolveContext context)
+        private static IEnumerable<Localization> FilterLocalizations(IResolveContext context, Intermediate intermediate, IReadOnlyCollection<string> filterCultures)
         {
             var result = new List<Localization>();
-            var filter = CalculateCultureFilter(context);
+            var filter = CalculateCultureFilter(context, filterCultures);
 
-            var localizations = context.Localizations.Concat(context.IntermediateRepresentation.Localizations).ToList();
+            var localizations = context.Localizations.Concat(intermediate.Localizations).ToList();
 
             AddFilteredLocalizations(result, filter, localizations);
 
             return result;
         }
 
-        private static IEnumerable<string> CalculateCultureFilter(IResolveContext context)
+        private static IEnumerable<string> CalculateCultureFilter(IResolveContext context, IReadOnlyCollection<string> filterCultures)
         {
-            var filter = context.FilterCultures ?? Array.Empty<string>();
+            var filter = (filterCultures ?? Array.Empty<string>())
+                .SelectMany(c => c == null ? Array.Empty<string>() : c.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+                .Select(c => c.Trim())
+                .Select(c => c.Equals("neutral", StringComparison.OrdinalIgnoreCase) ? String.Empty : c)
+                .ToList();
 
             // If no filter was specified, look for a language neutral localization file specified
             // from the command-line (not embedded in the intermediate). If found, filter on language
             // neutral.
             if (!filter.Any() && context.Localizations.Any(l => String.IsNullOrEmpty(l.Culture)))
             {
-                filter = new[] { String.Empty };
+                filter.Add(String.Empty);
             }
 
             return filter;

@@ -108,6 +108,11 @@ namespace WixToolset.Extensibility.Data
         int? ResolvedLcid { get; set; }
 
         /// <summary>
+        /// Resolved results for additional languages to embed as transforms in a multilingual package.
+        /// </summary>
+        IReadOnlyCollection<IResolveResult> EmbeddedLanguageResolveResults { get; set; }
+
+        /// <summary>
         /// Skip creation of output.
         /// </summary>
         bool SuppressLayout { get; set; }

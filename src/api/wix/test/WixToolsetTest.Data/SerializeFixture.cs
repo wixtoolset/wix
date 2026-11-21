@@ -440,5 +440,62 @@ namespace WixToolsetTest.Data
                 File.Delete(path);
             }
         }
+
+        [Fact]
+        public void CanCloneIntermediate()
+        {
+            var sln = new SourceLineNumber("test.wxs", 1);
+
+            var section = new IntermediateSection("test", SectionType.Package);
+
+            var componentSymbol = section.AddSymbol(new ComponentSymbol(sln, new Identifier(AccessModifier.Global, "TestComponent"))
+            {
+                ComponentId = String.Empty,
+                DirectoryRef = "TestFolder",
+                Location = ComponentLocation.Either,
+                KeyPath = null,
+            });
+            componentSymbol.AddTag("tag1");
+            componentSymbol.AddTag("tag2");
+
+            var directorySymbol = section.AddSymbol(new DirectorySymbol(sln, new Identifier(AccessModifier.Virtual, "TestFolder"))
+            {
+                ParentDirectoryRef = String.Empty,
+                Name = "!(loc.FolderName)",
+            });
+
+            var fileSymbol = section.AddSymbol(new FileSymbol(sln, new Identifier(AccessModifier.Global, "TestFile"))
+            {
+                Source = new IntermediateFieldPathValue { Path = "data\\test.txt", Embed = true },
+            });
+
+            var original = new Intermediate("TestIntermediate", IntermediateLevels.Compiled, new[] { section }, null);
+            original.UpdateLevel(IntermediateLevels.Linked);
+
+            var cloned = original.Clone();
+
+            // Mutate original to verify deep clone independence.
+            directorySymbol.Name = "English Folder";
+            fileSymbol.Source = new IntermediateFieldPathValue { Path = "resolved\\en\\test.txt", Embed = false };
+            componentSymbol.RemoveTag("tag1");
+            original.UpdateLevel(IntermediateLevels.Resolved);
+
+            Assert.Equal("TestIntermediate", cloned.Id);
+            Assert.True(cloned.HasLevel(IntermediateLevels.Compiled));
+            Assert.True(cloned.HasLevel(IntermediateLevels.Linked));
+            Assert.False(cloned.HasLevel(IntermediateLevels.Resolved));
+
+            var clonedSection = Assert.Single(cloned.Sections);
+            var clonedComponent = Assert.Single(clonedSection.Symbols.OfType<ComponentSymbol>());
+            Assert.True(clonedComponent.HasTag("tag1"));
+            Assert.True(clonedComponent.HasTag("tag2"));
+
+            var clonedDirectory = Assert.Single(clonedSection.Symbols.OfType<DirectorySymbol>());
+            Assert.Equal("!(loc.FolderName)", clonedDirectory.Name);
+
+            var clonedFile = Assert.Single(clonedSection.Symbols.OfType<FileSymbol>());
+            Assert.Equal("data\\test.txt", clonedFile.Source.Path);
+            Assert.True(clonedFile.Source.Embed);
+        }
     }
 }

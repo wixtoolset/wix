@@ -27,6 +27,20 @@ namespace WixToolset.Data
 
         public static explicit operator string(IntermediateFieldValue value) => value.AsString();
 
+        /// <summary>
+        /// Creates a deep copy of this field value.
+        /// </summary>
+        /// <returns>Cloned field value.</returns>
+        public IntermediateFieldValue Clone()
+        {
+            return new IntermediateFieldValue
+            {
+                Context = this.Context,
+                Data = (this.Data is IntermediateFieldPathValue pathValue) ? pathValue.Clone() : this.Data,
+                PreviousValue = this.PreviousValue?.Clone(),
+            };
+        }
+
         internal static IntermediateFieldValue Deserialize(JsonObject jsonObject, Uri baseUri, IntermediateFieldType type)
         {
             var context = jsonObject.GetValueOrDefault<string>("context");

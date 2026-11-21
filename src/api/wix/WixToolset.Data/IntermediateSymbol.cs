@@ -66,6 +66,33 @@ namespace WixToolset.Data
         private string DebuggerDisplay => $"{this.Definition?.Name} {this.Id?.Id}";
 
         /// <summary>
+        /// Creates a deep copy of this symbol.
+        /// </summary>
+        /// <returns>Cloned symbol.</returns>
+        internal IntermediateSymbol Clone()
+        {
+            var symbol = this.Definition.CreateSymbol(this.SourceLineNumbers, this.Id);
+
+            for (var i = 0; i < this.Fields.Length; ++i)
+            {
+                symbol.Fields[i] = this.Fields[i]?.Clone();
+            }
+
+            if (this.tags is string tag)
+            {
+                symbol.tags = tag;
+            }
+            else if (this.tags is string[] tagsArray)
+            {
+                var clonedTags = new string[tagsArray.Length];
+                Array.Copy(tagsArray, clonedTags, tagsArray.Length);
+                symbol.tags = clonedTags;
+            }
+
+            return symbol;
+        }
+
+        /// <summary>
         /// Add a custom tag to the symbol.
         /// </summary>
         /// <param name="add">String tag to add to the symbol.</param>

@@ -56,6 +56,8 @@ namespace WixToolset.Core
 
         public int? ResolvedLcid { get; set; }
 
+        public IReadOnlyCollection<IResolveResult> EmbeddedLanguageResolveResults { get; set; }
+
         public bool SuppressLayout { get; set; }
 
         public CancellationToken CancellationToken { get; set; }

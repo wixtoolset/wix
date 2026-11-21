@@ -73,5 +73,26 @@ namespace WixToolsetTest.BuildTasks
                 WixAssert.StringEqual(@"test.txt", fileSymbol[FileSymbolFields.Source].PreviousValue.AsPath().Path);
             }
         }
+
+        [Fact]
+        public void WixAssignCultureCombinesCultureGroupsWithCommaForFallbackAndSemicolonForGroups()
+        {
+            var engine = new FakeBuildEngine();
+
+            var task = new WixAssignCulture
+            {
+                BuildEngine = engine,
+                Cultures = "en-US,en;de-DE",
+                Files = Array.Empty<TaskItem>(),
+            };
+
+            var result = task.Execute();
+            Assert.True(result, $"MSBuild task failed unexpectedly. Output:\r\n{engine.Output}");
+
+            var group = Assert.Single(task.CultureGroups);
+            Assert.Equal("en-US,en;de-DE", group.ItemSpec);
+            Assert.Equal(String.Empty, group.GetMetadata("OutputFolder"));
+            Assert.Equal("en-US", group.GetMetadata("OutputSuffix"));
+        }
     }
 }

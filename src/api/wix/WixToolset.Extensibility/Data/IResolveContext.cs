@@ -42,6 +42,11 @@ namespace WixToolset.Extensibility.Data
         /// </summary>
         IReadOnlyCollection<string> FilterCultures { get; set; }
 
+         /// <summary>
+        /// List of culture groups (each group is an ordered list of fallback cultures) to filter the localizations for multilingual packages.
+        /// </summary>
+        IReadOnlyCollection<IReadOnlyCollection<string>> FilterCultureGroups { get; set; }
+
         /// <summary>
         /// Intermediate folder.
         /// </summary>

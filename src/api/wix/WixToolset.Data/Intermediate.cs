@@ -233,6 +233,15 @@ namespace WixToolset.Data
         }
 
         /// <summary>
+        /// Creates a deep copy of this intermediate.
+        /// </summary>
+        /// <returns>Cloned intermediate.</returns>
+        public Intermediate Clone()
+        {
+            return new Intermediate(this.Id, this.Level, this.sections.Select(s => s.Clone()), this.localizationsByCulture);
+        }
+
+        /// <summary>
         /// Saves an intermediate to a path on disk.
         /// </summary>
         /// <param name="path">Path to save intermediate file to disk.</param>

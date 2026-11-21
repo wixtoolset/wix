@@ -39,5 +39,10 @@ namespace WixToolset.Extensibility.Data
         /// Resolved intermediate.
         /// </summary>
         Intermediate IntermediateRepresentation { get; set; }
+
+        /// <summary>
+        /// Resolved results for additional languages in a multilingual package.
+        /// </summary>
+        IReadOnlyCollection<IResolveResult> EmbeddedLanguageResolveResults { get; set; }
     }
 }
