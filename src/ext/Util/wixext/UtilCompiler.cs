@@ -3208,6 +3208,7 @@ namespace WixToolset.Util
         {
             var sourceLineNumbers = this.ParseHelper.GetSourceLineNumbers(element);
             string firstFailureActionType = null;
+            string imagePath = null;
             var newService = false;
             string programCommandLine = null;
             string rebootMessage = null;
@@ -3225,6 +3226,9 @@ namespace WixToolset.Util
                     {
                         case "FirstFailureActionType":
                             firstFailureActionType = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            break;
+                        case "ImagePath":
+                            imagePath = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "ProgramCommandLine":
                             programCommandLine = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3299,6 +3303,7 @@ namespace WixToolset.Util
                     RestartServiceDelayInSeconds = restartServiceDelay,
                     ProgramCommandLine = programCommandLine,
                     RebootMessage = rebootMessage,
+                    ImagePath = imagePath,
                 });
             }
         }

@@ -26,7 +26,7 @@
           <documentation>Required if not under a ServiceInstall element.</documentation>
         </annotation>
       </attribute>
-      <attribute name="FirstFailureActionType" use="required">
+      <attribute name="FirstFailureActionType">
         <annotation>
           <documentation>Action to take on the first failure of the service.</documentation>
         </annotation>
@@ -39,7 +39,7 @@
           </restriction>
         </simpleType>
       </attribute>
-      <attribute name="SecondFailureActionType" use="required">
+      <attribute name="SecondFailureActionType">
         <annotation>
           <documentation>Action to take on the second failure of the service.</documentation>
         </annotation>
@@ -52,7 +52,7 @@
           </restriction>
         </simpleType>
       </attribute>
-      <attribute name="ThirdFailureActionType" use="required">
+      <attribute name="ThirdFailureActionType">
         <annotation>
           <documentation>Action to take on the third failure of the service.</documentation>
         </annotation>
@@ -83,6 +83,11 @@
       <attribute name="RebootMessage" type="xs:string">
         <annotation>
           <documentation>If any of the three *ActionType attributes is "reboot", this specifies the message to broadcast to server users before doing so.</documentation>
+        </annotation>
+      </attribute>
+      <attribute name="ImagePath" type="xs:string">
+        <annotation>
+          <documentation>Fully-qualified path to the service binary file, which can also include arguments (for example, to host a service in svchost.exe). This value is formatted.</documentation>
         </annotation>
       </attribute>
       <anyAttribute namespace="##other" processContents="lax">

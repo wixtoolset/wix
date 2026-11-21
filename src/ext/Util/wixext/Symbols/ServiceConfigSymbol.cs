@@ -21,6 +21,7 @@ namespace WixToolset.Util
                 new IntermediateFieldDefinition(nameof(ServiceConfigSymbolFields.RestartServiceDelayInSeconds), IntermediateFieldType.Number),
                 new IntermediateFieldDefinition(nameof(ServiceConfigSymbolFields.ProgramCommandLine), IntermediateFieldType.String),
                 new IntermediateFieldDefinition(nameof(ServiceConfigSymbolFields.RebootMessage), IntermediateFieldType.String),
+                new IntermediateFieldDefinition(nameof(ServiceConfigSymbolFields.ImagePath), IntermediateFieldType.String),
             },
             typeof(ServiceConfigSymbol));
     }
@@ -42,6 +43,7 @@ namespace WixToolset.Util.Symbols
         RestartServiceDelayInSeconds,
         ProgramCommandLine,
         RebootMessage,
+        ImagePath,
     }
 
     public class ServiceConfigSymbol : IntermediateSymbol
@@ -114,6 +116,12 @@ namespace WixToolset.Util.Symbols
         {
             get => this.Fields[(int)ServiceConfigSymbolFields.RebootMessage].AsString();
             set => this.Set((int)ServiceConfigSymbolFields.RebootMessage, value);
+        }
+
+        public string ImagePath
+        {
+            get => this.Fields[(int)ServiceConfigSymbolFields.ImagePath].AsString();
+            set => this.Set((int)ServiceConfigSymbolFields.ImagePath, value);
         }
     }
 }

@@ -230,7 +230,7 @@ namespace WixToolsetTest.Util
                 "CustomAction:Wix4ExecServiceConfig_X64\t3073\tWix4UtilCA_X64\tExecServiceConfig\t",
                 "CustomAction:Wix4RollbackServiceConfig_X64\t3329\tWix4UtilCA_X64\tRollbackServiceConfig\t",
                 "CustomAction:Wix4SchedServiceConfig_X64\t1\tWix4UtilCA_X64\tSchedServiceConfig\t",
-                "Wix4ServiceConfig:svc\tfilPeUUVRrj2.Q_YcmN55mro4H1aQY\t1\trestart\trestart\trestart\t\t\t\t",
+                "Wix4ServiceConfig:svc\tfilPeUUVRrj2.Q_YcmN55mro4H1aQY\t1\trestart\trestart\trestart\t\t\t\t\t%SystemRoot%\\System32\\svchost.exe -k netsvcs",
             }, results.OrderBy(s => s).ToArray());
         }
 

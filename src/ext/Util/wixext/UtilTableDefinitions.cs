@@ -218,13 +218,14 @@ namespace WixToolset.Util
                 new ColumnDefinition("ServiceName", ColumnType.String, 72, primaryKey: true, nullable: false, ColumnCategory.Formatted, description: "Primary key, non-localized token"),
                 new ColumnDefinition("Component_", ColumnType.String, 72, primaryKey: false, nullable: false, ColumnCategory.Identifier, keyTable: "Component", keyColumn: 1, description: "Foreign key, Component used to determine install state ", modularizeType: ColumnModularizeType.Column),
                 new ColumnDefinition("NewService", ColumnType.Number, 1, primaryKey: false, nullable: false, ColumnCategory.Unknown, minValue: 0, maxValue: 1, description: "Whether the affected service is being installed or already exists."),
-                new ColumnDefinition("FirstFailureActionType", ColumnType.String, 32, primaryKey: false, nullable: false, ColumnCategory.Text, description: "First failure action type for configured service to take."),
-                new ColumnDefinition("SecondFailureActionType", ColumnType.String, 32, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Second failure action type for configured service to take."),
-                new ColumnDefinition("ThirdFailureActionType", ColumnType.String, 32, primaryKey: false, nullable: false, ColumnCategory.Text, description: "Third failure action type for configured service to take."),
+                new ColumnDefinition("FirstFailureActionType", ColumnType.String, 32, primaryKey: false, nullable: true, ColumnCategory.Text, description: "First failure action type for configured service to take."),
+                new ColumnDefinition("SecondFailureActionType", ColumnType.String, 32, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Second failure action type for configured service to take."),
+                new ColumnDefinition("ThirdFailureActionType", ColumnType.String, 32, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Third failure action type for configured service to take."),
                 new ColumnDefinition("ResetPeriodInDays", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Integer, minValue: 0, description: "Period after which to reset the failure count for the service."),
                 new ColumnDefinition("RestartServiceDelayInSeconds", ColumnType.Number, 4, primaryKey: false, nullable: true, ColumnCategory.Integer, minValue: 0, description: "Period after which to restart the service after a given failure."),
                 new ColumnDefinition("ProgramCommandLine", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Command line for program to run if failure action is RUN_COMMAND."),
                 new ColumnDefinition("RebootMessage", ColumnType.String, 255, primaryKey: false, nullable: true, ColumnCategory.Text, description: "Message to show to users when rebooting if failure action is REBOOT."),
+                new ColumnDefinition("ImagePath", ColumnType.String, 0, primaryKey: false, nullable: true, ColumnCategory.Formatted, description: "Fully-qualified path to the service binary file, which can also include arguments."),
             },
             symbolIdIsPrimaryKey: false
         );
