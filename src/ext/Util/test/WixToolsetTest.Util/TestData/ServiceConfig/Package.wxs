@@ -18,8 +18,8 @@
         <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
             <Component>
                 <File Name="notanexe.exe" Source="Package.wxs" />
-                <ServiceInstall Name="svc" Start="demand" Type="ownProcess" ErrorControl="normal">
-                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" />
+                <ServiceInstall Name="svc" Start="demand" Type="shareProcess" ErrorControl="normal">
+                    <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" ImagePath="%SystemRoot%\System32\svchost.exe -k netsvcs" />
                 </ServiceInstall>
             </Component>
         </ComponentGroup>

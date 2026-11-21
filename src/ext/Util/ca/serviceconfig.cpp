@@ -3,8 +3,8 @@
 #include "precomp.h"
 
 // structs
-LPCWSTR wzQUERY_SERVICECONFIG = L"SELECT `ServiceName`, `Component_`, `NewService`, `FirstFailureActionType`, `SecondFailureActionType`, `ThirdFailureActionType`, `ResetPeriodInDays`, `RestartServiceDelayInSeconds`, `ProgramCommandLine`, `RebootMessage` FROM `Wix4ServiceConfig`";
-enum eQUERY_SERVICECONFIG { QSC_SERVICENAME = 1, QSC_COMPONENT, QSC_NEWSERVICE, QSC_FIRSTFAILUREACTIONTYPE, QSC_SECONDFAILUREACTIONTYPE, QSC_THIRDFAILUREACTIONTYPE, QSC_RESETPERIODINDAYS, QSC_RESTARTSERVICEDELAYINSECONDS, QSC_PROGRAMCOMMANDLINE, QSC_REBOOTMESSAGE };
+LPCWSTR wzQUERY_SERVICECONFIG = L"SELECT `ServiceName`, `Component_`, `NewService`, `FirstFailureActionType`, `SecondFailureActionType`, `ThirdFailureActionType`, `ResetPeriodInDays`, `RestartServiceDelayInSeconds`, `ProgramCommandLine`, `RebootMessage`, `ImagePath` FROM `Wix4ServiceConfig`";
+enum eQUERY_SERVICECONFIG { QSC_SERVICENAME = 1, QSC_COMPONENT, QSC_NEWSERVICE, QSC_FIRSTFAILUREACTIONTYPE, QSC_SECONDFAILUREACTIONTYPE, QSC_THIRDFAILUREACTIONTYPE, QSC_RESETPERIODINDAYS, QSC_RESTARTSERVICEDELAYINSECONDS, QSC_PROGRAMCOMMANDLINE, QSC_REBOOTMESSAGE, QSC_IMAGEPATH };
 
 // consts
 LPCWSTR c_wzActionTypeNone = L"none";
@@ -40,7 +40,8 @@ static HRESULT ConfigureService(
     __in LPCWSTR wzThirdFailureActionType,
     __in DWORD dwResetPeriodInDays,
     __in LPWSTR wzRebootMessage,
-    __in LPWSTR wzProgramCommandLine
+    __in LPWSTR wzProgramCommandLine,
+    __in_opt LPCWSTR wzImagePath
     );
 
 
@@ -153,6 +154,11 @@ extern "C" UINT __stdcall SchedServiceConfig(
             hr = WcaWriteStringToCaData(pwzData, &pwzCustomActionData);
             ExitOnFailure(hr, "failed to add data to CustomActionData");
 
+            hr = WcaGetRecordFormattedString(hRec, QSC_IMAGEPATH, &pwzData); // null value already dealt w/ properly
+            ExitOnFailure(hr, "failed to get image path for service.");
+            hr = WcaWriteStringToCaData(pwzData, &pwzCustomActionData);
+            ExitOnFailure(hr, "failed to add data to CustomActionData");
+
             ++cServices;
         }
     }
@@ -188,7 +194,7 @@ LExit:
 CaExecServiceConfig - entry point for ServiceConfig Custom Action.
 
 NOTE: deferred CustomAction since it modifies the machine
-NOTE: CustomActionData == wzServiceName\tfNewService\twzFirstFailureActionType\twzSecondFailureActionType\twzThirdFailureActionType\tdwResetPeriodInDays\tdwRestartServiceDelayInSeconds\twzProgramCommandLine\twzRebootMessage\twzServiceName\tfNewService\t...
+NOTE: CustomActionData == wzServiceName\tfNewService\twzFirstFailureActionType\twzSecondFailureActionType\twzThirdFailureActionType\tdwResetPeriodInDays\tdwRestartServiceDelayInSeconds\twzProgramCommandLine\twzRebootMessage\twzImagePath\twzServiceName\tfNewService\t...
 *******************************************************************/
 extern "C" UINT __stdcall ExecServiceConfig(
     __in MSIHANDLE hInstall
@@ -211,6 +217,7 @@ extern "C" UINT __stdcall ExecServiceConfig(
     LPWSTR pwzThirdFailureActionType = NULL;
     LPWSTR pwzProgramCommandLine = NULL;
     LPWSTR pwzRebootMessage = NULL;
+    LPWSTR pwzImagePath = NULL;
     DWORD dwResetPeriodInDays = 0;
     DWORD dwRestartServiceDelayInSeconds = 0;
 
@@ -222,8 +229,10 @@ extern "C" UINT __stdcall ExecServiceConfig(
     WCHAR wzActionName[32] = { 0 };
 
     DWORD cbExistingServiceConfig = 0;
+    DWORD cbExistingQueryServiceConfig = 0;
 
     SERVICE_FAILURE_ACTIONSW* psfa = NULL;
+    LPQUERY_SERVICE_CONFIGW pqsc = NULL;
 
     // initialize
     hr = WcaInitialize(hInstall, "ExecServiceConfig");
@@ -286,6 +295,8 @@ extern "C" UINT __stdcall ExecServiceConfig(
         ExitOnFailure(hr, "failed to process CustomActionData");
         hr = WcaReadStringFromCaData(&pwz, &pwzRebootMessage);
         ExitOnFailure(hr, "failed to process CustomActionData");
+        hr = WcaReadStringFromCaData(&pwz, &pwzImagePath);
+        ExitOnFailure(hr, "failed to process CustomActionData");
 
         WcaLog(LOGMSG_VERBOSE, "Configuring Service: %ls", pwzServiceName);
 
@@ -313,6 +324,22 @@ extern "C" UINT __stdcall ExecServiceConfig(
             if (!::QueryServiceConfig2W(hService, SERVICE_CONFIG_FAILURE_ACTIONS, (LPBYTE)psfa, cbExistingServiceConfig, &cbExistingServiceConfig))
             {
                 ExitOnLastError(hr, "failed to Query Service.");
+            }
+
+            if (pwzImagePath && *pwzImagePath)
+            {
+                if (!::QueryServiceConfigW(hService, NULL, 0, &cbExistingQueryServiceConfig) && ERROR_INSUFFICIENT_BUFFER != ::GetLastError())
+                {
+                    ExitWithLastError(hr, "Failed to get current service binary path info.");
+                }
+
+                pqsc = static_cast<LPQUERY_SERVICE_CONFIGW>(MemAlloc(cbExistingQueryServiceConfig, TRUE));
+                ExitOnNull(pqsc, hr, E_OUTOFMEMORY, "failed to allocate memory for query service config.");
+
+                if (!::QueryServiceConfigW(hService, pqsc, cbExistingQueryServiceConfig, &cbExistingQueryServiceConfig))
+                {
+                    ExitOnLastError(hr, "failed to QueryServiceConfigW.");
+                }
             }
 
             // Build up rollback log so we can restore service state if necessary
@@ -371,14 +398,18 @@ extern "C" UINT __stdcall ExecServiceConfig(
             hr = WcaCaScriptWriteString(hRollbackScript, psfa->lpRebootMsg);
             ExitOnFailure(hr, "failed to add data to Rollback CustomActionData");
 
+            hr = WcaCaScriptWriteString(hRollbackScript, (pqsc && pqsc->lpBinaryPathName) ? pqsc->lpBinaryPathName : L"");
+            ExitOnFailure(hr, "failed to add binary path name to Rollback CustomActionData");
+
             // Nudge the system to get all our rollback data written to disk.
             WcaCaScriptFlush(hRollbackScript);
 
             ReleaseNullMem(psfa);
+            ReleaseNullMem(pqsc);
         }
 
         hr = ConfigureService(hSCM, hService, pwzServiceName, dwRestartServiceDelayInSeconds, pwzFirstFailureActionType,
-                              pwzSecondFailureActionType, pwzThirdFailureActionType, dwResetPeriodInDays, pwzRebootMessage, pwzProgramCommandLine);
+                              pwzSecondFailureActionType, pwzThirdFailureActionType, dwResetPeriodInDays, pwzRebootMessage, pwzProgramCommandLine, pwzImagePath);
         ExitOnFailure(hr, "Failed to configure service: %ls", pwzServiceName);
 
         hr = WcaProgressMessage(COST_SERVICECONFIG, FALSE);
@@ -410,7 +441,9 @@ LExit:
     }
 
     ReleaseMem(psfa);
+    ReleaseMem(pqsc);
 
+    ReleaseStr(pwzImagePath);
     ReleaseStr(pwzRebootMessage);
     ReleaseStr(pwzProgramCommandLine);
     ReleaseStr(pwzThirdFailureActionType);
@@ -429,7 +462,7 @@ LExit:
 RollbackServiceConfig - entry point for ServiceConfig rollback
                         Custom Action.
 
-NOTE: CustomActionScript Data == wzServiceName\twzFirstFailureActionType\twzSecondFailureActionType\twzThirdFailureActionType\tdwResetPeriodInDays\tdwRestartServiceDelayInSeconds\twzProgramCommandLine\twzRebootMessage\twzServiceName\t...
+NOTE: CustomActionScript Data == wzServiceName\twzFirstFailureActionType\twzSecondFailureActionType\twzThirdFailureActionType\tdwResetPeriodInDays\tdwRestartServiceDelayInSeconds\twzProgramCommandLine\twzRebootMessage\twzImagePath\twzServiceName\t...
 *******************************************************************/
 extern "C" UINT __stdcall RollbackServiceConfig(
     __in MSIHANDLE hInstall
@@ -451,6 +484,7 @@ extern "C" UINT __stdcall RollbackServiceConfig(
     LPWSTR pwzThirdFailureActionType = NULL;
     LPWSTR pwzProgramCommandLine = NULL;
     LPWSTR pwzRebootMessage = NULL;
+    LPWSTR pwzImagePath = NULL;
     DWORD dwResetPeriodInDays = 0;
     DWORD dwRestartServiceDelayInSeconds = 0;
 
@@ -526,6 +560,8 @@ extern "C" UINT __stdcall RollbackServiceConfig(
         ExitOnFailure(hr, "failed to process CustomActionData");
         hr = WcaReadStringFromCaData(&pwz, &pwzRebootMessage);
         ExitOnFailure(hr, "failed to process CustomActionData");
+        hr = WcaReadStringFromCaData(&pwz, &pwzImagePath);
+        ExitOnFailure(hr, "failed to process CustomActionData");
 
         WcaLog(LOGMSG_VERBOSE, "Reconfiguring Service: %ls", pwzServiceName);
 
@@ -536,7 +572,7 @@ extern "C" UINT __stdcall RollbackServiceConfig(
         ExitOnFailure(hr, "Failed to get service: %ls", pwzServiceName);
 
         hr = ConfigureService(hSCM, hService, pwzServiceName, dwRestartServiceDelayInSeconds, pwzFirstFailureActionType,
-                              pwzSecondFailureActionType, pwzThirdFailureActionType, dwResetPeriodInDays, pwzRebootMessage, pwzProgramCommandLine);
+                              pwzSecondFailureActionType, pwzThirdFailureActionType, dwResetPeriodInDays, pwzRebootMessage, pwzProgramCommandLine, pwzImagePath);
         ExitOnFailure(hr, "Failed to configure service: %ls", pwzServiceName);
 
         hr = WcaProgressMessage(COST_SERVICECONFIG, FALSE);
@@ -567,6 +603,7 @@ LExit:
 
     WcaCaScriptClose(hRollbackScript, WCA_CASCRIPT_CLOSE_DELETE);
 
+    ReleaseStr(pwzImagePath);
     ReleaseStr(pwzRebootMessage);
     ReleaseStr(pwzProgramCommandLine);
     ReleaseStr(pwzThirdFailureActionType);
@@ -701,7 +738,8 @@ static HRESULT ConfigureService(
     __in LPCWSTR wzThirdFailureActionType,
     __in DWORD dwResetPeriodInDays,
     __in LPWSTR wzRebootMessage,
-    __in LPWSTR wzProgramCommandLine
+    __in LPWSTR wzProgramCommandLine,
+    __in_opt LPCWSTR wzImagePath
     )
 {
     HRESULT hr = S_OK;
@@ -717,89 +755,112 @@ static HRESULT ConfigureService(
     SERVICE_FAILURE_ACTIONSW sfa;
     LPVOID lpMsgBuf = NULL;
 
-    // Always get the shutdown privilege in case we need to configure service to reboot.
-    if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES, &hToken))
+    // If an ImagePath is specified, update the service's binary path name.
+    if (wzImagePath && *wzImagePath)
     {
-        ExitWithLastError(hr, "Failed to get process token.");
-    }
-
-    priv.PrivilegeCount = 1;
-    priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-    if (!::LookupPrivilegeValueW(NULL, L"SeShutdownPrivilege", &priv.Privileges[0].Luid))
-    {
-        ExitWithLastError(hr, "Failed to get shutdown privilege LUID.");
-    }
-
-    cbPrevPriv = sizeof(TOKEN_PRIVILEGES);
-    pPrevPriv = static_cast<TOKEN_PRIVILEGES*>(MemAlloc(cbPrevPriv, TRUE));
-    ExitOnNull(pPrevPriv, hr, E_OUTOFMEMORY, "Failed to allocate memory for empty previous privileges.");
-
-    if (!::AdjustTokenPrivileges(hToken, FALSE, &priv, cbPrevPriv, pPrevPriv, &cbPrevPriv))
-    {
-        LPVOID pv = MemReAlloc(pPrevPriv, cbPrevPriv, TRUE);
-        ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for previous privileges.");
-        pPrevPriv = static_cast<TOKEN_PRIVILEGES*>(pv);
-
-        if (!::AdjustTokenPrivileges(hToken, FALSE, &priv, cbPrevPriv, pPrevPriv, &cbPrevPriv))
+        if (!::ChangeServiceConfigW(hService, SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, wzImagePath, NULL, NULL, NULL, NULL, NULL, NULL))
         {
-            ExitWithLastError(hr, "Failed to get shutdown privilege LUID.");
-        }
-    }
-
-    fAdjustedPrivileges = TRUE;
-
-    // build up SC_ACTION array
-    // TODO: why is delay only respected when SC_ACTION_RESTART is requested?
-    actions[0].Type = GetSCActionType(wzFirstFailureActionType);
-    actions[0].Delay = 0;
-    if (SC_ACTION_RESTART == actions[0].Type)
-    {
-        actions[0].Delay = dwRestartServiceDelayInSeconds * 1000; // seconds to milliseconds
-    }
-
-    actions[1].Type = GetSCActionType(wzSecondFailureActionType);
-    actions[1].Delay = 0;
-    if (SC_ACTION_RESTART == actions[1].Type)
-    {
-        actions[1].Delay = dwRestartServiceDelayInSeconds * 1000; // seconds to milliseconds
-    }
-
-    actions[2].Type = GetSCActionType(wzThirdFailureActionType);
-    actions[2].Delay = 0;
-    if (SC_ACTION_RESTART == actions[2].Type)
-    {
-        actions[2].Delay = dwRestartServiceDelayInSeconds * 1000; // seconds to milliseconds
-    }
-
-    // build up the SERVICE_FAILURE_ACTIONSW struct
-    sfa.dwResetPeriod = dwResetPeriodInDays * (24 * 60 * 60); // days to seconds
-    sfa.lpRebootMsg = wzRebootMessage;
-    sfa.lpCommand = wzProgramCommandLine;
-    sfa.cActions = countof(actions);
-    sfa.lpsaActions = actions;
-
-    // Call ChangeServiceConfig2 to actually set up the failure actions
-    if (!::ChangeServiceConfig2W(hService, SERVICE_CONFIG_FAILURE_ACTIONS, (LPVOID)&sfa))
-    {
-        er = ::GetLastError();
-        hr = HRESULT_FROM_WIN32(er);
+            er = ::GetLastError();
+            hr = HRESULT_FROM_WIN32(er);
 
 #pragma prefast(push)
 #pragma prefast(disable:25028)
-        ::FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, er, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&lpMsgBuf, 0, NULL);
+            ::FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, er, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&lpMsgBuf, 0, NULL);
 #pragma prefast(pop)
 
-        // Check if this is a service that can't be modified.
-        if (ERROR_CANNOT_DETECT_PROCESS_ABORT == er)
-        {
-            WcaLog(LOGMSG_STANDARD, "WARNING: Service \"%ls\" is not configurable on this server and will not be set.", wzServiceName);
+            ExitOnFailure(hr, "Cannot change service image path for service \"%ls\". Error: %ls", wzServiceName, (LPWSTR)lpMsgBuf);
         }
-        ExitOnFailure(hr, "Cannot change service configuration. Error: %ls", (LPWSTR)lpMsgBuf);
+    }
 
-        if (lpMsgBuf)
+    // Only configure failure actions if at least one failure action type was provided.
+    if ((wzFirstFailureActionType && *wzFirstFailureActionType) ||
+        (wzSecondFailureActionType && *wzSecondFailureActionType) ||
+        (wzThirdFailureActionType && *wzThirdFailureActionType))
+    {
+        // Always get the shutdown privilege in case we need to configure service to reboot.
+        if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES, &hToken))
         {
-            ::LocalFree(lpMsgBuf);
-            lpMsgBuf = NULL;
+            ExitWithLastError(hr, "Failed to get process token.");
+        }
+
+        priv.PrivilegeCount = 1;
+        priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+        if (!::LookupPrivilegeValueW(NULL, L"SeShutdownPrivilege", &priv.Privileges[0].Luid))
+        {
+            ExitWithLastError(hr, "Failed to get shutdown privilege LUID.");
+        }
+
+        cbPrevPriv = sizeof(TOKEN_PRIVILEGES);
+        pPrevPriv = static_cast<TOKEN_PRIVILEGES*>(MemAlloc(cbPrevPriv, TRUE));
+        ExitOnNull(pPrevPriv, hr, E_OUTOFMEMORY, "Failed to allocate memory for empty previous privileges.");
+
+        if (!::AdjustTokenPrivileges(hToken, FALSE, &priv, cbPrevPriv, pPrevPriv, &cbPrevPriv))
+        {
+            LPVOID pv = MemReAlloc(pPrevPriv, cbPrevPriv, TRUE);
+            ExitOnNull(pv, hr, E_OUTOFMEMORY, "Failed to allocate memory for previous privileges.");
+            pPrevPriv = static_cast<TOKEN_PRIVILEGES*>(pv);
+
+            if (!::AdjustTokenPrivileges(hToken, FALSE, &priv, cbPrevPriv, pPrevPriv, &cbPrevPriv))
+            {
+                ExitWithLastError(hr, "Failed to get shutdown privilege LUID.");
+            }
+        }
+
+        fAdjustedPrivileges = TRUE;
+
+        // build up SC_ACTION array
+        // TODO: why is delay only respected when SC_ACTION_RESTART is requested?
+        actions[0].Type = GetSCActionType(wzFirstFailureActionType);
+        actions[0].Delay = 0;
+        if (SC_ACTION_RESTART == actions[0].Type)
+        {
+            actions[0].Delay = dwRestartServiceDelayInSeconds * 1000; // seconds to milliseconds
+        }
+
+        actions[1].Type = GetSCActionType(wzSecondFailureActionType);
+        actions[1].Delay = 0;
+        if (SC_ACTION_RESTART == actions[1].Type)
+        {
+            actions[1].Delay = dwRestartServiceDelayInSeconds * 1000; // seconds to milliseconds
+        }
+
+        actions[2].Type = GetSCActionType(wzThirdFailureActionType);
+        actions[2].Delay = 0;
+        if (SC_ACTION_RESTART == actions[2].Type)
+        {
+            actions[2].Delay = dwRestartServiceDelayInSeconds * 1000; // seconds to milliseconds
+        }
+
+        // build up the SERVICE_FAILURE_ACTIONSW struct
+        sfa.dwResetPeriod = dwResetPeriodInDays * (24 * 60 * 60); // days to seconds
+        sfa.lpRebootMsg = wzRebootMessage;
+        sfa.lpCommand = wzProgramCommandLine;
+        sfa.cActions = countof(actions);
+        sfa.lpsaActions = actions;
+
+        // Call ChangeServiceConfig2 to actually set up the failure actions
+        if (!::ChangeServiceConfig2W(hService, SERVICE_CONFIG_FAILURE_ACTIONS, (LPVOID)&sfa))
+        {
+            er = ::GetLastError();
+            hr = HRESULT_FROM_WIN32(er);
+
+#pragma prefast(push)
+#pragma prefast(disable:25028)
+            ::FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, er, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&lpMsgBuf, 0, NULL);
+#pragma prefast(pop)
+
+            // Check if this is a service that can't be modified.
+            if (ERROR_CANNOT_DETECT_PROCESS_ABORT == er)
+            {
+                WcaLog(LOGMSG_STANDARD, "WARNING: Service \"%ls\" is not configurable on this server and will not be set.", wzServiceName);
+            }
+            ExitOnFailure(hr, "Cannot change service configuration. Error: %ls", (LPWSTR)lpMsgBuf);
+
+            if (lpMsgBuf)
+            {
+                ::LocalFree(lpMsgBuf);
+                lpMsgBuf = NULL;
+            }
         }
     }
 

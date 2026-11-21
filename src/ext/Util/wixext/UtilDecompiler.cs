@@ -647,7 +647,8 @@ namespace WixToolset.Util
                     NumericAttributeIfNotNull("ResetPeriodInDays", row, 6),
                     NumericAttributeIfNotNull("RestartServiceDelayInSeconds", row, 7),
                     AttributeIfNotNull("ProgramCommandLine", row, 8),
-                    AttributeIfNotNull("RebootMessage", row, 9)
+                    AttributeIfNotNull("RebootMessage", row, 9),
+                    row.Fields.Length > 10 ? AttributeIfNotNull("ImagePath", row, 10) : null
                     );
 
                 this.DecompilerHelper.IndexElement(row, serviceConfig);
