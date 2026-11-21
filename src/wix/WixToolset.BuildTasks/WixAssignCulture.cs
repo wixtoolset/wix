@@ -6,6 +6,7 @@ namespace WixToolset.BuildTasks
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Xml;
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
@@ -28,7 +29,6 @@ namespace WixToolset.BuildTasks
         /// Culture groups are seperated by semi-colons 
         /// Culture precedence within a culture group is evaluated from left to right where fallback cultures are 
         /// separated with commas.
-        /// The first (primary) culture in a culture group will be used as the output sub-folder.
         /// </summary>
         public string Cultures { get; set; }
 
@@ -139,25 +139,15 @@ namespace WixToolset.BuildTasks
 
             var cultureGroupItems = new List<TaskItem>();
 
-            if (1 == cultureGroups.Count && 0 == this.Files.Length)
-            {
-                // Maintain old behavior, if only one culturegroup is specified and no WXL, output to the default folder
-                var cultureGroupItem = new TaskItem(cultureGroups[0].ToString());
-                cultureGroupItem.SetMetadata(OutputSuffixMetadataName, cultureGroups[0].OutputSuffix);
-                cultureGroupItem.SetMetadata(OutputFolderMetadataName, CultureGroup.DefaultFolder);
-                cultureGroupItems.Add(cultureGroupItem);
-            }
-            else
-            {
-                foreach (var cultureGroup in cultureGroups)
-                {
-                    var cultureGroupItem = new TaskItem(cultureGroup.ToString());
-                    cultureGroupItem.SetMetadata(OutputSuffixMetadataName, cultureGroup.OutputSuffix);
-                    cultureGroupItem.SetMetadata(OutputFolderMetadataName, cultureGroup.OutputFolder);
-                    cultureGroupItems.Add(cultureGroupItem);
+            var combinedCultures = String.Join(";", cultureGroups.Select(cg => cg.ToString()));
+            var cultureGroupItem = new TaskItem(combinedCultures);
+            cultureGroupItem.SetMetadata(OutputSuffixMetadataName, cultureGroups[0].OutputSuffix);
+            cultureGroupItem.SetMetadata(OutputFolderMetadataName, CultureGroup.DefaultFolder);
+            cultureGroupItems.Add(cultureGroupItem);
 
-                    this.Log.LogMessage("Culture: {0}", cultureGroup.ToString());
-                }
+            if (cultureGroups.Count > 1 || this.Files.Length > 0 || !String.IsNullOrEmpty(this.Cultures))
+            {
+                this.Log.LogMessage("Culture: {0}", combinedCultures);
             }
 
             this.CultureGroups = cultureGroupItems.ToArray();
@@ -217,7 +207,7 @@ namespace WixToolset.BuildTasks
             {
                 if (this.Cultures.Count > 0)
                 {
-                    return String.Join(";", this.Cultures);
+                    return String.Join(",", this.Cultures);
                 }
 
                 // We use a keyword for a null culture because MSBuild cannnot handle "" items

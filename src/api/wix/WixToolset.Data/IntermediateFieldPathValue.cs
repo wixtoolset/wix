@@ -22,5 +22,19 @@ namespace WixToolset.Data
         /// </summary>
         /// <value>Data in the field.</value>
         public string Path { get; set; }
+
+        /// <summary>
+        /// Creates a deep copy of this path value.
+        /// </summary>
+        /// <returns>Cloned path value.</returns>
+        public IntermediateFieldPathValue Clone()
+        {
+            return new IntermediateFieldPathValue
+            {
+                Embed = this.Embed,
+                BaseUri = this.BaseUri,
+                Path = this.Path,
+            };
+        }
     }
 }

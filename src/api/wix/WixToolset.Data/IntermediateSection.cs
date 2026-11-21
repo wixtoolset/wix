@@ -88,6 +88,25 @@ namespace WixToolset.Data
         }
 
         /// <summary>
+        /// Creates a deep copy of this section.
+        /// </summary>
+        /// <returns>Cloned section.</returns>
+        internal IntermediateSection Clone()
+        {
+            var section = new IntermediateSection(this.Id, this.Type, this.CompilationId)
+            {
+                LibraryId = this.LibraryId,
+            };
+
+            foreach (var symbol in this.symbols)
+            {
+                section.symbols.Add(symbol.Clone());
+            }
+
+            return section;
+        }
+
+        /// <summary>
         /// Parse a section from the JSON data.
         /// </summary>
         internal static IntermediateSection Deserialize(ISymbolDefinitionCreator creator, Uri baseUri, JsonObject jsonObject)

@@ -93,7 +93,7 @@ namespace WixToolset.Core.CommandLine
 
             var preprocessorVariables = this.commandLine.CalculatePreprocessorVariables();
 
-            var filterCultures = this.commandLine.CalculateFilterCultures();
+            var filterCultureGroups = this.commandLine.CalculateFilterCultureGroups();
 
             var creator = this.ServiceProvider.GetService<ISymbolDefinitionCreator>();
 
@@ -150,7 +150,7 @@ namespace WixToolset.Core.CommandLine
                         {
                             using (new IntermediateFieldContext("wix.bind"))
                             {
-                                this.BindPhase(wixipl, wxls, filterCultures, this.commandLine.BackwardCompatibleGuidGeneration, this.commandLine.CabCachePath, this.commandLine.CabbingThreadCount, this.commandLine.BindPaths, this.commandLine.BindVariables, inputsOutputs, cancellationToken);
+                                this.BindPhase(wixipl, wxls, filterCultureGroups, this.commandLine.BackwardCompatibleGuidGeneration, this.commandLine.CabCachePath, this.commandLine.CabbingThreadCount, this.commandLine.BindPaths, this.commandLine.BindVariables, inputsOutputs, cancellationToken);
                             }
                         }
                     }
@@ -287,7 +287,7 @@ namespace WixToolset.Core.CommandLine
             return linker.Link(context);
         }
 
-        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<string> filterCultures, bool backwardCompatibleGuidGeneration, string cabCachePath, int cabbingThreadCount, IReadOnlyCollection<IBindPath> bindPaths, Dictionary<string, string> bindVariables, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
+        private void BindPhase(Intermediate output, IReadOnlyCollection<Localization> localizations, IReadOnlyCollection<IReadOnlyCollection<string>> filterCultureGroups, bool backwardCompatibleGuidGeneration, string cabCachePath, int cabbingThreadCount, IReadOnlyCollection<IBindPath> bindPaths, Dictionary<string, string> bindVariables, InputsAndOutputs inputsOutputs, CancellationToken cancellationToken)
         {
             IResolveResult resolveResult;
             {
@@ -296,7 +296,8 @@ namespace WixToolset.Core.CommandLine
                 context.BindVariables = bindVariables;
                 context.Extensions = this.ExtensionManager.GetServices<IResolverExtension>();
                 context.ExtensionData = this.ExtensionManager.GetServices<IExtensionData>();
-                context.FilterCultures = filterCultures;
+                context.FilterCultures = filterCultureGroups.FirstOrDefault() ?? Array.Empty<string>();
+                context.FilterCultureGroups = filterCultureGroups;
                 context.IntermediateFolder = this.IntermediateFolder;
                 context.IntermediateRepresentation = output;
                 context.Localizations = localizations;
@@ -324,6 +325,7 @@ namespace WixToolset.Core.CommandLine
                     context.ResolvedCodepage = resolveResult.Codepage;
                     context.ResolvedSummaryInformationCodepage = resolveResult.SummaryInformationCodepage;
                     context.ResolvedLcid = resolveResult.PackageLcid;
+                    context.EmbeddedLanguageResolveResults = resolveResult.EmbeddedLanguageResolveResults;
                     context.DefaultCompressionLevel = this.DefaultCompressionLevel;
                     context.DelayedFields = resolveResult.DelayedFields;
                     context.ExpectedEmbeddedFiles = resolveResult.ExpectedEmbeddedFiles;
@@ -808,9 +810,9 @@ namespace WixToolset.Core.CommandLine
                 return Data.OutputType.Unknown;
             }
 
-            public IReadOnlyList<string> CalculateFilterCultures()
+            public IReadOnlyList<IReadOnlyList<string>> CalculateFilterCultureGroups()
             {
-                var result = new List<string>();
+                var result = new List<IReadOnlyList<string>>();
 
                 if (this.Cultures == null)
                 {
@@ -823,12 +825,32 @@ namespace WixToolset.Core.CommandLine
                 }
                 else
                 {
-                    foreach (var culture in this.Cultures)
+                    foreach (var cultureArg in this.Cultures)
                     {
-                        // Neutral is different from null. For neutral we still want to do culture filtering.
-                        // Set the culture to the empty string = identifier for the invariant culture.
-                        var filter = (culture.Equals("neutral", StringComparison.OrdinalIgnoreCase)) ? String.Empty : culture;
-                        result.Add(filter);
+                        if (String.IsNullOrWhiteSpace(cultureArg))
+                        {
+                            continue;
+                        }
+
+                        if (cultureArg.Trim().Equals("null", StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        var group = new List<string>();
+                        foreach (var culture in cultureArg.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            var trimmed = culture.Trim();
+                            // Neutral is different from null. For neutral we still want to do culture filtering.
+                            // Set the culture to the empty string = identifier for the invariant culture.
+                            var filter = trimmed.Equals("neutral", StringComparison.OrdinalIgnoreCase) ? String.Empty : trimmed;
+                            group.Add(filter);
+                        }
+
+                        if (group.Count > 0)
+                        {
+                            result.Add(group);
+                        }
                     }
                 }
 

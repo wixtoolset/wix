@@ -179,17 +179,17 @@ namespace WixToolsetTest.Sdk
                 {
                     @"WIX1118: The variable 'Variable' with value 'DifferentValue' was previously declared with value 'Value'.",
                     @"WIX1102: The DefaultLanguage '1033' was used for file 'filcV1yrx0x8wJWj4qMzcH21jwkPko' which has no language or version. For unversioned files, specifying a value for DefaultLanguage is not neccessary and it will not be used when determining file versions. Remove the DefaultLanguage attribute to eliminate this warning.",
-                    @"WIX1122: The installer database '<basefolder>\obj\x86\Release\en-US\MsiPackage.msi' has external cabs, but at least one of them is not signed. Please ensure that all external cabs are signed, if you mean to sign them. If you don't mean to sign them, there is no need to inscribe the MSI as part of your build.",
+                    @"WIX1122: The installer database '<basefolder>\obj\x86\Release\MsiPackage.msi' has external cabs, but at least one of them is not signed. Please ensure that all external cabs are signed, if you mean to sign them. If you don't mean to sign them, there is no need to inscribe the MSI as part of your build.",
                     @"WIX1118: The variable 'Variable' with value 'DifferentValue' was previously declared with value 'Value'.",
                     @"WIX1102: The DefaultLanguage '1033' was used for file 'filcV1yrx0x8wJWj4qMzcH21jwkPko' which has no language or version. For unversioned files, specifying a value for DefaultLanguage is not neccessary and it will not be used when determining file versions. Remove the DefaultLanguage attribute to eliminate this warning.",
-                    @"WIX1122: The installer database '<basefolder>\obj\x86\Release\en-US\MsiPackage.msi' has external cabs, but at least one of them is not signed. Please ensure that all external cabs are signed, if you mean to sign them. If you don't mean to sign them, there is no need to inscribe the MSI as part of your build."
+                    @"WIX1122: The installer database '<basefolder>\obj\x86\Release\MsiPackage.msi' has external cabs, but at least one of them is not signed. Please ensure that all external cabs are signed, if you mean to sign them. If you don't mean to sign them, there is no need to inscribe the MSI as part of your build."
                 }, warnings);
 
                 var testMessages = result.Output.Where(line => line.Contains("TEST:")).Select(line => ReplacePathsInMessage(line, baseFolder)).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"TEST: SignCabs: <basefolder>\obj\x86\Release\en-US\cab1.cab",
-                    @"TEST: SignMsi: obj\x86\Release\en-US\MsiPackage.msi",
+                    @"TEST: SignCabs: <basefolder>\obj\x86\Release\cab1.cab",
+                    @"TEST: SignMsi: obj\x86\Release\MsiPackage.msi",
                 }, testMessages);
 
                 var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
@@ -198,9 +198,9 @@ namespace WixToolsetTest.Sdk
                     .ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"bin\x86\Release\en-US\cab1.cab",
-                    @"bin\x86\Release\en-US\MsiPackage.msi",
-                    @"bin\x86\Release\en-US\MsiPackage.wixpdb",
+                    @"bin\x86\Release\cab1.cab",
+                    @"bin\x86\Release\MsiPackage.msi",
+                    @"bin\x86\Release\MsiPackage.wixpdb",
                 }, paths);
             }
         }
@@ -327,9 +327,9 @@ namespace WixToolsetTest.Sdk
         {
             var expectedOutputs = new[]
                 {
-                    @"bin\x86\Release\en-US\cab1.cab",
-                    @"bin\x86\Release\en-US\MsiPackage.msi",
-                    @"bin\x86\Release\en-US\MsiPackage.wixpdb",
+                    @"bin\x86\Release\cab1.cab",
+                    @"bin\x86\Release\MsiPackage.msi",
+                    @"bin\x86\Release\MsiPackage.wixpdb",
                 };
 
             this.AssertWixpdb(buildSystem, null, expectedOutputs);
@@ -344,8 +344,8 @@ namespace WixToolsetTest.Sdk
         {
             this.AssertWixpdb(buildSystem, "NONE", new[]
                 {
-                    @"bin\x86\Release\en-US\cab1.cab",
-                    @"bin\x86\Release\en-US\MsiPackage.msi",
+                    @"bin\x86\Release\cab1.cab",
+                    @"bin\x86\Release\MsiPackage.msi",
                 });
         }
 
@@ -357,9 +357,9 @@ namespace WixToolsetTest.Sdk
         {
             var expectedOutputFiles = new[]
             {
-                @"bin\x86\Release\en-US\cab1.cab",
-                @"bin\x86\Release\en-US\MsiPackage.msi",
-                @"pdb\en-US\MsiPackage.wixpdb",
+                @"bin\x86\Release\cab1.cab",
+                @"bin\x86\Release\MsiPackage.msi",
+                @"pdb\MsiPackage.wixpdb",
             };
 
             var sourceFolder = TestData.Get(@"TestData", "SimpleMsiPackage", "MsiPackage");
@@ -422,9 +422,9 @@ namespace WixToolsetTest.Sdk
                     .ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    @"bin\x64\Release\en-US\cab1.cab",
-                    @"bin\x64\Release\en-US\MsiPackage.msi",
-                    @"bin\x64\Release\en-US\MsiPackage.wixpdb",
+                    @"bin\x64\Release\cab1.cab",
+                    @"bin\x64\Release\MsiPackage.msi",
+                    @"bin\x64\Release\MsiPackage.wixpdb",
                 }, paths);
             }
         }
@@ -508,11 +508,11 @@ namespace WixToolsetTest.Sdk
                 var lines = trackingContents.Select(l => l.Replace(baseFolder, "<basefolder>")).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "BuiltContentOutput\t<basefolder>\\obj\\Release\\de-DE\\cab1.cab",
-                    "BuiltPdbOutput\t<basefolder>\\obj\\Release\\de-DE\\SingleCultureWithFallbackMsiPackage.wixpdb",
-                    "BuiltTargetOutput\t<basefolder>\\obj\\Release\\de-DE\\SingleCultureWithFallbackMsiPackage.msi",
+                    "BuiltContentOutput\t<basefolder>\\obj\\Release\\cab1.cab",
+                    "BuiltPdbOutput\t<basefolder>\\obj\\Release\\SingleCultureWithFallbackMsiPackage.wixpdb",
+                    "BuiltTargetOutput\t<basefolder>\\obj\\Release\\SingleCultureWithFallbackMsiPackage.msi",
                     "Input\t<basefolder>\\data\\test.txt",
-                    "Intermediate\t<basefolder>\\obj\\Release\\de-DE\\cab1.cab"
+                    "Intermediate\t<basefolder>\\obj\\Release\\cab1.cab"
                 }, lines);
             }
         }
@@ -531,6 +531,7 @@ namespace WixToolsetTest.Sdk
                 var baseFolder = fs.BaseFolder;
                 var slnPath = Path.Combine(baseFolder, "MultiCulturalMsiPackage.slnx");
                 var projectFolder = Path.Combine(baseFolder, "MsiPackage");
+                var binFolder = Path.Combine(projectFolder, "bin");
 
                 var result = MsbuildUtilities.BuildProject(buildSystem, slnPath, new[]
                 {
@@ -539,27 +540,32 @@ namespace WixToolsetTest.Sdk
                 });
                 result.AssertSuccess();
 
-                var trackingEnuContents = File.ReadAllLines(Path.Combine(projectFolder, "obj", "x64", "Release", "MsiPackage.wixproj.BindTracking-en-US.txt"));
-                var enuLines = trackingEnuContents.Select(l => l.Replace(projectFolder, "<basefolder>")).ToArray();
+                var trackingContents = File.ReadAllLines(Path.Combine(projectFolder, "obj", "x64", "Release", "MsiPackage.wixproj.BindTracking-en-US.txt"));
+                var lines = trackingContents.Select(l => l.Replace(projectFolder, "<basefolder>")).ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "BuiltContentOutput\t<basefolder>\\obj\\x64\\Release\\en-US\\cab1.cab",
-                    "BuiltPdbOutput\t<basefolder>\\obj\\x64\\Release\\en-US\\MsiPackage.wixpdb",
-                    "BuiltTargetOutput\t<basefolder>\\obj\\x64\\Release\\en-US\\MsiPackage.msi",
+                    "BuiltContentOutput\t<basefolder>\\obj\\x64\\Release\\cab1.cab",
+                    "BuiltPdbOutput\t<basefolder>\\obj\\x64\\Release\\MsiPackage.wixpdb",
+                    "BuiltTargetOutput\t<basefolder>\\obj\\x64\\Release\\MsiPackage.msi",
                     "Input\t<basefolder>\\data\\test.txt",
-                    "Intermediate\t<basefolder>\\obj\\x64\\Release\\en-US\\cab1.cab"
-                }, enuLines);
+                    "Intermediate\t<basefolder>\\obj\\x64\\Release\\cab1.cab"
+                }, lines);
 
-                var trackingDeuContents = File.ReadAllLines(Path.Combine(projectFolder, "obj", "x64", "Release", "MsiPackage.wixproj.BindTracking-de-DE.txt"));
-                var deuLines = trackingDeuContents.Select(l => l.Replace(projectFolder, "<basefolder>")).ToArray();
+                var paths = Directory.EnumerateFiles(binFolder, @"*.*", SearchOption.AllDirectories)
+                    .Select(s => s.Substring(projectFolder.Length + 1))
+                    .OrderBy(s => s)
+                    .ToArray();
                 WixAssert.CompareLineByLine(new[]
                 {
-                    "BuiltContentOutput\t<basefolder>\\obj\\x64\\Release\\de-DE\\cab1.cab",
-                    "BuiltPdbOutput\t<basefolder>\\obj\\x64\\Release\\de-DE\\MsiPackage.wixpdb",
-                    "BuiltTargetOutput\t<basefolder>\\obj\\x64\\Release\\de-DE\\MsiPackage.msi",
-                    "Input\t<basefolder>\\data\\test.txt",
-                    "Intermediate\t<basefolder>\\obj\\x64\\Release\\de-DE\\cab1.cab"
-                }, deuLines);
+                    @"bin\x64\Release\cab1.cab",
+                    @"bin\x64\Release\MsiPackage.msi",
+                    @"bin\x64\Release\MsiPackage.wixpdb",
+                }, paths);
+
+                var intermediate = Intermediate.Load(Path.Combine(projectFolder, @"bin\x64\Release\MsiPackage.wixpdb"));
+                var section = intermediate.Sections.Single();
+                var summaryPlatform = section.Symbols.OfType<SummaryInformationSymbol>().Single(s => s.PropertyId == SummaryInformationType.PlatformAndLanguage);
+                Assert.AreEqual("x64;1033,1031", summaryPlatform.Value);
             }
         }
 

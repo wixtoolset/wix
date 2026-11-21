@@ -47,6 +47,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             this.ResolvedCodepage = context.ResolvedCodepage;
             this.ResolvedSummaryInformationCodepage = context.ResolvedSummaryInformationCodepage;
             this.ResolvedLcid = context.ResolvedLcid;
+            this.EmbeddedLanguageResolveResults = context.EmbeddedLanguageResolveResults;
             this.SuppressLayout = context.SuppressLayout;
 
             this.PatchSubStorages = patchSubStorages;
@@ -99,6 +100,8 @@ namespace WixToolset.Core.WindowsInstaller.Bind
         private int? ResolvedSummaryInformationCodepage { get; }
 
         private int? ResolvedLcid { get; }
+
+        private IReadOnlyCollection<IResolveResult> EmbeddedLanguageResolveResults { get; }
 
         private bool SuppressAddingValidationRows { get; }
 
@@ -444,6 +447,11 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 {
                     data.SubStorages.Add(storage);
                 }
+
+                if (this.EmbeddedLanguageResolveResults != null && this.EmbeddedLanguageResolveResults.Count > 0 && !this.Messaging.EncounteredError)
+                {
+                    this.CreateEmbeddedLanguageTransforms(section, data, tableDefinitions, allFileFacades, platform, compressed, calculatedCabbingThreadCount, trackedFiles);
+                }
             }
             else if (data.Type == OutputType.Patch)
             {
@@ -555,6 +563,280 @@ namespace WixToolset.Core.WindowsInstaller.Bind
             return result;
         }
 
+        private void CreateEmbeddedLanguageTransforms(IntermediateSection primarySection, WindowsInstallerData primaryData, TableDefinitionCollection tableDefinitions, List<IFileFacade> primaryFileFacades, Platform platform, bool compressed, int calculatedCabbingThreadCount, List<ITrackedFile> trackedFiles)
+        {
+            var primaryProductCode = primarySection.Symbols.OfType<PropertySymbol>().FirstOrDefault(p => p.Id.Id == "ProductCode")?.Value;
+            var primaryPackageCode = primarySection.Symbols.OfType<SummaryInformationSymbol>().FirstOrDefault(s => s.PropertyId == SummaryInformationType.PackageCode)?.Value;
+            var primaryComponentGuids = primarySection.Symbols.OfType<ComponentSymbol>().ToDictionary(c => c.Id.Id, c => c.ComponentId, StringComparer.Ordinal);
+            var branding = this.ServiceProvider.GetService<IWixBranding>();
+            var additionalLanguages = new List<string>();
+
+            foreach (var embeddedResolveResult in this.EmbeddedLanguageResolveResults)
+            {
+                var langIntermediate = embeddedResolveResult.IntermediateRepresentation;
+                var langSection = langIntermediate.Sections.Single();
+                var langPackageSymbol = this.GetSingleSymbol<WixPackageSymbol>(langSection);
+
+                this.ProcessProductVersion(langPackageSymbol, langSection, validate: false);
+
+                var langCodepage = CalculateCodepage(langPackageSymbol, null, null, embeddedResolveResult.Codepage, this.WindowsInstallerBackendHelper);
+
+                // Ensure generated ProductCode and PackageCode match the primary database unless explicitly localized.
+                if (!String.IsNullOrEmpty(primaryProductCode))
+                {
+                    var productCodeProp = langSection.Symbols.OfType<PropertySymbol>().FirstOrDefault(p => p.Id.Id == "ProductCode");
+                    if (productCodeProp != null && productCodeProp.Value == "*")
+                    {
+                        productCodeProp.Value = primaryProductCode;
+                    }
+                }
+
+                if (!String.IsNullOrEmpty(primaryPackageCode))
+                {
+                    var packageCodeSym = langSection.Symbols.OfType<SummaryInformationSymbol>().FirstOrDefault(s => s.PropertyId == SummaryInformationType.PackageCode);
+                    if (packageCodeSym == null)
+                    {
+                        langSection.AddSymbol(new SummaryInformationSymbol(null)
+                        {
+                            PropertyId = SummaryInformationType.PackageCode,
+                            Value = primaryPackageCode,
+                        });
+                    }
+                }
+
+                // If ProductLanguage was not localized in the .wxs (e.g. hardcoded in Package/@Language),
+                // override it with the resolved LCID for the embedded language so each embedded language transform gets its own LCID.
+                if (embeddedResolveResult.PackageLcid.HasValue && embeddedResolveResult.PackageLcid.Value != 0)
+                {
+                    var langProp = langSection.Symbols.OfType<PropertySymbol>().FirstOrDefault(p => p.Id.Id == "ProductLanguage");
+                    if (langProp != null && langProp.Fields[(int)PropertySymbolFields.Value]?.Context != "wix.bind")
+                    {
+                        var lcidString = embeddedResolveResult.PackageLcid.Value.ToString();
+                        langProp.Value = lcidString;
+                        langPackageSymbol.Language = lcidString;
+                    }
+
+                    var platformAndLangSym = langSection.Symbols.OfType<SummaryInformationSymbol>().FirstOrDefault(s => s.PropertyId == SummaryInformationType.PlatformAndLanguage);
+                    if (platformAndLangSym != null && platformAndLangSym.Fields[(int)SummaryInformationSymbolFields.Value]?.Context != "wix.bind")
+                    {
+                        var val = platformAndLangSym.Value ?? String.Empty;
+                        var sepIdx = val.IndexOf(';');
+                        if (sepIdx >= 0)
+                        {
+                            platformAndLangSym.Value = val.Substring(0, sepIdx + 1);
+                        }
+                    }
+                }
+
+                var delayedFields = embeddedResolveResult.DelayedFields ?? Array.Empty<IDelayedField>();
+                Dictionary<string, string> variableCache;
+                string langProductLanguage;
+                {
+                    var command = new ProcessPropertiesCommand(langSection, langPackageSymbol, embeddedResolveResult.PackageLcid ?? 0, delayedFields.Any(), this.WindowsInstallerBackendHelper);
+                    command.Execute();
+
+                    variableCache = command.DelayedVariablesCache;
+                    langProductLanguage = command.ProductLanguage;
+                }
+
+                {
+                    var command = new BindSummaryInfoCommand(langSection, embeddedResolveResult.SummaryInformationCodepage, langProductLanguage, this.WindowsInstallerBackendHelper, branding);
+                    command.Execute();
+                }
+
+                {
+                    var command = new SequenceActionsCommand(this.Messaging, langSection);
+                    command.Execute();
+                }
+
+                {
+                    var command = new CreateSpecialPropertiesCommand(langSection);
+                    command.Execute();
+                }
+
+                {
+                    var command = new AddCreateFoldersCommand(langSection);
+                    command.Execute();
+                }
+
+                if (this.Messaging.EncounteredError)
+                {
+                    return;
+                }
+
+                var dependencyRefs = langSection.Symbols.OfType<WixDependencyRefSymbol>().ToList();
+                if (dependencyRefs.Any())
+                {
+                    var command = new ProcessDependencyReferencesCommand(this.WindowsInstallerBackendHelper, langSection, dependencyRefs);
+                    command.Execute();
+                }
+
+                var softwareTags = langSection.Symbols.OfType<WixPackageTagSymbol>().ToList();
+                if (softwareTags.Any())
+                {
+                    var command = new ProcessPackageSoftwareTagsCommand(langSection, this.WindowsInstallerBackendHelper, this.FileSystem, softwareTags, this.IntermediateFolder);
+                    command.Execute();
+                }
+
+                if (embeddedResolveResult.ExpectedEmbeddedFiles != null && embeddedResolveResult.ExpectedEmbeddedFiles.Any())
+                {
+                    var extractedFiles = this.WindowsInstallerBackendHelper.ExtractEmbeddedFiles(embeddedResolveResult.ExpectedEmbeddedFiles);
+                    trackedFiles.AddRange(extractedFiles);
+                }
+
+                {
+                    var command = new UpdateFromTextFilesCommand(this.Messaging, langSection);
+                    command.Execute();
+                }
+
+                langIntermediate.UpdateLevel(Data.WindowsInstaller.IntermediateLevels.FullyBound);
+
+                List<IFileFacade> langFileFacades;
+                {
+                    var command = new GetFileFacadesCommand(langSection, this.WindowsInstallerBackendHelper);
+                    command.Execute();
+                    langFileFacades = command.FileFacades;
+                }
+
+                {
+                    var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, langSection, langFileFacades, langFileFacades, variableCache, overwriteHash: true, this.CancellationToken, calculatedCabbingThreadCount);
+                    command.Execute();
+                }
+
+                if (this.Messaging.EncounteredError)
+                {
+                    return;
+                }
+
+                if (delayedFields.Any())
+                {
+                    this.WindowsInstallerBackendHelper.ResolveDelayedFields(delayedFields, variableCache);
+                }
+
+                this.ProcessProductVersion(langPackageSymbol, langSection, validate: true);
+
+                if (this.BackendExtensions.Any())
+                {
+                    using (new IntermediateFieldContext("wix.bind.finalize"))
+                    {
+                        foreach (var extension in this.BackendExtensions)
+                        {
+                            extension.SymbolsFinalized(langSection);
+                        }
+
+                        var reresolvedFiles = langSection.Symbols
+                                                         .OfType<FileSymbol>()
+                                                         .Where(s => s.Fields.Any(f => f?.Context == "wix.bind.finalize"))
+                                                         .ToList();
+
+                        if (reresolvedFiles.Any())
+                        {
+                            var updatedFacades = reresolvedFiles.Select(f => langFileFacades.First(ff => ff.Id == f.Id?.Id));
+
+                            var command = new UpdateFileFacadesCommand(this.Messaging, this.FileSystem, langSection, langFileFacades, updatedFacades, variableCache, overwriteHash: false, this.CancellationToken, calculatedCabbingThreadCount);
+                            command.Execute();
+                        }
+                    }
+
+                    if (this.Messaging.EncounteredError)
+                    {
+                        return;
+                    }
+                }
+
+                // Preserve primary file sequence and media assignment order if possible, or run media assignment for localized files.
+                {
+                    var order = new OptimizeFileFacadesOrderCommand(this.WindowsInstallerBackendHelper, this.PathResolver, langSection, platform, langFileFacades);
+                    order.Execute();
+
+                    langFileFacades = order.FileFacades;
+
+                    var assign = new AssignMediaCommand(langSection, this.Messaging, langFileFacades, compressed);
+                    assign.Execute();
+
+                    var update = new UpdateMediaSequencesCommand(langSection, langFileFacades);
+                    update.Execute();
+                }
+
+                if (this.Messaging.EncounteredError)
+                {
+                    return;
+                }
+
+                {
+                    var command = new UpdateSymbolsWithFileFacadesCommand(langSection, langFileFacades);
+                    command.Execute();
+                }
+
+                // Ensure generated component GUIDs match the primary database so language transforms don't unnecessarily alter generated component GUIDs.
+                foreach (var comp in langSection.Symbols.OfType<ComponentSymbol>())
+                {
+                    if ((String.IsNullOrEmpty(comp.ComponentId) || comp.ComponentId == "*") &&
+                        primaryComponentGuids.TryGetValue(comp.Id.Id, out var primaryGuid))
+                    {
+                        comp.ComponentId = primaryGuid;
+                    }
+                }
+
+                {
+                    var command = new FinalizeComponentGuids(this.Messaging, this.WindowsInstallerBackendHelper, this.PathResolver, langSection, platform, this.BackwardCompatibleGuidGeneration);
+                    command.Execute();
+                }
+
+                WindowsInstallerData langData;
+                {
+                    var command = new CreateWindowsInstallerDataFromIRCommand(this.Messaging, langSection, tableDefinitions, langCodepage, this.BackendExtensions, this.WindowsInstallerBackendHelper);
+                    langData = command.Execute();
+                }
+
+                if (this.Messaging.EncounteredError)
+                {
+                    return;
+                }
+
+                var validationFlags = (primaryData.Codepage != langData.Codepage) ? TransformFlags.ErrorChangeCodePage : 0;
+                var differ = new Differ(this.Messaging);
+                var transform = differ.Diff(primaryData, langData, validationFlags);
+
+                if (this.Messaging.EncounteredError)
+                {
+                    return;
+                }
+
+                if (!String.IsNullOrEmpty(langProductLanguage))
+                {
+                    primaryData.SubStorages.Add(new SubStorage(langProductLanguage, transform));
+                    if (!additionalLanguages.Contains(langProductLanguage, StringComparer.OrdinalIgnoreCase))
+                    {
+                        additionalLanguages.Add(langProductLanguage);
+                    }
+                }
+            }
+
+            if (additionalLanguages.Count > 0)
+            {
+                var additionalLanguagesList = String.Join(",", additionalLanguages);
+
+                var platformAndLanguageSymbol = primarySection.Symbols.OfType<SummaryInformationSymbol>().FirstOrDefault(s => s.PropertyId == SummaryInformationType.PlatformAndLanguage);
+                if (platformAndLanguageSymbol != null)
+                {
+                    platformAndLanguageSymbol.Value = String.Concat(platformAndLanguageSymbol.Value, ",", additionalLanguagesList);
+                }
+
+                if (primaryData.TryGetTable("_SummaryInformation", out var summaryInfoTable))
+                {
+                    foreach (var row in summaryInfoTable.Rows)
+                    {
+                        if ((int)SummaryInformationType.PlatformAndLanguage == row.FieldAsInteger(0))
+                        {
+                            row[1] = String.Concat(row.FieldAsString(1), ",", additionalLanguagesList);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
         private void ProcessProductVersion(WixPackageSymbol packageSymbol, IntermediateSection section, bool validate)
         {
             if (this.WindowsInstallerBackendHelper.TryParseMsiProductVersion(packageSymbol.Version, strict: false, out var version))
@@ -575,11 +857,16 @@ namespace WixToolset.Core.WindowsInstaller.Bind
 
         private int CalculateCodepage(WixPackageSymbol packageSymbol, WixModuleSymbol moduleSymbol, WixPatchSymbol patchSymbol)
         {
+            return CalculateCodepage(packageSymbol, moduleSymbol, patchSymbol, this.ResolvedCodepage, this.WindowsInstallerBackendHelper);
+        }
+
+        private static int CalculateCodepage(WixPackageSymbol packageSymbol, WixModuleSymbol moduleSymbol, WixPatchSymbol patchSymbol, int? resolvedCodepage, IWindowsInstallerBackendHelper backendHelper)
+        {
             var codepage = packageSymbol?.Codepage ?? moduleSymbol?.Codepage ?? patchSymbol?.Codepage;
 
             if (String.IsNullOrEmpty(codepage))
             {
-                codepage = this.ResolvedCodepage?.ToString() ?? "65001";
+                codepage = resolvedCodepage?.ToString() ?? "65001";
 
                 if (packageSymbol != null)
                 {
@@ -595,7 +882,7 @@ namespace WixToolset.Core.WindowsInstaller.Bind
                 }
             }
 
-            return this.WindowsInstallerBackendHelper.GetValidCodePage(codepage);
+            return backendHelper.GetValidCodePage(codepage);
         }
 
         private T GetSingleSymbol<T>(IntermediateSection section) where T : IntermediateSymbol

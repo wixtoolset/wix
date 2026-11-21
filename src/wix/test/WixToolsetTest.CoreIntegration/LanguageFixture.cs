@@ -9,6 +9,7 @@ namespace WixToolsetTest.CoreIntegration
     using WixToolset.Data;
     using WixToolset.Data.Symbols;
     using WixToolset.Data.WindowsInstaller;
+    using WixToolset.Dtf.WindowsInstaller;
     using Xunit;
 
     public class LanguageFixture
@@ -168,6 +169,113 @@ namespace WixToolsetTest.CoreIntegration
 
                 var summaryCodepage = section.Symbols.OfType<SummaryInformationSymbol>().Single(s => s.PropertyId == SummaryInformationType.Codepage);
                 Assert.Equal("1252", summaryCodepage.Value);
+            }
+        }
+
+        [Theory]
+        [InlineData("de-DE,en-US")]
+        [InlineData("de-DE;en-US")]
+        public void CanBuildSingleLanguageWithFallbackCultures(string cultureArg)
+        {
+            var folder = TestData.Get(@"TestData", "Language");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-loc", Path.Combine(folder, "Package.ja-jp.wxl"),
+                    "-culture", cultureArg,
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", Path.Combine(baseFolder, "obj"),
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(Path.Combine(baseFolder, @"bin\test.wixpdb"));
+                var section = intermediate.Sections.Single();
+
+                var propertySymbol = section.Symbols.OfType<PropertySymbol>().Single(p => p.Id.Id == "ProductLanguage");
+                Assert.Equal("1033", propertySymbol.Value);
+
+                var summaryPlatform = section.Symbols.OfType<SummaryInformationSymbol>().Single(s => s.PropertyId == SummaryInformationType.PlatformAndLanguage);
+                Assert.Equal("Intel;1033", summaryPlatform.Value);
+
+                var names = Query.GetSubStorageNames(msiPath);
+                Assert.Empty(names);
+            }
+        }
+
+        [Fact]
+        public void CanBuildMultilingualMsiPackage()
+        {
+            var folder = TestData.Get(@"TestData", "Language");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+                var wixpdbPath = Path.Combine(baseFolder, @"bin\test.wixpdb");
+                var mstPath = Path.Combine(baseFolder, "1041.mst");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Package.wxs"),
+                    "-loc", Path.Combine(folder, "Package.en-us.wxl"),
+                    "-loc", Path.Combine(folder, "Package.ja-jp.wxl"),
+                    "-culture", "en-US",
+                    "-culture", "ja-JP",
+                    "-bindpath", Path.Combine(folder, "data"),
+                    "-intermediateFolder", Path.Combine(baseFolder, "obj"),
+                    "-o", msiPath
+                });
+
+                result.AssertSuccess();
+
+                var intermediate = Intermediate.Load(wixpdbPath);
+                var section = intermediate.Sections.Single();
+
+                var propertySymbol = section.Symbols.OfType<PropertySymbol>().Single(p => p.Id.Id == "ProductLanguage");
+                Assert.Equal("1033", propertySymbol.Value);
+
+                var summaryPlatform = section.Symbols.OfType<SummaryInformationSymbol>().Single(s => s.PropertyId == SummaryInformationType.PlatformAndLanguage);
+                Assert.Equal("Intel;1033,1041", summaryPlatform.Value);
+
+                var output = WindowsInstallerData.Load(wixpdbPath, false);
+                var substorage = Assert.Single(output.SubStorages);
+                Assert.Equal("1041", substorage.Name);
+
+                var names = Query.GetSubStorageNames(msiPath);
+                Assert.Equal(new[] { "1041" }, names);
+
+                using (var summaryInfo = new SummaryInfo(msiPath, enableWrite: false))
+                {
+                    Assert.Equal("Intel;1033,1041", summaryInfo.Template);
+                }
+
+                Query.ExtractSubStorage(msiPath, "1041", mstPath);
+
+                using (var db = new Database(msiPath, DatabaseOpenMode.Transact))
+                {
+                    var initialFeatureTitle = db.ExecuteScalar("SELECT `Title` FROM `Feature` WHERE `Feature` = 'ProductFeature'") as string;
+                    var initialProductLanguage = db.ExecuteScalar("SELECT `Value` FROM `Property` WHERE `Property` = 'ProductLanguage'") as string;
+                    Assert.Equal("MsiPackage en-us", initialFeatureTitle);
+                    Assert.Equal("1033", initialProductLanguage);
+
+                    db.ApplyTransform(mstPath);
+
+                    var transformedFeatureTitle = db.ExecuteScalar("SELECT `Title` FROM `Feature` WHERE `Feature` = 'ProductFeature'") as string;
+                    var transformedProductLanguage = db.ExecuteScalar("SELECT `Value` FROM `Property` WHERE `Property` = 'ProductLanguage'") as string;
+                    Assert.Equal("MsiPackage ja-jp", transformedFeatureTitle);
+                    Assert.Equal("1041", transformedProductLanguage);
+                }
             }
         }
     }

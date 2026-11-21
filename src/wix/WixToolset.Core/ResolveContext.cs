@@ -28,6 +28,8 @@ namespace WixToolset.Core
 
         public IReadOnlyCollection<string> FilterCultures { get; set; }
 
+        public IReadOnlyCollection<IReadOnlyCollection<string>> FilterCultureGroups { get; set; }
+
         public string IntermediateFolder { get; set; }
 
         public Intermediate IntermediateRepresentation { get; set; }

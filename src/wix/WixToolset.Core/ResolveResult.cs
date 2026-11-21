@@ -19,5 +19,7 @@ namespace WixToolset.Core
         public IReadOnlyCollection<IExpectedExtractFile> ExpectedEmbeddedFiles { get; set; }
 
         public Intermediate IntermediateRepresentation { get; set; }
+
+        public IReadOnlyCollection<IResolveResult> EmbeddedLanguageResolveResults { get; set; }
     }
 }
