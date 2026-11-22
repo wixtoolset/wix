@@ -577,6 +577,7 @@ namespace Bootstrapper
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::LocalApplicationData) + "\\", VariableGetStringHelper(&variables, L"LocalAppDataFolder"));
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::Personal) + "\\", VariableGetStringHelper(&variables, L"PersonalFolder"));
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::Programs) + "\\", VariableGetStringHelper(&variables, L"ProgramMenuFolder"));
+                Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::CommonPrograms) + "\\", VariableGetStringHelper(&variables, L"CommonProgramMenuFolder"));
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::SendTo) + "\\", VariableGetStringHelper(&variables, L"SendToFolder"));
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::StartMenu) + "\\", VariableGetStringHelper(&variables, L"StartMenuFolder"));
                 Assert::Equal<String^>(Environment::GetFolderPath(Environment::SpecialFolder::Startup) + "\\", VariableGetStringHelper(&variables, L"StartupFolder"));

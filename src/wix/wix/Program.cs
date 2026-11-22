@@ -74,7 +74,7 @@ namespace WixToolset.Tools
             }
             catch (Exception e)
             {
-                listener.Write(ErrorMessages.UnexpectedException(e));
+                listener.Write(ErrorMessages.UnexpectedException(e.ToString(), e.GetType().ToString(), e.StackTrace));
 
                 if (e is NullReferenceException || e is SEHException)
                 {

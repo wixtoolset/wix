@@ -527,6 +527,35 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void CannotBuildBundleWithInvalidIconRedux()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleWithInvalid", "BundleWithInvalidTinyIcon.wxs"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
+                    "-o", Path.Combine(baseFolder, @"bin\test.exe")
+                });
+
+                var message = result.Messages.Where(m => m.Level == MessageLevel.Error).Select(m => m.ToString().Replace(folder, "<testdata>")).ToArray();
+                WixAssert.CompareLineByLine(new[]
+                {
+                    @"Failed to update resources in the bundle. Ensure the bundle icon file is an icon file at '<testdata>\.Data\test.txt'. Detail: Unable to read beyond the end of the stream."
+                }, message);
+            }
+        }
+
+        [Fact]
         public void CannotBuildBundleWithInvalidUpgradeCode()
         {
             var folder = TestData.Get(@"TestData");

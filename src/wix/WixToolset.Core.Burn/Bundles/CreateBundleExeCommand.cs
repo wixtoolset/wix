@@ -164,12 +164,25 @@ namespace WixToolset.Core.Burn.Bundles
             if (bundleInfo.IconSourceFile != null)
             {
                 var iconGroup = new GroupIconResource("#1", burnLocale);
-                iconGroup.ReadFromFile(bundleInfo.IconSourceFile.Path);
-                resources.Add(iconGroup);
-
-                foreach (var icon in iconGroup.Icons)
+                try
                 {
-                    resources.Add(icon);
+                    iconGroup.ReadFromFile(bundleInfo.IconSourceFile.Path);
+                }
+                catch (Exception e)
+                {
+                    this.Messaging.Write(BurnBackendErrors.FailedToUpdateBundleResources(bundleInfo.SourceLineNumbers, bundleInfo.IconSourceFile?.Path, null, e.Message));
+
+                    iconGroup = null;
+                }
+
+                if (iconGroup is not null)
+                {
+                    resources.Add(iconGroup);
+
+                    foreach (var icon in iconGroup.Icons)
+                    {
+                        resources.Add(icon);
+                    }
                 }
             }
 
