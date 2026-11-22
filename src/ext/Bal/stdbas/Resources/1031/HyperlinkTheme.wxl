@@ -1,0 +1,71 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="de-de" Language="1031" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="[WixBundleName]-Setup" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Nach Updates wird gesucht" />
+  <String Id="UpdateButton" Value="Auf Version [WixStdBAUpdateAvailable] &amp;aktualisieren" />
+  <String Id="InstallHeader" Value="Willkommen" />
+  <String Id="InstallMessage" Value="Setup wird [WixBundleName] auf Ihrem Computer installieren. Klicken Sie zum Fortfahren auf &quot;Installieren&quot; oder zum Beenden auf &quot;Abbrechen&quot;." />
+  <String Id="InstallMessageOptions" Value="Setup wird [WixBundleName] auf Ihrem Computer installieren. Klicken Sie zum Fortfahren auf &quot;Installieren&quot;, zum Festlegen von Installationsoptionen auf &quot;Optionen&quot; oder zum Beenden auf &quot;Abbrechen&quot;." />
+  <String Id="InstallVersion" Value="Version [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="Sind Sie sicher, dass Sie den Vorgang abbrechen möchten?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Vorherige Version" />
+  <String Id="HelpHeader" Value="Setup-Hilfe" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - installiert, repariert, deinstalliert oder&#xA;   erstellt eine vollständige lokale Kopie des Bundles im Verzeichnis. &quot;/install&quot; ist der Standard.&#xA;&#xA;/passive | /quiet - zeigt eine minimale Benutzeroberfläche ohne Eingabeaufforderungen oder keine&#xA;   Benutzeroberfläche und keine Eingabeaufforderungen an. Standardmäßig werden die Benutzeroberfläche&#xA;   und alle Eingabeaufforderungen angezeigt.&#xA;&#xA;/norestart   - unterdrückt alle Neustartversuche. Standardmäßig fordert die Benutzeroberfläche vor einem Neustart dazu auf.&#xA;/log log.txt - protokolliert in einer bestimmten Datei. Standardmäßig wird eine Protokolldatei in %TEMP% erstellt." />
+  <String Id="HelpCloseButton" Value="&amp;Schließen" />
+  <String Id="InstallLicenseLinkText" Value="[WixBundleName]-&lt;a href=&quot;#&quot;&gt;Lizenzbedingungen&lt;/a&gt;." />
+  <String Id="InstallAcceptCheckbox" Value="Ich &amp;stimme den Lizenzbedingungen zu" />
+  <String Id="InstallOptionsButton" Value="&amp;Optionen" />
+  <String Id="InstallInstallButton" Value="&amp;Installieren" />
+  <String Id="InstallCancelButton" Value="&amp;Abbrechen" />
+  <String Id="OptionsHeader" Value="Setup-Optionen" />
+  <String Id="OptionsLocationLabel" Value="Installationsort:" />
+  <String Id="OptionsPerUserScopeText" Value="[WixBundleName] nur für &amp;mich installieren" />
+  <String Id="OptionsPerMachineScopeText" Value="[WixBundleName] für alle &amp;Benutzer installieren" />
+  <String Id="OptionsBrowseButton" Value="&amp;Durchsuchen" />
+  <String Id="OptionsOkButton" Value="&amp;OK" />
+  <String Id="OptionsCancelButton" Value="&amp;Abbrechen" />
+  <String Id="ProgressHeader" Value="Setup-Fortschritt" />
+  <String Id="ProgressLabel" Value="Verarbeitung:" />
+  <String Id="OverallProgressPackageText" Value="Wird initialisiert..." />
+  <String Id="ProgressCancelButton" Value="&amp;Abbrechen" />
+  <String Id="ModifyHeader" Value="Setup ändern" />
+  <String Id="ModifyRepairButton" Value="&amp;Reparieren" />
+  <String Id="ModifyUninstallButton" Value="&amp;Deinstallieren" />
+  <String Id="ModifyCancelButton" Value="&amp;Abbrechen" />
+  <String Id="SuccessHeader" Value="Setup erfolgreich" />
+  <String Id="SuccessCacheHeader" Value="Zwischenspeichern erfolgreich abgeschlossen" />
+  <String Id="SuccessInstallHeader" Value="Installation erfolgreich abgeschlossen" />
+  <String Id="SuccessLayoutHeader" Value="Layout erfolgreich abgeschlossen" />
+  <String Id="SuccessModifyHeader" Value="Änderung erfolgreich abgeschlossen" />
+  <String Id="SuccessRepairHeader" Value="Reparatur erfolgreich abgeschlossen" />
+  <String Id="SuccessUninstallHeader" Value="Deinstallation erfolgreich abgeschlossen" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Deinstallation erfolgreich abgeschlossen" />
+  <String Id="SuccessLaunchButton" Value="&amp;Starten" />
+  <String Id="SuccessRestartText" Value="Sie müssen Ihren Computer neu starten, bevor Sie die Software verwenden können." />
+  <String Id="SuccessUninstallRestartText" Value="Sie müssen Ihren Computer neu starten, um die Entfernung der Software abzuschließen." />
+  <String Id="SuccessRestartButton" Value="&amp;Neu starten" />
+  <String Id="SuccessCloseButton" Value="&amp;Schließen" />
+  <String Id="FailureHeader" Value="Setup fehlgeschlagen" />
+  <String Id="FailureCacheHeader" Value="Zwischenspeichern fehlgeschlagen" />
+  <String Id="FailureInstallHeader" Value="Setup fehlgeschlagen" />
+  <String Id="FailureLayoutHeader" Value="Layout fehlgeschlagen" />
+  <String Id="FailureModifyHeader" Value="Änderung fehlgeschlagen" />
+  <String Id="FailureRepairHeader" Value="Reparatur fehlgeschlagen" />
+  <String Id="FailureUninstallHeader" Value="Deinstallation fehlgeschlagen" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Deinstallation fehlgeschlagen" />
+  <String Id="FailureHyperlinkLogText" Value="Beim Setup ist aufgrund mindestens eines Problems ein Fehler aufgetreten. Beheben Sie die Probleme, und wiederholen Sie das Setup. Weitere Informationen finden Sie in der &lt;a href=&quot;#&quot;&gt;Protokolldatei&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Sie müssen den Computer neu starten, um das Zurücksetzen der Software abzuschließen." />
+  <String Id="FailureRestartButton" Value="&amp;Neu starten" />
+  <String Id="FailureCloseButton" Value="&amp;Schließen" />
+  <String Id="FilesInUseTitle" Value="Dateien werden verwendet" />
+  <String Id="FilesInUseLabel" Value="Die folgenden Anwendungen verwenden Dateien, die aktualisiert werden müssen:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Die &amp;Anwendungen schließen." />
+  <String Id="FilesInUseCloseRadioButton" Value="Die &amp;Anwendungen schließen und versuchen, sie neu zu starten." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="Anwendungen &amp;nicht schließen. Ein Neustart ist erforderlich." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Wiederholen" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Ignorieren" />
+  <String Id="FilesInUseExitButton" Value="Be&amp;enden" />
+</WixLocalization>

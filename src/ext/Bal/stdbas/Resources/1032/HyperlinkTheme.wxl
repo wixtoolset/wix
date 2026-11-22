@@ -1,0 +1,71 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="el-gr" Language="1032" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="Εγκατάσταση του [WixBundleName]" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Έλεγχος για ενημερώσεις" />
+  <String Id="UpdateButton" Value="&amp;Ενημέρωση στην έκδοση [WixStdBAUpdateAvailable]" />
+  <String Id="InstallHeader" Value="Καλώς ορίσατε" />
+  <String Id="InstallMessage" Value="Το πρόγραμμα εγκατάστασης θα εγκαταστήσει το [WixBundleName] στον υπολογιστή σας. Κάντε κλικ στο κουμπί Εγκατάσταση για να συνεχίσετε ή στο κουμπί Άκυρο για έξοδο." />
+  <String Id="InstallMessageOptions" Value="Το πρόγραμμα εγκατάστασης θα εγκαταστήσει το [WixBundleName] στον υπολογιστή σας. Κάντε κλικ στο κουμπί Εγκατάσταση για να συνεχίσετε, στο κουμπί Επιλογές για να ορίσετε τις επιλογές εγκατάστασης ή στο κουμπί Άκυρο για έξοδο." />
+  <String Id="InstallVersion" Value="Έκδοση [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="Είστε βέβαιοι ότι θέλετε να γίνει ακύρωση;" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Προηγούμενη έκδοση" />
+  <String Id="HelpHeader" Value="Βοήθεια για την εγκατάσταση" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - εγκαθιστά, επιδιορθώνει, καταργεί την εγκατάσταση ή&#xA;   δημιουργεί ένα πλήρες τοπικό αντίγραφο της δέσμης στον κατάλογο. Η εγκατάσταση είναι η προεπιλογή.&#xA;&#xA;/passive | /quiet - εμφανίζει ελάχιστο περιβάλλον εργασίας χρήστη χωρίς μηνύματα ή δεν εμφανίζει περιβάλλον&#xA;   εργασίας χρήστη και μηνύματα. Από προεπιλογή, εμφανίζονται το περιβάλλον εργασίας χρήστη και όλα τα μηνύματα.&#xA;&#xA;/norestart   - αποκρύπτει οποιεσδήποτε προσπάθειες για επανεκκίνηση. Από προεπιλογή, θα εμφανιστεί μήνυμα πριν από την επανεκκίνηση.&#xA;/log log.txt - πραγματοποιεί καταγραφή σε ένα συγκεκριμένο αρχείο. Από προεπιλογή, δημιουργείται ένα αρχείο καταγραφής στο %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Κλείσιμο" />
+  <String Id="InstallLicenseLinkText" Value="&lt;a href=&quot;#&quot;&gt;Όροι άδειας χρήσης&lt;/a&gt; του [WixBundleName]." />
+  <String Id="InstallAcceptCheckbox" Value="&amp;Συμφωνώ με τους όρους και τις προϋποθέσεις της άδειας χρήσης" />
+  <String Id="InstallOptionsButton" Value="Ε&amp;πιλογές" />
+  <String Id="InstallInstallButton" Value="&amp;Εγκατάσταση" />
+  <String Id="InstallCancelButton" Value="&amp;Άκυρο" />
+  <String Id="OptionsHeader" Value="Επιλογές εγκατάστασης" />
+  <String Id="OptionsLocationLabel" Value="Θέση εγκατάστασης:" />
+  <String Id="OptionsPerUserScopeText" Value="Εγκατάσταση του [WixBundleName] μόνο για ε&amp;μένα" />
+  <String Id="OptionsPerMachineScopeText" Value="Εγκατάσταση του [WixBundleName] για ό&amp;λους τους χρήστες" />
+  <String Id="OptionsBrowseButton" Value="Α&amp;ναζήτηση" />
+  <String Id="OptionsOkButton" Value="&amp;OK" />
+  <String Id="OptionsCancelButton" Value="&amp;Άκυρο" />
+  <String Id="ProgressHeader" Value="Πρόοδος εγκατάστασης" />
+  <String Id="ProgressLabel" Value="Επεξεργασία:" />
+  <String Id="OverallProgressPackageText" Value="Προετοιμασία..." />
+  <String Id="ProgressCancelButton" Value="&amp;Άκυρο" />
+  <String Id="ModifyHeader" Value="Τροποποίηση εγκατάστασης" />
+  <String Id="ModifyRepairButton" Value="Επι&amp;διόρθωση" />
+  <String Id="ModifyUninstallButton" Value="&amp;Κατάργηση εγκατάστασης" />
+  <String Id="ModifyCancelButton" Value="&amp;Άκυρο" />
+  <String Id="SuccessHeader" Value="Η εγκατάσταση ολοκληρώθηκε με επιτυχία" />
+  <String Id="SuccessCacheHeader" Value="Η αποθήκευση στην cache ολοκληρώθηκε με επιτυχία" />
+  <String Id="SuccessInstallHeader" Value="Η εγκατάσταση ολοκληρώθηκε με επιτυχία" />
+  <String Id="SuccessLayoutHeader" Value="Η διάταξη ολοκληρώθηκε με επιτυχία" />
+  <String Id="SuccessModifyHeader" Value="Η τροποποίηση ολοκληρώθηκε με επιτυχία" />
+  <String Id="SuccessRepairHeader" Value="Η επιδιόρθωση ολοκληρώθηκε με επιτυχία" />
+  <String Id="SuccessUninstallHeader" Value="Η κατάργηση εγκατάστασης ολοκληρώθηκε με επιτυχία" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Η κατάργηση εγκατάστασης ολοκληρώθηκε με επιτυχία" />
+  <String Id="SuccessLaunchButton" Value="&amp;Εκκίνηση" />
+  <String Id="SuccessRestartText" Value="Πρέπει να κάνετε επανεκκίνηση του υπολογιστή σας πριν χρησιμοποιήσετε το λογισμικό." />
+  <String Id="SuccessUninstallRestartText" Value="Πρέπει να κάνετε επανεκκίνηση του υπολογιστή σας για να ολοκληρωθεί η κατάργηση του λογισμικού." />
+  <String Id="SuccessRestartButton" Value="&amp;Επανεκκίνηση" />
+  <String Id="SuccessCloseButton" Value="&amp;Κλείσιμο" />
+  <String Id="FailureHeader" Value="Αποτυχία εγκατάστασης" />
+  <String Id="FailureCacheHeader" Value="Αποτυχία αποθήκευσης στην cache" />
+  <String Id="FailureInstallHeader" Value="Αποτυχία εγκατάστασης" />
+  <String Id="FailureLayoutHeader" Value="Αποτυχία διάταξης" />
+  <String Id="FailureModifyHeader" Value="Αποτυχία τροποποίησης" />
+  <String Id="FailureRepairHeader" Value="Αποτυχία επιδιόρθωσης" />
+  <String Id="FailureUninstallHeader" Value="Αποτυχία κατάργησης εγκατάστασης" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Αποτυχία κατάργησης εγκατάστασης" />
+  <String Id="FailureHyperlinkLogText" Value="Ένα ή περισσότερα προβλήματα προκάλεσαν την αποτυχία της εγκατάστασης. Διορθώστε τα προβλήματα και μετά επαναλάβετε την εγκατάσταση. Για περισσότερες πληροφορίες, ανατρέξτε στο &lt;a href=&quot;#&quot;&gt;αρχείο καταγραφής&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Για να ολοκληρωθεί η επαναφορά του λογισμικού, πρέπει να κάνετε επανεκκίνηση του υπολογιστή." />
+  <String Id="FailureRestartButton" Value="&amp;Επανεκκίνηση" />
+  <String Id="FailureCloseButton" Value="&amp;Κλείσιμο" />
+  <String Id="FilesInUseTitle" Value="Αρχεία σε χρήση" />
+  <String Id="FilesInUseLabel" Value="Οι παρακάτω εφαρμογές χρησιμοποιούν αρχεία που πρέπει να ενημερωθούν:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="&amp;Κλείσιμο των εφαρμογών." />
+  <String Id="FilesInUseCloseRadioButton" Value="&amp;Κλείσιμο των εφαρμογών και προσπάθεια επανεκκίνησής τους." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Να μην κλείσουν οι εφαρμογές. Θα απαιτηθεί επανεκκίνηση." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Επανάληψη" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Παράβλεψη" />
+  <String Id="FilesInUseExitButton" Value="Έ&amp;ξοδος" />
+</WixLocalization>

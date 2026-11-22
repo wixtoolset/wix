@@ -2,28 +2,37 @@
 
 
 <WixLocalization Culture="ja-jp" Language="1041" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="[WixBundleName] セットアップ" />
-  <String Id="Title" Value="[WixBundleName] セットアップには Microsoft .NET Framework が必要です" />
+  <String Id="Caption" Value="[WixBundleName] 前提条件セットアップ" />
+  <String Id="Title" Value="[WixBundleName] セットアップに必要な前提条件" />
+  <String Id="NonPrereqTitle" Value="[WixBundleName] セットアップ" />
   <String Id="ConfirmCancelMessage" Value="取り消しますか?" />
   <String Id="HelpHeader" Value="セットアップのヘルプ" />
   <String Id="HelpText" Value="/passive | /quiet -  最小の UI だけを表示してプロンプトは表示しないか、UI&#xA;   もプロンプトも表示しません。 既定では、UI とすべてのプロンプトが表示されます。&#xA;&#xA;/norestart   - 再起動の試みをすべて抑制します。既定では、再起動の前に UI によりプロンプトが表示されます。&#xA;/log log.txt - 特定のファイルにログを記録します。既定では、%TEMP% にログ ファイルが作成されます。" />
   <String Id="HelpCloseButton" Value="閉じる(&amp;C)" />
-  <String Id="InstallLicenseTerms" Value="Microsoft .NET Framework の&lt;a href=&quot;#&quot;&gt;ライセンス条項&lt;/a&gt;に同意する場合は、［同意してインストール］5D; ボタンをクリックします。" />
+  <String Id="InstallLicenseTerms" Value="前提条件の&lt;a href=&quot;#&quot;&gt;ライセンス条項&lt;/a&gt;に同意する場合は、[同意してインストール] ボタンをクリックします。" />
   <String Id="InstallAcceptAndInstallButton" Value="同意してインストール(&amp;A)" />
-  <String Id="InstallDeclineButton" Value="同意しない(&amp;)" />
+  <String Id="InstallDeclineButton" Value="同意しない(&amp;D)" />
   <String Id="ProgressHeader" Value="セットアップの進行状況" />
   <String Id="ProgressLabel" Value="処理中:" />
   <String Id="ProgressCancelButton" Value="キャンセル(&amp;C)" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="SuccessHeader" Value="前提条件のセットアップに成功しました" />
+  <String Id="SuccessLayoutHeader" Value="レイアウトが正常に完了しました" />
+  <String Id="SuccessRestartText" Value="[WixBundleName] セットアップを続行するには、コンピューターを再起動する必要があります。" />
+  <String Id="SuccessRestartButton" Value="再起動(&amp;R)" />
+  <String Id="SuccessCloseButton" Value="閉じる(&amp;C)" />
   <String Id="FailureHeader" Value="セットアップに失敗しました" />
+  <String Id="FailureLayoutHeader" Value="レイアウトに失敗しました" />
   <String Id="FailureLogLinkText" Value="1 つ以上の問題が原因でセットアップに失敗しました。問題を解決してからセットアップをやり直してください。詳細については、&lt;a href=&quot;#&quot;&gt;ログ ファイル&lt;/a&gt;を参照してください。" />
   <String Id="FailureRestartText" Value="ソフトウェアのロールバックを完了するには、コンピューターを再起動する必要があります。" />
   <String Id="FailureRestartButton" Value="再起動(&amp;R)" />
   <String Id="FailureCloseButton" Value="閉じる(&amp;C)" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="すべての前提条件がインストールされていますが、[WixBundleName] を起動できませんでした。" />
+  <String Id="FilesInUseTitle" Value="使用中のファイル" />
+  <String Id="FilesInUseLabel" Value="次のアプリケーションが、更新する必要のあるファイルを使用しています:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="アプリケーションを終了する(&amp;A)。" />
+  <String Id="FilesInUseCloseRadioButton" Value="アプリケーションを終了し、再起動を試みる(&amp;A)。" />
+  <String Id="FilesInUseDontCloseRadioButton" Value="アプリケーションを終了しない(&amp;D)。再起動が必要になります。" />
+  <String Id="FilesInUseRetryButton" Value="再試行(&amp;R)" />
+  <String Id="FilesInUseIgnoreButton" Value="無視(&amp;I)" />
+  <String Id="FilesInUseExitButton" Value="終了(&amp;X)" />
 </WixLocalization>

@@ -1,0 +1,67 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="sk-sk" Language="1051" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="[WixBundleName] – inštalácia" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Kontrolujú sa aktualizácie" />
+  <String Id="UpdateButton" Value="&amp;Aktualizovať na verziu [WixStdBAUpdateAvailable]" />
+  <String Id="InstallVersion" Value="Verzia [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="Naozaj chcete zrušiť operáciu?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Predchádzajúca verzia" />
+  <String Id="HelpHeader" Value="Pomocník pre inštaláciu" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] – nainštaluje, opraví, odinštaluje alebo&#xA;   vytvorí úplnú lokálnu kópiu balíka v adresári. Predvolená je inštalácia.&#xA;&#xA;/passive | /quiet – zobrazí minimálne používateľské rozhranie bez výziev alebo nezobrazí žiadne&#xA;   používateľské rozhranie ani výzvy. Predvolene sa zobrazuje používateľské rozhranie aj všetky výzvy.&#xA;&#xA;/norestart   – potlačí všetky pokusy o reštart. Predvolene sa pred reštartom zobrazí výzva.&#xA;/log log.txt – zaznamená denník do určeného súboru. Predvolene sa súbor denníka vytvorí v priečinku %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Zavrieť" />
+  <String Id="InstallAcceptCheckbox" Value="&amp;Súhlasím s licenčnými podmienkami" />
+  <String Id="InstallOptionsButton" Value="&amp;Možnosti" />
+  <String Id="InstallInstallButton" Value="&amp;Inštalovať" />
+  <String Id="InstallCancelButton" Value="&amp;Zrušiť" />
+  <String Id="OptionsHeader" Value="Možnosti inštalácie" />
+  <String Id="OptionsLocationLabel" Value="Umiestnenie inštalácie:" />
+  <String Id="OptionsPerUserScopeText" Value="Inštalovať [WixBundleName] iba pre &amp;mňa" />
+  <String Id="OptionsPerMachineScopeText" Value="Inštalovať [WixBundleName] pre všetkých &amp;používateľov" />
+  <String Id="OptionsBrowseButton" Value="&amp;Prehľadávať" />
+  <String Id="OptionsOkButton" Value="&amp;OK" />
+  <String Id="OptionsCancelButton" Value="&amp;Zrušiť" />
+  <String Id="ProgressHeader" Value="Priebeh inštalácie" />
+  <String Id="ProgressLabel" Value="Spracúva sa:" />
+  <String Id="OverallProgressPackageText" Value="Inicializuje sa..." />
+  <String Id="ProgressCancelButton" Value="&amp;Zrušiť" />
+  <String Id="ModifyHeader" Value="Upraviť inštaláciu" />
+  <String Id="ModifyRepairButton" Value="&amp;Opraviť" />
+  <String Id="ModifyUninstallButton" Value="&amp;Odinštalovať" />
+  <String Id="ModifyCancelButton" Value="&amp;Zrušiť" />
+  <String Id="SuccessHeader" Value="Inštalácia bola úspešná" />
+  <String Id="SuccessCacheHeader" Value="Uloženie do vyrovnávacej pamäte bolo úspešne dokončené" />
+  <String Id="SuccessInstallHeader" Value="Inštalácia bola úspešne dokončená" />
+  <String Id="SuccessLayoutHeader" Value="Rozloženie bolo úspešne dokončené" />
+  <String Id="SuccessModifyHeader" Value="Úprava bola úspešne dokončená" />
+  <String Id="SuccessRepairHeader" Value="Oprava bola úspešne dokončená" />
+  <String Id="SuccessUninstallHeader" Value="Odinštalovanie bolo úspešne dokončené" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Odinštalovanie bolo úspešne dokončené" />
+  <String Id="SuccessLaunchButton" Value="&amp;Spustiť" />
+  <String Id="SuccessRestartText" Value="Pred použitím softvéru musíte reštartovať počítač." />
+  <String Id="SuccessUninstallRestartText" Value="Na dokončenie odstránenia softvéru musíte reštartovať počítač." />
+  <String Id="SuccessRestartButton" Value="&amp;Reštartovať" />
+  <String Id="SuccessCloseButton" Value="&amp;Zavrieť" />
+  <String Id="FailureHeader" Value="Inštalácia zlyhala" />
+  <String Id="FailureCacheHeader" Value="Uloženie do vyrovnávacej pamäte zlyhalo" />
+  <String Id="FailureInstallHeader" Value="Inštalácia zlyhala" />
+  <String Id="FailureLayoutHeader" Value="Rozloženie zlyhalo" />
+  <String Id="FailureModifyHeader" Value="Úprava zlyhala" />
+  <String Id="FailureRepairHeader" Value="Oprava zlyhala" />
+  <String Id="FailureUninstallHeader" Value="Odinštalovanie zlyhalo" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Odinštalovanie zlyhalo" />
+  <String Id="FailureHyperlinkLogText" Value="Inštalácia zlyhala pre jednu alebo viac príčin. Odstráňte problémy a skúste znova spustiť inštaláciu. Ďalšie informácie nájdete v &lt;a href=&quot;#&quot;&gt;súbore denníka&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Dokončenie všetkých zmien softvéru vyžaduje reštart počítača." />
+  <String Id="FailureRestartButton" Value="&amp;Reštartovať" />
+  <String Id="FailureCloseButton" Value="&amp;Zavrieť" />
+  <String Id="FilesInUseTitle" Value="Používané súbory" />
+  <String Id="FilesInUseLabel" Value="Nasledujúce aplikácie používajú súbory, ktoré je potrebné aktualizovať:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Zavrieť &amp;aplikácie." />
+  <String Id="FilesInUseCloseRadioButton" Value="Zavrieť &amp;aplikácie a pokúsiť sa o ich opätovné spustenie." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Nezavrieť aplikácie. Bude potrebný reštart." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Znova" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Ignorovať" />
+  <String Id="FilesInUseExitButton" Value="Sk&amp;ončiť" />
+</WixLocalization>

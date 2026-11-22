@@ -1,0 +1,71 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="sv-se" Language="1053" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="[WixBundleName]-installation" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Söker efter uppdateringar" />
+  <String Id="UpdateButton" Value="&amp;Uppdatera till version [WixStdBAUpdateAvailable]" />
+  <String Id="InstallHeader" Value="Välkommen" />
+  <String Id="InstallMessage" Value="Installationsprogrammet kommer att installera [WixBundleName] på din dator. Klicka på Installera för att fortsätta eller Avbryt för att avsluta." />
+  <String Id="InstallMessageOptions" Value="Installationsprogrammet kommer att installera [WixBundleName] på din dator. Klicka på Installera för att fortsätta, Alternativ för att ange installationsalternativ eller Avbryt för att avsluta." />
+  <String Id="InstallVersion" Value="Version [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="Vill du avbryta?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Föregående version" />
+  <String Id="HelpHeader" Value="Installationshjälp" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - installerar, reparerar, avinstallerar eller&#xA;   skapar en fullständig lokal kopia av paketet i katalogen. Installera är standard.&#xA;&#xA;/passive | /quiet - visar ett minimalt användargränssnitt utan frågor eller inget användargränssnitt&#xA;   och inga frågor. Som standard visas användargränssnittet och alla frågor.&#xA;&#xA;/norestart   - förhindrar alla försök till omstart. Som standard frågar användargränssnittet före omstart.&#xA;/log log.txt - loggar till en specifik fil. Som standard skapas en loggfil i %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Stäng" />
+  <String Id="InstallLicenseLinkText" Value="[WixBundleName] &lt;a href=&quot;#&quot;&gt;licensvillkor&lt;/a&gt;." />
+  <String Id="InstallAcceptCheckbox" Value="Jag &amp;accepterar licensvillkoren" />
+  <String Id="InstallOptionsButton" Value="&amp;Alternativ" />
+  <String Id="InstallInstallButton" Value="&amp;Installera" />
+  <String Id="InstallCancelButton" Value="&amp;Avbryt" />
+  <String Id="OptionsHeader" Value="Installationsalternativ" />
+  <String Id="OptionsLocationLabel" Value="Installationsplats:" />
+  <String Id="OptionsPerUserScopeText" Value="Installera [WixBundleName] bara för &amp;mig" />
+  <String Id="OptionsPerMachineScopeText" Value="Installera [WixBundleName] för alla &amp;användare" />
+  <String Id="OptionsBrowseButton" Value="&amp;Bläddra" />
+  <String Id="OptionsOkButton" Value="&amp;OK" />
+  <String Id="OptionsCancelButton" Value="&amp;Avbryt" />
+  <String Id="ProgressHeader" Value="Installationsförlopp" />
+  <String Id="ProgressLabel" Value="Bearbetar:" />
+  <String Id="OverallProgressPackageText" Value="Initierar..." />
+  <String Id="ProgressCancelButton" Value="&amp;Avbryt" />
+  <String Id="ModifyHeader" Value="Ändra installation" />
+  <String Id="ModifyRepairButton" Value="&amp;Reparera" />
+  <String Id="ModifyUninstallButton" Value="&amp;Avinstallera" />
+  <String Id="ModifyCancelButton" Value="&amp;Avbryt" />
+  <String Id="SuccessHeader" Value="Installationen lyckades" />
+  <String Id="SuccessCacheHeader" Value="Cachelagring slutfördes" />
+  <String Id="SuccessInstallHeader" Value="Installationen slutfördes" />
+  <String Id="SuccessLayoutHeader" Value="Layout slutfördes" />
+  <String Id="SuccessModifyHeader" Value="Ändring slutfördes" />
+  <String Id="SuccessRepairHeader" Value="Reparation slutfördes" />
+  <String Id="SuccessUninstallHeader" Value="Avinstallation slutfördes" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Avinstallation slutfördes" />
+  <String Id="SuccessLaunchButton" Value="&amp;Starta" />
+  <String Id="SuccessRestartText" Value="Du måste starta om datorn innan du kan använda programvaran." />
+  <String Id="SuccessUninstallRestartText" Value="Du måste starta om datorn för att slutföra borttagningen av programvaran." />
+  <String Id="SuccessRestartButton" Value="&amp;Starta om" />
+  <String Id="SuccessCloseButton" Value="&amp;Stäng" />
+  <String Id="FailureHeader" Value="Installationen misslyckades" />
+  <String Id="FailureCacheHeader" Value="Cachelagring misslyckades" />
+  <String Id="FailureInstallHeader" Value="Installationen misslyckades" />
+  <String Id="FailureLayoutHeader" Value="Layout misslyckades" />
+  <String Id="FailureModifyHeader" Value="Ändring misslyckades" />
+  <String Id="FailureRepairHeader" Value="Reparation misslyckades" />
+  <String Id="FailureUninstallHeader" Value="Avinstallation misslyckades" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Avinstallation misslyckades" />
+  <String Id="FailureHyperlinkLogText" Value="Installationen misslyckades på grund av ett eller flera problem. Åtgärda problemen och försök igen. Se &lt;a href=&quot;#&quot;&gt;loggfilen&lt;/a&gt; för mer information." />
+  <String Id="FailureRestartText" Value="Starta om datorn för att återställa programmet." />
+  <String Id="FailureRestartButton" Value="&amp;Starta om" />
+  <String Id="FailureCloseButton" Value="&amp;Stäng" />
+  <String Id="FilesInUseTitle" Value="Filer som används" />
+  <String Id="FilesInUseLabel" Value="Följande program använder filer som behöver uppdateras:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Stäng &amp;programmen." />
+  <String Id="FilesInUseCloseRadioButton" Value="Stäng &amp;programmen och försök starta om dem." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Stäng inte programmen. En omstart kommer att krävas." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Försök igen" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Ignorera" />
+  <String Id="FilesInUseExitButton" Value="A&amp;vsluta" />
+</WixLocalization>

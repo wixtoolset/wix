@@ -1,4 +1,4 @@
-﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
     <Fragment>
@@ -6,7 +6,6 @@
             <Payload Name="wixpreq.thm" SourceFile="!(wix.WixPreqbaThemeXml=SourceDir\wixpreq.thm)" />
             <Payload Name="wixpreq.png" SourceFile="!(wix.WixPreqbaLogo=SourceDir\wixpreq.png)" />
             <Payload Name="wixpreq.wxl" SourceFile="!(wix.WixPreqbaThemeWxl=SourceDir\wixpreq.wxl)" />
-            <!--
             <Payload Name="1028\wixpreq.wxl" SourceFile="!(wix.WixPreqbaThemeWxl1028=SourceDir\1028\wixpreq.wxl)" />
             <Payload Name="1029\wixpreq.wxl" SourceFile="!(wix.WixPreqbaThemeWxl1029=SourceDir\1029\wixpreq.wxl)" />
             <Payload Name="1030\wixpreq.wxl" SourceFile="!(wix.WixPreqbaThemeWxl1030=SourceDir\1030\wixpreq.wxl)" />
@@ -30,7 +29,6 @@
             <Payload Name="2052\wixpreq.wxl" SourceFile="!(wix.WixPreqbaThemeWxl2052=SourceDir\2052\wixpreq.wxl)" />
             <Payload Name="2070\wixpreq.wxl" SourceFile="!(wix.WixPreqbaThemeWxl2070=SourceDir\2070\wixpreq.wxl)" />
             <Payload Name="3082\wixpreq.wxl" SourceFile="!(wix.WixPreqbaThemeWxl3082=SourceDir\3082\wixpreq.wxl)" />
-            -->
         </PayloadGroup>
     </Fragment>
 </Wix>

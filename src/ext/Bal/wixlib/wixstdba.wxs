@@ -1,4 +1,4 @@
-﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
@@ -7,6 +7,29 @@
         <PayloadGroup Id="WixStdbaRtfLicensePayloads">
             <Payload Name="thm.xml" Compressed="yes" SourceFile="!(wix.WixStdbaThemeXml=RtfTheme.xml)" />
             <Payload Name="thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl=RtfTheme.wxl)" />
+            <Payload Name="1028\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1028=1028\RtfTheme.wxl)" />
+            <Payload Name="1029\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1029=1029\RtfTheme.wxl)" />
+            <Payload Name="1030\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1030=1030\RtfTheme.wxl)" />
+            <Payload Name="1031\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1031=1031\RtfTheme.wxl)" />
+            <Payload Name="1032\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1032=1032\RtfTheme.wxl)" />
+            <Payload Name="1035\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1035=1035\RtfTheme.wxl)" />
+            <Payload Name="1036\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1036=1036\RtfTheme.wxl)" />
+            <Payload Name="1038\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1038=1038\RtfTheme.wxl)" />
+            <Payload Name="1040\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1040=1040\RtfTheme.wxl)" />
+            <Payload Name="1041\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1041=1041\RtfTheme.wxl)" />
+            <Payload Name="1042\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1042=1042\RtfTheme.wxl)" />
+            <Payload Name="1043\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1043=1043\RtfTheme.wxl)" />
+            <Payload Name="1044\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1044=1044\RtfTheme.wxl)" />
+            <Payload Name="1045\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1045=1045\RtfTheme.wxl)" />
+            <Payload Name="1046\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1046=1046\RtfTheme.wxl)" />
+            <Payload Name="1049\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1049=1049\RtfTheme.wxl)" />
+            <Payload Name="1051\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1051=1051\RtfTheme.wxl)" />
+            <Payload Name="1053\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1053=1053\RtfTheme.wxl)" />
+            <Payload Name="1055\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1055=1055\RtfTheme.wxl)" />
+            <Payload Name="1060\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1060=1060\RtfTheme.wxl)" />
+            <Payload Name="2052\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl2052=2052\RtfTheme.wxl)" />
+            <Payload Name="2070\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl2070=2070\RtfTheme.wxl)" />
+            <Payload Name="3082\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl3082=3082\RtfTheme.wxl)" />
             <Payload Name="logo.png" Compressed="yes" SourceFile="!(wix.WixStdbaLogo=logo.png)" />
 
             <Payload Name="!(wix.WixStdbaLicenseRtfName=license.rtf)" Compressed="yes" SourceFile="!(wix.WixStdbaLicenseRtf=LoremIpsumLicense.rtf)" />
@@ -24,6 +47,29 @@
         <PayloadGroup Id="WixStdbaRtfLargeLicensePayloads">
             <Payload Name="thm.xml" Compressed="yes" SourceFile="!(wix.WixStdbaThemeXml=RtfLargeTheme.xml)" />
             <Payload Name="thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl=RtfTheme.wxl)" />
+            <Payload Name="1028\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1028=1028\RtfTheme.wxl)" />
+            <Payload Name="1029\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1029=1029\RtfTheme.wxl)" />
+            <Payload Name="1030\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1030=1030\RtfTheme.wxl)" />
+            <Payload Name="1031\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1031=1031\RtfTheme.wxl)" />
+            <Payload Name="1032\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1032=1032\RtfTheme.wxl)" />
+            <Payload Name="1035\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1035=1035\RtfTheme.wxl)" />
+            <Payload Name="1036\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1036=1036\RtfTheme.wxl)" />
+            <Payload Name="1038\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1038=1038\RtfTheme.wxl)" />
+            <Payload Name="1040\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1040=1040\RtfTheme.wxl)" />
+            <Payload Name="1041\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1041=1041\RtfTheme.wxl)" />
+            <Payload Name="1042\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1042=1042\RtfTheme.wxl)" />
+            <Payload Name="1043\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1043=1043\RtfTheme.wxl)" />
+            <Payload Name="1044\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1044=1044\RtfTheme.wxl)" />
+            <Payload Name="1045\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1045=1045\RtfTheme.wxl)" />
+            <Payload Name="1046\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1046=1046\RtfTheme.wxl)" />
+            <Payload Name="1049\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1049=1049\RtfTheme.wxl)" />
+            <Payload Name="1051\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1051=1051\RtfTheme.wxl)" />
+            <Payload Name="1053\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1053=1053\RtfTheme.wxl)" />
+            <Payload Name="1055\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1055=1055\RtfTheme.wxl)" />
+            <Payload Name="1060\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1060=1060\RtfTheme.wxl)" />
+            <Payload Name="2052\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl2052=2052\RtfTheme.wxl)" />
+            <Payload Name="2070\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl2070=2070\RtfTheme.wxl)" />
+            <Payload Name="3082\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl3082=3082\RtfTheme.wxl)" />
             <Payload Name="logo.png" Compressed="yes" SourceFile="!(wix.WixStdbaLogo=logo.png)" />
 
             <Payload Name="!(wix.WixStdbaLicenseRtfName=license.rtf)" Compressed="yes" SourceFile="!(wix.WixStdbaLicenseRtf=LoremIpsumLicense.rtf)" />
@@ -41,6 +87,29 @@
         <PayloadGroup Id="WixStdbaHyperlinkLicensePayloads">
             <Payload Name="thm.xml" Compressed="yes" SourceFile="!(wix.WixStdbaThemeXml=HyperlinkTheme.xml)" />
             <Payload Name="thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl=HyperlinkTheme.wxl)" />
+            <Payload Name="1028\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1028=1028\HyperlinkTheme.wxl)" />
+            <Payload Name="1029\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1029=1029\HyperlinkTheme.wxl)" />
+            <Payload Name="1030\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1030=1030\HyperlinkTheme.wxl)" />
+            <Payload Name="1031\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1031=1031\HyperlinkTheme.wxl)" />
+            <Payload Name="1032\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1032=1032\HyperlinkTheme.wxl)" />
+            <Payload Name="1035\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1035=1035\HyperlinkTheme.wxl)" />
+            <Payload Name="1036\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1036=1036\HyperlinkTheme.wxl)" />
+            <Payload Name="1038\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1038=1038\HyperlinkTheme.wxl)" />
+            <Payload Name="1040\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1040=1040\HyperlinkTheme.wxl)" />
+            <Payload Name="1041\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1041=1041\HyperlinkTheme.wxl)" />
+            <Payload Name="1042\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1042=1042\HyperlinkTheme.wxl)" />
+            <Payload Name="1043\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1043=1043\HyperlinkTheme.wxl)" />
+            <Payload Name="1044\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1044=1044\HyperlinkTheme.wxl)" />
+            <Payload Name="1045\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1045=1045\HyperlinkTheme.wxl)" />
+            <Payload Name="1046\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1046=1046\HyperlinkTheme.wxl)" />
+            <Payload Name="1049\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1049=1049\HyperlinkTheme.wxl)" />
+            <Payload Name="1051\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1051=1051\HyperlinkTheme.wxl)" />
+            <Payload Name="1053\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1053=1053\HyperlinkTheme.wxl)" />
+            <Payload Name="1055\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1055=1055\HyperlinkTheme.wxl)" />
+            <Payload Name="1060\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1060=1060\HyperlinkTheme.wxl)" />
+            <Payload Name="2052\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl2052=2052\HyperlinkTheme.wxl)" />
+            <Payload Name="2070\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl2070=2070\HyperlinkTheme.wxl)" />
+            <Payload Name="3082\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl3082=3082\HyperlinkTheme.wxl)" />
             <Payload Name="logo.png" Compressed="yes" SourceFile="!(wix.WixStdbaLogo=logo.png)" />
         </PayloadGroup>
 
@@ -56,6 +125,29 @@
         <PayloadGroup Id="WixStdbaHyperlinkLargeLicensePayloads">
             <Payload Name="thm.xml" Compressed="yes" SourceFile="!(wix.WixStdbaThemeXml=HyperlinkLargeTheme.xml)" />
             <Payload Name="thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl=HyperlinkTheme.wxl)" />
+            <Payload Name="1028\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1028=1028\HyperlinkTheme.wxl)" />
+            <Payload Name="1029\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1029=1029\HyperlinkTheme.wxl)" />
+            <Payload Name="1030\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1030=1030\HyperlinkTheme.wxl)" />
+            <Payload Name="1031\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1031=1031\HyperlinkTheme.wxl)" />
+            <Payload Name="1032\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1032=1032\HyperlinkTheme.wxl)" />
+            <Payload Name="1035\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1035=1035\HyperlinkTheme.wxl)" />
+            <Payload Name="1036\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1036=1036\HyperlinkTheme.wxl)" />
+            <Payload Name="1038\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1038=1038\HyperlinkTheme.wxl)" />
+            <Payload Name="1040\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1040=1040\HyperlinkTheme.wxl)" />
+            <Payload Name="1041\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1041=1041\HyperlinkTheme.wxl)" />
+            <Payload Name="1042\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1042=1042\HyperlinkTheme.wxl)" />
+            <Payload Name="1043\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1043=1043\HyperlinkTheme.wxl)" />
+            <Payload Name="1044\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1044=1044\HyperlinkTheme.wxl)" />
+            <Payload Name="1045\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1045=1045\HyperlinkTheme.wxl)" />
+            <Payload Name="1046\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1046=1046\HyperlinkTheme.wxl)" />
+            <Payload Name="1049\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1049=1049\HyperlinkTheme.wxl)" />
+            <Payload Name="1051\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1051=1051\HyperlinkTheme.wxl)" />
+            <Payload Name="1053\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1053=1053\HyperlinkTheme.wxl)" />
+            <Payload Name="1055\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1055=1055\HyperlinkTheme.wxl)" />
+            <Payload Name="1060\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1060=1060\HyperlinkTheme.wxl)" />
+            <Payload Name="2052\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl2052=2052\HyperlinkTheme.wxl)" />
+            <Payload Name="2070\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl2070=2070\HyperlinkTheme.wxl)" />
+            <Payload Name="3082\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl3082=3082\HyperlinkTheme.wxl)" />
             <Payload Name="logo.png" Compressed="yes" SourceFile="!(wix.WixStdbaLogo=logo.png)" />
         </PayloadGroup>
 
@@ -71,6 +163,29 @@
         <PayloadGroup Id="WixStdbaHyperlinkSidebarLicensePayloads">
             <Payload Name="thm.xml" Compressed="yes" SourceFile="!(wix.WixStdbaThemeXml=HyperlinkSidebarTheme.xml)" />
             <Payload Name="thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl=HyperlinkTheme.wxl)" />
+            <Payload Name="1028\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1028=1028\HyperlinkTheme.wxl)" />
+            <Payload Name="1029\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1029=1029\HyperlinkTheme.wxl)" />
+            <Payload Name="1030\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1030=1030\HyperlinkTheme.wxl)" />
+            <Payload Name="1031\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1031=1031\HyperlinkTheme.wxl)" />
+            <Payload Name="1032\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1032=1032\HyperlinkTheme.wxl)" />
+            <Payload Name="1035\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1035=1035\HyperlinkTheme.wxl)" />
+            <Payload Name="1036\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1036=1036\HyperlinkTheme.wxl)" />
+            <Payload Name="1038\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1038=1038\HyperlinkTheme.wxl)" />
+            <Payload Name="1040\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1040=1040\HyperlinkTheme.wxl)" />
+            <Payload Name="1041\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1041=1041\HyperlinkTheme.wxl)" />
+            <Payload Name="1042\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1042=1042\HyperlinkTheme.wxl)" />
+            <Payload Name="1043\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1043=1043\HyperlinkTheme.wxl)" />
+            <Payload Name="1044\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1044=1044\HyperlinkTheme.wxl)" />
+            <Payload Name="1045\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1045=1045\HyperlinkTheme.wxl)" />
+            <Payload Name="1046\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1046=1046\HyperlinkTheme.wxl)" />
+            <Payload Name="1049\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1049=1049\HyperlinkTheme.wxl)" />
+            <Payload Name="1051\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1051=1051\HyperlinkTheme.wxl)" />
+            <Payload Name="1053\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1053=1053\HyperlinkTheme.wxl)" />
+            <Payload Name="1055\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1055=1055\HyperlinkTheme.wxl)" />
+            <Payload Name="1060\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl1060=1060\HyperlinkTheme.wxl)" />
+            <Payload Name="2052\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl2052=2052\HyperlinkTheme.wxl)" />
+            <Payload Name="2070\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl2070=2070\HyperlinkTheme.wxl)" />
+            <Payload Name="3082\thm.wxl" Compressed="yes" SourceFile="!(wix.WixStdbaThemeWxl3082=3082\HyperlinkTheme.wxl)" />
             <Payload Name="logo.png" Compressed="yes" SourceFile="!(wix.WixStdbaLogo=logo.png)" />
             <Payload Name="logoside.png" Compressed="yes" SourceFile="!(wix.WixStdbaLogoSide=logoside.png)" />
         </PayloadGroup>

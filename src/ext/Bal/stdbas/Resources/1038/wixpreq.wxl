@@ -2,28 +2,37 @@
 
 
 <WixLocalization Culture="hu-hu" Language="1038" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="[WixBundleName] telepítő" />
-  <String Id="Title" Value="A(z) [WixBundleName] telepítéséhez Microsoft .NET-keretrendszer szükséges" />
+  <String Id="Caption" Value="[WixBundleName] előfeltétel-telepítő" />
+  <String Id="Title" Value="A(z) [WixBundleName] telepítéséhez előfeltétel szükséges" />
+  <String Id="NonPrereqTitle" Value="[WixBundleName] telepítő" />
   <String Id="ConfirmCancelMessage" Value="Biztosan megszakítja?" />
   <String Id="HelpHeader" Value="A telepítő súgója" />
   <String Id="HelpText" Value="/passive | /quiet -  Minimális felhasználói felület megjelenítése kérdések&#xA;   nélkül, illetve felhasználói felület és kérdések megjelenítése nélküli&#xA;   telepítés. Alapesetben a felhasználói felület és minden kérdés megjelenik.&#xA;&#xA;/norestart     - Az újraindítási kérések elrejtése. Alapesetben a felhasználói&#xA;   felületen megjelennek az újraindítási kérések.&#xA;/log naplo.txt - Naplózás a megadott fájlba. Alapesetben a naplófájl a %TEMP%&#xA;   könyvtárban jön létre." />
   <String Id="HelpCloseButton" Value="&amp;Bezárás" />
-  <String Id="InstallLicenseTerms" Value="A Microsoft .NET-keretrendszer &lt;a href=&quot;#&quot;&gt;licencszerződésének&lt;/a&gt; elfogadásához kattintson az „Elfogadás és telepítés” gombra." />
+  <String Id="InstallLicenseTerms" Value="Az előfeltétel &lt;a href=&quot;#&quot;&gt;licencfeltételeinek&lt;/a&gt; elfogadásához kattintson az &quot;Elfogadás és telepítés&quot; gombra." />
   <String Id="InstallAcceptAndInstallButton" Value="&amp;Elfogadás és telepítés" />
   <String Id="InstallDeclineButton" Value="&amp;Elutasítás" />
   <String Id="ProgressHeader" Value="Telepítési folyamat" />
   <String Id="ProgressLabel" Value="Feldolgozás:" />
   <String Id="ProgressCancelButton" Value="&amp;Mégse" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="SuccessHeader" Value="Az előfeltétel telepítése sikerült" />
+  <String Id="SuccessLayoutHeader" Value="Az elrendezés sikeresen befejeződött" />
+  <String Id="SuccessRestartText" Value="A(z) [WixBundleName] telepítésének folytatásához újra kell indítania a számítógépet." />
+  <String Id="SuccessRestartButton" Value="&amp;Újraindítás" />
+  <String Id="SuccessCloseButton" Value="&amp;Bezárás" />
   <String Id="FailureHeader" Value="A telepítés nem sikerült" />
-  <String Id="FailureLogLinkText" Value="Legalább egy olyan hiba lépett fel, amely a telepítés meghiúsulását okozta. Hárítsa el a hibákat, majd futtassa újra a telepítőt. További információt a &lt;a href=&quot;#&quot;&gt;naplófájlban &lt;/a&gt; talál." />
+  <String Id="FailureLayoutHeader" Value="Az elrendezés nem sikerült" />
+  <String Id="FailureLogLinkText" Value="Legalább egy olyan hiba lépett fel, amely a telepítés meghiúsulását okozta. Hárítsa el a hibákat, majd futtassa újra a telepítőt. További információt a &lt;a href=&quot;#&quot;&gt;naplófájlban&lt;/a&gt; talál." />
   <String Id="FailureRestartText" Value="A szoftver visszaállításának befejezéséhez újra kell indítania a számítógépet." />
   <String Id="FailureRestartButton" Value="&amp;Újraindítás" />
   <String Id="FailureCloseButton" Value="&amp;Bezárás" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="A(z) [WixBundleName] nem tudott elindulni, pedig minden előfeltétel telepítve van." />
+  <String Id="FilesInUseTitle" Value="Használatban lévő fájlok" />
+  <String Id="FilesInUseLabel" Value="A következő alkalmazások frissítendő fájlokat használnak:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Az &amp;alkalmazások bezárása." />
+  <String Id="FilesInUseCloseRadioButton" Value="Az &amp;alkalmazások bezárása és kísérlet az újraindításukra." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Ne zárja be az alkalmazásokat. Újraindításra lesz szükség." />
+  <String Id="FilesInUseRetryButton" Value="Újr&amp;a" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Mellőzés" />
+  <String Id="FilesInUseExitButton" Value="&amp;Kilépés" />
 </WixLocalization>

@@ -7,6 +7,29 @@
             <Payload Name="wixpreq.thm" SourceFile="!(wix.WixIuibaThemeXml=SourceDir\iuipreq.thm)" />
             <Payload Name="wixpreq.png" SourceFile="!(wix.WixIuibaLogo=SourceDir\wixpreq.png)" />
             <Payload Name="wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl=SourceDir\wixpreq.wxl)" />
+            <Payload Name="1028\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1028=SourceDir\1028\wixpreq.wxl)" />
+            <Payload Name="1029\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1029=SourceDir\1029\wixpreq.wxl)" />
+            <Payload Name="1030\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1030=SourceDir\1030\wixpreq.wxl)" />
+            <Payload Name="1031\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1031=SourceDir\1031\wixpreq.wxl)" />
+            <Payload Name="1032\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1032=SourceDir\1032\wixpreq.wxl)" />
+            <Payload Name="1035\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1035=SourceDir\1035\wixpreq.wxl)" />
+            <Payload Name="1036\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1036=SourceDir\1036\wixpreq.wxl)" />
+            <Payload Name="1038\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1038=SourceDir\1038\wixpreq.wxl)" />
+            <Payload Name="1040\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1040=SourceDir\1040\wixpreq.wxl)" />
+            <Payload Name="1041\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1041=SourceDir\1041\wixpreq.wxl)" />
+            <Payload Name="1042\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1042=SourceDir\1042\wixpreq.wxl)" />
+            <Payload Name="1043\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1043=SourceDir\1043\wixpreq.wxl)" />
+            <Payload Name="1044\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1044=SourceDir\1044\wixpreq.wxl)" />
+            <Payload Name="1045\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1045=SourceDir\1045\wixpreq.wxl)" />
+            <Payload Name="1046\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1046=SourceDir\1046\wixpreq.wxl)" />
+            <Payload Name="1049\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1049=SourceDir\1049\wixpreq.wxl)" />
+            <Payload Name="1051\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1051=SourceDir\1051\wixpreq.wxl)" />
+            <Payload Name="1053\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1053=SourceDir\1053\wixpreq.wxl)" />
+            <Payload Name="1055\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1055=SourceDir\1055\wixpreq.wxl)" />
+            <Payload Name="1060\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl1060=SourceDir\1060\wixpreq.wxl)" />
+            <Payload Name="2052\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl2052=SourceDir\2052\wixpreq.wxl)" />
+            <Payload Name="2070\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl2070=SourceDir\2070\wixpreq.wxl)" />
+            <Payload Name="3082\wixpreq.wxl" SourceFile="!(wix.WixIuibaThemeWxl3082=SourceDir\3082\wixpreq.wxl)" />
         </PayloadGroup>
     </Fragment>
 </Wix>

@@ -1,0 +1,71 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="fi-fi" Language="1035" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="[WixBundleName] -asennus" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Tarkistetaan päivityksiä" />
+  <String Id="UpdateButton" Value="&amp;Päivitä versioon [WixStdBAUpdateAvailable]" />
+  <String Id="InstallHeader" Value="Tervetuloa" />
+  <String Id="InstallMessage" Value="Asennusohjelma asentaa ohjelman [WixBundleName] tietokoneeseen. Jatka valitsemalla Asenna tai poistu valitsemalla Peruuta." />
+  <String Id="InstallMessageOptions" Value="Asennusohjelma asentaa ohjelman [WixBundleName] tietokoneeseen. Jatka valitsemalla Asenna, määritä asennusasetukset valitsemalla Asetukset tai poistu valitsemalla Peruuta." />
+  <String Id="InstallVersion" Value="Versio [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="Haluatko varmasti peruuttaa?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Edellinen versio" />
+  <String Id="HelpHeader" Value="Asennusohjelman ohje" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - asentaa, korjaa, poistaa asennuksen tai&#xA;   luo paketista täydellisen paikallisen kopion hakemistoon. Oletusarvo on asennus.&#xA;&#xA;/passive | /quiet - näyttää mahdollisimman vähän käyttöliittymästä ilman kehotteita tai ei näytä&#xA;   käyttöliittymää eikä kehotteita. Oletusarvoisesti käyttöliittymä ja kaikki kehotteet näytetään.&#xA;&#xA;/norestart   - estää uudelleenkäynnistysyritykset. Oletusarvoisesti käyttöliittymä kysyy ennen uudelleenkäynnistystä.&#xA;/log log.txt - kirjaa lokitiedot tiettyyn tiedostoon. Oletusarvoisesti lokitiedosto luodaan %TEMP%-kansioon." />
+  <String Id="HelpCloseButton" Value="&amp;Sulje" />
+  <String Id="InstallLicenseLinkText" Value="Ohjelman [WixBundleName] &lt;a href=&quot;#&quot;&gt;käyttöoikeusehdot&lt;/a&gt;." />
+  <String Id="InstallAcceptCheckbox" Value="&amp;Hyväksyn käyttöoikeussopimuksen ehdot" />
+  <String Id="InstallOptionsButton" Value="&amp;Asetukset" />
+  <String Id="InstallInstallButton" Value="&amp;Asenna" />
+  <String Id="InstallCancelButton" Value="&amp;Peruuta" />
+  <String Id="OptionsHeader" Value="Asennusasetukset" />
+  <String Id="OptionsLocationLabel" Value="Asennussijainti:" />
+  <String Id="OptionsPerUserScopeText" Value="Asenna [WixBundleName] vain &amp;minulle" />
+  <String Id="OptionsPerMachineScopeText" Value="Asenna [WixBundleName] kaikille &amp;käyttäjille" />
+  <String Id="OptionsBrowseButton" Value="&amp;Selaa" />
+  <String Id="OptionsOkButton" Value="&amp;OK" />
+  <String Id="OptionsCancelButton" Value="&amp;Peruuta" />
+  <String Id="ProgressHeader" Value="Asennuksen edistyminen" />
+  <String Id="ProgressLabel" Value="Käsitellään:" />
+  <String Id="OverallProgressPackageText" Value="Alustetaan..." />
+  <String Id="ProgressCancelButton" Value="&amp;Peruuta" />
+  <String Id="ModifyHeader" Value="Muokkaa asennusta" />
+  <String Id="ModifyRepairButton" Value="&amp;Korjaa" />
+  <String Id="ModifyUninstallButton" Value="&amp;Poista asennus" />
+  <String Id="ModifyCancelButton" Value="&amp;Peruuta" />
+  <String Id="SuccessHeader" Value="Asennus onnistui" />
+  <String Id="SuccessCacheHeader" Value="Välimuistiin tallentaminen onnistui" />
+  <String Id="SuccessInstallHeader" Value="Asennus onnistui" />
+  <String Id="SuccessLayoutHeader" Value="Asettelu onnistui" />
+  <String Id="SuccessModifyHeader" Value="Muokkaus onnistui" />
+  <String Id="SuccessRepairHeader" Value="Korjaus onnistui" />
+  <String Id="SuccessUninstallHeader" Value="Asennuksen poisto onnistui" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Asennuksen poisto onnistui" />
+  <String Id="SuccessLaunchButton" Value="&amp;Käynnistä" />
+  <String Id="SuccessRestartText" Value="Tietokone on käynnistettävä uudelleen ennen ohjelmiston käyttämistä." />
+  <String Id="SuccessUninstallRestartText" Value="Tietokone on käynnistettävä uudelleen ohjelmiston poistamisen viimeistelemiseksi." />
+  <String Id="SuccessRestartButton" Value="&amp;Käynnistä uudelleen" />
+  <String Id="SuccessCloseButton" Value="&amp;Sulje" />
+  <String Id="FailureHeader" Value="Asennus epäonnistui" />
+  <String Id="FailureCacheHeader" Value="Välimuistiin tallentaminen epäonnistui" />
+  <String Id="FailureInstallHeader" Value="Asennus epäonnistui" />
+  <String Id="FailureLayoutHeader" Value="Asettelu epäonnistui" />
+  <String Id="FailureModifyHeader" Value="Muokkaus epäonnistui" />
+  <String Id="FailureRepairHeader" Value="Korjaus epäonnistui" />
+  <String Id="FailureUninstallHeader" Value="Asennuksen poisto epäonnistui" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Asennuksen poisto epäonnistui" />
+  <String Id="FailureHyperlinkLogText" Value="Asennus epäonnistui yhdestä tai useammasta syystä. Korjaa ongelmat ja yritä suorittaa asennus sitten uudelleen. Lisätietoja on &lt;a href=&quot;#&quot;&gt;lokitiedostossa&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Tietokone täytyy käynnistää uudelleen ohjelmiston palautuksen viimeistelemiseksi." />
+  <String Id="FailureRestartButton" Value="&amp;Käynnistä uudelleen" />
+  <String Id="FailureCloseButton" Value="&amp;Sulje" />
+  <String Id="FilesInUseTitle" Value="Tiedostoja on käytössä" />
+  <String Id="FilesInUseLabel" Value="Seuraavat sovellukset käyttävät tiedostoja, jotka on päivitettävä:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="&amp;Sulje sovellukset." />
+  <String Id="FilesInUseCloseRadioButton" Value="&amp;Sulje sovellukset ja yritä käynnistää ne uudelleen." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Älä sulje sovelluksia. Uudelleenkäynnistys tarvitaan." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Yritä uudelleen" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Ohita" />
+  <String Id="FilesInUseExitButton" Value="&amp;Lopeta" />
+</WixLocalization>

@@ -2,28 +2,37 @@
 
 
 <WixLocalization Culture="ru-ru" Language="1049" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="Установка [WixBundleName]" />
-  <String Id="Title" Value="Для установки [WixBundleName] требуется Microsoft .NET Framework" />
+  <String Id="Caption" Value="Установка необходимых компонентов [WixBundleName]" />
+  <String Id="Title" Value="Для установки [WixBundleName] требуется необходимый компонент" />
+  <String Id="NonPrereqTitle" Value="Установка [WixBundleName]" />
   <String Id="ConfirmCancelMessage" Value="Вы действительно хотите отменить операцию?" />
   <String Id="HelpHeader" Value="Справка по установке" />
   <String Id="HelpText" Value="/passive | /quiet - отображение минимального ИП без запросов или работа без ИП &#xA;   и беззапросов. По умолчанию отображаются ИП и все запросы.&#xA;&#xA;/norestart   - отключение всех попыток перезагрузки. По умолчанию в ИП перед&#xA;   перезагрузкой отображается запрос.&#xA;/log log.txt - запись журнала в указанный файл. По умолчанию файл журнала&#xA;   создается в папке %TEMP%." />
   <String Id="HelpCloseButton" Value="&amp;Закрыть" />
-  <String Id="InstallLicenseTerms" Value="Нажмите кнопку &quot;Принять и установить&quot;, чтобы принять &lt;a href=&quot;#&quot;&gt;условия лицензии&lt;/a&gt; Microsoft .NET Framework." />
+  <String Id="InstallLicenseTerms" Value="Нажмите кнопку &quot;Принять и установить&quot;, чтобы принять &lt;a href=&quot;#&quot;&gt;условия лицензии&lt;/a&gt; необходимого компонента." />
   <String Id="InstallAcceptAndInstallButton" Value="&amp;Принять и установить" />
   <String Id="InstallDeclineButton" Value="&amp;Отклонить" />
   <String Id="ProgressHeader" Value="Выполнение установки" />
   <String Id="ProgressLabel" Value="Обработка:" />
   <String Id="ProgressCancelButton" Value="&amp;Отмена" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="SuccessHeader" Value="Установка необходимых компонентов успешно завершена" />
+  <String Id="SuccessLayoutHeader" Value="Создание макета успешно завершено" />
+  <String Id="SuccessRestartText" Value="Для продолжения установки [WixBundleName] необходимо перезагрузить компьютер." />
+  <String Id="SuccessRestartButton" Value="&amp;Перезагрузить" />
+  <String Id="SuccessCloseButton" Value="&amp;Закрыть" />
   <String Id="FailureHeader" Value="Сбой установки" />
+  <String Id="FailureLayoutHeader" Value="Сбой создания макета" />
   <String Id="FailureLogLinkText" Value="Не удалось выполнить установку из-за одной или нескольких проблем. Устраните эти проблемы, а затем снова запустите программу установки. Дополнительные сведения см. в &lt;a href=&quot;#&quot;&gt;файле журнала&lt;/a&gt;." />
   <String Id="FailureRestartText" Value="Необходимо перезагрузить компьютер, чтобы завершить откат программного обеспечения." />
   <String Id="FailureRestartButton" Value="&amp;Перезагрузить" />
   <String Id="FailureCloseButton" Value="&amp;Закрыть" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="Не удалось запустить [WixBundleName], несмотря на то что все необходимые компоненты установлены." />
+  <String Id="FilesInUseTitle" Value="Используемые файлы" />
+  <String Id="FilesInUseLabel" Value="Следующие приложения используют файлы, которые необходимо обновить:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Закрыть &amp;приложения." />
+  <String Id="FilesInUseCloseRadioButton" Value="Закрыть &amp;приложения и попытаться перезапустить их." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Не закрывать приложения. Потребуется перезагрузка." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Повторить" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Пропустить" />
+  <String Id="FilesInUseExitButton" Value="В&amp;ыход" />
 </WixLocalization>

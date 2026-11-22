@@ -1,0 +1,67 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="ko-kr" Language="1042" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="[WixBundleName] 설치" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="업데이트 확인 중" />
+  <String Id="UpdateButton" Value="[WixStdBAUpdateAvailable] 버전으로 업데이트(&amp;U)" />
+  <String Id="InstallVersion" Value="버전 [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="취소하시겠습니까?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="이전 버전" />
+  <String Id="HelpHeader" Value="설치 도움말" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - 번들을 설치, 복구, 제거하거나&#xA;   디렉터리에 전체 로컬 복사본을 만듭니다. 설치가 기본값입니다.&#xA;&#xA;/passive | /quiet - 메시지 없이 최소 UI를 표시하거나 UI와 메시지를 전혀&#xA;   표시하지 않습니다. 기본적으로 UI 및 모든 메시지가 표시됩니다.&#xA;&#xA;/norestart   - 다시 시작하려는 시도를 무시합니다. 기본적으로 UI는 다시 시작하기 전에 메시지를 표시합니다.&#xA;/log log.txt - 특정 파일에 기록합니다. 기본적으로 로그 파일이 %TEMP%에 생성됩니다." />
+  <String Id="HelpCloseButton" Value="닫기(&amp;C)" />
+  <String Id="InstallAcceptCheckbox" Value="사용 조건에 동의합니다(&amp;A)" />
+  <String Id="InstallOptionsButton" Value="옵션(&amp;O)" />
+  <String Id="InstallInstallButton" Value="설치(&amp;I)" />
+  <String Id="InstallCancelButton" Value="취소(&amp;C)" />
+  <String Id="OptionsHeader" Value="설치 옵션" />
+  <String Id="OptionsLocationLabel" Value="설치 위치:" />
+  <String Id="OptionsPerUserScopeText" Value="나만을 위해 [WixBundleName] 설치(&amp;M)" />
+  <String Id="OptionsPerMachineScopeText" Value="모든 사용자를 위해 [WixBundleName] 설치(&amp;U)" />
+  <String Id="OptionsBrowseButton" Value="찾아보기(&amp;B)" />
+  <String Id="OptionsOkButton" Value="확인(&amp;O)" />
+  <String Id="OptionsCancelButton" Value="취소(&amp;C)" />
+  <String Id="ProgressHeader" Value="설치 진행률" />
+  <String Id="ProgressLabel" Value="처리 중:" />
+  <String Id="OverallProgressPackageText" Value="초기화 중..." />
+  <String Id="ProgressCancelButton" Value="취소(&amp;C)" />
+  <String Id="ModifyHeader" Value="설치 수정" />
+  <String Id="ModifyRepairButton" Value="복구(&amp;R)" />
+  <String Id="ModifyUninstallButton" Value="제거(&amp;U)" />
+  <String Id="ModifyCancelButton" Value="취소(&amp;C)" />
+  <String Id="SuccessHeader" Value="설치 성공" />
+  <String Id="SuccessCacheHeader" Value="캐시가 성공적으로 완료되었습니다" />
+  <String Id="SuccessInstallHeader" Value="설치가 성공적으로 완료되었습니다" />
+  <String Id="SuccessLayoutHeader" Value="레이아웃이 성공적으로 완료되었습니다" />
+  <String Id="SuccessModifyHeader" Value="수정이 성공적으로 완료되었습니다" />
+  <String Id="SuccessRepairHeader" Value="복구가 성공적으로 완료되었습니다" />
+  <String Id="SuccessUninstallHeader" Value="제거가 성공적으로 완료되었습니다" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="제거가 성공적으로 완료되었습니다" />
+  <String Id="SuccessLaunchButton" Value="실행(&amp;L)" />
+  <String Id="SuccessRestartText" Value="소프트웨어를 사용하려면 먼저 컴퓨터를 다시 시작해야 합니다." />
+  <String Id="SuccessUninstallRestartText" Value="소프트웨어 제거를 완료하려면 컴퓨터를 다시 시작해야 합니다." />
+  <String Id="SuccessRestartButton" Value="다시 시작(&amp;R)" />
+  <String Id="SuccessCloseButton" Value="닫기(&amp;C)" />
+  <String Id="FailureHeader" Value="설치 실패" />
+  <String Id="FailureCacheHeader" Value="캐시 실패" />
+  <String Id="FailureInstallHeader" Value="설치 실패" />
+  <String Id="FailureLayoutHeader" Value="레이아웃 실패" />
+  <String Id="FailureModifyHeader" Value="수정 실패" />
+  <String Id="FailureRepairHeader" Value="복구 실패" />
+  <String Id="FailureUninstallHeader" Value="제거 실패" />
+  <String Id="FailureUnsafeUninstallHeader" Value="제거 실패" />
+  <String Id="FailureHyperlinkLogText" Value="하나 이상의 문제로 인해 설치에 실패했습니다. 문제를 수정하고 설치를 다시 시도하십시오. 자세한 내용은 &lt;a href=&quot;#&quot;&gt;로그 파일&lt;/a&gt;을 참조하십시오." />
+  <String Id="FailureRestartText" Value="소프트웨어의 롤백을 완료하려면 컴퓨터를 다시 시작해야 합니다." />
+  <String Id="FailureRestartButton" Value="다시 시작(&amp;R)" />
+  <String Id="FailureCloseButton" Value="닫기(&amp;C)" />
+  <String Id="FilesInUseTitle" Value="사용 중인 파일" />
+  <String Id="FilesInUseLabel" Value="다음 응용 프로그램이 업데이트해야 하는 파일을 사용하고 있습니다:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="응용 프로그램을 닫습니다(&amp;A)." />
+  <String Id="FilesInUseCloseRadioButton" Value="응용 프로그램을 닫고 다시 시작을 시도합니다(&amp;A)." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="응용 프로그램을 닫지 않습니다(&amp;D). 다시 부팅해야 합니다." />
+  <String Id="FilesInUseRetryButton" Value="다시 시도(&amp;R)" />
+  <String Id="FilesInUseIgnoreButton" Value="무시(&amp;I)" />
+  <String Id="FilesInUseExitButton" Value="끝내기(&amp;X)" />
+</WixLocalization>

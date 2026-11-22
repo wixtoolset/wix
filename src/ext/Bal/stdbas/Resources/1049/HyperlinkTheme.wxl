@@ -1,0 +1,71 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="ru-ru" Language="1049" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="Установка [WixBundleName]" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Проверка наличия обновлений" />
+  <String Id="UpdateButton" Value="&amp;Обновить до версии [WixStdBAUpdateAvailable]" />
+  <String Id="InstallHeader" Value="Добро пожаловать" />
+  <String Id="InstallMessage" Value="Программа установки установит [WixBundleName] на ваш компьютер. Нажмите «Установить», чтобы продолжить, или «Отмена», чтобы выйти." />
+  <String Id="InstallMessageOptions" Value="Программа установки установит [WixBundleName] на ваш компьютер. Нажмите «Установить», чтобы продолжить, «Параметры», чтобы задать параметры установки, или «Отмена», чтобы выйти." />
+  <String Id="InstallVersion" Value="Версия [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="Вы действительно хотите отменить операцию?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Предыдущая версия" />
+  <String Id="HelpHeader" Value="Справка по установке" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - установка, восстановление, удаление или&#xA;   создание полной локальной копии пакета в каталоге. По умолчанию выполняется установка.&#xA;&#xA;/passive | /quiet - отображение минимального интерфейса без запросов или работа без интерфейса и&#xA;   без запросов. По умолчанию отображаются интерфейс и все запросы.&#xA;&#xA;/norestart   - отключение всех попыток перезагрузки. По умолчанию перед перезагрузкой отображается запрос.&#xA;/log log.txt - запись журнала в указанный файл. По умолчанию файл журнала создается в папке %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Закрыть" />
+  <String Id="InstallLicenseLinkText" Value="&lt;a href=&quot;#&quot;&gt;Условия лицензии&lt;/a&gt; [WixBundleName]." />
+  <String Id="InstallAcceptCheckbox" Value="Я &amp;принимаю условия лицензионного соглашения" />
+  <String Id="InstallOptionsButton" Value="&amp;Параметры" />
+  <String Id="InstallInstallButton" Value="&amp;Установить" />
+  <String Id="InstallCancelButton" Value="&amp;Отмена" />
+  <String Id="OptionsHeader" Value="Параметры установки" />
+  <String Id="OptionsLocationLabel" Value="Папка установки:" />
+  <String Id="OptionsPerUserScopeText" Value="Установить [WixBundleName] только для &amp;меня" />
+  <String Id="OptionsPerMachineScopeText" Value="Установить [WixBundleName] для всех &amp;пользователей" />
+  <String Id="OptionsBrowseButton" Value="&amp;Обзор" />
+  <String Id="OptionsOkButton" Value="&amp;ОК" />
+  <String Id="OptionsCancelButton" Value="&amp;Отмена" />
+  <String Id="ProgressHeader" Value="Выполнение установки" />
+  <String Id="ProgressLabel" Value="Обработка:" />
+  <String Id="OverallProgressPackageText" Value="Инициализация..." />
+  <String Id="ProgressCancelButton" Value="&amp;Отмена" />
+  <String Id="ModifyHeader" Value="Изменение установки" />
+  <String Id="ModifyRepairButton" Value="&amp;Восстановить" />
+  <String Id="ModifyUninstallButton" Value="&amp;Удалить" />
+  <String Id="ModifyCancelButton" Value="&amp;Отмена" />
+  <String Id="SuccessHeader" Value="Установка успешно завершена" />
+  <String Id="SuccessCacheHeader" Value="Кэширование успешно завершено" />
+  <String Id="SuccessInstallHeader" Value="Установка успешно завершена" />
+  <String Id="SuccessLayoutHeader" Value="Создание макета успешно завершено" />
+  <String Id="SuccessModifyHeader" Value="Изменение успешно завершено" />
+  <String Id="SuccessRepairHeader" Value="Восстановление успешно завершено" />
+  <String Id="SuccessUninstallHeader" Value="Удаление успешно завершено" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Удаление успешно завершено" />
+  <String Id="SuccessLaunchButton" Value="&amp;Запустить" />
+  <String Id="SuccessRestartText" Value="Прежде чем использовать программу, необходимо перезагрузить компьютер." />
+  <String Id="SuccessUninstallRestartText" Value="Для завершения удаления программы необходимо перезагрузить компьютер." />
+  <String Id="SuccessRestartButton" Value="&amp;Перезагрузить" />
+  <String Id="SuccessCloseButton" Value="&amp;Закрыть" />
+  <String Id="FailureHeader" Value="Сбой установки" />
+  <String Id="FailureCacheHeader" Value="Сбой кэширования" />
+  <String Id="FailureInstallHeader" Value="Сбой установки" />
+  <String Id="FailureLayoutHeader" Value="Сбой создания макета" />
+  <String Id="FailureModifyHeader" Value="Сбой изменения" />
+  <String Id="FailureRepairHeader" Value="Сбой восстановления" />
+  <String Id="FailureUninstallHeader" Value="Сбой удаления" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Сбой удаления" />
+  <String Id="FailureHyperlinkLogText" Value="Не удалось выполнить установку из-за одной или нескольких проблем. Устраните эти проблемы, а затем снова запустите программу установки. Дополнительные сведения см. в &lt;a href=&quot;#&quot;&gt;файле журнала&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Необходимо перезагрузить компьютер, чтобы завершить откат программного обеспечения." />
+  <String Id="FailureRestartButton" Value="&amp;Перезагрузить" />
+  <String Id="FailureCloseButton" Value="&amp;Закрыть" />
+  <String Id="FilesInUseTitle" Value="Используемые файлы" />
+  <String Id="FilesInUseLabel" Value="Следующие приложения используют файлы, которые необходимо обновить:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Закрыть &amp;приложения." />
+  <String Id="FilesInUseCloseRadioButton" Value="Закрыть &amp;приложения и попытаться перезапустить их." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Не закрывать приложения. Потребуется перезагрузка." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Повторить" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Пропустить" />
+  <String Id="FilesInUseExitButton" Value="В&amp;ыход" />
+</WixLocalization>

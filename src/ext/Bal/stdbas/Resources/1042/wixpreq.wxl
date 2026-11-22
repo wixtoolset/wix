@@ -2,28 +2,37 @@
 
 
 <WixLocalization Culture="ko-kr" Language="1042" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="[WixBundleName] 설치" />
-  <String Id="Title" Value="[WixBundleName] 설치에 필요한 Microsoft .NET Framework" />
+  <String Id="Caption" Value="[WixBundleName] 필수 구성 요소 설치" />
+  <String Id="Title" Value="[WixBundleName] 설치에 필요한 필수 구성 요소" />
+  <String Id="NonPrereqTitle" Value="[WixBundleName] 설치" />
   <String Id="ConfirmCancelMessage" Value="취소하시겠습니까?" />
   <String Id="HelpHeader" Value="설치 도움말" />
   <String Id="HelpText" Value="/passive | /quiet -  메시지 없이 최소 UI를 표시하거나 UI와 메시지를 전혀&#xA;   표시하지 않습니다. 기본적으로 UI 및 모든 메시지는 표시됩니다.&#xA;&#xA;/norestart   - 다시 시작하려는 시도를 무시합니다. 기본적으로 UI는 다시 시작하기 전에 메시지를 표시합니다.&#xA;/log log.txt - 특정 파일에 기록합니다. 기본적으로 로그 파일이 %TEMP%에 생성됩니다." />
   <String Id="HelpCloseButton" Value="닫기(&amp;C)" />
-  <String Id="InstallLicenseTerms" Value="Microsoft .NET Framework &lt;a href=&quot;#&quot;&gt;사용 조건&lt;/a&gt;에 동의하려면 &quot;동의 및 설치&quot;를 클릭하십시오." />
+  <String Id="InstallLicenseTerms" Value="필수 구성 요소 &lt;a href=&quot;#&quot;&gt;사용 조건&lt;/a&gt;에 동의하려면 &quot;동의 및 설치&quot; 단추를 클릭하십시오." />
   <String Id="InstallAcceptAndInstallButton" Value="동의 및 설치(&amp;A)" />
   <String Id="InstallDeclineButton" Value="동의 안 함(&amp;D)" />
   <String Id="ProgressHeader" Value="설치 진행률" />
   <String Id="ProgressLabel" Value="처리 중:" />
   <String Id="ProgressCancelButton" Value="취소(&amp;C)" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="SuccessHeader" Value="필수 구성 요소 설치 성공" />
+  <String Id="SuccessLayoutHeader" Value="레이아웃이 성공적으로 완료되었습니다" />
+  <String Id="SuccessRestartText" Value="[WixBundleName] 설치를 계속하려면 먼저 컴퓨터를 다시 시작해야 합니다." />
+  <String Id="SuccessRestartButton" Value="다시 시작(&amp;R)" />
+  <String Id="SuccessCloseButton" Value="닫기(&amp;C)" />
   <String Id="FailureHeader" Value="설치 실패" />
+  <String Id="FailureLayoutHeader" Value="레이아웃 실패" />
   <String Id="FailureLogLinkText" Value="하나 이상의 문제로 인해 설치에 실패했습니다. 문제를 수정하고 설치를 다시 시도하십시오. 자세한 내용은 &lt;a href=&quot;#&quot;&gt;로그 파일&lt;/a&gt;을 참조하십시오." />
   <String Id="FailureRestartText" Value="소프트웨어의 롤백을 완료하려면 컴퓨터를 다시 시작해야 합니다." />
   <String Id="FailureRestartButton" Value="다시 시작(&amp;R)" />
   <String Id="FailureCloseButton" Value="닫기(&amp;C)" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="모든 필수 구성 요소가 설치되어 있음에도 불구하고 [WixBundleName]을(를) 시작하지 못했습니다." />
+  <String Id="FilesInUseTitle" Value="사용 중인 파일" />
+  <String Id="FilesInUseLabel" Value="다음 응용 프로그램이 업데이트해야 하는 파일을 사용하고 있습니다:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="응용 프로그램을 닫습니다(&amp;A)." />
+  <String Id="FilesInUseCloseRadioButton" Value="응용 프로그램을 닫고 다시 시작을 시도합니다(&amp;A)." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="응용 프로그램을 닫지 않습니다(&amp;D). 다시 부팅해야 합니다." />
+  <String Id="FilesInUseRetryButton" Value="다시 시도(&amp;R)" />
+  <String Id="FilesInUseIgnoreButton" Value="무시(&amp;I)" />
+  <String Id="FilesInUseExitButton" Value="끝내기(&amp;X)" />
 </WixLocalization>

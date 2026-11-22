@@ -1,0 +1,71 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="da-dk" Language="1030" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="Installation af [WixBundleName]" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Søger efter opdateringer" />
+  <String Id="UpdateButton" Value="&amp;Opdater til version [WixStdBAUpdateAvailable]" />
+  <String Id="InstallHeader" Value="Velkommen" />
+  <String Id="InstallMessage" Value="Installationsprogrammet installerer [WixBundleName] på computeren. Klik på Installer for at fortsætte eller Annuller for at afslutte." />
+  <String Id="InstallMessageOptions" Value="Installationsprogrammet installerer [WixBundleName] på computeren. Klik på Installer for at fortsætte, Indstillinger for at angive installationsindstillinger eller Annuller for at afslutte." />
+  <String Id="InstallVersion" Value="Version [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="Er du sikker på, at du vil annullere?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Tidligere version" />
+  <String Id="HelpHeader" Value="Hjælp til installation" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - installerer, reparerer, afinstallerer eller&#xA;   opretter en komplet lokal kopi af pakken i mappen. Installer er standard.&#xA;&#xA;/passive | /quiet - viser en minimal brugergrænseflade uden prompter eller viser ingen brugergrænseflade og&#xA;   ingen prompter. Brugergrænsefladen og alle prompter vises som standard.&#xA;&#xA;/norestart   - skjuler forsøg på genstart. Der vises som standard en forespørgsel i brugergrænsefladen, før der genstartes.&#xA;/log log.txt - logfører til en bestemt fil. Der oprettes som standard en logfil i %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Luk" />
+  <String Id="InstallLicenseLinkText" Value="[WixBundleName] &lt;a href=&quot;#&quot;&gt;licensvilkår&lt;/a&gt;." />
+  <String Id="InstallAcceptCheckbox" Value="Jeg &amp;accepterer licensvilkårene og -betingelserne" />
+  <String Id="InstallOptionsButton" Value="&amp;Indstillinger" />
+  <String Id="InstallInstallButton" Value="&amp;Installer" />
+  <String Id="InstallCancelButton" Value="&amp;Annuller" />
+  <String Id="OptionsHeader" Value="Installationsindstillinger" />
+  <String Id="OptionsLocationLabel" Value="Installationsplacering:" />
+  <String Id="OptionsPerUserScopeText" Value="Installer kun [WixBundleName] for &amp;mig" />
+  <String Id="OptionsPerMachineScopeText" Value="Installer [WixBundleName] for alle &amp;brugere" />
+  <String Id="OptionsBrowseButton" Value="&amp;Gennemse" />
+  <String Id="OptionsOkButton" Value="&amp;OK" />
+  <String Id="OptionsCancelButton" Value="&amp;Annuller" />
+  <String Id="ProgressHeader" Value="Status for installation" />
+  <String Id="ProgressLabel" Value="Behandler:" />
+  <String Id="OverallProgressPackageText" Value="Initialiserer..." />
+  <String Id="ProgressCancelButton" Value="&amp;Annuller" />
+  <String Id="ModifyHeader" Value="Rediger installation" />
+  <String Id="ModifyRepairButton" Value="&amp;Reparer" />
+  <String Id="ModifyUninstallButton" Value="&amp;Afinstaller" />
+  <String Id="ModifyCancelButton" Value="&amp;Annuller" />
+  <String Id="SuccessHeader" Value="Installationen blev gennemført" />
+  <String Id="SuccessCacheHeader" Value="Cachelagring blev gennemført" />
+  <String Id="SuccessInstallHeader" Value="Installationen blev gennemført" />
+  <String Id="SuccessLayoutHeader" Value="Layout blev gennemført" />
+  <String Id="SuccessModifyHeader" Value="Redigering blev gennemført" />
+  <String Id="SuccessRepairHeader" Value="Reparation blev gennemført" />
+  <String Id="SuccessUninstallHeader" Value="Afinstallation blev gennemført" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Afinstallation blev gennemført" />
+  <String Id="SuccessLaunchButton" Value="&amp;Start" />
+  <String Id="SuccessRestartText" Value="Du skal genstarte computeren, før du kan bruge softwaren." />
+  <String Id="SuccessUninstallRestartText" Value="Du skal genstarte computeren for at fuldføre fjernelsen af softwaren." />
+  <String Id="SuccessRestartButton" Value="&amp;Genstart" />
+  <String Id="SuccessCloseButton" Value="&amp;Luk" />
+  <String Id="FailureHeader" Value="Installationen mislykkedes" />
+  <String Id="FailureCacheHeader" Value="Cachelagring mislykkedes" />
+  <String Id="FailureInstallHeader" Value="Installationen mislykkedes" />
+  <String Id="FailureLayoutHeader" Value="Layout mislykkedes" />
+  <String Id="FailureModifyHeader" Value="Redigering mislykkedes" />
+  <String Id="FailureRepairHeader" Value="Reparation mislykkedes" />
+  <String Id="FailureUninstallHeader" Value="Afinstallation mislykkedes" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Afinstallation mislykkedes" />
+  <String Id="FailureHyperlinkLogText" Value="Installationen blev ikke gennemført på grund af et eller flere problemer. Løs problemerne, og prøv derefter at installere igen. Se &lt;a href=&quot;#&quot;&gt;logfilen&lt;/a&gt; for at få flere oplysninger." />
+  <String Id="FailureRestartText" Value="Du skal genstarte computeren for at fuldføre tilbageførslen af softwaren." />
+  <String Id="FailureRestartButton" Value="&amp;Genstart" />
+  <String Id="FailureCloseButton" Value="&amp;Luk" />
+  <String Id="FilesInUseTitle" Value="Filer i brug" />
+  <String Id="FilesInUseLabel" Value="Følgende programmer bruger filer, der skal opdateres:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Luk &amp;programmerne." />
+  <String Id="FilesInUseCloseRadioButton" Value="Luk &amp;programmerne, og forsøg at genstarte dem." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Luk ikke programmerne. En genstart vil være påkrævet." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Prøv igen" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Ignorer" />
+  <String Id="FilesInUseExitButton" Value="&amp;Afslut" />
+</WixLocalization>

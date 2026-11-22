@@ -48,6 +48,10 @@ namespace WixToolsetTest.BootstrapperApplications
 
                 Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.thm")));
                 Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, "wixpreq.wxl")));
+                foreach (var lcid in new[] { "1028", "1029", "1030", "1031", "1032", "1035", "1036", "1038", "1040", "1041", "1042", "1043", "1044", "1045", "1046", "1049", "1051", "1053", "1055", "1060", "2052", "2070", "3082" })
+                {
+                    Assert.IsTrue(File.Exists(Path.Combine(baFolderPath, lcid, "wixpreq.wxl")), $"Expected localized {lcid}\\wixpreq.wxl in BA container.");
+                }
             }
         }
 
