@@ -1,0 +1,67 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="tr-tr" Language="1055" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="[WixBundleName] Kurulumu" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Güncelleştirmeler denetleniyor" />
+  <String Id="UpdateButton" Value="[WixStdBAUpdateAvailable] sürümüne &amp;güncelleştir" />
+  <String Id="InstallVersion" Value="Sürüm [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="İptal etmek istediğinizden emin misiniz?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Önceki sürüm" />
+  <String Id="HelpHeader" Value="Kurulum Yardımı" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - paketi yükler, onarır, kaldırır veya&#xA;   dizinde tam bir yerel kopyasını oluşturur. Yükleme varsayılandır.&#xA;&#xA;/passive | /quiet - istem olmadan en az kullanıcı arabirimi görüntüler veya hiç kullanıcı arabirimi ve&#xA;   istem görüntülemez. Varsayılan olarak kullanıcı arabirimi ve tüm istemler görüntülenir.&#xA;&#xA;/norestart   - yeniden başlatma girişimlerini engeller. Varsayılan olarak kullanıcı arabirimi yeniden başlatmadan önce sorar.&#xA;/log log.txt - belirli bir dosyaya günlük kaydeder. Varsayılan olarak %TEMP% içinde bir günlük dosyası oluşturulur." />
+  <String Id="HelpCloseButton" Value="&amp;Kapat" />
+  <String Id="InstallAcceptCheckbox" Value="Lisans hüküm ve koşullarını &amp;kabul ediyorum" />
+  <String Id="InstallOptionsButton" Value="&amp;Seçenekler" />
+  <String Id="InstallInstallButton" Value="&amp;Yükle" />
+  <String Id="InstallCancelButton" Value="&amp;İptal" />
+  <String Id="OptionsHeader" Value="Kurulum Seçenekleri" />
+  <String Id="OptionsLocationLabel" Value="Yükleme konumu:" />
+  <String Id="OptionsPerUserScopeText" Value="[WixBundleName] uygulamasını yalnızca &amp;benim için yükle" />
+  <String Id="OptionsPerMachineScopeText" Value="[WixBundleName] uygulamasını tüm &amp;kullanıcılar için yükle" />
+  <String Id="OptionsBrowseButton" Value="&amp;Gözat" />
+  <String Id="OptionsOkButton" Value="&amp;Tamam" />
+  <String Id="OptionsCancelButton" Value="&amp;İptal" />
+  <String Id="ProgressHeader" Value="Kurulum İlerleme Durumu" />
+  <String Id="ProgressLabel" Value="İşleniyor:" />
+  <String Id="OverallProgressPackageText" Value="Başlatılıyor..." />
+  <String Id="ProgressCancelButton" Value="&amp;İptal" />
+  <String Id="ModifyHeader" Value="Kurulumu Değiştir" />
+  <String Id="ModifyRepairButton" Value="&amp;Onar" />
+  <String Id="ModifyUninstallButton" Value="&amp;Kaldır" />
+  <String Id="ModifyCancelButton" Value="&amp;İptal" />
+  <String Id="SuccessHeader" Value="Kurulum Başarılı" />
+  <String Id="SuccessCacheHeader" Value="Önbelleğe Alma Başarıyla Tamamlandı" />
+  <String Id="SuccessInstallHeader" Value="Yükleme Başarıyla Tamamlandı" />
+  <String Id="SuccessLayoutHeader" Value="Düzen Başarıyla Tamamlandı" />
+  <String Id="SuccessModifyHeader" Value="Değiştirme Başarıyla Tamamlandı" />
+  <String Id="SuccessRepairHeader" Value="Onarım Başarıyla Tamamlandı" />
+  <String Id="SuccessUninstallHeader" Value="Kaldırma Başarıyla Tamamlandı" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Kaldırma Başarıyla Tamamlandı" />
+  <String Id="SuccessLaunchButton" Value="&amp;Başlat" />
+  <String Id="SuccessRestartText" Value="Yazılımı kullanabilmeniz için bilgisayarınızı yeniden başlatmanız gerekir." />
+  <String Id="SuccessUninstallRestartText" Value="Yazılımın kaldırılmasını tamamlamak için bilgisayarınızı yeniden başlatmanız gerekir." />
+  <String Id="SuccessRestartButton" Value="&amp;Yeniden Başlat" />
+  <String Id="SuccessCloseButton" Value="&amp;Kapat" />
+  <String Id="FailureHeader" Value="Kurulum Başarısız" />
+  <String Id="FailureCacheHeader" Value="Önbelleğe Alma Başarısız" />
+  <String Id="FailureInstallHeader" Value="Kurulum Başarısız" />
+  <String Id="FailureLayoutHeader" Value="Düzen Başarısız" />
+  <String Id="FailureModifyHeader" Value="Değiştirme Başarısız" />
+  <String Id="FailureRepairHeader" Value="Onarım Başarısız" />
+  <String Id="FailureUninstallHeader" Value="Kaldırma Başarısız" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Kaldırma Başarısız" />
+  <String Id="FailureHyperlinkLogText" Value="Bir veya daha fazla sorun kurulumun başarısız olmasına neden oldu. Lütfen sorunları çözün ve kurulumu yeniden deneyin. Daha fazla bilgi için &lt;a href=&quot;#&quot;&gt;günlük dosyasına&lt;/a&gt; bakın." />
+  <String Id="FailureRestartText" Value="Yazılım geri alma işlemini tamamlamak için bilgisayarınızı yeniden başlatmanız gerekir." />
+  <String Id="FailureRestartButton" Value="&amp;Yeniden Başlat" />
+  <String Id="FailureCloseButton" Value="&amp;Kapat" />
+  <String Id="FilesInUseTitle" Value="Kullanılan Dosyalar" />
+  <String Id="FilesInUseLabel" Value="Aşağıdaki uygulamalar güncelleştirilmesi gereken dosyaları kullanıyor:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="&amp;Uygulamaları kapat." />
+  <String Id="FilesInUseCloseRadioButton" Value="&amp;Uygulamaları kapat ve yeniden başlatmayı dene." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="Uygulamaları &amp;kapatma. Yeniden başlatma gerekecektir." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Yeniden Dene" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Yoksay" />
+  <String Id="FilesInUseExitButton" Value="Çı&amp;kış" />
+</WixLocalization>

@@ -2,28 +2,37 @@
 
 
 <WixLocalization Culture="nl-nl" Language="1043" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="[WixBundleName] Installatie" />
-  <String Id="Title" Value="Microsoft .NET Framework is vereist voor installatie [WixBundleName]" />
-  <String Id="ConfirmCancelMessage" Value="Weet u zeker dat u de installatie wilt annuleren?" />
+  <String Id="Caption" Value="[WixBundleName] Vereisteninstallatie" />
+  <String Id="Title" Value="Vereiste nodig voor installatie van [WixBundleName]" />
+  <String Id="NonPrereqTitle" Value="[WixBundleName] installatie" />
+  <String Id="ConfirmCancelMessage" Value="Weet u zeker dat u wilt annuleren?" />
   <String Id="HelpHeader" Value="Help bij Setup" />
   <String Id="HelpText" Value="/passive | /quiet - geeft een minimale gebruikersinterface weer zonder prompts&#xA;   of geeft geen gebruikersinterface en geen prompts weer. Gebruikersinterface&#xA;   en alle prompts worden standaard weergegeven.&#xA;&#xA;/norestart   - pogingen tot opnieuw opstarten onderdrukken.&#xA;   Gebruikersinterface vraagt standaard alvorens opnieuw op te starten.&#xA;/log log.txt - registreert gegevens in een specifiek bestand. Een logbestand&#xA;   wordt standaard in %TEMP% gemaakt." />
   <String Id="HelpCloseButton" Value="&amp;Sluiten" />
-  <String Id="InstallLicenseTerms" Value="Klik op de knop 'Accepteren en installeren' om de &lt;a href=&quot;#&quot;&gt;licentievoorwaarden&lt;/a&gt; van het Microsoft .NET Framework te accepteren." />
+  <String Id="InstallLicenseTerms" Value="Klik op de knop &quot;Accepteren en installeren&quot; om de &lt;a href=&quot;#&quot;&gt;licentievoorwaarden&lt;/a&gt; van de vereiste te accepteren." />
   <String Id="InstallAcceptAndInstallButton" Value="&amp;Accepteren en installeren" />
   <String Id="InstallDeclineButton" Value="&amp;Weigeren" />
-  <String Id="ProgressHeader" Value="Voortgang van de installatie" />
+  <String Id="ProgressHeader" Value="Voortgang van installatie" />
   <String Id="ProgressLabel" Value="Verwerken:" />
   <String Id="ProgressCancelButton" Value="&amp;Annuleren" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="SuccessHeader" Value="Installatie van vereisten voltooid" />
+  <String Id="SuccessLayoutHeader" Value="Lay-out voltooid" />
+  <String Id="SuccessRestartText" Value="U moet uw computer opnieuw opstarten voordat de installatie van [WixBundleName] kan worden voortgezet." />
+  <String Id="SuccessRestartButton" Value="&amp;Opnieuw opstarten" />
+  <String Id="SuccessCloseButton" Value="&amp;Sluiten" />
   <String Id="FailureHeader" Value="Installatie mislukt" />
-  <String Id="FailureLogLinkText" Value="Er zijn een of meer fouten opgetreden waardoor de installatie is mislukt. Corrigeer de problemen en voer Setup opnieuw uit. Raadpleeg het &lt;a href=&quot;#&quot;&gt;log boekbestand&lt;/a&gt; voor meer informatie." />
+  <String Id="FailureLayoutHeader" Value="Lay-out mislukt" />
+  <String Id="FailureLogLinkText" Value="Er zijn een of meer fouten opgetreden waardoor de installatie is mislukt. Corrigeer de problemen en voer Setup opnieuw uit. Raadpleeg het &lt;a href=&quot;#&quot;&gt;logboekbestand&lt;/a&gt; voor meer informatie." />
   <String Id="FailureRestartText" Value="U moet uw computer opnieuw opstarten om het terugdraaien van de software te voltooien." />
   <String Id="FailureRestartButton" Value="&amp;Opnieuw opstarten" />
   <String Id="FailureCloseButton" Value="&amp;Sluiten" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] kan niet worden gestart, hoewel alle vereisten zijn geïnstalleerd." />
+  <String Id="FilesInUseTitle" Value="Bestanden in gebruik" />
+  <String Id="FilesInUseLabel" Value="De volgende toepassingen gebruiken bestanden die moeten worden bijgewerkt:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Sluit de &amp;toepassingen." />
+  <String Id="FilesInUseCloseRadioButton" Value="Sluit de &amp;toepassingen en probeer ze opnieuw te starten." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Sluit de toepassingen niet. Opnieuw opstarten is vereist." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Opnieuw" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Negeren" />
+  <String Id="FilesInUseExitButton" Value="&amp;Afsluiten" />
 </WixLocalization>

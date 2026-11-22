@@ -1,0 +1,71 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="ja-jp" Language="1041" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="[WixBundleName] セットアップ" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="更新プログラムを確認しています" />
+  <String Id="UpdateButton" Value="バージョン [WixStdBAUpdateAvailable] に更新(&amp;U)" />
+  <String Id="InstallHeader" Value="ようこそ" />
+  <String Id="InstallMessage" Value="セットアップはコンピューターに [WixBundleName] をインストールします。続行するには [インストール] を、終了するには [キャンセル] をクリックしてください。" />
+  <String Id="InstallMessageOptions" Value="セットアップはコンピューターに [WixBundleName] をインストールします。続行するには [インストール] を、インストール オプションを設定するには [オプション] を、終了するには [キャンセル] をクリックしてください。" />
+  <String Id="InstallVersion" Value="バージョン [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="取り消しますか?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="以前のバージョン" />
+  <String Id="HelpHeader" Value="セットアップのヘルプ" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - バンドルのインストール、修復、アンインストール、または&#xA;   ディレクトリへの完全なローカル コピーの作成を行います。既定はインストールです。&#xA;&#xA;/passive | /quiet - 最小限の UI を表示してプロンプトを表示しないか、UI もプロンプトも&#xA;   表示しません。既定では、UI とすべてのプロンプトが表示されます。&#xA;&#xA;/norestart   - 再起動の試みをすべて抑制します。既定では、再起動の前に UI によりプロンプトが表示されます。&#xA;/log log.txt - 特定のファイルにログを記録します。既定では、%TEMP% にログ ファイルが作成されます。" />
+  <String Id="HelpCloseButton" Value="閉じる(&amp;C)" />
+  <String Id="InstallLicenseLinkText" Value="[WixBundleName] &lt;a href=&quot;#&quot;&gt;ライセンス条項&lt;/a&gt;。" />
+  <String Id="InstallAcceptCheckbox" Value="ライセンス条項および条件に同意します(&amp;A)" />
+  <String Id="InstallOptionsButton" Value="オプション(&amp;O)" />
+  <String Id="InstallInstallButton" Value="インストール(&amp;I)" />
+  <String Id="InstallCancelButton" Value="キャンセル(&amp;C)" />
+  <String Id="OptionsHeader" Value="セットアップ オプション" />
+  <String Id="OptionsLocationLabel" Value="インストール先:" />
+  <String Id="OptionsPerUserScopeText" Value="[WixBundleName] を自分専用にインストールする(&amp;M)" />
+  <String Id="OptionsPerMachineScopeText" Value="[WixBundleName] をすべてのユーザー用にインストールする(&amp;U)" />
+  <String Id="OptionsBrowseButton" Value="参照(&amp;B)" />
+  <String Id="OptionsOkButton" Value="&amp;OK" />
+  <String Id="OptionsCancelButton" Value="キャンセル(&amp;C)" />
+  <String Id="ProgressHeader" Value="セットアップの進行状況" />
+  <String Id="ProgressLabel" Value="処理中:" />
+  <String Id="OverallProgressPackageText" Value="初期化しています..." />
+  <String Id="ProgressCancelButton" Value="キャンセル(&amp;C)" />
+  <String Id="ModifyHeader" Value="セットアップの変更" />
+  <String Id="ModifyRepairButton" Value="修復(&amp;R)" />
+  <String Id="ModifyUninstallButton" Value="アンインストール(&amp;U)" />
+  <String Id="ModifyCancelButton" Value="キャンセル(&amp;C)" />
+  <String Id="SuccessHeader" Value="セットアップに成功しました" />
+  <String Id="SuccessCacheHeader" Value="キャッシュが正常に完了しました" />
+  <String Id="SuccessInstallHeader" Value="インストールが正常に完了しました" />
+  <String Id="SuccessLayoutHeader" Value="レイアウトが正常に完了しました" />
+  <String Id="SuccessModifyHeader" Value="変更が正常に完了しました" />
+  <String Id="SuccessRepairHeader" Value="修復が正常に完了しました" />
+  <String Id="SuccessUninstallHeader" Value="アンインストールが正常に完了しました" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="アンインストールが正常に完了しました" />
+  <String Id="SuccessLaunchButton" Value="起動(&amp;L)" />
+  <String Id="SuccessRestartText" Value="ソフトウェアを使用する前に、コンピューターを再起動する必要があります。" />
+  <String Id="SuccessUninstallRestartText" Value="ソフトウェアの削除を完了するには、コンピューターを再起動する必要があります。" />
+  <String Id="SuccessRestartButton" Value="再起動(&amp;R)" />
+  <String Id="SuccessCloseButton" Value="閉じる(&amp;C)" />
+  <String Id="FailureHeader" Value="セットアップに失敗しました" />
+  <String Id="FailureCacheHeader" Value="キャッシュに失敗しました" />
+  <String Id="FailureInstallHeader" Value="セットアップに失敗しました" />
+  <String Id="FailureLayoutHeader" Value="レイアウトに失敗しました" />
+  <String Id="FailureModifyHeader" Value="変更に失敗しました" />
+  <String Id="FailureRepairHeader" Value="修復に失敗しました" />
+  <String Id="FailureUninstallHeader" Value="アンインストールに失敗しました" />
+  <String Id="FailureUnsafeUninstallHeader" Value="アンインストールに失敗しました" />
+  <String Id="FailureHyperlinkLogText" Value="1 つ以上の問題が原因でセットアップに失敗しました。問題を解決してからセットアップをやり直してください。詳細については、&lt;a href=&quot;#&quot;&gt;ログ ファイル&lt;/a&gt;を参照してください。" />
+  <String Id="FailureRestartText" Value="ソフトウェアのロールバックを完了するには、コンピューターを再起動する必要があります。" />
+  <String Id="FailureRestartButton" Value="再起動(&amp;R)" />
+  <String Id="FailureCloseButton" Value="閉じる(&amp;C)" />
+  <String Id="FilesInUseTitle" Value="使用中のファイル" />
+  <String Id="FilesInUseLabel" Value="次のアプリケーションが、更新する必要のあるファイルを使用しています:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="アプリケーションを終了する(&amp;A)。" />
+  <String Id="FilesInUseCloseRadioButton" Value="アプリケーションを終了し、再起動を試みる(&amp;A)。" />
+  <String Id="FilesInUseDontCloseRadioButton" Value="アプリケーションを終了しない(&amp;D)。再起動が必要になります。" />
+  <String Id="FilesInUseRetryButton" Value="再試行(&amp;R)" />
+  <String Id="FilesInUseIgnoreButton" Value="無視(&amp;I)" />
+  <String Id="FilesInUseExitButton" Value="終了(&amp;X)" />
+</WixLocalization>

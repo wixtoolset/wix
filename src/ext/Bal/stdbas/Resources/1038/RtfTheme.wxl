@@ -1,0 +1,67 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="hu-hu" Language="1038" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="[WixBundleName] telepítő" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Frissítések keresése" />
+  <String Id="UpdateButton" Value="&amp;Frissítés a következő verzióra: [WixStdBAUpdateAvailable]" />
+  <String Id="InstallVersion" Value="Verzió: [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="Biztosan megszakítja?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Előző verzió" />
+  <String Id="HelpHeader" Value="A telepítő súgója" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - telepíti, kijavítja, eltávolítja a csomagot,&#xA;   vagy létrehozza annak teljes helyi másolatát a könyvtárban. A telepítés az alapértelmezett.&#xA;&#xA;/passive | /quiet - minimális felhasználói felületet jelenít meg kérdések nélkül, vagy egyáltalán nem&#xA;   jelenít meg felületet és kérdéseket. Alapértelmezés szerint a felület és minden kérdés megjelenik.&#xA;&#xA;/norestart   - elrejti az újraindítási kísérleteket. Alapértelmezés szerint a felület rákérdez az újraindítás előtt.&#xA;/log log.txt - naplózás a megadott fájlba. Alapértelmezés szerint a naplófájl a %TEMP% könyvtárban jön létre." />
+  <String Id="HelpCloseButton" Value="&amp;Bezárás" />
+  <String Id="InstallAcceptCheckbox" Value="&amp;Elfogadom a licencfeltételeket" />
+  <String Id="InstallOptionsButton" Value="&amp;Beállítások" />
+  <String Id="InstallInstallButton" Value="&amp;Telepítés" />
+  <String Id="InstallCancelButton" Value="&amp;Mégse" />
+  <String Id="OptionsHeader" Value="Telepítési beállítások" />
+  <String Id="OptionsLocationLabel" Value="Telepítés helye:" />
+  <String Id="OptionsPerUserScopeText" Value="A(z) [WixBundleName] telepítése csak &amp;nekem" />
+  <String Id="OptionsPerMachineScopeText" Value="A(z) [WixBundleName] telepítése minden &amp;felhasználónak" />
+  <String Id="OptionsBrowseButton" Value="&amp;Tallózás" />
+  <String Id="OptionsOkButton" Value="&amp;OK" />
+  <String Id="OptionsCancelButton" Value="&amp;Mégse" />
+  <String Id="ProgressHeader" Value="Telepítési folyamat" />
+  <String Id="ProgressLabel" Value="Feldolgozás:" />
+  <String Id="OverallProgressPackageText" Value="Inicializálás..." />
+  <String Id="ProgressCancelButton" Value="&amp;Mégse" />
+  <String Id="ModifyHeader" Value="Telepítés módosítása" />
+  <String Id="ModifyRepairButton" Value="&amp;Javítás" />
+  <String Id="ModifyUninstallButton" Value="&amp;Eltávolítás" />
+  <String Id="ModifyCancelButton" Value="&amp;Mégse" />
+  <String Id="SuccessHeader" Value="A telepítés sikerült" />
+  <String Id="SuccessCacheHeader" Value="A gyorsítótárazás sikeresen befejeződött" />
+  <String Id="SuccessInstallHeader" Value="A telepítés sikeresen befejeződött" />
+  <String Id="SuccessLayoutHeader" Value="Az elrendezés sikeresen befejeződött" />
+  <String Id="SuccessModifyHeader" Value="A módosítás sikeresen befejeződött" />
+  <String Id="SuccessRepairHeader" Value="A javítás sikeresen befejeződött" />
+  <String Id="SuccessUninstallHeader" Value="Az eltávolítás sikeresen befejeződött" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Az eltávolítás sikeresen befejeződött" />
+  <String Id="SuccessLaunchButton" Value="&amp;Indítás" />
+  <String Id="SuccessRestartText" Value="A szoftver használata előtt újra kell indítania a számítógépet." />
+  <String Id="SuccessUninstallRestartText" Value="A szoftver eltávolításának befejezéséhez újra kell indítania a számítógépet." />
+  <String Id="SuccessRestartButton" Value="&amp;Újraindítás" />
+  <String Id="SuccessCloseButton" Value="&amp;Bezárás" />
+  <String Id="FailureHeader" Value="A telepítés nem sikerült" />
+  <String Id="FailureCacheHeader" Value="A gyorsítótárazás nem sikerült" />
+  <String Id="FailureInstallHeader" Value="A telepítés nem sikerült" />
+  <String Id="FailureLayoutHeader" Value="Az elrendezés nem sikerült" />
+  <String Id="FailureModifyHeader" Value="A módosítás nem sikerült" />
+  <String Id="FailureRepairHeader" Value="A javítás nem sikerült" />
+  <String Id="FailureUninstallHeader" Value="Az eltávolítás nem sikerült" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Az eltávolítás nem sikerült" />
+  <String Id="FailureHyperlinkLogText" Value="Legalább egy olyan hiba lépett fel, amely a telepítés meghiúsulását okozta. Hárítsa el a hibákat, majd futtassa újra a telepítőt. További információt a &lt;a href=&quot;#&quot;&gt;naplófájlban&lt;/a&gt; talál." />
+  <String Id="FailureRestartText" Value="A szoftver visszaállításának befejezéséhez újra kell indítania a számítógépet." />
+  <String Id="FailureRestartButton" Value="&amp;Újraindítás" />
+  <String Id="FailureCloseButton" Value="&amp;Bezárás" />
+  <String Id="FilesInUseTitle" Value="Használatban lévő fájlok" />
+  <String Id="FilesInUseLabel" Value="A következő alkalmazások frissítendő fájlokat használnak:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Az &amp;alkalmazások bezárása." />
+  <String Id="FilesInUseCloseRadioButton" Value="Az &amp;alkalmazások bezárása és kísérlet az újraindításukra." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Ne zárja be az alkalmazásokat. Újraindításra lesz szükség." />
+  <String Id="FilesInUseRetryButton" Value="Újr&amp;a" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Mellőzés" />
+  <String Id="FilesInUseExitButton" Value="&amp;Kilépés" />
+</WixLocalization>

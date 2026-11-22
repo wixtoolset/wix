@@ -1,0 +1,67 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="sl-si" Language="1060" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="Namestitev [WixBundleName]" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Preverjanje posodobitev" />
+  <String Id="UpdateButton" Value="&amp;Posodobi na različico [WixStdBAUpdateAvailable]" />
+  <String Id="InstallVersion" Value="Različica [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="Ali ste prepričani, da želite preklicati?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Prejšnja različica" />
+  <String Id="HelpHeader" Value="Pomoč za namestitev" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - namesti, popravi, odstrani ali&#xA;   ustvari popolno lokalno kopijo paketa v imeniku. Namestitev je privzeta.&#xA;&#xA;/passive | /quiet - prikaže minimalni uporabniški vmesnik brez pozivov ali ne prikaže uporabniškega&#xA;   vmesnika in pozivov. Privzeto so prikazani uporabniški vmesnik in vsi pozivi.&#xA;&#xA;/norestart   - prepreči vse poskuse ponovnega zagona. Privzeto uporabniški vmesnik prikaže poziv pred ponovnim zagonom.&#xA;/log log.txt - beleži v določeno datoteko. Privzeto je dnevniška datoteka ustvarjena v mapi %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Zapri" />
+  <String Id="InstallAcceptCheckbox" Value="&amp;Strinjam se z licenčnimi pogoji in določili" />
+  <String Id="InstallOptionsButton" Value="&amp;Možnosti" />
+  <String Id="InstallInstallButton" Value="&amp;Namesti" />
+  <String Id="InstallCancelButton" Value="&amp;Prekliči" />
+  <String Id="OptionsHeader" Value="Možnosti namestitve" />
+  <String Id="OptionsLocationLabel" Value="Mesto namestitve:" />
+  <String Id="OptionsPerUserScopeText" Value="Namesti [WixBundleName] samo &amp;zame" />
+  <String Id="OptionsPerMachineScopeText" Value="Namesti [WixBundleName] za vse &amp;uporabnike" />
+  <String Id="OptionsBrowseButton" Value="&amp;Prebrskaj" />
+  <String Id="OptionsOkButton" Value="V &amp;redu" />
+  <String Id="OptionsCancelButton" Value="&amp;Prekliči" />
+  <String Id="ProgressHeader" Value="Potek namestitve" />
+  <String Id="ProgressLabel" Value="Obdelovanje:" />
+  <String Id="OverallProgressPackageText" Value="Inicializacija..." />
+  <String Id="ProgressCancelButton" Value="&amp;Prekliči" />
+  <String Id="ModifyHeader" Value="Spremeni namestitev" />
+  <String Id="ModifyRepairButton" Value="&amp;Popravi" />
+  <String Id="ModifyUninstallButton" Value="&amp;Odstrani" />
+  <String Id="ModifyCancelButton" Value="&amp;Prekliči" />
+  <String Id="SuccessHeader" Value="Namestitev je uspela" />
+  <String Id="SuccessCacheHeader" Value="Predpomnjenje je uspešno končano" />
+  <String Id="SuccessInstallHeader" Value="Namestitev je uspešno končana" />
+  <String Id="SuccessLayoutHeader" Value="Postavitev je uspešno končana" />
+  <String Id="SuccessModifyHeader" Value="Sprememba je uspešno končana" />
+  <String Id="SuccessRepairHeader" Value="Popravilo je uspešno končano" />
+  <String Id="SuccessUninstallHeader" Value="Odstranitev je uspešno končana" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Odstranitev je uspešno končana" />
+  <String Id="SuccessLaunchButton" Value="&amp;Zaženi" />
+  <String Id="SuccessRestartText" Value="Pred uporabo programske opreme morate znova zagnati računalnik." />
+  <String Id="SuccessUninstallRestartText" Value="Za dokončanje odstranitve programske opreme morate znova zagnati računalnik." />
+  <String Id="SuccessRestartButton" Value="&amp;Ponovni zagon" />
+  <String Id="SuccessCloseButton" Value="&amp;Zapri" />
+  <String Id="FailureHeader" Value="Namestitev ni uspela" />
+  <String Id="FailureCacheHeader" Value="Predpomnjenje ni uspelo" />
+  <String Id="FailureInstallHeader" Value="Namestitev ni uspela" />
+  <String Id="FailureLayoutHeader" Value="Postavitev ni uspela" />
+  <String Id="FailureModifyHeader" Value="Sprememba ni uspela" />
+  <String Id="FailureRepairHeader" Value="Popravilo ni uspelo" />
+  <String Id="FailureUninstallHeader" Value="Odstranitev ni uspela" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Odstranitev ni uspela" />
+  <String Id="FailureHyperlinkLogText" Value="Namestitev ni uspela zaradi ene ali več težav. Odpravite težave in ponovno zaženite namestitev. Za več informacij glejte &lt;a href=&quot;#&quot;&gt;dnevniško datoteko&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Za povrnitev prejšnjega stanja programske opreme morate ponovno zagnati računalnik." />
+  <String Id="FailureRestartButton" Value="&amp;Ponovni zagon" />
+  <String Id="FailureCloseButton" Value="&amp;Zapri" />
+  <String Id="FilesInUseTitle" Value="Datoteke v uporabi" />
+  <String Id="FilesInUseLabel" Value="Naslednji programi uporabljajo datoteke, ki jih je treba posodobiti:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Zapri &amp;programe." />
+  <String Id="FilesInUseCloseRadioButton" Value="Zapri &amp;programe in jih poskusi znova zagnati." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Ne zapri programov. Potreben bo ponovni zagon." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Poskusi znova" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Prezri" />
+  <String Id="FilesInUseExitButton" Value="I&amp;zhod" />
+</WixLocalization>

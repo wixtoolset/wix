@@ -1,29 +1,38 @@
 ﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
 
 
-<WixLocalization Culture="zh-ch" Language="2052" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="[WixBundleName] 安装" />
-  <String Id="Title" Value="[WixBundleName] 安装需要 Microsoft .NET Framework" />
+<WixLocalization Culture="zh-cn" Language="2052" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="[WixBundleName] 必备组件安装程序" />
+  <String Id="Title" Value="[WixBundleName] 安装需要必备组件" />
+  <String Id="NonPrereqTitle" Value="[WixBundleName] 安装程序" />
   <String Id="ConfirmCancelMessage" Value="是否确实要取消?" />
   <String Id="HelpHeader" Value="安装程序帮助" />
   <String Id="HelpText" Value="/passive | /quiet -  显示最小的 UI 且无提示，或者不显示 UI 且&#xA;   无提示。默认情况下显示 UI 和所有提示。&#xA;&#xA;/norestart   - 隐藏任何重启提示。默认情况下 UI 会在重启前提示。&#xA;/log log.txt - 记录到特定文件。默认情况下在 %TEMP% 中创建日志文件。" />
   <String Id="HelpCloseButton" Value="关闭(&amp;C)" />
-  <String Id="InstallLicenseTerms" Value="单击“接受并安装”按钮以接受 Microsoft .NET Framework &lt;a href=&quot;#&quot;&gt;许可证条款&lt;/a&gt;。" />
+  <String Id="InstallLicenseTerms" Value="单击&quot;接受并安装&quot;按钮以接受必备组件&lt;a href=&quot;#&quot;&gt;许可条款&lt;/a&gt;。" />
   <String Id="InstallAcceptAndInstallButton" Value="接受并安装(&amp;A)" />
   <String Id="InstallDeclineButton" Value="拒绝(&amp;D)" />
   <String Id="ProgressHeader" Value="安装进度" />
   <String Id="ProgressLabel" Value="正在处理:" />
   <String Id="ProgressCancelButton" Value="取消(&amp;C)" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="SuccessHeader" Value="必备组件安装成功" />
+  <String Id="SuccessLayoutHeader" Value="布局成功完成" />
+  <String Id="SuccessRestartText" Value="必须重新启动计算机，然后 [WixBundleName] 安装程序才能继续。" />
+  <String Id="SuccessRestartButton" Value="重启(&amp;R)" />
+  <String Id="SuccessCloseButton" Value="关闭(&amp;C)" />
   <String Id="FailureHeader" Value="安装失败" />
-  <String Id="FailureLogLinkText" Value="一个或多个问题导致安装失败。请解决问题，然后重新尝试安装。有关详情，请查看&lt;a href=&quot;#&quot;&gt;日志文件&lt;/a&gt;。" />
+  <String Id="FailureLayoutHeader" Value="布局失败" />
+  <String Id="FailureLogLinkText" Value="一个或多个问题导致安装失败。请解决问题，然后重新尝试安装。有关详细信息，请参阅&lt;a href=&quot;#&quot;&gt;日志文件&lt;/a&gt;。" />
   <String Id="FailureRestartText" Value="必须重启计算机才能完成软件的回滚。" />
   <String Id="FailureRestartButton" Value="重启(&amp;R)" />
   <String Id="FailureCloseButton" Value="关闭(&amp;C)" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="尽管已安装所有必备组件，但 [WixBundleName] 仍无法启动。" />
+  <String Id="FilesInUseTitle" Value="使用中的文件" />
+  <String Id="FilesInUseLabel" Value="以下应用程序正在使用需要更新的文件:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="关闭应用程序(&amp;A)。" />
+  <String Id="FilesInUseCloseRadioButton" Value="关闭应用程序并尝试重新启动它们(&amp;A)。" />
+  <String Id="FilesInUseDontCloseRadioButton" Value="不关闭应用程序(&amp;D)。将需要重新启动。" />
+  <String Id="FilesInUseRetryButton" Value="重试(&amp;R)" />
+  <String Id="FilesInUseIgnoreButton" Value="忽略(&amp;I)" />
+  <String Id="FilesInUseExitButton" Value="退出(&amp;X)" />
 </WixLocalization>

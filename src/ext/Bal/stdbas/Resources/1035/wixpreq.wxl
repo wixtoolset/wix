@@ -2,28 +2,37 @@
 
 
 <WixLocalization Culture="fi-fi" Language="1035" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="[WixBundleName] -asennus" />
-  <String Id="Title" Value="Microsoft .NET Framework tarvitaan [WixBundleName] -asennusta varten" />
+  <String Id="Caption" Value="[WixBundleName] -esivaatimusten asennus" />
+  <String Id="Title" Value="[WixBundleName] -asennus edellyttää esivaatimusta" />
+  <String Id="NonPrereqTitle" Value="[WixBundleName] -asennus" />
   <String Id="ConfirmCancelMessage" Value="Haluatko varmasti peruuttaa?" />
   <String Id="HelpHeader" Value="Asennusohjelman ohje" />
   <String Id="HelpText" Value="/passive | /quiet -  näyttää mahdollisimman vähän käyttöliittymästä; ei&#xA;   kehotteita tai ei käyttöliittymää ja kehotteita. Oletusarvoisesti&#xA;   käyttöliittymä ja kaikki kehotteet näytetään.&#xA;&#xA;/norestart   - estää uudelleenkäynnistysyritykset. Oletusarvoisesti&#xA;   käyttöliittymä kysyy ennen uudelleenkäynnistystä.&#xA;/log loki.txt - kirjaa lokitiedot erityiseen tiedostoon. Oletusarvoisesti&#xA;   lokitiedosto luodaan %TEMP%-kansioon." />
   <String Id="HelpCloseButton" Value="&amp;Sulje" />
-  <String Id="InstallLicenseTerms" Value="Hyväksy Microsoft .NET Framework -ohjelman &lt;a href=&quot;#&quot;&gt;käyttöoikeusehdot&lt;/a&gt; valitsemalla Hyväksy ja asenna." />
+  <String Id="InstallLicenseTerms" Value="Hyväksy esivaatimuksen &lt;a href=&quot;#&quot;&gt;käyttöoikeusehdot&lt;/a&gt; valitsemalla &quot;Hyväksy ja asenna&quot;." />
   <String Id="InstallAcceptAndInstallButton" Value="&amp;Hyväksy ja asenna" />
   <String Id="InstallDeclineButton" Value="&amp;Hylkää" />
   <String Id="ProgressHeader" Value="Asennuksen edistyminen" />
   <String Id="ProgressLabel" Value="Käsitellään:" />
   <String Id="ProgressCancelButton" Value="&amp;Peruuta" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="SuccessHeader" Value="Esivaatimusten asennus onnistui" />
+  <String Id="SuccessLayoutHeader" Value="Asettelu onnistui" />
+  <String Id="SuccessRestartText" Value="Tietokone on käynnistettävä uudelleen ennen kuin ohjelman [WixBundleName] asennus voi jatkua." />
+  <String Id="SuccessRestartButton" Value="&amp;Käynnistä uudelleen" />
+  <String Id="SuccessCloseButton" Value="&amp;Sulje" />
   <String Id="FailureHeader" Value="Asennus epäonnistui" />
+  <String Id="FailureLayoutHeader" Value="Asettelu epäonnistui" />
   <String Id="FailureLogLinkText" Value="Asennus epäonnistui yhdestä tai useammasta syystä. Korjaa ongelmat ja yritä suorittaa asennus sitten uudelleen. Lisätietoja on &lt;a href=&quot;#&quot;&gt;lokitiedostossa&lt;/a&gt;." />
   <String Id="FailureRestartText" Value="Tietokone täytyy käynnistää uudelleen ohjelmiston palautuksen viimeistelemiseksi." />
   <String Id="FailureRestartButton" Value="&amp;Käynnistä uudelleen" />
   <String Id="FailureCloseButton" Value="&amp;Sulje" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="Ohjelman [WixBundleName] käynnistys epäonnistui, vaikka kaikki esivaatimukset on asennettu." />
+  <String Id="FilesInUseTitle" Value="Tiedostoja on käytössä" />
+  <String Id="FilesInUseLabel" Value="Seuraavat sovellukset käyttävät tiedostoja, jotka on päivitettävä:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="&amp;Sulje sovellukset." />
+  <String Id="FilesInUseCloseRadioButton" Value="&amp;Sulje sovellukset ja yritä käynnistää ne uudelleen." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Älä sulje sovelluksia. Uudelleenkäynnistys tarvitaan." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Yritä uudelleen" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Ohita" />
+  <String Id="FilesInUseExitButton" Value="&amp;Lopeta" />
 </WixLocalization>

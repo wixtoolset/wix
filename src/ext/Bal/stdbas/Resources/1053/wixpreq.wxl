@@ -2,28 +2,37 @@
 
 
 <WixLocalization Culture="sv-se" Language="1053" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="[WixBundleName]-installation" />
-  <String Id="Title" Value="Microsoft .NET Framework krävs för installation av [WixBundleName]" />
+  <String Id="Caption" Value="Installation av förutsättningar för [WixBundleName]" />
+  <String Id="Title" Value="Förutsättning krävs för installation av [WixBundleName]" />
+  <String Id="NonPrereqTitle" Value="[WixBundleName]-installation" />
   <String Id="ConfirmCancelMessage" Value="Vill du avbryta?" />
   <String Id="HelpHeader" Value="Installationshjälp" />
   <String Id="HelpText" Value="/passive | /quiet -  visar ett minimalt användargränssnitt utan prompter,&#xA;   alternativt inget användargränssnitt och inga prompter. Som standard visas&#xA;   användargränssnitt och samtliga prompter.&#xA;&#xA;/norestart   - hejdar omstart. Som standard visar användargränssnittet en&#xA;   prompt före omstart.&#xA;/log log.txt - skapar logg till en specifik fil. Som standard skapas loggfilen&#xA;   i %TEMP%." />
   <String Id="HelpCloseButton" Value="&amp;Stäng" />
-  <String Id="InstallLicenseTerms" Value="Klicka på knappen &quot;Godkänn och installera&quot; för att godkänna &lt;a href=&quot;#&quot;&gt;licensvillkoren&lt;/a&gt; för Microsoft .NET Framework." />
+  <String Id="InstallLicenseTerms" Value="Klicka på knappen &quot;Godkänn och installera&quot; för att godkänna &lt;a href=&quot;#&quot;&gt;licensvillkoren&lt;/a&gt; för förutsättningen." />
   <String Id="InstallAcceptAndInstallButton" Value="&amp;Godkänn och installera" />
-  <String Id="InstallDeclineButton" Value="&amp;Avbryt" />
+  <String Id="InstallDeclineButton" Value="&amp;Avböj" />
   <String Id="ProgressHeader" Value="Installationsförlopp" />
   <String Id="ProgressLabel" Value="Bearbetar:" />
   <String Id="ProgressCancelButton" Value="&amp;Avbryt" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="SuccessHeader" Value="Installation av förutsättningar lyckades" />
+  <String Id="SuccessLayoutHeader" Value="Layout slutfördes" />
+  <String Id="SuccessRestartText" Value="Du måste starta om datorn innan installationen av [WixBundleName] kan fortsätta." />
+  <String Id="SuccessRestartButton" Value="&amp;Starta om" />
+  <String Id="SuccessCloseButton" Value="&amp;Stäng" />
   <String Id="FailureHeader" Value="Installationen misslyckades" />
+  <String Id="FailureLayoutHeader" Value="Layout misslyckades" />
   <String Id="FailureLogLinkText" Value="Installationen misslyckades på grund av ett eller flera problem. Åtgärda problemen och försök igen. Se &lt;a href=&quot;#&quot;&gt;loggfilen&lt;/a&gt; för mer information." />
   <String Id="FailureRestartText" Value="Starta om datorn för att återställa programmet." />
   <String Id="FailureRestartButton" Value="&amp;Starta om" />
   <String Id="FailureCloseButton" Value="&amp;Stäng" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] kunde inte startas trots att alla förutsättningar är installerade." />
+  <String Id="FilesInUseTitle" Value="Filer som används" />
+  <String Id="FilesInUseLabel" Value="Följande program använder filer som behöver uppdateras:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Stäng &amp;programmen." />
+  <String Id="FilesInUseCloseRadioButton" Value="Stäng &amp;programmen och försök starta om dem." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Stäng inte programmen. En omstart kommer att krävas." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Försök igen" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Ignorera" />
+  <String Id="FilesInUseExitButton" Value="A&amp;vsluta" />
 </WixLocalization>

@@ -2,28 +2,37 @@
 
 
 <WixLocalization Culture="pt-pt" Language="2070" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="Configuração do [WixBundleName]" />
-  <String Id="Title" Value="O Microsoft .NET Framework é necessário para a configuração do [WixBundleName]" />
+  <String Id="Caption" Value="Instalação de Pré-requisitos do [WixBundleName]" />
+  <String Id="Title" Value="Pré-requisito necessário para a instalação do [WixBundleName]" />
+  <String Id="NonPrereqTitle" Value="Instalação do [WixBundleName]" />
   <String Id="ConfirmCancelMessage" Value="Tem a certeza de que pretende cancelar?" />
-  <String Id="HelpHeader" Value="Ajuda da Configuração" />
+  <String Id="HelpHeader" Value="Ajuda da Instalação" />
   <String Id="HelpText" Value="/passive | /quiet -  apresenta IU mínima sem mensagens ou não apresenta IU nem&#xA;   mensagens. Por predefinição, são apresentadas a IU e todas as mensagens.&#xA;&#xA;/norestart   - suprimir qualquer tentativa de reinício. Por predefinição, a IU&#xA;   avisará antes de reiniciar.&#xA;/log log.txt - regista num ficheiro específico. Por predefinição, é criado um&#xA;   ficheiro de registo em %TEMP%." />
   <String Id="HelpCloseButton" Value="&amp;Fechar" />
-  <String Id="InstallLicenseTerms" Value="Clique no botão &quot;Aceitar e Instalar&quot; para aceitar os &lt;a href=&quot;#&quot;&gt;termos de licenciamento&lt;/a&gt; do Microsoft .NET Framework." />
+  <String Id="InstallLicenseTerms" Value="Clique no botão &quot;Aceitar e Instalar&quot; para aceitar os &lt;a href=&quot;#&quot;&gt;termos de licenciamento&lt;/a&gt; do pré-requisito." />
   <String Id="InstallAcceptAndInstallButton" Value="&amp;Aceitar e Instalar" />
   <String Id="InstallDeclineButton" Value="&amp;Recusar" />
-  <String Id="ProgressHeader" Value="Progresso da Configuração" />
+  <String Id="ProgressHeader" Value="Progresso da Instalação" />
   <String Id="ProgressLabel" Value="A processar:" />
   <String Id="ProgressCancelButton" Value="&amp;Cancelar" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
-  <String Id="FailureHeader" Value="Falha da Configuração" />
-  <String Id="FailureLogLinkText" Value="Um ou mais problemas provocaram a falha da configuração. Corrija os problemas e repita a configuração. Para mais informações, consulte o &lt;a href=&quot;#&quot;&gt;ficheiro de registo&lt;/a&gt;." />
+  <String Id="SuccessHeader" Value="Instalação de Pré-requisitos Bem-sucedida" />
+  <String Id="SuccessLayoutHeader" Value="Esquema Concluído com Êxito" />
+  <String Id="SuccessRestartText" Value="Tem de reiniciar o computador antes que a instalação do [WixBundleName] possa continuar." />
+  <String Id="SuccessRestartButton" Value="&amp;Reiniciar" />
+  <String Id="SuccessCloseButton" Value="&amp;Fechar" />
+  <String Id="FailureHeader" Value="Falha na Instalação" />
+  <String Id="FailureLayoutHeader" Value="Falha no Esquema" />
+  <String Id="FailureLogLinkText" Value="Um ou mais problemas provocaram a falha da instalação. Corrija os problemas e repita a instalação. Para mais informações, consulte o &lt;a href=&quot;#&quot;&gt;ficheiro de registo&lt;/a&gt;." />
   <String Id="FailureRestartText" Value="Tem de reiniciar o computador para concluir a reversão do software." />
   <String Id="FailureRestartButton" Value="&amp;Reiniciar" />
   <String Id="FailureCloseButton" Value="&amp;Fechar" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="O [WixBundleName] falhou ao iniciar, embora todos os pré-requisitos estejam instalados." />
+  <String Id="FilesInUseTitle" Value="Ficheiros em Utilização" />
+  <String Id="FilesInUseLabel" Value="As seguintes aplicações estão a utilizar ficheiros que precisam de ser atualizados:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Fechar as &amp;aplicações." />
+  <String Id="FilesInUseCloseRadioButton" Value="Fechar as &amp;aplicações e tentar reiniciá-las." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Não fechar as aplicações. Será necessário reiniciar." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Repetir" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Ignorar" />
+  <String Id="FilesInUseExitButton" Value="Sai&amp;r" />
 </WixLocalization>

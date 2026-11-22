@@ -2,28 +2,37 @@
 
 
 <WixLocalization Culture="sk-sk" Language="1051" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="[WixBundleName] – inštalácia" />
-  <String Id="Title" Value="Na inštaláciu aplikácie [WixBundleName] sa vyžaduje súčasť Microsoft .NET Framework" />
+  <String Id="Caption" Value="[WixBundleName] – inštalácia požiadaviek" />
+  <String Id="Title" Value="Na inštaláciu aplikácie [WixBundleName] sa vyžaduje predpoklad" />
+  <String Id="NonPrereqTitle" Value="[WixBundleName] – inštalácia" />
   <String Id="ConfirmCancelMessage" Value="Naozaj chcete zrušiť operáciu?" />
   <String Id="HelpHeader" Value="Pomocník pre inštaláciu" />
   <String Id="HelpText" Value="/passive | /quiet – zobrazí minimálne používateľské rozhranie bez výziev alebo&#xA;   nezobrazí žiadne používateľské rozhranie ani výzvy. Predvolene sa&#xA;   zobrazuje používateľské rozhranie aj všetky výzvy.&#xA;&#xA;/norestart   – zruší všetky pokusy o reštart. Používateľské rozhranie&#xA;   predvolene zobrazí pred reštartom výzvu.&#xA;/log log.txt – urobí záznam do určeného súboru. Súbor denníka sa predvolene&#xA;   vytvorí v priečinku %TEMP%." />
   <String Id="HelpCloseButton" Value="&amp;Zavrieť" />
-  <String Id="InstallLicenseTerms" Value="Kliknutím na tlačidlo Súhlasiť a inštalovať vyjadrite svoj súhlas s &lt;a href=&quot;#&quot;&gt;licenčnými podmienkami&lt;/a&gt; súčasti Microsoft .NET Framework." />
+  <String Id="InstallLicenseTerms" Value="Kliknutím na tlačidlo &quot;Súhlasiť a inštalovať&quot; vyjadríte svoj súhlas s &lt;a href=&quot;#&quot;&gt;licenčnými podmienkami&lt;/a&gt; požadovanej súčasti." />
   <String Id="InstallAcceptAndInstallButton" Value="&amp;Súhlasiť a inštalovať" />
   <String Id="InstallDeclineButton" Value="&amp;Odmietnuť" />
   <String Id="ProgressHeader" Value="Priebeh inštalácie" />
   <String Id="ProgressLabel" Value="Spracúva sa:" />
   <String Id="ProgressCancelButton" Value="&amp;Zrušiť" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="SuccessHeader" Value="Inštalácia požiadaviek bola úspešná" />
+  <String Id="SuccessLayoutHeader" Value="Rozloženie bolo úspešne dokončené" />
+  <String Id="SuccessRestartText" Value="Pred pokračovaním inštalácie aplikácie [WixBundleName] musíte reštartovať počítač." />
+  <String Id="SuccessRestartButton" Value="&amp;Reštartovať" />
+  <String Id="SuccessCloseButton" Value="&amp;Zavrieť" />
   <String Id="FailureHeader" Value="Inštalácia zlyhala" />
+  <String Id="FailureLayoutHeader" Value="Rozloženie zlyhalo" />
   <String Id="FailureLogLinkText" Value="Inštalácia zlyhala pre jednu alebo viac príčin. Odstráňte problémy a skúste znova spustiť inštaláciu. Ďalšie informácie nájdete v &lt;a href=&quot;#&quot;&gt;súbore denníka&lt;/a&gt;." />
   <String Id="FailureRestartText" Value="Dokončenie všetkých zmien softvéru vyžaduje reštart počítača." />
   <String Id="FailureRestartButton" Value="&amp;Reštartovať" />
   <String Id="FailureCloseButton" Value="&amp;Zavrieť" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="Aplikáciu [WixBundleName] sa nepodarilo spustiť, hoci sú nainštalované všetky požadované súčasti." />
+  <String Id="FilesInUseTitle" Value="Používané súbory" />
+  <String Id="FilesInUseLabel" Value="Nasledujúce aplikácie používajú súbory, ktoré je potrebné aktualizovať:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="Zavrieť &amp;aplikácie." />
+  <String Id="FilesInUseCloseRadioButton" Value="Zavrieť &amp;aplikácie a pokúsiť sa o ich opätovné spustenie." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Nezavrieť aplikácie. Bude potrebný reštart." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Znova" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Ignorovať" />
+  <String Id="FilesInUseExitButton" Value="Sk&amp;ončiť" />
 </WixLocalization>

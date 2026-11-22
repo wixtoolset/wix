@@ -1,0 +1,71 @@
+﻿<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+
+<WixLocalization Culture="cs-cz" Language="1029" xmlns="http://wixtoolset.org/schemas/v4/wxl">
+  <String Id="Caption" Value="Instalace produktu [WixBundleName]" />
+  <String Id="Title" Value="[WixBundleName]" />
+  <String Id="CheckingForUpdatesLabel" Value="Kontrola aktualizací" />
+  <String Id="UpdateButton" Value="&amp;Aktualizovat na verzi [WixStdBAUpdateAvailable]" />
+  <String Id="InstallHeader" Value="Vítejte" />
+  <String Id="InstallMessage" Value="Instalační program nainstaluje produkt [WixBundleName] do vašeho počítače. Pokračujte kliknutím na tlačítko Instalovat nebo instalaci ukončete kliknutím na tlačítko Storno." />
+  <String Id="InstallMessageOptions" Value="Instalační program nainstaluje produkt [WixBundleName] do vašeho počítače. Pokračujte kliknutím na tlačítko Instalovat, nastavte možnosti instalace kliknutím na tlačítko Možnosti nebo instalaci ukončete kliknutím na tlačítko Storno." />
+  <String Id="InstallVersion" Value="Verze [WixBundleVersion]" />
+  <String Id="ConfirmCancelMessage" Value="Opravdu chcete akci zrušit?" />
+  <String Id="ExecuteUpgradeRelatedBundleMessage" Value="Předchozí verze" />
+  <String Id="HelpHeader" Value="Nápověda k instalaci" />
+  <String Id="HelpText" Value="/install | /repair | /uninstall | /layout [directory] - nainstaluje, opraví, odinstaluje nebo&#xA;   vytvoří úplnou místní kopii balíčku v adresáři. Výchozí akcí je instalace.&#xA;&#xA;/passive | /quiet - zobrazí minimální uživatelské rozhraní bez výzev nebo nezobrazí žádné rozhraní ani&#xA;   výzvy. Ve výchozím nastavení se zobrazuje rozhraní i všechny výzvy.&#xA;&#xA;/norestart   - potlačí jakékoli pokusy o restartování. Ve výchozím nastavení se před restartováním zobrazí výzva.&#xA;/log log.txt - zapisuje protokol do konkrétního souboru. Ve výchozím nastavení je soubor protokolu vytvořen v %TEMP%." />
+  <String Id="HelpCloseButton" Value="&amp;Zavřít" />
+  <String Id="InstallLicenseLinkText" Value="&lt;a href=&quot;#&quot;&gt;Licenční podmínky&lt;/a&gt; produktu [WixBundleName]." />
+  <String Id="InstallAcceptCheckbox" Value="&amp;Souhlasím s licenčními podmínkami" />
+  <String Id="InstallOptionsButton" Value="&amp;Možnosti" />
+  <String Id="InstallInstallButton" Value="&amp;Instalovat" />
+  <String Id="InstallCancelButton" Value="&amp;Storno" />
+  <String Id="OptionsHeader" Value="Možnosti instalace" />
+  <String Id="OptionsLocationLabel" Value="Umístění instalace:" />
+  <String Id="OptionsPerUserScopeText" Value="Instalovat [WixBundleName] pouze pro &amp;mě" />
+  <String Id="OptionsPerMachineScopeText" Value="Instalovat [WixBundleName] pro všechny &amp;uživatele" />
+  <String Id="OptionsBrowseButton" Value="&amp;Procházet" />
+  <String Id="OptionsOkButton" Value="&amp;OK" />
+  <String Id="OptionsCancelButton" Value="&amp;Storno" />
+  <String Id="ProgressHeader" Value="Průběh instalace" />
+  <String Id="ProgressLabel" Value="Probíhá zpracování:" />
+  <String Id="OverallProgressPackageText" Value="Probíhá inicializace..." />
+  <String Id="ProgressCancelButton" Value="&amp;Storno" />
+  <String Id="ModifyHeader" Value="Upravit instalaci" />
+  <String Id="ModifyRepairButton" Value="&amp;Opravit" />
+  <String Id="ModifyUninstallButton" Value="&amp;Odinstalovat" />
+  <String Id="ModifyCancelButton" Value="&amp;Storno" />
+  <String Id="SuccessHeader" Value="Instalace byla úspěšná" />
+  <String Id="SuccessCacheHeader" Value="Uložení do mezipaměti bylo úspěšně dokončeno" />
+  <String Id="SuccessInstallHeader" Value="Instalace byla úspěšně dokončena" />
+  <String Id="SuccessLayoutHeader" Value="Rozložení bylo úspěšně dokončeno" />
+  <String Id="SuccessModifyHeader" Value="Úprava byla úspěšně dokončena" />
+  <String Id="SuccessRepairHeader" Value="Oprava byla úspěšně dokončena" />
+  <String Id="SuccessUninstallHeader" Value="Odinstalace byla úspěšně dokončena" />
+  <String Id="SuccessUnsafeUninstallHeader" Value="Odinstalace byla úspěšně dokončena" />
+  <String Id="SuccessLaunchButton" Value="&amp;Spustit" />
+  <String Id="SuccessRestartText" Value="Před použitím softwaru je nutné restartovat počítač." />
+  <String Id="SuccessUninstallRestartText" Value="Pro dokončení odebrání softwaru je nutné restartovat počítač." />
+  <String Id="SuccessRestartButton" Value="&amp;Restartovat" />
+  <String Id="SuccessCloseButton" Value="&amp;Zavřít" />
+  <String Id="FailureHeader" Value="Instalace se nezdařila" />
+  <String Id="FailureCacheHeader" Value="Uložení do mezipaměti se nezdařilo" />
+  <String Id="FailureInstallHeader" Value="Instalace se nezdařila" />
+  <String Id="FailureLayoutHeader" Value="Rozložení se nezdařilo" />
+  <String Id="FailureModifyHeader" Value="Úprava se nezdařila" />
+  <String Id="FailureRepairHeader" Value="Oprava se nezdařila" />
+  <String Id="FailureUninstallHeader" Value="Odinstalace se nezdařila" />
+  <String Id="FailureUnsafeUninstallHeader" Value="Odinstalace se nezdařila" />
+  <String Id="FailureHyperlinkLogText" Value="Byly zjištěny problémy, kvůli kterým se instalaci nepodařilo dokončit. Odstraňte tyto problémy a potom instalaci opakujte. Další informace naleznete v &lt;a href=&quot;#&quot;&gt;souboru protokolu&lt;/a&gt;." />
+  <String Id="FailureRestartText" Value="Aby bylo možné vrácení změn softwaru dokončit, je nutné počítač restartovat." />
+  <String Id="FailureRestartButton" Value="&amp;Restartovat" />
+  <String Id="FailureCloseButton" Value="&amp;Zavřít" />
+  <String Id="FilesInUseTitle" Value="Používané soubory" />
+  <String Id="FilesInUseLabel" Value="Následující aplikace používají soubory, které je třeba aktualizovat:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="&amp;Ukončit aplikace." />
+  <String Id="FilesInUseCloseRadioButton" Value="&amp;Ukončit aplikace a pokusit se je znovu spustit." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="&amp;Neukončovat aplikace. Bude nutné restartovat počítač." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Opakovat" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Ignorovat" />
+  <String Id="FilesInUseExitButton" Value="&amp;Konec" />
+</WixLocalization>

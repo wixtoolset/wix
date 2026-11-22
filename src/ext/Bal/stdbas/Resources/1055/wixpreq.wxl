@@ -2,28 +2,37 @@
 
 
 <WixLocalization Culture="tr-tr" Language="1055" xmlns="http://wixtoolset.org/schemas/v4/wxl">
-  <String Id="Caption" Value="[WixBundleName] Kurulumu" />
-  <String Id="Title" Value="[WixBundleName] kurulumu için Microsoft .NET Framework gerekir" />
+  <String Id="Caption" Value="[WixBundleName] Önkoşul Kurulumu" />
+  <String Id="Title" Value="[WixBundleName] kurulumu için önkoşul gerekiyor" />
+  <String Id="NonPrereqTitle" Value="[WixBundleName] kurulumu" />
   <String Id="ConfirmCancelMessage" Value="İptal etmek istediğinizden emin misiniz?" />
   <String Id="HelpHeader" Value="Kurulum Yardımı" />
   <String Id="HelpText" Value="/passive | /quiet -  komut istemi olmayan olabildiğince küçük bir UI&#xA;   görüntüler veya komut istemi ve UI görüntülemez. Varsayılan olarak UI&#xA;   ve tüm komut istemleri görüntülenir.&#xA;&#xA;/norestart   - yeniden başlatma denemelerini engeller. Varsayılan&#xA;   olarak UI yeniden başlatmadan önce komut isteyecektir.&#xA;/log log.txt - belirli bir dosyayı günlük dosyası olarak kullanır.&#xA;   Varsayılan olarak %TEMP% konumunda bir günlük dosyası oluşturulur." />
   <String Id="HelpCloseButton" Value="&amp;Kapat" />
-  <String Id="InstallLicenseTerms" Value="Microsoft .NET Framework &lt;a href=&quot;#&quot;&gt;lisans şartlarını&lt;/a&gt; kabul etmek için &quot;Kabul Et ve Yükle&quot; düğmesini tıklatın." />
+  <String Id="InstallLicenseTerms" Value="Önkoşul &lt;a href=&quot;#&quot;&gt;lisans koşullarını&lt;/a&gt; kabul etmek için &quot;Kabul Et ve Yükle&quot; düğmesine tıklayın." />
   <String Id="InstallAcceptAndInstallButton" Value="&amp;Kabul Et ve Yükle" />
   <String Id="InstallDeclineButton" Value="&amp;Reddet" />
   <String Id="ProgressHeader" Value="Kurulum İlerleme Durumu" />
   <String Id="ProgressLabel" Value="İşleniyor:" />
   <String Id="ProgressCancelButton" Value="&amp;İptal" />
-  <String Id="SuccessHeader" Value="Microsoft .NET Framework Setup Successful" />
-  <String Id="SuccessRestartText" Value="You must restart your computer before [WixBundleName] setup can continue." />
-  <String Id="SuccessRestartButton" Value="&amp;Restart" />
-  <String Id="SuccessCloseButton" Value="&amp;Close" />
+  <String Id="SuccessHeader" Value="Önkoşul Kurulumu Başarılı" />
+  <String Id="SuccessLayoutHeader" Value="Düzen Başarıyla Tamamlandı" />
+  <String Id="SuccessRestartText" Value="[WixBundleName] kurulumunun devam edebilmesi için bilgisayarınızı yeniden başlatmanız gerekir." />
+  <String Id="SuccessRestartButton" Value="&amp;Yeniden Başlat" />
+  <String Id="SuccessCloseButton" Value="&amp;Kapat" />
   <String Id="FailureHeader" Value="Kurulum Başarısız" />
+  <String Id="FailureLayoutHeader" Value="Düzen Başarısız" />
   <String Id="FailureLogLinkText" Value="Bir veya daha fazla sorun kurulumun başarısız olmasına neden oldu. Lütfen sorunları çözün ve kurulumu yeniden deneyin. Daha fazla bilgi için &lt;a href=&quot;#&quot;&gt;günlük dosyasına&lt;/a&gt; bakın." />
   <String Id="FailureRestartText" Value="Yazılım geri alma işlemini tamamlamak için bilgisayarınızı yeniden başlatmanız gerekir." />
   <String Id="FailureRestartButton" Value="&amp;Yeniden Başlat" />
   <String Id="FailureCloseButton" Value="&amp;Kapat" />
-  <String Id="NET452WIN7RTMErrorMessage" Value="[WixBundleName] cannot run on Windows 7 RTM with .NET 4.5.2 installed. Install Windows 7 SP1 to run in a supported environment." />
-  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="[WixBundleName] failed to load the .NET Framework runtime even though all of the prerequisites are installed." />
-  <String Id="ErrorFailNoActionReboot" Value="No action was taken as a system reboot is required." />
+  <String Id="PREREQBAINFINITELOOPErrorMessage" Value="Tüm önkoşullar yüklü olmasına rağmen [WixBundleName] başlatılamadı." />
+  <String Id="FilesInUseTitle" Value="Kullanılan Dosyalar" />
+  <String Id="FilesInUseLabel" Value="Aşağıdaki uygulamalar güncelleştirilmesi gereken dosyaları kullanıyor:" />
+  <String Id="FilesInUseNetfxCloseRadioButton" Value="&amp;Uygulamaları kapat." />
+  <String Id="FilesInUseCloseRadioButton" Value="&amp;Uygulamaları kapat ve yeniden başlatmayı dene." />
+  <String Id="FilesInUseDontCloseRadioButton" Value="Uygulamaları &amp;kapatma. Yeniden başlatma gerekecektir." />
+  <String Id="FilesInUseRetryButton" Value="&amp;Yeniden Dene" />
+  <String Id="FilesInUseIgnoreButton" Value="&amp;Yoksay" />
+  <String Id="FilesInUseExitButton" Value="Çı&amp;kış" />
 </WixLocalization>
