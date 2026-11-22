@@ -240,6 +240,7 @@ extern "C" HRESULT VariableInitialize(
         {L"CommonFilesFolder", InitializeVariableCsidlFolder, CSIDL_PROGRAM_FILES_COMMON},
 #endif
         {L"CommonFiles6432Folder", InitializeVariable6432Folder, CSIDL_PROGRAM_FILES_COMMON},
+        {L"CommonProgramMenuFolder", InitializeVariableCsidlFolder, CSIDL_COMMON_PROGRAMS},
         {L"CompatibilityMode", InitializeVariableOsInfo, OS_INFO_VARIABLE_CompatibilityMode},
         {VARIABLE_DATE, InitializeVariableDate, 0},
         {L"ComputerName", InitializeVariableComputerName, 0},
