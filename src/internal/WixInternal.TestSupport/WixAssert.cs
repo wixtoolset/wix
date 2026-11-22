@@ -12,13 +12,13 @@ namespace WixInternal.MSTestSupport
 
     public class WixAssert
     {
-        public static void CompareLineByLine(string[] expectedLines, string[] actualLines)
+        public static void CompareLineByLine(string[] expectedLines, string[] actualLines, bool ignoreCase = false)
         {
             var lineNumber = 0;
 
             for (; lineNumber < expectedLines.Length && lineNumber < actualLines.Length; ++lineNumber)
             {
-                StringEqual($"{lineNumber}: {expectedLines[lineNumber]}", $"{lineNumber}: {actualLines[lineNumber]}");
+                StringEqual($"{lineNumber}: {expectedLines[lineNumber]}", $"{lineNumber}: {actualLines[lineNumber]}", ignoreCase);
             }
 
             var additionalExpectedLines = expectedLines.Length > lineNumber ? String.Join(Environment.NewLine, expectedLines.Skip(lineNumber).Select((s, i) => $"{lineNumber + i}: {s}")) : $"Missing {actualLines.Length - lineNumber} lines";
