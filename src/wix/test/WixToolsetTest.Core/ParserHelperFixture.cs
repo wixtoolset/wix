@@ -81,6 +81,17 @@ namespace WixToolsetTest.Core
             WixAssert.StringEqual("v1.2.3.4", result);
         }
 
+        [Fact]
+        public void CanParseDirtyCondition()
+        {
+            var helper = GetParserHelper();
+
+            var attribute = CreateAttribute($"FOO{Environment.NewLine}\tAND{Environment.NewLine}\tNOT\tBAR");
+            var result = helper.GetAttributeConditionValue(null, attribute);
+
+            WixAssert.StringEqual("FOO   AND   NOT BAR", result);
+        }
+
 
         private static IParseHelper GetParserHelper()
         {

@@ -290,6 +290,14 @@ namespace WixToolset.Extensibility.Services
         string GetAttributeIdentifierValue(SourceLineNumber sourceLineNumbers, XAttribute attribute);
 
         /// <summary>
+        /// Get a condition attribute value.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
+        /// <param name="attribute">The attribute containing the value to get.</param>
+        /// <returns>A valid condition value.</returns>
+        string GetAttributeConditionValue(SourceLineNumber sourceLineNumbers, XAttribute attribute);
+
+        /// <summary>
         /// Get an integer attribute value and displays an error for an illegal integer value.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>

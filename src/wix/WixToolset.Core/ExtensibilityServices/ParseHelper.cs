@@ -450,6 +450,18 @@ namespace WixToolset.Core.ExtensibilityServices
             return new Identifier(access, value);
         }
 
+        public string GetAttributeConditionValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
+        {
+            if (null == attribute)
+            {
+                throw new ArgumentNullException(nameof(attribute));
+            }
+
+            var value = this.GetAttributeValue(sourceLineNumbers, attribute)?.Trim().Replace('\t', ' ').Replace('\r', ' ').Replace('\n', ' ');
+
+            return value;
+        }
+
         public string GetAttributeIdentifierValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
         {
             return Common.GetAttributeIdentifierValue(this.Messaging, sourceLineNumbers, attribute);
