@@ -2670,7 +2670,8 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    var context = new Dictionary<string, string>() { { "DirectoryId", directoryId }, { "ComponentGroupId", id.Id }, };
+                    this.Core.ParseExtensionElement(node, child, context);
                 }
             }
 
