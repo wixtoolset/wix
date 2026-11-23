@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Bundle Id="WixToolsetTest.TestBundle" Name="BindVarSourceFileFails" Version="!(wix.BundleVersion)" Manufacturer="Example Corporation">
+    <BootstrapperApplication Id="fakeba" SourceFile="fakeba.dll" />
+
+    <Chain>
+      <MsiPackage SourceFile="!(wix.MsiSourceFile)" />
+    </Chain>
+
+    <WixVariable Id="BundleVersion" Value="v8.7.6.5" />
+    <WixVariable Id="MsiSourceFile" Value="\\Server\Share\Malware\innocent_package.msi" />
+  </Bundle>
+</Wix>

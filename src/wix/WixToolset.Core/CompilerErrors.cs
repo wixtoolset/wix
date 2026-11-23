@@ -36,6 +36,11 @@ namespace WixToolset.Core
             return Message(sourceLineNumbers, Ids.ExampleRegid, "Regid '{0}' is a placeholder that must be replaced with an appropriate value for your installation. Use the simplified URI for your organization or project.", regid);
         }
 
+        public static Message UseOfBinderVariablesRequiresOtherAttribute(SourceLineNumber sourceLineNumbers, string elementName, string attributeName, string value, string otherAttributeName)
+        {
+            return Message(sourceLineNumbers, Ids.UseOfBinderVariablesRequiresOtherAttribute, "The {0}/@{1} attribute's value, '{2}', contains binder variables so the {3} attribute must also be specified. An accurate value for {3} must be known at compile time, but binder variables aren't known until bind time.", elementName, attributeName, value, otherAttributeName);
+        }
+
         private static Message Message(SourceLineNumber sourceLineNumber, Ids id, string format, params object[] args)
         {
             return new Message(sourceLineNumber, MessageLevel.Error, (int)id, format, args);
@@ -45,11 +50,11 @@ namespace WixToolset.Core
         {
             IllegalCharactersInProvider = 5400,
             ReservedValue = 5401,
-
             IllegalName = 6601,
             ExampleRegid = 6602,
             IllegalBundleVariableName = 6603,
             AlreadyDefinedBootstrapperApplicationSource = 6604,
+            UseOfBinderVariablesRequiresOtherAttribute = 6605,
         } // 5400-5499 and 6600-6699 were the ranges for Dependency and Tag which are now in Core between CompilerWarnings and CompilerErrors.
     }
 }

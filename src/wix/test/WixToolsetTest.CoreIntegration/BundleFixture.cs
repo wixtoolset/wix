@@ -49,6 +49,33 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void BindVariableSourceFileFails()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var exePath = Path.Combine(baseFolder, @"bin\test.exe");
+
+                var result = WixRunner.Execute(new[]
+                {
+                    "build",
+                    Path.Combine(folder, "BundleBindVariables", "BindVarSourceFileFails.wxs"),
+                    "-bindpath", Path.Combine(folder, "SimpleBundle", "data"),
+                    "-bindpath", Path.Combine(folder, ".Data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-acceptEula", "wix" + SomeVerInfo.Major,
+                    "-o", exePath,
+                });
+
+                Assert.Equal(6605/*CompilerErrors.UseOfBinderVariablesRequiresOtherAttribute*/, result.ExitCode);
+                Assert.Equal("The MsiPackage/@SourceFile attribute's value, '!(wix.MsiSourceFile)', contains binder variables so the Name attribute must also be specified. An accurate value for Name must be known at compile time, but binder variables aren't known until bind time.", result.Messages.Select(m => m.ToString()).Single());
+            }
+        }
+
+        [Fact]
         public void CanBuildMultiFileBundle()
         {
             var folder = TestData.Get(@"TestData\SimpleBundle");
