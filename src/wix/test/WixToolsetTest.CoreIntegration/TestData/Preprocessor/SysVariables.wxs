@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Launch Condition="NOT FALSE" Message="SourceFileDir = $(sys.SOURCEFILEDIR); SourceFileName = $(sys.SOURCEFILENAME); SourceFileNameWithoutExtension = $(sys.SOURCEFILENAMEWITHOUTEXTENSION); SourceFilePath = $(sys.SOURCEFILEPATH); Platform = $(sys.PLATFORM); BuildArch = $(sys.BUILDARCH); BuildArchShort = $(sys.BUILDARCHSHORT); WixMajorVersion = $(sys.WIXMAJORVERSION); WixVersion = $(sys.WIXVERSION)" />
+</Wix>
