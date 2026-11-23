@@ -201,7 +201,7 @@ namespace Example.Extension
                             variable = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Condition":
-                            condition = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);
+                            condition = this.ParseHelper.GetAttributeConditionValue(sourceLineNumbers, attrib);
                             break;
                         case "After":
                             after = this.ParseHelper.GetAttributeValue(sourceLineNumbers, attrib);

@@ -212,6 +212,11 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttributes(this.SourceLineNumbers, this.Element.Name.LocalName, "Name", "SourceFile"));
             }
 
+            if (String.IsNullOrEmpty(this.Name) && Common.ContainsValidBinderVariable(this.SourceFile))
+            {
+                this.Core.Write(CompilerErrors.UseOfBinderVariablesRequiresOtherAttribute(this.SourceLineNumbers, this.Element.Name.LocalName, "SourceFile", this.SourceFile, "Name"));
+            }
+
             if (!this.Core.EncounteredError)
             {
                 symbol = this.Core.AddSymbol(new WixBundlePayloadSymbol(this.SourceLineNumbers, this.Id)
@@ -325,7 +330,7 @@ namespace WixToolset.Core
         public void ParseName(XAttribute attrib)
         {
             this.Name = this.Core.GetAttributeLongFilename(this.SourceLineNumbers, attrib, false, true);
-            if (!this.Core.IsValidLongFilename(this.Name, false, true))
+            if (!this.Core.IsValidLongFilename(this.Name, allowWildcards: false, allowRelative: true))
             {
                 this.Core.Write(ErrorMessages.IllegalLongFilename(this.SourceLineNumbers, this.Element.Name.LocalName, "Name", this.Name));
             }

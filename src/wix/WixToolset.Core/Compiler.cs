@@ -2171,7 +2171,7 @@ namespace WixToolset.Core
                             disableRegistryReflection = YesNoType.Yes == this.Core.GetAttributeYesNoValue(sourceLineNumbers, attrib);
                             break;
                         case "Condition":
-                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                             break;
                         case "Directory":
                             directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
@@ -2670,7 +2670,8 @@ namespace WixToolset.Core
                 }
                 else
                 {
-                    this.Core.ParseExtensionElement(node, child);
+                    var context = new Dictionary<string, string>() { { "DirectoryId", directoryId }, { "ComponentGroupId", id.Id }, };
+                    this.Core.ParseExtensionElement(node, child, context);
                 }
             }
 
@@ -5671,7 +5672,7 @@ namespace WixToolset.Core
                                 }
                                 break;
                             case "Condition":
-                                condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                                condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                                 break;
                             case "Directory":
                                 directoryId = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
@@ -6301,7 +6302,7 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                         case "Condition":
-                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                             break;
                         case "Message":
                             message = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -7642,7 +7643,7 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                         case "Condition":
-                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                             break;
                         case "Value":
                             level = this.Core.GetAttributeIntegerValue(sourceLineNumbers, attrib, 0, Int16.MaxValue);

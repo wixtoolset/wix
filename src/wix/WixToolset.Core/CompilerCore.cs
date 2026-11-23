@@ -669,6 +669,17 @@ namespace WixToolset.Core
         }
 
         /// <summary>
+        /// Get a condition attribute value.
+        /// </summary>
+        /// <param name="sourceLineNumbers">Source line information about the owner element.</param>
+        /// <param name="attribute">The attribute containing the value to get.</param>
+        /// <returns>A valid condition value.</returns>
+        public string GetAttributeConditionValue(SourceLineNumber sourceLineNumbers, XAttribute attribute)
+        {
+            return this.parseHelper.GetAttributeConditionValue(sourceLineNumbers, attribute);
+        }
+
+        /// <summary>
         /// Gets a yes/no value and displays an error for an illegal yes/no value.
         /// </summary>
         /// <param name="sourceLineNumbers">Source line information about the owner element.</param>

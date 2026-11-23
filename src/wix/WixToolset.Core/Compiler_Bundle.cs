@@ -155,7 +155,7 @@ namespace WixToolset.Core
                             compressed = this.Core.GetAttributeYesNoDefaultValue(sourceLineNumbers, attrib);
                             break;
                         case "Condition":
-                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                             break;
                         case "Copyright":
                             copyright = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -3241,7 +3241,7 @@ namespace WixToolset.Core
                             repairArgument = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                             break;
                         case "Condition":
-                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                             break;
                         default:
                             this.Core.UnexpectedAttribute(node, attrib);
@@ -3534,7 +3534,7 @@ namespace WixToolset.Core
                             value = this.Core.GetAttributeValue(sourceLineNumbers, attrib, EmptyRule.CanBeEmpty);
                             break;
                         case "Condition":
-                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                             break;
                         default:
                             this.Core.UnexpectedAttribute(node, attrib);
@@ -3772,7 +3772,7 @@ namespace WixToolset.Core
                             variable = this.Core.GetAttributeBundleVariableNameValue(sourceLineNumbers, attrib);
                             break;
                         case "Condition":
-                            condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                            condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                             break;
                         case "After":
                             after = this.Core.GetAttributeValue(sourceLineNumbers, attrib);

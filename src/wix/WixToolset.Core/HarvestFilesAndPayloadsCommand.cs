@@ -62,8 +62,8 @@ namespace WixToolset.Core
 
             var resolvedFiles = Enumerable.Empty<WildcardFile>();
 
-            var included = this.GetWildcardFiles(inclusions, harvestFile.SourceLineNumbers, harvestFile.SourcePath);
-            var excluded = this.GetWildcardFiles(exclusions, harvestFile.SourceLineNumbers, harvestFile.SourcePath);
+            var included = this.GetWildcardFiles(inclusions, harvestFile.SourceLineNumbers, forExclusion: false, harvestFile.SourcePath);
+            var excluded = this.GetWildcardFiles(exclusions, harvestFile.SourceLineNumbers, forExclusion: true, harvestFile.SourcePath);
 
             foreach (var excludedFile in excluded)
             {
@@ -148,8 +148,8 @@ namespace WixToolset.Core
 
             var resolvedFiles = Enumerable.Empty<WildcardFile>();
 
-            var included = this.GetWildcardFiles(inclusions, sourceLineNumbers);
-            var excluded = this.GetWildcardFiles(exclusions, sourceLineNumbers);
+            var included = this.GetWildcardFiles(inclusions, sourceLineNumbers, forExclusion: false);
+            var excluded = this.GetWildcardFiles(exclusions, sourceLineNumbers, forExclusion: true);
 
             foreach (var excludedFile in excluded)
             {
@@ -199,7 +199,7 @@ namespace WixToolset.Core
             }
         }
 
-        private IEnumerable<WildcardFile> GetWildcardFiles(IEnumerable<string> patterns, SourceLineNumber sourceLineNumbers, string sourcePath = null)
+        private IEnumerable<WildcardFile> GetWildcardFiles(IEnumerable<string> patterns, SourceLineNumber sourceLineNumbers, bool forExclusion = false, string sourcePath = null)
         {
             sourcePath = sourcePath?.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
@@ -210,6 +210,11 @@ namespace WixToolset.Core
                 // Resolve bind paths, if any, which might result in multiple directories.
                 foreach (var path in this.ResolveBindPaths(sourceLineNumbers, pattern))
                 {
+                    if (!forExclusion)
+                    {
+                        this.Messaging.Write(OptimizerVerboses.HarvestingPath(sourceLineNumbers, path, pattern));
+                    }
+
                     var sourceDirectory = String.IsNullOrEmpty(sourcePath) ? Path.GetDirectoryName(sourceLineNumbers.FileName) : sourcePath;
                     var recursive = path.IndexOf("**") >= 0;
                     var filePortion = Path.GetFileName(path);

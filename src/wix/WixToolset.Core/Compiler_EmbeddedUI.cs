@@ -49,7 +49,7 @@ namespace WixToolset.Core
                         commandLine = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
                         break;
                     case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                         break;
                     case "FileSource":
                         if (null != source)

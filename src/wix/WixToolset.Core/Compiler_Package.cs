@@ -1212,7 +1212,7 @@ namespace WixToolset.Core
                         id = this.Core.GetAttributeIdentifier(sourceLineNumbers, attrib);
                         break;
                     case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                         break;
                     case "Sddl":
                         sddl = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
@@ -2570,7 +2570,7 @@ namespace WixToolset.Core
                             }
                             break;
                         case "Condition":
-                            condition = this.Core.GetAttributeValue(childSourceLineNumbers, attrib);
+                            condition = this.Core.GetAttributeConditionValue(childSourceLineNumbers, attrib);
                             break;
                         case "Dialog":
                             if (showDialog)
@@ -3680,6 +3680,11 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Start"));
             }
 
+            if (!String.IsNullOrEmpty(password) && String.IsNullOrEmpty(account))
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Password", "Account"));
+            }
+
             if (eraseDescription)
             {
                 description = "[~]";
@@ -3767,7 +3772,7 @@ namespace WixToolset.Core
                         actionName = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         break;
                     case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                         break;
                     case "Id":
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
@@ -3872,7 +3877,7 @@ namespace WixToolset.Core
                         id = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);
                         break;
                     case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                         break;
                     case "After":
                         afterAction = this.Core.GetAttributeIdentifierValue(sourceLineNumbers, attrib);

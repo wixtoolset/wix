@@ -222,6 +222,12 @@ namespace WixToolset.Core.ExtensibilityServices
                         case "SOURCEFILEDIR":
                             return String.Concat(Path.GetDirectoryName(context.CurrentSourceLineNumber.FileName), Path.DirectorySeparatorChar);
 
+                        case "SOURCEFILENAME":
+                            return Path.GetFileName(context.CurrentSourceLineNumber.FileName);
+
+                        case "SOURCEFILENAMEWITHOUTEXTENSION":
+                            return Path.GetFileNameWithoutExtension(context.CurrentSourceLineNumber.FileName);
+
                         case "SOURCEFILEPATH":
                             return context.CurrentSourceLineNumber.FileName;
 

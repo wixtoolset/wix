@@ -1653,7 +1653,7 @@ namespace WixToolset.Core
                     switch (attrib.Name.LocalName)
                     {
                     case "Condition":
-                        condition = this.Core.GetAttributeValue(sourceLineNumbers, attrib);
+                        condition = this.Core.GetAttributeConditionValue(sourceLineNumbers, attrib);
                         break;
                     case "Control":
                         if (null != control)

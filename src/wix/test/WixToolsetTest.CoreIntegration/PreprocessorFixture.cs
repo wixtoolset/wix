@@ -2,8 +2,10 @@
 
 namespace WixToolsetTest.CoreIntegration
 {
+    using System;
     using System.IO;
     using System.Linq;
+    using System.Xml.Linq;
     using WixInternal.Core.TestPackage;
     using WixInternal.TestSupport;
     using WixToolset.Core;
@@ -181,6 +183,48 @@ namespace WixToolsetTest.CoreIntegration
 
                 Assert.Equal(147, result.ExitCode);
                 Assert.StartsWith("Found a <?if?>", result.Messages.Single().ToString());
+            }
+        }
+
+        [Fact]
+        public void SysVariablesWorkAsExpected()
+        {
+            var rootFolder = TestData.Get();
+            var folder = Path.Combine(rootFolder, "TestData", "Preprocessor");
+
+            var serviceProvider = WixToolsetServiceProviderFactory.CreateServiceProvider();
+            var context = serviceProvider.GetService<IPreprocessContext>();
+            context.Platform = Platform.ARM64;
+            context.SourcePath = Path.Combine(folder, "SysVariables.wxs");
+
+            var preprocessor = serviceProvider.GetService<IPreprocessor>();
+            var result = preprocessor.Preprocess(context);
+
+            // Check $(sys) variables that we can reliably test.
+            var values = $"""
+                SourceFileDir = {Backslashify(folder)};
+                SourceFileName = SysVariables.wxs;
+                SourceFileNameWithoutExtension = SysVariables;
+                SourceFilePath = {context.SourcePath};
+                Platform = arm64;
+                BuildArch = arm64;
+                BuildArchShort = A64;
+                WixMajorVersion = {SomeVerInfo.Major};
+                WixVersion = {SomeVerInfo.FileVersion}
+                """;
+
+            var expected = String.Join(Environment.NewLine,
+                $"<Wix xmlns='http://wixtoolset.org/schemas/v4/wxs'>",
+                $"  <Launch Condition='NOT FALSE' Message='{values}' />",
+                $"</Wix>"
+            );
+
+            var xExpected = XDocument.Parse(expected);
+            WixAssert.CompareXml(xExpected, result.Document);
+
+            static string Backslashify(string dir)
+            {
+                return $@"{dir.TrimEnd(Path.DirectorySeparatorChar)}{Path.DirectorySeparatorChar}";
             }
         }
     }
