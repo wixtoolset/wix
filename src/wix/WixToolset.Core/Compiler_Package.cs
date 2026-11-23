@@ -3680,6 +3680,11 @@ namespace WixToolset.Core
                 this.Core.Write(ErrorMessages.ExpectedAttribute(sourceLineNumbers, node.Name.LocalName, "Start"));
             }
 
+            if (!String.IsNullOrEmpty(password) && String.IsNullOrEmpty(account))
+            {
+                this.Core.Write(ErrorMessages.IllegalAttributeWithoutOtherAttributes(sourceLineNumbers, node.Name.LocalName, "Password", "Account"));
+            }
+
             if (eraseDescription)
             {
                 description = "[~]";

@@ -774,6 +774,33 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void BadServiceInstallAuthoringFails()
+        {
+            var folder = TestData.Get(@"TestData");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var msiPath = Path.Combine(baseFolder, @"bin\test.msi");
+
+                var result = WixRunner.Execute(warningsAsErrors: false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "ServiceInstall", "BadServiceInstall.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "MinimalComponentGroup.wxs"),
+                    Path.Combine(folder, "ProductWithComponentGroupRef", "Product.wxs"),
+                    "-bindpath", Path.Combine(folder, "SingleFile", "data"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", msiPath
+                });
+
+                Assert.Equal(37/*ErrorMessages.IllegalAttributeWithoutOtherAttributes*/, result.ExitCode);
+                Assert.Equal("The ServiceInstall/@Password attribute can only be specified with the following attribute Account present.", result.Messages.Select(m=>m.ToString()).Single());
+            }
+        }
+
+        [Fact]
         public void PopulatesTextStyleTableWhenColorIsNull()
         {
             var folder = TestData.Get(@"TestData");
