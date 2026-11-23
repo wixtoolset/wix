@@ -33,10 +33,10 @@ namespace WixToolsetTest.CoreIntegration
             Build("ZeroFiles.wxs", (_, sourceFolder, baseFolder, result) =>
             {
                 var messages = result.Messages.Select(m => FormatMessage(m, sourceFolder, baseFolder)).ToArray();
-                WixAssert.CompareLineByLine(new[]
-                {
+                WixAssert.CompareLineByLine(
+                [
                     "8600: Inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify paths, inclusions, and exclusions on Files or Payloads for accuracy.",
-                }, messages);
+                ], messages);
             }, assertSuccess: false);
         }
 
@@ -46,13 +46,26 @@ namespace WixToolsetTest.CoreIntegration
             Build("BadDirectory.wxs", (_, sourceFolder, baseFolder, result) =>
             {
                 var messages = result.Messages.Select(m => FormatMessage(m, sourceFolder, baseFolder)).ToArray();
-                WixAssert.CompareLineByLine(new[]
-                {
+                WixAssert.CompareLineByLine(
+                [
                     @"8601: Missing directory for harvesting files: Could not find a part of the path '<sourceFolder>\files2\MissingDirectory'.",
                     @"8600: Inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify paths, inclusions, and exclusions on Files or Payloads for accuracy.",
                     @"8601: Missing directory for harvesting files: Could not find a part of the path '<sourceFolder>\files2\ThisDirectoryIsAlsoMissing'.",
                     @"8600: Inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify paths, inclusions, and exclusions on Files or Payloads for accuracy.",
-                }, messages);
+                ], messages);
+            }, assertSuccess: false);
+        }
+
+        [Fact]
+        public void BadPathSyntaxIsAWarning()
+        {
+            Build("BadPathSyntax.wxs", (_, sourceFolder, baseFolder, result) =>
+            {
+                var messages = result.Messages.Select(m => FormatMessage(m, sourceFolder, baseFolder)).ToArray();
+                WixAssert.CompareLineByLine(
+                [
+                    @"8600: Inclusions and exclusions resulted in zero files harvested. Unless that is expected, you should verify paths, inclusions, and exclusions on Files or Payloads for accuracy.",
+                ], messages);
             }, assertSuccess: false);
         }
 
@@ -333,6 +346,7 @@ namespace WixToolsetTest.CoreIntegration
             {
                 @"flsiYjLzK34LeZEChPfagEeCq391QE=PFiles\Example Corporation HarvestedFiles\BadAuthoring.wxs",
                 @"flssFAX35joEC73c.9dGg2Cxy9yZHg=PFiles\Example Corporation HarvestedFiles\BadDirectory.wxs",
+                @"flsidp1EEfxcohhjyZadqfdf.WCxvA=PFiles\Example Corporation HarvestedFiles\BadPathSyntax.wxs",
                 @"flsYgiwrDUkZnBEK6iUMkxxaJlD8yQ=PFiles\Example Corporation HarvestedFiles\test1.txt",
                 @"flsj.cb0sFWqIPHPFSKJSEEaPDuAQ4=PFiles\Example Corporation HarvestedFiles\test2.txt",
                 @"flsD7JQZm.Ts2375WMT.zsTxqCAf.s=PFiles\Example Corporation HarvestedFiles\files1_sub1\test10.txt",
@@ -392,8 +406,10 @@ namespace WixToolsetTest.CoreIntegration
                 var messages = result.Messages.Select(m => m.Id).Where(i => i >= 8700 && i < 8800);
                 Assert.Equal(new[]
                 {
+                    8702,
                     8701,
                     8700,
+                    8702,
                     8701,
                     8700,
                     8700,
