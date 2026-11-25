@@ -1,0 +1,8 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+    <Fragment>
+        <?message This is a message in WiX v$(sys.WIXMAJORVERSION).?>
+        <?warning This is a warning in WiX v$(sys.WIXVERSION).?>
+        <?error This is an error for platform $(sys.BUILDARCH).?>
+        <?message This message is not emitted because of the previous ?error?.?>
+    </Fragment>
+</Wix>

@@ -447,6 +447,10 @@ namespace WixToolset.Core
                                 this.PreprocessWarning(state, reader.Value);
                                 break;
 
+                            case "message":
+                                this.PreprocessMessage(state, reader.Value);
+                                break;
+
                             case "undef":
                                 this.PreprocessUndef(state, reader.Value);
                                 break;
@@ -569,6 +573,19 @@ namespace WixToolset.Core
             warningMessage = state.Helper.PreprocessString(state.Context, warningMessage);
 
             this.Messaging.Write(CompilerWarnings.PreprocessorWarning(state.Context.CurrentSourceLineNumber, warningMessage));
+        }
+
+        /// <summary>
+        /// Processes a message processing instruction.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="message">Text from source.</param>
+        private void PreprocessMessage(ProcessingState state, string message)
+        {
+            // Resolve other variables in the warning message.
+            message = state.Helper.PreprocessString(state.Context, message);
+
+            this.Messaging.Write(CompilerInformationals.PreprocessorMessage(state.Context.CurrentSourceLineNumber, message));
         }
 
         /// <summary>

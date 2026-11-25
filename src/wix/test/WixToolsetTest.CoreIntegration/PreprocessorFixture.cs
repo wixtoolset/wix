@@ -134,6 +134,36 @@ namespace WixToolsetTest.CoreIntegration
         }
 
         [Fact]
+        public void ErrorsWarningsAndMessagesAreEmitted()
+        {
+            var folder = TestData.Get(@"TestData", "Preprocessor");
+
+            using (var fs = new DisposableFileSystem())
+            {
+                var baseFolder = fs.GetFolder();
+                var intermediateFolder = Path.Combine(baseFolder, "obj");
+                var arch = "arm64";
+
+                var result = WixRunner.Execute(warningsAsErrors: false, new[]
+                {
+                    "build",
+                    Path.Combine(folder, "Messages.wxs"),
+                    "-intermediateFolder", intermediateFolder,
+                    "-o", Path.Combine(baseFolder, @"bin\test.msi"),
+                    "-arch", arch
+                });
+
+                var warning = result.Messages.Select(m => $"ln {m.SourceLineNumbers.LineNumber}: {m.Level.ToString().ToLowerInvariant()}: {m}").ToArray();
+                WixAssert.CompareLineByLine(
+                [
+                    $"ln 3: information: This is a message in WiX v{SomeVerInfo.Major}.",
+                    $"ln 4: warning: This is a warning in WiX v{SomeVerInfo.FileVersion}.",
+                    $"ln 5: error: This is an error for platform {arch}.",
+                ], warning);
+            }
+        }
+
+        [Fact]
         public void ForEachLoopsWork()
         {
             var folder = TestData.Get(@"TestData\ForEach");
